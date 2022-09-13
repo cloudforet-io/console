@@ -13,8 +13,7 @@
 <script lang="ts">
 import {
     computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 

@@ -3,8 +3,8 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import { defineComponent, getCurrentInstance, onMounted } from '@vue/composition-api';
+import { defineComponent, getCurrentInstance, onMounted } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -36,7 +36,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const onSignIn = async () => {
             if (!props.nextPath) {

@@ -46,9 +46,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { byteFormatter, commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -56,6 +53,9 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { PSkeleton, PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 import type { Location } from 'vue-router';
 
 import { store } from '@/store';

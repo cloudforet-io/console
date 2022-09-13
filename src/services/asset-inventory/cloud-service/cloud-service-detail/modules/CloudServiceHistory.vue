@@ -79,10 +79,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import type { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
@@ -97,6 +93,10 @@ import { useInfiniteScroll } from '@vueuse/core';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import localeData from 'dayjs/plugin/localeData';
+import {
+    computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -145,7 +145,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             timelineWrapperRef: null as null | HTMLElement,

@@ -44,15 +44,15 @@
 <script lang="ts">
 
 
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
-
 import {
     PI, PBadge, PAnchor,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import type { PropType } from 'vue';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
+
 
 import { store } from '@/store';
 

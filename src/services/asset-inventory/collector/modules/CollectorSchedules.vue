@@ -89,11 +89,6 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    reactive, toRefs, computed, watch, getCurrentInstance,
-} from '@vue/composition-api';
-
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
@@ -107,6 +102,10 @@ import type { DataTableField } from '@spaceone/design-system/dist/src/data-displ
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { debounce, get } from 'lodash';
+import {
+    reactive, toRefs, computed, watch, getCurrentInstance,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -138,7 +137,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             totalCount: 0,

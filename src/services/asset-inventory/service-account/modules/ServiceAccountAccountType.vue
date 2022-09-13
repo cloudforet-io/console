@@ -9,11 +9,11 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-
 import {
     PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
+import type { PropType } from 'vue';
+
 
 import type { PageMode } from '@/services/asset-inventory/service-account/type';
 

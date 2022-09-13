@@ -46,15 +46,15 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
-
 import {
     PRadio, PSelectButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import { range } from 'lodash';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
+
 
 import { store } from '@/store';
 
@@ -90,7 +90,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const timezoneForFormatter = computed(() => store.state.user.timezone).value;
         const {
             forms: {

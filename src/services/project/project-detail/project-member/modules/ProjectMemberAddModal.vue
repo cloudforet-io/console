@@ -105,9 +105,6 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, toRefs, computed, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -116,6 +113,9 @@ import {
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
 import { debounce } from 'lodash';
+import {
+    reactive, toRefs, computed, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';

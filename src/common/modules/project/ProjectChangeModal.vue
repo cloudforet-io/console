@@ -45,10 +45,8 @@
 
 <script lang="ts">
 /* eslint-disable no-await-in-loop */
-import { reactive, toRefs, watch } from '@vue/composition-api';
-
-
 import { PButtonModal, PRadio } from '@spaceone/design-system';
+import { reactive, toRefs, watch } from 'vue';
 import type Vue from 'vue';
 
 import { useProxyValue } from '@/common/composables/proxy-state';

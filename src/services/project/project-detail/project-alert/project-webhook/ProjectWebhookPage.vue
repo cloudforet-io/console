@@ -126,10 +126,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    reactive, toRefs, computed, getCurrentInstance, onActivated,
-} from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
@@ -151,7 +147,11 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import {
+    reactive, toRefs, computed, getCurrentInstance, onActivated,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -194,7 +194,7 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const handlers = {
             keyItemSets: [{
                 title: 'Properties',

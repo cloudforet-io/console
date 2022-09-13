@@ -1,8 +1,8 @@
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import { getCurrentInstance, reactive } from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { cloneDeep } from 'lodash';
+import { getCurrentInstance, reactive } from 'vue';
+import type { Vue } from 'vue/types/vue';
+
 
 import { i18n } from '@/translations';
 
@@ -23,7 +23,7 @@ interface NotificationItemState {
 	projectChannelId?: string;
 }
 export const useNotificationItem = (obj: NotificationItemState) => {
-    const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+    const vm = getCurrentInstance()?.proxy as Vue;
     const state = reactive<NotificationItemState>(obj);
     const cancelEdit = (initialData) => {
         state.isEditMode = false;

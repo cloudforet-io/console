@@ -21,10 +21,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    reactive, watch, toRefs, computed, onUnmounted, getCurrentInstance,
-} from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -33,6 +29,10 @@ import {
     PDataLoader, PDatePagination, PSkeleton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    reactive, watch, toRefs, computed, onUnmounted, getCurrentInstance,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -77,7 +77,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             chartRef: null as HTMLElement | null,

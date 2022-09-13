@@ -52,15 +52,15 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import {
     PEmpty, PTab, PDataTable, PI, PBadge, PButton,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';

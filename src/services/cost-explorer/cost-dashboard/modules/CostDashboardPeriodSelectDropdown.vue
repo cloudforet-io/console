@@ -38,9 +38,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -50,6 +47,9 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

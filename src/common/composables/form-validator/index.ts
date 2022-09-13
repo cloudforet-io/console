@@ -1,9 +1,8 @@
-import type { ComputedRef, UnwrapRef } from '@vue/composition-api';
+import { clone } from 'lodash';
+import type { ComputedRef, UnwrapRef } from 'vue';
 import {
     computed, reactive, ref,
-} from '@vue/composition-api';
-
-import { clone } from 'lodash';
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 

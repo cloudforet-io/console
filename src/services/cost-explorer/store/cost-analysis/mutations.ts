@@ -5,10 +5,11 @@ import type {
 } from '@/services/cost-explorer/store/cost-analysis/type';
 import type {
     CostQueryFilters, CostQuerySetModel, GroupBy, Period,
+    Granularity,
 } from '@/services/cost-explorer/type';
 
 
-export const setGranularity: Mutation<CostAnalysisStoreState> = (state, granularity: string) => {
+export const setGranularity: Mutation<CostAnalysisStoreState> = (state, granularity: Granularity) => {
     state.granularity = granularity;
 };
 

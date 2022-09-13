@@ -8,15 +8,15 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

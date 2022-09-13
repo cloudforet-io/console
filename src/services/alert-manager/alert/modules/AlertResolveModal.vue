@@ -20,14 +20,14 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import {
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PTextarea, PFieldGroup,
 } from '@spaceone/design-system';
+import {
+    reactive, toRefs, watch,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

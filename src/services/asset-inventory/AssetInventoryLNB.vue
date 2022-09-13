@@ -5,16 +5,16 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { get } from 'lodash';
 import {
     computed,
     defineComponent,
     getCurrentInstance,
     reactive, toRefs,
     watch,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
-import { get } from 'lodash';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -42,7 +42,7 @@ export default defineComponent({
     name: 'AssetInventoryLNB',
     components: { LNB },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             isCloudServiceDetailPage: computed(() => vm.$route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME),
             detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {

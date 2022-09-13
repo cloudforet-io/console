@@ -6,10 +6,10 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     defineComponent, nextTick, onMounted, ref, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import type { VirtualScroll } from './types';
 import { setHighlightCode } from './utils';

@@ -5,8 +5,8 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+import { getCurrentInstance, reactive, toRefs } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
@@ -25,7 +25,7 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             projectId: vm.$route.params.id,
             hasManagePermission: useManagePermissionState(),

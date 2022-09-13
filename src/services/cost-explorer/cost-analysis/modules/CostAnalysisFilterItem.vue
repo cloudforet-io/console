@@ -37,9 +37,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -51,6 +48,9 @@ import type {
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 
 
 import { store } from '@/store';

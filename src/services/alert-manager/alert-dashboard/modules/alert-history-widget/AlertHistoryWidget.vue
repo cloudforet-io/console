@@ -42,10 +42,6 @@
 
 <script lang="ts">
 
-import {
-    reactive, toRefs, watch, watchEffect,
-} from '@vue/composition-api';
-
 
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -54,6 +50,9 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find } from 'lodash';
+import {
+    reactive, toRefs, watch, watchEffect,
+} from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

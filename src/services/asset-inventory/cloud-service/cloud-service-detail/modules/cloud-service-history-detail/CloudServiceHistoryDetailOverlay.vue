@@ -84,10 +84,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy, PropType } from '@vue/composition-api';
-import {
-    computed, defineComponent, getCurrentInstance, onMounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
@@ -95,6 +91,11 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { useInfiniteScroll } from '@vueuse/core';
+import {
+    computed, defineComponent, getCurrentInstance, onMounted, reactive, toRefs, watch,
+} from 'vue';
+import type { PropType } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -173,7 +174,7 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             resourceId: computed(() => props.cloudServiceItem.reference.resource_id),
             cloudServiceId: computed(() => props.cloudServiceItem.cloud_service_id),

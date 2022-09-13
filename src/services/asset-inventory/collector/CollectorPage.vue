@@ -183,10 +183,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    reactive, toRefs, computed, watch, getCurrentInstance,
-} from '@vue/composition-api';
 
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -201,8 +197,12 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import {
+    reactive, toRefs, computed, watch, getCurrentInstance,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Component } from 'vue/types/umd';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -248,7 +248,7 @@ export default {
         TagsPanel,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const queryHelper = new QueryHelper();
 
         const storeState = reactive({

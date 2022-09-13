@@ -30,10 +30,6 @@
     </p-list-card>
 </template>
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
 
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -43,6 +39,10 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -62,7 +62,7 @@ export default {
         PI,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const storeState = reactive({
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             users: computed(() => store.state.reference.user.items),

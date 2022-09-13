@@ -20,12 +20,12 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
-
-import {
     PHorizontalLayout, PPageTitle,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
+
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 

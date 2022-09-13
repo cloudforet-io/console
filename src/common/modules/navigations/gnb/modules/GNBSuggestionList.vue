@@ -65,15 +65,15 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    defineComponent, onUnmounted,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 import {
     PContextMenu, PI, PLazyImg, PTooltip,
 } from '@spaceone/design-system';
+import type { PropType } from 'vue';
+import {
+    defineComponent, onUnmounted,
+    reactive, toRefs, watch,
+} from 'vue';
+
 
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';

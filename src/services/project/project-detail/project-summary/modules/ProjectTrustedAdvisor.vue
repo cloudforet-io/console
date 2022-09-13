@@ -51,18 +51,17 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, reactive, toRefs,
-    getCurrentInstance,
-} from '@vue/composition-api';
-
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PI } from '@spaceone/design-system';
 import { findKey } from 'lodash';
+import {
+    computed, reactive, toRefs,
+    getCurrentInstance,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -108,7 +107,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const queryHelper = new QueryHelper();
 
         const state = reactive({

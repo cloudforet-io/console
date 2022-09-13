@@ -85,9 +85,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -95,6 +92,9 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PButton, PButtonModal, PI, PTextEditor, PToolbox, PEmpty,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 
 import { store } from '@/store';
 

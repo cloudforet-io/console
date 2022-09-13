@@ -10,13 +10,12 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
-
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { PAnchor } from '@spaceone/design-system';
+import type { PropType } from 'vue';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 import type { Location } from 'vue-router';
 
 import type { ReferenceItem } from '@/store/modules/reference/type';

@@ -18,9 +18,6 @@
 
 <script lang="ts">
 
-import {
-    onMounted, reactive, toRefs, computed,
-} from '@vue/composition-api';
 
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -29,6 +26,9 @@ import {
     PI,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    onMounted, reactive, toRefs, computed,
+} from 'vue';
 
 import { store } from '@/store';
 

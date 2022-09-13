@@ -24,12 +24,12 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { PButtonModal, PTab } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

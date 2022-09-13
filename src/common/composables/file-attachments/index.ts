@@ -1,6 +1,6 @@
-import type { ComputedRef, Ref } from '@vue/composition-api';
-
 import { computedAsync } from '@vueuse/core';
+import type { ComputedRef, Ref } from 'vue';
+
 
 import { getDownloadUrl } from '@/lib/file-manager';
 import type { FileInfo } from '@/lib/file-manager/type';

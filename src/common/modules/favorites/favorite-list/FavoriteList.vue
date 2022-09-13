@@ -45,12 +45,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PI, PIconButton } from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
-import { PI, PIconButton } from '@spaceone/design-system';
 
 import type { FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -78,7 +78,7 @@ export default {
         },
     },
     setup(props: FavoriteListProps) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             displayItems: computed<FavoriteItem[]>(() => {
                 if (state.isExpanded) return props.items;

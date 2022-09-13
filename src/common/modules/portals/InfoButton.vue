@@ -23,16 +23,16 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PI, PAnchor } from '@spaceone/design-system';
 import {
     computed,
     getCurrentInstance,
     onBeforeUnmount,
     reactive,
     toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
-import { PI, PAnchor } from '@spaceone/design-system';
 
 export default {
     name: 'InfoButton',
@@ -54,7 +54,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             tag: computed(() => (props.href ? PAnchor : 'span')),
             childProps: computed(() => {

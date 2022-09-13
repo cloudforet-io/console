@@ -29,15 +29,15 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
 
 import {
     PI, PTab,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { vOnClickOutside } from '@vueuse/components';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
 import type { DirectiveFunction } from 'vue';
 
 import { i18n } from '@/translations';

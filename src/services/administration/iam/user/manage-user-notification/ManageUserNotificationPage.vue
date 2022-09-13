@@ -9,12 +9,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
-import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -28,7 +28,7 @@ export default {
         NotificationChannelList, PBreadcrumbs, PPageTitle,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             isManageable: computed(() => store.getters['user/isDomainOwner'] || store.getters['user/hasDomainRole']),
         });

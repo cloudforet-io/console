@@ -62,9 +62,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -73,6 +70,9 @@ import type { MapChart } from '@amcharts/amcharts4/maps';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader, PProgressBar } from '@spaceone/design-system';
+import {
+    computed, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
 import type { Location } from 'vue-router';
 
 import { store } from '@/store';

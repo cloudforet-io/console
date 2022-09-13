@@ -77,10 +77,6 @@
 
 <script lang="ts">
 
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -88,6 +84,10 @@ import {
     PButton, PButtonModal, PCheckBox, PDataLoader, PSearch,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type Vue from 'vue';
+import {
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
 import draggable from 'vuedraggable';
 
 import { i18n } from '@/translations';
@@ -162,7 +162,8 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }) {
+        const vm = getCurrentInstance()?.proxy as Vue;
         let schema: any = {};
 
         const state = reactive({
@@ -291,7 +292,7 @@ export default defineComponent<Props>({
                     options,
                 });
 
-                showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '', root);
+                showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '', vm);
                 emit('complete');
                 state.proxyVisible = false;
             } catch (e) {

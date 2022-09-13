@@ -1,9 +1,11 @@
-import type { ComputedRef, Ref } from '@vue/composition-api';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+import { debouncedWatch, useThrottleFn } from '@vueuse/core';
+import type { ComputedRef, Ref } from 'vue';
 import {
     computed, nextTick, onBeforeUnmount, onMounted, ref, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { debouncedWatch, useThrottleFn } from '@vueuse/core';
 
 import type {
     Lines, Meta, Mode, Theme, VirtualScroll,

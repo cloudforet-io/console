@@ -41,7 +41,6 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -49,6 +48,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PButton, PCollapsibleList, PPaneLayout, PPanelTop, PTextarea, PSelectDropdown,
 } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
 
 import type { TimeStamp } from '@/models';
 import { store } from '@/store';

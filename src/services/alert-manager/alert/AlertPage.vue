@@ -17,14 +17,13 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
-
-
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { PPageTitle } from '@spaceone/design-system';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
+
 
 import { i18n } from '@/translations';
 
@@ -47,7 +46,7 @@ export default {
         PPageTitle,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             pageTitle: computed(() => i18n.t('MONITORING.ALERT.ALERT_LIST.ALERT')),

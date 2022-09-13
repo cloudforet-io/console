@@ -59,11 +59,11 @@
 </template>
 
 <script lang="ts">
-import { toRefs } from '@vue/composition-api';
-
 import {
     PBadge, PButton, PI,
 } from '@spaceone/design-system';
+import { toRefs } from 'vue';
+
 
 import AddNotificationLevel from '@/services/notification/modules/AddNotificationLevel.vue';
 import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';

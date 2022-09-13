@@ -26,16 +26,16 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
 
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
 import VueI18n from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -78,7 +78,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             updateMode: computed(() => !!props.project),
             proxyVisible: useProxyValue('visible', props, emit),

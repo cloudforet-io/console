@@ -28,13 +28,13 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, defineComponent,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    computed, defineComponent,
+    reactive, toRefs, watch,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

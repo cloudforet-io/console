@@ -15,10 +15,10 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -33,7 +33,7 @@ export default {
         DeleteModal,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             proxyVisible: computed({
                 get() { return store.state.service.project.projectGroupDeleteCheckModalVisible; },

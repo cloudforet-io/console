@@ -5,11 +5,11 @@
 </template>
 
 <script lang="ts">
+import { PPaneLayout } from '@spaceone/design-system';
 import {
     reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { PPaneLayout } from '@spaceone/design-system';
 
 export default {
     name: 'BudgetBulkCreateFileUpload',

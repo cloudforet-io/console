@@ -11,8 +11,7 @@
 <script lang="ts">
 import {
     computed, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
+} from 'vue';
 import type { Location } from 'vue-router';
 
 import { SpaceRouter } from '@/router';
@@ -36,7 +35,9 @@ import CostAnalysisHeader from '@/services/cost-explorer/cost-analysis/modules/C
 import CostAnalysisQueryFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFilter.vue';
 import type { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/cost-analysis/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { CostQuerySetModel, CostQuerySetOption, GroupBy } from '@/services/cost-explorer/type';
+import type {
+    CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy,
+} from '@/services/cost-explorer/type';
 
 
 export interface SaveQueryEmitParam {
@@ -76,7 +77,7 @@ export default {
         };
 
         const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): Partial<CostQuerySetOption> => ({
-            granularity: queryStringToString(urlQuery.granularity),
+            granularity: queryStringToString(urlQuery.granularity) as Granularity,
             stack: queryStringToBoolean(urlQuery.stack),
             group_by: queryStringToArray(urlQuery.groupBy),
             primary_group_by: queryStringToString(urlQuery.primaryGroupBy) as GroupBy,

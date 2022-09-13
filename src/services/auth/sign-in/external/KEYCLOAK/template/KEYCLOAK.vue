@@ -12,12 +12,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PButton } from '@spaceone/design-system';
 import {
     defineComponent, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
-import { PButton } from '@spaceone/design-system';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
@@ -27,7 +27,7 @@ export default defineComponent({
         PButton,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             keycloakVisible: false,
         });

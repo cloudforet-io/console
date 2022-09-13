@@ -77,14 +77,14 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, defineComponent, onUnmounted,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPageTitle, PIconButton, PBadge, PPaneLayout, PLabel, PTextEditor, PButton, PTextInput, PFieldGroup,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs, defineComponent, onUnmounted,
+} from 'vue';
 
 
 import { SpaceRouter } from '@/router';

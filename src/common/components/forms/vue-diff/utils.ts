@@ -1,6 +1,6 @@
-import type { Ref } from '@vue/composition-api';
-
 import { diff_match_patch as DiffMatchPatch } from 'diff-match-patch';
+import type { Ref } from 'vue';
+
 
 import hljs from './highlight';
 import type { Diffs, Lines, Mode } from './types';

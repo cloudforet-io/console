@@ -63,8 +63,8 @@ module.exports = {
             /* The code below is for npm link case */
             symlinks: false,
             alias: {
-                '@vue/composition-api': path.resolve(__dirname, './node_modules/@vue/composition-api/'),
                 '@spaceone/console-core-lib': path.resolve(__dirname, './packages/@spaceone/console-core-lib/dist/'),
+                vue: path.resolve('./node_modules/vue'),
             },
         },
         plugins: [

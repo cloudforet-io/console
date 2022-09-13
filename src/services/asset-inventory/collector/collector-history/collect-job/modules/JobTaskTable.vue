@@ -63,10 +63,6 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, onActivated, onDeactivated, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 
 import { iso8601Formatter, durationFormatter } from '@spaceone/console-core-lib';
@@ -78,6 +74,10 @@ import {
     PAnchor, PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import { capitalize } from 'lodash';
+import {
+    computed, getCurrentInstance, onActivated, onDeactivated, reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -132,7 +132,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: false,
             timezone: computed(() => store.state.user.timezone),

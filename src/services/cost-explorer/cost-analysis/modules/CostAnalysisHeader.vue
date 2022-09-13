@@ -65,10 +65,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -76,6 +72,10 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
+import {
+    computed,
+    reactive, toRefs, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 

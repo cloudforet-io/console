@@ -26,17 +26,16 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, watch,
-} from '@vue/composition-api';
-
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPanelTop, PDefinitionTable, PLazyImg, PStatus, PTextList,
 } from '@spaceone/design-system';
+import {
+    computed, getCurrentInstance, reactive, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -56,7 +55,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const baseState = reactive({
             name: computed(() => vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_TITLE')),
             timezone: computed(() => vm.$store.state.user.timezone) as unknown as string,

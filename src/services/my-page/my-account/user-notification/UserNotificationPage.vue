@@ -9,12 +9,12 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs,
-} from '@vue/composition-api';
-
-import {
     PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
+import {
+    reactive, toRefs,
+} from 'vue';
+
 
 import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
 

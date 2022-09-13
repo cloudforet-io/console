@@ -45,9 +45,6 @@
 
 <script lang="ts">
 
-import {
-    reactive, toRefs, computed, onMounted,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -56,6 +53,9 @@ import {
 import {
     camelCase, isEmpty, get,
 } from 'lodash';
+import {
+    reactive, toRefs, computed, onMounted,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

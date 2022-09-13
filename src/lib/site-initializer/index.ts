@@ -1,6 +1,6 @@
-import { computed } from '@vue/composition-api';
-
 import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { computed } from 'vue';
+
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

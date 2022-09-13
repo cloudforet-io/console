@@ -71,10 +71,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    toRefs, reactive, watch, computed, getCurrentInstance,
-} from '@vue/composition-api';
 
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -85,6 +81,10 @@ import {
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import { get, range } from 'lodash';
+import {
+    toRefs, reactive, watch, computed, getCurrentInstance,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import type { TimeStamp } from '@/models';
@@ -150,7 +150,7 @@ export default {
         CollectorPluginsToolbox,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: false,
             totalCount: 0,

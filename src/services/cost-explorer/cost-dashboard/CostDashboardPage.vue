@@ -80,15 +80,15 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PI, PIconButton, PButton, PPageTitle,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 
 import { SpaceRouter } from '@/router';

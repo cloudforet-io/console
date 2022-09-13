@@ -14,9 +14,9 @@
 
 <script lang="ts">
 
-import { reactive, toRefs } from '@vue/composition-api';
-
 import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
+import { reactive, toRefs } from 'vue';
+
 
 const LEVEL_LIST = Object.freeze([
     { label: 'Level 1', name: 'LV1', type: 'item' },

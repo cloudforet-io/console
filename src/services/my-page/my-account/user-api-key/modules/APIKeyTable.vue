@@ -70,10 +70,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy, UnwrapRef } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -82,7 +78,12 @@ import {
     PButton, PDataTable, PPaneLayout, PTableCheckModal, PStatus, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { UnwrapRef } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 
 import type { TimeStamp } from '@/models';
@@ -143,7 +144,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: false,
             fields: [

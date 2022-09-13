@@ -68,9 +68,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
@@ -80,6 +77,9 @@ import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/te
 import {
     find, forEach, range, size,
 } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

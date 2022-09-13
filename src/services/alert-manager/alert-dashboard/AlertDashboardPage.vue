@@ -15,14 +15,14 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, toRefs,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPageTitle,
 } from '@spaceone/design-system';
+import {
+    reactive, toRefs,
+} from 'vue';
 
 import AlertHistoryWidget from '@/services/alert-manager/alert-dashboard/modules/alert-history-widget/AlertHistoryWidget.vue';
 import AlertStateWidget from '@/services/alert-manager/alert-dashboard/modules/AlertStateWidget.vue';

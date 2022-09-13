@@ -37,9 +37,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { commaFormatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -49,6 +46,9 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { vOnClickOutside } from '@vueuse/components';
+import {
+    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
 import type { DirectiveFunction } from 'vue';
 
 import { store } from '@/store';

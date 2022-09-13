@@ -8,11 +8,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    getCurrentInstance,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { PieChart } from '@amcharts/amcharts4/charts';
@@ -20,6 +15,11 @@ import * as am4core from '@amcharts/amcharts4/core';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
+import {
+    getCurrentInstance,
+    reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { CURRENCY } from '@/store/modules/display/config';
 
@@ -81,7 +81,7 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             chartRef: null as HTMLElement | null,

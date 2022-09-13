@@ -29,11 +29,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed,
-    defineComponent,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -50,6 +45,11 @@ import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { debounce, isEmpty } from 'lodash';
+import {
+    computed,
+    defineComponent,
+    reactive, toRefs, watch,
+} from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

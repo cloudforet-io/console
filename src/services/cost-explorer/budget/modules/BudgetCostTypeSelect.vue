@@ -27,12 +27,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    computed,
-    defineComponent,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PFieldGroup, PRadio, PSearchDropdown } from '@spaceone/design-system';
@@ -43,6 +37,12 @@ import type {
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce } from 'lodash';
+import {
+    computed,
+    defineComponent,
+    reactive, toRefs, watch,
+} from 'vue';
+import type { PropType } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
@@ -188,7 +188,7 @@ export default defineComponent<Props>({
 
         watch([() => state.costTypeInfo, () => isAllValid.value], debounce(([costTypeInfo, isValid]) => {
             emit('update', costTypeInfo, isValid);
-        }, 300), { immediate: true });
+        }, 300) as any, { immediate: true });
 
         // LOAD REFERENCE STORE
         (async () => {

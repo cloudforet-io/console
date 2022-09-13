@@ -42,10 +42,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -53,6 +49,10 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { get } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+import type { PropType } from 'vue';
 
 import { i18n } from '@/translations';
 

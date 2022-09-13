@@ -20,15 +20,14 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
-
 import {
     PLottie, PButton,
 } from '@spaceone/design-system';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
 import type { RouteConfig } from 'vue-router';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -41,7 +40,7 @@ export default {
         PLottie,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             serviceRoute: computed(() => vm.$route.matched[vm.$route.matched.length - 2]),
             mainLabel: computed(() => {

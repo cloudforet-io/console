@@ -27,9 +27,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
@@ -42,6 +39,9 @@ import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-d
 import bytes from 'bytes';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+import {
+    computed, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';

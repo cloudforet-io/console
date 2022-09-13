@@ -18,12 +18,12 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PDataTable, PCard } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { computed, reactive, toRefs } from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

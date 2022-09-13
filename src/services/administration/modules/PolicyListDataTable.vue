@@ -66,10 +66,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import type { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
@@ -80,6 +76,10 @@ import {
 import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { filter, capitalize } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+import type { PropType } from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

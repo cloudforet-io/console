@@ -62,10 +62,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
@@ -73,6 +69,10 @@ import {
 } from '@spaceone/design-system';
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -98,7 +98,7 @@ export default {
         PDataLoader,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             userId: '',

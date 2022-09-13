@@ -93,10 +93,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -109,6 +105,10 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -152,7 +152,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const userListApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(15)
             .setSort('name', true)

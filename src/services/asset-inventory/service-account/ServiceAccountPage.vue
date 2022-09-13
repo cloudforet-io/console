@@ -56,9 +56,6 @@
 </template>
 <script lang="ts">
 /* external library */
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -75,6 +72,9 @@ import type {
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import {
+    computed, reactive, watch, toRefs,
+} from 'vue';
 
 /* components */
 import { SpaceRouter } from '@/router';

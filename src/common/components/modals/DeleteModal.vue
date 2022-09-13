@@ -35,10 +35,9 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import { reactive, toRefs } from '@vue/composition-api';
-
 import { PButtonModal, PButton } from '@spaceone/design-system';
+import type { PropType } from 'vue';
+import { reactive, toRefs } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import type { Size } from '@/common/components/modals/config';

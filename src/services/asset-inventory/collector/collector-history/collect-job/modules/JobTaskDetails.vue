@@ -10,12 +10,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PTab } from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
-import { PTab } from '@spaceone/design-system';
 
 import JobTaskErrorList from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskErrorList.vue';
 import type { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
@@ -35,7 +35,7 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             tabs: computed(() => [
                 { name: 'error-list', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST'), keepAlive: true },

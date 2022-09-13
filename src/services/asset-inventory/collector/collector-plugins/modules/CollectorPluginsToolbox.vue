@@ -13,14 +13,14 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { PToolbox } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 
 
 import { store } from '@/store';

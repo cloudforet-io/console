@@ -91,16 +91,15 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    reactive, toRefs, computed, getCurrentInstance,
-} from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PSelectDropdown, PFieldGroup, PTextInput, PDivider,
 } from '@spaceone/design-system';
+import {
+    reactive, toRefs, computed, getCurrentInstance,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -155,7 +154,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             visible: computed({

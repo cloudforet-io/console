@@ -35,12 +35,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { isEmpty } from 'lodash';
 import {
     toRefs, reactive, computed, getCurrentInstance, watch,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
-import { isEmpty } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -86,7 +86,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),

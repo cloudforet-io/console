@@ -48,15 +48,15 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton, PPaneLayout,
 } from '@spaceone/design-system';
+import {
+    getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
+
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -104,7 +104,7 @@ export default {
         },
     },
     setup(props, context) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             type: '',
             description: null,

@@ -30,12 +30,12 @@
 </template>
 
 <script lang="ts">
+import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import {
     computed,
     reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 
 import BudgetFormAmountPlanLastMonthsCost
     from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';

@@ -52,10 +52,6 @@
 
 <script lang="ts">
 
-import type { PropType } from '@vue/composition-api';
-import {
-    defineComponent, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
@@ -64,6 +60,10 @@ import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
+import {
+    defineComponent, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
+import type { PropType } from 'vue';
 
 
 import config from '@/lib/config';

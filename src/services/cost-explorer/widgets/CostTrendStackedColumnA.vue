@@ -16,11 +16,10 @@
 </template>
 
 <script lang="ts">
+import dayjs from 'dayjs';
 import {
     computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
-
-import dayjs from 'dayjs';
+} from 'vue';
 
 
 import { CURRENCY } from '@/store/modules/display/config';

@@ -12,7 +12,6 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
     PSelectDropdown,
@@ -20,6 +19,7 @@ import {
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+import { computed, reactive, toRefs } from 'vue';
 
 
 import { i18n } from '@/translations';

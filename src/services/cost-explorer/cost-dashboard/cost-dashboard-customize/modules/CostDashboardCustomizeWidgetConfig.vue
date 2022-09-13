@@ -49,13 +49,13 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { PFieldGroup, PSelectDropdown, PTextInput } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 import VueI18n from 'vue-i18n';
 
 import { i18n } from '@/translations';

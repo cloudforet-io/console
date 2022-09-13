@@ -30,12 +30,11 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { includes } from 'lodash';
 import {
     reactive, toRefs, computed, getCurrentInstance, defineComponent,
-} from '@vue/composition-api';
-
-import { includes } from 'lodash';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -64,7 +63,7 @@ export default defineComponent({
         GNBToolset,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             openedMenu: '',

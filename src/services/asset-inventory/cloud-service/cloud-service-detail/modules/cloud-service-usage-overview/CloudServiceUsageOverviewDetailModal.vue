@@ -44,10 +44,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, defineComponent,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
@@ -63,6 +59,10 @@ import type {
 import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
+import {
+    computed, defineComponent,
+    reactive, toRefs, watch,
+} from 'vue';
 
 
 import { store } from '@/store';

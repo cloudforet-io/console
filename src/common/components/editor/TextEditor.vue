@@ -6,10 +6,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    defineComponent, onBeforeUnmount, onMounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { Color } from '@tiptap/extension-color';
 import Link from '@tiptap/extension-link';
@@ -18,6 +14,10 @@ import TextStyle from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
 import StarterKit from '@tiptap/starter-kit';
 import { Editor, EditorContent } from '@tiptap/vue-2';
+import {
+    defineComponent, onBeforeUnmount, onMounted, reactive, toRefs, watch,
+} from 'vue';
+import type { PropType } from 'vue';
 
 import { createImageExtension } from '@/common/components/editor/extensions/image';
 import { getAttachments, setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';

@@ -80,16 +80,16 @@
 </template>
 
 <script lang="ts">
-import type { ComputedRef, PropType } from '@vue/composition-api';
-import {
-    computed,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPaneLayout, PFieldGroup, PTextInput, PRadio, PSearchDropdown, PCheckBox, PButton,
 } from '@spaceone/design-system';
+import type { ComputedRef, PropType } from 'vue';
+import {
+    computed,
+    reactive, toRefs, watch,
+} from 'vue';
+
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

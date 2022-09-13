@@ -1,5 +1,3 @@
-import VueCompositionApi from '@vue/composition-api';
-
 import SpaceDesignSystem from '@spaceone/design-system';
 import PortalVue from 'portal-vue';
 import VTooltip from 'v-tooltip';
@@ -21,7 +19,6 @@ import '@spaceone/design-system/css/light-style.css';
 
 
 /** ********** SET VUE PLUGINS ************** */
-Vue.use(VueCompositionApi);
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 Vue.use(PortalVue);

@@ -25,11 +25,11 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PAnchor, PDataTable } from '@spaceone/design-system';
+import { getCurrentInstance, reactive, toRefs } from 'vue';
+import type { Vue } from 'vue/types/vue';
+
 
 import { i18n } from '@/translations';
 
@@ -60,7 +60,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             loading: true,

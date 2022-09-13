@@ -30,11 +30,11 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
-
 import {
     PButtonModal, PPaneLayout, PTextarea, PFieldGroup, PEmpty,
 } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
+
 
 import { i18n } from '@/translations';
 

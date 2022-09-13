@@ -1,7 +1,6 @@
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import { computed, getCurrentInstance } from '@vue/composition-api';
-
+import { computed, getCurrentInstance } from 'vue';
 import type { Location } from 'vue-router';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -10,7 +9,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 export const useBreadcrumbs = () => {
-    const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+    const vm = getCurrentInstance()?.proxy as Vue;
     return {
         breadcrumbs: computed(() => {
             const matched = vm.$route.matched;

@@ -27,14 +27,14 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PBadge, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
+import type { PropType } from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

@@ -101,10 +101,6 @@
 
 <script lang="ts">
 
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 
 import { iso8601Formatter, durationFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
@@ -122,6 +118,9 @@ import {
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import { capitalize } from 'lodash';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

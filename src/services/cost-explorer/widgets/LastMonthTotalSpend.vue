@@ -18,9 +18,6 @@
 </template>
 
 <script lang="ts">
-import {
-    onUnmounted, computed, reactive, toRefs, watch, defineComponent,
-} from '@vue/composition-api';
 
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -28,6 +25,9 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import dayjs from 'dayjs';
+import {
+    onUnmounted, computed, reactive, toRefs, watch, defineComponent,
+} from 'vue';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';

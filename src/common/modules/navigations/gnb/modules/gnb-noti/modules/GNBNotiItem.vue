@@ -28,15 +28,15 @@
 </template>
 
 <script lang="ts">
-import {
-    computed,
-    defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
 
 import {
     PI, PIconButton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    computed,
+    defineComponent, reactive, toRefs,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';

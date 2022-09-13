@@ -87,10 +87,6 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -103,6 +99,10 @@ import dayjs from 'dayjs';
 import {
     debounce, find, capitalize, chain, range, sortBy, get,
 } from 'lodash';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { store } from '@/store';
@@ -161,7 +161,7 @@ export default {
         },
     },
     setup(props: MonitoringProps) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             showLoader: computed(() => props.loading || state.metricsLoading),
             timezone: computed(() => store.state.user.timezone),

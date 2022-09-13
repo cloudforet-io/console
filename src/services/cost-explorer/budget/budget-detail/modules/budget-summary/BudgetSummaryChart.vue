@@ -8,17 +8,17 @@
 </template>
 
 <script lang="ts">
-import {
-    computed,
-    onUnmounted,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    computed,
+    onUnmounted,
+    reactive, toRefs, watch,
+} from 'vue';
 
 
 import config from '@/lib/config';

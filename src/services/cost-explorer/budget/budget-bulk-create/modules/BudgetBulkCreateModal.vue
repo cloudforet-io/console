@@ -13,12 +13,12 @@
 </template>
 
 <script lang="ts">
+import { PButtonModal } from '@spaceone/design-system';
 import {
     defineComponent,
     reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { PButtonModal } from '@spaceone/design-system';
 
 interface Props {
     visible: boolean;

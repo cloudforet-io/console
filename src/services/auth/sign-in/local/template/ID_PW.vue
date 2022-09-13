@@ -41,16 +41,15 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 import {
     getCurrentInstance,
     reactive,
     toRefs,
     defineComponent, computed,
-} from '@vue/composition-api';
-
-import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -73,7 +72,7 @@ export default defineComponent({
         },
     },
     setup(props, context) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             userId: '' as string | undefined,
             password: '',

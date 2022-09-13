@@ -98,16 +98,17 @@
 </template>
 
 <script lang="ts">
-import {
-    computed,
-    defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
 
 import {
     PI, PDivider, PButton,
 } from '@spaceone/design-system';
 import { vOnClickOutside } from '@vueuse/components';
 import ejs from 'ejs';
+import {
+    computed,
+    defineComponent, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type Vue from 'vue';
 import type { DirectiveFunction } from 'vue';
 import type { Location } from 'vue-router';
 
@@ -144,7 +145,9 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             userIcon: computed(() => {
                 if (state.isDomainOwner) return 'root-account';
@@ -228,14 +231,14 @@ export default defineComponent<Props>({
         };
         const handleClickGoToMyPage = () => {
             hideProfileMenu();
-            root.$router.push({ name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME });
+            vm.$router.push({ name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME });
         };
         const handleClickSignOut = async () => {
             const res: Location = {
                 name: AUTH_ROUTE.SIGN_OUT._NAME,
-                query: { nextPath: root.$route.fullPath },
+                query: { nextPath: vm.$route.fullPath },
             };
-            await root.$router.push(res);
+            await vm.$router.push(res);
         };
 
         return {

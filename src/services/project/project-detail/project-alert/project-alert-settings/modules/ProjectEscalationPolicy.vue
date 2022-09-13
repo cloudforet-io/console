@@ -55,10 +55,6 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 
-import {
-    computed, onActivated, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
@@ -68,6 +64,9 @@ import {
     PBadge, PDivider, PI, PAnchor,
 } from '@spaceone/design-system';
 import { get, filter } from 'lodash';
+import {
+    computed, onActivated, reactive, toRefs, watch,
+} from 'vue';
 
 
 import { i18n } from '@/translations';

@@ -7,12 +7,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import {
     getCurrentInstance, onActivated, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -30,7 +30,7 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({

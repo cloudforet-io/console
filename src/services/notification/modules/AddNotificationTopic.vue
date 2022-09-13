@@ -28,12 +28,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PRadio, PCheckBox } from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
-import { PRadio, PCheckBox } from '@spaceone/design-system';
 
 const TOPIC_LIST = [
     { label: 'Alert', value: 'monitoring.Alert' },
@@ -57,7 +57,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             topicModeList: computed(() => [{
                 label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL'), value: false,

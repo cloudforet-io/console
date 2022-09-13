@@ -27,12 +27,12 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import { computed, reactive, watch } from '@vue/composition-api';
-
 import {
     PPaneLayout, PPanelTop, PButton, PAnchor,
 } from '@spaceone/design-system';
+import type { PropType } from 'vue';
+import { computed, reactive, watch } from 'vue';
+
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

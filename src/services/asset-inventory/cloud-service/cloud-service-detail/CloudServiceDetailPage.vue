@@ -146,11 +146,6 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    reactive, computed, getCurrentInstance, watch,
-} from '@vue/composition-api';
-
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
@@ -168,7 +163,11 @@ import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-displa
 import { debouncedWatch } from '@vueuse/core';
 import dayjs from 'dayjs';
 import { isEmpty, get } from 'lodash';
+import {
+    reactive, computed, getCurrentInstance, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -241,7 +240,7 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const queryHelper = new QueryHelper();
         /* Sidebar */
         const sidebarState = reactive({
@@ -552,6 +551,8 @@ export default {
             // initiate queryTags with keyItemSets
             fetchOptionState.queryTags = queryHelper.setKeyItemSets(after).queryTags;
         }, { immediate: true });
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         debouncedWatch([() => props.group, () => props.name], async () => {
             if (!props.isServerPage && !props.name) return;
             tableState.schema = await getTableSchema();

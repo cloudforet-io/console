@@ -36,16 +36,15 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
-
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPanelTop, PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
+
 
 import type { Tags } from '@/models';
 import { store } from '@/store';
@@ -86,7 +85,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const baseState = reactive({
             title: computed(() => i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES')),
             loading: true,

@@ -105,10 +105,6 @@
 
 <script lang="ts">
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -126,7 +122,11 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { orderBy, range } from 'lodash';
+import {
+    computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
 import type { NumberFormatOptions } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 
 import { CURRENCY } from '@/store/modules/display/config';
@@ -180,7 +180,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const queryHelper = new QueryHelper();
         const state = reactive({
             loading: false,

@@ -44,10 +44,6 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
@@ -57,6 +53,10 @@ import {
     PPaneLayout, PToolbox, PI, PDataLoader,
 } from '@spaceone/design-system';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -88,7 +88,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             projects: computed(() => store.getters['reference/projectItems']),
             totalCount: 0,

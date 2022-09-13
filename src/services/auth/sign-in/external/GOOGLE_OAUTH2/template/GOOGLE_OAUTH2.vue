@@ -7,7 +7,7 @@
 <script lang="ts">
 import {
     defineComponent, onMounted,
-} from '@vue/composition-api';
+} from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

@@ -25,13 +25,11 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     toRefs, reactive, computed, getCurrentInstance,
-} from '@vue/composition-api';
-
-
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -75,7 +73,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             userType: computed(() => (props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER')),

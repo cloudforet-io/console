@@ -38,9 +38,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
@@ -49,6 +46,9 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PButtonModal, PBoxTab,
 } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

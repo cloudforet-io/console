@@ -31,12 +31,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import {
     computed, defineComponent, getCurrentInstance, reactive,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { registerServiceStore } from '@/common/composables/register-service-store';
@@ -60,7 +60,7 @@ export default defineComponent({
     },
     setup() {
         registerServiceStore('myPage', myPageStore);
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const { breadcrumbs } = useBreadcrumbs();
         const handbookState = reactive({
             tabs: [{ name: 'spacectl', label: 'Spacectl', keepAlive: true }] as TabItem[],

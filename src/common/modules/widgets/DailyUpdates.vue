@@ -89,9 +89,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
@@ -99,6 +96,9 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PLazyImg, PSkeleton, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find, range } from 'lodash';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 import type { Location } from 'vue-router';
 
 import { store } from '@/store';

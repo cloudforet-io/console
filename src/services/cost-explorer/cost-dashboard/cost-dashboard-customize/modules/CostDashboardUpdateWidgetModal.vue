@@ -16,13 +16,13 @@
 </template>
 
 <script lang="ts">
+import { PButtonModal } from '@spaceone/design-system';
 import {
     computed,
     defineComponent,
     reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { PButtonModal } from '@spaceone/design-system';
 
 import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';

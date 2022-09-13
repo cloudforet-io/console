@@ -28,14 +28,14 @@
 </template>
 
 <script lang="ts">
-import {
-    computed,
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { PButton, PDivider, PLabel } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import {
+    computed,
+    reactive, toRefs, watch,
+} from 'vue';
 
 import type { AutofillOptions } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanAutofillModal.vue';
 import BudgetFormAmountPlanAutofillModal

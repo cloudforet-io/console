@@ -22,14 +22,14 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from '@vue/composition-api';
 
 import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import dayjs from 'dayjs';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 
 
 import { store } from '@/store';

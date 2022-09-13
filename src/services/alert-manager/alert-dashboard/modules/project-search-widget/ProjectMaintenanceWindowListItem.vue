@@ -33,9 +33,6 @@
 
 <script lang="ts">
 
-import {
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -43,6 +40,9 @@ import {
     PListCard, PI, PAnchor,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    reactive, toRefs, watch,
+} from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

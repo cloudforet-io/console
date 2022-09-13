@@ -17,12 +17,12 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import { commaFormatter, getNumberFromString } from '@spaceone/console-core-lib';
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

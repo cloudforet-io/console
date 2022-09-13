@@ -56,14 +56,14 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import {
     PButtonModal, PCollapsibleList, PTag,
 } from '@spaceone/design-system';
 import { sum } from 'lodash';
+import {
+    computed, defineComponent, reactive, toRefs, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';

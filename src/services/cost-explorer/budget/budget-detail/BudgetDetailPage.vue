@@ -31,9 +31,9 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
-
 import { PPageTitle, PIconButton } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from 'vue';
+
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

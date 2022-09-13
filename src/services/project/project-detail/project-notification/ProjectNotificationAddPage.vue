@@ -11,15 +11,14 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, onActivated, reactive, toRefs,
-} from '@vue/composition-api';
-
 import {
     PBreadcrumbs, PPageTitle,
 } from '@spaceone/design-system';
+import {
+    computed, getCurrentInstance, onActivated, reactive, toRefs,
+} from 'vue';
 import VueI18n from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
@@ -37,7 +36,7 @@ export default {
     },
 
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             pageTitle: '' as TranslateResult,
             //

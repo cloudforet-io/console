@@ -55,14 +55,14 @@
 
 <script lang="ts">
 
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import {
     PButton, PFieldGroup, PIconButton, PTextInput,
 } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
+import {
+    computed, defineComponent, reactive, toRefs, watch,
+} from 'vue';
 
 import { i18n } from '@/translations';
 

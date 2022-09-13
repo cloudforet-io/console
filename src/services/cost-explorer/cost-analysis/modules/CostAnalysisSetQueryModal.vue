@@ -49,9 +49,6 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
 
 import {
     PButtonModal,
@@ -59,6 +56,9 @@ import {
     PToggleButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -132,7 +132,7 @@ export default {
 
             state.proxyVisible = false;
         };
-        const handleSelectGranularity = (granularity: string) => {
+        const handleSelectGranularity = (granularity: Granularity) => {
             state.granularity = granularity;
         };
         const handleSelectCurrency = (currency: Currency) => {

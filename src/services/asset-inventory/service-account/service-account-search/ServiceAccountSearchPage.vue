@@ -3,11 +3,11 @@
 </template>
 
 <script lang="ts">
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import type {
     ComponentInstance,
-} from '@vue/composition-api';
+} from 'vue';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { NoSearchResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';

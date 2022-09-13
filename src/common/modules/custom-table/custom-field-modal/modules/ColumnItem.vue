@@ -19,13 +19,13 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
-
 import { PCheckBox, PI } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { PropType } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
+
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';

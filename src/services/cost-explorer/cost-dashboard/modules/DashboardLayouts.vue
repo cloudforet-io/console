@@ -66,12 +66,12 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
+import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
-import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -139,7 +139,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             widgetCount: computed<number>(() => props.layout.flat().length),
             renderedCount: 0,

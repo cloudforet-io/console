@@ -58,11 +58,6 @@
 
 <script lang="ts">
 
-import type { SetupContext, ComponentRenderProxy } from '@vue/composition-api';
-import {
-    toRefs, reactive, computed, watch, getCurrentInstance,
-} from '@vue/composition-api';
-
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -70,6 +65,11 @@ import {
     PButtonModal, PDataTable, PSelectableList, PBadge,
 } from '@spaceone/design-system';
 import { keys, forEach, get } from 'lodash';
+import {
+    toRefs, reactive, computed, watch, getCurrentInstance,
+} from 'vue';
+import type { SetupContext } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -106,7 +106,7 @@ export default {
         },
     },
     setup(props: CollectModalProps, context: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             loading: true,
@@ -174,7 +174,7 @@ export default {
                     collector_id: id,
                     filter: { [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map(r => r[props.idKey]) },
                 });
-                showSuccessMessage(vm.$t('COMMON.COLLECT_MODAL.ALT_S_COLLECT_DATA'), '', context.root);
+                showSuccessMessage(vm.$t('COMMON.COLLECT_MODAL.ALT_S_COLLECT_DATA'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.COLLECT_MODAL.ALT_E_COLLECT_DATA'));
             } finally {

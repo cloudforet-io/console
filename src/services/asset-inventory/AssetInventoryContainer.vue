@@ -21,7 +21,7 @@
 <script lang="ts">
 import {
     defineComponent,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { registerServiceStore } from '@/common/composables/register-service-store';

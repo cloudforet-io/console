@@ -55,17 +55,16 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
-
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PLottie, PSkeleton, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import type { TimeStamp } from '@/models';
@@ -117,7 +116,7 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: false,
             skeletons: range(2),

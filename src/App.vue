@@ -59,16 +59,15 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
-import {
-    computed,
-    defineComponent, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
-
 import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar,
 } from '@spaceone/design-system';
+import {
+    computed,
+    defineComponent, getCurrentInstance, reactive, toRefs,
+} from 'vue';
 import type { Location } from 'vue-router';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -104,7 +103,7 @@ export default defineComponent({
         PSidebar,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),

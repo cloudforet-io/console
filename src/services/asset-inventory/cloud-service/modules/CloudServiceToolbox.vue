@@ -38,10 +38,6 @@
 
 <script lang="ts">
 // package
-import type { PropType } from '@vue/composition-api';
-import {
-    computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
 
 // design system
 import type { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
@@ -56,6 +52,10 @@ import {
 import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
+import type { PropType } from 'vue';
 
 // core lib
 
