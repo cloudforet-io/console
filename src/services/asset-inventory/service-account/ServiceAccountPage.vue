@@ -34,7 +34,6 @@
             </template>
             <template #toolbox-bottom>
                 <div class="account-type-filter">
-                    <!-- song-lang -->
                     <span class="label">{{ 'Account Type' }}</span>
                     <p-select-status v-for="(status, idx) in tableState.accountTypeList" :key="`${status.name}-${idx}`"
                                      :selected="tableState.selectedAccountType"
@@ -46,6 +45,11 @@
                     </p-select-status>
                 </div>
             </template>
+            <!--            <template #col-service_account_type-format="{data}">-->
+            <!--                <p-badge v-if="data" :outline="true" :style-type="ACCOUNT_TYPE_BADGE_OPTION[data].styleType">-->
+            <!--                    {{ ACCOUNT_TYPE_BADGE_OPTION[data] ? ACCOUNT_TYPE_BADGE_OPTION[data].label : '' }}-->
+            <!--                </p-badge>-->
+            <!--            </template>-->
         </p-dynamic-layout>
         <custom-field-modal v-model="tableState.visibleCustomFieldModal"
                             resource-type="identity.ServiceAccount"
@@ -92,6 +96,16 @@ import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/C
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ServiceAccountProviderList
     from '@/services/asset-inventory/service-account/modules/ServiceAccountProviderList.vue';
+
+const ACCOUNT_TYPE = Object.freeze({
+    GENERAL_ACCOUNT: 'general_account',
+    TRUST_ACCOUNT: 'trust_account',
+});
+
+const ACCOUNT_TYPE_BADGE_OPTION = Object.freeze({
+    [ACCOUNT_TYPE.TRUST_ACCOUNT]: { label: 'General Account', styleType: 'primary' },
+    [ACCOUNT_TYPE.GENERAL_ACCOUNT]: { label: 'Trust Account', styleType: 'gray' },
+});
 
 export default {
     name: 'ServiceAccountPage',
@@ -144,10 +158,9 @@ export default {
             schema: null as null|DynamicLayout,
             visibleCustomFieldModal: false,
             accountTypeList: computed(() => [
-                // song-lang
                 { name: 'all', label: 'All' },
-                { name: 'trustAccount', label: 'Trust Account' },
-                { name: 'generalAccount', label: 'General Account' },
+                { name: ACCOUNT_TYPE.TRUST_ACCOUNT, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUST_ACCOUNT].label },
+                { name: ACCOUNT_TYPE.GENERAL_ACCOUNT, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL_ACCOUNT].label },
             ]),
             selectedAccountType: 'all',
             searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
@@ -322,6 +335,7 @@ export default {
             handleSelectServiceAccountType,
             handleClickRow,
             handleDynamicLayoutFetch,
+            ACCOUNT_TYPE_BADGE_OPTION,
         };
     },
 };
