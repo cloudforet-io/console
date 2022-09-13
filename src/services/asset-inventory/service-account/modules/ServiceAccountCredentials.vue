@@ -1,73 +1,108 @@
 <template>
     <p-pane-layout class="service-account-credentials">
-        <div class="title">
-            {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS') }}
-        </div>
-        <template v-if="mode === 'CREATE' || 'UPDATE'">
-            <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIAL_HELP_TEXT', { provider: providerData.name })" required>
-                <div class="flex">
-                    <p-radio v-model="hasCredentialKey" :value="true" class="radio-text">
-                        {{ $t('APP.MAIN.YES') }}
-                    </p-radio>
-                    <p-radio v-model="hasCredentialKey" :value="false">
-                        {{ $t('APP.MAIN.NO') }}
-                    </p-radio>
-                </div>
-            </p-field-group>
-            <div v-if="hasCredentialKey">
-                <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SECRET_TYPE_LABEL')" required>
+        <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')">
+            <template v-if="mode === 'READ'" #extra>
+                <p-button icon="ic_edit">
+                    <!--song-lang-->
+                    Edit
+                </p-button>
+            </template>
+        </p-panel-top>
+        <div class="content-wrapper">
+            <template v-if="mode === 'READ'">
+                <p-dynamic-layout v-if="readState.detailSchema"
+                                  v-bind="readState.detailSchema"
+                                  :type-options="{
+                                      loading: readState.loading
+                                  }"
+                                  :data="readState.item"
+                                  :field-handler="fieldHandler"
+                />
+            </template>
+            <template v-if="EDIT_MODE.includes(mode)">
+                <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIAL_HELP_TEXT', { provider: providerData.name })" required>
                     <div class="flex">
-                        <p-radio v-for="(type, idx) in secretTypes" :key="idx" v-model="selectedSecretType"
-                                 class="radio-text" :value="type"
-                        >
-                            {{ type }}
+                        <p-radio v-model="formState.hasCredentialKey" :value="true" class="radio-text">
+                            {{ $t('APP.MAIN.YES') }}
+                        </p-radio>
+                        <p-radio v-model="formState.hasCredentialKey" :value="false">
+                            {{ $t('APP.MAIN.NO') }}
                         </p-radio>
                     </div>
                 </p-field-group>
-                <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" stretch>
-                    <template #input>
-                        <p-json-schema-form :form-data.sync="customSchemaForm" :schema="credentialSchema"
-                                            :language="$store.state.user.language"
-                                            class="custom-schema-box"
-                                            @validate="handleCredentialValidate"
-                        />
-                    </template>
-                    <template #json>
-                        <p-text-editor class="m-4" :code.sync="credentialJson" />
-                    </template>
-                </p-tab>
-            </div>
-        </template>
+                <div v-if="formState.hasCredentialKey">
+                    <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SECRET_TYPE_LABEL')" required>
+                        <div class="flex">
+                            <p-radio v-for="(type, idx) in formState.secretTypes" :key="idx" v-model="formState.selectedSecretType"
+                                     class="radio-text" :value="type"
+                            >
+                                {{ type }}
+                            </p-radio>
+                        </div>
+                    </p-field-group>
+                    <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" stretch>
+                        <template #input>
+                            <p-json-schema-form :form-data.sync="formState.customSchemaForm" :schema="formState.credentialSchema"
+                                                :language="$store.state.user.language"
+                                                class="custom-schema-box"
+                                                @validate="handleCredentialValidate"
+                            />
+                        </template>
+                        <template #json>
+                            <p-text-editor class="m-4" :code.sync="formState.credentialJson" />
+                        </template>
+                    </p-tab>
+                </div>
+            </template>
+        </div>
     </p-pane-layout>
 </template>
 
 <script lang="ts">
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PPaneLayout, PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor,
+    PPaneLayout, PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PDynamicLayout, PPanelTop, PButton,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { get } from 'lodash';
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, watch,
 } from 'vue';
 import type { PropType } from 'vue';
 
+import type { ItemOptions } from '@/component-util/dynamic-layout/layout-schema';
 import { i18n } from '@/translations';
 
-import type { ActiveDataType, CredentialForm, PageMode } from '@/services/asset-inventory/service-account/type';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type {
+    ActiveDataType, CredentialForm, PageMode, ProviderModel,
+} from '@/services/asset-inventory/service-account/type';
+import { EDIT_MODE } from '@/services/asset-inventory/service-account/type';
 
 
-export default {
+interface Props {
+    mode: PageMode;
+    providerData?: ProviderModel;
+    isValid: boolean;
+    serviceAccountId?: string;
+}
+
+export default defineComponent<Props>({
     name: 'ServiceAccountCredentials',
     components: {
         PPaneLayout,
+        PPanelTop,
         PFieldGroup,
         PRadio,
         PTab,
         PJsonSchemaForm,
         PTextEditor,
+        PDynamicLayout,
+        PButton,
     },
     props: {
         mode: {
@@ -82,13 +117,13 @@ export default {
             type: Boolean,
             default: false,
         },
-        // serviceAccountId: {
-        //     type: String,
-        //     default: '',
-        // },
+        serviceAccountId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, { emit }) {
-        const state = reactive({
+        const formState = reactive({
             hasCredentialKey: true,
             secretTypes: computed(() => get(props.providerData, 'capability.supported_schema', [])),
             selectedSecretType: '',
@@ -97,46 +132,45 @@ export default {
             isCustomSchemaFormValid: false,
             credentialJson: '',
             formData: computed<CredentialForm>(() => ({
-                hasCredentialKey: state.hasCredentialKey,
-                selectedSecretType: state.selectedSecretType,
-                customSchemaForm: state.customSchemaForm,
-                credentialJson: state.credentialJson,
+                hasCredentialKey: formState.hasCredentialKey,
+                selectedSecretType: formState.selectedSecretType,
+                customSchemaForm: formState.customSchemaForm,
+                credentialJson: formState.credentialJson,
                 activeDataType: tabState.activeTab as ActiveDataType,
             })),
-            isAllValid: computed(() => {
-                if (!state.hasCredentialKey) return true;
-                if (state.secretTypes.length) {
-                    if (tabState.activeTab === 'input') return state.isCustomSchemaFormValid;
-                    return !!state.credentialJson.length;
+            isAllValid: computed<boolean>(() => {
+                if (!formState.hasCredentialKey) return true;
+                if (formState.secretTypes.length) {
+                    if (tabState.activeTab === 'input') return formState.isCustomSchemaFormValid;
+                    return !!formState.credentialJson.length;
                 }
                 return true;
             }),
-            // timezone: computed(() => store.state.user.timezone),
-            // fields: [
-            //     { label: 'Secret', name: 'secret_id' },
-            //     { label: 'Name', name: 'name' },
-            //     { label: 'Schema', name: 'schema' },
-            //     {
-            //         label: 'Created',
-            //         name: 'created_at',
-            //         type: 'datetime',
-            //         options: {
-            //             source_type: 'timestamp',
-            //             source_format: 'seconds',
-            //         },
-            //     },
-            // ],
-            // items: [],
-            // loading: true,
-            // options: {
-            //     sortBy: 'secret_id',
-            //     sortDesc: true,
-            //     pageStart: 1,
-            //     pageLimit: 15,
-            //     searchText: '',
-            // },
         });
-
+        const readState = reactive({
+            loading: true,
+            detailSchema: computed(() => {
+                const fields = Object.entries(formState.credentialSchema?.properties ?? {}).map(([k, v]) => ({
+                    key: k,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    name: v?.title ?? k,
+                }));
+                return {
+                    name: 'Credentials',
+                    type: 'item',
+                    options: {
+                        fields: [
+                            { key: 'schema', name: 'Secret Type' },
+                            ...fields,
+                        ],
+                        translation_id: 'IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS',
+                    } as ItemOptions,
+                };
+            }),
+            item: {},
+            fieldHandler: [],
+        });
         const tabState = reactive({
             tabs: computed<TabItem[]>(() => [
                 { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_INPUT'), name: 'input', keepAlive: true },
@@ -145,91 +179,95 @@ export default {
             activeTab: 'input',
         });
 
-        // const apiQuery = new ApiQueryHelper();
-        // const getQuery = () => apiQuery.setFilters([{
-        //     k: 'service_account_id',
-        //     v: props.serviceAccountId,
-        //     o: '=',
-        // }, { v: state.options.searchText }])
-        //     .setSort(state.options.sortBy, state.options.sortDesc)
-        //     .setPage(
-        //         state.options.pageStart,
-        //         state.options.pageLimit,
-        //     )
-        //     .setOnly('secret_id', 'name', 'schema', 'created_at')
-        //     .data;
-        //
-        // const api = SpaceConnector.client.secret.secret.list;
-        //
-        // const listCredentials = async () => {
-        //     state.loading = true;
-        //     try {
-        //         const res = await api({ query: getQuery() });
-        //         state.items = res.results;
-        //     } catch (e) {
-        //         ErrorHandler.handleError(e);
-        //         state.items = [];
-        //     } finally {
-        //         state.loading = false;
-        //     }
-        // };
-
-        // watch(() => props.serviceAccountId, (after, before) => {
-        //     if (after !== before) listCredentials();
-        // }, { immediate: true });
+        /* Util */
+        const fieldHandler = (field) => {
+            if (field.extraData?.reference) {
+                return referenceFieldFormatter(field.extraData.reference, field.data);
+            }
+            return {};
+        };
 
         /* Api */
+        const apiQuery = new ApiQueryHelper();
+        const listCredentials = async (serviceAccountId: string) => {
+            try {
+                readState.loading = true;
+
+                const getQuery = () => apiQuery
+                    .setFilters([{ k: 'service_account_id', v: serviceAccountId, o: '=' }]);
+                const { results } = await SpaceConnector.client.secret.secret.list({ query: getQuery().data });
+                if (results.length) readState.item = results[0];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                readState.item = {};
+            } finally {
+                readState.loading = false;
+            }
+        };
         const getCredentialSchema = async (selectedSecretType) => {
             const res = await SpaceConnector.client.repository.schema.get({
                 name: selectedSecretType,
                 only: ['schema'],
             });
-            state.credentialSchema = res.schema;
+            formState.credentialSchema = res.schema;
             const defaultCredentialForm = {};
             Object.keys(res.schema.properties).forEach((key) => {
                 // Because p-json-schema-form is not able to perform exact validation, `undefined` is assigned.
                 defaultCredentialForm[key] = undefined;
             });
-            state.customSchemaForm = defaultCredentialForm;
+            formState.customSchemaForm = defaultCredentialForm;
         };
 
         /* Event */
         const handleCredentialValidate = (isValid) => {
-            state.isCustomSchemaFormValid = isValid;
+            formState.isCustomSchemaFormValid = isValid;
         };
 
+        /* Watcher */
+        // CREATE || UPDATE
         watch(() => props.providerData, (providerData) => {
             const supportedSchema = providerData?.capability?.supported_schema;
-            state.selectedSecretType = supportedSchema ? supportedSchema[0] : '';
+            formState.selectedSecretType = supportedSchema ? supportedSchema[0] : '';
         }, { immediate: true });
-        watch(() => state.selectedSecretType, async (after, before) => {
+        watch(() => formState.selectedSecretType, async (after, before) => {
             if (after && after !== before) {
                 await getCredentialSchema(after);
             }
         }, { immediate: true });
-        watch(() => state.formData, (formData) => {
+        watch(() => formState.formData, (formData) => {
             emit('change', formData);
         });
-        watch(() => state.isAllValid, (isAllValid) => {
+        watch(() => formState.isAllValid, (isAllValid) => {
             emit('update:isValid', isAllValid);
         });
+        // READ
+        watch(() => props.serviceAccountId, (serviceAccountId) => {
+            if (serviceAccountId) listCredentials(serviceAccountId);
+        }, { immediate: true });
 
         return {
-            ...toRefs(state),
+            formState,
+            readState,
             tabState,
+            EDIT_MODE,
+            fieldHandler,
             handleCredentialValidate,
         };
     },
-};
+});
 </script>
-
-<style lang="postcss">
+<style lang="postcss" scoped>
 .service-account-credentials {
-    padding: 2rem 1rem;
-    .title {
-        font-size: 1.5rem;
-        line-height: 120%;
-        margin-bottom: 2rem;
+    .p-panel-top::v-deep {
+        .extra {
+            text-align: right;
+        }
+    }
+    .content-wrapper::v-deep {
+        padding: 0.5rem 1rem 2.5rem 1rem;
+        .p-panel-top {
+            display: none;
+        }
     }
     .radio-text {
         margin-right: 1.125rem;
