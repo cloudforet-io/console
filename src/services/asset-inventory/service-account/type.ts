@@ -29,6 +29,7 @@ export type ProjectGroup = ProjectItemResp;
 
 
 // Service Account Forms
+export const EDIT_MODE = ['CREATE', 'UPDATE'];
 export type PageMode = 'CREATE' | 'UPDATE' | 'READ';
 export interface BaseInformationForm {
     accountName: string;
