@@ -1,3 +1,10 @@
+# [1.1.0-beta.391](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.390...v1.1.0-beta.391) (2022-09-13)
+
+
+### Bug Fixes
+
+* readme broken link ([#20](https://github.com/cloudforet-io/mirinae/issues/20)) ([81020ca](https://github.com/cloudforet-io/mirinae/commit/81020ca9e4ef2090557050ed225a8609bb2e8453))
+
 # [1.1.0-beta.390](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.389...v1.1.0-beta.390) (2022-09-08)
 
 
