@@ -179,22 +179,26 @@ export default defineComponent<Props>({
             formState.serviceAccountNames = results.map(v => v.name);
         };
         const getDetailSchema = async (provider) => {
-            const result = await SpaceConnector.client.addOns.pageSchema.get({
-                resource_type: 'identity.ServiceAccount',
-                schema: 'details',
-                options: {
-                    provider,
-                },
-            });
-            readState.detailSchema = result.details[0];
+            try {
+                const result = await SpaceConnector.client.addOns.pageSchema.get({
+                    resource_type: 'identity.ServiceAccount',
+                    schema: 'details',
+                    options: {
+                        provider,
+                    },
+                });
+                readState.detailSchema = result.details[0];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                readState.detailSchema = {};
+            }
         };
         const getServiceAccount = async (serviceAccountId) => {
             try {
                 readState.loading = true;
-                const result = await SpaceConnector.client.identity.serviceAccount.get({
+                readState.items = await SpaceConnector.client.identity.serviceAccount.get({
                     service_account_id: serviceAccountId,
                 });
-                readState.items = result;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 readState.items = [];
