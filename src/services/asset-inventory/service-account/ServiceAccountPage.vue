@@ -6,51 +6,47 @@
                       class="page-title"
         />
         <service-account-provider-list :provider-list="providerList" :selected-provider.sync="selectedProvider" />
-        <p-horizontal-layout>
-            <template #container="{ height }">
-                <p-dynamic-layout v-if="tableState.schema"
-                                  type="query-search-table"
-                                  :options="tableState.schema.options"
-                                  :data="tableState.items"
-                                  :fetch-options="fetchOptionState"
-                                  :type-options="{
-                                      ...typeOptionState,
-                                      keyItemSets,
-                                      valueHandlerMap,
-                                  }"
-                                  :style="{height: `${height}px`}"
-                                  :field-handler="fieldHandler"
-                                  @fetch="handleDynamicLayoutFetch"
-                                  @export="exportServiceAccountData"
-                                  @click-settings="handleClickSettings"
-                                  @click-row="handleClickRow"
+        <p-dynamic-layout v-if="tableState.schema"
+                          class="service-account-table"
+                          type="query-search-table"
+                          :options="tableState.schema.options"
+                          :data="tableState.items"
+                          :fetch-options="fetchOptionState"
+                          :type-options="{
+                              ...typeOptionState,
+                              keyItemSets,
+                              valueHandlerMap,
+                          }"
+                          :field-handler="fieldHandler"
+                          @fetch="handleDynamicLayoutFetch"
+                          @export="exportServiceAccountData"
+                          @click-settings="handleClickSettings"
+                          @click-row="handleClickRow"
+        >
+            <template #toolbox-left>
+                <p-button style-type="primary-dark"
+                          icon="ic_plus_bold"
+                          :disabled="!tableState.hasManagePermission"
+                          @click="clickAddServiceAccount"
                 >
-                    <template #toolbox-left>
-                        <p-button style-type="primary-dark"
-                                  icon="ic_plus_bold"
-                                  :disabled="!tableState.hasManagePermission"
-                                  @click="clickAddServiceAccount"
-                        >
-                            {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
-                        </p-button>
-                    </template>
-                    <template #toolbox-bottom>
-                        <div class="account-type-filter">
-                            <!-- song-lang -->
-                            <span class="label">{{ 'Account Type' }}</span>
-                            <p-select-status v-for="(status, idx) in tableState.accountTypeList" :key="`${status.name}-${idx}`"
-                                             :selected="tableState.selectedAccountType"
-                                             :value="status.name"
-                                             :multi-selectable="false"
-                                             @change="handleSelectServiceAccountType"
-                            >
-                                {{ status.label }}
-                            </p-select-status>
-                        </div>
-                    </template>
-                </p-dynamic-layout>
+                    {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
+                </p-button>
             </template>
-        </p-horizontal-layout>
+            <template #toolbox-bottom>
+                <div class="account-type-filter">
+                    <!-- song-lang -->
+                    <span class="label">{{ 'Account Type' }}</span>
+                    <p-select-status v-for="(status, idx) in tableState.accountTypeList" :key="`${status.name}-${idx}`"
+                                     :selected="tableState.selectedAccountType"
+                                     :value="status.name"
+                                     :multi-selectable="false"
+                                     @change="handleSelectServiceAccountType"
+                    >
+                        {{ status.label }}
+                    </p-select-status>
+                </div>
+            </template>
+        </p-dynamic-layout>
         <custom-field-modal v-model="tableState.visibleCustomFieldModal"
                             resource-type="identity.ServiceAccount"
                             :options="{provider: selectedProvider}"
@@ -66,11 +62,7 @@ import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
-    PPageTitle,
-    PDynamicLayout,
-    PHorizontalLayout,
-    PButton,
-    PSelectStatus,
+    PPageTitle, PDynamicLayout, PButton, PSelectStatus,
 } from '@spaceone/design-system';
 import type {
     DynamicLayoutEventListener,
@@ -108,7 +100,6 @@ export default {
         ServiceAccountProviderList,
         PDynamicLayout,
         PPageTitle,
-        PHorizontalLayout,
         PButton,
         PSelectStatus,
     },
@@ -337,10 +328,6 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .service-account-page {
-    .provider-dropdown {
-        @apply font-normal;
-    }
-
     .account-type-filter {
         @apply flex gap-4 items-center border-t border-gray-200;
         padding: 0.75rem 1rem;
@@ -351,6 +338,9 @@ export default {
             @apply text-gray-500;
             font-size: 0.875rem;
         }
+    }
+    .service-account-table {
+        @apply border border-gray-200 rounded;
     }
 
     >>> .p-dynamic-layout-table .p-toolbox-table {
