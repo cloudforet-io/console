@@ -30,7 +30,10 @@
         <div class="content-wrapper">
             <service-account-account-type :mode="pageModeMap.accountType" />
             <service-account-project :mode="pageModeMap.project" :project-id="projectId" />
-            <service-account-base-information :mode="pageModeMap.baseInformation" />
+            <service-account-base-information :mode="pageModeMap.baseInformation"
+                                              :provider-data="providerData"
+                                              :service-account-id="serviceAccountId"
+            />
             <service-account-credentials :mode="pageModeMap.credentials" />
         </div>
     </div>
@@ -59,7 +62,7 @@ import ServiceAccountBaseInformation
 import ServiceAccountCredentials
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
 import ServiceAccountProject from '@/services/asset-inventory/service-account/modules/ServiceAccountProject.vue';
-import type { PageMode } from '@/services/asset-inventory/service-account/type';
+import type { PageMode, ProviderModel } from '@/services/asset-inventory/service-account/type';
 
 
 export default defineComponent({
@@ -89,14 +92,14 @@ export default defineComponent({
         const state = reactive({
             loading: true,
             hasManagePermission: useManagePermissionState(),
-            deleteModalVisible: false,
+            item: {} as any,
+            providerData: {} as ProviderModel,
             provider: computed(() => {
                 if (!storeState.providerLoading && !state.loading) {
                     return storeState.providers[state.item?.provider] || undefined;
                 }
                 return undefined;
             }),
-            item: {} as any,
             providerIcon: computed(() => state.provider?.icon),
             consoleLink: computed(() => {
                 if (state.provider?.linkTemplate) return render(state.provider.linkTemplate, state.item);
@@ -109,6 +112,7 @@ export default defineComponent({
                 baseInformation: 'READ',
                 credentials: 'READ',
             } as {[pageName: string]: PageMode},
+            deleteModalVisible: false,
         });
 
         /* Api */
@@ -125,6 +129,16 @@ export default defineComponent({
                 state.loading = false;
             }
         };
+        const getProvider = async (provider) => {
+            try {
+                state.providerData = await SpaceConnector.client.identity.provider.get({
+                    provider,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.providerData = {};
+            }
+        };
 
         /* Event */
         const handleOpenDeleteModal = () => {
@@ -139,8 +153,11 @@ export default defineComponent({
         })();
 
         /* Watcher */
-        watch(() => props.serviceAccountId, (serviceAccountId) => {
-            if (serviceAccountId) getServiceAccount(serviceAccountId);
+        watch(() => props.serviceAccountId, async (serviceAccountId) => {
+            if (serviceAccountId) {
+                await getServiceAccount(serviceAccountId);
+                await getProvider(state.item?.provider);
+            }
         }, { immediate: true });
 
         return {
