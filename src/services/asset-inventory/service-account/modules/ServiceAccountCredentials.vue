@@ -176,7 +176,6 @@ export default defineComponent<Props>({
                 };
             }),
             item: {} as CredentialModel,
-            fieldHandler: [],
         });
         const tabState = reactive({
             tabs: computed<TabItem[]>(() => [
