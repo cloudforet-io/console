@@ -174,7 +174,7 @@ export default {
                     collector_id: id,
                     filter: { [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map(r => r[props.idKey]) },
                 });
-                showSuccessMessage(vm.$t('COMMON.COLLECT_MODAL.ALT_S_COLLECT_DATA'), '', context.root);
+                showSuccessMessage(vm.$t('COMMON.COLLECT_MODAL.ALT_S_COLLECT_DATA'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.COLLECT_MODAL.ALT_E_COLLECT_DATA'));
             } finally {
