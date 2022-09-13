@@ -74,10 +74,10 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { flatMap } from 'lodash';
 
@@ -184,7 +184,7 @@ export default {
         },
     },
     setup(props: ToolboxGridLayoutProps, context) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const proxyState = reactive({
             thisPage: makeOptionalProxy<number>('thisPage', vm, 1),

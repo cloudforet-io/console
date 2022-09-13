@@ -42,11 +42,11 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     computed,
     defineComponent, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import {
     COLLAPSIBLE_LIST_THEME,
@@ -106,7 +106,7 @@ export default defineComponent<CollapsibleListProps>({
         },
     },
     setup(props: CollapsibleListProps) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             proxyUnfoldedIndices: makeOptionalProxy<number[]>('unfoldedIndices', vm, props.unfoldedIndices || []),
             collapsibleItems: computed<CollapsibleItem[]>(() => props.items.map((d) => {

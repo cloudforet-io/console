@@ -1,4 +1,4 @@
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from 'vue';
 
 import { action } from '@storybook/addon-actions';
 import { number, withKnobs } from '@storybook/addon-knobs';

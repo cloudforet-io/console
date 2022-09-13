@@ -25,12 +25,12 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { useTab } from '@/hooks/tab';
-import type { ButtonTabProps } from '@/navigation/tabs/button-tab/type';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
 
@@ -42,7 +42,8 @@ export default defineComponent({
     },
     props: {
         tabs: {
-            type: Array,
+            // FIXME:: below any type
+            type: Array as PropType<any>,
             default: () => [],
         },
         activeTab: {
@@ -50,7 +51,7 @@ export default defineComponent({
             default: '',
         },
     },
-    setup(props: ButtonTabProps, { emit }) {
+    setup(props, { emit }) {
         const {
             tabItems,
             keepAliveTabNames,

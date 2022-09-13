@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from 'vue';
 
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';

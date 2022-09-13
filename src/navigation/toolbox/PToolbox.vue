@@ -71,10 +71,10 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { groupBy } from 'lodash';
 
@@ -193,7 +193,7 @@ export default defineComponent<ToolboxProps>({
         },
     },
     setup(props: ToolboxProps, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const initPageSize = props.pageSizeOptions ? props.pageSizeOptions[0] || 24 : 24;
 
         const proxyState = reactive({

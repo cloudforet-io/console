@@ -7,10 +7,10 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     defineComponent, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
@@ -47,7 +47,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             proxyValue: makeOptionalProxy('value', vm, props.value),

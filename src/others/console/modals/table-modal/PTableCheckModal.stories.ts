@@ -1,4 +1,4 @@
-import { ref } from '@vue/composition-api';
+import { ref } from 'vue';
 
 import { action } from '@storybook/addon-actions';
 import { select, text, boolean } from '@storybook/addon-knobs';

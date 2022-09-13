@@ -34,11 +34,11 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed,
     defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';

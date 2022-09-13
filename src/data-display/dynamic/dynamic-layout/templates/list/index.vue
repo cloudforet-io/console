@@ -20,7 +20,7 @@
 <script lang="ts">
 import {
     computed, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { map, replace } from 'lodash';
 

@@ -32,7 +32,7 @@
 <script lang="ts">
 import {
     computed, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import { themes } from '@/others/deprecated/selectable-item/config';

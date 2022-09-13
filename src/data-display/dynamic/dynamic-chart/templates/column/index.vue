@@ -28,13 +28,13 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed,
     defineComponent,
     onUnmounted,
     reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { max } from 'lodash';
 

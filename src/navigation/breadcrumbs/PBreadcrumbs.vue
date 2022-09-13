@@ -45,8 +45,8 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
-import { defineComponent, reactive } from '@vue/composition-api';
+import type { PropType } from 'vue';
+import { defineComponent, reactive } from 'vue';
 
 import type { Location } from 'vue-router';
 

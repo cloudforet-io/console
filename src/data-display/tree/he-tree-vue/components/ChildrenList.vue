@@ -35,7 +35,7 @@
 import {
     computed,
     defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 interface ChildrenListProps {
   rtl: boolean;

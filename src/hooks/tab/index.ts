@@ -1,7 +1,7 @@
-import type { UnwrapRef, ComputedRef } from '@vue/composition-api';
+import type { UnwrapRef, ComputedRef } from 'vue';
 import {
     computed, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import type { TabItem } from '@/navigation/tabs/tab/type';
 

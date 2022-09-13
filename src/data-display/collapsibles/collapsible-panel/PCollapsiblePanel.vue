@@ -13,10 +13,10 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     defineComponent, getCurrentInstance, onMounted, onUnmounted, onUpdated, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { debounce } from 'lodash';
 
@@ -45,7 +45,7 @@ export default defineComponent({
         },
     },
     setup(props: CollapsiblePanelProps) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             proxyIsCollapsed: makeOptionalProxy('isCollapsed', vm, props.isCollapsed),
             fakeTextRef: null as null|HTMLElement,

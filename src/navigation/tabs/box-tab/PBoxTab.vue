@@ -21,12 +21,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/composition-api';
+import { computed, defineComponent } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useTab } from '@/hooks/tab';
 import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
-import type { BoxTabProps } from '@/navigation/tabs/box-tab/type';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
 
@@ -56,7 +55,7 @@ export default defineComponent({
             },
         },
     },
-    setup(props: BoxTabProps, { emit }) {
+    setup(props, { emit }) {
         const {
             tabItems,
             keepAliveTabNames,

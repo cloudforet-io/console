@@ -41,7 +41,7 @@
     </p-button-modal>
 </template>
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from 'vue';
 
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import { SizeMapping } from '@/feedbacks/modals/type';

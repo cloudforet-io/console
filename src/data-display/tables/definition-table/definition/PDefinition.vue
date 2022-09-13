@@ -30,7 +30,7 @@
 <script lang="ts">
 import {
     computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import type { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';

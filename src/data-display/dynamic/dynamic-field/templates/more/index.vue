@@ -15,11 +15,11 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed,
     defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import type { MoreDynamicFieldProps, MoreTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/more/type';
 import type { MoreOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';

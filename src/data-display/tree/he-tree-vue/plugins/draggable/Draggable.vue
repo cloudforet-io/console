@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+// @ts-nocheck
+import { defineComponent } from 'vue';
 
 import {
     arrayLast,
@@ -39,7 +40,6 @@ export default defineComponent({
         };
     },
     mounted() {
-        // eslint-disable-next-line no-multi-assign
         const options = this._draggableOptions = {
             indent: this.indent,
             triggerClass: this.triggerClass,
@@ -97,14 +97,12 @@ export default defineComponent({
                 const node = tree.getNodeByPath(path);
                 return tree.isNodeDroppable(node, path);
             },
-            // eslint-disable-next-line consistent-return
             _findClosestDroppablePosition: (branchEl, treeEl) => {
                 // @ts-ignore
                 const tree = this.getTreeVmByTreeEl(treeEl);
                 const path = tree.getPathByBranchEl(branchEl);
                 const findPath = arrayWithoutEnd(path, 1);
                 let cur = path;
-                // eslint-disable-next-line no-restricted-syntax,@typescript-eslint/no-shadow
                 for (const { node, path } of tree.iteratePath(findPath, { reverse: true })) {
                     if (tree.isNodeDroppable(node, path)) {
                         return tree.getBranchElByPath(cur);
@@ -120,7 +118,6 @@ export default defineComponent({
                 store.startTree.$emit('after-placeholder-created', store);
             },
             getPathByBranchEl: branchEl => this.getPathByBranchEl(branchEl),
-            // eslint-disable-next-line consistent-return
             beforeFirstMove: (store) => {
                 this.treesStore.store = store;
                 // @ts-ignore
@@ -144,7 +141,6 @@ export default defineComponent({
                 store.startTree.$emit('drag', store);
                 this.$root.$emit('he-tree-drag', store);
             },
-            // eslint-disable-next-line consistent-return
             filterTargetTree: (targetTreeEl, store) => {
                 // @ts-ignore
                 const targetTree = this.getTreeVmByTreeEl(targetTreeEl);
@@ -172,7 +168,6 @@ export default defineComponent({
             afterMove: (store) => {
                 store.startTree.$emit('after-move', store);
             },
-            // eslint-disable-next-line consistent-return
             beforeDrop: (pathChanged, store) => {
                 const { targetTree } = store;
                 if (targetTree.hasHook('ondragend') && targetTree.executeHook('ondragend', [targetTree, store]) === false) {
@@ -180,7 +175,6 @@ export default defineComponent({
                 }
                 this.$root.$emit('he-tree-before-drop', store);
             },
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars,consistent-return
             afterDrop: (store, t) => {
                 if (store.pathChanged) {
                     const {
@@ -235,13 +229,9 @@ export default defineComponent({
 
                     const rollback = () => {
                         // remove inserted node from target position
-                        // eslint-disable-next-line @typescript-eslint/no-shadow
                         const targetParentPath = arrayWithoutEnd(targetPath, 1);
-                        // eslint-disable-next-line @typescript-eslint/no-shadow
                         const targetParent = targetTree.getNodeByPath(targetParentPath);
-                        // eslint-disable-next-line @typescript-eslint/no-shadow
                         const targetSiblings = targetParentPath.length === 0 ? targetTree.treeData : targetParent.children;
-                        // eslint-disable-next-line @typescript-eslint/no-shadow
                         const targetIndex = arrayLast(targetPath);
                         targetSiblings.splice(targetIndex, 1);
 
@@ -271,7 +261,6 @@ export default defineComponent({
                         targetTree.$emit('input', targetTree.treeData);
                         targetTree.$emit('change', store);
                     }
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     return new Promise<void>((resolve, reject) => {
                         targetTree.$nextTick(() => {
                             resolve();
@@ -280,7 +269,6 @@ export default defineComponent({
                 }
             },
         };
-        // eslint-disable-next-line @typescript-eslint/naming-convention,no-multi-assign
         const _makeTreeDraggable_obj = this._makeTreeDraggable_obj = makeTreeDraggable(this.$el, options);
         // watch props and update options
         ['indent',
@@ -303,14 +291,11 @@ export default defineComponent({
     // computed: {},
     // watch: {},
     methods: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         _Draggable_unfoldTargetNodeByEl(branchEl, store) {
             const { targetTree } = store;
             const path = targetTree.getPathByBranchEl(branchEl);
             const node = targetTree.getNodeByPath(path);
-            // eslint-disable-next-line no-unused-expressions
             targetTree.unfold && targetTree.unfold(node, path);
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             return new Promise<void>((resolve, reject) => {
                 targetTree.$nextTick(() => {
                     resolve();
@@ -322,13 +307,11 @@ export default defineComponent({
             // @ts-ignore
             const allNodes = this.getAllNodesByPath(path);
             allNodes.unshift(this.rootNode);
-            // eslint-disable-next-line @typescript-eslint/no-shadow,no-restricted-syntax
             for (const { value: node, index } of iterateAll<Node>(allNodes, { reverse: true })) {
                 const currentPath = path.slice(0, (index ?? 0) + 1);
                 const draggableOpt = node.$draggable !== undefined ? node.$draggable : this.eachDraggable;
                 const draggable = resolveValueOrGetter(draggableOpt, [currentPath, this, store]);
                 if (draggable === undefined) {
-                    // eslint-disable-next-line no-continue
                     continue;
                 } else {
                     return draggable;
@@ -343,13 +326,11 @@ export default defineComponent({
             allNodes.unshift(this.rootNode);
             let droppableFinal; let
                 resolved;
-            // eslint-disable-next-line @typescript-eslint/no-shadow,no-restricted-syntax
             for (const { value: node, index } of iterateAll<Node>(allNodes, { reverse: true })) {
                 const currentPath = path.slice(0, (index ?? 0) + 1);
                 const droppableOpt = node.$droppable !== undefined ? node.$droppable : this.eachDroppable;
                 const droppable = resolveValueOrGetter(droppableOpt, [currentPath, this, store]);
                 if (droppable === undefined) {
-                    // eslint-disable-next-line no-continue
                     continue;
                 } else {
                     droppableFinal = droppable;
@@ -370,9 +351,7 @@ export default defineComponent({
         },
         // override
         getPathByBranchEl(branchEl) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const store = this.treesStore.store;
-            // eslint-disable-next-line consistent-return
             const getAttrPath = (el) => {
                 const pathStr = el.getAttribute('data-tree-node-path');
                 if (pathStr) {
@@ -385,7 +364,6 @@ export default defineComponent({
             }
             // placeholder path
             let parentPath;
-            // eslint-disable-next-line consistent-return
             findParent(branchEl, (el) => {
                 if (hasClass(el, 'tree-root')) {
                     parentPath = [];
@@ -398,7 +376,6 @@ export default defineComponent({
                 return false;
             });
             let index = 0;
-            // eslint-disable-next-line no-restricted-syntax,@typescript-eslint/no-unused-vars
             for (const { value: el, index: index2 } of iterateAll<HTMLElement>(branchEl.parentElement.children)) {
                 if (hasClass(el, 'tree-branch') || hasClass(el, 'tree-placeholder')) {
                     if (el === branchEl) {

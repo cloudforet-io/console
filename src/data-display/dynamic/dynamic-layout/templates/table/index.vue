@@ -57,10 +57,10 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import type { ComponentRenderProxy, PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
@@ -109,7 +109,7 @@ export default defineComponent<TableDynamicLayoutProps>({
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),

@@ -1,5 +1,4 @@
 declare module '*.vue' {
-    import VueCompositionApi from '@vue/composition-api';
     import Vue from 'vue';
 
     import { VTooltip } from 'v-tooltip';
@@ -11,7 +10,6 @@ declare module '*.vue' {
 
     Vue.use(VueRouter);
     Vue.use(VueI18n);
-    Vue.use(VueCompositionApi);
     Vue.use(Fragment.Plugin);
     Vue.use(Notifications);
     Vue.use(SvgIcon);

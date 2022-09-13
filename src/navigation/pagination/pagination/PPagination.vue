@@ -25,10 +25,10 @@
     </nav>
 </template>
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     computed, getCurrentInstance, reactive,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
@@ -66,7 +66,7 @@ export default {
         // },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         // pagination logic
         const paginate = (
             totalItems,

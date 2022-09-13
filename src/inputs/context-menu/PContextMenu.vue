@@ -83,10 +83,10 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';

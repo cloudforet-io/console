@@ -7,7 +7,7 @@
     </span>
 </template>
 <script lang="ts">
-import { computed, defineComponent } from '@vue/composition-api';
+import { computed, defineComponent } from 'vue';
 
 import { get } from 'lodash';
 import type { TranslateResult } from 'vue-i18n';

@@ -3,13 +3,13 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed,
     defineComponent,
     onMounted, onUnmounted,
     reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { TreeMap } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';

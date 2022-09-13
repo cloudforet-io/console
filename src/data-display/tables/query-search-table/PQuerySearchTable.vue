@@ -34,10 +34,9 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     getCurrentInstance, reactive,
-} from '@vue/composition-api';
+} from 'vue';
 
 import type { Options, QuerySearchTableProps } from '@/data-display/tables/query-search-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
@@ -134,7 +133,7 @@ export default {
         },
     },
     setup(props: QuerySearchTableProps, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const proxyState = reactive({
             selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, [], ['select']),

@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 

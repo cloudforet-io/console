@@ -116,7 +116,7 @@
 <script lang="ts">
 import {
     toRefs, reactive, computed,
-} from '@vue/composition-api';
+} from 'vue';
 
 
 import { size } from 'lodash';

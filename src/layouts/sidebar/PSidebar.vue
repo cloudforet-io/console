@@ -34,10 +34,9 @@
 <script lang="ts">
 import {
     computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import type { SidebarProps } from '@/layouts/sidebar/type';
 import {
     STYLE_TYPE as SIDEBAR_STYLE_TYPE,
     SIZE as SIDEBAR_SIZE,
@@ -79,7 +78,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props: SidebarProps, { emit, listeners }) {
+    setup(props, { emit, listeners }) {
         const state = reactive({
             proxyVisible: listeners.close || listeners['update:visible'] ? computed({
                 get() {

@@ -25,7 +25,7 @@
 <script lang="ts">
 import {
     computed, defineComponent,
-} from '@vue/composition-api';
+} from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 import type { SelectProps } from '@/hooks/select';

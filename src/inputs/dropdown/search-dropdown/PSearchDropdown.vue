@@ -80,10 +80,10 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { reduce } from 'lodash';
 
@@ -191,7 +191,7 @@ export default defineComponent<SearchDropdownProps>({
         },
     },
     setup(props: SearchDropdownProps, { emit, slots, listeners }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
 
         const {
             proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,

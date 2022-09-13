@@ -17,14 +17,15 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { get } from 'lodash';
 
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
-import type { TextListItem, TextListProps } from '@/others/console/text-list/type';
+import type { TextListItem } from '@/others/console/text-list/type';
 import { isNotEmpty } from '@/util/helpers';
 
 export default defineComponent({
@@ -32,7 +33,8 @@ export default defineComponent({
     components: { PAnchor },
     props: {
         items: {
-            type: [Array],
+            // FIXME:: below any type
+            type: Array as PropType<any>,
             default: () => [],
         },
         delimiter: {
@@ -60,7 +62,7 @@ export default defineComponent({
             default: undefined,
         },
     },
-    setup(props: TextListProps) {
+    setup(props) {
         const state = reactive({
             component: computed(() => (props.link ? PAnchor : (props.tag || 'span'))),
             displayItems: computed(() => props.items.reduce((res, item) => {

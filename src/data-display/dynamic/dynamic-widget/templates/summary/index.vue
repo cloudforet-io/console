@@ -17,12 +17,12 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed,
     defineComponent,
     reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DEFAULT_VALUE_OPTIONS } from '@/data-display/dynamic/dynamic-widget/config';

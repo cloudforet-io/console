@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/composition-api';
+import { computed, defineComponent } from 'vue';
 
 import { themes } from '@/data-display/status/config';
 import type { StatusProps } from '@/data-display/status/type';

@@ -21,7 +21,7 @@
 <script lang="ts">
 import {
     computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import PI from '@/foundation/icons/PI.vue';

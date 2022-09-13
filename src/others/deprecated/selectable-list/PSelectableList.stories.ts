@@ -1,6 +1,6 @@
 import {
     toRefs, reactive,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { action } from '@storybook/addon-actions';
 import {

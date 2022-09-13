@@ -1,7 +1,7 @@
-import type { Ref } from '@vue/composition-api';
+import type { Ref } from 'vue';
 import {
     computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import type { ErrorObject, ValidateFunction } from 'ajv';
 import type Ajv from 'ajv';

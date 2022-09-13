@@ -22,7 +22,7 @@
 import {
     computed,
     defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { v4 as uuidV4 } from 'uuid';
 

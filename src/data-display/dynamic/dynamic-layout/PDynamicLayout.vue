@@ -18,13 +18,12 @@
 import {
     defineComponent,
     onMounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 import type { AsyncComponent } from 'vue';
 import type { ImportedComponent } from 'vue/types/options';
 
 import { isEqual } from 'lodash';
 
-import type { DynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayoutType } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { dynamicLayoutTypes } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
@@ -94,7 +93,7 @@ export default defineComponent({
             default: undefined,
         },
     },
-    setup(props: DynamicLayoutProps) {
+    setup(props) {
         const state = reactive({
             component: null as null|AsyncComponent,
         });

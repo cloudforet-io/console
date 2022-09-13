@@ -36,7 +36,7 @@
 <script lang="ts">
 import {
     toRefs, reactive, computed, onMounted, onUnmounted,
-} from '@vue/composition-api';
+} from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 

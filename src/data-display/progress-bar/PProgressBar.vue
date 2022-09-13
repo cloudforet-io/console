@@ -19,7 +19,7 @@
 <script lang="ts">
 import {
     computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { PROGRESS_BAR_SIZE } from '@/data-display/progress-bar/config';
 import type { ProgressBarProps } from '@/data-display/progress-bar/type';

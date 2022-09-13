@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 
 import type { ModalProps } from '@/feedbacks/modals/type';
 import { SizeMapping } from '@/feedbacks/modals/type';

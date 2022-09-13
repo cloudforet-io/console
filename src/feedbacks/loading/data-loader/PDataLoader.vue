@@ -43,10 +43,10 @@
 </template>
 
 <script lang="ts">
-import type { ComputedRef, PropType, WatchStopHandle } from '@vue/composition-api';
+import type { ComputedRef, PropType, WatchStopHandle } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { isEmpty } from 'lodash';
 

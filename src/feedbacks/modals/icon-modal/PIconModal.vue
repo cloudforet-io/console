@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from 'vue';
 
 import type { IconModalProps } from '@/feedbacks/modals/icon-modal/type';
 import PI from '@/foundation/icons/PI.vue';

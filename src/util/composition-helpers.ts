@@ -1,7 +1,9 @@
-import type { ComponentRenderProxy, Ref } from '@vue/composition-api';
+import type { Ref } from 'vue';
 import {
     computed, ref,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
+
 
 /**
  * Event listeners by pass
@@ -49,7 +51,7 @@ export const makeProxy = <T>(name: string, props: any, emit: any): Ref<T> => com
  * * @param events?
  * @return {Ref<*>|*}
  */
-export function makeOptionalProxy <T=any>(name: string, vm: ComponentRenderProxy, initData: any, events?: string[]) {
+export function makeOptionalProxy <T=any>(name: string, vm: Vue, initData: any, events?: string[]) {
     let propsVal = vm.$props[name];
     const currentVal = ref(propsVal === undefined ? initData : propsVal);
     let prevVal = currentVal.value;

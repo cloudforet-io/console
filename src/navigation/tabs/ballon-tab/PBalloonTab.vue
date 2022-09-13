@@ -28,7 +28,7 @@
 <script lang="ts">
 import {
     reactive, toRefs, computed, onMounted, onUnmounted, onUpdated,
-} from '@vue/composition-api';
+} from 'vue';
 
 
 import { useTab } from '@/hooks/tab';

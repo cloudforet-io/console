@@ -1,7 +1,7 @@
-import type { ComponentRenderProxy, ComputedRef } from '@vue/composition-api';
+import type { ComputedRef } from 'vue';
 import {
     computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import type { ResizeObserverEntry } from '@juggle/resize-observer';
@@ -35,7 +35,7 @@ const getScrollableParent = (ele?: Element|null): Element => {
 };
 
 export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu }: StateArgs) => {
-    const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+    const vm = getCurrentInstance()?.proxy as Vue;
     const state = reactive({
         useFixedMenuStyle,
         visibleMenu,

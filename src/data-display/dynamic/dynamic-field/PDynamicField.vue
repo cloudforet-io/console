@@ -28,11 +28,10 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
 import {
     defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
-import type { AsyncComponent } from 'vue';
+} from 'vue';
+import type { PropType, AsyncComponent } from 'vue';
 import type { ImportedComponent } from 'vue/types/options';
 
 import type { DynamicFieldProps, DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';

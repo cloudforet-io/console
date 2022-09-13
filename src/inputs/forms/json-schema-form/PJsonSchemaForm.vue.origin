@@ -14,7 +14,7 @@
 <script lang="ts">
 import {
     computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { flatMap, sortBy } from 'lodash';
 import VueFormJsonSchema from 'vue-form-json-schema/dist/vue-form-json-schema.esm';

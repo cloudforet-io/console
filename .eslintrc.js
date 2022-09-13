@@ -133,10 +133,6 @@ module.exports = {
                         group: 'builtin',
                     },
                     {
-                        pattern: '@vue/composition-api',
-                        group: 'builtin',
-                    },
-                    {
                         pattern: 'vue/types/**',
                         group: 'builtin',
                     },
@@ -151,7 +147,7 @@ module.exports = {
                         position: 'after',
                     },
                 ],
-                pathGroupsExcludedImportTypes: ['@vue/composition-api', '@vue/test-utils', 'vue/types'],
+                pathGroupsExcludedImportTypes: ['@vue/test-utils', 'vue/types'],
                 alphabetize: {
                     order: 'asc',
                     caseInsensitive: true,

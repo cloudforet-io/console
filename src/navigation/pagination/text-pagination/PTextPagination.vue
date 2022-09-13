@@ -21,7 +21,7 @@
     </nav>
 </template>
 <script lang="ts">
-import { watch } from '@vue/composition-api';
+import { watch } from 'vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 

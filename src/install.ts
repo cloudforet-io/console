@@ -1,4 +1,3 @@
-import VueCompositionApi from '@vue/composition-api';
 import type { PluginFunction, VueConstructor } from 'vue';
 
 import VTooltip from 'v-tooltip';
@@ -15,7 +14,6 @@ import { applyAmchartsGlobalSettings } from './plugins/amcharts';
 export interface MirinaeOptions {
     installVueRouter?: boolean;
     installVueI18n?: boolean;
-    installVueCompositionApi?: boolean;
     installFragment?: boolean;
     amchartsLicenses?: string[];
 }
@@ -43,7 +41,6 @@ export class MirinaeInstaller {
         const options = MirinaeInstaller._options;
         if (options?.installVueRouter) vueConstructor.use(VueRouter);
         if (options?.installVueI18n) vueConstructor.use(VueI18n);
-        if (options?.installVueCompositionApi) vueConstructor.use(VueCompositionApi);
         if (options?.installFragment) vueConstructor.use(Fragment.Plugin);
         vueConstructor.use(Notifications, { velocity });
         vueConstructor.use(SvgIcon, {

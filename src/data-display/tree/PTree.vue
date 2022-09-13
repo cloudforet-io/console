@@ -70,7 +70,7 @@
 /* eslint-disable no-await-in-loop */
 import {
     defineComponent, computed, onMounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { unionBy } from 'lodash';
 import { focus } from 'vue-focus';

@@ -31,7 +31,7 @@
 
 import {
     defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
 import PCard from '@/data-display/cards/card/PCard.vue';

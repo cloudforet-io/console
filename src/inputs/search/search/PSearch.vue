@@ -28,10 +28,10 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { focus } from 'vue-focus';
 import type { TranslateResult } from 'vue-i18n';
@@ -84,7 +84,7 @@ export default defineComponent<SearchProps>({
         },
     },
     setup(props: SearchProps, { emit, listeners }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
             placeholderText: computed<TranslateResult>(() => {

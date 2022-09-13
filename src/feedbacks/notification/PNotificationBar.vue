@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import { defineComponent, reactive, toRefs } from 'vue';
 
 import { styleTypes } from '@/feedbacks/notification/config';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';

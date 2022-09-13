@@ -16,7 +16,7 @@
 <script lang="ts">
 import {
     defineComponent, computed, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { ToggleButton } from 'vue-js-toggle-button';
 

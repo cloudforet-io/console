@@ -68,7 +68,7 @@ module.exports = {
          */
         // eslint-disable-next-line consistent-return
         externals(context, request, callback) {
-            if (/^vue$|@vue\/composition-api|vue-router|vue-i18n|vue-fragment|@amcharts/.test(request)) {
+            if (/^vue$|@vue\/vue-router|vue-i18n|vue-fragment|@amcharts/.test(request)) {
                 return callback(null, `commonjs ${request}`);
             }
             callback();

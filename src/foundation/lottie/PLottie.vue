@@ -10,7 +10,7 @@
 <script lang="ts">
 import {
     defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import lottie from 'lottie-web';
 

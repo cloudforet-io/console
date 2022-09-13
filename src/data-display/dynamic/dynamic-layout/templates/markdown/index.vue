@@ -11,11 +11,11 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     computed, getCurrentInstance,
     reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import type {
     MarkdownDynamicLayoutProps,
@@ -53,7 +53,7 @@ export default {
         },
     },
     setup(props: MarkdownDynamicLayoutProps) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
             rootData: computed<any[]>(() => {

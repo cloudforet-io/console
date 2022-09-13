@@ -38,7 +38,7 @@
 <script lang="ts">
 import {
     reactive, computed, toRefs, defineComponent,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { orderBy } from 'lodash';
 

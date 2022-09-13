@@ -21,7 +21,7 @@
 <script lang="ts">
 import {
     reactive, computed, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 import { SELECT_BUTTON_GROUP_THEME } from '@/inputs/buttons/select-button-group/config';

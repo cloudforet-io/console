@@ -8,10 +8,10 @@
     />
 </template>
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed, defineComponent,
-} from '@vue/composition-api';
+} from 'vue';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { EnumTypeOptions, EnumDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/enum/type';

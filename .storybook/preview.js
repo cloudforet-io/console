@@ -2,7 +2,6 @@ import "@/styles/style.pcss";
 
 import { withDesign } from 'storybook-addon-designs';
 
-import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 
 import Vue from 'vue';
@@ -24,7 +23,6 @@ import { applyAmchartsGlobalSettings } from '@/plugins/amcharts';
 
 Vue.use(VueRouter)
 Vue.use(VueI18n);
-Vue.use(VueCompositionApi);
 Vue.use(Notifications, { velocity });
 Vue.use(SvgIcon, {
     tagName: 'svgicon',

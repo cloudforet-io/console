@@ -13,7 +13,7 @@
 </template>
 <script lang="ts">
 import '@/foundation/icons/p-icons';
-import { defineComponent } from '@vue/composition-api';
+import { defineComponent } from 'vue';
 
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 /* https://www.npmjs.com/package/vue-svgicon */

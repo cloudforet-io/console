@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { defineComponent } from 'vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { commaFormatter } from '@/util/helpers';

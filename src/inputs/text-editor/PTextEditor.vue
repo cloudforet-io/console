@@ -30,12 +30,12 @@
  * CodeMirror can get String ONLY
  */
 
-import type { ComponentRenderProxy, PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed, defineComponent,
     getCurrentInstance, onBeforeUnmount,
     reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import type { EditorConfiguration } from 'codemirror';
 import CodeMirror from 'codemirror';
@@ -109,7 +109,7 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             content: '',
             cmInstance: null as any,

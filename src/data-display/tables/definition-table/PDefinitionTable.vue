@@ -55,10 +55,10 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { every, get, range } from 'lodash';
 

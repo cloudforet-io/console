@@ -16,8 +16,9 @@
 </template>
 
 <script lang="ts">
+// @ts-nocheck
 import * as ut from '../utils';
-import { defineComponent } from '@vue/composition-api';
+import { defineComponent } from 'vue';
 import {
   arrayRemove,
   joinFunctionsByNext,
@@ -71,11 +72,9 @@ export default defineComponent({
             _hooks: {} as Record<string, {(...args: any[]): any}[]>
         };
     },
-    // computed: {},
     watch: {
         treeData: {
             immediate: true,
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             handler(treeData) {
                 this._TreeDataHelper = new TreeData(this.treeData);
             },

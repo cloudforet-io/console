@@ -65,7 +65,7 @@ https://www.amcharts.com/online-store/licenses-explained/
 ### 1. Install
 
 ```shell
-npm install @spaceone/design-system vue @vue/composition-api vue-router vue-i18n vue-fragment @amcharts
+npm install @spaceone/design-system vue vue-router vue-i18n vue-fragment @amcharts
 ```
 
 ### 2. Set plugin
@@ -84,7 +84,6 @@ Vue.use(MirinaeDesignSystem, pluginOptions);
 | --- | ---- |
 | installVueRouter | Whether to install Vue Router. Some components use Vue Router, so don't give this option if you have already installed it in your application. |
 | installVueI18n | Whether to install Vue I18n. Some components use Vue I18n, so don't give this option if you have already installed it in your application. |
-| installVueCompositionApi | Whether to install the Vue Composition API. All components use the Vue Composition API, so don't give this option if you have already installed it in your application. |
 | installFragment | Whether to install Vue Fragment. Some components use Vue Fragment, so don't give this option if you have already installed it in your application. |
 | amchartsLicenses | If you use the amcharts library such as Dynamic Chart, license the amcharts as a string array. |
 
@@ -92,7 +91,6 @@ Vue.use(MirinaeDesignSystem, pluginOptions);
 interface MirinaeDSOptions {
     installVueRouter?: boolean;
     installVueI18n?: boolean;
-    installVueCompositionApi?: boolean;
     installFragment?: boolean;
     amchartsLicenses?: string[];
 }

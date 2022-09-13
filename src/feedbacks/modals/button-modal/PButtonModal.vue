@@ -83,7 +83,7 @@
 <script lang="ts">
 import {
     computed, defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import type { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';

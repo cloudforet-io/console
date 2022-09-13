@@ -22,7 +22,7 @@
 <script lang="ts">
 import {
     reactive, toRefs, computed,
-} from '@vue/composition-api';
+} from 'vue';
 
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';

@@ -19,7 +19,7 @@
 import {
     computed,
     defineComponent, reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import linkifyIt from 'linkify-it';
 

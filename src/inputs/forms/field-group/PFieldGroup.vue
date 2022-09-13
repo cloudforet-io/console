@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { defineComponent } from 'vue';
 
 import PLabel from '@/data-display/label/PLabel.vue';
 

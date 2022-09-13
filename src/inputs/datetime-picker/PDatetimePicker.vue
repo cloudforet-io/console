@@ -23,10 +23,10 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
@@ -109,7 +109,7 @@ export default {
         },
     },
     setup(props: DatetimePickerProps, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             datePickerRef: null as null | HTMLElement,
             datePicker: null as null | Instance,

@@ -1,7 +1,7 @@
-import type { Ref } from '@vue/composition-api';
+import type { Ref } from 'vue';
 import {
     computed, ref, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 /**
  * @name useProxyValue

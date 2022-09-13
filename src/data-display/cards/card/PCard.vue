@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { defineComponent } from 'vue';
 
 import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 import type { CardProps } from '@/data-display/cards/card/type';

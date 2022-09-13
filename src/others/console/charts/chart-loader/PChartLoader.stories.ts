@@ -1,6 +1,6 @@
 import {
     toRefs, reactive, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import {
     boolean,

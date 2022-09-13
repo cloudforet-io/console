@@ -29,7 +29,7 @@
 <script lang="ts">
 import {
     reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 

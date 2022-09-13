@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/composition-api';
+import { computed, defineComponent } from 'vue';
 
 import PStatus from '@/data-display/status/PStatus.vue';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';

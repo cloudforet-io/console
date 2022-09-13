@@ -38,11 +38,11 @@
 </template>
 
 <script lang="ts">
-import type { ComponentRenderProxy } from '@vue/composition-api';
 import {
     getCurrentInstance,
     reactive,
-} from '@vue/composition-api';
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { get, findIndex } from 'lodash';
 
@@ -109,7 +109,7 @@ export default {
         },
     },
     setup(props: SelectableListProps, { emit }) {
-        const vm = getCurrentInstance()?.proxy as ComponentRenderProxy;
+        const vm = getCurrentInstance()?.proxy as Vue;
         const proxyState = reactive({
             selectedIndexes: makeOptionalProxy('selectedIndexes', vm, [], ['select']),
             disabledIndexes: makeOptionalProxy('disabledIndexes', vm, []),

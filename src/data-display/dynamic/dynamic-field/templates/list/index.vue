@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from 'vue';
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { ListDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/list/type';

@@ -62,10 +62,10 @@
 </template>
 
 <script lang="ts">
-import type { WatchStopHandle } from '@vue/composition-api';
+import type { PropType, WatchStopHandle } from 'vue';
 import {
     computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
@@ -92,7 +92,6 @@ import type {
     KeyItem,
     KeyMenuItem,
     OperatorType,
-    QuerySearchProps,
     ValueHandler,
     ValueItem,
     ValueMenuItem, MenuType, QueryItem, KeyDataType,
@@ -135,7 +134,8 @@ export default defineComponent({
             default: false,
         },
         keyItemSets: {
-            type: Array,
+            // FIXME:: below any type
+            type: Array as PropType<any>,
             default: () => [],
         },
         valueHandlerMap: {
@@ -143,7 +143,7 @@ export default defineComponent({
             default: () => ({}),
         },
     },
-    setup(props: QuerySearchProps, { emit, slots }) {
+    setup(props, { emit, slots }) {
         const state = reactive({
             /* Input */
             inputRef: null as null|HTMLElement,

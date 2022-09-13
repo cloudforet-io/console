@@ -1,4 +1,4 @@
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import { reactive, toRefs, watch } from 'vue';
 
 import type { Localize } from 'ajv-i18n/localize/types';
 

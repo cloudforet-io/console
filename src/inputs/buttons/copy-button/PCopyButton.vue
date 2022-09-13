@@ -33,7 +33,7 @@
 <script lang="ts">
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
-} from '@vue/composition-api';
+} from 'vue';
 import type Vue from 'vue';
 
 

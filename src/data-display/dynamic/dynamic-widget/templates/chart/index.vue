@@ -20,12 +20,12 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from '@vue/composition-api';
+import type { PropType } from 'vue';
 import {
     computed,
     defineComponent,
     reactive, toRefs,
-} from '@vue/composition-api';
+} from 'vue';
 
 import { DYNAMIC_CHART_LIMIT_MAP, DYNAMIC_CHART_THEMES } from '@/data-display/dynamic/dynamic-chart/config';
 import PDynamicChart from '@/data-display/dynamic/dynamic-chart/PDynamicChart.vue';
