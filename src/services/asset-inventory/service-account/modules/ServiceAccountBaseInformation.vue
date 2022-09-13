@@ -40,17 +40,13 @@ The Key - Value pair is a required field. Only underscores (_), characters, and 
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from 'vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PJsonSchemaForm, PFieldGroup, PPaneLayout, PTextInput, PPanelTop,
 } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 

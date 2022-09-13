@@ -15,9 +15,9 @@
 
 <script lang="ts">
 
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
-
 import { PLazyImg } from '@spaceone/design-system';
+import { defineComponent, reactive, toRefs } from 'vue';
+
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

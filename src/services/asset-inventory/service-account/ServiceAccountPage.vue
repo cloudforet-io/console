@@ -72,12 +72,9 @@ import type {
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-    computed, reactive, ref, watch, toRefs
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import {
-    computed, reactive, ref, watch, toRefs,
+    computed, reactive, watch, toRefs,
 } from 'vue';
-import type { Ref } from 'vue';
 
 /* components */
 import { SpaceRouter } from '@/router';
