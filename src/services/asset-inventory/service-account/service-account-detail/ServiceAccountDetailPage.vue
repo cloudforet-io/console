@@ -34,7 +34,9 @@
                                               :provider-data="providerData"
                                               :service-account-id="serviceAccountId"
             />
-            <service-account-credentials :mode="pageModeMap.credentials" />
+            <service-account-credentials :mode="pageModeMap.credentials"
+                                         :service-account-id="serviceAccountId"
+            />
         </div>
     </div>
 </template>
