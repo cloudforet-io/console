@@ -9,14 +9,18 @@
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-dynamic-layout v-if="tableState.schema"
-                                  type="table"
+                                  type="query-search-table"
                                   :options="tableState.schema.options"
                                   :data="tableState.items"
                                   :fetch-options="fetchOptionState"
-                                  :type-options="typeOptionState"
+                                  :type-options="{
+                                      ...typeOptionState,
+                                      keyItemSets,
+                                      valueHandlerMap,
+                                  }"
                                   :style="{height: `${height}px`}"
                                   :field-handler="fieldHandler"
-                                  @fetch="fetchTableData"
+                                  @fetch="handleDynamicLayoutFetch"
                                   @export="exportServiceAccountData"
                                   @click-settings="handleClickSettings"
                                   @click-row="handleClickRow"
@@ -58,6 +62,7 @@
 /* external library */
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
+import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
@@ -87,6 +92,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import type { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
+import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
@@ -126,7 +132,7 @@ export default {
             pageLimit: 15,
             sortDesc: true,
             sortBy: 'created_at',
-            searchText: queryHelper.apiQuery.keyword,
+            queryTags: queryHelper.setFiltersAsRawQueryString(query.filters).queryTags,
         });
 
         const typeOptionState = reactive({
@@ -153,17 +159,24 @@ export default {
                 { name: 'generalAccount', label: 'General Account' },
             ]),
             selectedAccountType: 'all',
+            searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
         });
 
+        const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
+            computed(() => tableState.schema?.options?.search ?? []),
+            'identity.ServiceAccount',
+            // computed(() => )
+        );
         /** Handling API with SpaceConnector * */
 
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilters([{ k: 'provider', v: state.selectedProvider, o: '=' }])
-                .addFilter(...queryHelper.filters);
-
+                .setFilters([
+                    { k: 'provider', v: state.selectedProvider, o: '=' },
+                    ...tableState.searchFilters,
+                ]);
             const fields = tableState.schema?.options?.fields;
             if (fields) {
                 apiQuery.setOnly(...fields.map(d => d.key).filter(d => !d.startsWith('tags.')), 'service_account_id', 'tags');
@@ -203,11 +216,8 @@ export default {
             if (changed.pageStart !== undefined) {
                 fetchOptionState.pageStart = changed.pageStart;
             }
-            if (changed.searchText !== undefined) {
-                fetchOptionState.searchText = changed.searchText;
-                // sync updated query tags to url query string
-                queryHelper.setFilters([{ v: changed.searchText }]);
-                replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+            if (changed.queryTags !== undefined) {
+                fetchOptionState.queryTags = changed.queryTags;
             }
             listServiceAccountData();
         };
@@ -251,6 +261,10 @@ export default {
                 params: { serviceAccountId: item.service_account_id },
             });
         };
+        const handleDynamicLayoutFetch = (changed) => {
+            if (tableState.schema === null || !isAllLoaded.value) return;
+            fetchTableData(changed);
+        };
         /** ******* Page Init ******* */
         const getTableSchema = async () => {
             try {
@@ -291,15 +305,24 @@ export default {
         };
         init();
         /** ************************* */
+        const replaceQueryHelper = new QueryHelper();
+        watch(() => tableState.searchFilters, (searchFilters) => {
+            replaceQueryHelper.setFilters(searchFilters);
+            const filterQueryString = query.filters ?? '';
+            if (replaceQueryHelper.rawQueryString !== JSON.stringify(filterQueryString)) {
+                replaceUrlQuery('filters', replaceQueryHelper.rawQueryStrings);
+            }
+        });
 
         return {
             ...toRefs(state),
             tableState,
             fetchOptionState,
             typeOptionState,
+            keyItemSets,
+            valueHandlerMap,
             exportServiceAccountData,
             listServiceAccountData,
-            fetchTableData,
             fieldHandler,
             reloadTable,
             handleClickSettings,
@@ -307,6 +330,7 @@ export default {
 
             handleSelectServiceAccountType,
             handleClickRow,
+            handleDynamicLayoutFetch,
         };
     },
 };
