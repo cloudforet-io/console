@@ -91,6 +91,13 @@ interface Props {
     serviceAccountId?: string;
 }
 
+interface CredentialModel {
+    schema?: string;
+    provider?: string;
+    secret_type?: string;
+    [key: string]: string | undefined;
+}
+
 export default defineComponent<Props>({
     name: 'ServiceAccountCredentials',
     components: {
@@ -168,7 +175,7 @@ export default defineComponent<Props>({
                     } as ItemOptions,
                 };
             }),
-            item: {},
+            item: {} as CredentialModel,
             fieldHandler: [],
         });
         const tabState = reactive({
@@ -241,8 +248,11 @@ export default defineComponent<Props>({
             emit('update:isValid', isAllValid);
         });
         // READ
-        watch(() => props.serviceAccountId, (serviceAccountId) => {
-            if (serviceAccountId) listCredentials(serviceAccountId);
+        watch(() => props.serviceAccountId, async (serviceAccountId) => {
+            if (serviceAccountId) {
+                await listCredentials(serviceAccountId);
+                await getCredentialSchema(readState.item.schema);
+            }
         }, { immediate: true });
 
         return {
