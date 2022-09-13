@@ -11,7 +11,7 @@
 <a  href="https://www.apache.org/licenses/LICENSE-2.0"  target="_blank">  
 <img  alt="License: Apache 2.0"  src="https://img.shields.io/badge/License-Apache 2.0-yellow.svg"  />  
 </a> 
-<a href="http://storybook.developer.spaceone.dev/"  target="_blank">  
+<a href="https://storybook.developer.spaceone.dev/"  target="_blank">  
     <img alt="mirinae storybook" src="https://img.shields.io/badge/Design System-SpaceOne-blueviolet.svg?logo=storybook" />  
 </a> 
 </div>
