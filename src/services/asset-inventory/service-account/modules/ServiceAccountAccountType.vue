@@ -5,14 +5,12 @@
         <div class="content-wrapper">
             <div v-if="mode === 'CREATE' || mode === 'UPDATE'" class="create-mode-wrapper">
                 <div class="card-wrapper">
-                    <!--                    song-lang-->
                     <p-select-card
                         v-model="selectedType"
                         value="GENERAL"
                         label="General Account"
                         class="card"
                     />
-                    <!--                    song-lang-->
                     <p-select-card
                         v-model="selectedType"
                         value="TRUST"
@@ -33,23 +31,13 @@
                     <p-anchor highlight text="here" />
                 </div>
             </div>
-            <div v-else class="read-mode-wrapper">
-                <p-badge v-if="badgeType === 'GENERAL'" outline style-type="gray">
-                    <!--                    song-lang-->
-                    General Account
-                </p-badge>
-                <p-badge v-else outline style-type="primary">
-                    <!--                    song-lang-->
-                    Trust Account
-                </p-badge>
-            </div>
         </div>
     </p-pane-layout>
 </template>
 
 <script lang="ts">
 import {
-    PPaneLayout, PPanelTop, PSelectCard, PI, PAnchor, PBadge,
+    PPaneLayout, PPanelTop, PSelectCard, PI, PAnchor,
 } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import { computed, reactive, toRefs } from 'vue';
@@ -65,7 +53,6 @@ export default {
         PPanelTop,
         PSelectCard,
         PI,
-        PBadge,
     },
     props: {
         mode: {
