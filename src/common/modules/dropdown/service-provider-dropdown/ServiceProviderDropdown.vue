@@ -30,6 +30,7 @@
 
 <script lang="ts">
 import { PSelectDropdown, PLazyImg } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import { computed, reactive, toRefs } from 'vue';
 
 
@@ -58,7 +59,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxySelected: useProxyValue('selectedProvider', props, emit),
             providerList: computed(() => store.state.reference.provider.items),

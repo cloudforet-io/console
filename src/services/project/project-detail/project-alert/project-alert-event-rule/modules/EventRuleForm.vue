@@ -31,7 +31,11 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton,
 } from '@spaceone/design-system';
-import { reactive, toRefs, watch } from 'vue';
+import type { SetupContext } from 'vue';
+import {
+    getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -103,7 +107,9 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             conditionsPolicy: CONDITIONS_POLICY.ALL as ConditionsPolicy,
             conditions: [
@@ -151,7 +157,7 @@ export default {
                     options: state.options,
                     project_id: props.projectId,
                 });
-                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.EVENT_RULE.ALT_E_CREATE_EVENT_RULE'));
             }
@@ -165,7 +171,7 @@ export default {
                     actions: state.actions,
                     options: state.options,
                 });
-                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.EVENT_RULE.ALT_E_UPDATE_EVENT_RULE'));
             }

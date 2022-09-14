@@ -116,7 +116,7 @@ import {
 } from '@/common/modules/monitoring/config';
 import type {
     AvailableResource,
-    Metric, MetricChartData, MonitoringProps, StatisticsType, StatItem,
+    Metric, MetricChartData, StatisticsType, StatItem,
 } from '@/common/modules/monitoring/type';
 
 
@@ -160,7 +160,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: MonitoringProps) {
+    setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             showLoader: computed(() => props.loading || state.metricsLoading),

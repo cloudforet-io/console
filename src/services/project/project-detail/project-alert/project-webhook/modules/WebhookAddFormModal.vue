@@ -52,10 +52,11 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -90,7 +91,9 @@ export default {
             default: '',
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             plugins: computed(() => store.state.reference.plugin.items),
             proxyVisible: useProxyValue('visible', props, emit),
@@ -148,7 +151,7 @@ export default {
                     },
                     project_id: props.projectId,
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'));
             } finally {

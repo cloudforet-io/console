@@ -37,9 +37,11 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
 import { uniqBy } from 'lodash';
+import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -74,7 +76,9 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             modalLoading: false,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -99,7 +103,7 @@ export default {
                     },
                     alertId: props.alertId,
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_ASSIGN_MEMBER'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_ASSIGN_MEMBER'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_ASSIGN_MEMBER'));
             } finally {

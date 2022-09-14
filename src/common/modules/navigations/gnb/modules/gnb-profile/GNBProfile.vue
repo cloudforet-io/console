@@ -109,7 +109,7 @@ import {
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type Vue from 'vue';
-import type { DirectiveFunction } from 'vue';
+import type { DirectiveFunction, SetupContext } from 'vue';
 import type { Location } from 'vue-router';
 
 import { store } from '@/store';
@@ -145,7 +145,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({

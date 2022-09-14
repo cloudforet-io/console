@@ -97,9 +97,11 @@ import {
     PButton, PButtonModal, PFieldGroup, PRadio, PSelectButton, PTextInput,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -161,7 +163,9 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             loading: false,
@@ -262,7 +266,7 @@ export default {
                     ...getTimeParams(),
                 });
 
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_CREATE_MAINTENANCE_WINDOW'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_CREATE_MAINTENANCE_WINDOW'), '', vm);
                 return res.maintenance_window_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_CREATE_MAINTENANCE_WINDOW'));
@@ -280,7 +284,7 @@ export default {
                     ...getTimeParams(),
                 });
 
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_UPDATE_MAINTENANCE_WINDOW'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_UPDATE_MAINTENANCE_WINDOW'), '', vm);
                 return res.maintenance_window_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_UPDATE_MAINTENANCE_WINDOW'));

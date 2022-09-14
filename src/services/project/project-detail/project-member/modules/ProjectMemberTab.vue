@@ -88,9 +88,11 @@ import {
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -148,7 +150,9 @@ export default {
             default: false,
         },
     },
-    setup(props, { root, emit }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const apiQueryHelper = new ApiQueryHelper().setPageLimit(15).setFilters(props.filters);
         const storeState = reactive({
             users: computed(() => store.state.reference.user.items),
@@ -254,7 +258,7 @@ export default {
                     project_id: props.projectId,
                     users: items.map(it => it.resource_id),
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
             }
@@ -265,7 +269,7 @@ export default {
                     project_group_id: props.projectGroupId,
                     users: items.map(it => it.resource_id),
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
             }

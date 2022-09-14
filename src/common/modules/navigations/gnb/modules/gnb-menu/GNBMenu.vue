@@ -42,7 +42,7 @@
 import { PI } from '@spaceone/design-system';
 import { vOnClickOutside } from '@vueuse/components';
 import { defineComponent } from 'vue';
-import type { PropType, DirectiveFunction } from 'vue';
+import type { PropType, DirectiveFunction, SetupContext } from 'vue';
 
 import { SpaceRouter } from '@/router';
 
@@ -94,7 +94,7 @@ export default defineComponent({
             default: () => [],
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const handleMenu = () => {
             if (props.subMenuList?.length > 0) {
                 emit('open-menu', props.name);

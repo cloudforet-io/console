@@ -193,8 +193,9 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { root }) {
+    setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
+
         const handlers = {
             keyItemSets: [{
                 title: 'Properties',
@@ -309,7 +310,7 @@ export default {
                     // eslint-disable-next-line camelcase
                     webhook_id: state.selectedItem[0].webhook_id,
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ENABLE_WEBHOOK'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ENABLE_WEBHOOK'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ENABLE_WEBHOOK'));
             } finally {
@@ -324,7 +325,7 @@ export default {
                     // eslint-disable-next-line camelcase
                     webhook_id: state.selectedItem[0].webhook_id,
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DISABLE_WEBHOOK'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DISABLE_WEBHOOK'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DISABLE_WEBHOOK'));
             } finally {
@@ -338,7 +339,7 @@ export default {
                 await SpaceConnector.client.monitoring.webhook.delete({
                     webhook_id: state.selectedItem[0].webhook_id,
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, 'PROJECT.DETAIL.ALT_E_DELETE_WEBHOOK');
             } finally {

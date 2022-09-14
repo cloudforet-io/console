@@ -73,11 +73,11 @@ import {
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import {
-    computed,
+    computed, getCurrentInstance,
     reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-
+import type { Vue } from 'vue/types/vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -122,7 +122,9 @@ export default {
             default: false,
         },
     },
-    setup(props, { root }) {
+    setup() {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
             costQueryList: computed<CostQuerySetModel[]>(() => costExplorerStore.state.costAnalysis.costQueryList),
@@ -238,7 +240,7 @@ export default {
                     },
                 });
                 await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', root);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
             }
@@ -249,7 +251,7 @@ export default {
             try {
                 await SpaceConnector.client.costAnalysis.costQuerySet.delete({ cost_query_set_id: state.itemIdForDeleteQuery });
                 await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', root);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', vm);
                 if (state.selectedQueryId === state.itemIdForDeleteQuery) {
                     await SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });
                     setQueryOptions();

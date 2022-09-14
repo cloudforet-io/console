@@ -53,6 +53,7 @@ import {
 import {
     camelCase, isEmpty, get,
 } from 'lodash';
+import type { SetupContext } from 'vue';
 import {
     reactive, toRefs, computed, onMounted,
 } from 'vue';
@@ -65,12 +66,6 @@ import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInput
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-interface Props {
-    tags: Tag;
-    resourceKey: string;
-    resourceId: string;
-    resourceType: string;
-}
 
 export default {
     name: 'TagsOverlay',
@@ -101,7 +96,7 @@ export default {
             required: true,
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             loading: false,
             showHeader: computed(() => state.newTags.length > 0),

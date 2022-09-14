@@ -67,7 +67,7 @@ import {
     PPanelTop,
     PTextInput,
 } from '@spaceone/design-system';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, watch,
 } from 'vue';
@@ -122,7 +122,7 @@ export default defineComponent<Props>({
             default: undefined,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const {
             forms: { serviceAccountName },
             invalidState,

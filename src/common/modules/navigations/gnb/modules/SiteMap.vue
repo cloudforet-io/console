@@ -65,7 +65,7 @@
 
 import { PI } from '@spaceone/design-system';
 import vClickOutside from 'v-click-outside';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 
@@ -96,7 +96,7 @@ export default {
             default: () => ([]),
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const showSiteMap = () => {
             emit('update:visible', true);
         };

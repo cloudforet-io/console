@@ -103,9 +103,10 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 import type { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 import { map } from 'lodash';
 import {
-    computed, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -137,7 +138,9 @@ export default {
             default: '',
         },
     },
-    setup(props, { root }) {
+    setup() {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             userId: computed(() => store.state.user.userId),
             userRole: computed(() => {
@@ -210,7 +213,7 @@ export default {
         const updateUser = async (userParam) => {
             try {
                 await store.dispatch('user/setUser', userParam);
-                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
             }

@@ -64,6 +64,7 @@
 import {
     PButton, PI, PIconButton, PDataLoader,
 } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import { computed, reactive, toRefs } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -107,7 +108,7 @@ export default {
         PIconButton,
     },
     props: {},
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             loading: true,
             showAll: false,

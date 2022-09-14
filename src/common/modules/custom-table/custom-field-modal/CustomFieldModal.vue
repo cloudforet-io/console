@@ -84,7 +84,7 @@ import {
     PButton, PButtonModal, PCheckBox, PDataLoader, PSearch,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import type Vue from 'vue';
+import type Vue, { SetupContext } from 'vue';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
@@ -162,7 +162,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
         let schema: any = {};
 

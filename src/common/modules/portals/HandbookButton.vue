@@ -40,6 +40,7 @@
 import {
     PI, PCheckBox, PTab,
 } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
     computed, reactive, toRefs, watch, onMounted, onUnmounted, defineComponent,
 } from 'vue';
@@ -49,11 +50,6 @@ import { store } from '@/store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-interface Props {
-    tabs?: any[];
-    activeTab?: string;
-    type: string;
-}
 
 export default defineComponent({
     name: 'HandbookButton',
@@ -74,7 +70,7 @@ export default defineComponent({
             required: true,
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxyActiveTab: useProxyValue('activeTab', props, emit),
             storageKey: computed<string>(() => `handbook:${store.state.user.userId}:${props.type}`),

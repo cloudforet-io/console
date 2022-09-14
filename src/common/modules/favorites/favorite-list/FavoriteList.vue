@@ -57,7 +57,6 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import type { FavoriteListProps } from '@/common/modules/favorites/favorite-list/type';
 
 const LIMIT_COUNT = 5;
 export default {
@@ -77,7 +76,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: FavoriteListProps) {
+    setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             displayItems: computed<FavoriteItem[]>(() => {

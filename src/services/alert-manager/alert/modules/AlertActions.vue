@@ -79,7 +79,11 @@ import {
     PButton, PSelectDropdown, PTableCheckModal, PI, PBadge,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { computed, reactive, toRefs } from 'vue';
+import type { SetupContext } from 'vue';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -136,7 +140,9 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             projects: computed(() => store.getters['reference/projectItems']),
@@ -185,7 +191,7 @@ export default {
                 await SpaceConnector.client.monitoring.alert.delete({
                     alerts: props.selectedItems.map(d => d.alert_id),
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_DELETE'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_DELETE'), '', vm);
                 state.visibleDeleteModal = false;
                 emit('refresh');
                 await store.dispatch('service/projectDetail/getAlertCounts');

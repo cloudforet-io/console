@@ -113,10 +113,12 @@ import {
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
 import { debounce } from 'lodash';
+import type { SetupContext } from 'vue';
 import {
-    reactive, toRefs, computed, watch,
+    reactive, toRefs, computed, watch, getCurrentInstance,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -170,7 +172,9 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             loading: false,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -331,7 +335,7 @@ export default {
                     params.project_id = props.projectId;
                     await SpaceConnector.client.identity.project.member.add(params);
                 }
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.MEMBER.ALT_E_ADD_MEMBER'));
             }

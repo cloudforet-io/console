@@ -26,6 +26,7 @@
 
 import { PDataLoader } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
+import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
@@ -74,7 +75,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const storeState = reactive({
             menuItems: computed<DisplayMenu[]>(() => store.getters['display/allMenuList']),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),

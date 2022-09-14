@@ -29,10 +29,11 @@
 import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -46,15 +47,7 @@ import {
     REQUEST_TYPE,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
-
-interface Props {
-    visible: boolean;
-    headerTitle: string;
-    selectedQuery: CostQuerySetModel;
-    requestType: RequestType;
-}
 
 export default {
     name: 'CostAnalysisSaveQueryFormModal',
@@ -84,7 +77,9 @@ export default {
             },
         },
     },
-    setup(props: Props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const formState = reactive({
             queryName: undefined as undefined | string,
         });
@@ -108,7 +103,7 @@ export default {
         const saveQuery = async () => {
             try {
                 const updatedQuery = await costExplorerStore.dispatch('costAnalysis/saveQuery', formState.queryName);
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', root);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', vm);
                 emit('confirm', { updatedQuery, requestType: REQUEST_TYPE.SAVE });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
@@ -121,7 +116,7 @@ export default {
                     selectedQuery: props.selectedQuery, formState,
                 });
                 if (!updatedQuery) return;
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_EDITED_QUERY'), '', root);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_EDITED_QUERY'), '', vm);
                 emit('confirm', { updatedQuery, requestType: REQUEST_TYPE.EDIT });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_EDITED_QUERY'));

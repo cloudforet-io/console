@@ -50,7 +50,9 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PBadge, PButton, PI,
 } from '@spaceone/design-system';
-import { reactive, toRefs } from 'vue';
+import type { SetupContext } from 'vue';
+import { getCurrentInstance, reactive, toRefs } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -89,7 +91,9 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             topicModeForEdit: undefined,
             topicForEdit: props.channelData?.subscriptions,
@@ -116,7 +120,7 @@ export default {
                     is_subscribe: state.topicModeForEdit,
                     subscriptions: state.topicForEdit,
                 });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', vm);
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {
@@ -130,7 +134,7 @@ export default {
                     is_subscribe: state.topicModeForEdit,
                     subscriptions: state.topicForEdit,
                 });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', vm);
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {

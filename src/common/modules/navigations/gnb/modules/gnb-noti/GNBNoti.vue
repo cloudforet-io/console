@@ -49,7 +49,7 @@ import { vOnClickOutside } from '@vueuse/components';
 import {
     computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
-import type { DirectiveFunction } from 'vue';
+import type { DirectiveFunction, SetupContext } from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -84,7 +84,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
             domainName: computed(() => store.state.domain.name),

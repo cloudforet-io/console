@@ -55,9 +55,9 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButtonModal, PSelectCard } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 
@@ -76,7 +76,9 @@ export default {
     },
     props: {
     },
-    setup(props, { root }) {
+    setup() {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             visible: false,
             isSessionExpired: computed(() => store.state.user.isSessionExpired),
@@ -149,7 +151,7 @@ export default {
                         answer2: state.selectedAnswer2,
                     },
                 });
-                showSuccessMessage('소중한 의견 감사합니다.', '', root);
+                showSuccessMessage('소중한 의견 감사합니다.', '', vm);
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

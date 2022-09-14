@@ -51,7 +51,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { root }) {
+    setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
@@ -89,7 +89,7 @@ export default {
                 });
                 state.isActivated = true;
                 tabState.activeTab = 'settings';
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ACTIVATE_ALERT'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ACTIVATE_ALERT'), '', vm);
             } catch (e) {
                 state.isActivated = false;
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ACTIVATE_ALERT'));

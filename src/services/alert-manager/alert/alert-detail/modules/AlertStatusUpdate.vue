@@ -33,8 +33,10 @@
 import {
     PButtonModal, PPaneLayout, PTextarea, PFieldGroup, PEmpty,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from 'vue';
-
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -67,7 +69,9 @@ export default {
             default: false,
         },
     },
-    setup(props, { root }) {
+    setup(props) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             modalVisible: false,
             status: computed(() => alertManagerStore.state.alert.alertData?.status_message),
@@ -88,7 +92,7 @@ export default {
                     },
                     alertId: props.id,
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_S_UPDATE_STATUS'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_S_UPDATE_STATUS'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_E_UPDATE_STATUS'));
             } finally {

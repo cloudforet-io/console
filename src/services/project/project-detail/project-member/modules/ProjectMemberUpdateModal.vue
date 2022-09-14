@@ -65,8 +65,9 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
-import { reactive, toRefs } from 'vue';
-import type { PropType } from 'vue';
+import { getCurrentInstance, reactive, toRefs } from 'vue';
+import type { PropType, SetupContext } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -80,14 +81,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type { MemberItem } from '@/services/project/project-detail/project-member/type';
 
-
-interface Props {
-    visible: boolean;
-    selectedMember: MemberItem;
-    isProjectGroup: boolean;
-    projectGroupId?: string;
-    projectId?: string;
-}
 
 export default {
     name: 'ProjectMemberUpdateModal',
@@ -126,7 +119,9 @@ export default {
             default: undefined,
         },
     },
-    setup(props: Props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             loading: false,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -199,11 +194,11 @@ export default {
                 if (props.isProjectGroup) {
                     params.project_group_id = props.projectGroupId;
                     await SpaceConnector.client.identity.projectGroup.member.add(params);
-                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '', root);
+                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '', vm);
                 } else {
                     params.project_id = props.projectId;
                     await SpaceConnector.client.identity.project.member.add(params);
-                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '', root);
+                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '', vm);
                 }
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'));
@@ -218,11 +213,11 @@ export default {
                 if (props.isProjectGroup) {
                     params.project_group_id = props.projectGroupId;
                     await SpaceConnector.client.identity.projectGroup.member.modify(params);
-                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '', root);
+                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '', vm);
                 } else {
                     params.project_id = props.projectId;
                     await SpaceConnector.client.identity.project.member.modify(params);
-                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '', root);
+                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '', vm);
                 }
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'));

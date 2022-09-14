@@ -44,19 +44,14 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable no-await-in-loop */
 import { PButtonModal, PRadio } from '@spaceone/design-system';
 import { reactive, toRefs, watch } from 'vue';
+import type { SetupContext } from 'vue';
 import type Vue from 'vue';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-interface Props {
-    visible: boolean;
-    projectId: string;
-    loading: boolean;
-}
 
 export default {
     name: 'ProjectTreeModal',
@@ -79,7 +74,7 @@ export default {
             default: false,
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             treeRef: null as null|Vue,
             selectedProjectIds: [] as string[],

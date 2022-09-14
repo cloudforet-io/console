@@ -95,6 +95,7 @@ import {
 import { useInfiniteScroll } from '@vueuse/core';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import type { SetupContext } from 'vue';
 import {
     computed,
     onMounted, reactive, toRefs, watch,
@@ -151,7 +152,7 @@ export default {
             default: 0,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const { i18nDayjs } = useI18nDayjs();
         const state = reactive({
             loading: true,

@@ -17,7 +17,7 @@ import { Editor, EditorContent } from '@tiptap/vue-2';
 import {
     defineComponent, onBeforeUnmount, onMounted, reactive, toRefs, watch,
 } from 'vue';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 
 import { createImageExtension } from '@/common/components/editor/extensions/image';
 import { getAttachments, setAttachmentsToContents } from '@/common/components/editor/extensions/image/helper';
@@ -60,7 +60,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         loadMonospaceFonts();
 
         const state = reactive({

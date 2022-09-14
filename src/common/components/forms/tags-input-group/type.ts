@@ -13,12 +13,3 @@ export type ValidationData = {
     isValid: boolean;
     message: string | TranslateResult;
 };
-
-export interface TagsInputGroupProps {
-    tags: Tag;
-    disabled: boolean;
-    isValid: boolean;
-    showValidation: boolean;
-    showHeader: boolean;
-    focused: boolean;
-}

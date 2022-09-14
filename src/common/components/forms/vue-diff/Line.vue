@@ -56,7 +56,7 @@
 
 <script lang="ts">
 import { useResizeObserver, useThrottleFn } from '@vueuse/core';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     computed, defineComponent, ref,
 } from 'vue';
@@ -100,7 +100,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const lineRef = ref<null | HTMLElement>(null);
         const rowStyle = computed(() => {
             if (!props.scrollOptions) return undefined;

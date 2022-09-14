@@ -22,7 +22,11 @@
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButtonModal, PCheckBox } from '@spaceone/design-system';
-import { reactive, toRefs, watch } from 'vue';
+import type { SetupContext } from 'vue';
+import {
+    getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -52,7 +56,9 @@ export default {
             default: () => [],
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             isAssignedToMe: true,
@@ -76,7 +82,7 @@ export default {
             try {
                 await updateToAcknowledge();
                 emit('confirm');
-                showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_STATE_CHANGED'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_STATE_CHANGED'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_STATE_CHANGED'));
             } finally {

@@ -55,7 +55,7 @@
 
 <script lang="ts">
 import { PDataLoader } from '@spaceone/design-system';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     computed,
     defineComponent,
@@ -119,7 +119,7 @@ export default defineComponent<Props>({
             default: 15,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             menuTotalCount: computed<undefined|number>(() => props.items?.find(d => d.itemType === SUGGESTION_TYPE.MENU)?.totalCount),
             cloudServiceTotalCount: computed<undefined|number>(() => props.items?.find(d => d.itemType === SUGGESTION_TYPE.CLOUD_SERVICE)?.totalCount),

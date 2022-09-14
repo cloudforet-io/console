@@ -138,7 +138,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { root }) {
+    setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
 
         const tagQueryHandler = new QueryHelper()
@@ -216,7 +216,7 @@ export default {
                 });
                 state.visibleCloseCheckModal = false;
 
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_CLOSE_MAINTENANCE_WINDOW'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_CLOSE_MAINTENANCE_WINDOW'), '', vm);
                 await getMaintenanceWindows();
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_CLOSE_MAINTENANCE_WINDOW'));

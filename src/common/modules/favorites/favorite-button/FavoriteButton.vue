@@ -56,7 +56,7 @@ export default defineComponent<FavoriteButtonProps>({
             default: false,
         },
     },
-    setup(props: FavoriteButtonProps) {
+    setup(props) {
         const state = reactive({
             isLoading: computed(() => store.state.favorite.isLoading[props.favoriteType]),
             hasLoaded: computed(() => Array.isArray(state.favoriteItems)),
