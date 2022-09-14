@@ -18,6 +18,7 @@ export interface CommonOptions {
     field_description?: string;
     postfix?: string;
     prefix?: string;
+    disable_copy?: boolean;
 }
 
 export interface BadgeOptions extends CommonOptions {

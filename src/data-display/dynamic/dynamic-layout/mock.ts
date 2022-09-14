@@ -390,6 +390,9 @@ export default {
             fields: [{
                 name: 'Instance ID',
                 key: 'data.compute.instance_name',
+                options: {
+                    disable_copy: true,
+                },
             }, {
                 name: 'Region',
                 key: 'data.compute.region',

@@ -77,6 +77,9 @@ Each type is slightly different, but there are also **common options**.
 - prefix
   - the value before value
   - ex) '$' + 3000
+- disable_copy
+  - false (default): Show copy icon
+  - true : Hide copy icon
 
 ```typescript
 interface CommonOptions {
@@ -90,6 +93,7 @@ interface CommonOptions {
     postfix?: string;
     prefix?: string;
     field_description?: string;
+    disable_copy?: boolean;
 }
 ````
 

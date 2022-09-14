@@ -23,9 +23,7 @@ import {
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import type {
-    ItemDynamicLayoutProps,
-} from '@/data-display/dynamic/dynamic-layout/templates/item/type';
+import type { ItemDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/item/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable.vue';
 import type { DefinitionData, DefinitionField } from '@/data-display/tables/definition-table/type';
@@ -72,13 +70,11 @@ export default {
             fields: computed<DefinitionField[]>(() => {
                 if (!props.options.fields) return [];
                 const locale = vm.$i18n.locale;
-                return props.options.fields.map((d) => {
-                    const res = {
-                        label: d.options?.translation_id ? vm.$t(d.options.translation_id as string, locale) : d.name,
-                        name: d.key,
-                    } as DefinitionField;
-                    return res;
-                });
+                return props.options.fields.map(d => ({
+                    label: d.options?.translation_id ? vm.$t(d.options.translation_id as string, locale) : d.name,
+                    name: d.key,
+                    disableCopy: !!d.options?.disable_copy,
+                } as DefinitionField));
             }),
             rootData: computed<DefinitionData>(() => {
                 if (props.options.root_path) {
