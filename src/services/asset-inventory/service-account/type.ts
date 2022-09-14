@@ -46,6 +46,12 @@ export interface CredentialForm {
     credentialJson: string;
     activeDataType: ActiveDataType;
 }
+export interface CredentialModel {
+    schema?: string;
+    provider?: string;
+    secret_type?: string;
+    [key: string]: string | undefined;
+}
 
 export interface ProjectForm {
     selectedProject: ProjectGroup | null;
