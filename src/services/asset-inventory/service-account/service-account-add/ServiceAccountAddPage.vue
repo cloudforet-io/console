@@ -40,12 +40,14 @@
                                      :is-valid.sync="isProjectFormValid"
                                      @change="handleChangeProjectForm"
             />
-            <service-account-credentials v-if="enableCredentialInput"
-                                         mode="CREATE"
-                                         :provider-data="providerData"
-                                         :is-valid.sync="isCredentialFormValid"
-                                         @change="handleChangeCredentialForm"
-            />
+            <p-pane-layout class="credentials-form-wrapper">
+                <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')" />
+                <service-account-credentials-form v-if="enableCredentialInput"
+                                                  :provider="provider"
+                                                  :is-valid.sync="isCredentialFormValid"
+                                                  @change="handleChangeCredentialForm"
+                />
+            </p-pane-layout>
         </div>
 
         <div class="button-wrapper">
@@ -65,10 +67,9 @@
 </template>
 
 <script lang="ts">
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PButton, PLazyImg, PMarkdown, PPageTitle,
+    PButton, PLazyImg, PMarkdown, PPageTitle, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
 import { get } from 'lodash';
 import {
@@ -89,8 +90,8 @@ import ServiceAccountAccountType
     from '@/services/asset-inventory/service-account/modules/ServiceAccountAccountType.vue';
 import ServiceAccountBaseInformation
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
-import ServiceAccountCredentials
-    from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
+import ServiceAccountCredentialsForm
+    from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentialsForm.vue';
 import ServiceAccountProject from '@/services/asset-inventory/service-account/modules/ServiceAccountProject.vue';
 import type {
     AccountType,
@@ -101,15 +102,17 @@ import type {
 export default {
     name: 'AddServiceAccountPage',
     components: {
+        ServiceAccountCredentialsForm,
         ServiceAccountProject,
         ServiceAccountAccountType,
-        ServiceAccountCredentials,
         ServiceAccountBaseInformation,
         InfoButton,
         PLazyImg,
         PMarkdown,
         PPageTitle,
         PButton,
+        PPaneLayout,
+        PPanelTop,
     },
     props: {
         provider: {
@@ -287,6 +290,12 @@ export default {
     .content-wrapper {
         display: grid;
         gap: 1rem;
+
+        .credentials-form-wrapper {
+            .service-account-credentials-form {
+                padding: 0.5rem 1rem 2.5rem 1rem;
+            }
+        }
     }
     .info-button {
         flex-shrink: 0;

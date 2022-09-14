@@ -37,7 +37,7 @@
                                               :provider-data="providerData"
                                               :service-account-id="serviceAccountId"
             />
-            <service-account-credentials :mode="pageModeMap.credentials"
+            <service-account-credentials :provider="providerKey"
                                          :service-account-id="serviceAccountId"
             />
         </div>
@@ -108,6 +108,7 @@ export default defineComponent({
                 }
                 return undefined;
             }),
+            providerKey: computed(() => state.provider?.key),
             providerIcon: computed(() => state.provider?.icon),
             consoleLink: computed(() => {
                 if (state.provider?.linkTemplate) return render(state.provider.linkTemplate, state.item);
@@ -137,7 +138,7 @@ export default defineComponent({
                 state.loading = false;
             }
         };
-        const getProvider = async (provider) => {
+        const getProviderData = async (provider) => {
             try {
                 state.providerData = await SpaceConnector.client.identity.provider.get({
                     provider,
@@ -164,7 +165,7 @@ export default defineComponent({
         watch(() => props.serviceAccountId, async (serviceAccountId) => {
             if (serviceAccountId) {
                 await getServiceAccount(serviceAccountId);
-                await getProvider(state.item?.provider);
+                await getProviderData(state.item?.provider);
             }
         }, { immediate: true });
 
