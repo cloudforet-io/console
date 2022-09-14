@@ -27,7 +27,10 @@
         </p-page-title>
 
         <div class="content-wrapper">
-            <service-account-account-type mode="CREATE" />
+            <service-account-account-type :provider="provider"
+                                          :account-type.sync="accountType"
+                                          @change="handleChangeAccountType"
+            />
             <service-account-base-information mode="CREATE"
                                               :provider-data="providerData"
                                               :is-valid.sync="isBaseInformationFormValid"
@@ -90,6 +93,7 @@ import ServiceAccountCredentials
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
 import ServiceAccountProject from '@/services/asset-inventory/service-account/modules/ServiceAccountProject.vue';
 import type {
+    AccountType,
     BaseInformationForm, CredentialForm, ProjectForm, ProviderModel,
 } from '@/services/asset-inventory/service-account/type';
 
@@ -131,6 +135,7 @@ export default {
         const formState = reactive({
             baseInformationForm: {} as BaseInformationForm,
             isBaseInformationFormValid: false,
+            accountType: 'GENERAL' as AccountType,
             credentialForm: {} as CredentialForm,
             isCredentialFormValid: false,
             projectForm: {} as ProjectForm,
@@ -243,6 +248,9 @@ export default {
             if (nextPath) SpaceRouter.router.push(nextPath);
             else SpaceRouter.router.back();
         };
+        const handleChangeAccountType = (accountType: AccountType) => {
+            formState.accountType = accountType;
+        };
         const handleChangeBaseInformationForm = (baseInformationForm) => {
             formState.baseInformationForm = baseInformationForm;
         };
@@ -264,6 +272,7 @@ export default {
             ...toRefs(formState),
             handleSave,
             handleGoBack,
+            handleChangeAccountType,
             handleChangeBaseInformationForm,
             handleChangeCredentialForm,
             handleChangeProjectForm,
