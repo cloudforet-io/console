@@ -45,8 +45,11 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton, PI,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from 'vue';
-
+import type { SetupContext } from 'vue';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -86,7 +89,9 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const timezoneForFormatter = computed(() => store.state.user.timezone).value;
         const state = reactive({
             scheduleModeForEdit: props.channelData?.is_scheduled,
@@ -121,7 +126,7 @@ export default {
                     is_scheduled: state.scheduleModeForEdit,
                     schedule: state.scheduleForEdit,
                 });
-                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', root);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', vm);
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {
@@ -135,7 +140,7 @@ export default {
                     is_scheduled: state.scheduleModeForEdit,
                     schedule: state.scheduleForEdit,
                 });
-                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', root);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', vm);
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {

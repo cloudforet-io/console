@@ -60,9 +60,11 @@ import {
     PAnchor, PButton,
     PButtonModal, PFieldGroup, PRadio, PTextarea, PTextInput,
 } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -98,7 +100,9 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             loading: false,
@@ -155,7 +159,7 @@ export default {
                     project_id: state.selectedProjectId,
                     description: state.description,
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_CREATE'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_CREATE'), '', vm);
                 emit('confirm');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_CREATE'));

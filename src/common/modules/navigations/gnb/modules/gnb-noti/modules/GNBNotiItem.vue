@@ -33,6 +33,7 @@ import {
     PI, PIconButton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import type { SetupContext } from 'vue';
 import {
     computed,
     defineComponent, reactive, toRefs,
@@ -88,7 +89,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             occurred: computed(() => {

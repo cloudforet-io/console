@@ -46,9 +46,11 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PButtonModal, PBoxTab,
 } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -90,7 +92,9 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const tableState = reactive({
             loading: true,
             items: [] as any,
@@ -197,7 +201,7 @@ export default {
             }
             if (newEscalationPolicyId) {
                 await updateProjectAlertConfig(newEscalationPolicyId);
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_ESCALATION_POLICY'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_ESCALATION_POLICY'), '', vm);
             }
             emit('confirm');
             state.proxyVisible = false;

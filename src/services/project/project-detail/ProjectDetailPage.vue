@@ -164,7 +164,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { root }) {
+    setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
 
         registerServiceStore<ProjectDetailState>('projectDetail', ProjectDetailStoreModule);
@@ -266,7 +266,7 @@ export default {
                     project_id: state.projectId,
                 });
                 // await store.dispatch('favorite/project/removeItem', { id: projectId.value });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '', vm);
                 vm.$router.go(-1);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'));

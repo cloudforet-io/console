@@ -32,7 +32,11 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButton, PIconButton } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
-import { computed, reactive, toRefs } from 'vue';
+import type { SetupContext } from 'vue';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -49,13 +53,6 @@ import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import SetFilterModal from '@/services/cost-explorer/modules/SetFilterModal.vue';
 import type { CostQueryFilters } from '@/services/cost-explorer/type';
 
-
-interface Props {
-    dashboardId: string;
-    filters: CostQueryFilters;
-    printMode: boolean;
-    manageDisabled: boolean;
-}
 
 export default {
     name: 'CostDashboardFilter',
@@ -84,7 +81,9 @@ export default {
             default: false,
         },
     },
-    setup(props: Props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             proxyFilters: useProxyValue<CostQueryFilters>('filters', props, emit),
             filterLabel: computed(() => {
@@ -112,7 +111,7 @@ export default {
                     default_filter: filters,
                 });
                 state.proxyFilters = filters;
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_S_EDIT_FILTER'), '', root);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_S_EDIT_FILTER'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_E_EDIT_FILTER'));
             }
@@ -125,7 +124,7 @@ export default {
                     default_filter: filters,
                 });
                 state.proxyFilters = filters;
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_S_EDIT_FILTER'), '', root);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_S_EDIT_FILTER'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_E_EDIT_FILTER'));
             }

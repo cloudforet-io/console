@@ -68,7 +68,7 @@
 import {
     PContextMenu, PI, PLazyImg, PTooltip,
 } from '@spaceone/design-system';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     defineComponent, onUnmounted,
     reactive, toRefs, watch,
@@ -122,7 +122,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             contextMenuRef: null as null | any,
         });

@@ -42,7 +42,7 @@ import {
     defineComponent,
     reactive, toRefs, watch,
 } from 'vue';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { store } from '@/store';
@@ -90,7 +90,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const {
             forms: {
                 selectedCostType, selectedResources,

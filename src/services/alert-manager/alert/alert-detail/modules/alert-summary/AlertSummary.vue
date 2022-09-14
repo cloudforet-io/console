@@ -70,8 +70,9 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import {
-    computed, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -85,7 +86,6 @@ import {
     ALERT_STATE, ALERT_URGENCY,
 } from '@/services/alert-manager/lib/config';
 import { alertManagerStore } from '@/services/alert-manager/store';
-import type { AlertDataModel } from '@/services/alert-manager/type';
 
 
 // interface HeaderState {
@@ -96,12 +96,6 @@ import type { AlertDataModel } from '@/services/alert-manager/type';
 //     alertStateList: MenuItem[];
 //     alertUrgencyList: MenuItem[];
 // }
-
-interface PropsType {
-    id: string;
-    alertData: AlertDataModel;
-    manageDisabled: boolean;
-}
 
 const calculateTime = (time) => {
     const today = dayjs().toISOString();
@@ -138,7 +132,9 @@ export default {
             default: false,
         },
     },
-    setup(props: PropsType, { root }) {
+    setup(props) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             alertInfo: computed(() => alertManagerStore.state.alert.alertData),
             alertState: computed(() => state.alertInfo?.state),
@@ -168,7 +164,7 @@ export default {
                     },
                     alertId: props.id,
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_STATE'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_STATE'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_URGENCY'));
             }
@@ -182,7 +178,7 @@ export default {
                     },
                     alertId: props.id,
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_URGENCY'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_URGENCY'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_URGENCY'));
             }

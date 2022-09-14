@@ -68,7 +68,10 @@ import {
     PButton, PLazyImg, PMarkdown, PPageTitle,
 } from '@spaceone/design-system';
 import { get } from 'lodash';
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, getCurrentInstance, reactive, toRefs,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -110,7 +113,9 @@ export default {
             default: null,
         },
     },
-    setup(props, { root }) {
+    setup(props) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             providerLoading: true,
             providerData: {} as ProviderModel,
@@ -205,7 +210,7 @@ export default {
                     await createSecretWithJson(json);
                 } else if (formState.credentialForm.activeDataType === 'input') await createSecretWithForm();
 
-                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', root);
+                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm);
                 isSucceed = true;
             } catch (e) {
                 isSucceed = false;

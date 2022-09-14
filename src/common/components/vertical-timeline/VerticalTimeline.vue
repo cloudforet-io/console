@@ -34,6 +34,7 @@ import {
     PBadge,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import type { SetupContext } from 'vue';
 import { defineComponent } from 'vue';
 
 
@@ -87,7 +88,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         /* Util */
         const getBadgeStyleType = (itemColor: string): string => {
             if (itemColor === 'GREEN') return 'green200';

@@ -57,6 +57,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PDataLoader, PI, PDivider,
 } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
     computed, reactive, toRefs,
 } from 'vue';
@@ -108,7 +109,7 @@ export default {
             default: 0,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             loading: true,
             timezone: computed(() => store.state.user.timezone),

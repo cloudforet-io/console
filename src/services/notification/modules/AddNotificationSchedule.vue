@@ -50,6 +50,7 @@ import {
     PRadio, PSelectButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import { range } from 'lodash';
+import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
@@ -89,7 +90,7 @@ export default {
             default: null,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const timezoneForFormatter = computed(() => store.state.user.timezone).value;
         const {

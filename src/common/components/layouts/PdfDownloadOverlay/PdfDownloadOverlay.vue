@@ -52,7 +52,7 @@ import {
     defineComponent,
     reactive, toRefs, watch,
 } from 'vue';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 
 import type { PdfFontFamily, Language } from '@/common/components/layouts/PdfDownloadOverlay/fonts';
 import {
@@ -152,7 +152,7 @@ export default defineComponent<Props>({
             },
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxyVisible: props.visible,
             loading: true,

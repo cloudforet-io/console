@@ -42,6 +42,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
     getCurrentInstance,
     reactive,
@@ -71,7 +72,7 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props, context) {
+    setup(props, context: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             userId: '' as string | undefined,

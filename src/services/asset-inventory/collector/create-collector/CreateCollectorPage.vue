@@ -84,14 +84,14 @@ export default {
         PLazyImg,
         PToggleButton,
     },
-    setup(props, { root }) {
+    setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             plugin: {},
             imageUrl: computed(() => state.plugin?.tags?.icon),
             provider: computed(() => get(state.plugin, 'provider', '')),
-            pluginId: get(root, '$route.params.pluginId', ''),
+            pluginId: get(vm, '$route.params.pluginId', ''),
             tags: {},
             supportedSchema: [],
             //

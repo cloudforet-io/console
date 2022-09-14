@@ -31,9 +31,11 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -59,7 +61,9 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             loading: false,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -100,7 +104,7 @@ export default {
 
             try {
                 await updateWebhook();
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_WEBHOOK'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_WEBHOOK'), '', vm);
                 state.proxyVisible = false;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_WEBHOOK'));

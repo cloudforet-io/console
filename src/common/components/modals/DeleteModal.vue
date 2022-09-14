@@ -36,7 +36,7 @@
 
 <script lang="ts">
 import { PButtonModal, PButton } from '@spaceone/design-system';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import { reactive, toRefs } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -91,7 +91,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
         });

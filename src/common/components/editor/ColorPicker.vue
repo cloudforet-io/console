@@ -27,7 +27,7 @@
 <script lang="ts">
 import { PI, PSelectDropdown } from '@spaceone/design-system';
 import type { Editor } from '@tiptap/core';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     defineComponent, reactive, toRefs,
 } from 'vue';
@@ -58,7 +58,7 @@ export default defineComponent<Props>({
             required: true,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             textColorItems: COLOR_PICKER_COLOR_SETS.flatMap(color => ({ name: color })),
         });

@@ -56,6 +56,7 @@ import {
     PToggleButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { SetupContext } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -87,7 +88,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             granularity: '' as Granularity,

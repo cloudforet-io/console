@@ -21,7 +21,7 @@
 <script lang="ts">
 import { PCheckBox, PI } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -62,7 +62,7 @@ export default defineComponent<Props>({
             default: '',
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             regex: computed(() => new RegExp(props.searchText || '', 'i')),
             proxySelectedKeys: useProxyValue('selectedKeys', props, emit),

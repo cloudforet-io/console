@@ -30,7 +30,7 @@ import {
     PAutocompleteSearch, PCheckBox, PTag,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from 'vue';
@@ -66,7 +66,7 @@ export default defineComponent<Props>({
             default: true,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({

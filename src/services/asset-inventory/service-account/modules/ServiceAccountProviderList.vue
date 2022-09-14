@@ -16,6 +16,7 @@
 <script lang="ts">
 
 import { PLazyImg } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import { defineComponent, reactive, toRefs } from 'vue';
 
 
@@ -36,7 +37,7 @@ export default defineComponent({
             default: 'atlassian',
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxySelectedProvider: useProxyValue('selectedProvider', props, emit),
         });

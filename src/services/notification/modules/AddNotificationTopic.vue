@@ -29,6 +29,7 @@
 
 <script lang="ts">
 import { PRadio, PCheckBox } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
@@ -56,7 +57,7 @@ export default {
             default: null,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             topicModeList: computed(() => [{

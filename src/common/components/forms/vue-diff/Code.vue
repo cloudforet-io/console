@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     defineComponent, nextTick, onMounted, ref, watch,
 } from 'vue';
@@ -31,7 +31,7 @@ export default defineComponent({
         },
     },
     emits: ['rendered'],
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const highlightCode = ref('');
 
         onMounted(() => {

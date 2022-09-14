@@ -40,6 +40,7 @@ import {
     PStatus, PTableCheckModal,
 } from '@spaceone/design-system';
 import { map } from 'lodash';
+import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
@@ -77,7 +78,7 @@ export default {
             default: '',
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             fields: computed(() => ([
@@ -105,7 +106,7 @@ export default {
             try {
                 await SpaceConnector.client.identity.user.delete(getUsersParam(items));
                 await administrationStore.dispatch('user/selectIndex', []);
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', state.selectedIndex.length), '', root);
+                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', state.selectedIndex.length), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length));
             } finally {
@@ -116,7 +117,7 @@ export default {
         const enableUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.enable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_ENABLE', state.selectedIndex.length), '', root);
+                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_ENABLE', state.selectedIndex.length), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', state.selectedIndex.length));
             } finally {
@@ -127,7 +128,7 @@ export default {
         const disableUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.disable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DISABLE', state.selectedIndex.length), '', root);
+                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DISABLE', state.selectedIndex.length), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', state.selectedIndex.length));
             } finally {

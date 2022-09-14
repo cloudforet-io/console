@@ -5,6 +5,7 @@
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import {
     defineComponent, onMounted,
 } from 'vue';
@@ -15,7 +16,7 @@ import { loadAuth } from '@/services/auth/authenticator/loader';
 
 export default defineComponent({
     name: 'GoogleSignIn',
-    setup(props, context) {
+    setup(props, context: SetupContext) {
         const onSignIn = () => {
             context.emit('sign-in');
         };

@@ -38,7 +38,7 @@ import { vOnClickOutside } from '@vueuse/components';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
-import type { DirectiveFunction } from 'vue';
+import type { DirectiveFunction, SetupContext } from 'vue';
 
 import { i18n } from '@/translations';
 
@@ -65,7 +65,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             tabs: computed(() => ([
                 { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },

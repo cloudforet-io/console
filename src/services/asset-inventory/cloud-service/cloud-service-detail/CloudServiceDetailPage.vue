@@ -239,7 +239,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { root }) {
+    setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const queryHelper = new QueryHelper();
         /* Sidebar */
@@ -515,7 +515,7 @@ export default {
                     ...checkTableModalState.params,
                     cloud_services: tableState.selectedItems.map(item => item.cloud_service_id),
                 });
-                showSuccessMessage(i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_S_CHECK_MODAL', { action: checkTableModalState.title }), '', root);
+                showSuccessMessage(i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_S_CHECK_MODAL', { action: checkTableModalState.title }), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }));
             } finally {

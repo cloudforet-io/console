@@ -19,6 +19,7 @@
 
 import { PFieldGroup } from '@spaceone/design-system';
 import { debounce } from 'lodash';
+import type { SetupContext } from 'vue';
 import { defineComponent, watch } from 'vue';
 
 import { i18n } from '@/translations';
@@ -52,7 +53,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const {
             forms: {
                 selectedTargets,

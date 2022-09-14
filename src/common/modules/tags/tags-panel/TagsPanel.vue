@@ -46,11 +46,6 @@ import type { Vue } from 'vue/types/vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 
-interface Props {
-    resourceKey: string;
-    resourceId: string;
-    resourceType: string;
-}
 export default {
     name: 'TagsPanel',
     components: {
@@ -80,7 +75,7 @@ export default {
             default: false,
         },
     },
-    setup(props: Props) {
+    setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));

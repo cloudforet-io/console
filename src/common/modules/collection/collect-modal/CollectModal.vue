@@ -77,7 +77,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-import type { CollectModalProps } from '@/common/modules/collection/collect-modal/type';
 
 export default {
     name: 'CollectModal',
@@ -105,7 +104,7 @@ export default {
             default: 'name',
         },
     },
-    setup(props: CollectModalProps, context: SetupContext) {
+    setup(props, context: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({

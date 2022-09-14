@@ -19,6 +19,7 @@
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -47,7 +48,7 @@ export default defineComponent({
             default: null,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             timezone: computed(() => store.state.user.timezone),

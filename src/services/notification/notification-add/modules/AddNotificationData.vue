@@ -38,6 +38,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PFieldGroup, PTextInput, PJsonSchemaForm,
 } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
@@ -88,7 +89,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const protocol = vm.$route.params.protocol;
 

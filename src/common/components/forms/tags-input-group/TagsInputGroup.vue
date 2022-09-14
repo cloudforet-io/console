@@ -60,6 +60,7 @@ import {
     PButton, PFieldGroup, PIconButton, PTextInput,
 } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
+import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
@@ -67,7 +68,7 @@ import {
 import { i18n } from '@/translations';
 
 import type {
-    Tag, TagItem, TagsInputGroupProps, ValidationData,
+    Tag, TagItem, ValidationData,
 } from '@/common/components/forms/tags-input-group/type';
 
 
@@ -117,7 +118,7 @@ export default defineComponent({
             default: true,
         },
     },
-    setup(props: TagsInputGroupProps, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             items: dictToArray(props.tags) as TagItem[],
             keyValidations: computed<ValidationData[]>(() => {

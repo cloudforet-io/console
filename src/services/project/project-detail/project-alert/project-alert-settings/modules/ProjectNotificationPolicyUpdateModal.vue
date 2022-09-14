@@ -29,8 +29,11 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PSelectCard,
 } from '@spaceone/design-system';
-import { reactive, toRefs, watch } from 'vue';
-
+import type { SetupContext } from 'vue';
+import {
+    getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -65,7 +68,9 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             notificationUrgency: undefined,
@@ -79,7 +84,7 @@ export default {
                         notification_urgency: state.notificationUrgency,
                     },
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_NOTIFICATION_POLICY'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_NOTIFICATION_POLICY'), '', vm);
                 emit('confirm');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_NOTIFICATION_POLICY'));

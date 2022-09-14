@@ -69,6 +69,7 @@ import {
     PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree, PButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { SetupContext } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -128,7 +129,7 @@ export default {
             default: true,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             loading: true,
             visibleMenu: false,

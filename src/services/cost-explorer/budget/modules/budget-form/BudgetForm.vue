@@ -27,9 +27,10 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButton } from '@spaceone/design-system';
 import {
-    computed,
+    computed, getCurrentInstance,
     reactive, toRefs,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
@@ -58,7 +59,9 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { root }) {
+    setup() {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             baseInfo: {} as BudgetBaseInfo,
             isBaseInfoValid: false,
@@ -78,7 +81,7 @@ export default {
                     ...state.amountPlanInfo,
                 });
 
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '', root);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '', vm);
                 SpaceRouter.router.push({
                     name: COST_EXPLORER_ROUTE.BUDGET._NAME,
                 });

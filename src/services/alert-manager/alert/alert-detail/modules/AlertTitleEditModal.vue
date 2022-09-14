@@ -27,10 +27,11 @@
 
 <script lang="ts">
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
-
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -71,7 +72,9 @@ export default {
             default: null,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             loading: true,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -97,7 +100,7 @@ export default {
                     },
                     alertId: props.alertId,
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_TITLE'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_TITLE'), '', vm);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_TITLE'));
             } finally {

@@ -27,9 +27,11 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PSelectCard,
 } from '@spaceone/design-system';
+import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -65,7 +67,9 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }: SetupContext) {
+        const vm = getCurrentInstance()?.proxy as Vue;
+
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             selectOptions: computed(() => ([
@@ -89,7 +93,7 @@ export default {
                         recovery_mode: state.recoveryMode,
                     },
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_AUTO_RECOVERY'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_AUTO_RECOVERY'), '', vm);
                 emit('confirm');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_AUTO_RECOVERY'));
