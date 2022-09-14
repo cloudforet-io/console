@@ -109,7 +109,7 @@ jobs:
           git push && \git push -f origin "${{ env.VERSION }}"
 
   # pypi:
-  #   if: github.repository_owner == 'spaceone-dev'
+  #   if: github.repository_owner == 'cloudforet-io'
   #   needs: [condition_check, update_local_version_file]
   #   runs-on: ubuntu-latest
   #   env:
@@ -151,7 +151,7 @@ jobs:
 
   docker:
     needs: [condition_check, update_local_version_file]
-    if: github.repository_owner == 'spaceone-dev'
+    if: github.repository_owner == 'cloudforet-io'
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.condition_check.outputs.TAG }}
@@ -212,7 +212,7 @@ jobs:
  
 
   notify_to_slack:
-    if: github.repository_owner == 'spaceone-dev'
+    if: github.repository_owner == 'cloudforet-io'
     needs: [condition_check, update_local_version_file, docker]
     runs-on: ubuntu-latest
     steps:
