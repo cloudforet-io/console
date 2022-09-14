@@ -36,6 +36,7 @@ export interface BaseInformationForm {
     customSchemaForm: { [key: string]: any; };
     tags: Tag;
 }
+export type AccountType = 'GENERAL' | 'TRUST';
 
 export type ActiveDataType = 'input' | 'json';
 export interface CredentialForm {
