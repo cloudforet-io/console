@@ -74,11 +74,11 @@
                     <p v-if="item.createdCount || item.deletedCount" class="daily-service">
                         {{ item.title }}<br> <span class="text-sm font-bold">{{ item.totalCount || 0 }}</span>
                     </p>
-                    <router-link v-if="item.createdCount" :to="item.href" class="daily-created-count">
+                    <router-link v-if="item.createdCount" :to="item.createdHref" class="daily-created-count">
                         {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
                         <span class="text-blue-600 font-bold text-sm">{{ item.createdCount || 0 }}</span>
                     </router-link>
-                    <router-link v-if="item.deletedCount" :to="item.href" class="daily-deleted-count">
+                    <router-link v-if="item.deletedCount" :to="item.deletedHref" class="daily-deleted-count">
                         {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
                         <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}</span>
                     </router-link>
