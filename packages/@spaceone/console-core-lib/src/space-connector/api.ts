@@ -160,14 +160,14 @@ class API {
         return this.defaultAxiosConfig;
     }
 
-    private handleRequestError = (error: AxiosError) => {
+    private handleRequestError = async (error: AxiosError) => {
         switch (error.response?.status) {
         case 400: {
             throw new BadRequestError(error);
         }
         case 401: {
             console.log('[API][handleRequestError] 401 error occurred');
-            const res = this.refreshAccessToken();
+            const res = await this.refreshAccessToken();
             if (!res) throw new AuthenticationError(error);
             else break;
         }
