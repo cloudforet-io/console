@@ -1,3 +1,10 @@
+# [1.1.0-beta.392](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.391...v1.1.0-beta.392) (2022-09-14)
+
+
+### Bug Fixes
+
+* **dynamic-layout:** add `disalbe_copy` option to DynamicField options ([#22](https://github.com/cloudforet-io/mirinae/issues/22)) ([e78fc35](https://github.com/cloudforet-io/mirinae/commit/e78fc35de44c5e3d61026ce8d82e3e52ceb3fe6e))
+
 # [1.1.0-beta.391](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.390...v1.1.0-beta.391) (2022-09-13)
 
 
