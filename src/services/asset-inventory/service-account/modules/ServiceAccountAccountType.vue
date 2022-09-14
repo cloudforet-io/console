@@ -3,19 +3,22 @@
         <!--song-lang-->
         <p-panel-top title="Account Type" />
         <div class="content-wrapper">
-            <div v-if="mode === 'CREATE' || mode === 'UPDATE'" class="create-mode-wrapper">
+            <div class="create-mode-wrapper">
                 <div class="card-wrapper">
                     <p-select-card
                         v-model="selectedType"
                         value="GENERAL"
                         label="General Account"
                         class="card"
+                        @click="() => handleSelectAccountType('GENERAL')"
                     />
                     <p-select-card
+                        v-if="TRUST_ACCOUNT_ALLOWED.some((d) => d === provider)"
                         v-model="selectedType"
                         value="TRUST"
                         label="Trust Account"
                         class="card"
+                        @click="() => handleSelectAccountType('TRUST')"
                     />
                 </div>
                 <div class="information-wrapper">
@@ -39,13 +42,16 @@
 import {
     PPaneLayout, PPanelTop, PSelectCard, PI, PAnchor,
 } from '@spaceone/design-system';
-import type { PropType } from 'vue';
-import { computed, reactive, toRefs } from 'vue';
+import type { PropType, SetupContext } from 'vue';
+import {
+    reactive, toRefs, defineComponent, watch,
+} from 'vue';
 
-import type { PageMode, AccountType } from '@/services/asset-inventory/service-account/type';
+import { TRUST_ACCOUNT_ALLOWED } from '@/services/asset-inventory/service-account/config';
+import type { AccountType } from '@/services/asset-inventory/service-account/type';
 
 
-export default {
+export default defineComponent({
     name: 'ServiceAccountAccountType',
     components: {
         PAnchor,
@@ -55,26 +61,36 @@ export default {
         PI,
     },
     props: {
-        mode: {
-            type: String as PropType<PageMode>,
-            default: 'READ',
-        },
-        badgeType: {
+        accountType: {
             type: String as PropType<AccountType>,
             default: 'GENERAL',
         },
+        provider: {
+            type: String,
+            default: undefined,
+        },
     },
-    setup(props) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             selectedType: 'GENERAL' as AccountType,
-            badgeType: computed<AccountType>(() => props.badgeType),
+        });
+
+        const handleSelectAccountType = (accountType: AccountType) => {
+            state.selectedType = accountType;
+            emit('change', accountType);
+        };
+
+        watch(() => props.accountType, (accountType: AccountType) => {
+            state.selectedType = accountType;
         });
 
         return {
             ...toRefs(state),
+            TRUST_ACCOUNT_ALLOWED,
+            handleSelectAccountType,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .service-account-account-type {

@@ -28,7 +28,8 @@
             </template>
         </p-page-title>
         <div class="content-wrapper">
-            <service-account-account-type :mode="pageModeMap.accountType" />
+            <!--            FIXME:: below <service-account-account-type /> should changed to badge-->
+            <service-account-account-type />
             <service-account-project :mode="pageModeMap.project" :project-id="projectId" />
             <service-account-base-information :mode="pageModeMap.baseInformation"
                                               :provider-data="providerData"
