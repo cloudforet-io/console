@@ -52,7 +52,7 @@ import {
     PPaneLayout, PPanelTop, PSelectCard, PI, PAnchor, PBadge,
 } from '@spaceone/design-system';
 import type { PropType } from 'vue';
-import { reactive, toRefs } from 'vue';
+import { computed, reactive, toRefs } from 'vue';
 
 import type { PageMode, AccountType } from '@/services/asset-inventory/service-account/type';
 
@@ -72,15 +72,15 @@ export default {
             type: String as PropType<PageMode>,
             default: 'READ',
         },
-        accountType: {
+        badgeType: {
             type: String as PropType<AccountType>,
             default: 'GENERAL',
         },
     },
-    setup() {
+    setup(props) {
         const state = reactive({
             selectedType: 'GENERAL' as AccountType,
-            badgeType: 'GENERAL' as AccountType,
+            badgeType: computed<AccountType>(() => props.badgeType),
         });
 
         return {
