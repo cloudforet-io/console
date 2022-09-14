@@ -30,6 +30,8 @@
         <div class="content-wrapper">
             <service-account-account-type :mode="pageModeMap.accountType" />
             <service-account-project :mode="pageModeMap.project" :project-id="projectId" />
+            <!--            FIXME:: below <service-account-attached-general-accounts /> should have v-if about accountType-->
+            <service-account-attached-general-accounts />
             <service-account-base-information :mode="pageModeMap.baseInformation"
                                               :provider-data="providerData"
                                               :service-account-id="serviceAccountId"
@@ -59,6 +61,8 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import ServiceAccountAccountType
     from '@/services/asset-inventory/service-account/modules/ServiceAccountAccountType.vue';
+import ServiceAccountAttachedGeneralAccounts
+    from '@/services/asset-inventory/service-account/modules/ServiceAccountAttachedGeneralAccounts.vue';
 import ServiceAccountBaseInformation
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
 import ServiceAccountCredentials
@@ -71,6 +75,7 @@ export default defineComponent({
     name: 'ServiceAccountDetailPage',
     components: {
         ServiceAccountCredentials,
+        ServiceAccountAttachedGeneralAccounts,
         ServiceAccountBaseInformation,
         ServiceAccountProject,
         ServiceAccountAccountType,
@@ -185,6 +190,9 @@ export default defineComponent({
         }
         .service-account-project {
             @apply col-span-6;
+        }
+        .service-account-attached-general-accounts {
+            @apply col-span-12;
         }
         .service-account-base-information {
             @apply col-span-12;
