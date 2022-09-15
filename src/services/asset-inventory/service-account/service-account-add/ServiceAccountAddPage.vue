@@ -36,9 +36,9 @@
                                               :is-valid.sync="isBaseInformationFormValid"
                                               @change="handleChangeBaseInformationForm"
             />
-            <service-account-project mode="CREATE"
-                                     :is-valid.sync="isProjectFormValid"
-                                     @change="handleChangeProjectForm"
+            <service-account-project-form mode="CREATE"
+                                          :is-valid.sync="isProjectFormValid"
+                                          @change="handleChangeProjectForm"
             />
             <p-pane-layout class="credentials-form-wrapper">
                 <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')" />
@@ -92,7 +92,7 @@ import ServiceAccountBaseInformation
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentialsForm.vue';
-import ServiceAccountProject from '@/services/asset-inventory/service-account/modules/ServiceAccountProject.vue';
+import ServiceAccountProjectForm from '@/services/asset-inventory/service-account/modules/ServiceAccountProjectForm.vue';
 import type {
     AccountType,
     BaseInformationForm, CredentialForm, ProjectForm, ProviderModel,
@@ -103,7 +103,7 @@ export default {
     name: 'AddServiceAccountPage',
     components: {
         ServiceAccountCredentialsForm,
-        ServiceAccountProject,
+        ServiceAccountProjectForm,
         ServiceAccountAccountType,
         ServiceAccountBaseInformation,
         InfoButton,

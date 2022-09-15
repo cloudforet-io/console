@@ -30,7 +30,7 @@
         <div class="content-wrapper">
             <!--            FIXME:: below <service-account-account-type /> should changed to badge-->
             <service-account-account-type />
-            <service-account-project :mode="pageModeMap.project" :project-id="projectId" />
+            <service-account-project-detail :mode="pageModeMap.project" :project-id="projectId" />
             <!--            FIXME:: below <service-account-attached-general-accounts /> should have v-if about accountType-->
             <service-account-attached-general-accounts />
             <service-account-base-information :mode="pageModeMap.baseInformation"
@@ -68,7 +68,7 @@ import ServiceAccountBaseInformation
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
 import ServiceAccountCredentials
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
-import ServiceAccountProject from '@/services/asset-inventory/service-account/modules/ServiceAccountProject.vue';
+import ServiceAccountProjectDetail from '@/services/asset-inventory/service-account/modules/ServiceAccountProjectDetail.vue';
 import type { PageMode, ProviderModel } from '@/services/asset-inventory/service-account/type';
 
 
@@ -78,7 +78,7 @@ export default defineComponent({
         ServiceAccountCredentials,
         ServiceAccountAttachedGeneralAccounts,
         ServiceAccountBaseInformation,
-        ServiceAccountProject,
+        ServiceAccountProjectDetail,
         ServiceAccountAccountType,
         PIconButton,
         PPageTitle,
@@ -190,7 +190,7 @@ export default defineComponent({
         .service-account-account-type {
             @apply col-span-6;
         }
-        .service-account-project {
+        .service-account-project-detail {
             @apply col-span-6;
         }
         .service-account-attached-general-accounts {
