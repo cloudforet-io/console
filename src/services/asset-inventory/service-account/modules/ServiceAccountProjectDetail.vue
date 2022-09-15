@@ -1,7 +1,7 @@
 <template>
     <p-pane-layout class="service-account-project-detail">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
-            <template v-if="mode === 'READ'" #extra>
+            <template #extra>
                 <p-button icon="ic_edit">
                     <!--song-lang-->
                     Edit
@@ -9,19 +9,9 @@
             </template>
         </p-panel-top>
         <div class="content-wrapper">
-            <div v-if="mode === 'READ'">
-                <p-anchor :href="readState.projectLink">
-                    {{ readState.projectName }}
-                </p-anchor>
-            </div>
-            <project-select-dropdown v-if="mode === 'CREATE'"
-                                     class="project-select-dropdown"
-                                     project-selectable
-                                     :selected-project-ids="formState.selectedProjects"
-                                     :use-fixed-menu-style="false"
-                                     :invalid="formState.proxyIsValid === false"
-                                     @select="handleSelectedProject"
-            />
+            <p-anchor :href="state.projectLink">
+                {{ state.projectName }}
+            </p-anchor>
         </div>
     </p-pane-layout>
 </template>
@@ -30,8 +20,7 @@
 import {
     PPaneLayout, PPanelTop, PButton, PAnchor,
 } from '@spaceone/design-system';
-import type { PropType } from 'vue';
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 
 import { SpaceRouter } from '@/router';
@@ -39,27 +28,16 @@ import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
-
-import type { PageMode, ProjectForm } from '@/services/asset-inventory/service-account/type';
-import type { ProjectGroupTreeItem } from '@/services/project/type';
-
 
 export default {
     name: 'ServiceAccountProjectDetail',
     components: {
         PPaneLayout,
         PPanelTop,
-        ProjectSelectDropdown,
         PButton,
         PAnchor,
     },
     props: {
-        mode: {
-            type: String as PropType<PageMode>,
-            default: 'READ',
-        },
         isValid: {
             type: Boolean,
             default: undefined,
@@ -69,12 +47,12 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { emit }) {
-        const readState = reactive({
+    setup(props) {
+        const state = reactive({
             projects: computed(() => store.getters['reference/projectItems']),
             projectName: computed(() => {
                 if (props.projectId) {
-                    return readState.projects[props.projectId]?.label ?? '';
+                    return state.projects[props.projectId]?.label ?? '';
                 }
                 return '';
             }),
@@ -87,19 +65,7 @@ export default {
                 return undefined;
             }),
         });
-        const formState = reactive({
-            selectedProjects: [] as ProjectGroupTreeItem[],
-            formData: computed<ProjectForm>(() => ({
-                selectedProject: formState.selectedProjects,
-            })),
-            proxyIsValid: useProxyValue('is-valid', props, emit),
-        });
 
-        /* Event */
-        const handleSelectedProject = (selectedProject) => {
-            formState.formData.selectedProject = selectedProject.length ? selectedProject[0] : null;
-            formState.proxyIsValid = !!selectedProject.length;
-        };
 
         /* Init */
         (async () => {
@@ -108,15 +74,8 @@ export default {
             ]);
         })();
 
-        /* Watcher */
-        watch(() => formState.formData, (formData) => {
-            emit('change', formData);
-        });
-
         return {
-            readState,
-            formState,
-            handleSelectedProject,
+            state,
         };
     },
 };

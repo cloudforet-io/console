@@ -30,7 +30,7 @@
         <div class="content-wrapper">
             <!--            FIXME:: below <service-account-account-type /> should changed to badge-->
             <service-account-account-type />
-            <service-account-project-detail :mode="pageModeMap.project" :project-id="projectId" />
+            <service-account-project-detail :project-id="projectId" />
             <!--            FIXME:: below <service-account-attached-general-accounts /> should have v-if about accountType-->
             <service-account-attached-general-accounts />
             <service-account-base-information :mode="pageModeMap.baseInformation"

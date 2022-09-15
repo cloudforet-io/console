@@ -1,26 +1,14 @@
 <template>
     <p-pane-layout class="service-account-project">
-        <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
-            <template v-if="mode === 'READ'" #extra>
-                <p-button icon="ic_edit">
-                    <!--song-lang-->
-                    Edit
-                </p-button>
-            </template>
-        </p-panel-top>
+        <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')" />
         <div class="content-wrapper">
-            <div v-if="mode === 'READ'">
-                <p-anchor :href="readState.projectLink">
-                    {{ readState.projectName }}
-                </p-anchor>
-            </div>
-            <project-select-dropdown v-if="mode === 'CREATE'"
-                                     class="project-select-dropdown"
-                                     project-selectable
-                                     :selected-project-ids="formState.selectedProjects"
-                                     :use-fixed-menu-style="false"
-                                     :invalid="formState.proxyIsValid === false"
-                                     @select="handleSelectedProject"
+            <project-select-dropdown
+                class="project-select-dropdown"
+                project-selectable
+                :selected-project-ids="state.selectedProjects"
+                :use-fixed-menu-style="false"
+                :invalid="state.proxyIsValid === false"
+                @select="handleSelectedProject"
             />
         </div>
     </p-pane-layout>
@@ -28,21 +16,16 @@
 
 <script lang="ts">
 import {
-    PPaneLayout, PPanelTop, PButton, PAnchor,
+    PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
-import type { PropType } from 'vue';
 import { computed, reactive, watch } from 'vue';
 
-
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import type { PageMode, ProjectForm } from '@/services/asset-inventory/service-account/type';
+import type { ProjectForm } from '@/services/asset-inventory/service-account/type';
 import type { ProjectGroupTreeItem } from '@/services/project/type';
 
 
@@ -52,14 +35,8 @@ export default {
         PPaneLayout,
         PPanelTop,
         ProjectSelectDropdown,
-        PButton,
-        PAnchor,
     },
     props: {
-        mode: {
-            type: String as PropType<PageMode>,
-            default: 'READ',
-        },
         isValid: {
             type: Boolean,
             default: undefined,
@@ -70,35 +47,18 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const readState = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
-            projectName: computed(() => {
-                if (props.projectId) {
-                    return readState.projects[props.projectId]?.label ?? '';
-                }
-                return '';
-            }),
-            projectLink: computed(() => {
-                if (props.projectId) {
-                    return SpaceRouter.router.resolve(referenceRouter(props.projectId, {
-                        resource_type: 'identity.Project',
-                    })).href;
-                }
-                return undefined;
-            }),
-        });
-        const formState = reactive({
+        const state = reactive({
             selectedProjects: [] as ProjectGroupTreeItem[],
             formData: computed<ProjectForm>(() => ({
-                selectedProject: formState.selectedProjects,
+                selectedProject: state.selectedProjects,
             })),
             proxyIsValid: useProxyValue('is-valid', props, emit),
         });
 
         /* Event */
         const handleSelectedProject = (selectedProject) => {
-            formState.formData.selectedProject = selectedProject.length ? selectedProject[0] : null;
-            formState.proxyIsValid = !!selectedProject.length;
+            state.formData.selectedProject = selectedProject.length ? selectedProject[0] : null;
+            state.proxyIsValid = !!selectedProject.length;
         };
 
         /* Init */
@@ -109,13 +69,12 @@ export default {
         })();
 
         /* Watcher */
-        watch(() => formState.formData, (formData) => {
+        watch(() => state.formData, (formData) => {
             emit('change', formData);
         });
 
         return {
-            readState,
-            formState,
+            state,
             handleSelectedProject,
         };
     },
