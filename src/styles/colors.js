@@ -1,7 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-// const { colors } = require('tailwindcss/defaultTheme');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { kebabCase, forEach } = require('lodash');
+import { kebabCase, forEach } from 'lodash';
 
 const palette = {
     black: '#000000',
@@ -107,7 +104,7 @@ const palette = {
         900: '#0F4D4D',
     },
 };
-const colorSet = {
+export const colorSet = {
     transparent: 'transparent',
     black: palette.black,
     white: palette.white,
@@ -169,10 +166,3 @@ const semanticColors = {
 const kebabColors = {};
 forEach(semanticColors, (d, k) => { kebabColors[kebabCase(k)] = d; });
 forEach(colorSet, (d, k) => { kebabColors[kebabCase(k)] = d; });
-
-
-module.exports = {
-    ...semanticColors,
-    ...colorSet,
-    ...kebabColors,
-};

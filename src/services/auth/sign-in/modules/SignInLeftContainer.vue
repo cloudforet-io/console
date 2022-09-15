@@ -48,7 +48,8 @@ export default {
     },
     setup() {
         const state = reactive({
-            version: process.env.VUE_APP_VERSION,
+            // version: import.meta.VUE_APP_VERSION,
+            version: '1',
             signInImage: computed(() => config.get('DOMAIN_IMAGE.SIGN_IN')),
             contactLink: computed(() => config.get('CONTACT_LINK')),
         });
