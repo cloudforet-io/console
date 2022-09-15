@@ -3,6 +3,7 @@
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
             <template #extra>
                 <p-button v-if="!editMode" :disabled="!projectName" icon="ic_edit"
+                          :style-type="!projectName && 'transparent'"
                           @click="handleClickEditButton"
                 >
                     <!--song-lang-->
