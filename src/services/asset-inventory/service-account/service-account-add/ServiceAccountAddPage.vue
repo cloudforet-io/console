@@ -36,9 +36,9 @@
                                               :is-valid.sync="isBaseInformationFormValid"
                                               @change="handleChangeBaseInformationForm"
             />
-            <service-account-project-form mode="CREATE"
-                                          :is-valid.sync="isProjectFormValid"
-                                          @change="handleChangeProjectForm"
+            <service-account-project-form
+                :is-valid.sync="isProjectFormValid"
+                @change="handleChangeProjectForm"
             />
             <p-pane-layout class="credentials-form-wrapper">
                 <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')" />
