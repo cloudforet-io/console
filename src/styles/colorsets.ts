@@ -1,16 +1,16 @@
 import {
-    blue, coral, gray, green, indigo, peacock, red, violet, yellow,
+    colorSet,
 } from '@/styles/colors';
 
 export const DEFAULT_CHART_COLORS = [
-    violet[400], violet[600], blue[400], blue[600], coral[400], coral[600],
-    yellow[400], yellow[600], green[400], green[600], peacock[400], peacock[600],
-    red[400], red[600], indigo[400], indigo[600], violet[500], violet[700],
-    blue[500], blue[700], coral[500], coral[700], yellow[500], yellow[700],
-    green[500], green[700], peacock[500], peacock[700], red[500], red[700],
-    indigo[500], indigo[700],
+    colorSet.violet[400], colorSet.violet[600], colorSet.blue[400], colorSet.blue[600], colorSet.coral[400], colorSet.coral[600],
+    colorSet.yellow[400], colorSet.yellow[600], colorSet.green[400], colorSet.green[600], colorSet.peacock[400], colorSet.peacock[600],
+    colorSet.red[400], colorSet.red[600], colorSet.indigo[400], colorSet.indigo[600], colorSet.violet[500], colorSet.violet[700],
+    colorSet.blue[500], colorSet.blue[700], colorSet.coral[500], colorSet.coral[700], colorSet.yellow[500], colorSet.yellow[700],
+    colorSet.green[500], colorSet.green[700], colorSet.peacock[500], colorSet.peacock[700], colorSet.red[500], colorSet.red[700],
+    colorSet.indigo[500], colorSet.indigo[700],
 ];
 
-export const DISABLED_LEGEND_COLOR = gray[300];
+export const DISABLED_LEGEND_COLOR = colorSet.gray[300];
 
-export const BACKGROUND_COLOR = gray[100];
+export const BACKGROUND_COLOR = colorSet.gray[100];

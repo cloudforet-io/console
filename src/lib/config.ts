@@ -35,7 +35,7 @@ class Config {
             this.createAxiosInstance();
             this.config = {};
             await this.load('/default.json');
-            await this.load(`/${process.env.NODE_ENV}.json`);
+            await this.load(`/${import.meta.env.MODE}.json`);
         }
     }
 
