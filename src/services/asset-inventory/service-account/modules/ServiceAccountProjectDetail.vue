@@ -4,13 +4,13 @@
             <template #extra>
                 <p-button v-if="!editMode" :disabled="!projectName" icon="ic_edit"
                           :style-type="!projectName && 'transparent'"
-                          @click="handleClickEditButton"
+                          @click="handleEditMode"
                 >
                     <!--song-lang-->
                     Edit
                 </p-button>
                 <div v-else>
-                    <p-button @click="handleClickEditButton">
+                    <p-button @click="handleEditMode">
                         <!--                        song-lang-->
                         Cancel
                     </p-button>
@@ -31,12 +31,14 @@
                                      project-selectable
                                      :selected-project-id="selectedProjects"
                                      :use-fixed-menu-style="false"
+                                     @select="handleSelectProject"
             />
         </div>
     </p-pane-layout>
 </template>
 
 <script lang="ts">
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPaneLayout, PPanelTop, PButton, PAnchor,
 } from '@spaceone/design-system';
@@ -49,13 +51,15 @@ import { store } from '@/store';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import type { ProjectForm } from '@/services/asset-inventory/service-account/type';
-import type { ProjectGroupTreeItem } from '@/services/project/type';
+import type { ProjectGroupTreeItem, ProjectItemResp } from '@/services/project/type';
 
 
 export default {
@@ -103,12 +107,25 @@ export default {
         });
 
 
-        const handleClickEditButton = () => { state.editMode = !state.editMode; };
-        const handleSelectProject = (selectedProject) => {
+        const handleEditMode = () => { state.editMode = !state.editMode; };
+        const handleSelectProject = (selectedProject: ProjectItemResp[]) => {
             state.formData.selectedProject = selectedProject.length ? selectedProject[0] : null;
             state.proxyIsValid = !!selectedProject.length;
         };
-        const handleClickSave = () => { state.editMode = !state.editMode; };
+        const handleClickSave = async () => {
+            state.editMode = !state.editMode;
+            if (!state.formData.selectedProject?.id) return;
+            try {
+                await SpaceConnector.client.identity.serviceAccount.update({
+                    service_account_id: state.formData.selectedProject?.id ?? '',
+                    project_id: props.projectId,
+                });
+                // song-lang
+                showSuccessMessage('Successfully changed project', '');
+            } catch (e: unknown) {
+                ErrorHandler.handleError(e);
+            }
+        };
 
         /* Init */
         (async () => {
@@ -119,7 +136,7 @@ export default {
 
         return {
             ...toRefs(state),
-            handleClickEditButton,
+            handleEditMode,
             handleSelectProject,
             handleClickSave,
         };
