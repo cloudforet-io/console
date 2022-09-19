@@ -1,0 +1,43 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import { i18n } from '@/translations';
+
+import PEmpty from '@/data-display/empty/PEmpty';
+import { getEmptyArgTypes } from '@/data-display/empty/story-helper';
+
+
+<Meta title='Data Display/Empty' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A179434',
+    }
+}} argTypes={getEmptyArgTypes()}/>
+
+
+export const Template = (args, {argTypes}) => ({
+    props: Object.keys(argTypes),
+    i18n,
+    components: { PEmpty },
+    template: `
+        <div class="h-full w-full overflow p-8">
+            <p-empty>
+                <div v-if="defaultSlot" v-html="defaultSlot"/>
+            </p-empty>
+        </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Empty
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

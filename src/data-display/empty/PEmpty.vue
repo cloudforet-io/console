@@ -1,21 +1,15 @@
+<template>
+    <div class="p-empty">
+        <slot />
+    </div>
+</template>
+
 <script lang="ts">
-import { getBindClass } from '@/util/functional-helpers';
 
 export default {
     name: 'PEmpty',
-    functional: true,
-    render(h, { listeners, children, data }) {
-        return h('div', {
-            ...data,
-            class: {
-                ...getBindClass(data.class),
-                'p-empty': true,
-            },
-            on: {
-                ...listeners,
-            },
-        },
-        children);
+    setup() {
+        return {};
     },
 };
 </script>
