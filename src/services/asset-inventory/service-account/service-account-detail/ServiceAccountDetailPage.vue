@@ -33,8 +33,7 @@
             <service-account-project-detail :project-id="projectId" />
             <!--            FIXME:: below <service-account-attached-general-accounts /> should have v-if about accountType-->
             <service-account-attached-general-accounts />
-            <service-account-base-information :mode="pageModeMap.baseInformation"
-                                              :provider-data="providerData"
+            <service-account-base-information :provider="providerKey"
                                               :service-account-id="serviceAccountId"
             />
             <service-account-credentials :provider="providerKey"
@@ -69,7 +68,7 @@ import ServiceAccountBaseInformation
 import ServiceAccountCredentials
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
 import ServiceAccountProjectDetail from '@/services/asset-inventory/service-account/modules/ServiceAccountProjectDetail.vue';
-import type { PageMode, ProviderModel } from '@/services/asset-inventory/service-account/type';
+import type { ProviderModel } from '@/services/asset-inventory/service-account/type';
 
 
 export default defineComponent({
@@ -115,12 +114,6 @@ export default defineComponent({
                 return '';
             }),
             projectId: computed(() => state.item.project_info?.project_id),
-            pageModeMap: {
-                accountType: 'READ',
-                project: 'READ',
-                baseInformation: 'READ',
-                credentials: 'READ',
-            } as {[pageName: string]: PageMode},
             deleteModalVisible: false,
         });
 

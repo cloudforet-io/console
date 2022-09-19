@@ -36,6 +36,15 @@ export interface BaseInformationForm {
     customSchemaForm: { [key: string]: any; };
     tags: Tag;
 }
+export interface ServiceAccountModel {
+    name: string;
+    provider: string;
+    service_account_id: string;
+    service_account_type?: AccountType;
+    data: {
+        [key: string]: string;
+    }
+}
 export type AccountType = 'GENERAL' | 'TRUST';
 
 export type ActiveDataType = 'input' | 'json';
