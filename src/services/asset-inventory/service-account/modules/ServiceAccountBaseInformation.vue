@@ -45,8 +45,11 @@ import {
     PButton, PDataLoader, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -55,10 +58,7 @@ import ServiceAccountBaseInformationDetail
 import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformationForm.vue';
 import type {
-    BaseInformationForm,
-    PageMode,
-    ProviderModel,
-    ServiceAccountModel,
+    BaseInformationForm, PageMode, ProviderModel, ServiceAccountModel,
 } from '@/services/asset-inventory/service-account/type';
 import { EDIT_MODE } from '@/services/asset-inventory/service-account/type';
 
@@ -84,6 +84,7 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             providerData: {} as ProviderModel,
@@ -132,6 +133,8 @@ export default {
                     data: state.baseInformationForm.customSchemaForm,
                     tags: state.baseInformationForm.tags,
                 });
+                // song-lang
+                showSuccessMessage('Successfully Update Base Information', '', vm.$root);
             } catch (e) {
                 // song-lang
                 ErrorHandler.handleRequestError(e, 'Failed to Update Base Information');
