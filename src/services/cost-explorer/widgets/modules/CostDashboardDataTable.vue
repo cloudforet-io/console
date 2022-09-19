@@ -261,7 +261,8 @@ export default {
         font-size: 0.875rem;
     }
 
-    .p-data-table::v-deep {
+    /* custom design-system component - p-data-table */
+    :deep(.p-data-table) {
         .status-wrapper {
             display: inline-flex;
             .toggle-button {
@@ -292,7 +293,8 @@ export default {
     }
 
     &.print-mode {
-        .p-data-table::v-deep {
+        /* custom design-system component - p-data-table */
+        :deep(.p-data-table) {
             .table-container {
                 overflow: hidden;
             }

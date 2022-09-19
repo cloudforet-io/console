@@ -3,6 +3,7 @@
                    :invalid="!disableValidation && invalidState.selectedTargets"
                    :invalid-text="invalidTexts.selectedTargets"
                    required
+                   class="budget-target-select-field"
     >
         <project-select-dropdown :selected-project-ids="selectedTargets"
                                  :invalid="!disableValidation && invalidState.selectedTargets"
@@ -84,3 +85,15 @@ export default defineComponent<Props>({
     },
 });
 </script>
+
+<style lang="postcss" scoped>
+.budget-target-select-field {
+    width: 30rem;
+}
+
+@screen mobile {
+    .budget-target-select-field {
+        width: 100%;
+    }
+}
+</style>

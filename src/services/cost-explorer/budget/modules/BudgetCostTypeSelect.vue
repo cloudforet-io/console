@@ -3,15 +3,16 @@
                    required
                    :invalid="!disableValidation && invalidState.selectedResources"
                    :invalid-text="invalidTexts.selectedResources"
-                   class="cost-type"
+                   class="budget-cost-type-select-field"
     >
-        <p-radio v-for="(costTypeLabel, costTypeKey) in costTypeItems" :key="costTypeKey"
-                 :selected="selectedCostType" :value="costTypeKey"
-                 class="mr-4"
-                 @change="setForm('selectedCostType', $event)"
-        >
-            {{ costTypeLabel }}
-        </p-radio>
+        <div class="cost-type-wrapper">
+            <p-radio v-for="(costTypeLabel, costTypeKey) in costTypeItems" :key="costTypeKey"
+                     :selected="selectedCostType" :value="costTypeKey"
+                     @change="setForm('selectedCostType', $event)"
+            >
+                {{ costTypeLabel }}
+            </p-radio>
+        </div>
         <p-search-dropdown v-if="selectedCostType !== 'all'"
                            :visible-menu.sync="visibleResourceMenu"
                            :menu="resourceMenuItems"
@@ -212,3 +213,29 @@ export default defineComponent<Props>({
     },
 });
 </script>
+
+<style lang="postcss" scoped>
+.budget-cost-type-select-field {
+    width: 30rem;
+    .p-search-dropdown {
+        margin-top: 0.5rem;
+    }
+}
+
+.cost-type-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    .p-radio {
+        margin-right: 1rem;
+        margin-bottom: 0.25rem;
+    }
+}
+
+@screen mobile {
+    .budget-cost-type-select-field {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+}
+</style>

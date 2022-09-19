@@ -102,12 +102,21 @@ export default {
 <style lang="postcss" scoped>
 .basic-dashboard {
     h3 {
-        @apply pt-0;
+        @apply font-bold mb-3 pt-0;
+        font-size: 0.875rem;
     }
     .dashboard-list {
-        @apply mb-2;
+        @apply grid grid-cols-4 col-gap-2 mb-2;
         .dashboard-item {
             @apply mb-4;
+        }
+
+        /* custom design-system component - p-select-card */
+        :deep(.p-select-card) {
+            font-size: 0.875rem;
+            .contents {
+                @apply font-bold;
+            }
         }
     }
     .widget-list-wrapper {

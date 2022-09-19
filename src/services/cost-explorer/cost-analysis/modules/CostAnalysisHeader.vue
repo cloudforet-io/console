@@ -315,7 +315,8 @@ export default {
         }
     }
 
-    .list-button::v-deep {
+    /* custom design-system component - p-select-dropdown */
+    :deep(.list-button) {
         @apply bg-transparent;
         display: inline-flex;
         .p-context-menu {
@@ -335,7 +336,8 @@ export default {
 
     &.interactive-mode {
         @screen mobile {
-            &::v-deep .extra {
+            .button-wrapper.extra {
+                margin-top: 1rem;
                 width: 100%;
             }
         }

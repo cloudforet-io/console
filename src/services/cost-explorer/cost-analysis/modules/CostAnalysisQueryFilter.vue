@@ -8,7 +8,7 @@
                                        :selected="granularity"
                                        style-type="transparent"
                                        :read-only="printMode"
-                                       class="select-dropdown"
+                                       class="granularity-select"
                                        @select="handleSelectGranularity"
                     />
                 </div>
@@ -193,7 +193,9 @@ export default {
         .label {
             white-space: nowrap;
         }
-        .select-dropdown::v-deep {
+
+        /* custom design-system component - p-select-dropdown */
+        :deep(.granularity-select) {
             .text {
                 white-space: nowrap;
             }

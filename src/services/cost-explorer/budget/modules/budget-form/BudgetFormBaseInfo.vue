@@ -8,6 +8,7 @@
                            :invalid="invalidState.name"
                            :invalid-text="invalidTexts.name"
                            required
+                           class="base-info-field"
             >
                 <p-text-input :value="name" :invalid="invalidState.name" @input="setForm('name', $event)" />
             </p-field-group>
@@ -125,34 +126,17 @@ export default {
 .p-panel-top {
     margin-bottom: 0.5rem;
 }
-.p-field-group {
+
+.base-info-field {
     width: 30rem;
     .p-text-input {
         width: 100%;
     }
-    .p-radio {
-        margin-right: 1rem;
-    }
-}
-.cost-type {
-    .p-search-dropdown {
-        margin-top: 0.5rem;
-    }
 }
 
 @screen mobile {
-    .p-field-group {
+    .base-info-field {
         width: 100%;
-    }
-    .cost-type::v-deep {
-        display: flex;
-        flex-wrap: wrap;
-        .label-box {
-            width: 100%;
-        }
-        .p-radio {
-            margin-bottom: 0.25rem;
-        }
     }
 }
 </style>

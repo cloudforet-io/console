@@ -125,11 +125,22 @@ export default {
     .p-divider {
         @apply w-full mb-6;
     }
+    h3 {
+        @apply font-bold mb-3;
+        font-size: 0.875rem;
+    }
     .dashboard-list {
+        @apply grid grid-cols-4 col-gap-2;
         .dashboard-item {
             @apply flex flex-col justify-between row-gap-2 mb-4;
-            .p-select-card {
+
+            /* custom design-system component - p-select-card */
+            :deep(.p-select-card) {
                 @apply flex-grow;
+                font-size: 0.875rem;
+                .contents {
+                    @apply font-bold;
+                }
             }
             .p-anchor {
                 @apply text-center text-blue-700;

@@ -1,5 +1,5 @@
 <template>
-    <div class="widget-config">
+    <div class="cost-dashboard-customize-widget-config">
         <p-field-group :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.LABEL_NAME')"
                        :invalid="invalidState.name"
                        :invalid-text="invalidTexts.name"
@@ -204,7 +204,7 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.widget-config {
+.cost-dashboard-customize-widget-config {
     .p-text-input {
         @apply w-full;
     }

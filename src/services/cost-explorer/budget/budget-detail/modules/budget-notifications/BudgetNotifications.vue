@@ -199,8 +199,11 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.budget-notifications::v-deep .body {
-    padding: 0;
+/* custom design-system component - p-card */
+:deep(.p-card) {
+    .body {
+        padding: 0;
+    }
 }
 .header {
     @apply flex justify-between items-center;

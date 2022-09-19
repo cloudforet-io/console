@@ -324,7 +324,9 @@ export default defineComponent<WidgetProps>({
             display: inline-block;
             width: 50%;
         }
-        .p-data-table::v-deep thead {
+
+        /* custom design-system component - p-data-table */
+        :deep(.p-data-table) thead {
             display: none;
         }
     }

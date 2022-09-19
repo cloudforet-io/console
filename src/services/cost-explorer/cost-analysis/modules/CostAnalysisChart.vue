@@ -371,7 +371,9 @@ export default {
                 font-size: 0.875rem;
                 font-weight: bold;
             }
-            .p-select-dropdown::v-deep {
+
+            /* custom design-system component - p-select-dropdown */
+            :deep(.p-select-dropdown) {
                 .dropdown-button {
                     font-weight: bold;
                 }
@@ -415,7 +417,9 @@ export default {
                 &.disabled {
                     @apply text-gray-300;
                 }
-                .p-status::v-deep {
+
+                /* custom design-system component - p-status */
+                :deep(.p-status) {
                     .text {
                         white-space: nowrap;
                     }

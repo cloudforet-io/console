@@ -63,3 +63,10 @@ export default {
     },
 };
 </script>
+
+<style lang="postcss" scoped>
+h3 {
+    @apply font-bold mb-3;
+    font-size: 0.875rem;
+}
+</style>

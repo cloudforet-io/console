@@ -90,6 +90,11 @@ export default defineComponent<Props>({
     }
 }
 
+/* custom design-system component - p-button */
+:deep(.p-button) {
+    padding: 0 1rem;
+}
+
 @screen mobile {
     /* custom design-system component - p-popover */
     :deep(.popover) {
