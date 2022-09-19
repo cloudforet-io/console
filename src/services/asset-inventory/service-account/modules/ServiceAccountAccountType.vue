@@ -23,15 +23,17 @@
                 </div>
                 <div class="information-wrapper">
                     <p-i name="ic_outlined-info"
-                         height="1em" width="1em"
+                         height="1rem" width="1rem"
                          color="inherit"
                          class="external-icon"
                     />
-                    <!--                    song-lang-->
-                    <span>Trust Account can allow entities in other AWS accounts belonging to you.
-                        Get more details</span>
-                    <!--                    song-lang-->
-                    <p-anchor highlight text="here" />
+                    <div class="anchor-wrapper">
+                        <!--                    song-lang-->
+                        <span>Trust Account can allow entities in other AWS accounts belonging to you.
+                            Get more details</span>
+                        <!--                    song-lang-->
+                        <p-anchor class="here-anchor" highlight text="here" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -97,6 +99,7 @@ export default defineComponent({
     .content-wrapper {
         padding: 0.5rem 1rem 2.5rem 1rem;
         .create-mode-wrapper {
+            @apply w-1/2;
             .card-wrapper {
                 @apply flex;
                 gap: 0.5rem;
@@ -119,7 +122,12 @@ export default defineComponent({
                 @apply flex;
                 gap: 0.3rem;
                 align-content: flex-start;
-                align-items: center;
+                .anchor-wrapper {
+                    width: calc(100% - 1rem);
+                }
+                .here-anchor {
+                    margin-left: 0.25rem;
+                }
             }
         }
     }
