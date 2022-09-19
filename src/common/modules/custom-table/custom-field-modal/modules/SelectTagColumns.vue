@@ -122,7 +122,8 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 
-.tag-menu-item.p-checkbox::v-deep {
+/* custom design-system component - p-checkbox */
+:deep(.tag-menu-item.p-checkbox) {
     @apply bg-transparent;
     display: flex;
     width: 100%;
@@ -143,7 +144,9 @@ export default defineComponent<Props>({
         margin-bottom: 0.5rem;
     }
 }
-.p-autocomplete-search::v-deep {
+
+/* custom design-system component - p-autocomplete-search */
+:deep(.p-autocomplete-search) {
     .p-context-menu {
         max-height: 50vh;
     }

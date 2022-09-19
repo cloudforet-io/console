@@ -405,7 +405,8 @@ section {
     padding-top: 2rem;
     padding-bottom: 2rem;
 
-    .legend.p-anchor::v-deep {
+    /* custom design-system component - p-anchor */
+    :deep(.legend.p-anchor) {
         @apply text-gray-900;
         display: inline-flex;
         flex-wrap: wrap;
@@ -476,7 +477,8 @@ section {
         }
     }
 
-    .more-btn::v-deep {
+    /* custom design-system component - p-button */
+    :deep(.more-btn) {
         @apply border-gray-900;
         display: block;
         width: 40%;

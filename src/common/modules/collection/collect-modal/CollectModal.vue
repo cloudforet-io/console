@@ -243,7 +243,9 @@ export default {
         height: auto;
         padding-bottom: 1rem;
     }
-    .p-data-table::v-deep {
+
+    /* custom design-system component - p-data-table */
+    :deep(.p-data-table) {
         @apply overflow-auto;
         max-height: calc(450px * 0.85);
         th {

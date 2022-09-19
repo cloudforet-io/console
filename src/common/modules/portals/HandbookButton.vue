@@ -140,7 +140,9 @@ export default defineComponent({
         transform: matrix(1, 0.05, -0.02, 1, 0, 0);
         content: '';
     }
-    .p-tab::v-deep {
+
+    /* custom design-system component - p-tab */
+    :deep(.p-tab) {
         @apply relative flex-grow border-0;
         z-index: 1;
         margin-bottom: 1rem;
@@ -174,7 +176,9 @@ export default defineComponent({
         &::before {
             bottom: 2.225rem;
         }
-        .p-tab::v-deep {
+
+        /* custom design-system component - p-tab */
+        :deep(.p-tab) {
             margin-bottom: 1.5rem;
             .is-single + .tab-pane {
                 height: calc(100% - 3.5rem);

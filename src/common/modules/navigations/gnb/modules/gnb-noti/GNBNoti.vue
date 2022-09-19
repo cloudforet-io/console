@@ -188,7 +188,9 @@ export default defineComponent<Props>({
             cursor: not-allowed;
         }
     }
-    .p-tab::v-deep {
+
+    /* custom design-system component - p-tab */
+    :deep(.p-tab) {
         @apply absolute bg-white rounded-xs border border-gray-200;
         display: flex;
         flex-direction: column;

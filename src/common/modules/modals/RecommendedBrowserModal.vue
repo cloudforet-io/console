@@ -98,7 +98,9 @@ export default {
         line-height: 150%;
     }
 }
-.p-button-modal::v-deep {
+
+/* custom design-system component - p-button-modal */
+:deep(.p-button-modal) {
     .modal-mask {
         .modal-header {
             height: unset;

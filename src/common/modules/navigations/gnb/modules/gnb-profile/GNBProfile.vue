@@ -390,7 +390,8 @@ export default defineComponent<Props>({
                     @apply bg-white;
                 }
 
-                &.p-anchor::v-deep:hover .text {
+                /* custom design-system component - p-anchor */
+                :deep(&.p-anchor:hover .text) {
                     text-decoration: none;
                 }
 

@@ -344,7 +344,8 @@ export default {
     display: flex;
     flex-direction: column;
 
-    .p-data-loader::v-deep {
+    /* custom design-system component - p-data-loader */
+    :deep(.p-data-loader) {
         &.loading {
             height: 13rem;
         }

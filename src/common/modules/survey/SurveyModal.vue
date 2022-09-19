@@ -193,7 +193,9 @@ export default {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 0.5rem;
-            .p-select-card::v-deep {
+
+            /* custom design-system component - p-select-card */
+            :deep(.p-select-card) {
                 height: 9.5rem;
             }
         }
