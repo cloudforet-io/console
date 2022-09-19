@@ -51,8 +51,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
 import {
     PEmpty, PTab, PDataTable, PI, PBadge, PButton,
 } from '@spaceone/design-system';
@@ -135,11 +133,5 @@ export default {
 }
 .selected-data-tab {
     @apply mt-8;
-}
-
-.api-key-table::v-deep {
-    .main-table-wrapper {
-        border: 0;
-    }
 }
 </style>

@@ -66,7 +66,9 @@ export default {
     @apply mx-0;
     max-width: 100%;
 }
-.user-toolbox-layout::v-deep {
+
+/* custom design-system component - p-horizontal-layout */
+:deep(.user-toolbox-layout) {
     .horizontal-contents {
         overflow: unset;
     }
