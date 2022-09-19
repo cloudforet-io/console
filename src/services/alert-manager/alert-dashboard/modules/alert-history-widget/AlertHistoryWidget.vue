@@ -204,7 +204,8 @@ export default {
             row-gap: 0.5rem;
             column-gap: 1rem;
 
-            .p-card::v-deep {
+            /* custom design-system component - p-card */
+            :deep(.p-card) {
                 @apply col-span-12;
                 width: 100%;
 
@@ -257,7 +258,8 @@ export default {
             .summary-wrapper {
                 @apply col-span-12 row-start-2;
 
-                .p-card::v-deep {
+                /* custom design-system component - p-card */
+                :deep(.p-card) {
                     @apply col-span-6;
                 }
             }
@@ -271,7 +273,8 @@ export default {
     @screen mobile {
         .content-wrapper {
             .summary-wrapper {
-                .p-card::v-deep {
+                /* custom design-system component - p-card */
+                :deep(.p-card) {
                     @apply col-span-12;
                 }
             }

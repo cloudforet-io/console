@@ -207,7 +207,9 @@ export default {
         max-height: 27.5rem;
         overflow-y: scroll;
     }
-    .p-select-dropdown::v-deep {
+
+    /* custom design-system component - p-select-dropdown */
+    :deep(.p-select-dropdown) {
         .p-context-menu {
             right: 0;
         }

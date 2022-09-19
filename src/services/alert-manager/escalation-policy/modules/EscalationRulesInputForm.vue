@@ -381,7 +381,8 @@ export default {
         }
     }
 
-    .p-select-dropdown::v-deep {
+    /* custom design-system component - p-select-dropdown */
+    :deep(.p-select-dropdown) {
         .dropdown-button {
             min-width: 6rem;
         }
@@ -441,7 +442,9 @@ export default {
                 }
                 .input {
                     @apply col-span-4;
-                    .p-select-dropdown::v-deep {
+
+                    /* custom design-system component - p-select-dropdown */
+                    :deep(.p-select-dropdown) {
                         min-width: 100%;
                     }
                     .rule-input {

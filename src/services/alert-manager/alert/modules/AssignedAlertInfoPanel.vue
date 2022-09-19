@@ -82,7 +82,9 @@ export default {
 .assign-alert-info {
     @apply col-span-12 rounded-lg;
     padding-bottom: 1rem;
-    .p-panel-top::v-deep {
+
+    /* custom design-system component - .p-panel-top */
+    :deep(.p-panel-top) {
         margin-top: 1rem;
         margin-bottom: 0.25rem;
         .title, .total-count {

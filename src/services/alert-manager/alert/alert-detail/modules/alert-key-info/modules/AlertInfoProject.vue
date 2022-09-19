@@ -152,7 +152,9 @@ export default {
 .modal-body {
     margin-top: 2rem;
 }
-.project-select-dropdown::v-deep {
+
+/* custom project-select-dropdown */
+:deep(.project-select-dropdown) {
     max-width: 25rem;
     flex-grow: 1;
 }

@@ -189,7 +189,9 @@ export default {
     font-size: 0.875rem;
     line-height: 140%;
 }
-.p-definition-table::v-deep {
+
+/* custom design-system component - p-definition-table */
+:deep(.p-definition-table) {
     .p-definition {
         .key {
             @apply capitalize;

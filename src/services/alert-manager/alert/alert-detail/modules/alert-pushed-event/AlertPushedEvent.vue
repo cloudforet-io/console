@@ -235,7 +235,9 @@ export default {
 .content-wrapper {
     max-height: 20.68rem;
 }
-.p-button-modal::v-deep {
+
+/* custom design-system component - p-button-modal */
+:deep(.p-button-modal) {
     .modal-content {
         .modal-body {
             min-height: 32rem;
