@@ -30,7 +30,7 @@
         <div class="content-wrapper">
             <!--            FIXME:: below <service-account-account-type /> should changed to badge-->
             <service-account-account-type />
-            <service-account-project-detail :project-id="projectId" />
+            <service-account-project-detail :project-id="projectId" :service-account-item="item" />
             <!--            FIXME:: below <service-account-attached-general-accounts /> should have v-if about accountType-->
             <service-account-attached-general-accounts />
             <service-account-base-information :provider="providerKey"
@@ -68,7 +68,7 @@ import ServiceAccountBaseInformation
 import ServiceAccountCredentials
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
 import ServiceAccountProjectDetail from '@/services/asset-inventory/service-account/modules/ServiceAccountProjectDetail.vue';
-import type { ProviderModel } from '@/services/asset-inventory/service-account/type';
+import type { ProviderModel, ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
 
 
 export default defineComponent({
@@ -99,7 +99,7 @@ export default defineComponent({
         const state = reactive({
             loading: true,
             hasManagePermission: useManagePermissionState(),
-            item: {} as any,
+            item: {} as ServiceAccountModel,
             providerData: {} as ProviderModel,
             provider: computed(() => {
                 if (!storeState.providerLoading && !state.loading) {
