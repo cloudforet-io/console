@@ -1,7 +1,6 @@
 <template>
     <div class="service-account-credentials-form">
-        <p-field-group v-if="editMode === 'CREATE'"
-                       :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIAL_HELP_TEXT', { provider: providerData.name })"
+        <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIAL_HELP_TEXT', { provider: providerData.name })"
                        required
         >
             <div class="flex">
@@ -65,7 +64,14 @@ import type {
 } from '@/services/asset-inventory/service-account/type';
 
 
-export default defineComponent({
+interface Props {
+    editMode: PageMode;
+    provider?: string;
+    isValid: boolean;
+    originFormData: CredentialForm;
+}
+
+export default defineComponent<Props>({
     name: 'ServiceAccountCredentialsForm',
     components: {
         PFieldGroup,
@@ -126,11 +132,6 @@ export default defineComponent({
             activeTab: 'input',
         });
 
-        /* Util */
-        const initFormData = () => {
-            state.selectedSecretType = props.originFormData.selectedSecretType;
-        };
-
         /* Api */
         const getProviderData = async (provider: string) => {
             try {
@@ -139,9 +140,11 @@ export default defineComponent({
                 });
                 state.providerData = result;
                 const supportedSchema = result?.capability?.supported_schema;
-                if (props.editMode === 'CREATE') {
-                    state.selectedSecretType = supportedSchema ? supportedSchema[0] : '';
+                let selectedSecretType = supportedSchema ? supportedSchema[0] : '';
+                if (props.editMode === 'UPDATE' && props.originFormData.selectedSecretType) {
+                    selectedSecretType = props.originFormData.selectedSecretType;
                 }
+                state.selectedSecretType = selectedSecretType;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.providerData = {};
@@ -168,20 +171,18 @@ export default defineComponent({
         const handleChangeSecretType = (val: string) => {
             if (state.selectedSecretType !== val) {
                 state.selectedSecretType = val;
-                getCredentialSchema();
             }
         };
 
         /* Watcher */
-        watch(() => props.provider, (provider) => {
-            if (provider) getProviderData(provider);
-        }, { immediate: true });
-        watch(() => props.editMode, (editMode) => {
-            if (editMode === 'UPDATE') {
-                initFormData();
-                getCredentialSchema();
+        watch(() => props.provider, async (provider) => {
+            if (provider) {
+                await getProviderData(provider);
             }
         }, { immediate: true });
+        watch(() => state.selectedSecretType, (selectedSecretType) => {
+            if (selectedSecretType) getCredentialSchema();
+        });
         watch(() => state.formData, (formData) => {
             emit('change', formData);
         });
