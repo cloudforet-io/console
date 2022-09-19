@@ -69,7 +69,9 @@ export default defineComponent({
     @apply mx-0;
     max-width: 100%;
 }
-.role-toolbox-layout::v-deep {
+
+/* custom design-system component - p-horizontal-layout */
+:deep(.role-toolbox-layout) {
     .horizontal-contents {
         overflow: unset;
     }

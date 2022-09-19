@@ -156,7 +156,9 @@ export default {
             max-width: 43.5rem;
             .card {
                 width: calc(50% - 0.25rem);
-                &::v-deep {
+
+                /* custom design-system component - p-select-card */
+                :deep(&) {
                     .marker {
                         display: none;
                     }

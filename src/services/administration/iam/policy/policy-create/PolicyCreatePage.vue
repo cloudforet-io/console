@@ -149,8 +149,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.policy-create-page::v-deep {
-    .policy-create-info-wrapper {
+.policy-create-page {
+    /* custom design-system component - p-pane-layout */
+    :deep(.policy-create-info-wrapper) {
         padding: 1.125rem 1rem 2.5rem;
     }
 
@@ -166,12 +167,14 @@ export default {
         float: right;
         margin-top: 1rem;
 
-        & .p-button {
+        /* custom design-system component - p-button */
+        :deep(.p-button) {
             margin-left: 1rem;
         }
     }
 
-    .p-text-editor {
+    /* custom design-system component - p-text-editor */
+    :deep(.p-text-editor) {
         min-height: 30rem;
     }
 }

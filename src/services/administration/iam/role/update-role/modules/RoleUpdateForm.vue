@@ -163,8 +163,10 @@ export default {
         font-size: 1.125rem;
         line-height: 1.40625rem;
     }
+
     .policy-list-data-table {
-        &::v-deep .p-data-table {
+        /* custom design-system component - p-data-table */
+        :deep(& .p-data-table) {
             min-height: unset;
         }
         .help-text-wrapper {

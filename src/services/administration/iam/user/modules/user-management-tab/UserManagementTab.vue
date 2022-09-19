@@ -180,7 +180,9 @@ export default {
     @apply mt-8;
 }
 
-.api-key-table::v-deep {
+/* custom user-a-p-i-key-table */
+:deep(.api-key-table) {
+    /* custom design-system component - p-pane-layout */
     .main-table-wrapper {
         border: 0;
     }

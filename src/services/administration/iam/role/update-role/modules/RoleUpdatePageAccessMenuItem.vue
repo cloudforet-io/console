@@ -136,7 +136,9 @@ export default {
         display: flex;
         align-items: center;
         width: 12rem;
-        .p-checkbox::v-deep {
+
+        /* custom design-system component - p-checkbox */
+        :deep(.p-checkbox) {
             display: inline-flex;
             align-items: center;
             .text {

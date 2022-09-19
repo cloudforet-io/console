@@ -303,7 +303,9 @@ export default {
         }
     }
 }
-.p-toolbox-table::v-deep {
+
+/* custom design-system component - p-toolbox-table */
+:deep(.p-toolbox-table) {
     .p-toolbox {
         padding-top: 0;
     }
