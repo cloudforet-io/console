@@ -264,24 +264,25 @@ export default {
 <style lang="postcss" scoped>
 .daily-updates {
     @apply bg-white;
-    &::v-deep {
-        .widget-contents {
-            @apply h-full;
-            padding: 0;
-        }
-        .item-container.card {
-            background-color: transparent;
-        }
-        .p-lazy-img .img-container {
-            @apply rounded;
-        }
+
+    /* custom widget-layout */
+    :deep(&.widget-contents) {
+        @apply h-full;
+        padding: 0;
     }
+
+    /* custom design-system component - p-lazy-img */
+    :deep(.p-lazy-img .img-container) {
+        @apply rounded;
+    }
+
     min-height: 25rem;
     max-height: 35rem;
 }
 
 @screen lg {
-    .daily-updates::v-deep {
+    /* custom widget-layout */
+    :deep(.daily-updates) {
         &.p-pane-layout {
             background-color: rgba(theme('colors.white'));
         }

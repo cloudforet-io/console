@@ -171,7 +171,8 @@ export default defineComponent({
 </script>
 <style lang="postcss" scoped>
 .gnb-recent {
-    .p-data-loader::v-deep {
+    /* custom design-system component - p-data-loader */
+    :deep(.p-data-loader) {
         &.loading {
             height: 13rem;
         }

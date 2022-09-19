@@ -84,7 +84,8 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
-.p-checkbox::v-deep {
+/* custom design-system component - p-checkbox */
+:deep(.p-checkbox) {
     display: flex;
     align-items: center;
     cursor: pointer;

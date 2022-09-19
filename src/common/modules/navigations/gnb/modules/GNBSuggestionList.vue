@@ -162,7 +162,8 @@ export default defineComponent<Props>({
     padding-bottom: 0.125rem;
     max-height: unset;
 
-    &::v-deep {
+    /* custom gnb-suggestion-list */
+    :deep(&) {
         .context-header {
             margin-top: 0;
             margin-bottom: 0.25rem;

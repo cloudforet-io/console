@@ -154,7 +154,8 @@ export default {
     @apply border-t border-gray-200 p-4 flex items-center;
 }
 
-.p-tree::v-deep {
+/* custom design-system component - p-tree */
+:deep(.p-tree) {
     .p-tree-node .tree-row {
         .right-extra {
             display: none;

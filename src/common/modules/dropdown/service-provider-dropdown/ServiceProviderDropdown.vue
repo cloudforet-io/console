@@ -85,7 +85,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.service-provider-dropdown::v-deep {
+/* custom design-system component - p-select-dropdown */
+:deep(.service-provider-dropdown) {
     .dropdown-button {
         @apply rounded-2xl border-gray-200 bg-gray-100;
         width: unset;

@@ -318,7 +318,8 @@ export default {
 
 <style lang="postcss" scoped>
 .project-select-dropdown {
-    .p-search-dropdown::v-deep {
+    /* custom design-system component - p-search-dropdown */
+    :deep(.p-search-dropdown) {
         .button-wrapper {
             padding: 0.5rem;
             .create-button {
@@ -326,7 +327,9 @@ export default {
             }
         }
     }
-    .p-tree::v-deep {
+
+    /* custom design-system component - p-tree */
+    :deep(.p-tree) {
         padding: 0.25rem;
         .toggle-right {
             @apply flex-shrink-0;

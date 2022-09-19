@@ -212,7 +212,8 @@ export default defineComponent<Props>({
     margin-top: 0.25rem;
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
 
-    .p-data-loader::v-deep {
+    /* custom design-system component - p-data-loader */
+    :deep(.p-data-loader) {
         flex-grow: 1;
         .data-loader-container {
             max-height: calc(100vh - $gnb-height - 5rem);
@@ -284,14 +285,13 @@ export default defineComponent<Props>({
         height: calc(100vh - $gnb-height - 0.5rem);
         margin-top: -0.375rem;
 
-        &::v-deep {
-            .p-data-loader {
-                @apply flex-grow;
-                .data-loader-container {
-                    @apply flex items-center;
-                    .data-wrapper {
-                        width: 100%;
-                    }
+        /* custom design-system component - p-data-loader */
+        :deep(.p-data-loader) {
+            @apply flex-grow;
+            .data-loader-container {
+                @apply flex items-center;
+                .data-wrapper {
+                    width: 100%;
                 }
             }
         }

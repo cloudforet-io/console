@@ -273,7 +273,8 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .gnb-favorite {
-    .p-data-loader::v-deep {
+    /* custom design-system component - p-data-loader */
+    :deep(.p-data-loader) {
         &.loading {
             height: 15rem;
         }
@@ -283,7 +284,9 @@ export default {
             padding: 1rem 0;
         }
     }
-    .gnb-search-suggestion-list::v-deep {
+
+    /* custom gnb-suggestion-list */
+    :deep(.gnb-search-suggestion-list) {
         .context-header {
             display: flex;
             justify-content: space-between;

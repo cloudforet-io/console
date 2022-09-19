@@ -102,7 +102,9 @@ export default {
         @apply ml-1 mr-0;
     }
 }
-.info-contents::v-deep {
+
+/* custom portal - info-contents */
+:deep(.info-contents) {
     &.no-title {
         margin-top: -1rem;
     }
