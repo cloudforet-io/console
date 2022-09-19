@@ -76,7 +76,9 @@ export default defineComponent<Props>({
 .pdf-download-button {
     display: inline-flex;
 }
-.popover::v-deep {
+
+/* custom design-system component - p-popover */
+:deep(.popover) {
     .popper {
         z-index: 1;
     }
@@ -89,7 +91,8 @@ export default defineComponent<Props>({
 }
 
 @screen mobile {
-    .popover::v-deep {
+    /* custom design-system component - p-popover */
+    :deep(.popover) {
         .popper {
             width: 17rem;
         }
