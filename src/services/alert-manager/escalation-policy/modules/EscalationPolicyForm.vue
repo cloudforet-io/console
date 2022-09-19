@@ -263,7 +263,8 @@ export default {
 
 <style lang="postcss" scoped>
 .escalation-policy-form {
-    .project-field::v-deep {
+    /* custom design-system component - p-field-group */
+    :deep(.project-field) {
         .label-box {
             display: block;
             .form-label {

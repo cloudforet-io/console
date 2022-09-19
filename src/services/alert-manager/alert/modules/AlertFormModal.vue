@@ -215,7 +215,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.project-field-group::v-deep {
+/* custom design-system component - p-field-group */
+:deep(.project-field-group) {
     .form-label {
         display: flex;
         width: 100%;

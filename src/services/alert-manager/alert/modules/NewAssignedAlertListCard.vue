@@ -142,7 +142,8 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.assigned-alert-list::v-deep {
+/* custom design-system component - p-list-card */
+:deep(.assigned-alert-list) {
     header {
         @apply flex items-center;
 

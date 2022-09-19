@@ -350,7 +350,8 @@ export default {
         @apply grid grid-cols-12 gap-2;
         vertical-align: middle;
 
-        .p-balloon-tab::v-deep {
+        /* custom design-system component - .p-balloon-tab */
+        :deep(.p-balloon-tab) {
             @apply col-span-3;
 
             &.desktop-balloon-tab {
@@ -412,7 +413,9 @@ export default {
                     }
                 }
             }
-            .p-list-card::v-deep {
+
+            /* custom design-system component - p-list-card */
+            :deep(.p-list-card) {
                 header {
                     display: none;
                 }
@@ -452,7 +455,8 @@ export default {
         .content-wrapper {
             display: block;
 
-            .p-balloon-tab::v-deep {
+            /* custom design-system component - .p-balloon-tab */
+            :deep(.p-balloon-tab) {
                 &.desktop-balloon-tab {
                     display: none;
                 }
@@ -480,7 +484,9 @@ export default {
                         display: none;
                     }
                 }
-                .p-list-card::v-deep {
+
+                /* custom design-system component - p-list-card */
+                :deep(.p-list-card) {
                     header {
                         display: block;
 

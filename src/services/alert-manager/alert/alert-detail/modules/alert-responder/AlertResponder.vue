@@ -264,7 +264,8 @@ export default {
     }
 }
 
-.project-channel-list::v-deep {
+/* custom project-channel-list */
+:deep(.project-channel-list) {
     @apply bg-gray-100;
 }
 

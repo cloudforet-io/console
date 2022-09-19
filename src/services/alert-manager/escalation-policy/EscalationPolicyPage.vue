@@ -267,7 +267,9 @@ export default {
     .table-wrapper {
         @apply bg-white border border-gray-200 rounded-md;
     }
-    .p-toolbox::v-deep {
+
+    /* custom design-system component - p-toolbox */
+    :deep(.p-toolbox) {
         padding: 1.5rem 1rem 0.5rem;
 
         .left-area-wrapper {

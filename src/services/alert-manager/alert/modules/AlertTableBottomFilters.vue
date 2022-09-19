@@ -182,7 +182,8 @@ export default {
             margin: 0.5rem 0;
 
             &.filter-assigned {
-                .p-checkbox::v-deep {
+                /* custom design-system component - p-checkbox */
+                :deep(.p-checkbox) {
                     .text {
                         @apply inline-block;
                         margin-left: 0.375rem;

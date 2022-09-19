@@ -119,7 +119,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.p-list-card::v-deep {
+/* custom design-system component - p-list-card */
+:deep(.p-list-card) {
     .body {
         overflow-y: auto;
         .title-wrapper {

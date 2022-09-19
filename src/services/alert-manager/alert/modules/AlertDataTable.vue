@@ -468,7 +468,9 @@ export default {
 <style lang="postcss" scoped>
 .alert-data-table {
     @apply col-span-12;
-    .p-toolbox-table::v-deep {
+
+    /* custom design-system component - p-toolbox-table */
+    :deep(.p-toolbox-table) {
         @apply rounded-l;
         .top-wrapper {
             @apply bg-white;

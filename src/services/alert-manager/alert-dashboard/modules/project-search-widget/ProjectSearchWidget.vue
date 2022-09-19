@@ -191,7 +191,8 @@ export default {
 
 <style lang="postcss" scoped>
 .project-search-widget {
-    .p-toolbox::v-deep {
+    /* custom design-system component - .p-toolbox */
+    :deep(.p-toolbox) {
         .p-search {
             @apply rounded-md;
         }
@@ -229,14 +230,24 @@ export default {
                 flex-direction: column;
                 gap: 0.75rem;
 
-                .project-maintenance-window-list-item::v-deep, .project-alert-list-item::v-deep {
+                /* custom project-maintenance-window-list-item */
+
+                /* custom project-alert-list-item */
+
+                /* custom design-system component - p-list-card */
+                :deep(.project-maintenance-window-list-item), :deep(.project-alert-list-item) {
                     .body {
                         max-height: 12.5rem;
                     }
                 }
 
                 &.multiple-items {
-                    .project-maintenance-window-list-item::v-deep, .project-alert-list-item::v-deep {
+                    /* custom project-maintenance-window-list-item */
+
+                    /* custom project-alert-list-item */
+
+                    /* custom design-system component - p-list-card */
+                    :deep(.project-maintenance-window-list-item), :deep(.project-alert-list-item) {
                         .body {
                             max-height: 5rem;
                         }
