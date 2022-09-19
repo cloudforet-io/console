@@ -284,7 +284,7 @@ export default defineComponent<Props>({
     }
 
     /* custom design-system component - p-icon-button */
-    .menu-button.p-icon-button::v-deep {
+    :deep(.menu-button.p-icon-button) {
         @apply rounded text-gray-900 outline-none;
 
         &.disabled {
@@ -303,7 +303,7 @@ export default defineComponent<Props>({
     }
 
     /* custom design-system component - p-select-dropdown */
-    .menu-dropdown.p-select-dropdown:not(.invalid):not(.disabled):not(.read-only).transparent::v-deep {
+    :deep(.menu-dropdown.p-select-dropdown:not(.invalid):not(.disabled):not(.read-only).transparent) {
         > .dropdown-button {
             @apply rounded text-gray-900 outline-none;
             padding-left: 0.5rem;

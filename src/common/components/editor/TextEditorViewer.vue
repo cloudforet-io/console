@@ -46,7 +46,7 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 @import './text-editor-nodes.pcss';
-.text-editor-contents::v-deep {
+:deep(.text-editor-contents) {
     @mixin all-nodes-style;
 
     img:active {
