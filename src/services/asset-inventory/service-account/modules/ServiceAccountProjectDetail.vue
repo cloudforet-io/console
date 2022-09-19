@@ -22,7 +22,20 @@
             <p-anchor v-if="!editMode && !!projectName" :href="projectLink">
                 {{ projectName }}
             </p-anchor>
-            <span v-if="!editMode && !projectName">N/A</span>
+            <span v-if="!editMode && !projectName && accountType === 'TRUST'">N/A</span>
+            <div v-if="!editMode && !projectName && accountType === 'GENERAL'">
+                <!--                song-lang-->
+                <span>-- <span class="required-span">** required</span></span>
+                <!--                song-lang-->
+                <p-tooltip class="project-required-tooltip" contents="It's now required to select a specific <br>
+                                                                    project for any service account. <br>
+                                                                    ( Note: A randomly generated <br>
+                                                                    project will be forcefully added to <br>
+                                                                     the accounts with no project soon.)"
+                >
+                    <p-i name="ic_tooltip" width="1rem" height="1rem" />
+                </p-tooltip>
+            </div>
             <project-select-dropdown v-if="editMode"
                                      class="project-select-dropdown"
                                      project-selectable
@@ -37,7 +50,7 @@
 <script lang="ts">
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PPaneLayout, PPanelTop, PButton, PAnchor,
+    PPaneLayout, PPanelTop, PButton, PAnchor, PI, PTooltip,
 } from '@spaceone/design-system';
 import type { PropType, SetupContext } from 'vue';
 import { computed, reactive, toRefs } from 'vue';
@@ -68,6 +81,8 @@ export default {
         PButton,
         PAnchor,
         ProjectSelectDropdown,
+        PI,
+        PTooltip,
     },
     props: {
         isValid: {
@@ -156,6 +171,9 @@ export default {
     }
     .content-wrapper {
         padding: 0.5rem 1rem 2.5rem 1rem;
+        .required-span {
+            @apply text-red-500 mx-1;
+        }
         .project-select-dropdown {
             width: 100%;
         }
