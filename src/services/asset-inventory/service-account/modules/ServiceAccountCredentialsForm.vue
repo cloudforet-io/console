@@ -175,10 +175,8 @@ export default defineComponent<Props>({
         };
 
         /* Watcher */
-        watch(() => props.provider, async (provider) => {
-            if (provider) {
-                await getProviderData(provider);
-            }
+        watch(() => props.provider, (provider) => {
+            if (provider) getProviderData(provider);
         }, { immediate: true });
         watch(() => state.selectedSecretType, (selectedSecretType) => {
             if (selectedSecretType) getCredentialSchema();
