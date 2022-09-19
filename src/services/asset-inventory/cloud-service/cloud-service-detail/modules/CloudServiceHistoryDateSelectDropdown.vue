@@ -78,3 +78,22 @@ export default {
     },
 };
 </script>
+
+<style lang="postcss" scoped>
+/* custom design-system component - p-select-dropdown */
+:deep(.month-select-dropdown) {
+    .dropdown-button {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
+
+/* custom design-system component - p-select-dropdown */
+:deep(.year-select-dropdown) {
+    .dropdown-button {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: 0;
+    }
+}
+</style>

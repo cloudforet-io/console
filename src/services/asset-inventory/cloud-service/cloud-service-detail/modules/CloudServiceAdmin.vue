@@ -152,7 +152,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
->>> .p-search-table {
+/* custom design-system component - p-search-table */
+:deep(.p-search-table) {
     border-width: 0;
 }
 </style>

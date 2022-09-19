@@ -601,7 +601,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
->>> .p-horizontal-layout .horizontal-contents {
+/* custom design-system component - p-horizontal-layout */
+:deep(.p-horizontal-layout) .horizontal-contents {
     overflow: unset;
 }
 
@@ -628,13 +629,18 @@ export default {
     @apply mt-8;
 }
 
->>> .p-dynamic-layout-query-search-table .p-toolbox-table {
+/* custom design-system component - p-dynamic-layout */
+
+/* custom design-system component - p-dynamic-layout-query-search-table */
+:deep(.p-dynamic-layout-query-search-table) .p-toolbox-table {
     @apply border border-gray-200 rounded-lg;
     .p-data-table {
         min-height: unset;
     }
 }
-.p-tab::v-deep {
+
+/* custom design-system component - p-tab */
+:deep(.p-tab) {
     @apply rounded-lg;
     &.monitoring {
         .tab-pane {
@@ -644,13 +650,18 @@ export default {
 }
 
 @screen mobile {
-    ::v-deep {
+    /* custom design-system component - p-horizontal-layout */
+    :deep(.p-horizontal-layout) {
         .horizontal-contents {
             height: 50rem !important;
-            .p-dynamic-layout-query-search-table {
-                height: 50rem !important;
-            }
         }
+    }
+
+    /* custom design-system component - p-dynamic-layout */
+
+    /* custom design-system component - p-dynamic-layout-query-search-table */
+    :deep(.p-dynamic-layout-query-search-table) {
+        height: 50rem !important;
     }
 }
 </style>

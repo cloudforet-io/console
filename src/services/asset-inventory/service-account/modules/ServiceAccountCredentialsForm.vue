@@ -207,7 +207,9 @@ export default defineComponent({
     .custom-schema-box {
         padding: 2rem 2rem 0 2rem;
     }
-    .p-tab::v-deep {
+
+    /* custom design-system component - p-tab */
+    :deep(.p-tab) {
         .p-text-editor {
             .CodeMirror {
                 font-family: Inconsolata, monospace;
@@ -226,7 +228,8 @@ export default defineComponent({
     }
 
     @screen tablet {
-        .p-tab::v-deep {
+        /* custom design-system component - p-tab */
+        :deep(.p-tab) {
             .p-text-input {
                 width: 100%;
             }

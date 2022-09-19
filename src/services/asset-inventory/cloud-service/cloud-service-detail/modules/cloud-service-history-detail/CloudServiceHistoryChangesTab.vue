@@ -145,7 +145,9 @@ export default defineComponent({
         height: calc(100% - 3.5rem);
         .cloud-service-history-changes-key-nav {
             width: 20%;
-            .p-card::v-deep {
+
+            /* custom design-system component - p-card */
+            :deep(.p-card) {
                 height: 100%;
 
                 header {
@@ -173,7 +175,9 @@ export default defineComponent({
         }
         .cloud-service-history-changes-code-nav {
             width: 80%;
-            .p-card::v-deep {
+
+            /* custom design-system component - p-card */
+            :deep(.p-card) {
                 height: 100%;
                 header {
                     @apply flex items-center border border-b border-solid;
@@ -224,7 +228,8 @@ export default defineComponent({
                 width: 100% !important;
             }
             .cloud-service-history-changes-key-nav {
-                .p-card::v-deep {
+                /* custom design-system component - p-card */
+                :deep(.p-card) {
                     .body {
                         max-height: 11.25rem;
                         overflow-y: scroll;
@@ -234,7 +239,9 @@ export default defineComponent({
             }
             .cloud-service-history-changes-code-nav {
                 height: 3.5rem;
-                .p-card::v-deep {
+
+                /* custom design-system component - p-card */
+                :deep(.p-card) {
                     @apply border-l border-gray-200;
                     header {
                         height: 100%;

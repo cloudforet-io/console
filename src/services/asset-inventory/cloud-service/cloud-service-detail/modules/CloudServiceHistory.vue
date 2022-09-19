@@ -346,21 +346,9 @@ export default {
 
 <style lang="postcss" scoped>
 .cloud-service-history {
-    .p-toolbox::v-deep {
+    /* custom design-system component - p-toolbox */
+    :deep(.p-toolbox) {
         padding: 1.5rem 1rem 0.5rem;
-        .month-select-dropdown {
-            .dropdown-button {
-                border-top-right-radius: 0;
-                border-bottom-right-radius: 0;
-            }
-        }
-        .year-select-dropdown {
-            .dropdown-button {
-                border-top-left-radius: 0;
-                border-bottom-left-radius: 0;
-                border-left: 0;
-            }
-        }
     }
     .timeline-wrapper {
         height: 30rem;

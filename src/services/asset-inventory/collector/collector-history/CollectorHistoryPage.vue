@@ -377,14 +377,17 @@ export default {
                 line-height: 1.5;
                 padding-right: 1rem;
             }
-            .select-button-group::v-deep {
+
+            /* custom design-system component - p-select-button-group */
+            :deep(.select-button-group) {
                 .button-group {
                     display: flex;
                 }
             }
         }
 
-        .p-toolbox-table {
+        /* custom design-system component - p-toolbox-table */
+        :deep(.p-toolbox-table) {
             &.no-data {
                 .p-data-table {
                     min-height: 18.75rem;

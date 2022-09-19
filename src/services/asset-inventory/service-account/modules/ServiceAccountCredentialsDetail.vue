@@ -109,7 +109,8 @@ export default defineComponent<Props>({
 });
 </script>
 <style lang="postcss" scoped>
-.service-account-credentials-detail::v-deep {
+/* custom design-system component - p-dynamic-layout */
+:deep(.service-account-credentials-detail) {
     .p-panel-top {
         display: none;
     }

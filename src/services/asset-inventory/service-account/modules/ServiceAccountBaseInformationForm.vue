@@ -180,12 +180,15 @@ export default defineComponent<Props>({
 </script>
 <style lang="postcss" scoped>
 .service-account-base-information-form {
-    .account-name-input::v-deep {
+    /* custom design-system component - p-text-input */
+    :deep(.account-name-input) {
         .input-container {
             width: 50%;
         }
     }
-    .p-json-schema-form::v-deep {
+
+    /* custom design-system component - p-json-schema-form */
+    :deep(.p-json-schema-form) {
         .p-text-input {
             width: 100%;
             .input-container {
@@ -195,12 +198,15 @@ export default defineComponent<Props>({
     }
 
     @screen tablet {
-        .account-name-input::v-deep {
+        /* custom design-system component - p-text-input */
+        :deep(.account-name-input) {
             .input-container {
                 width: 100%;
             }
         }
-        .p-json-schema-form::v-deep {
+
+        /* custom design-system component - p-json-schema-form */
+        :deep(.p-json-schema-form) {
             .p-text-input {
                 .input-container {
                     width: 100%;

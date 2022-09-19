@@ -98,10 +98,11 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.cloud-service-usage-overview-summary::v-deep {
+/* custom design-system component - p-data-loader */
+.cloud-service-usage-overview-summary {
     @apply bg-gray-100 rounded-lg;
     min-height: 4.1875rem;
-    .data-loader-container {
+    :deep(.data-loader-container) {
         .loader-wrapper .loader,
         .data-wrapper {
             display: flex;
@@ -130,7 +131,9 @@ export default {
     .skeleton-wrapper {
         flex-direction: column;
     }
-    .p-dynamic-widget {
+
+    /* custom design-system component - p-dynamic-widget */
+    :deep(.p-dynamic-widget) {
         width: 100%;
         min-width: 140px;
         box-sizing: content-box;

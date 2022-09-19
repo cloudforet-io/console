@@ -234,7 +234,7 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
-.cloud-service-usage-overview-detail-modal::v-deep {
+.cloud-service-usage-overview-detail-modal {
     .modal-inner {
         @apply bg-gray-100;
         display: flex;
@@ -254,30 +254,37 @@ export default defineComponent<Props>({
         margin-bottom: 0.75rem;
     }
 
-    .p-dynamic-chart-column {
-        .label-wrapper {
-            @apply items-center;
-            > .name {
-                @apply truncate mr-4;
-            }
-            > .value {
-                @apply flex-shrink-0;
+    /* custom design-system component - p-dynamic-widget */
+    :deep(.p-dynamic-widget) {
+        .amcharts-Polyspline {
+            @apply hidden;
+        }
+
+        /* custom design-system component - p-dynamic-widget-chart */
+        &.p-dynamic-widget-chart {
+            @apply overflow-visible h-auto;
+            min-height: 17.5rem;
+        }
+
+        /* custom design-system component - p-dynamic-chart */
+
+        /* custom design-system component - p-dynamic-chart-column */
+        &.p-dynamic-chart-column {
+            .label-wrapper {
+                @apply items-center;
+                > .name {
+                    @apply truncate mr-4;
+                }
+                > .value {
+                    @apply flex-shrink-0;
+                }
             }
         }
-    }
-
-    .p-dynamic-widget-chart {
-        @apply overflow-visible h-auto;
-        min-height: 17.5rem;
-    }
-
-    .amcharts-Polyspline {
-        @apply hidden;
     }
 }
 
 @screen laptop {
-    .cloud-service-usage-overview-detail-modal::v-deep {
+    .cloud-service-usage-overview-detail-modal {
         .chart-widget-wrapper {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
@@ -285,9 +292,9 @@ export default defineComponent<Props>({
 }
 
 @screen tablet {
-    .cloud-service-usage-overview-detail-modal::v-deep {
+    .cloud-service-usage-overview-detail-modal {
         .modal-inner {
-            height: 70vh;
+            min-height: 70vh;
         }
         .chart-widget-wrapper {
             grid-template-columns: 1fr;
@@ -296,7 +303,7 @@ export default defineComponent<Props>({
 }
 
 @screen mobile {
-    .cloud-service-usage-overview-detail-modal::v-deep {
+    .cloud-service-usage-overview-detail-modal {
         .modal-inner {
             padding: 0;
         }

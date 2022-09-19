@@ -276,7 +276,9 @@ export default defineComponent<Props>({
 .data-loader {
     height: 26.125rem;
 }
-.log-dynamic-layout::v-deep {
+
+/* custom design-system component - p-dynamic-layout */
+:deep(.log-dynamic-layout) {
     .p-toolbox {
         padding-top: 0;
     }

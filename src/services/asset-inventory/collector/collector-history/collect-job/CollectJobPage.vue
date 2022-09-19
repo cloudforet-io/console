@@ -66,7 +66,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
->>> .p-horizontal-layout .horizontal-contents {
+/* custom design-system component - p-horizontal-layout */
+:deep(.p-horizontal-layout) .horizontal-contents {
     overflow: unset;
 }
 
@@ -78,13 +79,15 @@ export default {
 }
 
 @screen mobile {
-    >>> .p-toolbox-table .p-data-table {
+    /* custom design-system component - p-toolbox-table */
+    :deep(.p-toolbox-table) .p-data-table {
         min-height: unset;
     }
 }
 
 @screen tablet {
-    >>> .p-toolbox-table .p-data-table {
+    /* custom design-system component - p-toolbox-table */
+    :deep(.p-toolbox-table) .p-data-table {
         min-height: unset;
     }
 }

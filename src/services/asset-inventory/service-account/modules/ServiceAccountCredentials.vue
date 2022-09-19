@@ -154,7 +154,8 @@ export default defineComponent<Props>({
 </script>
 <style lang="postcss" scoped>
 .service-account-credentials {
-    .p-panel-top::v-deep {
+    /* custom design-system component - p-panel-top */
+    :deep(.p-panel-top) {
         .extra {
             text-align: right;
         }

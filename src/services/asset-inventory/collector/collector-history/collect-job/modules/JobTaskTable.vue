@@ -332,7 +332,9 @@ export default {
             line-height: 1.5;
             padding-right: 1rem;
         }
-        .select-button-group::v-deep {
+
+        /* custom design-system component - p-select-button-group */
+        :deep(.select-button-group) {
             .button-group {
                 display: flex;
             }

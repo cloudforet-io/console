@@ -83,7 +83,8 @@ export default {
 
 <style lang="postcss" scoped>
 .service-account-project {
-    .p-panel-top::v-deep {
+    /* custom design-system component - p-panel-top */
+    :deep(.p-panel-top) {
         .extra {
             text-align: right;
         }
