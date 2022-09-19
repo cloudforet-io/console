@@ -37,7 +37,7 @@
                         {{ $t('COMMON.GNB.SEARCH.HELP_TEXT') }}
                     </p>
                 </div>
-                <div class="no-data">
+                <div v-if="inputText" class="no-data">
                     <img src="@/assets/images/illust_ghost.svg" class="img-no-data">
                     <p class="no-data-text">
                         <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
@@ -224,7 +224,6 @@ export default defineComponent<Props>({
 
     .no-data {
         margin: 2.5rem 0;
-
         > img {
             @apply ml-auto mr-auto;
 
@@ -244,6 +243,7 @@ export default defineComponent<Props>({
             margin-top: 1.5rem;
             font-size: 0.875rem;
             line-height: 1.5;
+            word-break: break-word;
             em {
                 @apply font-bold text-gray-500;
             }
