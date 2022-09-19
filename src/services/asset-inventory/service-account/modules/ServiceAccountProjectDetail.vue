@@ -2,7 +2,7 @@
     <p-pane-layout class="service-account-project-detail">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
             <template #extra>
-                <p-button v-if="!editMode" :disabled="!projectName" icon="ic_edit"
+                <p-button v-if="!editMode" :disabled="accountType === 'TRUST'" icon="ic_edit"
                           :style-type="!projectName && 'transparent'"
                           @click="handleEditMode"
                 >
@@ -42,7 +42,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPaneLayout, PPanelTop, PButton, PAnchor,
 } from '@spaceone/design-system';
-import type { SetupContext } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import { computed, reactive, toRefs } from 'vue';
 
 
@@ -58,7 +58,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import type { ProjectForm } from '@/services/asset-inventory/service-account/type';
+import type { AccountType, ProjectForm, ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
 import type { ProjectGroupTreeItem, ProjectItemResp } from '@/services/project/type';
 
 
@@ -78,6 +78,10 @@ export default {
         },
         projectId: {
             type: String,
+            default: undefined,
+        },
+        serviceAccountItem: {
+            type: Object as PropType<ServiceAccountModel>,
             default: undefined,
         },
     },
@@ -104,6 +108,7 @@ export default {
                 selectedProject: state.selectedProjects,
             })),
             proxyIsValid: useProxyValue('is-valid', props, emit),
+            accountType: computed<AccountType>(() => props.serviceAccountItem?.service_account_type ?? 'GENERAL'),
         });
 
 
