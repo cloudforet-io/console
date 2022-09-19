@@ -31,16 +31,17 @@
                                           :account-type.sync="accountType"
                                           @change="handleChangeAccountType"
             />
-            <service-account-base-information mode="CREATE"
-                                              :provider-data="providerData"
-                                              :is-valid.sync="isBaseInformationFormValid"
-                                              @change="handleChangeBaseInformationForm"
+            <p-pane-layout class="form-wrapper">
+                <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')" />
+                <service-account-base-information-form :schema="baseInformationSchema"
+                                                       :is-valid.sync="isBaseInformationFormValid"
+                                                       @change="handleChangeBaseInformationForm"
+                />
+            </p-pane-layout>
+            <service-account-project-form :is-valid.sync="isProjectFormValid"
+                                          @change="handleChangeProjectForm"
             />
-            <service-account-project-form
-                :is-valid.sync="isProjectFormValid"
-                @change="handleChangeProjectForm"
-            />
-            <p-pane-layout class="credentials-form-wrapper">
+            <p-pane-layout class="form-wrapper">
                 <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')" />
                 <service-account-credentials-form v-if="enableCredentialInput"
                                                   :provider="provider"
@@ -88,8 +89,8 @@ import InfoButton from '@/common/modules/portals/InfoButton.vue';
 
 import ServiceAccountAccountType
     from '@/services/asset-inventory/service-account/modules/ServiceAccountAccountType.vue';
-import ServiceAccountBaseInformation
-    from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
+import ServiceAccountBaseInformationForm
+    from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformationForm.vue';
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentialsForm.vue';
 import ServiceAccountProjectForm from '@/services/asset-inventory/service-account/modules/ServiceAccountProjectForm.vue';
@@ -102,10 +103,10 @@ import type {
 export default {
     name: 'AddServiceAccountPage',
     components: {
+        ServiceAccountBaseInformationForm,
         ServiceAccountCredentialsForm,
         ServiceAccountProjectForm,
         ServiceAccountAccountType,
-        ServiceAccountBaseInformation,
         InfoButton,
         PLazyImg,
         PMarkdown,
@@ -133,6 +134,7 @@ export default {
                 const secretTypes = get(state.providerData, 'capability.supported_schema', []);
                 return secretTypes.length > 0;
             }),
+            baseInformationSchema: computed(() => state.providerData.template?.service_account?.schema),
         });
 
         const formState = reactive({
@@ -178,6 +180,7 @@ export default {
                 name: formState.baseInformationForm.accountName,
                 data: formState.baseInformationForm.customSchemaForm,
                 tags: formState.baseInformationForm.tags,
+                service_account_type: formState.accountType,
             };
 
             if (formState.projectForm.selectedProject) {
@@ -291,8 +294,11 @@ export default {
         display: grid;
         gap: 1rem;
 
-        .credentials-form-wrapper {
+        .form-wrapper {
             .service-account-credentials-form {
+                padding: 0.5rem 1rem 2.5rem 1rem;
+            }
+            .service-account-base-information-form {
                 padding: 0.5rem 1rem 2.5rem 1rem;
             }
         }
