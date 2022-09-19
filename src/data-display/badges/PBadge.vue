@@ -1,19 +1,26 @@
+<template>
+    <span class="p-badge" :class="allBodyClass" :style="[inlineStyles]">
+        <slot />
+    </span>
+</template>
+
 <script lang="ts">
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
+import type { PropType } from 'vue';
+
 import { BADGE_STYLE } from '@/data-display/badges/type';
-import PAnchor from '@/inputs/anchors/PAnchor.vue';
-import { getBindClass } from '@/util/functional-helpers';
+import type { Badge, BadgeStyleType } from '@/data-display/badges/type';
 import { getColor } from '@/util/helpers';
 
-export default {
+export default defineComponent<Badge>({
     name: 'PBadge',
-    functional: true,
-    components: { PAnchor },
     props: {
-        /** @type {string} */
         styleType: {
-            type: String,
+            type: String as PropType<BadgeStyleType>,
             default: 'primary',
-            validator(value) {
+            validator(value: string) {
                 return Object.keys(BADGE_STYLE).indexOf(value) !== -1;
             },
         },
@@ -34,34 +41,34 @@ export default {
             default: false,
         },
     },
-    render(h, { props, data, children }) {
-        const newData = {
-            ...data,
-            class: {
-                ...getBindClass(data.class),
-            },
-        };
-        newData.class['p-badge'] = true;
-        newData.class[`badge-${props.shape}`] = true;
-        if (props.backgroundColor || props.textColor) {
-            newData.staticStyle = data.staticStyle || {};
-            if (props.outline) {
-                newData.staticStyle.backgroundColor = 'transparent';
-                newData.staticStyle.borderColor = getColor(props.backgroundColor);
-                newData.staticStyle.borderWidth = '1px';
-                newData.staticStyle.color = getColor(props.backgroundColor);
-            } else {
-                newData.staticStyle.color = getColor(props.textColor);
-                newData.staticStyle.backgroundColor = getColor(props.backgroundColor);
-            }
-        } else {
-            newData.class[`badge-${props.styleType}`] = true;
-        }
-        if (props.outline) newData.class.outline = true;
+    setup(props) {
+        const state = reactive({
+            allBodyClass: computed(() => {
+                const classes: string[] = [];
+                if (props.shape) classes.push(`badge-${props.shape}`);
+                if (!(props.backgroundColor && props.textColor)) classes.push(`badge-${props.styleType}`);
+                if (props.outline) classes.push('outline');
+                return classes;
+            }),
+            inlineStyles: computed(() => {
+                const inlineStyle = {} as {[prop: string]: string};
+                if (props.backgroundColor) inlineStyle.backgroundColor = getColor(props.backgroundColor);
+                if (props.textColor) inlineStyle.color = getColor(props.textColor);
+                if ((props.backgroundColor || props.textColor) && props.outline) {
+                    inlineStyle.borderColor = getColor(props.backgroundColor);
+                    inlineStyle.borderWidth = '1px';
+                    inlineStyle.backgroundColor = 'transparent';
+                    inlineStyle.color = getColor(props.textColor ? props.textColor : props.backgroundColor);
+                }
+                return inlineStyle;
+            }),
+        });
 
-        return h('span', newData, children);
+        return {
+            ...toRefs(state),
+        };
     },
-};
+});
 </script>
 
 <style lang="postcss">

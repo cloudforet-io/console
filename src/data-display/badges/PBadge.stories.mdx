@@ -12,7 +12,7 @@ import { getBadgesArgTypes } from '@/data-display/badges/story-helper';
 
 export const Template = (args,{argTypes})=>({
     props: Object.keys(argTypes),
-    components: {PBadge},
+    components: { PBadge },
     template: `
         <div style="display:flex; align-items:center; justify-content:center; height:100px;">
             <p-badge :styleType="styleType"

@@ -44,9 +44,8 @@
 <script lang="ts">
 import {
     computed,
-    defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    defineComponent, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     COLLAPSIBLE_LIST_THEME,
@@ -56,8 +55,7 @@ import type { CollapsibleItem, CollapsibleListProps } from '@/data-display/colla
 import PCollapsiblePanel from '@/data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
 import PCollapsibleToggle from '@/data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
-import { makeOptionalProxy } from '@/util/composition-helpers';
-
+import { useProxyValue } from '@/hooks';
 
 export default defineComponent<CollapsibleListProps>({
     name: 'PCollapsibleList',
@@ -105,10 +103,9 @@ export default defineComponent<CollapsibleListProps>({
             },
         },
     },
-    setup(props: CollapsibleListProps) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+    setup(props, { emit }) {
         const state = reactive({
-            proxyUnfoldedIndices: makeOptionalProxy<number[]>('unfoldedIndices', vm, props.unfoldedIndices || []),
+            proxyUnfoldedIndices: useProxyValue<number[]>('unfoldedIndices', props, emit),
             collapsibleItems: computed<CollapsibleItem[]>(() => props.items.map((d) => {
                 if (typeof d === 'string') return { data: d };
                 return d;
