@@ -155,7 +155,7 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-.p-text-input::v-deep {
+:deep(.p-text-input) {
     input:-webkit-autofill {
         transition: background-color 5000s;
         -webkit-box-shadow: 0 0 0 30px white inset !important;
@@ -187,7 +187,7 @@ export default defineComponent({
         .form {
             margin-top: 0.5rem;
         }
-        .p-field-group::v-deep label {
+        .p-field-group:deep(label) {
             display: none;
         }
     }
