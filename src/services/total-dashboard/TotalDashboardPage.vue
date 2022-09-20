@@ -159,7 +159,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.total-dashboard::v-deep {
+/* custom general-page-layout */
+:deep(.total-dashboard) {
     @apply bg-gray-100;
     height: auto;
     .page-contents {
