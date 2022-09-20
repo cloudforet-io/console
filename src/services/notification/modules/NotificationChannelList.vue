@@ -284,7 +284,9 @@ export default {
     font-size: 1.375rem;
     line-height: 145%;
 }
-.p-data-loader::v-deep {
+
+/* custom design-system component - p-data-loader */
+:deep(.p-data-loader) {
     .data-wrapper {
         overflow-y: hidden;
     }
