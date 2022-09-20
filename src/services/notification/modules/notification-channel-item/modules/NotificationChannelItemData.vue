@@ -218,7 +218,7 @@ export default {
 
 <style lang="postcss" scoped>
 @import '../styles/channelItem.pcss';
-.content-wrapper::v-deep .edit-button {
+.content-wrapper .edit-button {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -229,20 +229,25 @@ export default {
         }
     }
 }
-.p-json-schema-form::v-deep {
-    &.schema-form {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
+
+/* custom design-system component - p-json-schema-form */
+:deep(.p-json-schema-form.schema-form) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     .label-box {
         display: none;
     }
     .json-schema-field-group {
         margin-bottom: 0;
     }
+    .p-field-group:last-of-type {
+        margin-bottom: 0;
+    }
 }
-.p-field-group::v-deep {
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
     .label-box {
         display: none;
     }

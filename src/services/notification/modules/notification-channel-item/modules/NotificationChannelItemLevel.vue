@@ -142,7 +142,7 @@ export default {
 .level-badge {
     @apply rounded;
 }
-.content-wrapper::v-deep .edit-button {
+.content-wrapper .edit-button {
     display: flex;
     align-items: center;
     gap: 0.5rem;

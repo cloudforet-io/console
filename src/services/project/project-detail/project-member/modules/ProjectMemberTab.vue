@@ -344,7 +344,8 @@ export default {
 
 <style lang="postcss" scoped>
 .member-tab {
-    .p-toolbox-table::v-deep {
+    /* custom design-system component - p-toolbox-table */
+    :deep(.p-toolbox-table) {
         @apply border-none;
         .p-panel-top {
             height: auto;

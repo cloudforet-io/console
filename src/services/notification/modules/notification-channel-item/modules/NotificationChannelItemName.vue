@@ -128,7 +128,7 @@ export default {
 
 <style lang="postcss" scoped>
 @import '../styles/channelItem.pcss';
-.content-wrapper::v-deep .edit-button {
+.content-wrapper .edit-button {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -139,7 +139,7 @@ export default {
         }
     }
 }
-.p-field-group::v-deep {
+.p-field-group {
     margin-bottom: 0;
 }
 </style>

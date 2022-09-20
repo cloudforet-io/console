@@ -660,7 +660,9 @@ export default {
         .table-button-wrapper {
             text-align: right;
         }
-        .p-data-table::v-deep {
+
+        /* custom design-system component - p-data-table */
+        :deep(.p-data-table) {
             @apply rounded-xs;
             height: auto;
             text-align: right;

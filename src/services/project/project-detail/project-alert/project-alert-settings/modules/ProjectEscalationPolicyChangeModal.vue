@@ -233,12 +233,12 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.escalation-policy-change-modal::v-deep {
-    .modal-content {
+/* custom design-system component - p-button-modal */
+.escalation-policy-change-modal {
+    :deep(.modal-content) {
         height: 53.75rem;
     }
-
-    .modal-content-wrapper {
+    :deep(.modal-content-wrapper) {
         padding: 1rem 0;
     }
 }

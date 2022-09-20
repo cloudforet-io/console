@@ -23,6 +23,7 @@
                                     <favorite-button :item-id="item.project_id"
                                                      :favorite-type="FAVORITE_TYPE.PROJECT"
                                                      scale="0.7"
+                                                     class="favorite-button"
                                     />
                                 </div>
                             </div>
@@ -472,11 +473,11 @@ export default {
 .card {
     @apply flex flex-col w-full h-full;
     position: relative;
-    .favorite-wrapper .favorite-btn::v-deep:not(.active) {
+    .favorite-wrapper .favorite-button:not(.active) {
         display: none;
     }
     &:hover {
-        .favorite-wrapper .favorite-btn::v-deep:not(.active) {
+        .favorite-wrapper .favorite-button:not(.active) {
             display: block;
         }
     }

@@ -198,8 +198,11 @@ export default {
     max-width: 30rem;
     margin-top: 1.25rem;
 }
-.p-json-schema-form::v-deep {
-    .json-schema-field-group {
+
+/* custom design-system component - p-json-schema-form */
+:deep(.p-json-schema-form) {
+    .p-text-input {
+        width: 100%;
         max-width: 30rem;
     }
 }

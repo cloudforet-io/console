@@ -247,7 +247,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.p-toolbox-table::v-deep {
+.p-toolbox-table {
     @apply border-0 h-full;
 }
 </style>

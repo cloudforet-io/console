@@ -242,7 +242,9 @@ export default {
             }
         }
     }
-    .p-list-card::v-deep {
+
+    /* custom design-system component - p-list-card */
+    :deep(.p-list-card) {
         header {
             display: flex;
             align-items: center;
@@ -271,7 +273,8 @@ export default {
 
 @screen tablet {
     .content-wrapper {
-        .p-list-card::v-deep {
+        /* custom design-system component - p-list-card */
+        :deep(.p-list-card) {
             header {
                 .assigned-button {
                     display: none;

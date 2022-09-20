@@ -368,10 +368,11 @@ export default {
             height: 100%;
         }
     }
-    .table-wrapper::v-deep {
+    .table-wrapper {
         padding-top: 1rem;
 
-        .cost-dashboard-data-table {
+        /* custom /* custom design-system component - p-card */
+        :deep(.cost-dashboard-data-table) {
             .p-data-table {
                 min-height: 13.5rem;
             }

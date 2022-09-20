@@ -138,7 +138,8 @@ export default {
     }
 }
 .project-alert-page {
-    .p-button-tab::v-deep {
+    /* custom design-system component - p-button-tab */
+    :deep(.p-button-tab) {
         .button-group {
             @apply mb-0;
             margin-top: 2rem;

@@ -44,7 +44,8 @@
                                 <span class="label-number text-xs text-gray-600">{{ item.count }}</span>
                             </div>
                             <p-progress-bar :percentage="(item.count / maxValue) * 100"
-                                            class="progress-bar" :class="selectedProvider||'aws'"
+                                            class="progress-bar"
+                                            :class="selectedProvider||'aws'"
                                             :color="providers[selectedProvider] ? providers[selectedProvider].color : 'gray'"
                             />
                         </router-link>
@@ -500,12 +501,14 @@ export default {
     &:hover {
         @apply bg-blue-100 cursor-pointer underline rounded-xs;
     }
-    .progress-bar {
+
+    /* custom design-system component - p-progress-bar */
+    :deep(.progress-bar) {
         padding: 0;
-        >>> .background-bar {
+        .background-bar {
             height: 0.25rem;
         }
-        >>> .tracker-bar {
+        .tracker-bar {
             height: 0.25rem;
             margin-top: -0.25rem;
         }

@@ -24,8 +24,7 @@
             </p-button>
         </div>
         <div v-for="data in orderedCardData" :key="data.order" class="card-list-wrapper">
-            <p-card class="card"
-                    :style-type="isEditMode && selectedOrder === data.order ? 'indigo400' : 'gray100'"
+            <p-card :style-type="isEditMode && selectedOrder === data.order ? 'indigo400' : 'gray100'"
                     :header="isEditMode && selectedOrder === data.order ? $t('PROJECT.EVENT_RULE.EDIT_EVENT_RULE') : ''"
             >
                 <template #header>
@@ -80,7 +79,7 @@
             </p-card>
         </div>
         <p-card v-if="isEditMode && mode === EDIT_MODE.CREATE"
-                class="card" style-type="indigo400"
+                style-type="indigo400"
                 :header="$t('PROJECT.EVENT_RULE.ADD_EVENT_RULE')"
         >
             <event-rule-form :project-id="projectId"
@@ -355,7 +354,9 @@ export default {
     width: 100%;
     margin-top: 1rem;
 }
-.card::v-deep {
+
+/* custom design-system component - p-card */
+:deep(.p-card) {
     margin-bottom: 1rem;
 
     header {
@@ -412,7 +413,8 @@ export default {
 }
 
 @screen tablet {
-    .card::v-deep {
+    /* custom design-system component - p-card */
+    :deep(.p-card) {
         .body {
             display: block;
         }

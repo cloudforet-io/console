@@ -176,7 +176,8 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
->>> .progress-bar {
+/* custom budget-usage-progress-bar */
+:deep(.progress-bar) {
     .background-bar {
         height: 0.75rem;
     }

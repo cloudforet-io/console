@@ -100,7 +100,9 @@ export default {
             }
         }
     }
-    &::v-deep .body {
+
+    /* custom design-system component - p-card */
+    :deep(.body) {
         @apply bg-white;
         flex-grow: 1;
         padding: 1rem;

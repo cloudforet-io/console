@@ -330,7 +330,9 @@ export default {
 .project-search {
     @apply w-full;
     padding: 0 0.75rem;
-    .p-autocomplete-search::v-deep {
+
+    /* custom design-system component - p-autocomplete-search */
+    :deep(.p-autocomplete-search) {
         .p-search {
             overflow-x: hidden;
             overflow-y: hidden;

@@ -46,11 +46,13 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 @import './text-editor-nodes.pcss';
-:deep(.text-editor-contents) {
-    @mixin all-nodes-style;
+.text-editor-contents {
+    :deep() {
+        @mixin all-nodes-style;
 
-    img:active {
-        outline: none;
+        img:active {
+            outline: none;
+        }
     }
 }
 </style>

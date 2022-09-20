@@ -472,7 +472,8 @@ export default {
 
 <style lang="postcss" scoped>
 .project-member-add-modal {
-    .p-box-tab::v-deep {
+    /* custom design-system component - p-box-tab */
+    :deep(.p-box-tab) {
         .tab-pane {
             padding: 0;
         }
@@ -486,20 +487,7 @@ export default {
             line-height: 1.25;
             padding-bottom: 1rem;
         }
-        .p-search-dropdown::v-deep {
-            .help-text {
-                @apply text-gray-400;
-                font-size: 0.75rem;
-                line-height: 1.3;
-                padding: 0.25rem 0.5rem;
-            }
-            .context-item {
-                &.empty {
-                    height: 8rem;
-                    align-items: baseline;
-                }
-            }
-        }
+
         .help-icon {
             @apply text-gray-400;
         }
