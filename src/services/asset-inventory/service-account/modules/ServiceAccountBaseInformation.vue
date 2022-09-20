@@ -178,12 +178,13 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .service-account-base-information {
-    .p-panel-top::v-deep {
+    /* custom design-system component - p-panel-top */
+    :deep(.p-panel-top) {
         .extra {
             text-align: right;
         }
     }
-    .content-wrapper::v-deep {
+    .content-wrapper {
         padding: 0.5rem 1rem 2.5rem 1rem;
     }
 }

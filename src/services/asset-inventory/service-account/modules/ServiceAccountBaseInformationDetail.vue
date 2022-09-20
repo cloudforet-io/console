@@ -81,8 +81,11 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.service-account-base-information-detail::v-deep {
-    .p-panel-top {
+.service-account-base-information-detail {
+    /* custom design-system component - p-dynamic-layout */
+
+    /* custom design-system component - p-panel-top */
+    :deep(.p-panel-top) {
         display: none;
     }
 }

@@ -216,7 +216,9 @@ export default {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        .p-select-dropdown::v-deep {
+
+        /* custom design-system component - p-select-dropdown */
+        :deep(.p-select-dropdown) {
             .p-context-menu {
                 right: 0;
             }

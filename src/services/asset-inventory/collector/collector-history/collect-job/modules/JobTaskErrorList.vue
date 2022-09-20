@@ -166,7 +166,9 @@ $maxText:    79ch;
         }
         .toggle-box {
             width: 2.625rem;
-            ::v-deep .p-collapsible-toggle {
+
+            /* custom design-system component - p-collapsible-toggle */
+            :deep(.p-collapsible-toggle) {
                 span {
                     @apply flex;
                 }

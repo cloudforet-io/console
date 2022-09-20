@@ -357,7 +357,10 @@ export default {
         @apply border border-gray-200 rounded;
     }
 
-    >>> .p-dynamic-layout-table .p-toolbox-table {
+    /* custom design-system component - p-dynamic-layout */
+
+    /* custom design-system component - p-dynamic-layout-table */
+    :deep(.p-dynamic-layout-table) .p-toolbox-table {
         @apply border border-gray-200 rounded-lg;
         .p-data-table {
             min-height: unset;

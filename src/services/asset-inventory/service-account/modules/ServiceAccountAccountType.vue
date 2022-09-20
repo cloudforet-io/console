@@ -9,7 +9,6 @@
                         v-model="selectedType"
                         value="GENERAL"
                         label="General Account"
-                        class="card"
                         @click="() => handleSelectAccountType('GENERAL')"
                     />
                     <p-select-card
@@ -17,7 +16,6 @@
                         v-model="selectedType"
                         value="TRUST"
                         label="Trust Account"
-                        class="card"
                         @click="() => handleSelectAccountType('TRUST')"
                     />
                 </div>
@@ -101,16 +99,16 @@ export default defineComponent({
                 @apply flex;
                 gap: 0.5rem;
                 margin-bottom: 1rem;
-                .card {
+
+                /* custom design-system component - p-select-card */
+                :deep(.p-select-card) {
                     width: calc(50% - 0.25rem);
-                    &::v-deep {
+                    .marker {
+                        display: none;
+                    }
+                    &.selected {
                         .marker {
-                            display: none;
-                        }
-                        &.selected {
-                            .marker {
-                                display: block;
-                            }
+                            display: block;
                         }
                     }
                 }

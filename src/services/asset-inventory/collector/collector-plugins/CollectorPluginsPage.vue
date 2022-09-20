@@ -276,7 +276,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.filter-tag::v-deep {
+/* custom design-system component - p-badge */
+:deep(.filter-tag) {
     @apply inline-flex items-center mb-2 mr-2;
 }
 .divider {

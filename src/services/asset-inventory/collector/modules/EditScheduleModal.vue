@@ -468,7 +468,9 @@ export default {
         .interval-wrapper {
             display: inline-flex;
             width: 100%;
-            .p-field-group::v-deep .form-label {
+
+            /* custom design-system component - p-field-group */
+            :deep(.p-field-group) .form-label {
                 display: inline-flex;
             }
             .p-select-dropdown {

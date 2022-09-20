@@ -258,7 +258,8 @@ export default defineComponent<Props>({
         border: none;
         flex-grow: 1;
 
-        .p-page-title::v-deep {
+        /* custom design-system component - p-page-title */
+        :deep(.p-page-title) {
             min-height: 3.5rem;
             height: auto;
             padding: 1.5rem 1.5rem 0 1.5rem;
@@ -321,13 +322,15 @@ export default defineComponent<Props>({
                     }
                 }
             }
-            .right-part::v-deep {
+            .right-part {
                 width: 100%;
                 height: 100%;
                 display: flex;
                 flex-direction: column;
                 gap: 1rem;
-                .p-tab {
+
+                /* custom design-system component - p-tab */
+                :deep(.p-tab) {
                     flex-grow: 1;
                     .tab-item-wrapper {
                         height: 2.75rem;
@@ -385,7 +388,7 @@ export default defineComponent<Props>({
                 display: grid;
                 height: auto;
                 gap: 1rem;
-                .left-part, .right-part::v-deep {
+                .left-part, .right-part {
                     display: grid;
                     gap: 1rem;
                     .timeline-wrapper {

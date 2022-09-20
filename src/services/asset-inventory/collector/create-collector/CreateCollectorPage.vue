@@ -260,7 +260,9 @@ export default {
             width: 100%;
         }
     }
-    .p-progress-wizard::v-deep {
+
+    /* custom design-system component - p-progress-wizard */
+    :deep(.p-progress-wizard) {
         .contents {
             margin-top: 2.5rem;
         }

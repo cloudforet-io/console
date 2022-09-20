@@ -551,7 +551,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
->>> .p-horizontal-layout .horizontal-contents {
+/* custom design-system component - p-horizontal-layout */
+:deep(.p-horizontal-layout) .horizontal-contents {
     overflow: unset;
 }
 .left-toolbox-item {
