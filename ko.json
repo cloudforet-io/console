@@ -890,6 +890,7 @@
 			"TITLE": "개인 정보"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
+			"CREAT_PROJECT": "",
 			"PLACEHOLDER": "프로젝트 선택"
 		},
 		"SESSION_MODAL": {
@@ -1681,6 +1682,22 @@
 				"TAB_TAG": "태그",
 				"TITLE": "서버"
 			}
+		},
+		"SERVICE_ACCOUNT": {
+			"DETAIL": {
+				"ACCOUNT_TYPE_TITLE": "",
+				"ALT_E_UPDATE_BASE_INFO": "",
+				"ALT_S_CHANGE_PROJECT": "",
+				"ALT_S_UPDATE_BASE_INFO": "",
+				"ATTACHED_GENERAL_ACCOUNTS_TITLE": "",
+				"BASE_INFO_HELP_TEXT": "",
+				"CANCEL": "",
+				"CONNECT_TO_CONSOLE": "",
+				"EDIT": "",
+				"HERE": "",
+				"SAVE": "",
+				"TRUST_ACCOUNT_HELP_TEXT": ""
+			}
 		}
 	},
 	"MANAGEMENT": {
@@ -1742,6 +1759,7 @@
 	"MEMBER": "멤버",
 	"MEMBER_TITLE": "멤버",
 	"MENU": {
+		"ADDITIONAL_SETTINGS": "",
 		"ADMINISTRATION": "관리",
 		"ADMINISTRATION_IAM": "사용자 및 권한 관리",
 		"ADMINISTRATION_POLICY": "정책",
@@ -1768,7 +1786,8 @@
 		"MY_PAGE_ACCOUNT_PROFILE": "계정 & 프로필",
 		"MY_PAGE_API_KEY": "접근 설정(API & CLI)",
 		"MY_PAGE_NOTIFICATIONS": "알림 채널",
-		"PROJECT": "프로젝트"
+		"PROJECT": "프로젝트",
+		"PROVIDER": ""
 	},
 	"MODAL_DELETE_MEMBER_CONTENT": "선택한 멤버를 프로젝트에서 제거하시겠습니까?",
 	"MODAL_DELETE_MEMBER_TITLE": "멤버 제거 ",
