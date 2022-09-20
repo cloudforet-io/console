@@ -13,6 +13,7 @@
                     {{ readState.projectName }}
                 </p-anchor>
             </div>
+            <!--            FIXME:: MERGE ServiceAccountProjectForm/Detail TO THIS FILE -->
             <project-select-dropdown v-if="mode === 'CREATE'"
                                      class="project-select-dropdown"
                                      project-selectable
