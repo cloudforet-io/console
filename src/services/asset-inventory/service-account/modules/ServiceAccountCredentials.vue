@@ -23,18 +23,15 @@
         </p-panel-top>
         <div class="content-wrapper">
             <service-account-credentials-detail v-show="mode === 'READ'"
-                                                :service-account-id="serviceAccountId"
                                                 :credential-data="credentialData"
-                                                :provider="provider"
             />
-            <template v-if="mode === 'UPDATE'">
-                <service-account-credentials-form edit-mode="UPDATE"
-                                                  :provider="provider"
-                                                  :is-valid.sync="isFormValid"
-                                                  :origin-form-data="credentialForm"
-                                                  @change="handleChangeCredentialForm"
-                />
-            </template>
+            <service-account-credentials-form v-if="mode === 'UPDATE'"
+                                              edit-mode="UPDATE"
+                                              :provider="provider"
+                                              :is-valid.sync="isFormValid"
+                                              :origin-form-data="credentialForm"
+                                              @change="handleChangeCredentialForm"
+            />
         </div>
     </p-pane-layout>
 </template>
