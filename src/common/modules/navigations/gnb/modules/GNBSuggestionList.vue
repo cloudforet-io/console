@@ -1,6 +1,6 @@
 <template>
     <p-context-menu ref="contextMenuRef"
-                    class="gnb-search-suggestion-list"
+                    class="gnb-suggestion-list"
                     :menu="items"
                     no-select-indication
                     @keyup:up:end="$emit('move-focus-end', 'UPWARD')"
@@ -155,44 +155,20 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
-.gnb-search-suggestion-list {
+.gnb-suggestion-list {
     @apply bg-white border-none;
     padding-left: 0.75rem;
     padding-right: 0.75rem;
     padding-bottom: 0.125rem;
     max-height: unset;
 
-    /* custom gnb-suggestion-list */
-    :deep(&) {
+    /* custom design-system component - p-context-menu */
+    :deep() {
         .context-header {
             margin-top: 0;
             margin-bottom: 0.25rem;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
-        }
-
-        .suggestion-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            .image {
-                margin-right: 0.25rem;
-                flex-shrink: 0;
-            }
-            .texts {
-                display: flex;
-                flex-grow: 1;
-                .text-item {
-                    max-width: 10rem;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                }
-            }
-            .favorite-button {
-                flex-shrink: 0;
-            }
         }
 
         .p-context-menu-item {
@@ -217,10 +193,34 @@ export default defineComponent<Props>({
         .context-divider {
             margin: 0.875rem -0.75rem 1rem;
         }
+
+        .matched-character {
+            @apply text-blue-700 bg-blue-200;
+        }
     }
 
-    .matched-character {
-        @apply text-blue-700 bg-blue-200;
+    .suggestion-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        .image {
+            margin-right: 0.25rem;
+            flex-shrink: 0;
+        }
+        .texts {
+            display: flex;
+            flex-grow: 1;
+            .text-item {
+                max-width: 10rem;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+        }
+        .favorite-button {
+            flex-shrink: 0;
+        }
     }
 }
 </style>
