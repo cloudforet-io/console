@@ -39,7 +39,7 @@
             <project-select-dropdown v-if="editMode"
                                      class="project-select-dropdown"
                                      project-selectable
-                                     :selected-project-id="selectedProjects"
+                                     :selected-project-ids.sync="selectedProjects"
                                      :use-fixed-menu-style="false"
                                      @select="handleSelectProject"
             />
@@ -53,7 +53,9 @@ import {
     PPaneLayout, PPanelTop, PButton, PAnchor, PI, PTooltip,
 } from '@spaceone/design-system';
 import type { PropType, SetupContext } from 'vue';
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 
 import { SpaceRouter } from '@/router';
@@ -70,7 +72,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import type { AccountType, ProjectForm, ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
-import type { ProjectGroupTreeItem, ProjectItemResp } from '@/services/project/type';
+import type { ProjectItemResp } from '@/services/project/type';
 
 
 export default {
@@ -101,33 +103,28 @@ export default {
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectName: computed<string>(() => {
-                if (props.projectId) {
-                    return state.projects[props.projectId]?.label ?? '';
-                }
-                return '';
-            }),
-            projectLink: computed<string|undefined>(() => {
-                if (props.projectId) {
-                    return SpaceRouter.router.resolve(referenceRouter(props.projectId, {
-                        resource_type: 'identity.Project',
-                    })).href;
-                }
-                return undefined;
-            }),
+            projectName: '',
+            projectLink: '',
             editMode: false,
-            selectedProjects: [] as ProjectGroupTreeItem[],
-            formData: computed<ProjectForm>(() => ({
-                selectedProject: state.selectedProjects,
-            })),
+            selectedProjects: [] as Array<string>,
+            formData: { selectedProject: null } as ProjectForm,
             proxyIsValid: useProxyValue('is-valid', props, emit),
             accountType: computed<AccountType>(() => props.serviceAccountItem?.service_account_type ?? 'GENERAL'),
         });
 
+        /* Util */
+        const AnchorDataFormatter = (projectId: string): void => {
+            if (!projectId) return;
+            state.projectName = state.projects[projectId].label;
+            state.projectLink = SpaceRouter.router.resolve(referenceRouter(projectId, {
+                resource_type: 'identity.Project',
+            })).href;
+        };
 
+        /* Handler */
         const handleEditMode = () => { state.editMode = !state.editMode; };
         const handleSelectProject = (selectedProject: ProjectItemResp[]) => {
-            state.formData.selectedProject = selectedProject.length ? selectedProject[0] : null;
+            state.formData = { selectedProject: selectedProject.length ? selectedProject[0] : null };
             state.proxyIsValid = !!selectedProject.length;
         };
         const handleClickSave = async () => {
@@ -135,14 +132,26 @@ export default {
             if (!state.formData.selectedProject?.id) return;
             try {
                 await SpaceConnector.client.identity.serviceAccount.update({
-                    service_account_id: state.formData.selectedProject?.id ?? '',
-                    project_id: props.projectId,
+                    service_account_id: props.serviceAccountItem?.service_account_id ?? '',
+                    project_id: state.formData.selectedProject.id,
                 });
                 showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_CHANGE_PROJECT'), '');
+                AnchorDataFormatter(state.formData.selectedProject.id);
             } catch (e: unknown) {
                 ErrorHandler.handleError(e);
             }
         };
+
+        /* Watcher */
+        watch(() => props.projectId, (id: string) => {
+            AnchorDataFormatter(id);
+        });
+        watch(() => state.projects, () => {
+            AnchorDataFormatter(state.selectedProjects[0]);
+        });
+        watch(() => state.selectedProjects, (selectedProject: Array<string>) => {
+            state.formData = { selectedProject: { id: selectedProject[0], name: state.projects[selectedProject[0]]?.label, item_type: 'PROJECT' } };
+        });
 
         /* Init */
         (async () => {
