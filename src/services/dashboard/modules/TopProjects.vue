@@ -394,7 +394,9 @@ export default {
 .chart {
     min-height: 13rem;
 }
-.p-data-table::v-deep {
+
+/* custom design-system component - p-data-table */
+:deep(.p-data-table) {
     @apply rounded-xs;
     margin-top: 0.5rem;
     th {

@@ -272,7 +272,9 @@ export default {
 }
 .chart-container {
     @apply flex justify-center items-center mb-4;
-    .p-data-loader::v-deep {
+
+    /* custom design-system component - p-data-loader */
+    :deep(.p-data-loader) {
         .no-data-wrapper {
             display: flex;
             height: 100%;
@@ -282,7 +284,9 @@ export default {
         }
     }
 }
-.p-data-table::v-deep {
+
+/* custom design-system component - p-data-table */
+:deep(.p-data-table) {
     @apply rounded-xs;
     margin-top: 1rem;
     overflow-x: hidden;

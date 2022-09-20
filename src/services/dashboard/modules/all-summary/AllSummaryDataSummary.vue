@@ -363,7 +363,8 @@ export default {
         }
     }
 
-    .p-data-loader::v-deep {
+    /* custom design-system component - p-data-loader */
+    :deep(.p-data-loader) {
         .no-data-wrapper {
             display: grid;
             height: 13rem;

@@ -79,10 +79,12 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.dashboard::v-deep {
+.dashboard {
     @apply bg-gray-100;
     height: auto;
-    .page-contents {
+
+    /* customize general-page-layout */
+    :deep(.page-contents) {
         @apply bg-gray-100 grid-cols-12;
         display: grid;
         grid-auto-flow: row;

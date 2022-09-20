@@ -181,14 +181,17 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.widget-layout::v-deep {
+/* customize widget-layout */
+:deep(.widget-layout) {
     .title {
         font-size: 1.125rem;
         font-weight: bold;
         line-height: 1.2;
     }
 }
-.p-data-table::v-deep {
+
+/* custom design-system component - p-data-table */
+:deep(.p-data-table) {
     min-height: 8rem;
     margin-top: 0.75rem;
     .table-container {
