@@ -24,15 +24,9 @@
             </p-anchor>
             <span v-if="!editMode && !projectName && accountType === 'TRUST'">N/A</span>
             <div v-if="!editMode && !projectName && accountType === 'GENERAL'">
+                <span>-- <span class="required-span">{{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.REQUIRED') }}</span></span>
                 <!--                song-lang-->
-                <span>-- <span class="required-span">** required</span></span>
-                <!--                song-lang-->
-                <p-tooltip position="bottom" class="project-required-tooltip" contents="It's now required to select a specific <br>
-                                                                    project for any service account. <br>
-                                                                    ( Note: A randomly generated <br>
-                                                                    project will be forcefully added to <br>
-                                                                     the accounts with no project soon.)"
-                >
+                <p-tooltip position="bottom" class="project-required-tooltip" :contents="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.PROJECT_REQUIRED_HELP_TEXT')">
                     <p-i name="ic_tooltip" width="1rem" height="1rem" />
                 </p-tooltip>
             </div>
