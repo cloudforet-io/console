@@ -1,7 +1,6 @@
 <template>
     <p-pane-layout class="service-account-attached-general-accounts">
-        <!--        song-lang-->
-        <p-panel-top title="Attached General Accounts" />
+        <p-panel-top :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ATTACHED_GENERAL_ACCOUNTS_TITLE')" />
         <div class="content-wrapper">
             <p-data-table :fields="fields" />
         </div>

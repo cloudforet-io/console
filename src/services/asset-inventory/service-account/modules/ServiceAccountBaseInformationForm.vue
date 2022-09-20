@@ -21,10 +21,9 @@
                             :language="$store.state.user.language"
                             @validate="handleAccountValidate"
         />
-        <!--        song-lang-->
         <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_LABEL')"
-                       help-text="Set Account's tag.
-The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed."
+                       :help-text="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.BASE_INFO_HELP_TEXT')"
+                       class="account-tags"
         >
             <tags-input-group :tags="tags"
                               show-validation
@@ -184,6 +183,13 @@ export default defineComponent<Props>({
     :deep(.account-name-input) {
         .input-container {
             width: 50%;
+        }
+    }
+
+    /* custom design-system component - p-field-group */
+    :deep(.account-tags) {
+        .help-msg {
+            white-space: pre-line;
         }
     }
 

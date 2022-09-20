@@ -21,8 +21,7 @@
             <template #extra>
                 <p-button style-type="gray-border" :disabled="!consoleLink.length">
                     <p-anchor :href="consoleLink" :disabled="!consoleLink.length">
-                        <!--song-lang-->
-                        Connect to Console
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CONNECT_TO_CONSOLE') }}
                     </p-anchor>
                 </p-button>
             </template>

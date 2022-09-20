@@ -6,17 +6,14 @@
                           :style-type="!projectName && 'transparent'"
                           @click="handleEditMode"
                 >
-                    <!--song-lang-->
-                    Edit
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
                 <div v-else>
                     <p-button @click="handleEditMode">
-                        <!--                        song-lang-->
-                        Cancel
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary-dark" @click="handleClickSave">
-                        <!--                        song-lang-->
-                        Save
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
                     </p-button>
                 </div>
             </template>
@@ -48,6 +45,7 @@ import { computed, reactive, toRefs } from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
@@ -125,8 +123,7 @@ export default {
                     service_account_id: state.formData.selectedProject?.id ?? '',
                     project_id: props.projectId,
                 });
-                // song-lang
-                showSuccessMessage('Successfully changed project', '');
+                showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_CHANGE_PROJECT'), '');
             } catch (e: unknown) {
                 ErrorHandler.handleError(e);
             }

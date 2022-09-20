@@ -3,20 +3,17 @@
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')">
             <template #extra>
                 <p-button v-if="mode === 'READ'" icon="ic_edit" @click="handleClickEditButton">
-                    <!--song-lang-->
-                    Edit
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
                 <div v-else class="button-wrapper">
                     <p-button style-type="transparent" @click="handleClickCancelButton">
-                        <!--song-lang-->
-                        Cancel
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary-dark"
                               :disabled="!isFormValid"
                               @click="handleClickSaveButton"
                     >
-                        <!--song-lang-->
-                        Save
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
                     </p-button>
                 </div>
             </template>
@@ -48,6 +45,8 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -133,11 +132,9 @@ export default {
                     data: state.baseInformationForm.customSchemaForm,
                     tags: state.baseInformationForm.tags,
                 });
-                // song-lang
-                showSuccessMessage('Successfully Update Base Information', '', vm.$root);
+                showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_BASE_INFO'), '', vm.$root);
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, 'Failed to Update Base Information');
+                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_BASE_INFO'));
             }
         };
 
