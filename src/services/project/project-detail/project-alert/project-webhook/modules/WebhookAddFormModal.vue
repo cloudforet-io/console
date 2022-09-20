@@ -214,7 +214,9 @@ export default {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 0.5rem;
-    .p-select-card::v-deep {
+
+    /* custom design-system component - p-select-card */
+    :deep(.p-select-card) {
         height: 9.0625rem;
     }
 }
@@ -231,7 +233,9 @@ export default {
     .select-card-wrapper {
         grid-template-columns: auto;
         gap: 1rem;
-        .p-select-card::v-deep {
+
+        /* custom design-system component - p-select-card */
+        :deep(.p-select-card) {
             @apply flex items-center p-0 border-none;
             height: auto;
             min-height: auto;

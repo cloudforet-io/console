@@ -444,7 +444,9 @@ export default {
     .p-pane-layout {
         border-width: 0;
     }
-    .p-toolbox-table::v-deep {
+
+    /* custom design-system component - p-toolbox-table */
+    :deep(.p-toolbox-table) {
         .p-toolbox {
             padding-top: 0;
         }
@@ -453,7 +455,9 @@ export default {
             align-items: center;
         }
     }
-    .p-button-modal::v-deep {
+
+    /* custom delete-modal */
+    :deep(.delete-modal) {
         .delete-modal-content {
             @apply text-gray-900;
             margin-bottom: 1rem;

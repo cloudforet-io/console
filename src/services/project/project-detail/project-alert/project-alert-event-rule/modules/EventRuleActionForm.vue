@@ -297,7 +297,9 @@ export default {
                 display: none;
             }
         }
-        &.additional-information::v-deep {
+
+        /* customize tags-input-group */
+        :deep(&.additional-information) {
             display: block;
             .top-part {
                 display: flex;
@@ -316,12 +318,12 @@ export default {
         .project-select-dropdown, .user-search-dropdown {
             width: 60%;
         }
-        .user-search-dropdown::v-deep {
-            .p-tag {
-                .text {
-                    @apply truncate;
-                    max-width: 15rem;
-                }
+
+        /* custom design-system component - p-search-dropdown */
+        .user-search-dropdown {
+            :deep(.p-tag .text) {
+                @apply truncate;
+                max-width: 15rem;
             }
         }
     }
@@ -359,7 +361,9 @@ export default {
                     width: 100%;
                 }
             }
-            &.additional-information::v-deep {
+
+            /* customize tags-input-group */
+            :deep(&.additional-information) {
                 .p-field-group {
                     width: 45%;
                 }

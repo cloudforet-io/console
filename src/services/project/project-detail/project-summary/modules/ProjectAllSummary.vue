@@ -552,7 +552,9 @@ export default {
         padding-left: 0.25rem;
     }
 }
-.p-balloon-tab::v-deep {
+
+/* custom design-system component - p-balloon-tab */
+:deep(.p-balloon-tab) {
     .tab-pane {
         padding-bottom: 0;
     }

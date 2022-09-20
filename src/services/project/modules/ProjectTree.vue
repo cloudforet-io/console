@@ -473,7 +473,9 @@ export default {
     }
     color: inherit;
 }
-.p-tree::v-deep {
+
+/* custom design-system component - p-tree */
+:deep(.p-tree) {
     .tree-node-back {
         &:not(:hover) .group-add-btn {
             display: none;

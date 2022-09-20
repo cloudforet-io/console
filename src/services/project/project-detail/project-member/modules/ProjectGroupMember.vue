@@ -80,7 +80,9 @@ export default {
                 }
             }
         }
-        .member-tab::v-deep {
+
+        /* custom project-member-tab */
+        :deep(.member-tab) {
             .p-toolbox-table {
                 @apply border border-gray-200 rounded-md;
                 border-style: solid;

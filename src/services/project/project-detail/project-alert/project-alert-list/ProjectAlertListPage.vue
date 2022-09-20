@@ -104,8 +104,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.project-alert::v-deep {
-    .p-toolbox-table {
+.project-alert {
+    /* custom design-system component - p-toolbox-table */
+    :deep(.p-toolbox-table) {
         @apply border-0;
         .p-data-table {
             th:nth-child(8), td:nth-child(8) {

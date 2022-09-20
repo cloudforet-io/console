@@ -300,43 +300,6 @@ export default {
         line-height: 150%;
     }
 }
-.label-text-wrapper {
-    .label-text {
-        @apply text-gray-900;
-        font-size: 0.875rem;
-        margin-right: 0.5rem;
-        line-height: 140%;
-        font-weight: bold;
-    }
-    .label-help-msg {
-        @apply text-gray-500;
-        font-size: 0.75rem;
-        line-height: 150%;
-    }
-    margin-bottom: 0.25rem;
-}
-
-.label-input-wrapper {
-    display: flex;
-    margin-bottom: 1rem;
-}
-
-.icon-button::v-deep {
-    @apply p-0 inline-flex justify-center items-center;
-    min-width: 2rem;
-    max-width: 2rem;
-    min-height: 2rem;
-    max-height: 2rem;
-    margin-left: 0.5rem;
-    align-self: center;
-}
-
-.tag-wrapper {
-    min-height: 3.625rem;
-}
->>> .modal-content .modal-body-container {
-    overflow: auto;
-}
 
 .p-dropdown-menu-btn {
     @apply bg-white;
