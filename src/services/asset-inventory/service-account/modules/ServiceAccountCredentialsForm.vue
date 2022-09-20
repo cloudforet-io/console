@@ -12,7 +12,21 @@
                 </p-radio>
             </div>
         </p-field-group>
-        <div v-if="hasCredentialKey">
+        <template v-if="hasCredentialKey">
+            <!--        song-lang-->
+            <p-field-group label="Do you want to attach an existing Trust Account?"
+                           required
+            >
+                <div class="radio-wrapper">
+                    <p-radio v-model="attachTrustAccount" :value="false" class="radio-text">
+                        {{ $t('APP.MAIN.NO') }}
+                    </p-radio>
+                    <p-radio v-model="attachTrustAccount" :value="true">
+                        {{ $t('APP.MAIN.YES') }}<br>
+                    </p-radio>
+                    <p-select-dropdown :items="trustAccountItems" :disabled="!attachTrustAccount" />
+                </div>
+            </p-field-group>
             <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SECRET_TYPE_LABEL')" required class="mb-8">
                 <div class="flex">
                     <p-radio v-for="(type, idx) in secretTypes" :key="idx"
@@ -37,14 +51,14 @@
                     <p-text-editor class="m-4" :code.sync="credentialJson" />
                 </template>
             </p-tab>
-        </div>
+        </template>
     </div>
 </template>
 
 <script lang="ts">
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor,
+    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { get } from 'lodash';
@@ -59,13 +73,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { EDIT_MODE } from '@/services/asset-inventory/service-account/type';
 import type {
-    ActiveDataType, CredentialForm, ProviderModel,
-    PageMode,
+    ActiveDataType, CredentialForm, ProviderModel, PageMode, AccountType,
 } from '@/services/asset-inventory/service-account/type';
 
 
 interface Props {
     editMode: PageMode;
+    serviceAccountType: AccountType;
     provider?: string;
     isValid: boolean;
     originFormData: CredentialForm;
@@ -74,6 +88,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'ServiceAccountCredentialsForm',
     components: {
+        PSelectDropdown,
         PFieldGroup,
         PRadio,
         PTab,
@@ -84,6 +99,10 @@ export default defineComponent<Props>({
         editMode: {
             type: String as PropType<PageMode>,
             default: 'CREATE',
+        },
+        serviceAccountType: {
+            type: String as PropType<AccountType>,
+            default: 'GENERAL',
         },
         provider: {
             type: String,
@@ -102,7 +121,17 @@ export default defineComponent<Props>({
         const state = reactive({
             providerData: {} as ProviderModel,
             hasCredentialKey: true,
-            secretTypes: computed(() => get(state.providerData, 'capability.supported_schema', [])),
+            attachTrustAccount: false,
+            trustAccountItems: [],
+            secretTypes: computed(() => {
+                if (props.serviceAccountType === 'GENERAL') {
+                    if (state.attachTrustAccount) {
+                        return get(state.providerData, 'capability.general_service_account_schema', []);
+                    }
+                    return get(state.providerData, 'capability.supported_schema', []);
+                }
+                return get(state.providerData, 'capability.trust_service_account_schema', []);
+            }),
             selectedSecretType: '',
             customSchemaForm: {},
             credentialSchema: {},
@@ -156,12 +185,6 @@ export default defineComponent<Props>({
                 only: ['schema'],
             });
             state.credentialSchema = res.schema;
-            const defaultCredentialForm = {};
-            Object.keys(res.schema.properties).forEach((key) => {
-                // Because p-json-schema-form is not able to perform exact validation, `undefined` is assigned.
-                defaultCredentialForm[key] = undefined;
-            });
-            state.customSchemaForm = defaultCredentialForm;
         };
 
         /* Event */
@@ -178,6 +201,9 @@ export default defineComponent<Props>({
         watch(() => props.provider, (provider) => {
             if (provider) getProviderData(provider);
         }, { immediate: true });
+        watch(() => state.secretTypes, (secretTypes) => {
+            if (secretTypes.length) state.selectedSecretType = secretTypes[0];
+        });
         watch(() => state.selectedSecretType, (selectedSecretType) => {
             if (selectedSecretType) getCredentialSchema();
         });
@@ -202,6 +228,14 @@ export default defineComponent<Props>({
 .service-account-credentials-form {
     .radio-text {
         margin-right: 1.125rem;
+    }
+    .radio-wrapper {
+        display: grid;
+        gap: 0.5rem;
+        .p-select-dropdown {
+            width: calc(50% - 1.5rem);
+            margin-left: 1.5rem;
+        }
     }
     .custom-schema-box {
         padding: 2rem 2rem 0 2rem;

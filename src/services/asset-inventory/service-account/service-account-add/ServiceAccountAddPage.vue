@@ -44,6 +44,7 @@
             <p-pane-layout class="form-wrapper">
                 <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')" />
                 <service-account-credentials-form v-if="enableCredentialInput"
+                                                  :service-account-type="accountType"
                                                   :provider="provider"
                                                   :is-valid.sync="isCredentialFormValid"
                                                   @change="handleChangeCredentialForm"
@@ -193,33 +194,24 @@ export default {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
             }
         };
-        const createSecretWithForm = async () => {
-            await SpaceConnector.client.secret.secret.create({
-                name: formState.baseInformationForm.accountName + state.serviceAccountId,
-                data: formState.credentialForm,
-                schema: formState.credentialForm.selectedSecretType,
-                secret_type: 'CREDENTIALS',
-                service_account_id: state.serviceAccountId,
-                project_id: formState.projectForm.selectedProject?.id || null,
-            });
-        };
-        const createSecretWithJson = async (jsonData) => {
-            await SpaceConnector.client.secret.secret.create({
-                name: formState.baseInformationForm.accountName + state.serviceAccountId,
-                data: jsonData,
-                schema: formState.credentialForm.selectedSecretType,
-                secret_type: 'CREDENTIALS',
-                service_account_id: state.serviceAccountId,
-                project_id: formState.projectForm.selectedProject?.id || null,
-            });
-        };
         const createSecret = async (): Promise<boolean> => {
-            let isSucceed = false;
+            let isSucceed: boolean;
             try {
+                let data;
                 if (formState.credentialForm.activeDataType === 'json') {
-                    const json = JSON.parse(formState.credentialForm.credentialJson);
-                    await createSecretWithJson(json);
-                } else if (formState.credentialForm.activeDataType === 'input') await createSecretWithForm();
+                    data = JSON.parse(formState.credentialForm.credentialJson);
+                } else if (formState.credentialForm.activeDataType === 'input') {
+                    data = formState.credentialForm;
+                }
+
+                await SpaceConnector.client.secret.secret.create({
+                    name: formState.baseInformationForm.accountName + state.serviceAccountId,
+                    data,
+                    schema: formState.credentialForm.selectedSecretType,
+                    secret_type: 'CREDENTIALS',
+                    service_account_id: state.serviceAccountId,
+                    project_id: formState.projectForm.selectedProject?.id || null,
+                });
 
                 showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm);
                 isSucceed = true;
