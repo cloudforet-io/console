@@ -220,7 +220,8 @@ export default {
 
 <style lang="postcss" scoped>
 .set-filter-modal {
-    &.p-button-modal::v-deep {
+    /* custom design-system component - p-button-modal */
+    :deep(&.p-button-modal) {
         .modal-content {
             height: 48.75rem;
         }

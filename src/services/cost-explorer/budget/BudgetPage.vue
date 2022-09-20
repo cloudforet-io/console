@@ -101,7 +101,9 @@ export default {
         width: 9rem;
     }
 }
-.p-select-dropdown::v-deep {
+
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
     .placeholder {
         @apply font-bold;
     }

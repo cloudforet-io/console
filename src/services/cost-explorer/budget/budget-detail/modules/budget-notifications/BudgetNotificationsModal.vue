@@ -223,9 +223,12 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.budget-notifications-modal::v-deep .modal-content .header .modal-header {
-    height: auto;
-    min-height: 3.5rem;
+.budget-notifications-modal {
+    /* custom design-system component - p-button-modal */
+    :deep(.modal-content .header .modal-header) {
+        height: auto;
+        min-height: 3.5rem;
+    }
 }
 .desc {
     margin-bottom: 1rem;

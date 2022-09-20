@@ -310,16 +310,13 @@ export default {
             display: inline-flex;
             align-items: center;
             line-height: 1;
-            .download-pdf::v-deep {
+            .download-pdf {
                 margin-left: 0;
-                .p-button {
-                    padding: 0 1rem;
-                }
             }
         }
     }
 
-    &::v-deep .left-divider {
+    .left-divider {
         @apply relative;
         padding-left: 0.5rem;
         margin-left: 0.5rem;

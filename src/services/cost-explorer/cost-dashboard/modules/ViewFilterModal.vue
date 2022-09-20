@@ -131,31 +131,33 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.view-filter-modal::v-deep {
-    .filter-wrapper {
-        margin-bottom: 1.5rem;
-        .title {
-            margin-bottom: 1rem;
-        }
-        .p-empty {
-            @apply justify-start ;
-            font-size: 0.875rem;
-        }
-        .filters {
-            @apply flex flex-wrap;
-            gap: 0.5rem;
-        }
-    }
-    .modal-body {
+/* custom design-system component - p-button-modal */
+.view-filter-modal {
+    :deep(.modal-body) {
         max-height: 20rem;
     }
-    .modal-footer {
+    :deep(.modal-footer) {
         .cancel-button {
             display: none;
         }
         .modal-button {
             margin-left: auto;
         }
+    }
+}
+
+.filter-wrapper {
+    margin-bottom: 1.5rem;
+    .title {
+        margin-bottom: 1rem;
+    }
+    .p-empty {
+        @apply justify-start ;
+        font-size: 0.875rem;
+    }
+    .filters {
+        @apply flex flex-wrap;
+        gap: 0.5rem;
     }
 }
 </style>

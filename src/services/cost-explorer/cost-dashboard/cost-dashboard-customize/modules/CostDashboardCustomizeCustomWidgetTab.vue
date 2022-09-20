@@ -203,7 +203,14 @@ export default {
 <style lang="postcss" scoped>
 .cost-dashboard-customize-custom-widget-tab {
     .left-area {
+        @apply flex flex-col flex-grow flex-shrink border-r border-gray-200;
         overflow: hidden;
+        height: inherit;
+        .cost-query-area {
+            @apply mr-8;
+            height: auto;
+            overflow-y: auto;
+        }
         .widgets-area {
             @apply mb-4 border-b border-gray-200;
             min-height: 23.5rem;
@@ -218,14 +225,52 @@ export default {
                     @apply text-gray-600;
                 }
             }
+            + .widgets-area {
+                @apply mt-4 border-t border-gray-200;
+            }
+            .p-label {
+                @apply mt-6 mb-2;
+            }
         }
-        .cost-query-area {
-            @apply mr-8;
-            height: auto;
-            overflow-y: auto;
+        .widget-list {
+            @apply grid grid-cols-3 gap-2 pr-8;
+            .widget-card {
+                @apply flex flex-col overflow-hidden border border-gray-300 rounded-md cursor-pointer;
+                max-width: 20rem;
+                min-height: 7.1875rem;
+
+                &.selected {
+                    @apply border border-blue-600;
+                }
+                .card-header {
+                    @apply flex items-center pl-4 pr-4 flex-grow;
+                    min-height: 3.125rem;
+
+                    /* custom design-system component - p-radio */
+                    :deep(.p-radio) {
+                        @apply flex items-center;
+                        .radio-icon {
+                            @apply flex-shrink-0 mr-2;
+                        }
+                    }
+                }
+                .card-content {
+                    @apply flex justify-center items-center bg-gray-100;
+                    min-height: 4rem;
+                }
+            }
+        }
+        .text-pagination {
+            @apply flex justify-center w-full mt-6 mb-6;
         }
     }
     .right-area {
+        @apply overflow-auto flex-shrink-0 ml-8;
+        width: 16.5rem;
+        height: inherit;
+        .cost-dashboard-customize-widget-config {
+            @apply mt-6;
+        }
         .btn-remove {
             @apply block mt-6 ml-auto mr-auto;
         }

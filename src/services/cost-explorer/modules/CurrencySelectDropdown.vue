@@ -58,7 +58,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.currency-select-dropdown::v-deep {
+/* custom design-system component - p-select-dropdown */
+:deep(.currency-select-dropdown) {
     &.print-mode {
         .text {
             white-space: nowrap;

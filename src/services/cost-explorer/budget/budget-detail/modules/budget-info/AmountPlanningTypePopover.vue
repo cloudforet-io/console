@@ -1,5 +1,5 @@
 <template>
-    <p-popover class="popover" position="bottom-end">
+    <p-popover class="amount-planning-type-popover" position="bottom-end">
         <slot />
         <template #content>
             <div v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="total-wrapper">
@@ -66,7 +66,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.popover::v-deep {
+/* custom design-system component - p-popover */
+:deep(.amount-planning-type-popover) {
     z-index: 99;
     overflow-y: unset;
     .popper {

@@ -275,7 +275,9 @@ export default {
         }
     }
 }
-.p-badge::v-deep {
+
+/* custom design-system component - p-badge */
+:deep(.p-badge) {
     margin-right: 0.5rem;
     > p {
         white-space: nowrap;

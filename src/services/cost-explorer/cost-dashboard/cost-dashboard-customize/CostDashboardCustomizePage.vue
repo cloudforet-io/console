@@ -246,7 +246,9 @@ export default {
     }
     .dashboard-title {
         margin-left: 1rem;
-        &.p-text-input::v-deep {
+
+        /* custom design-system component - p-text-input */
+        :deep(.p-text-input) {
             .input-container {
                 @apply font-bold;
                 height: 3.125rem;

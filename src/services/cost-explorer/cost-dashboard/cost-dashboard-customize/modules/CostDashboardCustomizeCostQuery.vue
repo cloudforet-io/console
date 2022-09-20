@@ -174,34 +174,32 @@ export default {
         .p-label {
             @apply mr-auto;
         }
-        .p-anchor {
+
+        /* custom design-system component - p-anchor */
+        :deep(.p-anchor) {
             @apply ml-4;
-            &:hover::v-deep .text {
+            &:hover .text {
                 text-decoration: none;
             }
         }
     }
 
-    .content-wrapper::v-deep {
+    .content-wrapper {
+        /* custom design-system component - p-data-loader */
         .p-data-loader {
-            .no-data-wrapper {
+            :deep(.no-data-wrapper) {
                 @apply block;
                 font-size: 0.875rem;
-                .refresh-wrapper {
-                    @apply align-top;
-                    .text {
-                        @apply inline-block text-primary-2 font-bold;
-                        line-height: 2rem;
-                    }
+            }
+            .refresh-wrapper {
+                @apply align-top;
+                .text {
+                    @apply inline-block text-primary-2 font-bold;
+                    line-height: 2rem;
                 }
-                .help-text {
-                    @apply mt-4 mb-4;
-                }
-                .btn-add-query {
-                    &:hover .text {
-                        text-decoration: none;
-                    }
-                }
+            }
+            .help-text {
+                @apply mt-4 mb-4;
             }
         }
         .query-list-wrapper {

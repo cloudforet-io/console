@@ -1,5 +1,5 @@
 <template>
-    <p-popover class="popover" position="bottom-end">
+    <p-popover class="budget-cost-type-popover" position="bottom-end">
         <slot />
         <template #content>
             <div class="content-wrapper">
@@ -51,7 +51,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.popover::v-deep {
+/* custom design-system component - p-popover */
+:deep(.budget-cost-type-popover) {
     .popper {
         z-index: 1;
         width: 16.625rem;

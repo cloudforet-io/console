@@ -2,7 +2,7 @@
     <div class="cost-dashboard-create-form">
         <p-pane-layout>
             <h2>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.TEMPLATE') }}</h2>
-            <p-pane-layout class="p-8 mb-4">
+            <p-pane-layout>
                 <cost-dashboard-create-with-layout />
                 <cost-dashboard-create-with-dashboard />
             </p-pane-layout>
@@ -52,28 +52,12 @@ export default {
 .cost-dashboard-create-form {
     @apply flex flex-col row-gap-4;
     > .p-pane-layout {
-        @apply pt-8 pr-4 pb-10 pl-4;
+        @apply pt-8 pr-4 pb-10 pl-4 mb-4;
     }
     h2 {
         @apply mb-6;
         font-size: 1.5rem;
         line-height: 1.25;
-    }
-
-    &::v-deep {
-        h3 {
-            @apply font-bold mb-3;
-            font-size: 0.875rem;
-        }
-        .dashboard-list {
-            @apply grid grid-cols-4 col-gap-2;
-            .p-select-card {
-                font-size: 0.875rem;
-                .contents {
-                    @apply font-bold;
-                }
-            }
-        }
     }
 }
 </style>

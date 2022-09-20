@@ -43,7 +43,7 @@ interface Props {
     visible: boolean;
 }
 export default {
-    name: 'CostDashboardCreateCustomizeWidgetModal',
+    name: 'CostDashboardCustomizeWidgetModal',
     components: {
         CostDashboardCustomizeDefaultWidgetTab,
         CostDashboardCustomizeCustomWidgetTab,
@@ -114,71 +114,23 @@ export default {
 .p-tab {
     @apply border-0;
 }
-.p-button-modal::v-deep {
+
+.p-button-modal {
     $modal-hedaer: 3.5rem;
     $modal-padding: 8rem;
     $modal-footer: 4rem;
     $tab-bar: 3rem;
 
-    .modal-body {
+    /* custom design-system component - p-button-modal */
+    :deep(.modal-body) {
         @apply overflow-hidden;
         .tab-pane {
             height: calc(100vh - $modal-hedaer - $modal-padding - $modal-footer - $tab-bar);
         }
     }
 }
-.add-widget-tab::v-deep {
+.add-widget-tab {
     @apply flex w-full;
     height: inherit;
-
-    .left-area {
-        @apply overflow-auto flex flex-col flex-grow flex-shrink border-r border-gray-200;
-        height: inherit;
-        .widgets-area {
-            + .widgets-area {
-                @apply mt-4 border-t border-gray-200;
-            }
-            .p-label {
-                @apply mt-6 mb-2;
-            }
-        }
-        .widget-list {
-            @apply grid grid-cols-3 gap-2 pr-8;
-            .widget-card {
-                @apply flex flex-col overflow-hidden border border-gray-300 rounded-md cursor-pointer;
-                max-width: 20rem;
-                min-height: 7.1875rem;
-
-                &.selected {
-                    @apply border border-blue-600;
-                }
-                .card-header {
-                    @apply flex items-center pl-4 pr-4 flex-grow;
-                    min-height: 3.125rem;
-                    .p-radio {
-                        @apply flex items-center;
-                        .radio-icon {
-                            @apply flex-shrink-0 mr-2;
-                        }
-                    }
-                }
-                .card-content {
-                    @apply flex justify-center items-center bg-gray-100;
-                    min-height: 4rem;
-                }
-            }
-        }
-        .text-pagination {
-            @apply flex justify-center w-full mt-6 mb-6;
-        }
-    }
-    .right-area {
-        @apply overflow-auto flex-shrink-0 ml-8;
-        width: 16.5rem;
-        height: inherit;
-        .widget-config {
-            @apply mt-6;
-        }
-    }
 }
 </style>

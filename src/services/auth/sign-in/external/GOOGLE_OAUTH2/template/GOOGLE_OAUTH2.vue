@@ -39,18 +39,18 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-#g-sign-in-btn {
+:deep(#g-sign-in-btn) {
     @apply border border-gray-900 rounded-xs;
     box-shadow: none;
     overflow: hidden;
-    >>> .abcRioButtonIcon {
+    .abcRioButtonIcon {
         display: inline-flex;
         float: none;
     }
-    >>> .abcRioButtonContents {
+    .abcRioButtonContents {
         vertical-align: unset;
     }
-    >>> span {
+    span {
         @apply text-gray-900;
         line-height: 40px;
     }
