@@ -5,9 +5,9 @@
             <project-select-dropdown
                 class="project-select-dropdown"
                 project-selectable
-                :selected-project-ids="state.selectedProjects"
+                :selected-project-ids.sync="selectedProjects"
                 :use-fixed-menu-style="false"
-                :invalid="state.proxyIsValid === false"
+                :invalid="proxyIsValid === false"
                 @select="handleSelectedProject"
             />
         </div>
@@ -18,7 +18,9 @@
 import {
     PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
-import { computed, reactive, watch } from 'vue';
+import {
+    reactive, toRefs, watch,
+} from 'vue';
 
 import { store } from '@/store';
 
@@ -26,7 +28,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import type { ProjectForm } from '@/services/asset-inventory/service-account/type';
-import type { ProjectGroupTreeItem } from '@/services/project/type';
+import type { ProjectItemResp } from '@/services/project/type';
 
 
 export default {
@@ -48,16 +50,14 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            selectedProjects: [] as ProjectGroupTreeItem[],
-            formData: computed<ProjectForm>(() => ({
-                selectedProject: state.selectedProjects,
-            })),
+            selectedProjects: [] as Array<string>,
+            formData: { selectedProject: null } as ProjectForm,
             proxyIsValid: useProxyValue('is-valid', props, emit),
         });
 
         /* Event */
-        const handleSelectedProject = (selectedProject) => {
-            state.formData.selectedProject = selectedProject.length ? selectedProject[0] : null;
+        const handleSelectedProject = (selectedProject: ProjectItemResp[]) => {
+            state.formData = { selectedProject: selectedProject.length ? selectedProject[0] : null };
             state.proxyIsValid = !!selectedProject.length;
         };
 
@@ -69,12 +69,15 @@ export default {
         })();
 
         /* Watcher */
-        watch(() => state.formData, (formData) => {
+        watch(() => state.selectedProjects, (selectedProject: Array<string>) => {
+            state.formData = { selectedProject: { id: selectedProject[0], name: selectedProject[0], item_type: 'PROJECT' } };
+        });
+        watch(() => state.formData, (formData: ProjectForm) => {
             emit('change', formData);
         });
 
         return {
-            state,
+            ...toRefs(state),
             handleSelectedProject,
         };
     },
