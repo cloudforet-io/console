@@ -2,7 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import { reactive, toRefs } from 'vue';
 
 import { getPopoverArgTypes } from './story-helper';
-import PPopover from './PPopover';
+import PPopover from '@/data-display/popover/PPopover';
 import PButton from '../../inputs/buttons/button/PButton';
 import { faker } from '@faker-js/faker'; import PTextInput from '../../inputs/input/PTextInput';
 
@@ -19,14 +19,14 @@ export const Template = (args, { argTypes }) => ({
     components: { PPopover, PButton },
     template: `
         <div class="w-full overflow p-8 flex justify-center items-center" style="height: 250px;">
-            <p-popover :position="_position" :isVisible="_isVisible"
+            <p-popover :position="proxyPosition" :isVisible="proxyIsVisible"
                        :ignore-target-click="ignoreTargetClick" :trigger="trigger">
                 <div v-if="defaultSlot" v-html="defaultSlot" />
                 <p-button v-else style-type="primary" :outline="true" @click="handleClick">default</p-button>
                 <template #content>
                     <div v-if="contentRefSlot" v-html="contentRefSlot" />
                     <div v-else>
-                        <p style="margin-top:12px">content: {{defautlContentValue}}</p>
+                        <p style="margin-top:12px">content: {{defaultContentValue}}</p>
                     </div>
                 </template>
             </p-popover>
@@ -34,9 +34,9 @@ export const Template = (args, { argTypes }) => ({
     `,
     setup(props) {
         const state = reactive({
-            _position: props.position,
-            _isVisible: props.isVisible,
-            defautlContentValue: faker.lorem.sentence(10),
+            proxyPosition: props.position,
+            proxyIsVisible: props.isVisible,
+            defaultContentValue: faker.lorem.sentence(10),
         })
         const handleClick = () => {
             alert('default slot clicked')
@@ -107,6 +107,3 @@ export const Template = (args, { argTypes }) => ({
 </Canvas>
 
 <ArgsTable story="Playground"/>
-
-
-
