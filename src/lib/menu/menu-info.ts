@@ -88,13 +88,11 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         needPermissionByRole: true,
     },
     [MENU_ID.ADMINISTRATION_SETTINGS]: {
-        // song-lang => Additional Settings
-        translationId: 'Additional Settings',
+        translationId: 'MENU.ADDITIONAL_SETTINGS',
         needPermissionByRole: true,
     },
     [MENU_ID.ADMINISTRATION_PROVIDER]: {
-        // song-lang => Provider
-        translationId: 'Provider',
+        translationId: 'MENU.PROVIDER',
         needPermissionByRole: true,
     },
     [MENU_ID.MY_PAGE]: {

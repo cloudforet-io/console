@@ -3,8 +3,7 @@
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
             <template v-if="mode === 'READ'" #extra>
                 <p-button icon="ic_edit">
-                    <!--song-lang-->
-                    Edit
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
             </template>
         </p-panel-top>

@@ -53,8 +53,7 @@
                               style-type="gray-border"
                               @click="handleClickCreateButton"
                     >
-                        <!--song-lang-->
-                        Create Project
+                        {{ $t('COMMON.PROJECT_SELECT_DROPDOWN.CREAT_PROJECT') }}
                     </p-button>
                 </div>
             </template>

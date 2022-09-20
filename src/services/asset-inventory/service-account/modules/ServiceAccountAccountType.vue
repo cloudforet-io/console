@@ -1,7 +1,6 @@
 <template>
     <p-pane-layout class="service-account-account-type">
-        <!--song-lang-->
-        <p-panel-top title="Account Type" />
+        <p-panel-top :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ACCOUNT_TYPE_TITLE')" />
         <div class="content-wrapper">
             <div class="create-mode-wrapper">
                 <div class="card-wrapper">
@@ -26,11 +25,8 @@
                          class="external-icon"
                     />
                     <div class="anchor-wrapper">
-                        <!--                    song-lang-->
-                        <span>Trust Account can allow entities in other AWS accounts belonging to you.
-                            Get more details</span>
-                        <!--                    song-lang-->
-                        <p-anchor class="here-anchor" highlight text="here" />
+                        <span>{{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.TRUST_ACCOUNT_HELP_TEXT') }}</span>
+                        <p-anchor class="here-anchor" highlight :text="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.HERE')" />
                     </div>
                 </div>
             </div>

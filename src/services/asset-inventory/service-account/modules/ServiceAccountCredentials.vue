@@ -3,20 +3,17 @@
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')">
             <template #extra>
                 <p-button v-if="mode === 'READ'" icon="ic_edit" @click="handleClickEditButton">
-                    <!--song-lang-->
-                    Edit
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
                 <div v-else class="button-wrapper">
                     <p-button style-type="transparent" @click="handleClickCancelButton">
-                        <!--song-lang-->
-                        Cancel
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary-dark"
                               :disabled="!isFormValid"
                               @click="handleClickSaveButton"
                     >
-                        <!--song-lang-->
-                        Save
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
                     </p-button>
                 </div>
             </template>
