@@ -325,7 +325,8 @@ export default {
         }
     }
     .writer-name-input {
-        .p-text-input::v-deep {
+        /* custom design-system component - p-text-input */
+        :deep(.p-text-input) {
             @apply w-1/2;
             .input-container {
                 @apply w-full;

@@ -244,7 +244,8 @@ export default defineComponent<Props>({
         padding: 0.75rem 0 1rem 0;
     }
 
-    &::v-deep .no-data-wrapper {
+    /* custom design-system component - p-data-loader */
+    :deep(.p-data-loader .no-data-wrapper) {
         max-height: none;
     }
 

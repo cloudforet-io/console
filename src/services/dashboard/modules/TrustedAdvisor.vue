@@ -272,7 +272,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.widget-layout::v-deep {
+/* customize widget-layout */
+:deep(.widget-layout) {
     .title {
         font-size: 1.125rem;
         font-weight: bold;

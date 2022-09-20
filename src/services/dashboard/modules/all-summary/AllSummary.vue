@@ -502,7 +502,8 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.p-balloon-tab::v-deep {
+/* custom design-system component - p-balloon-tab */
+:deep(.p-balloon-tab) {
     .balloon-group {
         flex-wrap: nowrap;
         justify-content: space-evenly;

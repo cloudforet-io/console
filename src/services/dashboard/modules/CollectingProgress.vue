@@ -215,7 +215,7 @@ export default {
         }
     }
 }
-.widget-layout::v-deep {
+.widget-layout {
     @apply border border-gray-100 rounded-lg;
     position: relative;
     min-height: 18.75rem;
