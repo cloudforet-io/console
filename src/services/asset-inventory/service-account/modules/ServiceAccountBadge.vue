@@ -1,5 +1,5 @@
 <template>
-    <p-badge v-if="accountType" :outline="true" :style-type="ACCOUNT_TYPE_BADGE_OPTION[accountType].styleType">
+    <p-badge :outline="true" :style-type="ACCOUNT_TYPE_BADGE_OPTION[accountType].styleType">
         {{ ACCOUNT_TYPE_BADGE_OPTION[accountType] ? ACCOUNT_TYPE_BADGE_OPTION[accountType].label : '' }}
     </p-badge>
 </template>
