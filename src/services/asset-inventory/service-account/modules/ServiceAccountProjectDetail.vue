@@ -2,7 +2,7 @@
     <p-pane-layout class="service-account-project-detail">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
             <template #extra>
-                <p-button v-if="!editMode" :disabled="accountType === 'TRUST'" icon="ic_edit"
+                <p-button v-if="!editMode" :disabled="accountType === 'TRUST' && !projectName" icon="ic_edit"
                           :style-type="!projectName && 'transparent'"
                           @click="handleEditMode"
                 >
@@ -27,7 +27,7 @@
                 <!--                song-lang-->
                 <span>-- <span class="required-span">** required</span></span>
                 <!--                song-lang-->
-                <p-tooltip class="project-required-tooltip" contents="It's now required to select a specific <br>
+                <p-tooltip position="bottom" class="project-required-tooltip" contents="It's now required to select a specific <br>
                                                                     project for any service account. <br>
                                                                     ( Note: A randomly generated <br>
                                                                     project will be forcefully added to <br>
