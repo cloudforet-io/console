@@ -30,8 +30,7 @@
             <!--            FIXME:: below <service-account-account-type /> should changed to badge-->
             <service-account-account-type />
             <service-account-project-detail :project-id="projectId" :service-account-item="item" />
-            <!--            FIXME:: below <service-account-attached-general-accounts /> should have v-if about accountType-->
-            <service-account-attached-general-accounts />
+            <service-account-attached-general-accounts v-if="item.service_account_type === 'TRUST'" />
             <service-account-base-information :provider="providerKey"
                                               :service-account-id="serviceAccountId"
             />
