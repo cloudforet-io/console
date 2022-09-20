@@ -46,9 +46,7 @@
                 </div>
             </template>
             <!--            <template #col-service_account_type-format="{data}">-->
-            <!--                <p-badge v-if="data" :outline="true" :style-type="ACCOUNT_TYPE_BADGE_OPTION[data].styleType">-->
-            <!--                    {{ ACCOUNT_TYPE_BADGE_OPTION[data] ? ACCOUNT_TYPE_BADGE_OPTION[data].label : '' }}-->
-            <!--                </p-badge>-->
+            <!--                <service-account-badge v-if="data" :account-type="data" />-->
             <!--            </template>-->
         </p-dynamic-layout>
         <custom-field-modal v-model="tableState.visibleCustomFieldModal"
@@ -94,18 +92,9 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ACCOUNT_TYPE, ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/service-account/config';
 import ServiceAccountProviderList
     from '@/services/asset-inventory/service-account/modules/ServiceAccountProviderList.vue';
-
-const ACCOUNT_TYPE = Object.freeze({
-    GENERAL_ACCOUNT: 'general_account',
-    TRUST_ACCOUNT: 'trust_account',
-});
-
-const ACCOUNT_TYPE_BADGE_OPTION = Object.freeze({
-    [ACCOUNT_TYPE.TRUST_ACCOUNT]: { label: 'General Account', styleType: 'primary' },
-    [ACCOUNT_TYPE.GENERAL_ACCOUNT]: { label: 'Trust Account', styleType: 'gray' },
-});
 
 export default {
     name: 'ServiceAccountPage',
@@ -159,8 +148,8 @@ export default {
             visibleCustomFieldModal: false,
             accountTypeList: computed(() => [
                 { name: 'all', label: 'All' },
-                { name: ACCOUNT_TYPE.TRUST_ACCOUNT, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUST_ACCOUNT].label },
-                { name: ACCOUNT_TYPE.GENERAL_ACCOUNT, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL_ACCOUNT].label },
+                { name: ACCOUNT_TYPE.TRUST, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUST].label },
+                { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
             ]),
             selectedAccountType: 'all',
             searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),

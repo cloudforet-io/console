@@ -4,6 +4,7 @@ import type { Tags, TimeStamp } from '@/models';
 
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
+import type { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 import type { ProjectItemResp } from '@/services/project/type';
 
 const idField = 'provider';
@@ -45,7 +46,7 @@ export interface ServiceAccountModel {
         [key: string]: string;
     }
 }
-export type AccountType = 'GENERAL' | 'TRUST';
+export type AccountType = typeof ACCOUNT_TYPE[keyof typeof ACCOUNT_TYPE];
 
 export type ActiveDataType = 'input' | 'json';
 export interface CredentialForm {
