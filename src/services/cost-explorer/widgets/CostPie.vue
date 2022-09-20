@@ -301,9 +301,13 @@ export default defineComponent<WidgetProps>({
 }
 
 @screen tablet {
-    .table-right::v-deep {
+    .table-right {
         @apply border-t border-gray-200;
-        .p-data-table th {
+
+        /* custom cost-dashboard-data-table */
+
+        /* custom design-system component - p-data-table */
+        :deep(.p-data-table) th {
             display: none;
         }
     }

@@ -241,33 +241,33 @@ export default {
 
 <style lang="postcss" scoped>
 .project-wise-budget-usage-summary {
-    &::v-deep {
-        .body, .no-data {
-            min-height: 10rem;
+    /* custom cost-dashboard-card-widget-layout */
+
+    /* custom design-system component - p-card */
+    &.p-card:deep(.body, .no-data) {
+        min-height: 10rem;
+    }
+
+    .col-project {
+        display: flex;
+        align-items: center;
+        .project-icon {
+            margin-right: 0.25rem;
         }
     }
-    .p-data-table {
-        .col-project {
-            display: flex;
-            align-items: center;
-            .project-icon {
-                margin-right: 0.25rem;
-            }
+    .col-usage {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 14rem;
+        .progress-bar {
+            width: 7.5rem;
         }
-        .col-usage {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 14rem;
-            .progress-bar {
-                width: 7.5rem;
-            }
-            .usage-text {
-                flex-shrink: 0;
-                min-width: 3.375rem;
-                margin-left: 1rem;
-                text-align: right;
-            }
+        .usage-text {
+            flex-shrink: 0;
+            min-width: 3.375rem;
+            margin-left: 1rem;
+            text-align: right;
         }
     }
 }

@@ -236,9 +236,11 @@ export default {
         .left-select-filter-section {
             @apply bg-gray-100 border border-solid border-gray-200 rounded;
             padding: 0.5rem;
-            .collapsible-list-section {
+
+            /* custom design-system component - p-collapsible-list */
+            :deep(.collapsible-list-section) {
                 @apply flex flex-wrap flex-col gap-1;
-                ::v-deep .collapsible-item {
+                .collapsible-item {
                     @apply bg-white rounded-none;
                     padding: 0 1rem;
                     > .p-collapsible-panel {

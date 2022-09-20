@@ -331,11 +331,12 @@ export default defineComponent<WidgetProps>({
         }
     }
 
-    &.cost-dashboard-card-widget-layout::v-deep {
-        .body {
-            .no-data {
-                height: 18.75rem;
-            }
+    /* custom cost-dashboard-card-widget-layout */
+
+    /* custom design-system component - p-card */
+    &.cost-dashboard-card-widget-layout.p-card:deep(.body) {
+        .no-data {
+            height: 18.75rem;
         }
     }
 }
