@@ -293,7 +293,9 @@ export default {
     line-height: 120%;
     margin-bottom: 2rem;
 }
-.input-form.p-field-group::v-deep {
+
+/* custom design-system component - p-field-group */
+:deep(.input-form.p-field-group) {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -305,18 +307,13 @@ export default {
         margin-left: 8.5rem;
     }
 }
-.p-text-input::v-deep,
-.p-select-dropdown::v-deep,
-.p-search-dropdown::v-deep {
+.p-text-input,
+.p-select-dropdown,
+.p-search-dropdown {
     width: 100%;
     max-width: 25rem;
     flex-shrink: 0;
     flex-grow: 1;
-}
-.p-select-dropdown::v-deep {
-    .p-dropdown-button {
-        width: 100%;
-    }
 }
 
 .save-button {
@@ -325,9 +322,9 @@ export default {
 }
 
 @screen mobile {
-    .p-text-input::v-deep,
-    .p-select-dropdown::v-deep,
-    .p-autocomplete-search::v-deep {
+    .p-text-input,
+    .p-select-dropdown,
+    .p-search-dropdown {
         max-width: unset;
     }
 }
