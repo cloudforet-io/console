@@ -1695,8 +1695,10 @@
 				"CONNECT_TO_CONSOLE": "Connect to Console",
 				"EDIT": "Edit",
 				"HERE": "here",
+				"PROJECT_REQUIRED_HELP_TEXT": "It's now required to select a specific\nproject for any service account.\n( Note: A randomly generated\nproject will be forcefully added to\nthe accounts with no project soon.)",
+				"REQUIRED": "** required",
 				"SAVE": "Save",
-				"TRUST_ACCOUNT_HELP_TEXT": "Trust Account can allow entities in other AWS accounts belonging to you. Get more details"
+				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Account can allow entities in other AWS accounts belonging to you. Get more details"
 			}
 		}
 	},

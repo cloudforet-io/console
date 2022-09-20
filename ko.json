@@ -1695,6 +1695,8 @@
 				"CONNECT_TO_CONSOLE": "",
 				"EDIT": "",
 				"HERE": "",
+				"PROJECT_REQUIRED_HELP_TEXT": "",
+				"REQUIRED": "",
 				"SAVE": "",
 				"TRUST_ACCOUNT_HELP_TEXT": ""
 			}
