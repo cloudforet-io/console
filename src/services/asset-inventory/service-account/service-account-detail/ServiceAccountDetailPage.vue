@@ -65,7 +65,7 @@ import ServiceAccountBaseInformation
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
 import ServiceAccountCredentials
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
-import ServiceAccountProjectDetail from '@/services/asset-inventory/service-account/modules/ServiceAccountProjectDetail.vue';
+import ServiceAccountProjectDetail from '@/services/asset-inventory/service-account/service-account-detail/modules/ServiceAccountProjectDetail.vue';
 import type { ProviderModel, ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
 
 

@@ -94,7 +94,7 @@ import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformationForm.vue';
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentialsForm.vue';
-import ServiceAccountProjectForm from '@/services/asset-inventory/service-account/modules/ServiceAccountProjectForm.vue';
+import ServiceAccountProjectForm from '@/services/asset-inventory/service-account/service-account-add/modules/ServiceAccountProjectForm.vue';
 import type {
     AccountType,
     BaseInformationForm, CredentialForm, ProjectForm, ProviderModel,
