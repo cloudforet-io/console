@@ -24,6 +24,7 @@
             />
             <service-account-credentials-form v-if="mode === 'UPDATE'"
                                               edit-mode="UPDATE"
+                                              :service-account-type="serviceAccountType"
                                               :provider="provider"
                                               :is-valid.sync="isFormValid"
                                               :origin-form-data="credentialForm"
@@ -39,6 +40,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PPaneLayout, PPanelTop, PButton,
 } from '@spaceone/design-system';
+import type { PropType } from 'vue';
 import {
     defineComponent, reactive, toRefs, watch,
 } from 'vue';
@@ -49,13 +51,14 @@ import ServiceAccountCredentialsDetail
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentialsDetail.vue';
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentialsForm.vue';
-import type { PageMode, CredentialForm } from '@/services/asset-inventory/service-account/type';
+import type { PageMode, CredentialForm, AccountType } from '@/services/asset-inventory/service-account/type';
 import { EDIT_MODE } from '@/services/asset-inventory/service-account/type';
 
 
 interface Props {
     provider?: string;
     serviceAccountId?: string;
+    serviceAccountType: AccountType;
 }
 
 interface CredentialModel {
@@ -82,6 +85,10 @@ export default defineComponent<Props>({
         serviceAccountId: {
             type: String,
             default: undefined,
+        },
+        serviceAccountType: {
+            type: String as PropType<AccountType>,
+            default: 'GENERAL',
         },
     },
     setup(props) {
