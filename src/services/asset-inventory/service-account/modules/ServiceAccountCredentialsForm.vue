@@ -14,17 +14,17 @@
         </p-field-group>
         <template v-if="hasCredentialKey">
             <!--        song-lang-->
-            <p-field-group label="Do you want to attach an existing Trust Account?"
+            <p-field-group label="Do you want to attach an existing Trusted Account?"
                            required
             >
                 <div class="radio-wrapper">
-                    <p-radio v-model="attachTrustAccount" :value="false" class="radio-text">
+                    <p-radio v-model="attachTrustedAccount" :value="false" class="radio-text">
                         {{ $t('APP.MAIN.NO') }}
                     </p-radio>
-                    <p-radio v-model="attachTrustAccount" :value="true">
+                    <p-radio v-model="attachTrustedAccount" :value="true">
                         {{ $t('APP.MAIN.YES') }}<br>
                     </p-radio>
-                    <p-select-dropdown :items="trustAccountItems" :disabled="!attachTrustAccount" />
+                    <p-select-dropdown :items="trustedAccountItems" :disabled="!attachTrustedAccount" />
                 </div>
             </p-field-group>
             <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SECRET_TYPE_LABEL')" required class="mb-8">
@@ -121,16 +121,16 @@ export default defineComponent<Props>({
         const state = reactive({
             providerData: {} as ProviderModel,
             hasCredentialKey: true,
-            attachTrustAccount: false,
-            trustAccountItems: [],
+            attachTrustedAccount: false,
+            trustedAccountItems: [],
             secretTypes: computed(() => {
                 if (props.serviceAccountType === 'GENERAL') {
-                    if (state.attachTrustAccount) {
+                    if (state.attachTrustedAccount) {
                         return get(state.providerData, 'capability.general_service_account_schema', []);
                     }
                     return get(state.providerData, 'capability.supported_schema', []);
                 }
-                return get(state.providerData, 'capability.trust_service_account_schema', []);
+                return get(state.providerData, 'capability.trusted_service_account_schema', []);
             }),
             selectedSecretType: '',
             customSchemaForm: {},

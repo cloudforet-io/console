@@ -2,7 +2,7 @@
     <p-pane-layout class="service-account-project-detail">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
             <template #extra>
-                <p-button v-if="!editMode" :disabled="accountType === 'TRUST' && !projectName" icon="ic_edit"
+                <p-button v-if="!editMode" :disabled="accountType === 'TRUSTED' && !projectName" icon="ic_edit"
                           :style-type="!projectName && 'transparent'"
                           @click="handleEditMode"
                 >
@@ -22,7 +22,7 @@
             <p-anchor v-if="!editMode && !!projectName" :href="projectLink">
                 {{ projectName }}
             </p-anchor>
-            <span v-if="!editMode && !projectName && accountType === 'TRUST'">N/A</span>
+            <span v-if="!editMode && !projectName && accountType === 'TRUSTED'">N/A</span>
             <div v-if="!editMode && !projectName && accountType === 'GENERAL'">
                 <span>-- <span class="required-span">{{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.REQUIRED') }}</span></span>
                 <!--                song-lang-->
