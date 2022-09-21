@@ -14,9 +14,8 @@
             </div>
         </p-field-group>
         <template v-if="hasCredentialKey">
-            <!--        song-lang-->
             <p-field-group v-if="serviceAccountType !== 'TRUSTED'"
-                           label="Do you want to attach an existing Trusted Account?"
+                           label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CREDENTIALS_LABEL')"
                            required
             >
                 <div class="radio-wrapper">
