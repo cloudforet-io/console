@@ -11,11 +11,11 @@
                         @click="() => handleSelectAccountType('GENERAL')"
                     />
                     <p-select-card
-                        v-if="TRUST_ACCOUNT_ALLOWED.some((d) => d === provider)"
+                        v-if="TRUSTED_ACCOUNT_ALLOWED.some((d) => d === provider)"
                         v-model="selectedType"
-                        value="TRUST"
-                        label="Trust Account"
-                        @click="() => handleSelectAccountType('TRUST')"
+                        value="TRUSTED"
+                        label="Trusted Account"
+                        @click="() => handleSelectAccountType('TRUSTED')"
                     />
                 </div>
                 <div class="information-wrapper">
@@ -43,7 +43,7 @@ import {
     reactive, toRefs, defineComponent, watch,
 } from 'vue';
 
-import { TRUST_ACCOUNT_ALLOWED } from '@/services/asset-inventory/service-account/config';
+import { TRUSTED_ACCOUNT_ALLOWED } from '@/services/asset-inventory/service-account/config';
 import type { AccountType } from '@/services/asset-inventory/service-account/type';
 
 
@@ -82,7 +82,7 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
-            TRUST_ACCOUNT_ALLOWED,
+            TRUSTED_ACCOUNT_ALLOWED,
             handleSelectAccountType,
         };
     },

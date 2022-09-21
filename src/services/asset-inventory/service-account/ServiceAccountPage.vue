@@ -148,7 +148,7 @@ export default {
             visibleCustomFieldModal: false,
             accountTypeList: computed(() => [
                 { name: 'all', label: 'All' },
-                { name: ACCOUNT_TYPE.TRUST, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUST].label },
+                { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
                 { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
             ]),
             selectedAccountType: 'all',
