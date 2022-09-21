@@ -13,8 +13,7 @@
             </div>
         </p-field-group>
         <template v-if="hasCredentialKey">
-            <!--        song-lang-->
-            <p-field-group label="Do you want to attach an existing Trusted Account?"
+            <p-field-group :label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CREDENTIALS_LABEL')"
                            required
             >
                 <div class="radio-wrapper">

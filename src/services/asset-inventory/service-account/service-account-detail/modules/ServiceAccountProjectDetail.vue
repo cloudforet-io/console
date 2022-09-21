@@ -25,7 +25,6 @@
             <span v-if="!editMode && !projectName && accountType === 'TRUSTED'">N/A</span>
             <div v-if="!editMode && !projectName && accountType === 'GENERAL'">
                 <span>-- <span class="required-span">{{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.REQUIRED') }}</span></span>
-                <!--                song-lang-->
                 <p-tooltip position="bottom" class="project-required-tooltip" :contents="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.PROJECT_REQUIRED_HELP_TEXT')">
                     <p-i name="ic_tooltip" width="1rem" height="1rem" />
                 </p-tooltip>
