@@ -7,5 +7,5 @@ export const ACCOUNT_TYPE = Object.freeze({
 
 export const ACCOUNT_TYPE_BADGE_OPTION = Object.freeze({
     [ACCOUNT_TYPE.GENERAL]: { label: 'General Account', styleType: 'gray' },
-    [ACCOUNT_TYPE.TRUST]: { label: 'Trust Account', styleType: 'primary' },
+    [ACCOUNT_TYPE.TRUST]: { label: 'Trusted Account', styleType: 'primary' },
 });
