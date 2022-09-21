@@ -65,7 +65,7 @@ export default defineComponent<Props>({
                     type: 'item',
                     options: {
                         fields: [
-                            { key: 'schema', name: 'Secret Type' },
+                            { key: 'schema', name: 'Secret Type', options: { disable_copy: true } },
                             ...fields,
                         ],
                         translation_id: 'IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS',
@@ -109,12 +109,14 @@ export default defineComponent<Props>({
 });
 </script>
 <style lang="postcss" scoped>
-/* custom design-system component - p-dynamic-layout */
-:deep(.service-account-credentials-detail) {
-    .p-panel-top {
+.service-account-credentials-detail {
+    /* custom design-system component - p-panel-top */
+    :deep(.p-panel-top) {
         display: none;
     }
-    .p-definition-table {
+
+    /* custom design-system component - p-definition-table */
+    :deep(.p-definition-table) {
         min-height: auto;
     }
 }
