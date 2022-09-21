@@ -190,3 +190,12 @@ export default {
     }
 }
 </style>
+
+<style lang="postcss" >
+/* custom design-system component - p-tooltip */
+.p-tooltip {
+    .tooltip-inner {
+        white-space: pre-line;
+    }
+}
+</style>
