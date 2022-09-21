@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import type { ComputedRef } from 'vue';
 import { computed, getCurrentInstance } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
 
 import { getUserAccessLevel } from '@/lib/access-control';

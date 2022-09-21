@@ -108,9 +108,9 @@ import {
     computed,
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from 'vue';
-import type Vue from 'vue';
 import type { DirectiveFunction, SetupContext } from 'vue';
 import type { Location } from 'vue-router';
+import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
