@@ -394,22 +394,19 @@ export const getDataTableArgsType = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
     },
     beautifyText: {
         name: 'beautifyText',
-        type: { name: 'string' },
+        type: { name: 'boolean' },
         description: 'Whether to beautify text or not. See the `TextBeautifier` component.',
-        defaultValue: undefined,
+        defaultValue: false,
         table: {
             type: {
-                summary: 'function',
+                summary: 'boolean',
             },
             category: 'props',
             defaultValue: {
-                summary: 'undefined',
+                summary: 'false',
             },
         },
     },

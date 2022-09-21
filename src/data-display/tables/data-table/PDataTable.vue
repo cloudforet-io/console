@@ -54,7 +54,7 @@
                                             <template v-if="isFieldSortable(field.sortable)">
                                                 <p-i
                                                     v-if="sortable && (field.sortKey|| field.name) === sortBy"
-                                                    :name="proxyState.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'"
+                                                    :name="proxyState.proxySortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'"
                                                     class="sort-icon"
                                                 />
                                                 <p-i v-else
@@ -101,12 +101,12 @@
                                 @click.stop.prevent="onSelectClick"
                             >
                                 <p-check-box v-if="multiSelect"
-                                             v-model="proxyState.selectIndex"
+                                             v-model="proxyState.proxySelectIndex"
                                              :disabled="getRowSelectable ? getRowSelectable(item, rowIndex): false"
                                              :value="rowIndex"
                                 />
                                 <p-radio v-else
-                                         :selected="proxyState.selectIndex[0]"
+                                         :selected="proxyState.proxySelectIndex[0]"
                                          :disabled="getRowSelectable ? getRowSelectable(item, rowIndex): false"
                                          :value="rowIndex"
                                          @change="onChangeRadioSelect"
@@ -154,14 +154,14 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import {
-    toRefs, computed, reactive, watch, getCurrentInstance, defineComponent,
+    toRefs, computed, reactive, watch, defineComponent,
 } from 'vue';
 
 import { get, range } from 'lodash';
 
 import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
 import type { DataTableField, DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { useProxyValue } from '@/hooks';
 import { copyAnyData } from '@/util/helpers';
 
 const PCheckBox = () => import('@/inputs/checkbox/PCheckBox.vue');
@@ -221,7 +221,7 @@ export default defineComponent<DataTableProps>({
         },
         selectIndex: {
             type: Array,
-            default: undefined,
+            default: () => [],
         },
         multiSelect: {
             type: Boolean,
@@ -283,9 +283,7 @@ export default defineComponent<DataTableProps>({
             default: false,
         },
     },
-    setup(props, context) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
+    setup(props, { emit }) {
         const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map(child => ({ sortable: true, ...child }));
 
         const isFieldSortable = (sortable: boolean | undefined): boolean => (props.sortable ? sortable !== false : false);
@@ -321,9 +319,9 @@ export default defineComponent<DataTableProps>({
         };
 
         const proxyState = reactive({
-            selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, []),
-            sortBy: makeOptionalProxy<string>('sortBy', vm, true),
-            sortDesc: makeOptionalProxy<boolean|undefined>('sortDesc', vm, ''),
+            proxySelectIndex: useProxyValue<number[]>('selectIndex', props, emit),
+            proxySortBy: useProxyValue<string>('sortBy', props, emit),
+            proxySortDesc: useProxyValue<boolean|undefined>('sortDesc', props, emit),
         });
 
         const state = reactive({
@@ -383,11 +381,11 @@ export default defineComponent<DataTableProps>({
 
         const getSelectedState = (item, index) => {
             if (props.getRowSelectable) return props.getRowSelectable(item, index);
-            return props.multiSelect ? proxyState.selectIndex.some(d => index === d) : proxyState.selectIndex[0] === index;
+            return props.multiSelect ? proxyState.proxySelectIndex.some(d => index === d) : proxyState.proxySelectIndex[0] === index;
         };
 
         const checkboxToggle = (item, index) => {
-            const newSelected = [...proxyState.selectIndex];
+            const newSelected = [...proxyState.proxySelectIndex];
             if (getSelectedState(item, index)) {
                 const idx = newSelected.indexOf(index);
                 newSelected.splice(idx, 1);
@@ -395,12 +393,12 @@ export default defineComponent<DataTableProps>({
             } else {
                 newSelected.push(index);
             }
-            proxyState.selectIndex = newSelected;
+            proxyState.proxySelectIndex = newSelected;
         };
 
         /* Event Handlers */
         const onRowLeftClick = (item, index, event) => {
-            context.emit('rowLeftClick', item, index, event);
+            emit('rowLeftClick', item, index, event);
             if (!props.selectable) return;
             if (props.multiSelect) {
                 if (props.rowClickMultiSelectMode) {
@@ -412,14 +410,14 @@ export default defineComponent<DataTableProps>({
                     return;
                 }
             }
-            proxyState.selectIndex = [index];
+            proxyState.proxySelectIndex = [index];
         };
 
         const onTheadClick = (field) => {
             if (isFieldSortable(field.sortable)) {
                 const clickedKey = field.sortKey || field.name;
-                let sortBy = proxyState.sortBy;
-                let sortDesc: undefined|boolean = proxyState.sortDesc;
+                let sortBy = proxyState.proxySortBy;
+                let sortDesc: undefined|boolean = proxyState.proxySortDesc;
 
                 if (sortBy === clickedKey) {
                     // set reverse mode
@@ -432,9 +430,9 @@ export default defineComponent<DataTableProps>({
                 }
 
                 // set changed values
-                proxyState.sortBy = sortBy;
-                proxyState.sortDesc = sortDesc;
-                context.emit('changeSort', sortBy, sortDesc);
+                proxyState.proxySortBy = sortBy;
+                proxyState.proxySortDesc = sortDesc;
+                emit('changeSort', sortBy, sortDesc);
             }
         };
 
@@ -443,9 +441,9 @@ export default defineComponent<DataTableProps>({
         };
         const onSelectAllToggle = () => {
             if (state.allState) {
-                proxyState.selectIndex = range(props.items.length);
+                proxyState.proxySelectIndex = range(props.items.length);
             } else {
-                proxyState.selectIndex = [];
+                proxyState.proxySelectIndex = [];
             }
         };
         const onClickColCopy = (field: DataTableFieldType) => {
@@ -468,11 +466,11 @@ export default defineComponent<DataTableProps>({
         };
 
         const onChangeRadioSelect = (e) => {
-            proxyState.selectIndex = [e];
+            proxyState.proxySelectIndex = [e];
         };
 
 
-        watch(() => proxyState.selectIndex, (selectIndex) => {
+        watch(() => proxyState.proxySelectIndex, (selectIndex) => {
             state.allState = !!(props.items
                 && props.items.length
                 && props.items.length === selectIndex.length);
