@@ -86,26 +86,24 @@ export default {
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-select-dropdown */
-:deep(.service-provider-dropdown) {
-    .dropdown-button {
+.service-provider-dropdown {
+    :deep(.dropdown-button) {
         @apply rounded-2xl border-gray-200 bg-gray-100;
         width: unset;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
         .text {
             @apply flex items-center;
         }
-    }
-    &:not(.invalid):not(.disabled):not(.read-only).active.default {
-        .dropdown-button {
+        &:not(.invalid):not(.disabled):not(.read-only).active.default {
             @apply bg-gray-100 border-gray-200;
         }
-    }
-    &:not(.invalid):not(.disabled):not(.active):not(.read-only).default {
-        .dropdown-button:not(.active):not(.disabled):hover {
-            @apply bg-gray-100 border-gray-200;
+        &:not(.invalid):not(.disabled):not(.active):not(.read-only).default {
+            &:not(.active):not(.disabled):hover {
+                @apply bg-gray-100 border-gray-200;
+            }
         }
     }
-    .p-context-menu {
+    :deep(.p-context-menu) {
         margin-top: 0.125rem;
         .context-header {
             margin-top: 0.5625rem;
