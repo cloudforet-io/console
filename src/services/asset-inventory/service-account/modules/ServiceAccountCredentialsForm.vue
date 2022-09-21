@@ -1,6 +1,6 @@
 <template>
     <div class="service-account-credentials-form">
-        <p-field-group v-if="serviceAccountType !== 'TRUSTED'"
+        <p-field-group v-if="serviceAccountType !== ACCOUNT_TYPE.TRUSTED"
                        :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIAL_HELP_TEXT', { provider: providerData.name })"
                        required
         >
@@ -14,7 +14,7 @@
             </div>
         </p-field-group>
         <template v-if="hasCredentialKey">
-            <p-field-group v-if="serviceAccountType !== 'TRUSTED'"
+            <p-field-group v-if="serviceAccountType !== ACCOUNT_TYPE.TRUSTED"
                            label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CREDENTIALS_LABEL')"
                            required
             >
@@ -76,7 +76,7 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { EDIT_MODE } from '@/services/asset-inventory/service-account/type';
+import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 import type {
     ActiveDataType, CredentialForm, ProviderModel, PageMode, AccountType,
 } from '@/services/asset-inventory/service-account/type';
@@ -205,7 +205,7 @@ export default defineComponent<Props>({
         const listTrustAccounts = async () => {
             try {
                 const getQuery = () => apiQueryHelper
-                    .setFilters([{ k: 'service_account_type', v: 'TRUSTED', o: '=' }]);
+                    .setFilters([{ k: 'service_account_type', v: ACCOUNT_TYPE.TRUSTED, o: '=' }]);
                 const { results } = await SpaceConnector.client.identity.serviceAccount.list({ query: getQuery().data });
                 state.trustedAccountItems = results.map(d => ({
                     name: d.service_account_id,
@@ -268,7 +268,7 @@ export default defineComponent<Props>({
         return {
             ...toRefs(state),
             tabState,
-            EDIT_MODE,
+            ACCOUNT_TYPE,
             handleChangeSecretType,
             handleCredentialValidate,
             handleSelectNoCredentials,
