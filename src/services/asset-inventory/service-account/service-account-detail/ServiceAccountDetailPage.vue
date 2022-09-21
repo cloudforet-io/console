@@ -30,35 +30,62 @@
             <!--            FIXME:: below <service-account-account-type /> should changed to badge-->
             <service-account-account-type />
             <service-account-project-detail :project-id="projectId" :service-account-item="item" />
-            <service-account-attached-general-accounts v-if="item.service_account_type === 'TRUSTED'"
+            <service-account-attached-general-accounts v-if="item.service_account_type === ACCOUNT_TYPE.TRUSTED"
                                                        :service-account-id="serviceAccountId"
+                                                       :attached-general-accounts.sync="attachedGeneralAccounts"
             />
             <service-account-base-information :provider="providerKey"
                                               :service-account-id="serviceAccountId"
             />
             <service-account-credentials :provider="providerKey"
                                          :service-account-id="serviceAccountId"
+                                         :service-account-type="serviceAccountType"
             />
         </div>
+        <p-double-check-modal :visible.sync="deleteModalVisible"
+                              :header-title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_TITLE')"
+                              :sub-title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_DESC', { account: item.name })"
+                              :verification-text="item.name ? item.name : ''"
+                              theme-color="alert"
+                              size="sm"
+                              @confirm="handleConfirmDelete"
+        />
+        <!--song-lang-->
+        <p-button-modal :visible.sync="cannotDeleteModalVisible"
+                        header-title="Cannot delete this account"
+                        theme-color="alert"
+                        :hide-header-close-button="true"
+        >
+            <template #body>
+                <!--song-lang-->
+                Please note that this Trusted Account is currently attached in following accounts.
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
 <script lang="ts">
-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PAnchor, PButton, PIconButton, PPageTitle, PLazyImg,
+    PAnchor, PButton, PIconButton, PPageTitle, PLazyImg, PDoubleCheckModal, PButtonModal,
 } from '@spaceone/design-system';
 import { render } from 'ejs';
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 import ServiceAccountAccountType
     from '@/services/asset-inventory/service-account/modules/ServiceAccountAccountType.vue';
 import ServiceAccountAttachedGeneralAccounts
@@ -84,6 +111,8 @@ export default defineComponent({
         PButton,
         PAnchor,
         PLazyImg,
+        PDoubleCheckModal,
+        PButtonModal,
     },
     props: {
         serviceAccountId: {
@@ -92,6 +121,7 @@ export default defineComponent({
         },
     },
     setup(props) {
+        const vm = getCurrentInstance()?.proxy as Vue;
         const storeState = reactive({
             providerLoading: true,
             providers: computed(() => store.state.reference.provider.items),
@@ -100,6 +130,7 @@ export default defineComponent({
             loading: true,
             hasManagePermission: useManagePermissionState(),
             item: {} as ServiceAccountModel,
+            attachedGeneralAccounts: [] as ServiceAccountModel[],
             providerData: {} as ProviderModel,
             provider: computed(() => {
                 if (!storeState.providerLoading && !state.loading) {
@@ -114,7 +145,9 @@ export default defineComponent({
                 return '';
             }),
             projectId: computed(() => state.item.project_info?.project_id),
+            serviceAccountType: computed(() => state.item.service_account_type),
             deleteModalVisible: false,
+            cannotDeleteModalVisible: false,
         });
 
         /* Api */
@@ -141,10 +174,30 @@ export default defineComponent({
                 state.providerData = {};
             }
         };
+        const deleteServiceAccount = async () => {
+            try {
+                await SpaceConnector.client.identity.serviceAccount.delete({
+                    service_account_id: props.serviceAccountId,
+                });
+                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_DELETE_ACCOUNT'), '', vm.$root);
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_DELETE_ACCOUNT'));
+            } finally {
+                state.deleteModalVisible = false;
+            }
+        };
 
         /* Event */
         const handleOpenDeleteModal = () => {
-            state.deleteModalVisible = true;
+            if (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED && state.attachedGeneralAccounts.length) {
+                state.cannotDeleteModalVisible = true;
+            } else {
+                state.deleteModalVisible = true;
+            }
+        };
+        const handleConfirmDelete = async () => {
+            await deleteServiceAccount();
+            await SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME });
         };
 
         /* Init */
@@ -165,7 +218,9 @@ export default defineComponent({
         return {
             ...toRefs(state),
             ...toRefs(storeState),
+            ACCOUNT_TYPE,
             handleOpenDeleteModal,
+            handleConfirmDelete,
         };
     },
 });

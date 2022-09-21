@@ -26,6 +26,7 @@ import {
     PDataTable,
     PAnchor,
 } from '@spaceone/design-system';
+import type { PropType } from 'vue';
 import {
     defineComponent, reactive, toRefs,
 } from 'vue';
@@ -33,6 +34,7 @@ import {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import type { ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
 
 export default defineComponent({
     name: 'ServiceAccountAttachedGeneralAccounts',
@@ -47,8 +49,12 @@ export default defineComponent({
             type: String,
             default: undefined,
         },
+        attachedGeneralAccounts: {
+            type: Array as PropType<ServiceAccountModel[]>,
+            default: () => ([]),
+        },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const state = reactive({
             items: [] as any,
         });
@@ -63,6 +69,7 @@ export default defineComponent({
                     trusted_service_account_id: props.serviceAccountId,
                 });
                 state.items = results;
+                emit('update:attached-general-accounts', results);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.items = [];
