@@ -1693,6 +1693,7 @@
 				"BASE_INFO_HELP_TEXT": "Set Account's tag.\nAdd associated tags. The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
 				"CANCEL": "Cancel",
 				"CONNECT_TO_CONSOLE": "Connect to Console",
+				"CREDENTIALS_LABEL": "Do you want to attach an existing Trusted Account?",
 				"EDIT": "Edit",
 				"HERE": "here",
 				"PROJECT_REQUIRED_HELP_TEXT": "It's now required to select a specific\nproject for any service account.\n( Note: A randomly generated\nproject will be forcefully added to\nthe accounts with no project soon.)",
