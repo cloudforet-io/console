@@ -45,9 +45,6 @@
                     </p-select-status>
                 </div>
             </template>
-            <!--            <template #col-service_account_type-format="{data}">-->
-            <!--                <service-account-badge v-if="data" :account-type="data" />-->
-            <!--            </template>-->
         </p-dynamic-layout>
         <custom-field-modal v-model="tableState.visibleCustomFieldModal"
                             resource-type="identity.ServiceAccount"
@@ -133,7 +130,6 @@ export default {
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
-            selectIndex: [] as number[],
             selectable: false,
             colCopy: false,
             settingsVisible: true,
@@ -142,7 +138,6 @@ export default {
         const tableState = reactive({
             hasManagePermission: useManagePermissionState(),
             items: [],
-            selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
             selectedAccountIds: computed(() => tableState.selectedItems.map(d => d?.service_account_id)),
             schema: null as null|DynamicLayout,
             visibleCustomFieldModal: false,
@@ -177,14 +172,10 @@ export default {
             return apiQuery.data;
         };
 
-        const serviceAccountListApi = SpaceConnector.client.identity.serviceAccount.list;
         const listServiceAccountData = async () => {
             typeOptionState.loading = true;
             try {
-                const res = await serviceAccountListApi({ query: getQuery() });
-
-                // filtering select index
-                typeOptionState.selectIndex = typeOptionState.selectIndex.filter(d => !!res.results[d]);
+                const res = await SpaceConnector.client.identity.serviceAccount.list({ query: getQuery() });
 
                 tableState.items = res.results;
                 typeOptionState.totalCount = res.total_count;
@@ -292,7 +283,6 @@ export default {
                     replaceUrlQuery('provider', after);
                     await getTableSchema();
                     await listServiceAccountData();
-                    typeOptionState.selectIndex = [];
                 }
             }, { immediate: true });
         };
