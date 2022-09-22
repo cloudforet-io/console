@@ -128,6 +128,8 @@ export default defineComponent<Props>({
                 if (results.length) {
                     state.credentialData = results[0];
                     state.credentialForm.selectedSecretType = results[0].schema;
+                } else {
+                    state.credentialData = {};
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -136,13 +138,15 @@ export default defineComponent<Props>({
                 state.loading = false;
             }
         };
-        const deleteGeneralSecret = async () => {
+        const deleteGeneralSecret = async (): Promise<boolean> => {
             try {
                 await SpaceConnector.client.secret.secret.delete({
                     secret_id: state.credentialData.secret_id,
                 });
+                return true;
             } catch (e) {
-                ErrorHandler.handleError(e);
+                ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
+                return false;
             }
         };
         const createGeneralSecret = async () => {
@@ -163,9 +167,9 @@ export default defineComponent<Props>({
                     project_id: props.projectId || null,
                     trusted_secret_id: state.credentialForm.attachedTrustedAccountId,
                 });
-                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm);
+                showSuccessMessage(i18n.t('Successfully Updated Credentials'), '', vm);
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+                ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
             }
         };
         const updateTrustedSecret = async (): Promise<boolean> => {
@@ -176,7 +180,7 @@ export default defineComponent<Props>({
                 });
                 return true;
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+                ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
                 return false;
             }
         };
@@ -194,9 +198,9 @@ export default defineComponent<Props>({
                     data,
                 });
 
-                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm);
+                showSuccessMessage(i18n.t('Successfully Updated Credentials'), '', vm);
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+                ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
             }
         };
 
@@ -210,8 +214,15 @@ export default defineComponent<Props>({
         const handleClickSaveButton = async () => {
             if (!state.isFormValid) return;
             if (props.serviceAccountType === ACCOUNT_TYPE.GENERAL) {
-                if (!isEmpty(state.credentialData)) await deleteGeneralSecret();
-                await createGeneralSecret();
+                let isValid = true;
+                if (!isEmpty(state.credentialData)) isValid = await deleteGeneralSecret();
+                if (isValid) {
+                    if (state.credentialForm.hasCredentialKey) {
+                        await createGeneralSecret();
+                    } else {
+                        showSuccessMessage(i18n.t('Successfully Updated Credentials'), '', vm);
+                    }
+                }
             } else {
                 let isValid = true;
                 if (state.credentialForm.selectedSecretType !== state.credentialData.schema) {
