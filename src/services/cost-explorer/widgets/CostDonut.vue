@@ -49,8 +49,8 @@ import type { DataTableField } from '@spaceone/design-system/dist/src/data-displ
 import dayjs from 'dayjs';
 
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { CURRENCY } from '@/store/modules/display/config';
 

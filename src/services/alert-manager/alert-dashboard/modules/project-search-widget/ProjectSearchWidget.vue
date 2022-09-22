@@ -55,10 +55,10 @@ import {
 } from '@spaceone/design-system';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
-import { makeReferenceValueHandler } from 'cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 

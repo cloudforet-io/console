@@ -67,10 +67,10 @@ import {
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
-import { iso8601Formatter } from 'cloudforet/core-lib';
-import { makeReferenceValueHandler } from 'cloudforet/core-lib/component-util/query-search';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/core-lib';
+import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import type { TimeStamp } from '@/models';

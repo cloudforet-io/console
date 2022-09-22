@@ -1,7 +1,7 @@
 {
-  "name": "@spaceone/console-core-lib",
+  "name": "@cloudforet/corelib",
   "version": "1.16.0",
-  "description": "SpaceONE Console Core Library",
+  "description": "Cloudforet Console Core Library",
   "scripts": {
     "build": "npm run babel && npm run tsc",
     "build:watch": "rimraf dist & concurrently \"npm run babel:watch\"  \"npm run tsc:watch\"",

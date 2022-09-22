@@ -63,10 +63,10 @@ import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/te
 import { find } from 'lodash';
 
 
-import { commaFormatter } from 'cloudforet/core-lib';
-import { getPageStart } from 'cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { commaFormatter } from '@cloudforet/core-lib';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import { store } from '@/store';

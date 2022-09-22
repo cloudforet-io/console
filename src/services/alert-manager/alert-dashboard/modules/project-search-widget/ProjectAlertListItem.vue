@@ -33,8 +33,8 @@ import {
     PListCard, PAnchor,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import { store } from '@/store';

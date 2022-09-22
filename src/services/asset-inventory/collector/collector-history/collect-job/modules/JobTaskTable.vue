@@ -75,11 +75,11 @@ import {
 } from '@spaceone/design-system';
 import { capitalize } from 'lodash';
 
-import { iso8601Formatter, durationFormatter } from 'cloudforet/core-lib';
-import { makeEnumValueHandler, makeReferenceValueHandler } from 'cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet } from 'cloudforet/core-lib/component-util/query-search/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter, durationFormatter } from '@cloudforet/core-lib';
+import { makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 

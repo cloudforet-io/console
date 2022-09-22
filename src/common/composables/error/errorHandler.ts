@@ -1,10 +1,10 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     isInstanceOfAPIError, isInstanceOfAuthenticationError, isInstanceOfAuthorizationError,
     isInstanceOfBadRequestError,
-} from 'cloudforet/core-lib/space-connector/error';
+} from '@cloudforet/core-lib/space-connector/error';
 
 import { SpaceRouter } from '@/router';
 

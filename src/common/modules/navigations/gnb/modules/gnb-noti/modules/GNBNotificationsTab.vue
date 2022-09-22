@@ -100,9 +100,9 @@ import {
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-import { iso8601Formatter } from 'cloudforet/core-lib';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import { store } from '@/store';

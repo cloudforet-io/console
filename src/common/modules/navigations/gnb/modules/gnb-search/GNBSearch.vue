@@ -64,7 +64,7 @@ import axios from 'axios';
 import { debounce, throttle } from 'lodash';
 
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { SpaceRouter } from '@/router';

@@ -147,13 +147,13 @@ import {
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
-import { iso8601Formatter } from 'cloudforet/core-lib';
+import { iso8601Formatter } from '@cloudforet/core-lib';
 import {
     makeDistinctValueHandler, makeEnumValueHandler,
-} from 'cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+} from '@cloudforet/core-lib/component-util/query-search';
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

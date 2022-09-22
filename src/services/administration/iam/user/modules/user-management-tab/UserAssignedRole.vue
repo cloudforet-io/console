@@ -45,7 +45,7 @@ import {
     PPanelTop, PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import type { Tags } from '@/models';

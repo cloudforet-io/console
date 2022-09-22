@@ -94,9 +94,9 @@ import {
     PButton, PButtonModal, PI, PTextEditor, PToolbox, PEmpty,
 } from '@spaceone/design-system';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 

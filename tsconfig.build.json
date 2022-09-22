@@ -6,9 +6,9 @@
     "types": ["webpack-env"],
     "paths": {
       "@/*": ["src/*", "packages/cloudforet/core-lib/dist/*"],
-      "cloudforet/*": ["packages/cloudforet/*"],
-      "cloudforet/core-lib": ["packages/cloudforet/core-lib/dist/"],
-      "cloudforet/core-lib/*": ["packages/cloudforet/core-lib/dist/*"]
+      "@cloudforet/*": ["packages/cloudforet/*"],
+      "@cloudforet/core-lib": ["packages/cloudforet/core-lib/dist/"],
+      "@cloudforet/core-lib/*": ["packages/cloudforet/core-lib/dist/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],

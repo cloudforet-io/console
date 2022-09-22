@@ -80,7 +80,7 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 import dayjs from 'dayjs';
 
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

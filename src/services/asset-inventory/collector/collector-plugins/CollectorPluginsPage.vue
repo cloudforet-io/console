@@ -85,9 +85,9 @@ import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation
 import { get, range } from 'lodash';
 
 
-import { getPageStart } from 'cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import type { TimeStamp } from '@/models';

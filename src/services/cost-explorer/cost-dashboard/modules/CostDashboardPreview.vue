@@ -40,7 +40,7 @@ import {
     PPageTitle,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 

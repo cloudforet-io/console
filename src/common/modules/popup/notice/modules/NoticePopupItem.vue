@@ -45,8 +45,8 @@ import {
     PButtonModal, PBadge, PDivider, PButton,
 } from '@spaceone/design-system';
 
-import { iso8601Formatter } from 'cloudforet/core-lib';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { iso8601Formatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

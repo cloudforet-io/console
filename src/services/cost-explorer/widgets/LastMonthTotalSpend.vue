@@ -28,8 +28,8 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import dayjs from 'dayjs';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';

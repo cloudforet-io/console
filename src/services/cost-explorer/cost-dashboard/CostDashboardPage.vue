@@ -90,7 +90,7 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { SpaceRouter } from '@/router';

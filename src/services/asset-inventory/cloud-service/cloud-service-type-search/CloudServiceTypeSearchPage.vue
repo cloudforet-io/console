@@ -5,7 +5,7 @@
 <script lang="ts">
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { locationQueryToString } from '@/lib/router-query-string';
 

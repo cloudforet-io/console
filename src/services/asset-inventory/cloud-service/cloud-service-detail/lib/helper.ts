@@ -1,5 +1,5 @@
-import type { ValueHandler } from 'cloudforet/core-lib/component-util/query-search/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import type { ValueHandler } from '@cloudforet/core-lib/component-util/query-search/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 export const makeCustomValueHandler = (distinctKey: string, cloudServiceId: string): ValueHandler => async (inputText: string) => {
     try {

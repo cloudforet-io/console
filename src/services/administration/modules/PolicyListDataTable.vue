@@ -79,9 +79,9 @@ import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/qu
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { filter, capitalize } from 'lodash';
 
-import { setApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
-import type { ToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox/type';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

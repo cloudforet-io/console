@@ -63,7 +63,7 @@ import {
 } from '@spaceone/design-system';
 import { get } from 'lodash';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { TimeStamp } from '@/models';
 import { store } from '@/store';

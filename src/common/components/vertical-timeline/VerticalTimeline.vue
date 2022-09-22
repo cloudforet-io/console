@@ -37,7 +37,7 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { iso8601Formatter } from 'cloudforet/core-lib';
+import { iso8601Formatter } from '@cloudforet/core-lib';
 
 
 interface Props {

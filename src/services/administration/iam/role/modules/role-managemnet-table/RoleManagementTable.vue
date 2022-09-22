@@ -81,12 +81,12 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import { makeDistinctValueHandler, makeEnumValueHandler } from 'cloudforet/core-lib/component-util/query-search';
-import type { KeyItem } from 'cloudforet/core-lib/component-util/query-search/type';
-import { getApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
-import type { ToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItem } from '@cloudforet/core-lib/component-util/query-search/type';
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

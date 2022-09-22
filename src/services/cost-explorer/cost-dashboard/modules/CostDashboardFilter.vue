@@ -38,7 +38,7 @@ import type { Vue } from 'vue/types/vue';
 import { PButton, PIconButton } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

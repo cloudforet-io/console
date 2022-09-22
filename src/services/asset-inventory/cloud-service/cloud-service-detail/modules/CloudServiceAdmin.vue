@@ -35,8 +35,8 @@ import {
 } from '@spaceone/design-system';
 import type { SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import { store } from '@/store';

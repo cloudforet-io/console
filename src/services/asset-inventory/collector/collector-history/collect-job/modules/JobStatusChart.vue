@@ -46,7 +46,7 @@ import type { Vue } from 'vue/types/vue';
 
 import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

@@ -70,10 +70,10 @@ import { computed, reactive, toRefs } from 'vue';
 import { PSelectableItem, PSkeleton, PI } from '@spaceone/design-system';
 import { range } from 'lodash';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 

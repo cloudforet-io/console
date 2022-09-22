@@ -68,9 +68,9 @@ import {
     PRadio, PTextPagination, PButton, PLabel, PDataLoader,
 } from '@spaceone/design-system';
 
-import { getPageStart } from 'cloudforet/core-lib/component-util/pagination';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 

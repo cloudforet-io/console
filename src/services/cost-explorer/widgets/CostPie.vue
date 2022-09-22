@@ -54,8 +54,8 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { PSkeleton, PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

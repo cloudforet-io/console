@@ -114,16 +114,16 @@ import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation
 import { capitalize } from 'lodash';
 
 
-import { iso8601Formatter, durationFormatter, numberFormatter } from 'cloudforet/core-lib';
-import { getPageStart } from 'cloudforet/core-lib/component-util/pagination';
+import { iso8601Formatter, durationFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
-} from 'cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, QueryTag, ValueHandlerMap } from 'cloudforet/core-lib/component-util/query-search/type';
-import { setApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+} from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet, QueryTag, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

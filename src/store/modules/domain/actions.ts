@@ -2,7 +2,7 @@
 
 import type { Action } from 'vuex';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { DomainState, ExtendedAuthType } from './type';
 

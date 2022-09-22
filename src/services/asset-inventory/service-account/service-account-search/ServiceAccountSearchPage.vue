@@ -7,7 +7,7 @@ import type {
     ComponentInstance,
 } from 'vue';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { NoSearchResourceError } from '@/common/composables/error/error';

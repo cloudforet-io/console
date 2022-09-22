@@ -71,8 +71,8 @@ import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
 
 
-import { byteFormatter, commaFormatter, numberFormatter } from 'cloudforet/core-lib';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { byteFormatter, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

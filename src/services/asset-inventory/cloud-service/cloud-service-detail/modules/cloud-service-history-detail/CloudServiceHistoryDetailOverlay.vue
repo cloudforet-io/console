@@ -97,7 +97,7 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
-import { iso8601Formatter } from 'cloudforet/core-lib';
+import { iso8601Formatter } from '@cloudforet/core-lib';
 
 import { i18n } from '@/translations';
 

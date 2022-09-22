@@ -18,7 +18,7 @@ import type { Location } from 'vue-router';
 
 import { PAnchor } from '@spaceone/design-system';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { ReferenceItem } from '@/store/modules/reference/type';
 

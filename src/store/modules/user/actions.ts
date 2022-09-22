@@ -1,7 +1,7 @@
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { setI18nLocale } from '@/translations';
 

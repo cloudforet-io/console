@@ -1,6 +1,6 @@
 import type { Action } from 'vuex';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { RecentConfig, RecentState, RecentType } from '@/store/modules/recent/type';
 import {

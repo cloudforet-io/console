@@ -18,7 +18,7 @@ import VueI18n from 'vue-i18n';
 
 import { PDoubleCheckModal } from '@spaceone/design-system';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

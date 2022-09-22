@@ -24,7 +24,7 @@ import type { Vue } from 'vue/types/vue';
 
 import { PPageTitle } from '@spaceone/design-system';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 
 import { i18n } from '@/translations';

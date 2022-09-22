@@ -58,9 +58,9 @@ import type { Vue } from 'vue/types/vue';
 import { PI } from '@spaceone/design-system';
 import { findKey } from 'lodash';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 

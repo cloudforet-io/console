@@ -62,10 +62,10 @@ import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import type { Filter } from 'cloudforet/core-lib/space-connector/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { Filter } from '@cloudforet/core-lib/space-connector/type';
 
 
 import { store } from '@/store';

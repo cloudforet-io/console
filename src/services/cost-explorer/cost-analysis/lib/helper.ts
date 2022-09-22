@@ -4,7 +4,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type { CostQueryFilters, Period, Granularity } from '@/services/cost-explorer/type';

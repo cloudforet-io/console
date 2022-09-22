@@ -3,7 +3,7 @@ import type { Location } from 'vue-router';
 
 import { concat } from 'lodash';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { Reference, ResourceType } from '@/lib/reference/type';
 

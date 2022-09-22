@@ -6,9 +6,9 @@ import componentEN from '@spaceone/design-system/src/translations/language-pack/
 import componentJA from '@spaceone/design-system/src/translations/language-pack/ja.json';
 import componentKO from '@spaceone/design-system/src/translations/language-pack/ko.json';
 
-import en from 'cloudforet/language-pack/en.json';
-import ja from 'cloudforet/language-pack/ja.json';
-import ko from 'cloudforet/language-pack/ko.json';
+import en from '@cloudforet/language-pack/en.json';
+import ja from '@cloudforet/language-pack/ja.json';
+import ko from '@cloudforet/language-pack/ko.json';
 
 
 import { loadDayjsLocale } from '@/translations/vendors/dayjs';

@@ -62,7 +62,7 @@ import {
 } from '@spaceone/design-system';
 import { forEach, range, isEmpty } from 'lodash';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

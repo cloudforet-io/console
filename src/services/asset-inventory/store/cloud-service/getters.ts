@@ -1,6 +1,6 @@
 import type { Getter } from 'vuex';
 
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
 import type { CloudServiceCategory } from '@/services/asset-inventory/cloud-service/type';

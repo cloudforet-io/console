@@ -113,11 +113,11 @@ import type { Unit } from 'bytes';
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
 
-import { byteFormatter, commaFormatter } from 'cloudforet/core-lib';
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import { store } from '@/store';

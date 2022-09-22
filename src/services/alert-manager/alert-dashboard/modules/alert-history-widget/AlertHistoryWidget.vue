@@ -53,8 +53,8 @@ import {
 import dayjs from 'dayjs';
 import { find } from 'lodash';
 
-import { commaFormatter, numberFormatter } from 'cloudforet/core-lib';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

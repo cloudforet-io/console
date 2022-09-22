@@ -70,11 +70,11 @@ import { get } from 'lodash';
 import type { Table } from 'pdfmake/interfaces';
 
 
-import { setApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 // eslint-disable-next-line import/extensions,import/no-unresolved
 

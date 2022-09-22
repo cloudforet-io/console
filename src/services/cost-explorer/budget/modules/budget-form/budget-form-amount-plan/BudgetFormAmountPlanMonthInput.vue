@@ -24,7 +24,7 @@ import {
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import { commaFormatter, getNumberFromString } from 'cloudforet/core-lib';
+import { commaFormatter, getNumberFromString } from '@cloudforet/core-lib';
 
 import { i18n } from '@/translations';
 

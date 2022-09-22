@@ -43,9 +43,9 @@ import dayjs from 'dayjs';
 import { range } from 'lodash';
 
 
-import { byteFormatter, commaFormatter, numberFormatter } from 'cloudforet/core-lib';
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { byteFormatter, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { i18n } from '@/translations';

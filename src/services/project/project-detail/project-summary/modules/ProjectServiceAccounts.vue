@@ -46,9 +46,9 @@ import type { Location } from 'vue-router';
 import { PDataTable } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
-import { byteFormatter } from 'cloudforet/core-lib';
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { byteFormatter } from '@cloudforet/core-lib';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

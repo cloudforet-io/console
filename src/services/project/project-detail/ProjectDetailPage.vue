@@ -108,9 +108,9 @@ import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/t
 import { find } from 'lodash';
 
 
-import { commaFormatter } from 'cloudforet/core-lib';
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { commaFormatter } from '@cloudforet/core-lib';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

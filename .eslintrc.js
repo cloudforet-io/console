@@ -147,7 +147,7 @@ module.exports = {
                         position: 'after',
                     },
                     {
-                        pattern: 'cloudforet/**',
+                        pattern: '@cloudforet/**',
                         group: 'internal',
                         position: 'before',
                     },

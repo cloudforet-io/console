@@ -1,6 +1,6 @@
 import type { Mutation } from 'vuex';
 
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 import type { CloudServiceFilterMap, Period } from '@/services/asset-inventory/cloud-service/type';
 import type { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';

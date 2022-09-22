@@ -14,8 +14,8 @@
 
 import { computed, reactive, toRefs } from 'vue';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 import { CURRENCY } from '@/store/modules/display/config';
 

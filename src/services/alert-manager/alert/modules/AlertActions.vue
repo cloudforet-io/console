@@ -84,8 +84,8 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { durationFormatter, iso8601Formatter } from 'cloudforet/core-lib';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { durationFormatter, iso8601Formatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

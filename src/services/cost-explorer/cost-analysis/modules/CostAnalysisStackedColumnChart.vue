@@ -24,7 +24,7 @@ import {
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
-import { commaFormatter, numberFormatter } from 'cloudforet/core-lib';
+import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 
 
 import { CURRENCY } from '@/store/modules/display/config';

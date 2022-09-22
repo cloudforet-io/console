@@ -70,14 +70,14 @@ import dayjs from 'dayjs';
 import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
-} from 'cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from 'cloudforet/core-lib/component-util/query-search/type';
-import { setApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
-import type { ToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox/type';
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+} from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

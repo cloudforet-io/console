@@ -67,7 +67,7 @@ import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/t
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

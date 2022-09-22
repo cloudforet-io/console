@@ -65,7 +65,7 @@ import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 
-import { commaFormatter, numberFormatter } from 'cloudforet/core-lib';
+import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 
 
 import config from '@/lib/config';

@@ -199,12 +199,12 @@ import {
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
-import { iso8601Formatter } from 'cloudforet/core-lib';
-import { makeDistinctValueHandler } from 'cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from 'cloudforet/core-lib/component-util/query-search/type';
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/core-lib';
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

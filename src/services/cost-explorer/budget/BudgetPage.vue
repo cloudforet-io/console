@@ -35,8 +35,8 @@ import {
     PPageTitle, PDivider, PButton,
 } from '@spaceone/design-system';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';

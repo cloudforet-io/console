@@ -21,7 +21,7 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 
 import { store } from '@/store';

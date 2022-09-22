@@ -1,6 +1,6 @@
 import type { Action } from 'vuex';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { CollectorReferenceMap, CollectorReferenceState } from '@/store/modules/reference/collector/type';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';

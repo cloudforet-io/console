@@ -53,7 +53,7 @@ import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

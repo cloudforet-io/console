@@ -41,9 +41,9 @@ import type { Vue } from 'vue/types/vue';
 import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
 import { uniqBy } from 'lodash';
 
-import { getApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

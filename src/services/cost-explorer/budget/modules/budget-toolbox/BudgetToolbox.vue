@@ -71,9 +71,9 @@ import dayjs from 'dayjs';
 import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
-} from 'cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from 'cloudforet/core-lib/component-util/query-search/type';
-import { QueryHelper } from 'cloudforet/core-lib/query';
+} from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

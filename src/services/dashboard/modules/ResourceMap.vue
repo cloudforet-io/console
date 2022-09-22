@@ -75,8 +75,8 @@ import * as am4maps from '@amcharts/amcharts4/maps';
 import type { MapChart } from '@amcharts/amcharts4/maps';
 import { PDataLoader, PProgressBar } from '@spaceone/design-system';
 
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 

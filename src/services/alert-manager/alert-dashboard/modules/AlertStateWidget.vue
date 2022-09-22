@@ -114,11 +114,11 @@ import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/te
 import { find, sum } from 'lodash';
 
 
-import { commaFormatter } from 'cloudforet/core-lib';
-import { getPageStart } from 'cloudforet/core-lib/component-util/pagination';
-import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { commaFormatter } from '@cloudforet/core-lib';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

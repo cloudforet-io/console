@@ -65,8 +65,8 @@ import { PLottie, PSkeleton, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import type { TimeStamp } from '@/models';

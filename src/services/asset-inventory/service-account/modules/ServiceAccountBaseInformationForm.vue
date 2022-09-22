@@ -45,7 +45,7 @@ import {
 } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

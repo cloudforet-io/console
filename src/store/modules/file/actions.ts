@@ -2,7 +2,7 @@ import type { Action } from 'vuex';
 
 import axios from 'axios';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

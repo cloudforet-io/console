@@ -81,7 +81,7 @@ import {
 } from '@spaceone/design-system';
 import { render } from 'ejs';
 
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { SpaceRouter } from '@/router';
