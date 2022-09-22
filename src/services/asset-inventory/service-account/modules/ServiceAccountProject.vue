@@ -1,126 +1,148 @@
 <template>
     <p-pane-layout class="service-account-project">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
-            <template v-if="mode === 'READ'" #extra>
-                <p-button icon="ic_edit">
+            <template #extra>
+                <p-button v-if="mode === 'READ'" icon="ic_edit"
+                          style-type="transparent"
+                          :disabled="!editable"
+                          @click="handleClickEditButton"
+                >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
+                <div v-else class="button-wrapper">
+                    <p-button style-type="transparent" @click="handleClickCancelButton">
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
+                    </p-button>
+                    <p-button style-type="primary-dark"
+                              :disabled="!isFormValid"
+                              @click="handleClickSaveButton"
+                    >
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.SAVE') }}
+                    </p-button>
+                </div>
             </template>
         </p-panel-top>
         <div class="content-wrapper">
-            <div v-if="mode === 'READ'">
-                <p-anchor :href="readState.projectLink">
-                    {{ readState.projectName }}
-                </p-anchor>
-            </div>
-            <!--            FIXME:: MERGE ServiceAccountProjectForm/Detail TO THIS FILE -->
-            <project-select-dropdown v-if="mode === 'CREATE'"
-                                     class="project-select-dropdown"
-                                     project-selectable
-                                     :selected-project-ids="formState.selectedProjects"
-                                     :use-fixed-menu-style="false"
-                                     :invalid="formState.proxyIsValid === false"
-                                     @select="handleSelectedProject"
+            <service-account-project-detail v-if="mode === 'READ'"
+                                            :project-id="projectId"
+                                            :service-account-type="serviceAccountType"
+            />
+            <service-account-project-form v-else
+                                          :project-id="projectId"
+                                          :is-valid.sync="isFormValid"
+                                          @change="handleChangeForm"
             />
         </div>
     </p-pane-layout>
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
-import { computed, reactive, watch } from 'vue';
+import type { PropType, SetupContext } from 'vue';
+import {
+    defineComponent, reactive, toRefs,
+} from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PButton, PAnchor,
+    PPaneLayout, PPanelTop, PButton,
 } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { SpaceRouter } from '@/router';
-import { store } from '@/store';
+import { i18n } from '@/translations';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { PageMode, ProjectForm } from '@/services/asset-inventory/service-account/type';
-import type { ProjectGroupTreeItem } from '@/services/project/type';
+import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
+import ServiceAccountProjectDetail
+    from '@/services/asset-inventory/service-account/modules/ServiceAccountProjectDetail.vue';
+import ServiceAccountProjectForm
+    from '@/services/asset-inventory/service-account/modules/ServiceAccountProjectForm.vue';
+import type { ProjectForm, AccountType, PageMode } from '@/services/asset-inventory/service-account/type';
 
 
-export default {
+interface Props {
+    serviceAccountId?: string;
+    serviceAccountType: AccountType;
+    projectId?: string;
+    editable: boolean;
+}
+
+export default defineComponent<Props>({
     name: 'ServiceAccountProject',
     components: {
+        ServiceAccountProjectDetail,
+        ServiceAccountProjectForm,
         PPaneLayout,
         PPanelTop,
-        ProjectSelectDropdown,
         PButton,
-        PAnchor,
     },
     props: {
-        mode: {
-            type: String as PropType<PageMode>,
-            default: 'READ',
-        },
-        isValid: {
-            type: Boolean,
+        serviceAccountId: {
+            type: String,
             default: undefined,
+        },
+        serviceAccountType: {
+            type: String as PropType<AccountType>,
+            default: 'GENERAL',
         },
         projectId: {
             type: String,
             default: undefined,
         },
+        editable: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props, { emit }) {
-        const readState = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
-            projectName: computed(() => {
-                if (props.projectId) {
-                    return readState.projects[props.projectId]?.label ?? '';
-                }
-                return '';
-            }),
-            projectLink: computed(() => {
-                if (props.projectId) {
-                    return SpaceRouter.router.resolve(referenceRouter(props.projectId, {
-                        resource_type: 'identity.Project',
-                    })).href;
-                }
-                return undefined;
-            }),
+    setup(props, { emit }: SetupContext) {
+        const state = reactive({
+            mode: 'READ' as PageMode,
+            isFormValid: undefined,
+            projectForm: {} as ProjectForm,
         });
-        const formState = reactive({
-            selectedProjects: [] as ProjectGroupTreeItem[],
-            formData: computed<ProjectForm>(() => ({
-                selectedProject: formState.selectedProjects,
-            })),
-            proxyIsValid: useProxyValue('is-valid', props, emit),
-        });
+
+        /* Api */
+        const updateServiceAccount = async () => {
+            try {
+                await SpaceConnector.client.identity.serviceAccount.update({
+                    service_account_id: props.serviceAccountId,
+                    project_id: state.projectForm.selectedProjectId,
+                });
+                showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_CHANGE_PROJECT'), '');
+            } catch (e: unknown) {
+                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_CHANGE_PROJECT'));
+            }
+        };
 
         /* Event */
-        const handleSelectedProject = (selectedProject) => {
-            formState.formData.selectedProject = selectedProject.length ? selectedProject[0] : null;
-            formState.proxyIsValid = !!selectedProject.length;
+        const handleClickEditButton = () => {
+            state.mode = 'UPDATE';
         };
-
-        /* Init */
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-            ]);
-        })();
-
-        /* Watcher */
-        watch(() => formState.formData, (formData) => {
-            emit('change', formData);
-        });
+        const handleClickCancelButton = () => {
+            state.mode = 'READ';
+        };
+        const handleChangeForm = (projectForm) => {
+            state.projectForm = projectForm;
+        };
+        const handleClickSaveButton = async () => {
+            if (!state.isFormValid) return;
+            await updateServiceAccount();
+            state.mode = 'READ';
+            emit('change-project');
+        };
 
         return {
-            readState,
-            formState,
-            handleSelectedProject,
+            ...toRefs(state),
+            ACCOUNT_TYPE,
+            handleClickEditButton,
+            handleClickCancelButton,
+            handleClickSaveButton,
+            handleChangeForm,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
@@ -133,14 +155,9 @@ export default {
     }
     .content-wrapper {
         padding: 0.5rem 1rem 2.5rem 1rem;
-        .project-select-dropdown {
-            width: 50%;
-        }
-    }
-
-    @screen tablet {
-        .content-wrapper {
-            .project-select-dropdown {
+        .service-account-project-form {
+            /* custom project-select-dropdown */
+            :deep(.project-select-dropdown) {
                 width: 100%;
             }
         }
