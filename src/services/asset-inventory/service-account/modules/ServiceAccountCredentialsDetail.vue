@@ -98,7 +98,11 @@ export default defineComponent<Props>({
 
         /* Watcher */
         watch(() => props.credentialData, (credentialData) => {
-            if (credentialData?.schema) getCredentialSchema(credentialData.schema);
+            if (credentialData?.schema) {
+                getCredentialSchema(credentialData.schema);
+            } else {
+                state.credentialJsonSchema = {};
+            }
         });
 
         return {
