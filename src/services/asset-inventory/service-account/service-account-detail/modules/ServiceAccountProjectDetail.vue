@@ -115,7 +115,7 @@ export default {
         /* Util */
         const AnchorDataFormatter = (projectId: string): void => {
             if (!projectId) return;
-            state.projectName = state.projects[projectId].label;
+            state.projectName = state.projects[projectId]?.label ?? '';
             state.projectLink = SpaceRouter.router.resolve(referenceRouter(projectId, {
                 resource_type: 'identity.Project',
             })).href;
@@ -143,15 +143,12 @@ export default {
         };
 
         /* Watcher */
-        watch(() => props.projectId, (id: string) => {
+        watch(() => [props.projectId, state.projects], ([id]) => {
             AnchorDataFormatter(id);
-        });
-        watch(() => state.projects, () => {
-            AnchorDataFormatter(state.selectedProjects[0]);
         });
         watch(() => state.selectedProjects, (selectedProject: Array<string>) => {
             state.formData = { selectedProject: { id: selectedProject[0], name: state.projects[selectedProject[0]]?.label, item_type: 'PROJECT' } };
-        });
+        }, { deep: true });
 
         /* Init */
         (async () => {
