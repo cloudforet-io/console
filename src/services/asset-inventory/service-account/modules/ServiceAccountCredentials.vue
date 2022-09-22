@@ -39,16 +39,19 @@
 </template>
 
 <script lang="ts">
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import {
-    PPaneLayout, PPanelTop, PButton,
-} from '@spaceone/design-system';
-import { isEmpty } from 'lodash';
 import type { PropType } from 'vue';
 import {
     defineComponent, reactive, toRefs, watch,
 } from 'vue';
+
+import {
+    PPaneLayout, PPanelTop, PButton,
+} from '@spaceone/design-system';
+import { isEmpty } from 'lodash';
+
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 

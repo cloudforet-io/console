@@ -48,14 +48,16 @@
 </template>
 
 <script lang="ts">
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    PButton, PPaneLayout,
-} from '@spaceone/design-system';
 import {
     getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PButton, PPaneLayout,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

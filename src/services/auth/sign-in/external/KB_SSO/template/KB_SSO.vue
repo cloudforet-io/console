@@ -19,11 +19,12 @@
 </template>
 
 <script lang="ts">
-import { PButton } from '@spaceone/design-system';
 import {
     defineComponent, getCurrentInstance, computed, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PButton } from '@spaceone/design-system';
 
 
 export default defineComponent({

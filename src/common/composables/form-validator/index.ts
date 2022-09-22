@@ -1,9 +1,10 @@
-import { clone } from 'lodash';
 import type { ComputedRef, UnwrapRef } from 'vue';
 import {
     computed, reactive, ref,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+
+import { clone } from 'lodash';
 
 
 type ValidatorResult = boolean|TranslateResult;

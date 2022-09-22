@@ -11,10 +11,11 @@
 </template>
 
 <script lang="ts">
-import { PI } from '@spaceone/design-system';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
+
+import { PI } from '@spaceone/design-system';
 
 
 import { store } from '@/store';

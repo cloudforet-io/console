@@ -12,11 +12,12 @@
 </template>
 
 <script lang="ts">
-import { PButton } from '@spaceone/design-system';
 import {
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PButton } from '@spaceone/design-system';
 
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';

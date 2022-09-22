@@ -1,8 +1,10 @@
 import type { TimeUnit } from '@amcharts/amcharts4/core';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+
+
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type { CostQueryFilters, Period, Granularity } from '@/services/cost-explorer/type';

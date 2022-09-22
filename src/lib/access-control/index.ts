@@ -1,5 +1,6 @@
-import { clone } from 'lodash';
 import type { Route } from 'vue-router';
+
+import { clone } from 'lodash';
 
 import type { AccessLevel, PagePermissionTuple, PagePermissionType } from '@/lib/access-control/config';
 import { ACCESS_LEVEL, PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';

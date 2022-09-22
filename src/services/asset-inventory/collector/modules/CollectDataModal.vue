@@ -52,16 +52,18 @@
 <script lang="ts">
 
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    PButtonModal, PLazyImg, PDefinition,
-} from '@spaceone/design-system';
-import { get } from 'lodash';
 import {
     toRefs, reactive, computed, watch, getCurrentInstance,
 } from 'vue';
 import type { SetupContext } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PButtonModal, PLazyImg, PDefinition,
+} from '@spaceone/design-system';
+import { get } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { TimeStamp } from '@/models';
 import { store } from '@/store';

@@ -24,12 +24,13 @@
 <script lang="ts">
 
 
-import { PDataLoader } from '@spaceone/design-system';
-import { sortBy } from 'lodash';
 import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
+
+import { PDataLoader } from '@spaceone/design-system';
+import { sortBy } from 'lodash';
 
 
 import { SpaceRouter } from '@/router';

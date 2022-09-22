@@ -54,13 +54,14 @@
 </template>
 
 <script lang="ts">
-import { PDataLoader } from '@spaceone/design-system';
 import type { PropType, SetupContext } from 'vue';
 import {
     computed,
     defineComponent,
     reactive, toRefs, watch,
 } from 'vue';
+
+import { PDataLoader } from '@spaceone/design-system';
 
 
 import { i18n } from '@/translations';

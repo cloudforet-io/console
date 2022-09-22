@@ -9,11 +9,12 @@
 </template>
 
 <script lang="ts">
-import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 
 
 import { store } from '@/store';

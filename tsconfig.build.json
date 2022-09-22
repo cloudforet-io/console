@@ -5,13 +5,13 @@
     "outDir": "dist",
     "types": ["webpack-env"],
     "paths": {
-      "@/*": ["src/*", "packages/@spaceone/console-core-lib/dist/*"],
-      "@spaceone/console-core-lib": ["packages/@spaceone/console-core-lib/dist/"],
-      "@spaceone/console-core-lib/*": ["packages/@spaceone/console-core-lib/dist/*"],
-      "packages/*": ["packages/*"]
+      "@/*": ["src/*", "packages/cloudforet/core-lib/dist/*"],
+      "@cloudforet/*": ["packages/cloudforet/*"],
+      "@cloudforet/core-lib": ["packages/cloudforet/core-lib/dist/"],
+      "@cloudforet/core-lib/*": ["packages/cloudforet/core-lib/dist/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
   "exclude": ["node_modules", "src/**/*.stories.ts", "__tests__", "packages"],
-  "references": [{"path": "packages/@spaceone/console-core-lib/tsconfig.ref.json"}]
+  "references": [{"path": "packages/cloudforet/core-lib/tsconfig.ref.json"}]
 }

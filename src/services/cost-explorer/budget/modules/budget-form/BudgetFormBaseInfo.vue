@@ -22,11 +22,12 @@
 
 <script lang="ts">
 import {
-    PFieldGroup, PPaneLayout, PPanelTop, PTextInput,
-} from '@spaceone/design-system';
-import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+
+import {
+    PFieldGroup, PPaneLayout, PPanelTop, PTextInput,
+} from '@spaceone/design-system';
 
 
 import { i18n } from '@/translations';

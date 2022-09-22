@@ -17,12 +17,14 @@
 </template>
 
 <script lang="ts">
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { PPageTitle } from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PPageTitle } from '@spaceone/design-system';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 
 import { i18n } from '@/translations';

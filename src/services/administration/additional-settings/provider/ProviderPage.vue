@@ -10,15 +10,16 @@
 </template>
 
 <script lang="ts">
-import { PPageTitle, PDivider } from '@spaceone/design-system';
 import {
     reactive, toRefs,
 } from 'vue';
 
+import { PPageTitle, PDivider } from '@spaceone/design-system';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+
 
 export default {
     name: 'ProviderPage',

@@ -18,11 +18,13 @@
 
 <script lang="ts">
 
-import { commaFormatter, getNumberFromString } from '@spaceone/console-core-lib';
-import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+
+import { PFieldGroup, PTextInput } from '@spaceone/design-system';
+
+import { commaFormatter, getNumberFromString } from '@cloudforet/core-lib';
 
 import { i18n } from '@/translations';
 

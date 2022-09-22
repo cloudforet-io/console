@@ -94,20 +94,23 @@
 
 <script lang="ts">
 
-import { commaFormatter } from '@spaceone/console-core-lib';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
+
 import {
     PTab, PPageTitle, PButtonModal,
     PButton, PCopyButton, PBreadcrumbs, PIconButton, PBadge, PDataLoader,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { find } from 'lodash';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
+
+
+import { commaFormatter } from '@cloudforet/core-lib';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

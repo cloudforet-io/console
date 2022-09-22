@@ -16,11 +16,12 @@
 
 <script lang="ts">
 import {
-    PPaneLayout, PPanelTop,
-} from '@spaceone/design-system';
-import {
     reactive, toRefs, watch,
 } from 'vue';
+
+import {
+    PPaneLayout, PPanelTop,
+} from '@spaceone/design-system';
 
 import { store } from '@/store';
 

@@ -5,11 +5,12 @@
 </template>
 
 <script lang="ts">
-import { PBadge } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
+
+import { PBadge } from '@spaceone/design-system';
 
 import { ACCOUNT_TYPE, ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/service-account/config';
 import type { AccountType } from '@/services/asset-inventory/service-account/type';

@@ -41,7 +41,6 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 import type { SetupContext } from 'vue';
 import {
     getCurrentInstance,
@@ -51,6 +50,8 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
+
+import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 
 import { store } from '@/store';
 

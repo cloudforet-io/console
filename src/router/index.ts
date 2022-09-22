@@ -1,7 +1,8 @@
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import Vue from 'vue';
 import type { RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { ERROR_ROUTE } from '@/router/error-routes';
 

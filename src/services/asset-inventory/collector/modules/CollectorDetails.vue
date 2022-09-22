@@ -27,15 +27,17 @@
 <script lang="ts">
 
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    PPanelTop, PDefinitionTable, PLazyImg, PStatus, PTextList,
-} from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, reactive, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PPanelTop, PDefinitionTable, PLazyImg, PStatus, PTextList,
+} from '@spaceone/design-system';
+
+import { iso8601Formatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 

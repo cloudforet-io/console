@@ -39,10 +39,11 @@
 
 <script lang="ts">
 
-import { PI } from '@spaceone/design-system';
 import { vOnClickOutside } from '@vueuse/components';
 import { defineComponent } from 'vue';
 import type { PropType, DirectiveFunction, SetupContext } from 'vue';
+
+import { PI } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 

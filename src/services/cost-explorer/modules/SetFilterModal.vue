@@ -59,12 +59,13 @@
 <script lang="ts">
 
 import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+
+import {
     PButtonModal, PCollapsibleList, PTag,
 } from '@spaceone/design-system';
 import { sum } from 'lodash';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
 
 
 import { store } from '@/store';

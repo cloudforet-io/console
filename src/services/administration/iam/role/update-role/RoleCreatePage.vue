@@ -25,9 +25,11 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { PPageTitle, PButton } from '@spaceone/design-system';
 import { reactive, toRefs } from 'vue';
+
+import { PPageTitle, PButton } from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { SpaceRouter } from '@/router';

@@ -44,12 +44,13 @@
 
 <script lang="ts">
 import {
-    PDivider, PI, PLazyImg,
-} from '@spaceone/design-system';
-import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PDivider, PI, PLazyImg,
+} from '@spaceone/design-system';
 
 
 import { getUUID } from '@/lib/component-util/getUUID';

@@ -143,12 +143,14 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { reactive, toRefs, watch } from 'vue';
+
 import {
     PAnchor, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio,
 } from '@spaceone/design-system';
-import { reactive, toRefs, watch } from 'vue';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';

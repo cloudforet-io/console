@@ -31,12 +31,13 @@
 
 <script lang="ts">
 import {
-    PButtonModal, PPaneLayout, PTextarea, PFieldGroup, PEmpty,
-} from '@spaceone/design-system';
-import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PButtonModal, PPaneLayout, PTextarea, PFieldGroup, PEmpty,
+} from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 

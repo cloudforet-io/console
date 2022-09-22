@@ -35,13 +35,15 @@
 <script lang="ts">
 
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { PDataTable, PPanelTop, PButton } from '@spaceone/design-system';
-import { get, camelCase } from 'lodash';
 import {
     computed, reactive, toRefs, watch, getCurrentInstance,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PDataTable, PPanelTop, PButton } from '@spaceone/design-system';
+import { get, camelCase } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';

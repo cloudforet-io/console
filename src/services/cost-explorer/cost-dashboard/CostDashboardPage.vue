@@ -81,14 +81,16 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+
 import {
     PI, PIconButton, PButton, PPageTitle,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { SpaceRouter } from '@/router';

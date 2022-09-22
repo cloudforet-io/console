@@ -27,15 +27,17 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    PButtonModal, PFieldGroup, PTextInput,
-} from '@spaceone/design-system';
 import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PButtonModal, PFieldGroup, PTextInput,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

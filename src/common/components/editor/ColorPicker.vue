@@ -25,12 +25,13 @@
 </template>
 
 <script lang="ts">
-import { PI, PSelectDropdown } from '@spaceone/design-system';
-import type { Editor } from '@tiptap/core';
 import type { PropType, SetupContext } from 'vue';
 import {
     defineComponent, reactive, toRefs,
 } from 'vue';
+
+import { PI, PSelectDropdown } from '@spaceone/design-system';
+import type { Editor } from '@tiptap/core';
 
 
 import {

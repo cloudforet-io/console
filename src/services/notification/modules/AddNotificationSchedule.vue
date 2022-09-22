@@ -46,15 +46,16 @@
 </template>
 
 <script lang="ts">
-import {
-    PRadio, PSelectButton, PSelectDropdown,
-} from '@spaceone/design-system';
-import { range } from 'lodash';
 import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PRadio, PSelectButton, PSelectDropdown,
+} from '@spaceone/design-system';
+import { range } from 'lodash';
 
 
 import { store } from '@/store';

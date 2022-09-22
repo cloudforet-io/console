@@ -26,9 +26,10 @@
 
 <script lang="ts">
 
+import { computed, reactive, toRefs } from 'vue';
+
 import { PPopover } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { computed, reactive, toRefs } from 'vue';
 
 import { store } from '@/store';
 

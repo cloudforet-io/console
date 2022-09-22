@@ -32,13 +32,15 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    PPageTitle,
-} from '@spaceone/design-system';
 import {
     computed, onMounted, reactive, toRefs, watch,
 } from 'vue';
+
+import {
+    PPageTitle,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 

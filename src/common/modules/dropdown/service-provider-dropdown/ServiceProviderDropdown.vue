@@ -29,9 +29,10 @@
 </template>
 
 <script lang="ts">
-import { PSelectDropdown, PLazyImg } from '@spaceone/design-system';
 import type { SetupContext } from 'vue';
 import { computed, reactive, toRefs } from 'vue';
+
+import { PSelectDropdown, PLazyImg } from '@spaceone/design-system';
 
 
 import { store } from '@/store';

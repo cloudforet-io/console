@@ -1,5 +1,6 @@
-import { upperCase } from 'lodash';
 import type { RouteConfig } from 'vue-router';
+
+import { upperCase } from 'lodash';
 
 import { store } from '@/store';
 

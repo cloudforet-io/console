@@ -9,11 +9,12 @@
 
 <script lang="ts">
 import {
-    PPageTitle, PPaneLayout,
-} from '@spaceone/design-system';
-import {
     reactive, toRefs,
 } from 'vue';
+
+import {
+    PPageTitle, PPaneLayout,
+} from '@spaceone/design-system';
 
 
 import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';

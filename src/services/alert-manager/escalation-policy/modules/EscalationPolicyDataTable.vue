@@ -43,12 +43,13 @@
 
 <script lang="ts">
 
+import { computed, reactive, toRefs } from 'vue';
+
 import {
     PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { capitalize } from 'lodash';
-import { computed, reactive, toRefs } from 'vue';
 
 
 import { store } from '@/store';

@@ -42,11 +42,12 @@
 
 <script lang="ts">
 
+import { computed, reactive, toRefs } from 'vue';
+
 import {
     PCollapsibleToggle, PSelectCard,
 } from '@spaceone/design-system';
 import { flattenDeep, startCase } from 'lodash';
-import { computed, reactive, toRefs } from 'vue';
 
 import { defaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import type { DefaultLayout, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';

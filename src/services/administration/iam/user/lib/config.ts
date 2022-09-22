@@ -1,8 +1,8 @@
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
-} from '@spaceone/console-core-lib/component-util/query-search';
-import type { KeyItem } from '@spaceone/console-core-lib/component-util/query-search/type';
+} from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItem } from '@cloudforet/core-lib/component-util/query-search/type';
 
 import styles from '@/styles/colors';
 

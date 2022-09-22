@@ -5,10 +5,11 @@
 </template>
 
 <script lang="ts">
-import { PPaneLayout } from '@spaceone/design-system';
 import {
     reactive, toRefs,
 } from 'vue';
+
+import { PPaneLayout } from '@spaceone/design-system';
 
 
 export default {

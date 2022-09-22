@@ -61,12 +61,13 @@
 </template>
 
 <script lang="ts">
-import {
-    PButton, PI, PIconButton, PDataLoader,
-} from '@spaceone/design-system';
 import type { SetupContext } from 'vue';
 import { computed, reactive, toRefs } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+
+import {
+    PButton, PI, PIconButton, PDataLoader,
+} from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

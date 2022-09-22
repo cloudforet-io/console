@@ -31,11 +31,12 @@
 </template>
 
 <script lang="ts">
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import {
     computed, defineComponent, getCurrentInstance, reactive,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';

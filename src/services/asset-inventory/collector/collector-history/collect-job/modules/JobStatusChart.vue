@@ -34,8 +34,6 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
 import {
     computed,
     getCurrentInstance,
@@ -45,6 +43,10 @@ import {
     toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

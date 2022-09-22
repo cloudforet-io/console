@@ -22,10 +22,12 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { computed, reactive, toRefs } from 'vue';
+
 import { PSelectDropdown } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
-import { computed, reactive, toRefs } from 'vue';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';

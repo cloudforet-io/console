@@ -1,14 +1,15 @@
-import componentEN from '@spaceone/design-system/src/translations/language-pack/en.json';
-import componentJA from '@spaceone/design-system/src/translations/language-pack/ja.json';
-import componentKO from '@spaceone/design-system/src/translations/language-pack/ko.json';
 import Vue from 'vue';
 import type { IVueI18n, LocaleMessageObject } from 'vue-i18n';
 import VueI18n from 'vue-i18n';
 
+import componentEN from '@spaceone/design-system/src/translations/language-pack/en.json';
+import componentJA from '@spaceone/design-system/src/translations/language-pack/ja.json';
+import componentKO from '@spaceone/design-system/src/translations/language-pack/ko.json';
 
-import en from 'packages/language-pack/en.json';
-import ja from 'packages/language-pack/ja.json';
-import ko from 'packages/language-pack/ko.json';
+import en from '@cloudforet/language-pack/en.json';
+import ja from '@cloudforet/language-pack/ja.json';
+import ko from '@cloudforet/language-pack/ko.json';
+
 
 import { loadDayjsLocale } from '@/translations/vendors/dayjs';
 

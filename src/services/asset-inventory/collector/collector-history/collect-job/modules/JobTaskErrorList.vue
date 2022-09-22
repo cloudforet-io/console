@@ -52,10 +52,11 @@
 </template>
 
 <script lang="ts">
-import { PDataTable, PPanelTop, PCollapsibleToggle } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+
+import { PDataTable, PPanelTop, PCollapsibleToggle } from '@spaceone/design-system';
 
 
 import { resourceTypeLabels } from '@/lib/reference/type';

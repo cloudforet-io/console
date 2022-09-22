@@ -59,18 +59,20 @@
 </template>
 
 <script lang="ts">
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import type { PropType } from 'vue';
+import {
+    computed, defineComponent, reactive, watch, toRefs,
+} from 'vue';
+
 import {
     PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { get } from 'lodash';
-import type { PropType } from 'vue';
-import {
-    computed, defineComponent, reactive, watch, toRefs,
-} from 'vue';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 

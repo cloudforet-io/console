@@ -37,14 +37,15 @@
 <script lang="ts">
 
 import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
+
+import {
     PSearchDropdown,
 } from '@spaceone/design-system';
 import type {
     SearchDropdownMenuItem,
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
-import {
-    computed, defineComponent, reactive, toRefs,
-} from 'vue';
 
 import { store } from '@/store';
 

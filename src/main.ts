@@ -1,8 +1,9 @@
+import Vue from 'vue';
+import Fragment from 'vue-fragment';
+
 import SpaceDesignSystem from '@spaceone/design-system';
 import PortalVue from 'portal-vue';
 import VTooltip from 'v-tooltip';
-import Vue from 'vue';
-import Fragment from 'vue-fragment';
 
 import directive from '@/directives';
 import { SpaceRouter } from '@/router';

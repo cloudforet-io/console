@@ -41,20 +41,22 @@
 <script lang="ts">
 
 
+import {
+    reactive, toRefs, watch, onUnmounted, computed,
+} from 'vue';
+import type { Location } from 'vue-router';
+
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PSkeleton, PDataLoader,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
 import Color from 'color';
 import { range, orderBy } from 'lodash';
-import {
-    reactive, toRefs, watch, onUnmounted, computed,
-} from 'vue';
-import type { Location } from 'vue-router';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 

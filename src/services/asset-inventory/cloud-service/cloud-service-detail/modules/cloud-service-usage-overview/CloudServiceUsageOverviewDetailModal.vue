@@ -45,10 +45,11 @@
 
 <script lang="ts">
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import type { Filter } from '@spaceone/console-core-lib/space-connector/type';
+import {
+    computed, defineComponent,
+    reactive, toRefs, watch,
+} from 'vue';
+
 import {
     PButtonModal, PDynamicWidget, PQuerySearchTags, PDivider,
 } from '@spaceone/design-system';
@@ -59,10 +60,12 @@ import type {
 import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
-import {
-    computed, defineComponent,
-    reactive, toRefs, watch,
-} from 'vue';
+
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { Filter } from '@cloudforet/core-lib/space-connector/type';
 
 
 import { store } from '@/store';

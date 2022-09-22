@@ -6,10 +6,11 @@
 </template>
 
 <script lang="ts">
-import { PPageTitle } from '@spaceone/design-system';
 import {
     reactive, toRefs,
 } from 'vue';
+
+import { PPageTitle } from '@spaceone/design-system';
 
 
 import BudgetForm from '@/services/cost-explorer/budget/modules/budget-form/BudgetForm.vue';

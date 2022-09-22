@@ -1,7 +1,8 @@
-import dayjs from 'dayjs';
 import {
     computed,
 } from 'vue';
+
+import dayjs from 'dayjs';
 
 
 import { i18n } from '@/translations';

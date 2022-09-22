@@ -25,10 +25,12 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { PAnchor, PDataTable } from '@spaceone/design-system';
 import { getCurrentInstance, reactive, toRefs } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PAnchor, PDataTable } from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { i18n } from '@/translations';

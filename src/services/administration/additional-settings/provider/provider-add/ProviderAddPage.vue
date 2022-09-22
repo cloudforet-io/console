@@ -38,11 +38,12 @@
 
 
 import {
-    PPageTitle, PDivider, PDataLoader, PButtonModal, PIconModal,
-} from '@spaceone/design-system';
-import {
     computed, reactive, toRefs,
 } from 'vue';
+
+import {
+    PPageTitle, PDivider, PDataLoader, PButtonModal, PIconModal,
+} from '@spaceone/design-system';
 
 
 import { store } from '@/store';

@@ -10,13 +10,15 @@
 </template>
 
 <script lang="ts">
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { PAnchor } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router';
+
+import { PAnchor } from '@spaceone/design-system';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { ReferenceItem } from '@/store/modules/reference/type';
 

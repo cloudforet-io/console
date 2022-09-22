@@ -19,8 +19,9 @@
 </template>
 
 <script lang="ts">
-import { PAnchor, PLabel, PLazyImg } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from 'vue';
+
+import { PAnchor, PLabel, PLazyImg } from '@spaceone/design-system';
 
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';

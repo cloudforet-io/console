@@ -35,11 +35,12 @@
 </template>
 
 <script lang="ts">
-import { isEmpty } from 'lodash';
 import {
     toRefs, reactive, computed, getCurrentInstance, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { isEmpty } from 'lodash';
 
 
 import { SpaceRouter } from '@/router';

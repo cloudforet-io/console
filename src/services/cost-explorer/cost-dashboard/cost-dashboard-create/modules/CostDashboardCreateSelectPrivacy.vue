@@ -11,8 +11,9 @@
 </template>
 
 <script lang="ts">
-import { PRadio } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from 'vue';
+
+import { PRadio } from '@spaceone/design-system';
 
 
 import { i18n } from '@/translations';

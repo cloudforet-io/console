@@ -51,15 +51,17 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    PProgressWizard, PSelectDropdown, PLazyImg, PFieldGroup, PTextInput, PPageTitle, PToggleButton,
-} from '@spaceone/design-system';
-import { get, some } from 'lodash';
 import {
     reactive, toRefs, computed, getCurrentInstance,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PProgressWizard, PSelectDropdown, PLazyImg, PFieldGroup, PTextInput, PPageTitle, PToggleButton,
+} from '@spaceone/design-system';
+import { get, some } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

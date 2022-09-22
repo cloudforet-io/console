@@ -70,15 +70,17 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import {
-    PDivider, PI, PEmpty, PPaneLayout, PLazyImg, PDataLoader,
-} from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PDivider, PI, PEmpty, PPaneLayout, PLazyImg, PDataLoader,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 

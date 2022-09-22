@@ -28,13 +28,15 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { PBadge, PI } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 import type { PropType } from 'vue';
+
+import { PBadge, PI } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

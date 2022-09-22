@@ -23,7 +23,6 @@
 </template>
 
 <script lang="ts">
-import { PI, PAnchor } from '@spaceone/design-system';
 import {
     computed,
     getCurrentInstance,
@@ -32,6 +31,8 @@ import {
     toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PI, PAnchor } from '@spaceone/design-system';
 
 
 export default {

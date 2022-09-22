@@ -17,10 +17,12 @@
 <script lang="ts">
 
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { computed, reactive, toRefs } from 'vue';
+
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { find } from 'lodash';
-import { computed, reactive, toRefs } from 'vue';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

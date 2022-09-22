@@ -71,15 +71,18 @@
 </template>
 
 <script lang="ts">
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    PAnchor, PButton, PIconButton, PPageTitle, PLazyImg, PDoubleCheckModal, PButtonModal, PPaneLayout, PPanelTop,
-} from '@spaceone/design-system';
-import { render } from 'ejs';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PAnchor, PButton, PIconButton, PPageTitle, PLazyImg, PDoubleCheckModal, PButtonModal, PPaneLayout, PPanelTop,
+} from '@spaceone/design-system';
+import { render } from 'ejs';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

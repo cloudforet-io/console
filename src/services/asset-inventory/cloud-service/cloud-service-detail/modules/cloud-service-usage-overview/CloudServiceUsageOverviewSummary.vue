@@ -25,11 +25,12 @@
 
 <script lang="ts">
 
-import { PDataLoader, PDynamicWidget, PSkeleton } from '@spaceone/design-system';
-import type { DynamicWidgetFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
 import {
     reactive, toRefs,
 } from 'vue';
+
+import { PDataLoader, PDynamicWidget, PSkeleton } from '@spaceone/design-system';
+import type { DynamicWidgetFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
 
 import { store } from '@/store';
 

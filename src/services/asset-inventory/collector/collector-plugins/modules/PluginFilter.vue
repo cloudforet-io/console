@@ -23,13 +23,14 @@
 
 <script lang="ts">
 import {
-    PRadio,
-    // PCheckBox, PDivider
-} from '@spaceone/design-system';
-import {
     toRefs, reactive,
     // computed,
 } from 'vue';
+
+import {
+    PRadio,
+    // PCheckBox, PDivider
+} from '@spaceone/design-system';
 
 
 import { useProxyValue } from '@/common/composables/proxy-state';

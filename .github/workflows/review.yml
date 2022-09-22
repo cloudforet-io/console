@@ -33,7 +33,10 @@ jobs:
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm install
 
-
+      - name: Transpile Core-Lib
+        run: |
+          npm run tsc --workspace=@cloudforet/core-lib
+          
       - name: ESLint
         run: |
           npm run eslint

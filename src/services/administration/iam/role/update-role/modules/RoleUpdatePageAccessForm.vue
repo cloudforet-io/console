@@ -31,12 +31,13 @@
 
 <script lang="ts">
 
-import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
-import { find } from 'lodash';
 import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+
+import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
+import { find } from 'lodash';
 
 
 import type { RawPagePermission } from '@/lib/access-control/config';

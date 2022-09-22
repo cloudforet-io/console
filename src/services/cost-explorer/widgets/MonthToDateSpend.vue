@@ -46,15 +46,17 @@
 
 <script lang="ts">
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { PI } from '@spaceone/design-system';
-import type { Dayjs } from 'dayjs';
-import dayjs from 'dayjs';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PI } from '@spaceone/design-system';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import type { Currency } from '@/store/modules/display/config';

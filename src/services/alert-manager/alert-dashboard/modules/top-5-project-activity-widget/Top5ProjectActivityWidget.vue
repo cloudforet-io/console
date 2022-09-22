@@ -59,17 +59,19 @@
 
 <script lang="ts">
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import {
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
+
 import {
     PAnchor, PSelectStatus, PStatus, PSkeleton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find } from 'lodash';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

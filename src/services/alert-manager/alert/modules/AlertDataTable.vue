@@ -115,12 +115,10 @@
 </template>
 <script lang="ts">
 
-import { durationFormatter, iso8601Formatter, commaFormatter } from '@spaceone/console-core-lib';
-import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
-import type { KeyItemSet } from '@spaceone/console-core-lib/component-util/query-search/type';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import {
+    computed, onActivated, reactive, toRefs,
+} from 'vue';
+
 import {
     PToolboxTable,
     PButton,
@@ -130,9 +128,13 @@ import {
     PAnchor,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import {
-    computed, onActivated, reactive, toRefs,
-} from 'vue';
+
+import { durationFormatter, iso8601Formatter, commaFormatter } from '@cloudforet/core-lib';
+import { makeDistinctValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 

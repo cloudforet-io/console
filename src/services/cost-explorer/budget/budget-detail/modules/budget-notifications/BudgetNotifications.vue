@@ -94,11 +94,13 @@
 
 <script lang="ts">
 
-import { commaFormatter } from '@spaceone/console-core-lib';
+import { computed, reactive, toRefs } from 'vue';
+
 import {
     PAnchor, PBadge, PButton, PCard, PIconButton, PLottie,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from 'vue';
+
+import { commaFormatter } from '@cloudforet/core-lib';
 
 import { i18n } from '@/translations';
 

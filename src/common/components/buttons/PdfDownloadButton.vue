@@ -39,8 +39,9 @@
 </template>
 
 <script lang="ts">
-import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
 import { defineComponent } from 'vue';
+
+import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
 
 
 import { i18n } from '@/translations';

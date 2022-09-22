@@ -99,11 +99,7 @@
 
 <script lang="ts">
 
-import {
-    PI, PDivider, PButton,
-} from '@spaceone/design-system';
 import { vOnClickOutside } from '@vueuse/components';
-import ejs from 'ejs';
 import {
     computed,
     defineComponent, getCurrentInstance, reactive, toRefs,
@@ -111,6 +107,11 @@ import {
 import type { DirectiveFunction, SetupContext } from 'vue';
 import type { Location } from 'vue-router';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PI, PDivider, PButton,
+} from '@spaceone/design-system';
+import ejs from 'ejs';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

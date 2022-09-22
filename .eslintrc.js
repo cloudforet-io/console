@@ -137,16 +137,19 @@ module.exports = {
                         position: 'before',
                     },
                     {
-                        pattern: '@spaceone/design-system/**',
-                        group: 'external',
+                        pattern: '{@vue*,@vue*/**,vue*,vue*/**}',
+                        group: 'builtin',
+                        position: 'before',
                     },
                     {
-                        pattern: '@spaceone/console-core-lib',
+                        pattern: '{@spaceone/design-system/**}',
                         group: 'external',
+                        position: 'after',
                     },
                     {
-                        pattern: '@spaceone/console-core-lib/**',
-                        group: 'external',
+                        pattern: '@cloudforet/**',
+                        group: 'internal',
+                        position: 'before',
                     },
                     {
                         pattern: '@/router/**',
@@ -194,7 +197,7 @@ module.exports = {
         ],
         'import/namespace': [0, { allowComputed: true }],
     },
-    ignorePatterns: ['src/assets/**', '**/node_modules/**', 'translations/language-pack/**', 'public/lottie.js'],
+    ignorePatterns: ['src/assets/**', '**/node_modules/**', 'packages/cloudforet/language-pack/**', 'public/lottie.js'],
     parserOptions: {
         parser: '@typescript-eslint/parser',
         sourceType: 'module',

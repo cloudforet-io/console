@@ -32,12 +32,13 @@
 
 <script lang="ts">
 
+import { computed, reactive, toRefs } from 'vue';
+import type { Location } from 'vue-router/types/router';
+
 import {
     PButton, PLabel,
 } from '@spaceone/design-system';
 import { capitalize } from 'lodash';
-import { computed, reactive, toRefs } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';

@@ -1,12 +1,15 @@
-import { makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
-import type { KeyItem, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
-import type { Filter } from '@spaceone/console-core-lib/space-connector/type';
-import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { debouncedWatch } from '@vueuse/core';
 import {
     computed, reactive,
 } from 'vue';
 import type { ComputedRef } from 'vue';
+
+import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+
+import { makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItem, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import type { Filter } from '@cloudforet/core-lib/space-connector/type';
+
 
 import { store } from '@/store';
 

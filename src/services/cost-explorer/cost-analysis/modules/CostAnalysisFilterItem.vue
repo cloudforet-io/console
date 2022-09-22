@@ -38,7 +38,10 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
+
 import {
     PSearchDropdown,
 } from '@spaceone/design-system';
@@ -48,9 +51,9 @@ import type {
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
-import {
-    computed, reactive, toRefs,
-} from 'vue';
+
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

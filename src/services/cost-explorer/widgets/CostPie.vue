@@ -44,16 +44,18 @@
 
 <script lang="ts">
 
-import * as am4charts from '@amcharts/amcharts4/charts';
-import type { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
-import * as am4core from '@amcharts/amcharts4/core';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { PSkeleton, PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
+
+import * as am4charts from '@amcharts/amcharts4/charts';
+import type { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { PSkeleton, PDataLoader } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

@@ -9,14 +9,16 @@
 </template>
 
 <script lang="ts">
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    PDynamicLayout,
-} from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
+
+import {
+    PDynamicLayout,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ItemOptions } from '@/component-util/dynamic-layout/layout-schema';
 

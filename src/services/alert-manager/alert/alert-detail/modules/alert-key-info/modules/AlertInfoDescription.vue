@@ -26,8 +26,9 @@
 </template>
 
 <script lang="ts">
-import { PTextarea, PButton } from '@spaceone/design-system';
 import { toRefs } from 'vue';
+
+import { PTextarea, PButton } from '@spaceone/design-system';
 
 
 import { useAlertInfoItem } from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/composables';

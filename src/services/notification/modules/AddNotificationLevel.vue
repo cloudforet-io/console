@@ -14,8 +14,9 @@
 
 <script lang="ts">
 
-import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
 import { reactive, toRefs } from 'vue';
+
+import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
 
 
 const LEVEL_LIST = Object.freeze([

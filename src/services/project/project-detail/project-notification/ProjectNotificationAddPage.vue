@@ -12,13 +12,14 @@
 
 <script lang="ts">
 import {
-    PBreadcrumbs, PPageTitle,
-} from '@spaceone/design-system';
-import {
     computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from 'vue';
 import VueI18n from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PBreadcrumbs, PPageTitle,
+} from '@spaceone/design-system';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 

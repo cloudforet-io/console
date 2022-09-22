@@ -46,8 +46,9 @@
 </template>
 
 <script lang="ts">
-import { PPaneLayout, PAnchor } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from 'vue';
+
+import { PPaneLayout, PAnchor } from '@spaceone/design-system';
 
 
 import { store } from '@/store';

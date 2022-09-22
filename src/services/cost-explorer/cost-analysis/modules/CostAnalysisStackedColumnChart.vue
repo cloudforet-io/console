@@ -9,20 +9,22 @@
 
 <script lang="ts">
 
-import type { XYChart } from '@amcharts/amcharts4/charts';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import * as am4core from '@amcharts/amcharts4/core';
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import {
-    PDataLoader, PSkeleton,
-} from '@spaceone/design-system';
-import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
 import {
     getCurrentInstance,
     reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import type { XYChart } from '@amcharts/amcharts4/charts';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import {
+    PDataLoader, PSkeleton,
+} from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
+
+import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 
 
 import { CURRENCY } from '@/store/modules/display/config';

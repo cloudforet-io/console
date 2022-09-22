@@ -1,5 +1,5 @@
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import type { Query } from '@spaceone/console-core-lib/space-connector/type';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { Tags, TimeStamp } from '@/models';
 

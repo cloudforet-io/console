@@ -59,10 +59,11 @@
 </template>
 
 <script lang="ts">
+import { toRefs } from 'vue';
+
 import {
     PBadge, PButton, PI,
 } from '@spaceone/design-system';
-import { toRefs } from 'vue';
 
 
 import AddNotificationLevel from '@/services/notification/modules/AddNotificationLevel.vue';

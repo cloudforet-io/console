@@ -43,16 +43,18 @@
 <script lang="ts">
 
 
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import {
+    reactive, toRefs, watch, watchEffect,
+} from 'vue';
+
 import {
     PCard, PI, PDatePagination,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find } from 'lodash';
-import {
-    reactive, toRefs, watch, watchEffect,
-} from 'vue';
+
+import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

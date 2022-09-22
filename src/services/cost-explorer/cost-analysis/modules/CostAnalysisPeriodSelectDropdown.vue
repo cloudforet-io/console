@@ -22,14 +22,16 @@
 <script lang="ts">
 
 
-import { PBadge, PSelectDropdown } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import type { Dayjs } from 'dayjs';
-import dayjs from 'dayjs';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+
+import { PBadge, PSelectDropdown } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+
 
 import { i18n } from '@/translations';
 

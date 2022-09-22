@@ -1,4 +1,4 @@
-import API from '@spaceone/console-core-lib/space-connector/api';
+import API from '@cloudforet/core-lib/space-connector/api';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

@@ -26,15 +26,17 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+
 import {
     PPanelTop, PBadge, PSearchTable,
 } from '@spaceone/design-system';
 import type { SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import { store } from '@/store';

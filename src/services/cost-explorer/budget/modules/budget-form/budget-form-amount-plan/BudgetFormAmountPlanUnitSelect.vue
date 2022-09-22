@@ -17,12 +17,13 @@
 </template>
 
 <script lang="ts">
-import { PLabel, PSelectCard } from '@spaceone/design-system';
 import {
     computed,
     reactive, toRefs,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+
+import { PLabel, PSelectCard } from '@spaceone/design-system';
 
 
 import { i18n } from '@/translations';

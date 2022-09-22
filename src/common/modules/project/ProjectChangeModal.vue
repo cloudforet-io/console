@@ -44,10 +44,11 @@
 </template>
 
 <script lang="ts">
-import { PButtonModal, PRadio } from '@spaceone/design-system';
 import { reactive, toRefs, watch } from 'vue';
 import type { SetupContext } from 'vue';
 import type Vue from 'vue';
+
+import { PButtonModal, PRadio } from '@spaceone/design-system';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';

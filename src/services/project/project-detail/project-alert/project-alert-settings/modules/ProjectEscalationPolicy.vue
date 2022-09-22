@@ -56,17 +56,19 @@
 /* eslint-disable camelcase */
 
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import {
+    computed, onActivated, reactive, toRefs, watch,
+} from 'vue';
+
 import {
     PBadge, PDivider, PI, PAnchor,
 } from '@spaceone/design-system';
 import { get, filter } from 'lodash';
-import {
-    computed, onActivated, reactive, toRefs, watch,
-} from 'vue';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import { i18n } from '@/translations';

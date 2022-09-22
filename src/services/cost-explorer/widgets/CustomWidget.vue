@@ -59,17 +59,20 @@
 
 <script lang="ts">
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+
 import { PButton } from '@spaceone/design-system';
 import type {
     DataTableFieldType,
 } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
+
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { i18n } from '@/translations';
