@@ -6,9 +6,10 @@ import type { IVueI18n, LocaleMessageObject } from 'vue-i18n';
 import VueI18n from 'vue-i18n';
 
 
-import en from '@/translations/language-pack/en.json';
-import ja from '@/translations/language-pack/ja.json';
-import ko from '@/translations/language-pack/ko.json';
+import en from 'packages/language-pack/en.json';
+import ja from 'packages/language-pack/ja.json';
+import ko from 'packages/language-pack/ko.json';
+
 import { loadDayjsLocale } from '@/translations/vendors/dayjs';
 
 import { loadFonts } from '@/styles/fonts';
