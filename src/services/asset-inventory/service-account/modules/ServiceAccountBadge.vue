@@ -17,7 +17,7 @@ import type { AccountType } from '@/services/asset-inventory/service-account/typ
 
 interface Props {
     accountType: AccountType;
-    isManaged: boolean;
+    isManaged: 'true' | 'false';
 }
 
 export default defineComponent<Props>({
@@ -32,15 +32,15 @@ export default defineComponent<Props>({
             },
         },
         isManaged: {
-            type: Boolean,
-            default: false,
+            type: String as PropType<'true' | 'false'>,
+            default: 'false',
         },
     },
     setup(props) {
         const state = reactive({
             badgeOption: computed(() => {
                 if (props.accountType === ACCOUNT_TYPE.GENERAL) return ACCOUNT_TYPE_BADGE_OPTION[props.accountType];
-                const trustAccountType = props.isManaged ? 'TRUSTED-MANAGED' : ACCOUNT_TYPE.TRUSTED;
+                const trustAccountType = props.isManaged === 'true' ? 'TRUSTED-MANAGED' : ACCOUNT_TYPE.TRUSTED;
                 return ACCOUNT_TYPE_BADGE_OPTION[trustAccountType];
             }),
         });
