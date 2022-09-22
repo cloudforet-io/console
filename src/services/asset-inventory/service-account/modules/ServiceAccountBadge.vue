@@ -1,17 +1,25 @@
 <template>
-    <p-badge :outline="true" :style-type="ACCOUNT_TYPE_BADGE_OPTION[accountType].styleType">
-        {{ ACCOUNT_TYPE_BADGE_OPTION[accountType] ? ACCOUNT_TYPE_BADGE_OPTION[accountType].label : '' }}
+    <p-badge :style-type="badgeOption.styleType">
+        {{ badgeOption.label }}
     </p-badge>
 </template>
 
 <script lang="ts">
 import { PBadge } from '@spaceone/design-system';
 import type { PropType } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
 
 import { ACCOUNT_TYPE, ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/service-account/config';
 import type { AccountType } from '@/services/asset-inventory/service-account/type';
 
-export default {
+interface Props {
+    accountType: AccountType;
+    isManaged: boolean;
+}
+
+export default defineComponent<Props>({
     name: 'ServiceAccountBadge',
     components: { PBadge },
     props: {
@@ -22,11 +30,23 @@ export default {
                 return Object.values(ACCOUNT_TYPE).includes(value);
             },
         },
+        isManaged: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup() {
+    setup(props) {
+        const state = reactive({
+            badgeOption: computed(() => {
+                if (props.accountType === ACCOUNT_TYPE.GENERAL) return ACCOUNT_TYPE_BADGE_OPTION[props.accountType];
+                const trustAccountType = props.isManaged ? 'TRUST-MANAGED' : ACCOUNT_TYPE.TRUSTED;
+                return ACCOUNT_TYPE_BADGE_OPTION[trustAccountType];
+            }),
+        });
         return {
+            ...toRefs(state),
             ACCOUNT_TYPE_BADGE_OPTION,
         };
     },
-};
+});
 </script>
