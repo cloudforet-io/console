@@ -181,7 +181,7 @@ export default {
 
         // add TRUSTED MANAGED directly
         const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModelForBinding[]): ServiceAccountModelForBinding[] => serviceAccount.map((sa) => {
-            if (sa.service_account_type === ACCOUNT_TYPE.TRUSTED && sa.tags?.is_managed) {
+            if (sa.service_account_type === ACCOUNT_TYPE.TRUSTED && sa.tags?.is_managed === 'true') {
                 return {
                     ...sa,
                     service_account_type: 'TRUSTED-MANAGED',
