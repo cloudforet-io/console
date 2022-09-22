@@ -95,7 +95,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { ACCOUNT_TYPE, ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/service-account/config';
 import ServiceAccountProviderList
     from '@/services/asset-inventory/service-account/modules/ServiceAccountProviderList.vue';
-import type { ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
+import type { ServiceAccountModelForBinding } from '@/services/asset-inventory/service-account/type';
 
 export default {
     name: 'ServiceAccountPage',
@@ -141,7 +141,7 @@ export default {
 
         const tableState = reactive({
             hasManagePermission: useManagePermissionState(),
-            items: [] as ServiceAccountModel[],
+            items: [] as ServiceAccountModelForBinding[],
             schema: null as null|DynamicLayout,
             visibleCustomFieldModal: false,
             accountTypeList: computed(() => [
@@ -169,6 +169,9 @@ export default {
                     { k: 'provider', v: state.selectedProvider, o: '=' },
                     ...tableState.searchFilters,
                 ]);
+            if (tableState.selectedAccountType !== 'all') {
+                apiQuery.addFilter({ k: 'service_account_type', v: tableState.selectedAccountType, o: '=' });
+            }
             const fields = tableState.schema?.options?.fields;
             if (fields) {
                 apiQuery.setOnly(...fields.map(d => d.key).filter(d => !d.startsWith('tags.')), 'service_account_id', 'tags');
@@ -177,7 +180,7 @@ export default {
         };
 
         // add TRUSTED MANAGED directly
-        const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModel[]): ServiceAccountModel[] => serviceAccount.map((sa) => {
+        const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModelForBinding[]): ServiceAccountModelForBinding[] => serviceAccount.map((sa) => {
             if (sa.service_account_type === ACCOUNT_TYPE.TRUSTED && sa.tags?.is_managed) {
                 return {
                     ...sa,
@@ -310,6 +313,9 @@ export default {
             if (replaceQueryHelper.rawQueryString !== JSON.stringify(filterQueryString)) {
                 replaceUrlQuery('filters', replaceQueryHelper.rawQueryStrings);
             }
+        });
+        watch(() => tableState.selectedAccountType, () => {
+            listServiceAccountData();
         });
 
         return {
