@@ -41,10 +41,11 @@ export interface ServiceAccountModel {
     name: string;
     provider: string;
     service_account_id: string;
-    service_account_type?: AccountType;
+    service_account_type?: AccountType | 'TRUSTED-MANAGED';
     data: {
         [key: string]: string;
-    }
+    },
+    tags: {[key: string]: unknown; };
 }
 export type AccountType = typeof ACCOUNT_TYPE[keyof typeof ACCOUNT_TYPE];
 

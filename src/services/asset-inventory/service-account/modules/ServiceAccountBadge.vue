@@ -39,7 +39,7 @@ export default defineComponent<Props>({
         const state = reactive({
             badgeOption: computed(() => {
                 if (props.accountType === ACCOUNT_TYPE.GENERAL) return ACCOUNT_TYPE_BADGE_OPTION[props.accountType];
-                const trustAccountType = props.isManaged ? 'TRUST-MANAGED' : ACCOUNT_TYPE.TRUSTED;
+                const trustAccountType = props.isManaged ? 'TRUSTED-MANAGED' : ACCOUNT_TYPE.TRUSTED;
                 return ACCOUNT_TYPE_BADGE_OPTION[trustAccountType];
             }),
         });
