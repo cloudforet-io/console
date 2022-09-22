@@ -2,7 +2,11 @@
     <p-pane-layout class="service-account-base-information">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')">
             <template #extra>
-                <p-button v-if="mode === 'READ'" icon="ic_edit" @click="handleClickEditButton">
+                <p-button v-if="mode === 'READ'" icon="ic_edit"
+                          style-type="transparent"
+                          :disabled="!editable"
+                          @click="handleClickEditButton"
+                >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
                 <div v-else class="button-wrapper">
@@ -80,6 +84,10 @@ export default {
         serviceAccountId: {
             type: String,
             default: undefined,
+        },
+        editable: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props) {

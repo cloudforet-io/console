@@ -2,7 +2,11 @@
     <p-pane-layout class="service-account-credentials">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')">
             <template #extra>
-                <p-button v-if="mode === 'READ'" icon="ic_edit" @click="handleClickEditButton">
+                <p-button v-if="mode === 'READ'" icon="ic_edit"
+                          style-type="transparent"
+                          :disabled="!editable"
+                          @click="handleClickEditButton"
+                >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
                 <div v-else class="button-wrapper">
@@ -68,6 +72,7 @@ interface Props {
     serviceAccountType: AccountType;
     serviceAccountName?: string;
     projectId?: string;
+    editable: boolean;
 }
 
 export default defineComponent<Props>({
@@ -99,6 +104,10 @@ export default defineComponent<Props>({
         projectId: {
             type: String,
             default: undefined,
+        },
+        editable: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props) {
