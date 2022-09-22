@@ -6,12 +6,12 @@
     "types": ["webpack-env"],
     "paths": {
       "@/*": ["src/*", "packages/@spaceone/console-core-lib/dist/*"],
-      "@spaceone/console-core-lib": ["packages/@spaceone/console-core-lib/dist/"],
-      "@spaceone/console-core-lib/*": ["packages/@spaceone/console-core-lib/dist/*"],
-      "packages/*": ["packages/*"]
+      "@spaceone/console-core-lib": ["packages/cloudforet/core-lib/dist/"],
+      "@spaceone/console-core-lib/*": ["packages/cloudforet/core-lib/dist/*"],
+      "cloudforet/*": ["packages/cloudforet/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
   "exclude": ["node_modules", "src/**/*.stories.ts", "__tests__", "packages"],
-  "references": [{"path": "packages/@spaceone/console-core-lib/tsconfig.ref.json"}]
+  "references": [{"path": "packages/cloudforet/core-lib/tsconfig.ref.json"}]
 }

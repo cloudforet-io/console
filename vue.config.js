@@ -63,8 +63,8 @@ module.exports = {
             /* The code below is for npm link case */
             symlinks: false,
             alias: {
-                '@spaceone/console-core-lib': path.resolve(__dirname, './packages/@spaceone/console-core-lib/dist/'),
-                packages: path.resolve(__dirname, './packages/'),
+                '@spaceone/console-core-lib': path.resolve(__dirname, './packages/cloudforet/core-lib/dist/'),
+                cloudforet: path.resolve(__dirname, './packages/cloudforet/'),
                 vue: path.resolve('./node_modules/vue'),
             },
         },

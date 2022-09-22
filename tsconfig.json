@@ -2,12 +2,13 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@/*": ["src/*", "packages/@spaceone/console-core-lib/src/*"],
-      "@spaceone/console-core-lib": ["packages/@spaceone/console-core-lib/dist/index.d.ts", "packages/@spaceone/console-core-lib/src/index.ts"],
-      "@spaceone/console-core-lib/*": ["packages/@spaceone/console-core-lib/dist/*", "packages/@spaceone/console-core-lib/src/*"]
+      "@/*": ["src/*", "packages/cloudforet/core-lib/src/*"],
+      "@spaceone/console-core-lib": ["packages/cloudforet/core-lib/dist/index.d.ts", "packages/cloudforet/core-lib/src/index.ts"],
+      "@spaceone/console-core-lib/*": ["packages/cloudforet/core-lib/dist/*", "packages/cloudforet/core-lib/src/*"],
+      "cloudforet/*": ["packages/cloudforet/*"]
     }
   },
   "include": [ "**/*.ts", "**/*.tsx", "**/*.vue" ],
   "exclude": [ "node_modules", "src/assets", "**/*.stories.ts", "dist" ],
-  "references": [{"path": "packages/@spaceone/console-core-lib/tsconfig.ref.json"}]
+  "references": [{"path": "packages/cloudforet/core-lib/tsconfig.ref.json"}]
 }
