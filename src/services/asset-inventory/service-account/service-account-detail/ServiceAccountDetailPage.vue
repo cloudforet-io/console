@@ -27,8 +27,13 @@
             </template>
         </p-page-title>
         <div class="content-wrapper">
-            <!--            FIXME:: below <service-account-account-type /> should changed to badge-->
-            <service-account-account-type />
+            <p-pane-layout class="service-account-account-type">
+                <!--                song-lang-->
+                <p-panel-top title="Account Type" />
+                <div class="badge-wrapper">
+                    <service-account-badge :account-type="item.service_account_type" />
+                </div>
+            </p-pane-layout>
             <service-account-project-detail :project-id="projectId" :service-account-item="item" />
             <service-account-attached-general-accounts v-if="item.service_account_type === ACCOUNT_TYPE.TRUSTED"
                                                        :service-account-id="serviceAccountId"
@@ -65,7 +70,7 @@
 <script lang="ts">
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    PAnchor, PButton, PIconButton, PPageTitle, PLazyImg, PDoubleCheckModal, PButtonModal,
+    PAnchor, PButton, PIconButton, PPageTitle, PLazyImg, PDoubleCheckModal, PButtonModal, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
 import { render } from 'ejs';
 import {
@@ -84,10 +89,9 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
-import ServiceAccountAccountType
-    from '@/services/asset-inventory/service-account/modules/ServiceAccountAccountType.vue';
 import ServiceAccountAttachedGeneralAccounts
     from '@/services/asset-inventory/service-account/modules/ServiceAccountAttachedGeneralAccounts.vue';
+import ServiceAccountBadge from '@/services/asset-inventory/service-account/modules/ServiceAccountBadge.vue';
 import ServiceAccountBaseInformation
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
 import ServiceAccountCredentials
@@ -103,7 +107,7 @@ export default defineComponent({
         ServiceAccountAttachedGeneralAccounts,
         ServiceAccountBaseInformation,
         ServiceAccountProjectDetail,
-        ServiceAccountAccountType,
+        ServiceAccountBadge,
         PIconButton,
         PPageTitle,
         PButton,
@@ -111,6 +115,8 @@ export default defineComponent({
         PLazyImg,
         PDoubleCheckModal,
         PButtonModal,
+        PPaneLayout,
+        PPanelTop,
     },
     props: {
         serviceAccountId: {
@@ -235,6 +241,9 @@ export default defineComponent({
         gap: 1rem;
         .service-account-account-type {
             @apply col-span-6;
+            .badge-wrapper {
+                padding: 0 1rem;
+            }
         }
         .service-account-project-detail {
             @apply col-span-6;
