@@ -40,32 +40,35 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import {
     PPaneLayout, PPanelTop, PButton,
 } from '@spaceone/design-system';
+import { isEmpty } from 'lodash';
 import type { PropType } from 'vue';
 import {
-    defineComponent, reactive, toRefs, watch,
+    defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
+import type { Vue } from 'vue/types/vue';
+
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 import ServiceAccountCredentialsDetail
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentialsDetail.vue';
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentialsForm.vue';
-import type { PageMode, CredentialForm, AccountType } from '@/services/asset-inventory/service-account/type';
-import { EDIT_MODE } from '@/services/asset-inventory/service-account/type';
+import type {
+    PageMode, CredentialForm, AccountType, CredentialModel,
+} from '@/services/asset-inventory/service-account/type';
 
 
 interface Props {
     provider?: string;
     serviceAccountId?: string;
     serviceAccountType: AccountType;
-}
-
-interface CredentialModel {
-    schema?: string;
-    provider?: string;
-    secret_type?: string;
-    [key: string]: string | undefined;
+    serviceAccountName?: string;
+    projectId?: string;
 }
 
 export default defineComponent<Props>({
@@ -90,8 +93,17 @@ export default defineComponent<Props>({
             type: String as PropType<AccountType>,
             default: 'GENERAL',
         },
+        serviceAccountName: {
+            type: String,
+            default: undefined,
+        },
+        projectId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             mode: 'READ' as PageMode,
@@ -108,7 +120,11 @@ export default defineComponent<Props>({
 
                 const getQuery = () => apiQuery
                     .setFilters([{ k: 'service_account_id', v: serviceAccountId, o: '=' }]);
-                const { results } = await SpaceConnector.client.secret.secret.list({ query: getQuery().data });
+                let listApi = SpaceConnector.client.secret.secret.list;
+                if (props.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
+                    listApi = SpaceConnector.client.secret.trustedSecret.list;
+                }
+                const { results } = await listApi({ query: getQuery().data });
                 if (results.length) {
                     state.credentialData = results[0];
                     state.credentialForm.selectedSecretType = results[0].schema;
@@ -120,6 +136,69 @@ export default defineComponent<Props>({
                 state.loading = false;
             }
         };
+        const deleteGeneralSecret = async () => {
+            try {
+                await SpaceConnector.client.secret.secret.delete({
+                    secret_id: state.credentialData.secret_id,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+        const createGeneralSecret = async () => {
+            try {
+                let data;
+                if (state.credentialForm.activeDataType === 'json') {
+                    data = JSON.parse(state.credentialForm.credentialJson);
+                } else if (state.credentialForm.activeDataType === 'input') {
+                    data = state.credentialForm;
+                }
+
+                await SpaceConnector.client.secret.secret.create({
+                    name: (props.serviceAccountName ?? '') + props.serviceAccountId,
+                    data,
+                    schema: state.credentialForm.selectedSecretType,
+                    secret_type: 'CREDENTIALS',
+                    service_account_id: props.serviceAccountId,
+                    project_id: props.projectId || null,
+                    trusted_secret_id: state.credentialForm.attachedTrustedAccountId,
+                });
+                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm);
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+            }
+        };
+        const updateTrustedSecret = async (): Promise<boolean> => {
+            try {
+                await SpaceConnector.client.secret.trustedSecret.update({
+                    trusted_secret_id: state.credentialData.trusted_secret_id,
+                    schema: state.credentialForm.selectedSecretType,
+                });
+                return true;
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+                return false;
+            }
+        };
+        const updateDataTrustedSecret = async () => {
+            try {
+                let data;
+                if (state.credentialForm.activeDataType === 'json') {
+                    data = JSON.parse(state.credentialForm.credentialJson);
+                } else if (state.credentialForm.activeDataType === 'input') {
+                    data = state.credentialForm;
+                }
+
+                await SpaceConnector.client.secret.trustedSecret.updateData({
+                    trusted_secret_id: state.credentialData.trusted_secret_id,
+                    data,
+                });
+
+                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm);
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+            }
+        };
 
         /* Event */
         const handleClickEditButton = () => {
@@ -128,23 +207,32 @@ export default defineComponent<Props>({
         const handleClickCancelButton = () => {
             state.mode = 'READ';
         };
-        const handleClickSaveButton = () => {
+        const handleClickSaveButton = async () => {
             if (!state.isFormValid) return;
+            if (props.serviceAccountType === ACCOUNT_TYPE.GENERAL) {
+                if (!isEmpty(state.credentialData)) await deleteGeneralSecret();
+                await createGeneralSecret();
+            } else {
+                let isValid = true;
+                if (state.credentialForm.selectedSecretType !== state.credentialData.schema) {
+                    isValid = await updateTrustedSecret();
+                }
+                if (isValid) await updateDataTrustedSecret();
+            }
+            await getCredentialData(props.serviceAccountId as string);
             state.mode = 'READ';
-            console.log('save!');
         };
         const handleChangeCredentialForm = (credentialForm) => {
             state.credentialForm = credentialForm;
         };
 
         /* Watcher */
-        watch(() => props.serviceAccountId, (serviceAccountId) => {
+        watch([() => props.serviceAccountId, () => props.serviceAccountType], ([serviceAccountId]) => {
             if (serviceAccountId) getCredentialData(serviceAccountId);
         }, { immediate: true });
 
         return {
             ...toRefs(state),
-            EDIT_MODE,
             handleClickEditButton,
             handleClickCancelButton,
             handleClickSaveButton,
