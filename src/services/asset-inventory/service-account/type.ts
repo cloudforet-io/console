@@ -59,6 +59,10 @@ export interface CredentialForm {
     attachedTrustedAccountId?: string;
 }
 export interface CredentialModel {
+    secret_id?: string;
+    trusted_secret_id?: string;
+    service_account_id?: string;
+    name?: string;
     schema?: string;
     provider?: string;
     secret_type?: string;
