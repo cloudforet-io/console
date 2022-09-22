@@ -58,12 +58,14 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 import ServiceAccountBaseInformationDetail
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformationDetail.vue';
 import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformationForm.vue';
 import type {
     BaseInformationForm, PageMode, ProviderModel, ServiceAccountModel,
+    ServiceAccountModelForBinding,
 } from '@/services/asset-inventory/service-account/type';
 import { EDIT_MODE } from '@/services/asset-inventory/service-account/type';
 
@@ -115,13 +117,25 @@ export default {
                 state.providerData = {};
             }
         };
+
+        // add TRUSTED MANAGED directly
+        const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModelForBinding): ServiceAccountModelForBinding => {
+            if (serviceAccount.service_account_type === ACCOUNT_TYPE.TRUSTED && serviceAccount.tags?.is_managed) {
+                return {
+                    ...serviceAccount,
+                    service_account_type: 'TRUSTED-MANAGED',
+                };
+            }
+            return serviceAccount;
+        };
         const getServiceAccount = async (serviceAccountId) => {
             try {
                 state.loading = true;
                 const result = await SpaceConnector.client.identity.serviceAccount.get({
                     service_account_id: serviceAccountId,
                 });
-                state.serviceAccountData = result;
+
+                state.serviceAccountData = serviceAccountPreprocessor(result);
                 state.baseInformationForm = {
                     accountName: result.name,
                     customSchemaForm: result.data,
