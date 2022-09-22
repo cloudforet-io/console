@@ -1684,6 +1684,10 @@
 			}
 		},
 		"SERVICE_ACCOUNT": {
+			"DELETE_CHECK_MODAL": {
+				"NOTE": "",
+				"TITLE": ""
+			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "",
 				"ALT_E_UPDATE_BASE_INFO": "",
