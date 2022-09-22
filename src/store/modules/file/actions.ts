@@ -1,5 +1,5 @@
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import axios from 'axios';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import type { Action } from 'vuex';
 
 import { i18n } from '@/translations';

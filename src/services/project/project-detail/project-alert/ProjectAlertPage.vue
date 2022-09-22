@@ -22,9 +22,9 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButtonTab, PButton } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs, watch,
 } from 'vue';

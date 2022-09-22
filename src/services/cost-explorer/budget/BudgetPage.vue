@@ -26,11 +26,11 @@
 
 <script lang="ts">
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import {
     PPageTitle, PDivider, PButton,
 } from '@spaceone/design-system';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';

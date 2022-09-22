@@ -17,8 +17,8 @@
 </template>
 
 <script lang="ts">
-import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { PPageTitle } from '@spaceone/design-system';
+import { QueryHelper } from 'cloudforet/core-lib/query';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';

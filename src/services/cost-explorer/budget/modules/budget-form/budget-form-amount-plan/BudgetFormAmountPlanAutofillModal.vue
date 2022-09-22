@@ -42,8 +42,8 @@
 
 <script lang="ts">
 
-import { commaFormatter, getNumberFromString } from '@spaceone/console-core-lib';
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+import { commaFormatter, getNumberFromString } from 'cloudforet/core-lib';
 import {
     computed,
     reactive, toRefs, watch,

@@ -43,12 +43,12 @@
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PSkeleton, PDataLoader,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import Color from 'color';
 import { range, orderBy } from 'lodash';
 import {

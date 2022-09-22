@@ -147,10 +147,6 @@
 <script lang="ts">
 
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PHorizontalLayout, PTab, PDynamicLayout,
     PPageTitle, PEmpty, PTableCheckModal, PButton,
@@ -161,6 +157,10 @@ import type {
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { debouncedWatch } from '@vueuse/core';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import dayjs from 'dayjs';
 import { isEmpty, get } from 'lodash';
 import {

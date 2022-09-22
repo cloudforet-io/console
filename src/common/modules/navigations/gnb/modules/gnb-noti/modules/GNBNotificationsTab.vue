@@ -86,13 +86,13 @@
 
 <script lang="ts">
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PDataLoader, PButtonModal, PI, PAnchor, PDefinitionTable, PButton,
 } from '@spaceone/design-system';
 import { useInfiniteScroll } from '@vueuse/core';
+import { iso8601Formatter } from 'cloudforet/core-lib';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import type { SetupContext } from 'vue';

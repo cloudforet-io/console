@@ -69,11 +69,11 @@
 
 <script lang="ts">
 
-import { byteFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import {
     PDataTable, PTextPagination, PStatus, PI,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { byteFormatter, numberFormatter } from 'cloudforet/core-lib';
 import {
     computed, reactive, toRefs,
 } from 'vue';

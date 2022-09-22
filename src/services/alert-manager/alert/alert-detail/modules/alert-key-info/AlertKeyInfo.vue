@@ -68,11 +68,11 @@
 
 <script lang="ts">
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPaneLayout, PDefinitionTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
+import { iso8601Formatter } from 'cloudforet/core-lib';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed, reactive, toRefs,
 } from 'vue';

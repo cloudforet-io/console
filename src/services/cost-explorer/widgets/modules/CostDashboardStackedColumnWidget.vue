@@ -32,13 +32,13 @@
 import type { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { commaFormatter, numberFormatter } from 'cloudforet/core-lib';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,

@@ -141,11 +141,7 @@ module.exports = {
                         group: 'external',
                     },
                     {
-                        pattern: '@spaceone/console-core-lib',
-                        group: 'external',
-                    },
-                    {
-                        pattern: '@spaceone/console-core-lib/**',
+                        pattern: 'cloudforet/**',
                         group: 'external',
                     },
                     {

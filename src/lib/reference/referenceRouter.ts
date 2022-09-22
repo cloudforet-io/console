@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { QueryHelper } from 'cloudforet/core-lib/query';
 import { concat } from 'lodash';
 import type { Location } from 'vue-router';
 

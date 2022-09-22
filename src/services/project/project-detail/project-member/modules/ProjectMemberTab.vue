@@ -73,10 +73,6 @@
 
 <script lang="ts">
 
-import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import type { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PAnchor,
     PBadge,
@@ -88,6 +84,10 @@ import {
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { setApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
+import type { ToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,

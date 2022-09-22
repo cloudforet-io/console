@@ -80,10 +80,10 @@
 </template>
 
 <script lang="ts">
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPaneLayout, PFieldGroup, PTextInput, PRadio, PSearchDropdown, PCheckBox, PButton,
 } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import type { ComputedRef, PropType } from 'vue';
 import {
     computed,

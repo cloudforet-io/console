@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { QueryHelper } from 'cloudforet/core-lib/query';
 import {
     getCurrentInstance,
     onActivated, reactive, toRefs,

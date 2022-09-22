@@ -74,13 +74,13 @@
 <script lang="ts">
 
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PAnchor, PSearchTable,
 } from '@spaceone/design-system';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import dayjs from 'dayjs';
 import numeral from 'numeral';
 import {

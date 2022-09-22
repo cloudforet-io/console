@@ -46,10 +46,10 @@
 <script lang="ts">
 
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PIconButton, PPaneLayout, PButton,
 } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     camelCase, isEmpty, get,
 } from 'lodash';

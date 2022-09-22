@@ -39,12 +39,12 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PBadge, PSelectDropdown, PCheckBox, PI, PTooltip,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 import {

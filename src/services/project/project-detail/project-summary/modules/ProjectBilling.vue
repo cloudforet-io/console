@@ -109,8 +109,6 @@
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton,
     PDataLoader,
@@ -120,6 +118,8 @@ import {
     PIconButton,
     PSkeleton,
 } from '@spaceone/design-system';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import { orderBy, range } from 'lodash';
 import {

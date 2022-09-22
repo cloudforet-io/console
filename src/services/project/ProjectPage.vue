@@ -115,14 +115,14 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    isInstanceOfAuthorizationError,
-} from '@spaceone/console-core-lib/space-connector/error';
 import {
     PI, PPageTitle, PBreadcrumbs, PButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import {
+    isInstanceOfAuthorizationError,
+} from 'cloudforet/core-lib/space-connector/error';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';

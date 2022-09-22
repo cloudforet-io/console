@@ -28,8 +28,8 @@
 
 <script lang="ts">
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { PListCard, PI } from '@spaceone/design-system';
+import { iso8601Formatter } from 'cloudforet/core-lib';
 import { computed, reactive, toRefs } from 'vue';
 
 import { store } from '@/store';

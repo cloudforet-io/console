@@ -1,4 +1,4 @@
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import type { Action } from 'vuex';
 
 import type { CloudServiceTypeReferenceMap, CloudServiceTypeReferenceState } from '@/store/modules/reference/cloud-service-type/type';

@@ -106,12 +106,12 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PFieldGroup, PBoxTab, PSearchDropdown, PTooltip, PI, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { debounce } from 'lodash';
 import type { SetupContext } from 'vue';
 import {

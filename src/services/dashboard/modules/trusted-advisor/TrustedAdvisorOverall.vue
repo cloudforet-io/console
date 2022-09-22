@@ -30,9 +30,9 @@
 import type { PieChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from 'vue';

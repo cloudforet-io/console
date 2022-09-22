@@ -1,4 +1,4 @@
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
 import { isEmpty } from 'lodash';
 import type { Action } from 'vuex';
 

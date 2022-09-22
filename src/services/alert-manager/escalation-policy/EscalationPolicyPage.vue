@@ -61,17 +61,17 @@
 <script lang="ts">
 
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
-import {
-    makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler,
-} from '@spaceone/console-core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PPageTitle, PButton, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { iso8601Formatter } from 'cloudforet/core-lib';
+import {
+    makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler,
+} from 'cloudforet/core-lib/component-util/query-search';
+import { getApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import {
     reactive, toRefs, computed,
 } from 'vue';

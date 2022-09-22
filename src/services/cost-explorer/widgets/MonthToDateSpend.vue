@@ -46,9 +46,9 @@
 
 <script lang="ts">
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PI } from '@spaceone/design-system';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import {

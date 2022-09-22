@@ -94,9 +94,6 @@
 
 <script lang="ts">
 
-import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PBadge,
     PButton,
@@ -105,6 +102,9 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { getApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';

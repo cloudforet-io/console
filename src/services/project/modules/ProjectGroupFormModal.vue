@@ -28,9 +28,9 @@
 <script lang="ts">
 
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';

@@ -53,13 +53,13 @@
 </template>
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonTab, PDynamicLayout, PPanelTop, PSelectStatus, PDataLoader,
 } from '@spaceone/design-system';
 import type { DynamicLayoutEventListener } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import {

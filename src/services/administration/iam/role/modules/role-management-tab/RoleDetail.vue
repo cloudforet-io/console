@@ -58,12 +58,12 @@
 <script lang="ts">
 
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PAnchor, PBadge, PDataTable, PDefinitionTable, PPanelTop,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { iso8601Formatter } from 'cloudforet/core-lib';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';

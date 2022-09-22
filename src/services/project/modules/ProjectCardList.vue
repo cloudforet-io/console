@@ -122,9 +122,6 @@
 
 <script lang="ts">
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PSkeleton, PI, PButton, PToolbox, PDataLoader,
 } from '@spaceone/design-system';
@@ -132,6 +129,9 @@ import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/te
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import bytes from 'bytes';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import { range, uniq } from 'lodash';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,

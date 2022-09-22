@@ -78,10 +78,10 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PPageTitle, PIconButton, PBadge, PPaneLayout, PLabel, PTextEditor, PButton, PTextInput, PFieldGroup,
 } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed, reactive, toRefs, defineComponent, onUnmounted,
 } from 'vue';

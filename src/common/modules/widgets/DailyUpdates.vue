@@ -90,10 +90,10 @@
 
 <script lang="ts">
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PLazyImg, PSkeleton, PI } from '@spaceone/design-system';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import { find, range } from 'lodash';
 import {

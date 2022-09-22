@@ -32,10 +32,10 @@
 
 <script lang="ts">
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     PDefinitionTable, PPanelTop,
 } from '@spaceone/design-system';
+import { iso8601Formatter } from 'cloudforet/core-lib';
 import { map } from 'lodash';
 import { computed, reactive, toRefs } from 'vue';
 

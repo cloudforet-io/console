@@ -1,4 +1,4 @@
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

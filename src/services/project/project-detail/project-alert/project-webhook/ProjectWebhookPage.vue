@@ -127,13 +127,6 @@
 
 <script lang="ts">
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
-import {
-    makeDistinctValueHandler, makeEnumValueHandler,
-} from '@spaceone/console-core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PToolboxTable,
     PPanelTop,
@@ -147,6 +140,13 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { iso8601Formatter } from 'cloudforet/core-lib';
+import {
+    makeDistinctValueHandler, makeEnumValueHandler,
+} from 'cloudforet/core-lib/component-util/query-search';
+import { getApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import {
     reactive, toRefs, computed, getCurrentInstance, onActivated,
 } from 'vue';

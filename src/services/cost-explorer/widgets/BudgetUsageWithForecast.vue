@@ -38,12 +38,12 @@
 
 <script lang="ts">
 
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PDataTable, PI, PProgressBar,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,

@@ -112,13 +112,13 @@
 <script lang="ts">
 
 import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton, PIconButton, PSelectDropdown, PStatus, PTag, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import {
     cloneDeep, debounce, sum, isEmpty,

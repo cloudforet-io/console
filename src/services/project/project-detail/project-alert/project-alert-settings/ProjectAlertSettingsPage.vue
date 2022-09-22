@@ -101,10 +101,10 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PI, PIconButton, PPaneLayout, PButton,
 } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { get } from 'lodash';
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs, watch,

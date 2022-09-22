@@ -64,10 +64,10 @@
 
 <script lang="ts">
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     PButton, PPaneLayout, PSelectDropdown, PI, PBadge,
 } from '@spaceone/design-system';
+import { iso8601Formatter } from 'cloudforet/core-lib';
 import dayjs from 'dayjs';
 import {
     computed, getCurrentInstance, reactive, toRefs,

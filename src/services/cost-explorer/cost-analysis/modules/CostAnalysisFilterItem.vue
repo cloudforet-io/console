@@ -38,7 +38,6 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PSearchDropdown,
 } from '@spaceone/design-system';
@@ -48,6 +47,7 @@ import type {
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed, reactive, toRefs,
 } from 'vue';

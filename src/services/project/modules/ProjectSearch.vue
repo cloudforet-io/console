@@ -48,12 +48,12 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PAutocompleteSearch, PI, PTextHighlighting,
 } from '@spaceone/design-system';
 import type { MenuItem as ContextMenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import { debounce } from 'lodash';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,

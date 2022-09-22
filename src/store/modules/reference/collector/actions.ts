@@ -1,4 +1,4 @@
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import type { Action } from 'vuex';
 
 import type { CollectorReferenceMap, CollectorReferenceState } from '@/store/modules/reference/collector/type';

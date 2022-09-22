@@ -30,10 +30,10 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PTree, PI, PRadio,
 } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { computed, reactive, toRefs } from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

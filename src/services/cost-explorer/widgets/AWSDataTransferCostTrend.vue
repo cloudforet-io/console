@@ -31,12 +31,12 @@
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { byteFormatter, commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import bytes from 'bytes';
+import { byteFormatter, commaFormatter, numberFormatter } from 'cloudforet/core-lib';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 import {

@@ -29,7 +29,6 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PFieldGroup, PRadio, PSearchDropdown } from '@spaceone/design-system';
 import type {
     AutocompleteHandler,
@@ -37,6 +36,7 @@ import type {
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { debounce } from 'lodash';
 import {
     computed,

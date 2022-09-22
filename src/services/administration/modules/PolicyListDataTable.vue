@@ -67,14 +67,14 @@
 
 <script lang="ts">
 
-import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import type { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PAnchor, PBadge, PSelectStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { setApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
+import type { ToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox/type';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import { filter, capitalize } from 'lodash';
 import {
     computed, reactive, toRefs, watch,

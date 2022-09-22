@@ -58,12 +58,12 @@
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { byteFormatter, commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PBalloonTab, PButton, PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { byteFormatter, commaFormatter, numberFormatter } from 'cloudforet/core-lib';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
 import {

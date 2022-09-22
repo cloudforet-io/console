@@ -73,11 +73,11 @@
 
 <script lang="ts">
 
-import { durationFormatter, iso8601Formatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton, PSelectDropdown, PTableCheckModal, PI, PBadge,
 } from '@spaceone/design-system';
+import { durationFormatter, iso8601Formatter } from 'cloudforet/core-lib';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import type { SetupContext } from 'vue';
 import {

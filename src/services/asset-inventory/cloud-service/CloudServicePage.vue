@@ -57,21 +57,21 @@
 <script lang="ts">
 
 import {
-    makeDistinctValueHandler,
-    makeReferenceValueHandler,
-} from '@spaceone/console-core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
-import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import type { ToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox/type';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import {
     PDataLoader, PDivider, PButton, PPageTitle,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
+import {
+    makeDistinctValueHandler,
+    makeReferenceValueHandler,
+} from 'cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet, ValueHandlerMap } from 'cloudforet/core-lib/component-util/query-search/type';
+import { setApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
+import type { ToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox/type';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import dayjs from 'dayjs';
 import {
     computed, onUnmounted, reactive, toRefs, watch,

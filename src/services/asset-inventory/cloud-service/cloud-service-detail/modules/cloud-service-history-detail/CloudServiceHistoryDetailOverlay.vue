@@ -85,12 +85,12 @@
 
 <script lang="ts">
 
-import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     PPaneLayout, PPageTitle, PTab, PLottie, PCopyButton, PBadge, PDivider,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { useInfiniteScroll } from '@vueuse/core';
+import { iso8601Formatter } from 'cloudforet/core-lib';
 import {
     computed, defineComponent, getCurrentInstance, onMounted, reactive, toRefs, watch,
 } from 'vue';

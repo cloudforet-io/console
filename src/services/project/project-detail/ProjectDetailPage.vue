@@ -94,14 +94,14 @@
 
 <script lang="ts">
 
-import { commaFormatter } from '@spaceone/console-core-lib';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PTab, PPageTitle, PButtonModal,
     PButton, PCopyButton, PBreadcrumbs, PIconButton, PBadge, PDataLoader,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { commaFormatter } from 'cloudforet/core-lib';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { find } from 'lodash';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,

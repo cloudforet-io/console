@@ -34,8 +34,8 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed,
     getCurrentInstance,

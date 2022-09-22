@@ -43,11 +43,11 @@
 <script lang="ts">
 
 
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PCard, PI, PDatePagination,
 } from '@spaceone/design-system';
+import { commaFormatter, numberFormatter } from 'cloudforet/core-lib';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import { find } from 'lodash';
 import {

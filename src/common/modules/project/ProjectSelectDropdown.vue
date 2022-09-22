@@ -63,11 +63,11 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree, PButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import type { SetupContext } from 'vue';
 import {
     computed, reactive, toRefs, watch,

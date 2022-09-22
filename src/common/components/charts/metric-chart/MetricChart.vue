@@ -56,8 +56,8 @@
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
+import { commaFormatter, numberFormatter } from 'cloudforet/core-lib';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 import {

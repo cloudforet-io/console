@@ -30,10 +30,10 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton, PTextInput, PIconButton,
 } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed, onBeforeUnmount, onMounted, reactive, toRefs,
 } from 'vue';

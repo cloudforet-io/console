@@ -14,10 +14,10 @@
 
 <script lang="ts">
 
-import type { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { PToolbox } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import type { KeyItemSet, ValueHandlerMap } from 'cloudforet/core-lib/component-util/query-search/type';
+import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
 import {
     computed, reactive, toRefs,
 } from 'vue';

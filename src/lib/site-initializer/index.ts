@@ -1,4 +1,4 @@
-import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { QueryHelper } from 'cloudforet/core-lib/query';
 import { computed } from 'vue';
 
 

@@ -35,10 +35,10 @@
 </template>
 
 <script lang="ts">
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PFieldGroup, PJsonSchemaForm, PTextInput,
 } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { isEmpty } from 'lodash';
 import type { PropType, SetupContext } from 'vue';
 import {

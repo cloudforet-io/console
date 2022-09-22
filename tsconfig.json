@@ -3,9 +3,9 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["src/*", "packages/cloudforet/core-lib/src/*"],
-      "@spaceone/console-core-lib": ["packages/cloudforet/core-lib/dist/index.d.ts", "packages/cloudforet/core-lib/src/index.ts"],
-      "@spaceone/console-core-lib/*": ["packages/cloudforet/core-lib/dist/*", "packages/cloudforet/core-lib/src/*"],
-      "cloudforet/*": ["packages/cloudforet/*"]
+      "cloudforet/*": ["packages/cloudforet/*"],
+      "cloudforet/core-lib": ["packages/cloudforet/core-lib/dist/index.d.ts"],
+      "cloudforet/core-lib/*": ["packages/cloudforet/core-lib/dist/*"]
     }
   },
   "include": [ "**/*.ts", "**/*.tsx", "**/*.vue" ],

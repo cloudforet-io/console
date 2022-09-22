@@ -70,10 +70,10 @@
 </template>
 
 <script lang="ts">
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButton, PLazyImg, PMarkdown, PPageTitle, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { get } from 'lodash';
 import {
     computed, getCurrentInstance, reactive, toRefs,

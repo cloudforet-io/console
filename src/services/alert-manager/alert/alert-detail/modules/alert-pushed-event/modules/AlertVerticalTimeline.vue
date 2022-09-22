@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { iso8601Formatter } from '@spaceone/console-core-lib';
+import { iso8601Formatter } from 'cloudforet/core-lib';
 
 export default {
     name: 'AlertVerticalTimeline',

@@ -33,11 +33,11 @@
 <script lang="ts">
 
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PFieldGroup, PTextInput, PJsonSchemaForm,
 } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,

@@ -71,10 +71,10 @@
 </template>
 
 <script lang="ts">
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PAnchor, PButton, PIconButton, PPageTitle, PLazyImg, PDoubleCheckModal, PButtonModal, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { render } from 'ejs';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,

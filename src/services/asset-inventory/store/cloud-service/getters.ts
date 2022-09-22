@@ -1,4 +1,4 @@
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
 import type { Getter } from 'vuex';
 
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';

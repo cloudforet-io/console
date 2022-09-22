@@ -102,21 +102,21 @@
 <script lang="ts">
 
 
-import { iso8601Formatter, durationFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
-import {
-    makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
-} from '@spaceone/console-core-lib/component-util/query-search';
-import type { KeyItemSet, QueryTag, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
-import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PPageTitle, PPagination, PButtonModal, PLazyImg, PI,
     PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import { iso8601Formatter, durationFormatter, numberFormatter } from 'cloudforet/core-lib';
+import { getPageStart } from 'cloudforet/core-lib/component-util/pagination';
+import {
+    makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
+} from 'cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet, QueryTag, ValueHandlerMap } from 'cloudforet/core-lib/component-util/query-search/type';
+import { setApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import { capitalize } from 'lodash';
 import {
     computed, reactive, toRefs, watch,

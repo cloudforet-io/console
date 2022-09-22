@@ -1,4 +1,4 @@
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { cloneDeep } from 'lodash';
 import { getCurrentInstance, reactive } from 'vue';
 import type { Vue } from 'vue/types/vue';

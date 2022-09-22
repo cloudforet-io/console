@@ -100,15 +100,15 @@
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { byteFormatter, commaFormatter } from '@spaceone/console-core-lib';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PBalloonTab, PButton, PDataLoader, PSkeleton, PLottie,
 } from '@spaceone/design-system';
 import type { Unit } from 'bytes';
+import { byteFormatter, commaFormatter } from 'cloudforet/core-lib';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
 import {

@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts">
-import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { PAnchor } from '@spaceone/design-system';
+import { QueryHelper } from 'cloudforet/core-lib/query';
 import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs,

@@ -29,8 +29,8 @@
 
 <script lang="ts">
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PButton, PIconButton } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { isEmpty } from 'lodash';
 import type { SetupContext } from 'vue';
 import {

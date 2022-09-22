@@ -32,10 +32,10 @@
 <script lang="ts">
 
 
-import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
+import { getApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import { uniqBy } from 'lodash';
 import type { SetupContext } from 'vue';
 import {

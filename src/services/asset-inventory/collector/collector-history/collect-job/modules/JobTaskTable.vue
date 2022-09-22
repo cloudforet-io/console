@@ -65,14 +65,14 @@
 /* eslint-disable camelcase */
 
 
-import { iso8601Formatter, durationFormatter } from '@spaceone/console-core-lib';
-import { makeEnumValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
-import type { KeyItemSet } from '@spaceone/console-core-lib/component-util/query-search/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PAnchor, PSelectButtonGroup, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
+import { iso8601Formatter, durationFormatter } from 'cloudforet/core-lib';
+import { makeEnumValueHandler, makeReferenceValueHandler } from 'cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet } from 'cloudforet/core-lib/component-util/query-search/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import { capitalize } from 'lodash';
 import {
     computed, getCurrentInstance, onActivated, onDeactivated, reactive, toRefs, watch,

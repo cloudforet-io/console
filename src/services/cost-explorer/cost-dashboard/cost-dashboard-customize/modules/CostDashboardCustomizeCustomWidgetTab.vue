@@ -60,12 +60,12 @@
 
 <script lang="ts">
 
-import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PRadio, PTextPagination, PButton, PLabel, PDataLoader,
 } from '@spaceone/design-system';
+import { getPageStart } from 'cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';

@@ -21,10 +21,10 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PButtonModal, PTextarea, PFieldGroup,
 } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import type { SetupContext } from 'vue';
 import {
     getCurrentInstance,

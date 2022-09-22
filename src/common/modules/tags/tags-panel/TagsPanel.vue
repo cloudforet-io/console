@@ -35,8 +35,8 @@
 <script lang="ts">
 
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataTable, PPanelTop, PButton } from '@spaceone/design-system';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { get, camelCase } from 'lodash';
 import {
     computed, reactive, toRefs, watch, getCurrentInstance,

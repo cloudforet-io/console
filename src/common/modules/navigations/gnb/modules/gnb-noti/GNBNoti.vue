@@ -38,14 +38,14 @@
 
 <script lang="ts">
 
-import { commaFormatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PI, PTab, PBadge,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { vOnClickOutside } from '@vueuse/components';
+import { commaFormatter } from 'cloudforet/core-lib';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import {
     computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';

@@ -56,17 +56,17 @@
 
 
 import {
-    makeDistinctValueHandler,
-    makeReferenceValueHandler,
-} from '@spaceone/console-core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import {
     PToolbox, PSelectStatus, PButton, PI, PSelectDropdown, PDivider,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import {
+    makeDistinctValueHandler,
+    makeReferenceValueHandler,
+} from 'cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet, ValueHandlerMap } from 'cloudforet/core-lib/component-util/query-search/type';
+import { QueryHelper } from 'cloudforet/core-lib/query';
 import dayjs from 'dayjs';
 import {
     computed, reactive, toRefs, watch,

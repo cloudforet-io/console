@@ -54,17 +54,17 @@
 <script lang="ts">
 
 
-import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import type { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PAnchor, PI, PToolboxTable, PDataTable,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
+import { setApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 // eslint-disable-next-line import/extensions,import/no-unresolved

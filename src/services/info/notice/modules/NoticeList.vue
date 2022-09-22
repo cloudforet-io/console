@@ -56,14 +56,14 @@
 <script lang="ts">
 
 
-import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     PDataLoader, PDivider,
     PPagination, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import { getPageStart } from 'cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';

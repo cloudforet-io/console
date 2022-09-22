@@ -38,10 +38,10 @@
 
 <script lang="ts">
 
-import { byteFormatter } from '@spaceone/console-core-lib';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PDataTable } from '@spaceone/design-system';
+import { byteFormatter } from 'cloudforet/core-lib';
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { isEmpty } from 'lodash';
 import {
     computed, reactive, toRefs, watch,

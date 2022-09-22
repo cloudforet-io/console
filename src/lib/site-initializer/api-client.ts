@@ -1,5 +1,5 @@
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import type { MockInfo } from '@spaceone/console-core-lib/space-connector/type';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import type { MockInfo } from 'cloudforet/core-lib/space-connector/type';
 
 const getAfterCallApiMap = store => ({
     '/inventory/cloud-service-type/create': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
