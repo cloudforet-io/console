@@ -38,7 +38,8 @@
                                                        @change="handleChangeBaseInformationForm"
                 />
             </p-pane-layout>
-            <service-account-project-form :is-valid.sync="isProjectFormValid"
+            <service-account-project-form v-if="accountType === ACCOUNT_TYPE.GENERAL"
+                                          :is-valid.sync="isProjectFormValid"
                                           @change="handleChangeProjectForm"
             />
             <p-pane-layout class="form-wrapper">
@@ -88,6 +89,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
 
+import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 import ServiceAccountAccountType
     from '@/services/asset-inventory/service-account/modules/ServiceAccountAccountType.vue';
 import ServiceAccountBaseInformationForm
@@ -128,7 +130,6 @@ export default {
         const state = reactive({
             providerLoading: true,
             providerData: {} as ProviderModel,
-            serviceAccountId: '',
             providerIcon: computed(() => store.state.reference.provider.items[state.providerData?.provider]?.icon),
             description: computed(() => get(state.providerData, 'metadata.view.layouts.help:service_account:create', undefined)),
             enableCredentialInput: computed<boolean>(() => {
@@ -149,6 +150,7 @@ export default {
             isValid: computed(() => {
                 if (!formState.isBaseInformationFormValid) return false;
                 if (!formState.isCredentialFormValid) return false;
+                if (formState.accountType === ACCOUNT_TYPE.TRUSTED) return true;
                 if (!formState.isProjectFormValid) return false;
                 return true;
             }),
@@ -169,32 +171,29 @@ export default {
             }
         };
 
-        const deleteServiceAccount = async () => {
+        const deleteServiceAccount = async (serviceAccountId: string) => {
             await SpaceConnector.client.identity.serviceAccount.delete({
-                service_account_id: state.serviceAccountId,
+                service_account_id: serviceAccountId,
             });
-            state.serviceAccountId = '';
         };
-        const createServiceAccount = async () => {
-            const item: any = {
-                provider: props.provider,
-                name: formState.baseInformationForm.accountName,
-                data: formState.baseInformationForm.customSchemaForm,
-                tags: formState.baseInformationForm.tags,
-                service_account_type: formState.accountType,
-            };
-
-            if (formState.projectForm.selectedProject) {
-                item.project_id = formState.projectForm.selectedProject.id;
-            }
+        const createServiceAccount = async (): Promise<string|undefined> => {
             try {
-                const res = await SpaceConnector.client.identity.serviceAccount.create(item);
-                state.serviceAccountId = res.service_account_id;
+                const res = await SpaceConnector.client.identity.serviceAccount.create({
+                    provider: props.provider,
+                    name: formState.baseInformationForm.accountName,
+                    data: formState.baseInformationForm.customSchemaForm,
+                    tags: formState.baseInformationForm.tags,
+                    service_account_type: formState.accountType,
+                    trusted_service_account_id: formState.credentialForm.attachedTrustedAccountId,
+                    project_id: formState.projectForm.selectedProject?.id || null,
+                });
+                return res.service_account_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+                return undefined;
             }
         };
-        const createSecret = async (): Promise<boolean> => {
+        const createSecret = async (serviceAccountId: string): Promise<boolean> => {
             let isSucceed: boolean;
             try {
                 let data;
@@ -204,13 +203,18 @@ export default {
                     data = formState.credentialForm;
                 }
 
-                await SpaceConnector.client.secret.secret.create({
-                    name: formState.baseInformationForm.accountName + state.serviceAccountId,
+                let createApi = SpaceConnector.client.secret.secret.create;
+                if (formState.accountType === ACCOUNT_TYPE.TRUSTED) {
+                    createApi = SpaceConnector.client.secret.trustedSecret.create;
+                }
+                createApi({
+                    name: formState.baseInformationForm.accountName + serviceAccountId,
                     data,
                     schema: formState.credentialForm.selectedSecretType,
                     secret_type: 'CREDENTIALS',
-                    service_account_id: state.serviceAccountId,
+                    service_account_id: serviceAccountId,
                     project_id: formState.projectForm.selectedProject?.id || null,
+                    trusted_secret_id: formState.credentialForm.attachedTrustedAccountId,
                 });
 
                 showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm);
@@ -218,7 +222,7 @@ export default {
             } catch (e) {
                 isSucceed = false;
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
-                await deleteServiceAccount();
+                await deleteServiceAccount(serviceAccountId);
             }
 
             return isSucceed;
@@ -231,12 +235,12 @@ export default {
                 return;
             }
 
-            await createServiceAccount();
-            if (state.serviceAccountId && formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
+            const serviceAccountId = await createServiceAccount();
+            if (serviceAccountId && formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
                 if (formState.credentialForm.customSchemaForm?.private_key) {
                     formState.credentialForm.customSchemaForm.private_key = formState.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
                 }
-                const isSecretCreationSuccess = await createSecret();
+                const isSecretCreationSuccess = await createSecret(serviceAccountId);
                 if (!isSecretCreationSuccess) return;
             }
             SpaceRouter.router.back();
@@ -248,6 +252,9 @@ export default {
         };
         const handleChangeAccountType = (accountType: AccountType) => {
             formState.accountType = accountType;
+            if (accountType === ACCOUNT_TYPE.TRUSTED) {
+                formState.projectForm = { selectedProject: null };
+            }
         };
         const handleChangeBaseInformationForm = (baseInformationForm) => {
             formState.baseInformationForm = baseInformationForm;
@@ -268,6 +275,7 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(formState),
+            ACCOUNT_TYPE,
             handleSave,
             handleGoBack,
             handleChangeAccountType,

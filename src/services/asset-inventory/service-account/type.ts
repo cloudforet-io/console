@@ -55,6 +55,7 @@ export interface CredentialForm {
     customSchemaForm: { [key: string]: any; };
     credentialJson: string;
     activeDataType: ActiveDataType;
+    attachedTrustedAccountId?: string;
 }
 export interface CredentialModel {
     schema?: string;
