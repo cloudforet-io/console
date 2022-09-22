@@ -2,8 +2,8 @@
     <p-pane-layout class="service-account-project-detail">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
             <template #extra>
-                <p-button v-if="!editMode" :disabled="accountType === 'TRUSTED' && !projectName" icon="ic_edit"
-                          :style-type="!projectName && 'transparent'"
+                <p-button v-if="!editMode" :disabled="accountType === ACCOUNT_TYPE.TRUSTED && isManaged" icon="ic_edit"
+                          style-type="transparent"
                           @click="handleEditMode"
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
@@ -22,8 +22,8 @@
             <p-anchor v-if="!editMode && !!projectName" :href="projectLink">
                 {{ projectName }}
             </p-anchor>
-            <span v-if="!editMode && !projectName && accountType === 'TRUSTED'">N/A</span>
-            <div v-if="!editMode && !projectName && accountType === 'GENERAL'">
+            <span v-if="!editMode && !projectName && accountType === ACCOUNT_TYPE.TRUSTED">N/A</span>
+            <div v-if="!editMode && !projectName && accountType === ACCOUNT_TYPE.GENERAL">
                 <span>-- <span class="required-span">{{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.REQUIRED') }}</span></span>
                 <p-tooltip position="bottom" class="project-required-tooltip" :contents="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.PROJECT_REQUIRED_HELP_TEXT')">
                     <p-i name="ic_tooltip" width="1rem" height="1rem" />
@@ -64,6 +64,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
+import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 import type { AccountType, ProjectForm, ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
 import type { ProjectItemResp } from '@/services/project/type';
 
@@ -102,7 +103,8 @@ export default {
             selectedProjects: [] as Array<string>,
             formData: { selectedProject: null } as ProjectForm,
             proxyIsValid: useProxyValue('is-valid', props, emit),
-            accountType: computed<AccountType>(() => props.serviceAccountItem?.service_account_type ?? 'GENERAL'),
+            accountType: computed<AccountType>(() => props.serviceAccountItem?.service_account_type ?? ACCOUNT_TYPE.GENERAL),
+            isManaged: computed<boolean>(() => props.serviceAccountItem?.tags?.is_managed ?? false),
         });
 
         /* Util */
@@ -158,6 +160,7 @@ export default {
             handleEditMode,
             handleSelectProject,
             handleClickSave,
+            ACCOUNT_TYPE,
         };
     },
 };
