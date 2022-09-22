@@ -82,7 +82,6 @@ import type { Vue } from 'vue/types/vue';
 import {
     PEmpty, PStatus, PTab, PDataTable, PPanelTop,
 } from '@spaceone/design-system';
-
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 

@@ -60,7 +60,6 @@ import {
     PSelectDropdown,
     PToggleButton,
 } from '@spaceone/design-system';
-
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { store } from '@/store';

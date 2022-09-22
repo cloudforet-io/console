@@ -42,9 +42,9 @@ import { computed, reactive, toRefs } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
+import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
 
-import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 
 import { i18n } from '@/translations';
 

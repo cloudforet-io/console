@@ -63,7 +63,6 @@ import {
 import {
     PPageTitle, PDynamicLayout, PButton, PSelectStatus,
 } from '@spaceone/design-system';
-
 import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,

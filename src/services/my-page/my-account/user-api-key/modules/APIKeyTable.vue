@@ -81,7 +81,6 @@ import type { Vue } from 'vue/types/vue';
 import {
     PButton, PDataTable, PPaneLayout, PTableCheckModal, PStatus, PSelectDropdown,
 } from '@spaceone/design-system';
-
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { iso8601Formatter } from 'cloudforet/core-lib';

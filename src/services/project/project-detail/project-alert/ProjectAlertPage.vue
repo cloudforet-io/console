@@ -28,7 +28,6 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import { PButtonTab, PButton } from '@spaceone/design-system';
-
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { SpaceConnector } from 'cloudforet/core-lib/space-connector';

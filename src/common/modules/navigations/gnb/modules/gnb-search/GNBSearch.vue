@@ -58,11 +58,11 @@ import {
 import type { DirectiveFunction, SetupContext } from 'vue';
 
 import { PI } from '@spaceone/design-system';
+import { laptop } from '@spaceone/design-system/src/styles/screens';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce, throttle } from 'lodash';
 
-import { laptop } from '@spaceone/design-system/src/styles/screens';
 
 import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 

@@ -110,9 +110,9 @@ import {
 import {
     PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckBox, PIconButton, PI,
 } from '@spaceone/design-system';
+import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { find, sum } from 'lodash';
 
-import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 
 import { commaFormatter } from 'cloudforet/core-lib';
 import { getPageStart } from 'cloudforet/core-lib/component-util/pagination';

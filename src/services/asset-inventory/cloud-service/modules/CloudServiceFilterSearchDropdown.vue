@@ -43,7 +43,6 @@ import {
 import {
     PSearchDropdown,
 } from '@spaceone/design-system';
-
 import type {
     SearchDropdownMenuItem,
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';

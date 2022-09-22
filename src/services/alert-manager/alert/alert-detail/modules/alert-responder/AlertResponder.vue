@@ -54,9 +54,9 @@ import VueI18n from 'vue-i18n';
 import {
     PBadge, PCollapsibleList, PPaneLayout, PPanelTop, PSearchDropdown,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { difference } from 'lodash';
 
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';

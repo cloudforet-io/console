@@ -75,10 +75,9 @@ import type { PropType } from 'vue';
 import {
     PAnchor, PBadge, PSelectStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import { filter, capitalize } from 'lodash';
-
 import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { filter, capitalize } from 'lodash';
 
 import { setApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
 import type { ToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox/type';

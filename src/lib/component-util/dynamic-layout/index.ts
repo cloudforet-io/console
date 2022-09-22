@@ -1,6 +1,6 @@
+import type { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { forEach } from 'lodash';
 
-import type { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import type { ConsoleDynamicField, Reference } from '@/lib/component-util/dynamic-layout/type';
 

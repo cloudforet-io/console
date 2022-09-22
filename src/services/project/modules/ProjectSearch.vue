@@ -56,9 +56,9 @@ import type { Vue } from 'vue/types/vue';
 import {
     PAutocompleteSearch, PI, PTextHighlighting,
 } from '@spaceone/design-system';
+import type { MenuItem as ContextMenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { debounce } from 'lodash';
 
-import type { MenuItem as ContextMenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';

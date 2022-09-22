@@ -40,14 +40,14 @@ import {
 import {
     PButton,
 } from '@spaceone/design-system';
+import type {
+    DynamicWidgetSchema,
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { debounce, isEmpty } from 'lodash';
 
-import type {
-    DynamicWidgetSchema,
-} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
 
 import { QueryHelper } from 'cloudforet/core-lib/query';
 import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';

@@ -144,7 +144,6 @@ import {
     PSelectDropdown,
     PTableCheckModal,
 } from '@spaceone/design-system';
-
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 

@@ -25,7 +25,6 @@ import {
 } from 'vue';
 
 import { PCheckBox, PI } from '@spaceone/design-system';
-
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 
 

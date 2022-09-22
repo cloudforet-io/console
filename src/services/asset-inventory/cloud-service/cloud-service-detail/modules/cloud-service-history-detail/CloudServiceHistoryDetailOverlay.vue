@@ -95,7 +95,6 @@ import type { Vue } from 'vue/types/vue';
 import {
     PPaneLayout, PPageTitle, PTab, PLottie, PCopyButton, PBadge, PDivider,
 } from '@spaceone/design-system';
-
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { iso8601Formatter } from 'cloudforet/core-lib';

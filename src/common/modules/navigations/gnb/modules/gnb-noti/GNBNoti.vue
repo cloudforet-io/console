@@ -47,7 +47,6 @@ import type { DirectiveFunction, SetupContext } from 'vue';
 import {
     PI, PTab, PBadge,
 } from '@spaceone/design-system';
-
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { commaFormatter } from 'cloudforet/core-lib';

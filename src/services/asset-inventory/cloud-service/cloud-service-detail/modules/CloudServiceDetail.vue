@@ -36,13 +36,12 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import { PDynamicLayout, PButtonTab } from '@spaceone/design-system';
-import { find } from 'lodash';
-
 import type {
     DynamicLayoutEventListener, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { find } from 'lodash';
 
 import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';

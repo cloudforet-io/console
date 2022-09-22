@@ -39,9 +39,9 @@ import * as am4core from '@amcharts/amcharts4/core';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 
-import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { commaFormatter, numberFormatter } from 'cloudforet/core-lib';
 import { QueryHelper } from 'cloudforet/core-lib/query';

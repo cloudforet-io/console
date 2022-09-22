@@ -66,7 +66,6 @@ import type { Vue } from 'vue/types/vue';
 import {
     PButtonModal, PFieldGroup, PSearchDropdown, PTextInput,
 } from '@spaceone/design-system';
-
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
 

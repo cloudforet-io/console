@@ -88,7 +88,6 @@ import {
     PTableCheckModal,
     PToolboxTable,
 } from '@spaceone/design-system';
-
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 

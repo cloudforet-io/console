@@ -104,9 +104,9 @@ import {
     PTab, PPageTitle, PButtonModal,
     PButton, PCopyButton, PBreadcrumbs, PIconButton, PBadge, PDataLoader,
 } from '@spaceone/design-system';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { commaFormatter } from 'cloudforet/core-lib';
 import { QueryHelper } from 'cloudforet/core-lib/query';

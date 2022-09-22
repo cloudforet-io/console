@@ -1,8 +1,8 @@
 import type { TimeUnit } from '@amcharts/amcharts4/core';
+import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
 

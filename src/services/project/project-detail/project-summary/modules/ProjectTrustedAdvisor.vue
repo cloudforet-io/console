@@ -49,9 +49,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
-
 import {
     computed, reactive, toRefs,
     getCurrentInstance,

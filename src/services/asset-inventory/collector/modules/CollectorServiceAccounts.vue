@@ -65,7 +65,6 @@ import {
 import {
     PQuerySearchTable, PPanelTop, PButton, PAnchor,
 } from '@spaceone/design-system';
-
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { iso8601Formatter } from 'cloudforet/core-lib';

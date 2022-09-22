@@ -142,7 +142,7 @@ module.exports = {
                         position: 'before',
                     },
                     {
-                        pattern: '@spaceone/design-system/**',
+                        pattern: '{@spaceone/design-system/**}',
                         group: 'external',
                         position: 'after',
                     },

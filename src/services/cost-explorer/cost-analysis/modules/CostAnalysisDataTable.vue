@@ -62,13 +62,13 @@ import type { Location } from 'vue-router';
 import {
     PAnchor, PI, PToolboxTable, PDataTable,
 } from '@spaceone/design-system';
+import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 import type { Table } from 'pdfmake/interfaces';
 
-import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { setApiQueryWithToolboxOptions } from 'cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from 'cloudforet/core-lib/query';

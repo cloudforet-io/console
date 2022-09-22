@@ -76,9 +76,9 @@ import type { Vue } from 'vue/types/vue';
 import {
     PButton, PIconButton, PPageTitle, PSelectDropdown,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
 
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 

@@ -48,9 +48,8 @@ import { computed, reactive, toRefs } from 'vue';
 import {
     PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
-import { capitalize } from 'lodash';
-
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { capitalize } from 'lodash';
 
 
 import { store } from '@/store';

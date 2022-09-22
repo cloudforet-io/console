@@ -88,7 +88,6 @@ import draggable from 'vuedraggable';
 import {
     PButton, PButtonModal, PCheckBox, PDataLoader, PSearch,
 } from '@spaceone/design-system';
-
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 
 import { QueryHelper } from 'cloudforet/core-lib/query';

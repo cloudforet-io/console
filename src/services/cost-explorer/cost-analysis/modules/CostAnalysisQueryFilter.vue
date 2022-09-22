@@ -53,9 +53,8 @@ import { computed, reactive, toRefs } from 'vue';
 import {
     PIconButton, PSelectDropdown, PToggleButton,
 } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import dayjs from 'dayjs';
 
 
 import { i18n } from '@/translations';

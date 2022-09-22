@@ -110,9 +110,9 @@ import {
     PPageTitle, PPagination, PButtonModal, PLazyImg, PI,
     PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
+import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import { capitalize } from 'lodash';
 
-import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 
 import { iso8601Formatter, durationFormatter, numberFormatter } from 'cloudforet/core-lib';
 import { getPageStart } from 'cloudforet/core-lib/component-util/pagination';

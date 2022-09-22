@@ -148,9 +148,9 @@ import {
     PSearchDropdown,
     PDivider,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { debounce } from 'lodash';
 
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 

@@ -59,9 +59,9 @@ import type { Location } from 'vue-router';
 import {
     PListCard, PSelectButton, PTextPagination,
 } from '@spaceone/design-system';
+import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { find } from 'lodash';
 
-import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 
 import { commaFormatter } from 'cloudforet/core-lib';
 import { getPageStart } from 'cloudforet/core-lib/component-util/pagination';

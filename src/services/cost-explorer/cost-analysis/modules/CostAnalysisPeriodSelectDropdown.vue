@@ -28,10 +28,10 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { i18n } from '@/translations';
 
