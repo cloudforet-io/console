@@ -29,12 +29,13 @@ const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
 };
 
 const projectLinkFormatter: LinkFormatter = (name, data, reference, query) => {
-    const location = {
-        name,
-        query,
-        params: { id: data },
-    };
-    return location;
+    if (data) {
+        return {
+            name,
+            query,
+            params: data ? { id: data } : undefined,
+        };
+    } return {};
 };
 
 const projectGroupLinkFormatter: LinkFormatter = (name, data, reference, query) => {
