@@ -1,5 +1,5 @@
 {
-  "name": "@cloudforet/corelib",
+  "name": "@cloudforet/core-lib",
   "version": "1.16.0",
   "description": "Cloudforet Console Core Library",
   "scripts": {
