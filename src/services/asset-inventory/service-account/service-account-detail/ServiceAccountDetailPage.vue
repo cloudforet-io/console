@@ -50,15 +50,13 @@
                               size="sm"
                               @confirm="handleConfirmDelete"
         />
-        <!--song-lang-->
         <p-button-modal :visible.sync="cannotDeleteModalVisible"
-                        header-title="Cannot delete this account"
+                        :header-title="$t('INVENTORY.SERVICE_ACCOUNT.DELETE_MODAL.TITLE')"
                         theme-color="alert"
                         :hide-header-close-button="true"
         >
             <template #body>
-                <!--song-lang-->
-                Please note that this Trusted Account is currently attached in following accounts.
+                {{ $t('INVENTORY.SERVICE_ACCOUNT.DELETE_MODAL.NOTE') }}
             </template>
         </p-button-modal>
     </div>
