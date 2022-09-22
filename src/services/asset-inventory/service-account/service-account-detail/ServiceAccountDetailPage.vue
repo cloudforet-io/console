@@ -13,7 +13,7 @@
                 <div class="title-right-wrapper">
                     <p-icon-button name="ic_trashcan"
                                    class="w-full delete-button"
-                                   :disabled="!hasManagePermission"
+                                   :disabled="!hasManagePermission || isManagedAccount"
                                    @click="handleOpenDeleteModal"
                     />
                 </div>
@@ -40,12 +40,14 @@
             />
             <service-account-base-information :provider="providerKey"
                                               :service-account-id="serviceAccountId"
+                                              :editable="!isManagedAccount"
             />
             <service-account-credentials :provider="providerKey"
                                          :service-account-id="serviceAccountId"
                                          :service-account-type="serviceAccountType"
                                          :service-account-name="item.name"
                                          :project-id="projectId"
+                                         :editable="!isManagedAccount"
             />
         </div>
         <p-double-check-modal :visible.sync="deleteModalVisible"
@@ -151,6 +153,7 @@ export default defineComponent({
             }),
             projectId: computed(() => state.item.project_info?.project_id),
             serviceAccountType: computed(() => state.item.service_account_type),
+            isManagedAccount: computed(() => state.item.tags?.is_managed === 'true' ?? false),
             deleteModalVisible: false,
             cannotDeleteModalVisible: false,
         });
