@@ -45,9 +45,6 @@
                     </p-select-status>
                 </div>
             </template>
-            <!--            <template #col-service_account_type-format="{data}">-->
-            <!--                <service-account-badge v-if="data" :account-type="data" />-->
-            <!--            </template>-->
         </p-dynamic-layout>
         <custom-field-modal v-model="tableState.visibleCustomFieldModal"
                             resource-type="identity.ServiceAccount"
@@ -80,6 +77,7 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
+import type { ConsoleSearchSchema } from '@/lib/component-util/dynamic-layout/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
@@ -95,6 +93,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { ACCOUNT_TYPE, ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/service-account/config';
 import ServiceAccountProviderList
     from '@/services/asset-inventory/service-account/modules/ServiceAccountProviderList.vue';
+import type { ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
 
 export default {
     name: 'ServiceAccountPage',
@@ -133,7 +132,6 @@ export default {
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
-            selectIndex: [] as number[],
             selectable: false,
             colCopy: false,
             settingsVisible: true,
@@ -141,9 +139,7 @@ export default {
 
         const tableState = reactive({
             hasManagePermission: useManagePermissionState(),
-            items: [],
-            selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
-            selectedAccountIds: computed(() => tableState.selectedItems.map(d => d?.service_account_id)),
+            items: [] as ServiceAccountModel[],
             schema: null as null|DynamicLayout,
             visibleCustomFieldModal: false,
             accountTypeList: computed(() => [
@@ -152,13 +148,14 @@ export default {
                 { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
             ]),
             selectedAccountType: 'all',
-            searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
+            searchFilters: computed<QueryStoreFilter[]>(() => [
+                ...queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters,
+            ]),
         });
 
         const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
-            computed(() => tableState.schema?.options?.search ?? []),
+            computed(() => tableState.schema?.options?.search as unknown as ConsoleSearchSchema[] ?? []),
             'identity.ServiceAccount',
-            // computed(() => )
         );
         /** Handling API with SpaceConnector * */
 
@@ -177,16 +174,23 @@ export default {
             return apiQuery.data;
         };
 
-        const serviceAccountListApi = SpaceConnector.client.identity.serviceAccount.list;
+        // add TRUSTED MANAGED directly
+        const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModel[]): ServiceAccountModel[] => serviceAccount.map((sa) => {
+            if (sa.service_account_type === ACCOUNT_TYPE.TRUSTED && sa.tags?.is_managed) {
+                return {
+                    ...sa,
+                    service_account_type: 'TRUSTED-MANAGED',
+                };
+            }
+            return sa;
+        });
+
         const listServiceAccountData = async () => {
             typeOptionState.loading = true;
             try {
-                const res = await serviceAccountListApi({ query: getQuery() });
+                const res = await SpaceConnector.client.identity.serviceAccount.list({ query: getQuery() });
 
-                // filtering select index
-                typeOptionState.selectIndex = typeOptionState.selectIndex.filter(d => !!res.results[d]);
-
-                tableState.items = res.results;
+                tableState.items = serviceAccountPreprocessor(res.results);
                 typeOptionState.totalCount = res.total_count;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -220,7 +224,7 @@ export default {
             await store.dispatch('file/downloadExcel', {
                 url: '/identity/service-account/list',
                 param: { query: getQuery() },
-                fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
+                fields: dynamicFieldsToExcelDataFields(tableState.schema?.options?.fields ?? []),
                 file_name_prefix: FILE_NAME_PREFIX.serviceAccount,
             });
         };
@@ -292,7 +296,6 @@ export default {
                     replaceUrlQuery('provider', after);
                     await getTableSchema();
                     await listServiceAccountData();
-                    typeOptionState.selectIndex = [];
                 }
             }, { immediate: true });
         };
