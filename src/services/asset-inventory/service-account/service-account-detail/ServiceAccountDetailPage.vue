@@ -30,10 +30,10 @@
             <p-pane-layout class="service-account-account-type">
                 <p-panel-top :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE')" />
                 <div class="badge-wrapper">
-                    <service-account-badge :account-type="item.service_account_type" :is-managed="item.tags?.is_managed ?? 'false'" />
+                    <service-account-badge :account-type="item.service_account_type" :is-managed="isManagedAccount" />
                 </div>
             </p-pane-layout>
-            <service-account-project-detail :project-id="projectId" :service-account-item="item" />
+            <service-account-project-detail :project-id="projectId" :service-account-item="item" :editable="!isManagedAccount" />
             <service-account-attached-general-accounts v-if="item.service_account_type === ACCOUNT_TYPE.TRUSTED"
                                                        :service-account-id="serviceAccountId"
                                                        :attached-general-accounts.sync="attachedGeneralAccounts"
