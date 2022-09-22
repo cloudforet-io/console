@@ -153,7 +153,7 @@ export default defineComponent({
             }),
             projectId: computed(() => state.item.project_info?.project_id),
             serviceAccountType: computed(() => state.item.service_account_type),
-            isManagedAccount: computed(() => state.item.tags?.is_managed ?? false),
+            isManagedAccount: computed(() => state.item.tags?.is_managed === 'true' ?? false),
             deleteModalVisible: false,
             cannotDeleteModalVisible: false,
         });
