@@ -7,7 +7,8 @@
     "paths": {
       "@/*": ["src/*", "packages/@spaceone/console-core-lib/dist/*"],
       "@spaceone/console-core-lib": ["packages/@spaceone/console-core-lib/dist/"],
-      "@spaceone/console-core-lib/*": ["packages/@spaceone/console-core-lib/dist/*"]
+      "@spaceone/console-core-lib/*": ["packages/@spaceone/console-core-lib/dist/*"],
+      "packages/*": ["packages/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
