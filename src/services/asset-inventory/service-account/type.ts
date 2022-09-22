@@ -74,5 +74,5 @@ export interface CredentialModel {
 }
 
 export interface ProjectForm {
-    selectedProject: ProjectGroup | null;
+    selectedProjectId: string | null; // ProjectGroup | null;
 }

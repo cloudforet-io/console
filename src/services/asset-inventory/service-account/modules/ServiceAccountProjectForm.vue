@@ -1,27 +1,20 @@
 <template>
-    <p-pane-layout class="service-account-project">
-        <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')" />
-        <div class="content-wrapper">
-            <project-select-dropdown
-                class="project-select-dropdown"
-                project-selectable
-                :selected-project-ids.sync="selectedProjects"
-                :use-fixed-menu-style="false"
-                :invalid="proxyIsValid === false"
-                @select="handleSelectedProject"
-            />
-        </div>
-    </p-pane-layout>
+    <div class="service-account-project-form">
+        <project-select-dropdown
+            class="project-select-dropdown"
+            project-selectable
+            :selected-project-ids.sync="selectedProjects"
+            :use-fixed-menu-style="false"
+            :invalid="proxyIsValid === false"
+            @select="handleSelectedProject"
+        />
+    </div>
 </template>
 
 <script lang="ts">
 import {
     reactive, toRefs, watch,
 } from 'vue';
-
-import {
-    PPaneLayout, PPanelTop,
-} from '@spaceone/design-system';
 
 import { store } from '@/store';
 
@@ -35,8 +28,6 @@ import type { ProjectItemResp } from '@/services/project/type';
 export default {
     name: 'ServiceAccountProjectForm',
     components: {
-        PPaneLayout,
-        PPanelTop,
         ProjectSelectDropdown,
     },
     props: {
@@ -52,13 +43,13 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             selectedProjects: [] as Array<string>,
-            formData: { selectedProject: null } as ProjectForm,
+            formData: { selectedProjectId: null } as ProjectForm,
             proxyIsValid: useProxyValue('is-valid', props, emit),
         });
 
         /* Event */
         const handleSelectedProject = (selectedProject: ProjectItemResp[]) => {
-            state.formData = { selectedProject: selectedProject.length ? selectedProject[0] : null };
+            state.formData = { selectedProjectId: selectedProject.length ? selectedProject[0].id : null };
             state.proxyIsValid = !!selectedProject.length;
         };
 
@@ -70,9 +61,12 @@ export default {
         })();
 
         /* Watcher */
-        watch(() => state.selectedProjects, (selectedProject: Array<string>) => {
-            state.formData = { selectedProject: { id: selectedProject[0], name: selectedProject[0], item_type: 'PROJECT' } };
-        });
+        watch(() => props.projectId, (projectId) => {
+            if (projectId) {
+                state.formData = { selectedProjectId: projectId };
+                state.selectedProjects = [projectId];
+            }
+        }, { immediate: true });
         watch(() => state.formData, (formData: ProjectForm) => {
             emit('change', formData);
         });
@@ -86,25 +80,14 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.service-account-project {
-    /* custom design-system component - p-panel-top */
-    :deep(.p-panel-top) {
-        .extra {
-            text-align: right;
-        }
-    }
-    .content-wrapper {
-        padding: 0.5rem 1rem 2.5rem 1rem;
-        .project-select-dropdown {
-            width: 50%;
-        }
+.service-account-project-form {
+    .project-select-dropdown {
+        width: 50%;
     }
 
     @screen tablet {
-        .content-wrapper {
-            .project-select-dropdown {
-                width: 100%;
-            }
+        .project-select-dropdown {
+            width: 100%;
         }
     }
 }
