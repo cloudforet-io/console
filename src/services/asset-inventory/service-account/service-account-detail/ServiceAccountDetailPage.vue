@@ -51,12 +51,12 @@
                               @confirm="handleConfirmDelete"
         />
         <p-button-modal :visible.sync="cannotDeleteModalVisible"
-                        :header-title="$t('INVENTORY.SERVICE_ACCOUNT.DELETE_MODAL.TITLE')"
+                        :header-title="$t('INVENTORY.SERVICE_ACCOUNT.DELETE_CHECK_MODAL.TITLE')"
                         theme-color="alert"
                         :hide-header-close-button="true"
         >
             <template #body>
-                {{ $t('INVENTORY.SERVICE_ACCOUNT.DELETE_MODAL.NOTE') }}
+                {{ $t('INVENTORY.SERVICE_ACCOUNT.DELETE_CHECK_MODAL.NOTE') }}
             </template>
         </p-button-modal>
     </div>
