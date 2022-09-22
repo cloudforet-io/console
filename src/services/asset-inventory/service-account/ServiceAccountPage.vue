@@ -93,7 +93,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { ACCOUNT_TYPE, ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/service-account/config';
 import ServiceAccountProviderList
     from '@/services/asset-inventory/service-account/modules/ServiceAccountProviderList.vue';
-import type { ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
+import type { ServiceAccountModelForBinding } from '@/services/asset-inventory/service-account/type';
 
 export default {
     name: 'ServiceAccountPage',
@@ -139,7 +139,7 @@ export default {
 
         const tableState = reactive({
             hasManagePermission: useManagePermissionState(),
-            items: [] as ServiceAccountModel[],
+            items: [] as ServiceAccountModelForBinding[],
             schema: null as null|DynamicLayout,
             visibleCustomFieldModal: false,
             accountTypeList: computed(() => [
@@ -175,7 +175,7 @@ export default {
         };
 
         // add TRUSTED MANAGED directly
-        const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModel[]): ServiceAccountModel[] => serviceAccount.map((sa) => {
+        const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModelForBinding[]): ServiceAccountModelForBinding[] => serviceAccount.map((sa) => {
             if (sa.service_account_type === ACCOUNT_TYPE.TRUSTED && sa.tags?.is_managed) {
                 return {
                     ...sa,
