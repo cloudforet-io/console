@@ -6,7 +6,8 @@
   "author": "Cloudforet",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "serve:init": "rm -rf ./node_modules && rm -rf packages/cloudforet/core-lib/node_modules && npm install && npm run build --workspace=@cloudforet/core-lib && npm run serve",
+    "serve:init": "npm install && npm run build --workspace=@cloudforet/core-lib && npm run serve",
+    "serve:wipe": "rm -rf ./node_modules && rm -rf packages/cloudforet/core-lib/node_modules && npm run serve:init",
     "build": "NODE_OPTIONS=--max_old_space_size=4096 vue-cli-service build",
     "build:watch:core": "cd packages/cloudforet/core-lib && npm run build:watch --workpsace=@cloudforet/core-lib",
     "test:unit": "vue-cli-service test:unit",
