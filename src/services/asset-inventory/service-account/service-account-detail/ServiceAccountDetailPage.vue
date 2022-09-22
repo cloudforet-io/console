@@ -44,6 +44,8 @@
             <service-account-credentials :provider="providerKey"
                                          :service-account-id="serviceAccountId"
                                          :service-account-type="serviceAccountType"
+                                         :service-account-name="item.name"
+                                         :project-id="projectId"
             />
         </div>
         <p-double-check-modal :visible.sync="deleteModalVisible"
