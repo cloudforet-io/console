@@ -31,8 +31,9 @@
 </template>
 
 <script lang="ts">
-import { PPageTitle, PIconButton } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from 'vue';
+
+import { PPageTitle, PIconButton } from '@spaceone/design-system';
 
 
 import { SpaceRouter } from '@/router';

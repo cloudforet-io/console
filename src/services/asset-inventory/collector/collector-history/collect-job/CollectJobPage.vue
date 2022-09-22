@@ -19,11 +19,12 @@
 
 <script lang="ts">
 import {
-    PHorizontalLayout, PPageTitle,
-} from '@spaceone/design-system';
-import {
     reactive, toRefs, onActivated,
 } from 'vue';
+
+import {
+    PHorizontalLayout, PPageTitle,
+} from '@spaceone/design-system';
 
 
 import JobBasicInformation from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobBasicInformation.vue';

@@ -10,11 +10,12 @@
 </template>
 
 <script lang="ts">
-import { PTab } from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PTab } from '@spaceone/design-system';
 
 
 import JobTaskErrorList from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskErrorList.vue';

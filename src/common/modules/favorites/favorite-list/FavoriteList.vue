@@ -45,11 +45,12 @@
 </template>
 
 <script lang="ts">
-import { PI, PIconButton } from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PI, PIconButton } from '@spaceone/design-system';
 
 
 import type { FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';

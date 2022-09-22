@@ -63,9 +63,10 @@
 <script lang="ts">
 
 
+import type { PropType, SetupContext } from 'vue';
+
 import { PI } from '@spaceone/design-system';
 import vClickOutside from 'v-click-outside';
-import type { PropType, SetupContext } from 'vue';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 

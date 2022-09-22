@@ -24,9 +24,10 @@
 </template>
 
 <script lang="ts">
-import { PBreadcrumbs, PVerticalLayout } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import { computed, ref } from 'vue';
+
+import { PBreadcrumbs, PVerticalLayout } from '@spaceone/design-system';
 
 
 import FNB from '@/common/modules/navigations/FNB.vue';

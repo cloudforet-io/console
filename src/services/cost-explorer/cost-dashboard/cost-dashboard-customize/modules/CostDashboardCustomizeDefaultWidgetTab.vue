@@ -60,8 +60,9 @@
 </template>
 
 <script lang="ts">
-import { PRadio, PLabel, PTextPagination } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from 'vue';
+
+import { PRadio, PLabel, PTextPagination } from '@spaceone/design-system';
 
 
 import CostDashboardCustomizeWidgetConfig

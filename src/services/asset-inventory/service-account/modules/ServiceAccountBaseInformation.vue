@@ -42,13 +42,15 @@
 
 <script lang="ts">
 import {
-    PButton, PDataLoader, PPaneLayout, PPanelTop,
-} from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PButton, PDataLoader, PPaneLayout, PPanelTop,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

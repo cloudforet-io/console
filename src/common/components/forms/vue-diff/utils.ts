@@ -1,5 +1,6 @@
-import { diff_match_patch as DiffMatchPatch } from 'diff-match-patch';
 import type { Ref } from 'vue';
+
+import { diff_match_patch as DiffMatchPatch } from 'diff-match-patch';
 
 
 import hljs from './highlight';

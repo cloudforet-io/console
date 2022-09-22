@@ -28,12 +28,13 @@
 </template>
 
 <script lang="ts">
-import { PRadio, PCheckBox } from '@spaceone/design-system';
 import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PRadio, PCheckBox } from '@spaceone/design-system';
 
 
 const TOPIC_LIST = [

@@ -76,10 +76,11 @@
 </template>
 
 <script lang="ts">
-import { PAnchor } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+
+import { PAnchor } from '@spaceone/design-system';
 
 
 import { store } from '@/store';

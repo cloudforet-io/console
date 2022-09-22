@@ -26,10 +26,11 @@
 </template>
 
 <script lang="ts">
-import { PButton, PPageTitle } from '@spaceone/design-system';
 import {
     reactive, toRefs,
 } from 'vue';
+
+import { PButton, PPageTitle } from '@spaceone/design-system';
 
 
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';

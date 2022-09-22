@@ -59,15 +59,18 @@
 
 
 import {
-    PAnchor, PBadge, PDataTable, PDefinitionTable, PPanelTop,
-} from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import { iso8601Formatter } from 'cloudforet/core-lib';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+
+import {
+    PAnchor, PBadge, PDataTable, PDefinitionTable, PPanelTop,
+} from '@spaceone/design-system';
+
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+
+import { iso8601Formatter } from 'cloudforet/core-lib';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

@@ -18,10 +18,11 @@
 
 <script lang="ts">
 
-import { PFieldGroup } from '@spaceone/design-system';
-import { debounce } from 'lodash';
 import type { SetupContext } from 'vue';
 import { defineComponent, watch } from 'vue';
+
+import { PFieldGroup } from '@spaceone/design-system';
+import { debounce } from 'lodash';
 
 import { i18n } from '@/translations';
 

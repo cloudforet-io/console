@@ -58,13 +58,14 @@
 <script lang="ts">
 
 import {
-    PButtonModal, PCollapsibleList, PTag,
-} from '@spaceone/design-system';
-import { sum } from 'lodash';
-import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+
+import {
+    PButtonModal, PCollapsibleList, PTag,
+} from '@spaceone/design-system';
+import { sum } from 'lodash';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

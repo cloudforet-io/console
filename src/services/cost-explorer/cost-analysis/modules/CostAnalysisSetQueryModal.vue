@@ -50,16 +50,18 @@
 
 <script lang="ts">
 
+import type { SetupContext } from 'vue';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
+
 import {
     PButtonModal,
     PSelectDropdown,
     PToggleButton,
 } from '@spaceone/design-system';
+
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import type { SetupContext } from 'vue';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

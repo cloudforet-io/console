@@ -47,12 +47,13 @@
 </template>
 
 <script lang="ts">
-import { PDivider, PI } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router';
+
+import { PDivider, PI } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

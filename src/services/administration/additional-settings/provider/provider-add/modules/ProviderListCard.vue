@@ -27,8 +27,9 @@
 
 <script lang="ts">
 
-import { PCardItem, PButton, PLazyImg } from '@spaceone/design-system';
 import { reactive, toRefs } from 'vue';
+
+import { PCardItem, PButton, PLazyImg } from '@spaceone/design-system';
 
 
 import { useProxyValue } from '@/common/composables/proxy-state';

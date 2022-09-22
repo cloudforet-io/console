@@ -40,11 +40,12 @@
 </template>
 
 <script lang="ts">
-import { PI } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+
+import { PI } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

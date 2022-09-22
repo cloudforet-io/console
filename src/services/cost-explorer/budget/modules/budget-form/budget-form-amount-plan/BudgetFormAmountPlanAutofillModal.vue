@@ -42,12 +42,14 @@
 
 <script lang="ts">
 
-import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
-import { commaFormatter, getNumberFromString } from 'cloudforet/core-lib';
 import {
     computed,
     reactive, toRefs, watch,
 } from 'vue';
+
+import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+
+import { commaFormatter, getNumberFromString } from 'cloudforet/core-lib';
 
 import { i18n } from '@/translations';
 

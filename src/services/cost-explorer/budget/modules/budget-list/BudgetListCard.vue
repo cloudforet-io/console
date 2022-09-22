@@ -75,12 +75,13 @@
 
 <script lang="ts">
 import {
-    PDivider, PI, PSkeleton,
-} from '@spaceone/design-system';
-import {
     computed, reactive, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router';
+
+import {
+    PDivider, PI, PSkeleton,
+} from '@spaceone/design-system';
 
 
 import { store } from '@/store';

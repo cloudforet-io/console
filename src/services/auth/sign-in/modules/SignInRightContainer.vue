@@ -49,12 +49,13 @@
 
 <script lang="ts">
 import {
-    PI,
-} from '@spaceone/design-system';
-import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PI,
+} from '@spaceone/design-system';
 
 
 import { store } from '@/store';

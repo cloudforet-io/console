@@ -29,13 +29,15 @@
 
 <script lang="ts">
 
+import type { SetupContext } from 'vue';
+import { defineComponent } from 'vue';
+
 import {
     PBadge,
 } from '@spaceone/design-system';
-import { iso8601Formatter } from 'cloudforet/core-lib';
 import dayjs from 'dayjs';
-import type { SetupContext } from 'vue';
-import { defineComponent } from 'vue';
+
+import { iso8601Formatter } from 'cloudforet/core-lib';
 
 
 interface Props {

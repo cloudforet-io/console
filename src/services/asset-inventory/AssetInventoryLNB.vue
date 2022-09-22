@@ -5,7 +5,6 @@
 </template>
 
 <script lang="ts">
-import { get } from 'lodash';
 import {
     computed,
     defineComponent,
@@ -14,6 +13,8 @@ import {
     watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { get } from 'lodash';
 
 
 import { store } from '@/store';

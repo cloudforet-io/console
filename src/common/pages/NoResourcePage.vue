@@ -21,13 +21,14 @@
 
 <script lang="ts">
 import {
-    PLottie, PButton,
-} from '@spaceone/design-system';
-import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { RouteConfig } from 'vue-router';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PLottie, PButton,
+} from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 

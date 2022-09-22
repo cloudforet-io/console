@@ -57,19 +57,19 @@
 </template>
 
 <script lang="ts">
-
-
-import {
-    PButtonModal, PDataTable, PSelectableList, PBadge,
-} from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
-import { keys, forEach, get } from 'lodash';
 import {
     toRefs, reactive, computed, watch, getCurrentInstance,
 } from 'vue';
 import type { SetupContext } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PButtonModal, PDataTable, PSelectableList, PBadge,
+} from '@spaceone/design-system';
+import { keys, forEach, get } from 'lodash';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 
@@ -77,6 +77,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
 
 export default {
     name: 'CollectModal',

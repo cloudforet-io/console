@@ -66,11 +66,12 @@
 </template>
 
 <script lang="ts">
-import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
 
 
 import { i18n } from '@/translations';

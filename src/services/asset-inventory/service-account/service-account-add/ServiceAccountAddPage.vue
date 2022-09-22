@@ -71,14 +71,16 @@
 
 <script lang="ts">
 import {
-    PButton, PLazyImg, PMarkdown, PPageTitle, PPaneLayout, PPanelTop,
-} from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import { get } from 'lodash';
-import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PButton, PLazyImg, PMarkdown, PPageTitle, PPaneLayout, PPanelTop,
+} from '@spaceone/design-system';
+import { get } from 'lodash';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

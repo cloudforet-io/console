@@ -11,12 +11,14 @@
 <script lang="ts">
 
 import {
-    PSearchDropdown,
-} from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+
+import {
+    PSearchDropdown,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 

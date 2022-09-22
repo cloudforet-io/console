@@ -21,8 +21,9 @@
 </template>
 
 <script lang="ts">
-import { PButtonModal } from '@spaceone/design-system';
 import { reactive, toRefs } from 'vue';
+
+import { PButtonModal } from '@spaceone/design-system';
 
 
 import { SpaceRouter } from '@/router';

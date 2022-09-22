@@ -25,10 +25,11 @@
 </template>
 
 <script lang="ts">
+import { computed, reactive, toRefs } from 'vue';
+
 import {
     PLottie, PAnchor, PBadge,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from 'vue';
 
 
 import config from '@/lib/config';

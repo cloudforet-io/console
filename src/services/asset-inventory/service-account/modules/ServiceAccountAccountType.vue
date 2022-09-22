@@ -35,13 +35,14 @@
 </template>
 
 <script lang="ts">
-import {
-    PPaneLayout, PPanelTop, PSelectCard, PI, PAnchor,
-} from '@spaceone/design-system';
 import type { PropType, SetupContext } from 'vue';
 import {
     reactive, toRefs, defineComponent, watch,
 } from 'vue';
+
+import {
+    PPaneLayout, PPanelTop, PSelectCard, PI, PAnchor,
+} from '@spaceone/design-system';
 
 import { TRUSTED_ACCOUNT_ALLOWED } from '@/services/asset-inventory/service-account/config';
 import type { AccountType } from '@/services/asset-inventory/service-account/type';

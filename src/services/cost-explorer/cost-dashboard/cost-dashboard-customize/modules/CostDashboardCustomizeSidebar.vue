@@ -42,12 +42,13 @@
 </template>
 
 <script lang="ts">
-import { PButton, PI } from '@spaceone/design-system';
 import {
     computed,
     onUnmounted, reactive, toRefs,
 } from 'vue';
 import draggable from 'vuedraggable';
+
+import { PButton, PI } from '@spaceone/design-system';
 
 
 import { store } from '@/store';

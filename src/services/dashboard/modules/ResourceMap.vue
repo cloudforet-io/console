@@ -64,17 +64,19 @@
 
 <script lang="ts">
 
+import {
+    computed, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
+import type { Location } from 'vue-router';
+
 import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import type { MapChart } from '@amcharts/amcharts4/maps';
 import { PDataLoader, PProgressBar } from '@spaceone/design-system';
+
 import { QueryHelper } from 'cloudforet/core-lib/query';
 import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import {
-    computed, onUnmounted, reactive, toRefs, watch,
-} from 'vue';
-import type { Location } from 'vue-router';
 
 import { store } from '@/store';
 

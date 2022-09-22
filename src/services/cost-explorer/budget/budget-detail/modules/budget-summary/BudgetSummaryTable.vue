@@ -37,11 +37,12 @@
 
 <script lang="ts">
 
+import { computed, reactive, toRefs } from 'vue';
+import type { Location } from 'vue-router';
+
 import { PCollapsibleToggle, PDataTable } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import cloneDeep from 'lodash/cloneDeep';
-import { computed, reactive, toRefs } from 'vue';
-import type { Location } from 'vue-router';
 
 import { i18n } from '@/translations';
 

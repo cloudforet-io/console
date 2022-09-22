@@ -17,10 +17,11 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
+
+import dayjs from 'dayjs';
 
 
 import { CURRENCY } from '@/store/modules/display/config';

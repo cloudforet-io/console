@@ -65,14 +65,15 @@
 </template>
 
 <script lang="ts">
-import {
-    PContextMenu, PI, PLazyImg, PTooltip,
-} from '@spaceone/design-system';
 import type { PropType, SetupContext } from 'vue';
 import {
     defineComponent, onUnmounted,
     reactive, toRefs, watch,
 } from 'vue';
+
+import {
+    PContextMenu, PI, PLazyImg, PTooltip,
+} from '@spaceone/design-system';
 
 
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';

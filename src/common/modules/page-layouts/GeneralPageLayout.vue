@@ -15,9 +15,10 @@
 </template>
 
 <script lang="ts">
-import { PBreadcrumbs } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import { computed } from 'vue';
+
+import { PBreadcrumbs } from '@spaceone/design-system';
 
 
 import FNB from '@/common/modules/navigations/FNB.vue';

@@ -62,12 +62,14 @@
 </template>
 
 <script lang="ts">
-import { PButton, PDataLoader } from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PButton, PDataLoader } from '@spaceone/design-system';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

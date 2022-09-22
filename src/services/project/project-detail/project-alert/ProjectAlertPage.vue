@@ -22,13 +22,16 @@
 
 <script lang="ts">
 
-import { PButtonTab, PButton } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PButtonTab, PButton } from '@spaceone/design-system';
+
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

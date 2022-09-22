@@ -60,14 +60,15 @@
 
 <script lang="ts">
 import {
-    PNoticeAlert, PToastAlert, PIconModal, PSidebar,
-} from '@spaceone/design-system';
-import {
     computed,
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PNoticeAlert, PToastAlert, PIconModal, PSidebar,
+} from '@spaceone/design-system';
 
 import { store } from '@/store';
 

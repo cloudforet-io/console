@@ -34,8 +34,9 @@
     </p-button-modal>
 </template>
 <script lang="ts">
-import { PButtonModal, PCheckBox } from '@spaceone/design-system';
 import { reactive, toRefs } from 'vue';
+
+import { PButtonModal, PCheckBox } from '@spaceone/design-system';
 
 
 import { i18n } from '@/translations';

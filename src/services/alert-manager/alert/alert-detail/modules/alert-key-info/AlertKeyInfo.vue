@@ -69,14 +69,16 @@
 <script lang="ts">
 
 import {
-    PPaneLayout, PDefinitionTable, PAnchor, PBadge,
-} from '@spaceone/design-system';
-import { iso8601Formatter } from 'cloudforet/core-lib';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import {
     computed, reactive, toRefs,
 } from 'vue';
 import type { PropType } from 'vue';
+
+import {
+    PPaneLayout, PDefinitionTable, PAnchor, PBadge,
+} from '@spaceone/design-system';
+
+import { iso8601Formatter } from 'cloudforet/core-lib';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

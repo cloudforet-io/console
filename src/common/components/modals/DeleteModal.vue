@@ -35,10 +35,11 @@
 </template>
 
 <script lang="ts">
-import { PButtonModal, PButton } from '@spaceone/design-system';
 import type { PropType, SetupContext } from 'vue';
 import { reactive, toRefs } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+
+import { PButtonModal, PButton } from '@spaceone/design-system';
 
 import type { Size } from '@/common/components/modals/config';
 import { SIZE } from '@/common/components/modals/config';

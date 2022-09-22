@@ -56,20 +56,23 @@
 
 <script lang="ts">
 
+import {
+    computed, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
+import type { Location } from 'vue-router';
+
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import {
     PBalloonTab, PButton, PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import { byteFormatter, commaFormatter, numberFormatter } from 'cloudforet/core-lib';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
-import {
-    computed, onUnmounted, reactive, toRefs, watch,
-} from 'vue';
-import type { Location } from 'vue-router';
+
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+
+import { byteFormatter, commaFormatter, numberFormatter } from 'cloudforet/core-lib';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

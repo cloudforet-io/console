@@ -85,17 +85,20 @@
 
 <script lang="ts">
 
-import {
-    PPaneLayout, PPageTitle, PTab, PLottie, PCopyButton, PBadge, PDivider,
-} from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { useInfiniteScroll } from '@vueuse/core';
-import { iso8601Formatter } from 'cloudforet/core-lib';
 import {
     computed, defineComponent, getCurrentInstance, onMounted, reactive, toRefs, watch,
 } from 'vue';
 import type { PropType } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PPaneLayout, PPageTitle, PTab, PLottie, PCopyButton, PBadge, PDivider,
+} from '@spaceone/design-system';
+
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+
+import { iso8601Formatter } from 'cloudforet/core-lib';
 
 import { i18n } from '@/translations';
 

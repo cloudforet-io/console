@@ -42,13 +42,14 @@
 </template>
 
 <script lang="ts">
-import {
-    PCheckBox, PIconButton, PI, PTooltip,
-} from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs,
 } from 'vue';
+
+import {
+    PCheckBox, PIconButton, PI, PTooltip,
+} from '@spaceone/design-system';
 
 
 import { i18n } from '@/translations';

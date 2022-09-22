@@ -23,13 +23,14 @@
 </template>
 
 <script lang="ts">
-import {
-    PAnchor, PEmpty, PPaneLayout, PPanelTop,
-} from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs,
 } from 'vue';
+
+import {
+    PAnchor, PEmpty, PPaneLayout, PPanelTop,
+} from '@spaceone/design-system';
 
 
 import { store } from '@/store';

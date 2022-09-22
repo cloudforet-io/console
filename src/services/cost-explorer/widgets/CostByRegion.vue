@@ -47,21 +47,23 @@
 
 <script lang="ts">
 
+import {
+    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
+
 import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import type { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import { PDataLoader } from '@spaceone/design-system';
-import { QueryHelper } from 'cloudforet/core-lib/query';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import dayjs from 'dayjs';
 import {
     groupBy, sum,
 } from 'lodash';
-import {
-    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
-} from 'vue';
+
+import { QueryHelper } from 'cloudforet/core-lib/query';
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 

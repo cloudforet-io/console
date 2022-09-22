@@ -37,13 +37,14 @@
 </template>
 
 <script lang="ts">
-import {
-    PI, PCheckBox, PTab,
-} from '@spaceone/design-system';
 import type { SetupContext } from 'vue';
 import {
     computed, reactive, toRefs, watch, onMounted, onUnmounted, defineComponent,
 } from 'vue';
+
+import {
+    PI, PCheckBox, PTab,
+} from '@spaceone/design-system';
 
 
 import { store } from '@/store';

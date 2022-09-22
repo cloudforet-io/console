@@ -57,20 +57,23 @@
 /* external library */
 
 import {
+    computed, reactive, watch, toRefs,
+} from 'vue';
+
+import {
     PPageTitle, PDynamicLayout, PButton, PSelectStatus,
 } from '@spaceone/design-system';
+
 import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+
 import { QueryHelper } from 'cloudforet/core-lib/query';
 import type { QueryStoreFilter } from 'cloudforet/core-lib/query/type';
 import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from 'cloudforet/core-lib/space-connector/helper';
-import {
-    computed, reactive, watch, toRefs,
-} from 'vue';
 
 /* components */
 import { SpaceRouter } from '@/router';

@@ -30,11 +30,12 @@
 </template>
 
 <script lang="ts">
-import { includes } from 'lodash';
 import {
     reactive, toRefs, computed, getCurrentInstance, defineComponent,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { includes } from 'lodash';
 
 
 import { store } from '@/store';

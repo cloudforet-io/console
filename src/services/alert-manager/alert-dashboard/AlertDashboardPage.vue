@@ -17,12 +17,14 @@
 <script lang="ts">
 
 import {
-    PPageTitle,
-} from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import {
     reactive, toRefs,
 } from 'vue';
+
+import {
+    PPageTitle,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import AlertHistoryWidget from '@/services/alert-manager/alert-dashboard/modules/alert-history-widget/AlertHistoryWidget.vue';
 import AlertStateWidget from '@/services/alert-manager/alert-dashboard/modules/AlertStateWidget.vue';

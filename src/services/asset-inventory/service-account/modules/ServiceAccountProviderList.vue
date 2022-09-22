@@ -15,9 +15,10 @@
 
 <script lang="ts">
 
-import { PLazyImg } from '@spaceone/design-system';
 import type { SetupContext } from 'vue';
 import { defineComponent, reactive, toRefs } from 'vue';
+
+import { PLazyImg } from '@spaceone/design-system';
 
 
 import { useProxyValue } from '@/common/composables/proxy-state';

@@ -46,13 +46,15 @@
 
 <script lang="ts">
 
-import {
-    PBadge, PButton, PI,
-} from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import type { SetupContext } from 'vue';
 import { getCurrentInstance, reactive, toRefs } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PBadge, PButton, PI,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

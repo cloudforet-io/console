@@ -53,17 +53,19 @@
 <script lang="ts">
 
 
-import * as am4charts from '@amcharts/amcharts4/charts';
-import type { XYChart } from '@amcharts/amcharts4/charts';
-import * as am4core from '@amcharts/amcharts4/core';
-import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
-import { commaFormatter, numberFormatter } from 'cloudforet/core-lib';
-import dayjs from 'dayjs';
-import { get } from 'lodash';
 import {
     defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 import type { PropType } from 'vue';
+
+import * as am4charts from '@amcharts/amcharts4/charts';
+import type { XYChart } from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { get } from 'lodash';
+
+import { commaFormatter, numberFormatter } from 'cloudforet/core-lib';
 
 
 import config from '@/lib/config';

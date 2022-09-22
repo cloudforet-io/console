@@ -116,15 +116,16 @@
 </template>
 
 <script lang="ts">
-import {
-    PDivider, PI, PIconButton, PPopover, PSelectDropdown,
-} from '@spaceone/design-system';
-import type { Editor } from '@tiptap/vue-2';
 import type { PropType } from 'vue';
 import {
     computed,
     defineComponent, reactive, toRefs,
 } from 'vue';
+
+import {
+    PDivider, PI, PIconButton, PPopover, PSelectDropdown,
+} from '@spaceone/design-system';
+import type { Editor } from '@tiptap/vue-2';
 
 
 import { i18n } from '@/translations';

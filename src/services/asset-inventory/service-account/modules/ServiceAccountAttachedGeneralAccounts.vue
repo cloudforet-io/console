@@ -19,17 +19,19 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
+import {
+    defineComponent, reactive, toRefs,
+} from 'vue';
+
 import {
     PPaneLayout,
     PPanelTop,
     PDataTable,
     PAnchor,
 } from '@spaceone/design-system';
+
 import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import type { PropType } from 'vue';
-import {
-    defineComponent, reactive, toRefs,
-} from 'vue';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

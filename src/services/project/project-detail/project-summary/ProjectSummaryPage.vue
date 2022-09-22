@@ -23,10 +23,11 @@
 </template>
 
 <script lang="ts">
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     reactive, toRefs,
 } from 'vue';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

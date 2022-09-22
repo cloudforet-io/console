@@ -56,13 +56,16 @@
 
 <script lang="ts">
 
-import { PDataTable, PBadge, PAnchor } from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 import type { PropType } from 'vue';
+
+import { PDataTable, PBadge, PAnchor } from '@spaceone/design-system';
+
+import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

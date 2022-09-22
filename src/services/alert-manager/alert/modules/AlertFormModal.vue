@@ -55,16 +55,18 @@
 
 <script lang="ts">
 
-import {
-    PAnchor, PButton,
-    PButtonModal, PFieldGroup, PRadio, PTextarea, PTextInput,
-} from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PAnchor, PButton,
+    PButtonModal, PFieldGroup, PRadio, PTextarea, PTextInput,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

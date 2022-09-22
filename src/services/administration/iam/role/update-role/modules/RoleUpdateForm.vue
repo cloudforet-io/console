@@ -34,11 +34,12 @@
 </template>
 
 <script lang="ts">
-import { PPanelTop } from '@spaceone/design-system';
 import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+
+import { PPanelTop } from '@spaceone/design-system';
 
 
 import { i18n } from '@/translations';

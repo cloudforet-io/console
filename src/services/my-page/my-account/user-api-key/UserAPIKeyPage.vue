@@ -21,12 +21,14 @@
 <script lang="ts">
 
 import {
-    PDataTable, PPageTitle, PPaneLayout,
-} from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import {
     computed, reactive, toRefs,
 } from 'vue';
+
+import {
+    PDataTable, PPageTitle, PPaneLayout,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';

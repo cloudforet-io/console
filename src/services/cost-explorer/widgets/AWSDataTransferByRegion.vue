@@ -41,19 +41,23 @@
 
 <script lang="ts">
 
+import {
+    computed, onUnmounted, reactive, toRefs, watch,
+} from 'vue';
+
 import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
 import * as am4core from '@amcharts/amcharts4/core';
 import type { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import { PDataLoader } from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import bytes from 'bytes';
+import dayjs from 'dayjs';
+
+import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+
 import { QueryHelper } from 'cloudforet/core-lib/query';
 import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import dayjs from 'dayjs';
-import {
-    computed, onUnmounted, reactive, toRefs, watch,
-} from 'vue';
+
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

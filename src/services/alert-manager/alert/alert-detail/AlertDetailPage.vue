@@ -70,12 +70,14 @@
 </template>
 
 <script lang="ts">
-import { PIconButton, PPageTitle } from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import { PIconButton, PPageTitle } from '@spaceone/design-system';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 
 import { i18n } from '@/translations';

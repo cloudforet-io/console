@@ -9,14 +9,16 @@
 
 <script lang="ts">
 
-import * as am4charts from '@amcharts/amcharts4/charts';
-import * as am4core from '@amcharts/amcharts4/core';
-import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import dayjs from 'dayjs';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+
+import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

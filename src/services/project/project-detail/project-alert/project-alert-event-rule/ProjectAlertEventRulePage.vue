@@ -110,13 +110,15 @@
 <script lang="ts">
 
 import {
-    PPageTitle, PBreadcrumbs, PCard, PI, PButton,
-} from '@spaceone/design-system';
-import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
-import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PPageTitle, PBreadcrumbs, PCard, PI, PButton,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from 'cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 

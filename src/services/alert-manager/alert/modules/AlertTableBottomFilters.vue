@@ -42,10 +42,11 @@
 </template>
 
 <script lang="ts">
-import { PCheckBox, PSelectButton, PSelectStatus } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+
+import { PCheckBox, PSelectButton, PSelectStatus } from '@spaceone/design-system';
 
 
 import { i18n } from '@/translations';

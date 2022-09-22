@@ -9,17 +9,18 @@
 
 <script lang="ts">
 
+import {
+    getCurrentInstance,
+    reactive, toRefs, watch,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
+
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { PieChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import {
     PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
-import {
-    getCurrentInstance,
-    reactive, toRefs, watch,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { CURRENCY } from '@/store/modules/display/config';
 

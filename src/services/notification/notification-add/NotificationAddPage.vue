@@ -11,13 +11,14 @@
 
 <script lang="ts">
 import {
-    PPageTitle,
-} from '@spaceone/design-system';
-import {
     computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from 'vue';
 import VueI18n from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
+
+import {
+    PPageTitle,
+} from '@spaceone/design-system';
 
 import NotificationAddForm from '@/services/notification/notification-add/modules/NotificationAddForm.vue';
 
