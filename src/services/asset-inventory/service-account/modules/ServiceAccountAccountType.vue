@@ -18,7 +18,7 @@
                         @click="() => handleSelectAccountType('TRUSTED')"
                     />
                 </div>
-                <div class="information-wrapper">
+                <div v-if="TRUSTED_ACCOUNT_ALLOWED.some((d) => d === provider)" class="information-wrapper">
                     <p-i name="ic_outlined-info"
                          height="1rem" width="1rem"
                          color="inherit"
@@ -92,7 +92,7 @@ export default defineComponent({
 <style lang="postcss" scoped>
 .service-account-account-type {
     .content-wrapper {
-        padding: 0.5rem 1rem 2.5rem 1rem;
+        padding: 0.5rem 1rem 1.5rem 1rem;
         .create-mode-wrapper {
             @apply w-1/2;
             .card-wrapper {
@@ -117,6 +117,7 @@ export default defineComponent({
                 @apply flex;
                 gap: 0.3rem;
                 align-content: flex-start;
+                padding-bottom: 1rem;
                 .anchor-wrapper {
                     width: calc(100% - 1rem);
                 }
