@@ -15,7 +15,7 @@
         </p-field-group>
         <template v-if="hasCredentialKey">
             <p-field-group v-if="serviceAccountType !== ACCOUNT_TYPE.TRUSTED"
-                           label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CREDENTIALS_LABEL')"
+                           :label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CREDENTIALS_LABEL')"
                            required
             >
                 <div class="radio-wrapper">
@@ -27,7 +27,7 @@
                     <p-radio :selected="attachTrustedAccount" :value="true" @change="handleChangeAttachTrustedAccount">
                         {{ $t('APP.MAIN.YES') }}<br>
                     </p-radio>
-                    <p-select-dropdown :items="trustedAccountItems" :disabled="!attachTrustedAccount" />
+                    <p-select-dropdown v-model="attachedTrustedAccountId" :items="trustedAccountItems" :disabled="!attachTrustedAccount" />
                 </div>
             </p-field-group>
             <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SECRET_TYPE_LABEL')" required class="mb-8">
@@ -128,6 +128,7 @@ export default defineComponent<Props>({
             hasCredentialKey: true,
             attachTrustedAccount: false,
             trustedAccountItems: [] as SelectDropdownMenu[],
+            attachedTrustedAccountId: undefined,
             secretTypes: computed(() => {
                 if (props.serviceAccountType === 'GENERAL') {
                     if (state.attachTrustedAccount) {
@@ -148,6 +149,7 @@ export default defineComponent<Props>({
                 customSchemaForm: state.customSchemaForm,
                 credentialJson: state.credentialJson,
                 activeDataType: tabState.activeTab as ActiveDataType,
+                attachedTrustedAccountId: state.attachedTrustedAccountId,
             })),
             isAllValid: computed<boolean>(() => {
                 if (!state.hasCredentialKey) return true;
@@ -173,6 +175,7 @@ export default defineComponent<Props>({
             state.selectedSecretType = state.secretTypes[0];
             state.customSchemaForm = {};
             state.credentialJson = '';
+            state.attachedTrustedAccountId = undefined;
             tabState.activeTab = 'input';
         };
 
