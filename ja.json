@@ -2122,6 +2122,7 @@
 		"SERVER_MODEL": "サーバモデル",
 		"SERVER_TYPE": "サーバタイプ",
 		"SERVICE_ACCOUNT": "サービスアカウント",
+		"SERVICE_ACCOUNT_TYPE": "",
 		"UPDATED_AT": "変更日"
 	},
 	"PLUGIN": {

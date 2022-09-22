@@ -2122,6 +2122,7 @@
 		"SERVER_MODEL": "Server Model",
 		"SERVER_TYPE": "Server Type",
 		"SERVICE_ACCOUNT": "Service Accounts",
+		"SERVICE_ACCOUNT_TYPE": "Account Type",
 		"UPDATED_AT": "Updated"
 	},
 	"PLUGIN": {

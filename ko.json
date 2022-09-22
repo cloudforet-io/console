@@ -2122,6 +2122,7 @@
 		"SERVER_MODEL": "서버 모델",
 		"SERVER_TYPE": "서버 타입",
 		"SERVICE_ACCOUNT": "서비스 계정",
+		"SERVICE_ACCOUNT_TYPE": "어카운트 타입",
 		"UPDATED_AT": "변경 날짜"
 	},
 	"PLUGIN": {
