@@ -43,9 +43,8 @@ import {
 import { isEmpty } from 'lodash';
 import type { PropType } from 'vue';
 import {
-    defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    defineComponent, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -103,7 +102,6 @@ export default defineComponent<Props>({
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             mode: 'READ' as PageMode,
@@ -145,6 +143,7 @@ export default defineComponent<Props>({
                 });
                 return true;
             } catch (e) {
+                // song-lang
                 ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
                 return false;
             }
@@ -167,8 +166,10 @@ export default defineComponent<Props>({
                     project_id: props.projectId || null,
                     trusted_secret_id: state.credentialForm.attachedTrustedAccountId,
                 });
-                showSuccessMessage(i18n.t('Successfully Updated Credentials'), '', vm);
+                // song-lang
+                showSuccessMessage(i18n.t('Successfully Updated Credentials'), '');
             } catch (e) {
+                // song-lang
                 ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
             }
         };
@@ -180,6 +181,7 @@ export default defineComponent<Props>({
                 });
                 return true;
             } catch (e) {
+                // song-lang
                 ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
                 return false;
             }
@@ -198,8 +200,10 @@ export default defineComponent<Props>({
                     data,
                 });
 
-                showSuccessMessage(i18n.t('Successfully Updated Credentials'), '', vm);
+                // song-lang
+                showSuccessMessage(i18n.t('Successfully Updated Credentials'), '');
             } catch (e) {
+                // song-lang
                 ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
             }
         };
@@ -220,7 +224,8 @@ export default defineComponent<Props>({
                     if (state.credentialForm.hasCredentialKey) {
                         await createGeneralSecret();
                     } else {
-                        showSuccessMessage(i18n.t('Successfully Updated Credentials'), '', vm);
+                        // song-lang
+                        showSuccessMessage(i18n.t('Successfully Updated Credentials'), '');
                     }
                 }
             } else {
