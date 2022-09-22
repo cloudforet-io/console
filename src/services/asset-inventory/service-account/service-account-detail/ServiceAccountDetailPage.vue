@@ -28,8 +28,7 @@
         </p-page-title>
         <div class="content-wrapper">
             <p-pane-layout class="service-account-account-type">
-                <!--                song-lang-->
-                <p-panel-top title="Account Type" />
+                <p-panel-top :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE')" />
                 <div class="badge-wrapper">
                     <service-account-badge :account-type="item.service_account_type" />
                 </div>
