@@ -167,6 +167,9 @@ export default {
                     { k: 'provider', v: state.selectedProvider, o: '=' },
                     ...tableState.searchFilters,
                 ]);
+            if (tableState.selectedAccountType !== 'all') {
+                apiQuery.addFilter({ k: 'service_account_type', v: tableState.selectedAccountType, o: '=' });
+            }
             const fields = tableState.schema?.options?.fields;
             if (fields) {
                 apiQuery.setOnly(...fields.map(d => d.key).filter(d => !d.startsWith('tags.')), 'service_account_id', 'tags');
@@ -308,6 +311,9 @@ export default {
             if (replaceQueryHelper.rawQueryString !== JSON.stringify(filterQueryString)) {
                 replaceUrlQuery('filters', replaceQueryHelper.rawQueryStrings);
             }
+        });
+        watch(() => tableState.selectedAccountType, () => {
+            listServiceAccountData();
         });
 
         return {
