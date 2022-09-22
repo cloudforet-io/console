@@ -2,8 +2,8 @@
     <p-pane-layout class="service-account-project-detail">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
             <template #extra>
-                <p-button v-if="!editMode" :disabled="accountType === 'TRUSTED' && !projectName" icon="ic_edit"
-                          :style-type="!projectName && 'transparent'"
+                <p-button v-if="!editMode" :disabled="accountType === 'TRUSTED' && isManaged" icon="ic_edit"
+                          style-type="transparent"
                           @click="handleEditMode"
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
@@ -103,6 +103,7 @@ export default {
             formData: { selectedProject: null } as ProjectForm,
             proxyIsValid: useProxyValue('is-valid', props, emit),
             accountType: computed<AccountType>(() => props.serviceAccountItem?.service_account_type ?? 'GENERAL'),
+            isManaged: computed<boolean>(() => props.serviceAccountItem?.tags?.is_managed ?? false),
         });
 
         /* Util */
