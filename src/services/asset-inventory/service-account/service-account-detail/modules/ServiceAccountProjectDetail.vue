@@ -2,7 +2,7 @@
     <p-pane-layout class="service-account-project-detail">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
             <template #extra>
-                <p-button v-if="!editMode" :disabled="accountType === ACCOUNT_TYPE.TRUSTED && isManaged" icon="ic_edit"
+                <p-button v-if="!editMode" :disabled="accountType === ACCOUNT_TYPE.TRUSTED && !editable" icon="ic_edit"
                           style-type="transparent"
                           @click="handleEditMode"
                 >
@@ -95,6 +95,10 @@ export default {
             type: Object as PropType<ServiceAccountModel>,
             default: undefined,
         },
+        editable: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -106,7 +110,6 @@ export default {
             formData: { selectedProject: null } as ProjectForm,
             proxyIsValid: useProxyValue('is-valid', props, emit),
             accountType: computed<AccountType>(() => props.serviceAccountItem?.service_account_type ?? ACCOUNT_TYPE.GENERAL),
-            isManaged: computed<boolean>(() => props.serviceAccountItem?.tags?.is_managed ?? false),
         });
 
         /* Util */
