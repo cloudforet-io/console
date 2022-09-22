@@ -38,10 +38,13 @@
                                                        @change="handleChangeBaseInformationForm"
                 />
             </p-pane-layout>
-            <service-account-project-form v-if="accountType === ACCOUNT_TYPE.GENERAL"
-                                          :is-valid.sync="isProjectFormValid"
-                                          @change="handleChangeProjectForm"
-            />
+            <p-pane-layout class="form-wrapper">
+                <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')" />
+                <service-account-project-form v-if="accountType === ACCOUNT_TYPE.GENERAL"
+                                              :is-valid.sync="isProjectFormValid"
+                                              @change="handleChangeProjectForm"
+                />
+            </p-pane-layout>
             <p-pane-layout class="form-wrapper">
                 <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')" />
                 <service-account-credentials-form v-if="enableCredentialInput"
@@ -98,7 +101,7 @@ import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformationForm.vue';
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentialsForm.vue';
-import ServiceAccountProjectForm from '@/services/asset-inventory/service-account/service-account-add/modules/ServiceAccountProjectForm.vue';
+import ServiceAccountProjectForm from '@/services/asset-inventory/service-account/modules/ServiceAccountProjectForm.vue';
 import type {
     AccountType,
     BaseInformationForm, CredentialForm, ProjectForm, ProviderModel,
@@ -187,7 +190,7 @@ export default {
                     tags: formState.baseInformationForm.tags,
                     service_account_type: formState.accountType,
                     trusted_service_account_id: formState.credentialForm.attachedTrustedAccountId,
-                    project_id: formState.projectForm.selectedProject?.id || null,
+                    project_id: formState.projectForm.selectedProjectId,
                 });
                 return res.service_account_id;
             } catch (e) {
@@ -215,7 +218,7 @@ export default {
                     schema: formState.credentialForm.selectedSecretType,
                     secret_type: 'CREDENTIALS',
                     service_account_id: serviceAccountId,
-                    project_id: formState.projectForm.selectedProject?.id || null,
+                    project_id: formState.projectForm.selectedProjectId,
                     trusted_secret_id: formState.credentialForm.attachedTrustedAccountId,
                 });
 
@@ -255,7 +258,7 @@ export default {
         const handleChangeAccountType = (accountType: AccountType) => {
             formState.accountType = accountType;
             if (accountType === ACCOUNT_TYPE.TRUSTED) {
-                formState.projectForm = { selectedProject: null };
+                formState.projectForm = { selectedProjectId: null };
             }
         };
         const handleChangeBaseInformationForm = (baseInformationForm) => {
@@ -297,6 +300,9 @@ export default {
         gap: 1rem;
 
         .form-wrapper {
+            .service-account-project-form {
+                padding: 0.5rem 1rem 2.5rem 1rem;
+            }
             .service-account-credentials-form {
                 padding: 0.5rem 1rem 2.5rem 1rem;
             }

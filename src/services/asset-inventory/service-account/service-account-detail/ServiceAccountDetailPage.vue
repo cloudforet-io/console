@@ -33,7 +33,12 @@
                     <service-account-badge :account-type="item.service_account_type" :is-managed="isManagedAccount" />
                 </div>
             </p-pane-layout>
-            <service-account-project-detail :project-id="projectId" :service-account-item="item" :editable="!isManagedAccount" />
+            <service-account-project :project-id="projectId"
+                                     :service-account-id="serviceAccountId"
+                                     :service-account-type="serviceAccountType"
+                                     :editable="!isManagedAccount"
+                                     @change-project="handleChangeProject"
+            />
             <service-account-attached-general-accounts v-if="item.service_account_type === ACCOUNT_TYPE.TRUSTED"
                                                        :service-account-id="serviceAccountId"
                                                        :attached-general-accounts.sync="attachedGeneralAccounts"
@@ -102,17 +107,17 @@ import ServiceAccountBaseInformation
     from '@/services/asset-inventory/service-account/modules/ServiceAccountBaseInformation.vue';
 import ServiceAccountCredentials
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
-import ServiceAccountProjectDetail from '@/services/asset-inventory/service-account/service-account-detail/modules/ServiceAccountProjectDetail.vue';
+import ServiceAccountProject from '@/services/asset-inventory/service-account/modules/ServiceAccountProject.vue';
 import type { ProviderModel, ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
 
 
 export default defineComponent({
     name: 'ServiceAccountDetailPage',
     components: {
+        ServiceAccountProject,
         ServiceAccountCredentials,
         ServiceAccountAttachedGeneralAccounts,
         ServiceAccountBaseInformation,
-        ServiceAccountProjectDetail,
         ServiceAccountBadge,
         PIconButton,
         PPageTitle,
@@ -210,6 +215,9 @@ export default defineComponent({
             await deleteServiceAccount();
             await SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME });
         };
+        const handleChangeProject = () => {
+            getServiceAccount(props.serviceAccountId);
+        };
 
         /* Init */
         (async () => {
@@ -232,6 +240,7 @@ export default defineComponent({
             ACCOUNT_TYPE,
             handleOpenDeleteModal,
             handleConfirmDelete,
+            handleChangeProject,
         };
     },
 });
@@ -252,7 +261,7 @@ export default defineComponent({
                 padding: 0 1rem;
             }
         }
-        .service-account-project-detail {
+        .service-account-project {
             @apply col-span-6;
         }
         .service-account-attached-general-accounts {
@@ -263,6 +272,17 @@ export default defineComponent({
         }
         .service-account-credentials {
             @apply col-span-12;
+        }
+    }
+
+    @screen mobile {
+        .content-wrapper {
+            .service-account-account-type {
+                @apply col-span-12;
+            }
+            .service-account-project {
+                @apply col-span-12;
+            }
         }
     }
 }
