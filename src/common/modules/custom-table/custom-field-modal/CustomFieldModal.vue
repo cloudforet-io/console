@@ -384,7 +384,7 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-button-modal */
-:deep(.p-button-modal) {
+.p-button-modal:deep() {
     .modal-content {
         height: 100vh;
         .modal-body {
