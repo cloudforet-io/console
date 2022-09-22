@@ -34,7 +34,7 @@
             </template>
             <template #toolbox-bottom>
                 <div class="account-type-filter">
-                    <span class="label">{{ 'Account Type' }}</span>
+                    <span class="label">{{ $t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE') }}</span>
                     <p-select-status v-for="(status, idx) in tableState.accountTypeList" :key="`${status.name}-${idx}`"
                                      :selected="tableState.selectedAccountType"
                                      :value="status.name"
