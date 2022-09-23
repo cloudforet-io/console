@@ -6,7 +6,7 @@
                     :backdrop="backdrop"
                     :visible.sync="proxyVisible"
                     :theme-color="themeColor"
-                    :disabled="invalid"
+                    :disabled="invalid || inputText.length === 0"
                     @cancel="cancel"
                     @close="close"
                     @confirm="confirm"
