@@ -1,3 +1,10 @@
+# [1.1.0-beta.395](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.394...v1.1.0-beta.395) (2022-09-23)
+
+
+### Bug Fixes
+
+* **p-toolbox-table:** change two-way-binding hook ([#30](https://github.com/cloudforet-io/mirinae/issues/30)) ([9dca8b5](https://github.com/cloudforet-io/mirinae/commit/9dca8b5d81179f980207b356476baf301b338a57))
+
 # [1.1.0-beta.394](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.393...v1.1.0-beta.394) (2022-09-23)
 
 
