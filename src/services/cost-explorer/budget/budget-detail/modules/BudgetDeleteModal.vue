@@ -45,7 +45,8 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: false,
-            title: 'Delete Budget' as TranslateResult,
+            // song-lang
+            title: '$t(Delete Budget)' as TranslateResult,
             verificationText: computed(() => props.budgetName),
         });
 
