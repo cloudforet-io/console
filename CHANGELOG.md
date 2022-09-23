@@ -1,3 +1,10 @@
+# [1.1.0-beta.394](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.393...v1.1.0-beta.394) (2022-09-23)
+
+
+### Features
+
+* **text-editor:** add disableAutoReformat prop & refactor to use DataLoader for loading ux ([#29](https://github.com/cloudforet-io/mirinae/issues/29)) ([6bbb034](https://github.com/cloudforet-io/mirinae/commit/6bbb0345bfb12dbcb19073a851bbe2fdbbd40b37))
+
 # [1.1.0-beta.393](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.392...v1.1.0-beta.393) (2022-09-23)
 
 
