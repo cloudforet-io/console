@@ -67,17 +67,17 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, reactive, watch,
+    defineComponent, reactive, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import type { SetupContext } from 'vue';
 
 import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import type { ToolboxTableOptions, ToolboxTableProps } from '@/data-display/tables/toolbox-table/type';
+import { useProxyValue } from '@/hooks';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import PToolbox from '@/navigation/toolbox/PToolbox.vue';
-import { makeOptionalProxy } from '@/util/composition-helpers';
 
 
 export default defineComponent<ToolboxTableProps>({
@@ -108,11 +108,11 @@ export default defineComponent<ToolboxTableProps>({
         },
         sortBy: {
             type: String,
-            default: undefined,
+            default: '',
         },
         sortDesc: {
             type: Boolean,
-            default: undefined,
+            default: true,
         },
         colCopy: {
             type: Boolean,
@@ -124,7 +124,7 @@ export default defineComponent<ToolboxTableProps>({
         },
         selectIndex: {
             type: Array,
-            default: undefined,
+            default: () => [],
         },
         multiSelect: {
             type: Boolean,
@@ -205,11 +205,11 @@ export default defineComponent<ToolboxTableProps>({
         },
         thisPage: {
             type: Number,
-            default: undefined,
+            default: 1,
         },
         pageSize: {
             type: Number,
-            default: undefined,
+            default: 15,
         },
         totalCount: {
             type: Number,
@@ -233,28 +233,26 @@ export default defineComponent<ToolboxTableProps>({
         },
         queryTags: {
             type: Array,
-            default: undefined,
+            default: () => [],
         },
         searchText: {
             type: String,
-            default: undefined,
+            default: '',
         },
         timezone: {
             type: String,
             default: 'UTC',
         },
     },
-    setup(props: ToolboxTableProps, { emit }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
+    setup(props, { emit }: SetupContext) {
         const proxyState = reactive({
-            selectIndex: makeOptionalProxy<number[]>('selectIndex', vm, [], ['select']),
-            sortBy: makeOptionalProxy<string>('sortBy', vm, ''),
-            sortDesc: makeOptionalProxy<boolean>('sortDesc', vm, true),
-            thisPage: makeOptionalProxy<number>('thisPage', vm, 1),
-            pageSize: makeOptionalProxy<number>('pageSize', vm, 15),
-            queryTags: makeOptionalProxy<number>('queryTags', vm, []),
-            searchText: makeOptionalProxy<number>('searchText', vm, ''),
+            selectIndex: useProxyValue<number[]>('selectIndex', props, emit),
+            sortBy: useProxyValue<string>('sortBy', props, emit),
+            sortDesc: useProxyValue<boolean>('sortDesc', props, emit),
+            thisPage: useProxyValue<number>('thisPage', props, emit),
+            pageSize: useProxyValue<number>('pageSize', props, emit),
+            queryTags: useProxyValue<number>('queryTags', props, emit),
+            searchText: useProxyValue<number>('searchText', props, emit),
         });
 
 

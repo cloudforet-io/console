@@ -76,16 +76,15 @@ export const Template = (args, { argTypes }) => ({
         ></p-toolbox-table>
     </div>
     `,
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy
+    setup(props, { emit }) {
         const state = reactive({
-            proxySortBy: makeOptionalProxy('sortBy', vm, props.sortBy),
-            proxySortDesc: makeOptionalProxy('sortDesc', vm, props.sortDesc),
-            proxySelectIndex: makeOptionalProxy('selectIndex', vm, props.selectIndex),
-            proxyThisPage: makeOptionalProxy('thisPage', vm, props.thisPage),
-            proxyPageSize: makeOptionalProxy('pageSize', vm, props.pageSize),
-            proxySearchText: makeOptionalProxy('searchText', vm, props.searchText),
-            proxyQueryTags: makeOptionalProxy('queryTags', vm, props.queryTags),
+            proxySortBy: useProxyValue('sortBy', props, emit),
+            proxySortDesc: useProxyValue('sortDesc', props, emit),
+            proxySelectIndex: useProxyValue('selectIndex', props, emit),
+            proxyThisPage: useProxyValue('thisPage', props, emit),
+            proxyPageSize: useProxyValue('pageSize', props, emit),
+            proxySearchText: useProxyValue('searchText', props, emit),
+            proxyQueryTags: useProxyValue('queryTags', props, emit),
         });
         return {
             ...toRefs(state),
