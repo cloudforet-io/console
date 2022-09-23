@@ -93,8 +93,8 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-button-modal */
-:deep(.p-button-modal) {
-    .modal-body {
+.p-button-modal {
+    :deep(.modal-body) {
         overflow: unset;
     }
 }

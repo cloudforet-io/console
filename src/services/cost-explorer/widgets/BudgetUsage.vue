@@ -178,17 +178,6 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-/* custom budget-usage-progress-bar */
-:deep(.progress-bar) {
-    .background-bar {
-        height: 0.75rem;
-    }
-    .tracker-bar {
-        height: 0.75rem;
-        margin-top: -0.75rem;
-    }
-}
-
 .progress-bar-label {
     @apply flex;
     margin-top: 0.25rem;

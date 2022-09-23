@@ -54,3 +54,15 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+/* custom progress-bar */
+.progress-bar {
+    :deep(.background-bar) {
+        height: 0.75rem;
+    }
+    :deep(.tracker-bar) {
+        height: 0.75rem;
+        margin-top: -0.75rem;
+    }
+}
+</style>

@@ -226,7 +226,9 @@ export default {
 <style lang="postcss" scoped>
 .budget-notifications-modal {
     /* custom design-system component - p-button-modal */
-    :deep(.modal-content .header .modal-header) {
+    :deep(.modal-content),
+    :deep(.header),
+    :deep(.modal-header) {
         height: auto;
         min-height: 3.5rem;
     }

@@ -68,15 +68,9 @@ export default {
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-popover */
-:deep(.amount-planning-type-popover) {
+.amount-planning-type-popover {
     z-index: 99;
     overflow-y: unset;
-    .popper {
-        z-index: 99;
-        overflow: auto;
-        max-width: none;
-        max-height: none;
-    }
 }
 .total-wrapper {
     @apply flex items-center bg-gray-100;
@@ -119,5 +113,4 @@ export default {
         @apply bg-gray-100;
     }
 }
-
 </style>

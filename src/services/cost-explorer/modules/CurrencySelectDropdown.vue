@@ -60,12 +60,12 @@ export default {
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-select-dropdown */
-:deep(.currency-select-dropdown) {
-    &.print-mode {
+.currency-select-dropdown {
+    :deep(&.print-mode) {
         .text {
             white-space: nowrap;
+            border: solid 1px green;
         }
     }
 }
-
 </style>

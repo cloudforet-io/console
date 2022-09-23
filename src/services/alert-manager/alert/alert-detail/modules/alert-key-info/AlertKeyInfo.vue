@@ -193,8 +193,8 @@ export default {
 }
 
 /* custom design-system component - p-definition-table */
-:deep(.p-definition-table) {
-    .p-definition {
+.p-definition-table {
+    :deep(.p-definition) {
         .key {
             @apply capitalize;
             width: 10rem;
