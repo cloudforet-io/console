@@ -79,13 +79,6 @@ export default {
     margin-bottom: 1rem;
 }
 
-@screen mobile {
-    /* custom design-system component - p-toolbox-table */
-    :deep(.p-toolbox-table) .p-data-table {
-        min-height: unset;
-    }
-}
-
 @screen tablet {
     /* custom design-system component - p-toolbox-table */
     :deep(.p-toolbox-table) .p-data-table {

@@ -122,8 +122,8 @@ export default {
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-list-card */
-:deep(.p-list-card) {
-    .body {
+.p-list-card {
+    :deep(.body) {
         overflow-y: auto;
         .title-wrapper {
             @apply text-yellow-500;

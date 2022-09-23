@@ -52,8 +52,8 @@ export default {
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-popover */
-:deep(.budget-cost-type-popover) {
-    .popper {
+.budget-cost-type-popover {
+    :deep(.popper) {
         z-index: 1;
         width: 16.625rem;
     }
