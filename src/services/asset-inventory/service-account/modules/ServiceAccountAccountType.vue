@@ -24,9 +24,8 @@
                          color="inherit"
                          class="external-icon"
                     />
-                    <div class="anchor-wrapper">
+                    <div class="help-wrapper">
                         <span>{{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.TRUST_ACCOUNT_HELP_TEXT') }}</span>
-                        <p-anchor class="here-anchor" highlight :text="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.HERE')" />
                     </div>
                 </div>
             </div>
@@ -41,7 +40,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PSelectCard, PI, PAnchor,
+    PPaneLayout, PPanelTop, PSelectCard, PI,
 } from '@spaceone/design-system';
 
 import { TRUSTED_ACCOUNT_ALLOWED } from '@/services/asset-inventory/service-account/config';
@@ -51,7 +50,6 @@ import type { AccountType } from '@/services/asset-inventory/service-account/typ
 export default defineComponent({
     name: 'ServiceAccountAccountType',
     components: {
-        PAnchor,
         PPaneLayout,
         PPanelTop,
         PSelectCard,
@@ -118,11 +116,8 @@ export default defineComponent({
                 gap: 0.3rem;
                 align-content: flex-start;
                 padding-bottom: 1rem;
-                .anchor-wrapper {
+                .help-wrapper {
                     width: calc(100% - 1rem);
-                }
-                .here-anchor {
-                    margin-left: 0.25rem;
                 }
             }
         }
