@@ -29,5 +29,5 @@ This project is [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) licens
 ## Install
 
 ```shell
-npm i -S @spaceone/console-core-lib
+npm i -S @cloudforet/core-lib
 ```
