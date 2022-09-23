@@ -7,9 +7,9 @@
                     :visible.sync="proxyVisible"
                     :theme-color="themeColor"
                     :disabled="invalid || inputText.length === 0"
-                    @cancel="cancel"
-                    @close="close"
-                    @confirm="confirm"
+                    @cancel="handleCancel"
+                    @close="hadleClose"
+                    @confirm="handleConfirm"
     >
         <template #body>
             <div>
@@ -43,8 +43,6 @@
                                   @keyup.enter="confirm()"
                     />
                 </p-field-group>
-
-                <slot />
             </div>
         </template>
     </p-button-modal>
@@ -118,15 +116,15 @@ export default defineComponent({
             checkState.inputText = '';
             checkState.invalid = false;
         };
-        const cancel = (...event) => {
+        const handleCancel = (event) => {
             reset();
-            emit('cancel', ...event);
+            emit('cancel', event);
         };
-        const close = (...event) => {
+        const handleClose = (event) => {
             reset();
-            emit('close', ...event);
+            emit('close', event);
         };
-        const confirm = () => {
+        const handleConfirm = () => {
             if (checkState.inputText === props.verificationText) {
                 reset();
                 emit('confirm');
@@ -142,9 +140,9 @@ export default defineComponent({
         return {
             ...toRefs(state),
             ...toRefs(checkState),
-            cancel,
-            close,
-            confirm,
+            handleCancel,
+            handleClose,
+            handleConfirm,
         };
     },
 
