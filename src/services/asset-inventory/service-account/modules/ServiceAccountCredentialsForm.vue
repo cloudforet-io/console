@@ -14,7 +14,7 @@
             </div>
         </p-field-group>
         <template v-if="hasCredentialKey">
-            <p-field-group v-if="serviceAccountType !== ACCOUNT_TYPE.TRUSTED"
+            <p-field-group v-if="serviceAccountType !== ACCOUNT_TYPE.TRUSTED && TRUSTED_ACCOUNT_ALLOWED.some((d) => d === provider)"
                            :label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CREDENTIALS_LABEL')"
                            required
             >
@@ -78,7 +78,7 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
+import { ACCOUNT_TYPE, TRUSTED_ACCOUNT_ALLOWED } from '@/services/asset-inventory/service-account/config';
 import type {
     ActiveDataType, CredentialForm, ProviderModel, PageMode, AccountType,
 } from '@/services/asset-inventory/service-account/type';
@@ -274,6 +274,7 @@ export default defineComponent<Props>({
             ...toRefs(state),
             tabState,
             ACCOUNT_TYPE,
+            TRUSTED_ACCOUNT_ALLOWED,
             handleChangeSecretType,
             handleCredentialValidate,
             handleSelectNoCredentials,
