@@ -35,6 +35,16 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## How it works with data prop?
+
+If the `data` prop is `undefined` or `null` , it is assumed that initial loading has not occurred yet. <br/>
+So the empty case screen is not visible. <br/>
+
+On the other hand, if the `data` prop is an empty `array` or an empty `object`, it is assumed that the data is empty and an empty case screen is displayed.<br/>
+
+When the type of `data` prop is `boolean`, if the value is `true`, data is considered to exist, and if `false`, data is considered empty.<br/>
+When you simply want to control whether an empty screen is shown or not, you can solve it by putting a `boolean` value in the `data` prop.<br/>
+
 ## Basic
 <Canvas>
     <Story name="Basic" >
@@ -68,6 +78,51 @@ export const Template = (args, { argTypes }) => ({
                     state.loading = false;
                 }
                 fetchData()
+                return {
+                    ...toRefs(state),
+                    fetchData
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disable Empty Case
+<Canvas>
+    <Story name="Disable Empty Case" >
+        {{
+            components: { PDataLoader, PButton },
+            template: `
+<div class="w-full">
+    <p-button class="mb-2" style-type="primary" :outline="true" @click="fetchData">{{data.length ? 'Empty Data' : 'Load Data'}}</p-button>
+    <p-data-loader :loading="loading" :data="data" disable-empty-case
+        class="p-3 bg-gray-100 border border-gray-200"
+        style="width: 100%; height: 300px;"
+    >
+        <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+            {{d}}
+        </div>
+    </p-data-loader>
+</div>
+    `,
+            setup() {
+                const state = reactive({
+                    loading: false,
+                    data: range(15).map(() => faker.lorem.lines())
+                })
+                const fetchData = async () => {
+                    state.loading = true;
+                    state.data = await new Promise(resolve => {
+                        setTimeout(() => {
+                            if (state.data.length) resolve([])
+                            else resolve(range(15).map(() => faker.lorem.lines()))
+                        }, 1000)
+                    })
+                    state.loading = false;
+                }
                 return {
                     ...toRefs(state),
                     fetchData
@@ -267,6 +322,10 @@ export const Template = (args, { argTypes }) => ({
 
 You can adjust the opacity of the loader backdrop through the `loaderBackdropOpacity` prop.<br/>
 You can also change the backdrop color through the `loaderBackdropColor` prop.<br/>
+<br/>
+
+For the `loaderBackdropColor` prop, you can give the name of the color token. <br/>
+e.g. `gray.900`
 
 <Canvas>
     <Story name="Loader Backdrop Opacity" >

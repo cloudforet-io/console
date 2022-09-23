@@ -22,7 +22,7 @@
                 <div class="loader-backdrop"
                      :style="{
                          opacity: loaderBackdropOpacity,
-                         backgroundColor: loaderBackdropColor
+                         backgroundColor: refinedLoaderBackdropColor
                      }"
                 />
                 <div class="loader" :class="{[loaderType]: !$scopedSlots.loader}">
@@ -54,6 +54,7 @@ import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import { i18n } from '@/translations';
+import { getColor } from '@/util/helpers';
 
 interface Props {
     loading: boolean;
@@ -132,15 +133,19 @@ export default defineComponent<Props>({
             dataLoadOccurred: false,
             showEmptyCase: computed(() => !props.disableEmptyCase && state.isEmpty),
             isEmpty: computed(() => {
-                if (!props.data) return false;
+                // if data is null or undefined, it regards as data is not loaded yet. so it's not empty case.
+                if (props.data === null || props.data === undefined) return false;
+
+                // in other cases, it checks if the data is empty.
                 if (Array.isArray(props.data)) return props.data.length === 0;
-                if (typeof props.data === 'boolean') return props.data;
+                if (typeof props.data === 'boolean') return !props.data;
                 return isEmpty(props.data);
             }),
             lazyLoading: props.loading,
             minLoading: props.loading,
             isTransitioning: false,
             showLoader: computed(() => (props.disableTransition ? isLoading.value : (isLoading.value || state.isTransitioning))),
+            refinedLoaderBackdropColor: computed(() => getColor(props.loaderBackdropColor)),
         });
 
         const registerLazyLoadingWatch = () => {
