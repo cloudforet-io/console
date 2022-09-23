@@ -39,7 +39,7 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
             },
         },
         control: {
-            type: 'text',
+            type: 'object',
         },
     },
     options: {
@@ -143,6 +143,24 @@ export const getTextEditorArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'object',
+        },
+    },
+    disableAutoReformat: {
+        name: 'disableAutoReformat',
+        type: { name: 'boolean' },
+        description: 'Whether to disable auto reformatting of code on code change or not. It works only when the code prop\'s type is `string`.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
         },
     },
     /* slots */
