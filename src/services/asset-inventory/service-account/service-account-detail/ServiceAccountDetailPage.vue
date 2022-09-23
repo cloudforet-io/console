@@ -50,13 +50,12 @@
                                          :editable="!isManagedAccount"
             />
         </div>
-        <p-double-check-modal :visible.sync="deleteModalVisible"
-                              :header-title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_TITLE')"
-                              :sub-title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_DESC', { account: item.name })"
-                              :verification-text="item.name ? item.name : ''"
-                              theme-color="alert"
-                              size="sm"
-                              @confirm="handleConfirmDelete"
+        <double-check-modal :visible.sync="deleteModalVisible"
+                            :header-title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_TITLE')"
+                            :verification-text="item.name ? item.name : ''"
+                            theme-color="alert"
+                            size="sm"
+                            @confirm="handleConfirmDelete"
         />
         <p-button-modal :visible.sync="cannotDeleteModalVisible"
                         :header-title="$t('INVENTORY.SERVICE_ACCOUNT.DELETE_CHECK_MODAL.TITLE')"
@@ -77,7 +76,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PAnchor, PButton, PIconButton, PPageTitle, PLazyImg, PDoubleCheckModal, PButtonModal, PPaneLayout, PPanelTop,
+    PAnchor, PButton, PIconButton, PPageTitle, PLazyImg, PButtonModal, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
 import { render } from 'ejs';
 
@@ -90,6 +89,7 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import DoubleCheckModal from '@/common/components/modals/DoubleCheckModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
@@ -119,10 +119,10 @@ export default defineComponent({
         PButton,
         PAnchor,
         PLazyImg,
-        PDoubleCheckModal,
         PButtonModal,
         PPaneLayout,
         PPanelTop,
+        DoubleCheckModal,
     },
     props: {
         serviceAccountId: {
