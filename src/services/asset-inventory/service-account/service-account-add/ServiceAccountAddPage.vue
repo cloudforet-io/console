@@ -38,20 +38,20 @@
                                                        @change="handleChangeBaseInformationForm"
                 />
             </p-pane-layout>
-            <p-pane-layout class="form-wrapper">
+            <p-pane-layout v-if="accountType === ACCOUNT_TYPE.GENERAL" class="form-wrapper">
                 <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')" />
-                <service-account-project-form v-if="accountType === ACCOUNT_TYPE.GENERAL"
-                                              :is-valid.sync="isProjectFormValid"
-                                              @change="handleChangeProjectForm"
+                <service-account-project-form
+                    :is-valid.sync="isProjectFormValid"
+                    @change="handleChangeProjectForm"
                 />
             </p-pane-layout>
-            <p-pane-layout class="form-wrapper">
+            <p-pane-layout v-if="enableCredentialInput" class="form-wrapper">
                 <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')" />
-                <service-account-credentials-form v-if="enableCredentialInput"
-                                                  :service-account-type="accountType"
-                                                  :provider="provider"
-                                                  :is-valid.sync="isCredentialFormValid"
-                                                  @change="handleChangeCredentialForm"
+                <service-account-credentials-form
+                    :service-account-type="accountType"
+                    :provider="provider"
+                    :is-valid.sync="isCredentialFormValid"
+                    @change="handleChangeCredentialForm"
                 />
             </p-pane-layout>
         </div>
@@ -154,7 +154,7 @@ export default {
             isProjectFormValid: undefined,
             isValid: computed(() => {
                 if (!formState.isBaseInformationFormValid) return false;
-                if (!formState.isCredentialFormValid) return false;
+                if (!formState.isCredentialFormValid && state.enableCredentialInput) return false;
                 if (formState.accountType === ACCOUNT_TYPE.TRUSTED) return true;
                 if (!formState.isProjectFormValid) return false;
                 return true;
