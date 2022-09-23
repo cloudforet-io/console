@@ -1,3 +1,10 @@
+# [1.1.0-beta.393](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.392...v1.1.0-beta.393) (2022-09-23)
+
+
+### Bug Fixes
+
+* **data-loader:** separate null, undefined data from boolean value & enable to use color token name as loaderBackdropColor prop ([#28](https://github.com/cloudforet-io/mirinae/issues/28)) ([807e106](https://github.com/cloudforet-io/mirinae/commit/807e1061cf7949c607f46f4addbe2ea73fea8e10))
+
 # [1.1.0-beta.392](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.391...v1.1.0-beta.392) (2022-09-14)
 
 
