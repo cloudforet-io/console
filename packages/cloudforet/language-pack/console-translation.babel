@@ -7580,6 +7580,27 @@
                                                 </translations>
                                             </concept_node>
                                             <concept_node>
+                                                <name>DELETE_BUDGET</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description/>
+                                                <comment/>
+                                                <default_text/>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
+                                            <concept_node>
                                                 <name>UPDATE_BUDGET</name>
                                                 <definition_loaded>false</definition_loaded>
                                                 <description/>
@@ -30389,6 +30410,27 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
+                                        <name>ALT_E_UPDATE_CREDENTIALS</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>ALT_S_CHANGE_PROJECT</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -30411,6 +30453,27 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>ALT_S_UPDATE_BASE_INFO</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>ALT_S_UPDATE_CREDENTIALS</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
