@@ -14,18 +14,17 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, onMounted, onUnmounted, onUpdated, reactive, toRefs,
+    defineComponent, onMounted, onUnmounted, onUpdated, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { debounce } from 'lodash';
 
 import type { CollapsiblePanelProps } from '@/data-display/collapsibles/collapsible-panel/type';
 import PCollapsibleToggle from '@/data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { useProxyValue } from '@/hooks';
 
 
-export default defineComponent({
+export default defineComponent<CollapsiblePanelProps>({
     name: 'PCollapsiblePanel',
     components: { PCollapsibleToggle },
     model: {
@@ -44,10 +43,9 @@ export default defineComponent({
             default: 2,
         },
     },
-    setup(props: CollapsiblePanelProps) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+    setup(props, { emit }) {
         const state = reactive({
-            proxyIsCollapsed: makeOptionalProxy('isCollapsed', vm, props.isCollapsed),
+            proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
             fakeTextRef: null as null|HTMLElement,
             isOverflow: false,
         });

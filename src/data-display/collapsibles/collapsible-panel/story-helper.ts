@@ -15,7 +15,7 @@ export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
             },
             category: 'model',
             defaultValue: {
-                summary: '',
+                summary: null,
             },
         },
         control: null,
