@@ -8,7 +8,7 @@
                     :theme-color="themeColor"
                     :disabled="invalid || inputText.length === 0"
                     @cancel="handleCancel"
-                    @close="hadleClose"
+                    @close="handleClose"
                     @confirm="handleConfirm"
     >
         <template #body>
