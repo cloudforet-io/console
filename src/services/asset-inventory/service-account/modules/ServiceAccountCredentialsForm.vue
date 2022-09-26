@@ -50,7 +50,7 @@
             <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" stretch>
                 <template #input>
                     <p-json-schema-form :form-data.sync="formState.customSchemaForm"
-                                        :schema="convertedCredentialSchema"
+                                        :schema="credentialSchema"
                                         :language="$store.state.user.language"
                                         class="custom-schema-box"
                                         @validate="handleCredentialValidate"
@@ -62,7 +62,7 @@
                                    :invalid="!checkJsonStringAvailable(formState.credentialJson)"
                                    :invalid-text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.JSON_INVALID')"
                     >
-                        <p-text-editor :code.sync="formState.credentialJson" />
+                        <p-text-editor :code.sync="formState.credentialJson" :disable-auto-reformat="true" />
                     </p-field-group>
                 </template>
             </p-tab>
@@ -82,7 +82,7 @@ import {
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import { cloneDeep, get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -146,7 +146,6 @@ export default defineComponent<Props>({
                 name: d.service_account_id,
                 label: d.name,
             }))),
-            attachedTrustedAccountCredentialSchema: {} as JsonSchema,
             secretTypes: computed(() => {
                 if (props.serviceAccountType === 'GENERAL') {
                     if (formState.attachTrustedAccount) {
@@ -157,21 +156,6 @@ export default defineComponent<Props>({
                 return get(state.providerData, 'capability.trusted_service_account_schema', []);
             }),
             credentialSchema: {} as JsonSchema,
-            convertedCredentialSchema: computed<JsonSchema>(() => {
-                if (props.serviceAccountType === ACCOUNT_TYPE.GENERAL
-                    && formState.attachTrustedAccount
-                    && !isEmpty(state.attachedTrustedAccountCredentialSchema)
-                ) {
-                    const trustedSchemaFields = Object.keys(state.attachedTrustedAccountCredentialSchema.properties);
-                    const result = cloneDeep(state.credentialSchema);
-                    trustedSchemaFields.forEach((f) => {
-                        if (result.properties[f]) delete result.properties[f];
-                    });
-                    result.required = result.required?.filter(r => !trustedSchemaFields.includes(r));
-                    return result;
-                }
-                return state.credentialSchema;
-            }),
         });
         const formState = reactive({
             hasCredentialKey: true,
@@ -218,7 +202,6 @@ export default defineComponent<Props>({
             formState.credentialJson = '{}';
             formState.attachedTrustedAccountId = undefined;
             formState.isCustomSchemaFormValid = false;
-            state.attachedTrustedAccountCredentialSchema = {};
             tabState.activeTab = 'input';
         };
         const checkJsonStringAvailable = (str: string): boolean => {
@@ -272,21 +255,19 @@ export default defineComponent<Props>({
                 state.trustedAccounts = [];
             }
         };
-        const getTrustedAccountCredentialSchema = async (serviceAccountId: string) => {
+        const getTrustedAccountCredentialData = async (serviceAccountId: string) => {
             try {
                 const getQuery = () => apiQueryHelper
                     .setFilters([{ k: 'service_account_id', v: serviceAccountId, o: '=' }]);
                 const { results } = await SpaceConnector.client.secret.trustedSecret.list({ query: getQuery().data });
                 if (results.length) {
-                    const secretType = results[0].schema;
                     formState.attachedTrustedSecretId = results[0].trusted_secret_id;
-                    state.attachedTrustedAccountCredentialSchema = await getCredentialSchema(secretType);
                 } else {
-                    state.attachedTrustedAccountCredentialSchema = {};
+                    formState.attachedTrustedSecretId = undefined;
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.attachedTrustedAccountCredentialSchema = {};
+                formState.attachedTrustedSecretId = undefined;
             }
         };
 
@@ -337,7 +318,7 @@ export default defineComponent<Props>({
             }
         });
         watch(() => formState.attachedTrustedAccountId, (attachedTrustedAccountId) => {
-            getTrustedAccountCredentialSchema(attachedTrustedAccountId);
+            getTrustedAccountCredentialData(attachedTrustedAccountId);
         });
         watch(() => props.serviceAccountType, () => {
             initForm();

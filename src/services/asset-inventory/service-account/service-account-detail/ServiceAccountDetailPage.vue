@@ -52,6 +52,7 @@
                                          :service-account-type="serviceAccountType"
                                          :service-account-name="item.name"
                                          :project-id="projectId"
+                                         :attached-trusted-account-id="attachedTrustedAccountId"
                                          :editable="!isManagedAccount"
             />
         </div>
@@ -146,6 +147,7 @@ export default defineComponent({
             hasManagePermission: useManagePermissionState(),
             item: {} as ServiceAccountModel,
             attachedGeneralAccounts: [] as ServiceAccountModel[],
+            attachedTrustedAccountId: computed(() => state.item.trusted_service_account_id),
             providerData: {} as ProviderModel,
             provider: computed(() => {
                 if (!storeState.providerLoading && !state.loading) {

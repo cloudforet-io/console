@@ -205,14 +205,14 @@ export default {
                 if (formState.credentialForm.activeDataType === 'json') {
                     data = JSON.parse(formState.credentialForm.credentialJson);
                 } else if (formState.credentialForm.activeDataType === 'input') {
-                    data = formState.credentialForm;
+                    data = formState.credentialForm.customSchemaForm;
                 }
 
                 let createApi = SpaceConnector.client.secret.secret.create;
                 if (formState.accountType === ACCOUNT_TYPE.TRUSTED) {
                     createApi = SpaceConnector.client.secret.trustedSecret.create;
                 }
-                createApi({
+                await createApi({
                     name: formState.baseInformationForm.accountName + serviceAccountId,
                     data,
                     schema: formState.credentialForm.selectedSecretType,
