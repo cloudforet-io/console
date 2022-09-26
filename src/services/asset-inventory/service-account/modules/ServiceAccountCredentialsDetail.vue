@@ -17,12 +17,16 @@ import {
 import {
     PDynamicLayout,
 } from '@spaceone/design-system';
+import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ItemOptions } from '@/component-util/dynamic-layout/layout-schema';
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -31,6 +35,7 @@ import type { CredentialModel } from '@/services/asset-inventory/service-account
 
 interface Props {
     credentialData: CredentialModel;
+    attachedTrustedAccountId?: string;
 }
 
 export default defineComponent<Props>({
@@ -43,35 +48,59 @@ export default defineComponent<Props>({
             type: Object as PropType<CredentialModel>,
             default: () => ({}),
         },
+        attachedTrustedAccountId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
+        const storeState = reactive({
+            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+        });
         const state = reactive({
-            credentialJsonSchema: {},
+            attachedTrustedAccount: computed(() => {
+                if (props.attachedTrustedAccountId) return storeState.serviceAccounts[props.attachedTrustedAccountId];
+                return undefined;
+            }),
+            credentialJsonSchema: {} as JsonSchema,
             convertedCredentialData: computed(() => {
                 const convertedData = { ...props.credentialData };
                 Object.keys(state.credentialJsonSchema?.properties ?? {}).forEach((k) => {
                     convertedData[k] = '••••••••••••••••••••';
                 });
+                if (props.attachedTrustedAccountId) {
+                    convertedData.trusted_service_account_id = state.attachedTrustedAccount?.label ?? props.attachedTrustedAccountId;
+                }
                 return convertedData;
             }),
             detailSchema: computed(() => {
-                const fields = Object.entries(state.credentialJsonSchema?.properties ?? {}).map(([k, v]) => ({
-                    key: k,
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    name: v?.title ?? k,
-                    options: { disable_copy: true },
-                }));
+                const fields: DynamicField[] = [{
+                    key: 'schema', name: 'Secret Type', type: 'text', options: { disable_copy: true },
+                }];
+                if (props.attachedTrustedAccountId) {
+                    const link = SpaceRouter.router.resolve(referenceRouter(props.attachedTrustedAccountId, { resource_type: 'identity.ServiceAccount' })).href;
+                    fields.push({
+                        key: 'trusted_service_account_id',
+                        name: 'Trusted Account',
+                        type: 'text',
+                        options: { link, disable_copy: true },
+                    });
+                }
+                Object.entries(state.credentialJsonSchema?.properties ?? {}).forEach(([k, v]) => {
+                    fields.push({
+                        key: k,
+                        name: v?.title ?? k,
+                        type: 'text',
+                        options: { disable_copy: true },
+                    });
+                });
                 return {
                     name: 'Credentials',
                     type: 'item',
                     options: {
-                        fields: [
-                            { key: 'schema', name: 'Secret Type', options: { disable_copy: true } },
-                            ...fields,
-                        ],
+                        fields,
                         translation_id: 'IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS',
-                    } as ItemOptions,
+                    },
                 };
             }),
         });
@@ -97,6 +126,11 @@ export default defineComponent<Props>({
                 state.credentialJsonSchema = {};
             }
         };
+
+        /* Init */
+        (async () => {
+            await store.dispatch('reference/serviceAccount/load');
+        })();
 
         /* Watcher */
         watch(() => props.credentialData, (credentialData) => {
