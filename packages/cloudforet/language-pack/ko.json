@@ -1246,6 +1246,7 @@
 				"CREDENTIALS_NAME_PLACEHOLDER": "암호화 키 이름",
 				"CREDENTIALS_TITLE": "암호화 키",
 				"CREDENTIAL_HELP_TEXT": "{provider} 암호화 키를 보유하고 계신가요?",
+				"JSON_INVALID": "",
 				"NAME_DUPLICATED": "중복된 이름입니다.",
 				"NAME_INVALID": "2 글자 이상 입력해주세요.",
 				"NAME_LABEL": "이름",

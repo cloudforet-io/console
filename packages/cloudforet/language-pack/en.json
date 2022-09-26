@@ -1246,6 +1246,7 @@
 				"CREDENTIALS_NAME_PLACEHOLDER": "Credentials Name",
 				"CREDENTIALS_TITLE": "Credentials",
 				"CREDENTIAL_HELP_TEXT": "Do you have {provider} credentials key?",
+				"JSON_INVALID": "Invalid Json format.",
 				"NAME_DUPLICATED": "Name is duplicated.",
 				"NAME_INVALID": "Must longer than 2 characters",
 				"NAME_LABEL": "Name",
