@@ -69,7 +69,7 @@ const serviceAccountLinkFormatter: LinkFormatter = (name, data, reference, query
     const location = {
         name,
         query,
-        params: { id: data },
+        params: { serviceAccountId: data },
     };
     return location;
 };
@@ -120,7 +120,7 @@ const routerMap: RouterMap = {
         },
     'identity.ServiceAccount':
         {
-            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.SEARCH._NAME,
+            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'inventory.CloudService':
