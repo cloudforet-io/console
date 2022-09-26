@@ -57,7 +57,13 @@
                     />
                 </template>
                 <template #json>
-                    <p-text-editor class="m-4" :code.sync="formState.credentialJson" />
+                    <p-field-group required
+                                   class="json-form-wrapper"
+                                   :invalid="!checkJsonStringAvailable(formState.credentialJson)"
+                                   :invalid-text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.JSON_INVALID')"
+                    >
+                        <p-text-editor :code.sync="formState.credentialJson" />
+                    </p-field-group>
                 </template>
             </p-tab>
         </template>
@@ -171,7 +177,7 @@ export default defineComponent<Props>({
             hasCredentialKey: true,
             selectedSecretType: '',
             customSchemaForm: {},
-            credentialJson: '',
+            credentialJson: '{}',
             attachTrustedAccount: false,
             attachedTrustedAccountId: undefined,
             formData: computed<CredentialForm>(() => ({
@@ -188,7 +194,7 @@ export default defineComponent<Props>({
                 if (formState.attachTrustedAccount && !formState.attachedTrustedAccountId) return false;
                 if (state.secretTypes.length) {
                     if (tabState.activeTab === 'input') return formState.isCustomSchemaFormValid;
-                    return !!formState.credentialJson.length;
+                    return checkJsonStringAvailable(formState.credentialJson);
                 }
                 return true;
             }),
@@ -207,11 +213,19 @@ export default defineComponent<Props>({
             formState.attachTrustedAccount = false;
             formState.selectedSecretType = state.secretTypes[0];
             formState.customSchemaForm = {};
-            formState.credentialJson = '';
+            formState.credentialJson = '{}';
             formState.attachedTrustedAccountId = undefined;
             formState.isCustomSchemaFormValid = false;
             state.attachedTrustedAccountCredentialSchema = {};
             tabState.activeTab = 'input';
+        };
+        const checkJsonStringAvailable = (str: string): boolean => {
+            try {
+                JSON.parse(str);
+                return true;
+            } catch (e) {
+                return false;
+            }
         };
 
         /* Api */
@@ -343,6 +357,7 @@ export default defineComponent<Props>({
             handleSelectNoCredentials,
             handleChangeAttachTrustedAccount,
             handleChangeAttachedTrustedAccountId,
+            checkJsonStringAvailable,
         };
     },
 });
@@ -368,13 +383,15 @@ export default defineComponent<Props>({
 
     /* custom design-system component - p-tab */
     :deep(.p-tab) {
+        .json-form-wrapper {
+            margin: 1rem;
+        }
         .p-text-editor {
             .CodeMirror {
                 font-family: Inconsolata, monospace;
                 line-height: 1.5;
                 height: 14.375rem;
                 padding: 1rem;
-                margin: 0 0 -2rem;
             }
         }
         .p-text-input {
