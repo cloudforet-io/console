@@ -219,7 +219,7 @@ export default {
                     secret_type: 'CREDENTIALS',
                     service_account_id: serviceAccountId,
                     project_id: formState.projectForm.selectedProjectId,
-                    trusted_secret_id: formState.credentialForm.attachedTrustedAccountId,
+                    trusted_secret_id: formState.credentialForm.attachedTrustedSecretId,
                 });
 
                 showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm);
