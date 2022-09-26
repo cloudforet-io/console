@@ -40,6 +40,7 @@ export const getDefaultSchema = () => ({
             minLength: 1,
             type: 'string',
             default: '82',
+            enum: ['82', '333', '232'],
         },
         age: {
             title: 'Age',

@@ -21,6 +21,11 @@
                                disable-auto-reformat
                                @update:code="handleUpdateValue(schemaProperty, ...arguments)"
                 />
+                <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
+                                   :selected="rawFormData[schemaProperty.id]"
+                                   :items="schemaProperty.menuItems"
+                                   @update:selected="handleUpdateValue(schemaProperty, ...arguments)"
+                />
                 <p-text-input v-else
                               :value="rawFormData[schemaProperty.id]"
                               :type="schemaProperty.inputType"
@@ -46,15 +51,17 @@ import addFormats from 'ajv-formats';
 import { isEmpty } from 'lodash';
 
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
+import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import GenerateIdFormat from '@/inputs/forms/new-json-schema-form/components/GenerateIdFormat.vue';
 import { useLocalize } from '@/inputs/forms/new-json-schema-form/composables/localize';
 import { useValidation } from '@/inputs/forms/new-json-schema-form/composables/validation';
 import { addCustomFormats, addCustomKeywords } from '@/inputs/forms/new-json-schema-form/custom-schema';
+import type { RawValue, RefinedValue } from '@/inputs/forms/new-json-schema-form/helper';
 import {
     getComponentNameBySchemaProperty,
     getInputPlaceholderBySchemaProperty,
-    getInputTypeBySchemaProperty,
+    getInputTypeBySchemaProperty, getMenuItemsBySchemaProperty,
     initFormDataWithSchema,
     refineValueByProperty,
 } from '@/inputs/forms/new-json-schema-form/helper';
@@ -73,6 +80,7 @@ import { supportLanguages } from '@/translations';
 export default defineComponent<JsonSchemaFormProps>({
     name: 'PJsonSchemaForm',
     components: {
+        PSelectDropdown,
         PTextEditor,
         GenerateIdFormat,
         PMarkdown,
@@ -123,6 +131,7 @@ export default defineComponent<JsonSchemaFormProps>({
                             componentName: getComponentNameBySchemaProperty(schemaProperty),
                             inputType: getInputTypeBySchemaProperty(schemaProperty),
                             inputPlaceholder: getInputPlaceholderBySchemaProperty(schemaProperty),
+                            menuItems: getMenuItemsBySchemaProperty(schemaProperty),
                         };
                         return refined;
                     });
@@ -131,7 +140,7 @@ export default defineComponent<JsonSchemaFormProps>({
             }),
             requiredList: computed<string[]>(() => props.schema?.required ?? []),
             rawFormData: initFormDataWithSchema(props.schema, props.formData) as object,
-            refinedFormData: initFormDataWithSchema(props.schema, props.formData) as object,
+            refinedFormData: initFormDataWithSchema(props.schema, props.formData) as Record<string, RefinedValue>,
             contextKey: Math.floor(Math.random() * Date.now()),
         });
 
@@ -163,7 +172,7 @@ export default defineComponent<JsonSchemaFormProps>({
         };
 
         /* Event Handlers */
-        const handleUpdateValue = (property: InnerJsonSchema, val?: any) => {
+        const handleUpdateValue = (property: InnerJsonSchema, val?: RawValue) => {
             const { id } = property;
             state.rawFormData[id] = val;
             state.refinedFormData = { ...state.refinedFormData, [id]: refineValueByProperty(property, val) };
@@ -177,7 +186,7 @@ export default defineComponent<JsonSchemaFormProps>({
         /* Watchers */
         watch(() => props.schema, () => {
             state.contextKey = Math.floor(Math.random() * Date.now());
-            reset(props.formData ?? {});
+            reset(initFormDataWithSchema(props.schema, props.formData ?? {}));
         });
         watch(() => props.formData, (formData) => {
             if (formData === state.refinedFormData) return;
@@ -188,7 +197,7 @@ export default defineComponent<JsonSchemaFormProps>({
             emit('update:form-data', state.refinedFormData);
             emit('validate', isValid);
             emit('change', isValid, state.refinedFormData);
-        });
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

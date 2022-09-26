@@ -1,33 +1,39 @@
+import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
 import type {
     JsonSchema, InnerJsonSchema, ComponentName, TextInputType,
 } from '@/inputs/forms/new-json-schema-form/type';
 
 export const NUMERIC_TYPES = ['number', 'integer'];
 
-export const refineValueByProperty = ({ type, format }: JsonSchema, val?: any) => {
-    let dataValue: string|number|undefined;
-    if (NUMERIC_TYPES.includes(type)) {
-        if (val === undefined || val?.trim() === '') {
-            dataValue = undefined;
-        } else {
-            dataValue = Number(val);
-            if (Number.isNaN(dataValue)) dataValue = undefined;
-        }
-    } else if (format === 'json') {
-        if (!val?.trim()) dataValue = undefined;
-        else {
-            try {
-                const parsedData = JSON.parse(val);
-                if (typeof parsedData === 'object') dataValue = parsedData;
-                else dataValue = val;
-            } catch (e) {
-                dataValue = val;
-            }
-        }
-    } else {
-        dataValue = val?.trim() || undefined;
+export type RawValue = string|number|SelectDropdownMenu[]|undefined
+export type RefinedValue = string|number|undefined;
+
+const refineNumberTypeValue = (val: RawValue): RefinedValue => {
+    if (typeof val === 'string' && val.trim() === '') {
+        return undefined;
     }
+    let dataValue: RefinedValue = Number(val);
+    if (Number.isNaN(dataValue)) dataValue = undefined;
     return dataValue;
+};
+
+const refineJsonFormatValue = (val: RawValue): RefinedValue => {
+    if (typeof val !== 'string' || val.trim() === '') return undefined;
+
+    try {
+        const parsedData = JSON.parse(val);
+        if (typeof parsedData === 'object') return parsedData;
+        return val;
+    } catch (e) {
+        return val;
+    }
+};
+
+export const refineValueByProperty = ({ type, format }: JsonSchema, val?: RawValue): RefinedValue => {
+    if (NUMERIC_TYPES.includes(type)) return refineNumberTypeValue(val);
+    if (format === 'json') return refineJsonFormatValue(val);
+    if (typeof val === 'string') return val?.trim() || undefined;
+    return undefined;
 };
 
 export const initFormDataWithSchema = (schema?: JsonSchema, formData: object = {}): object => {
@@ -45,6 +51,7 @@ export const initFormDataWithSchema = (schema?: JsonSchema, formData: object = {
 export const getComponentNameBySchemaProperty = (schemaProperty: InnerJsonSchema): ComponentName => {
     if (schemaProperty.format === 'generate_id') return 'GenerateIdFormat';
     if (schemaProperty.format === 'json') return 'PTextEditor';
+    if (Array.isArray(schemaProperty.enum) && schemaProperty.type === 'string') return 'PSelectDropdown';
     return 'PTextInput';
 };
 
@@ -56,3 +63,21 @@ export const getInputTypeBySchemaProperty = (schemaProperty: InnerJsonSchema): T
 };
 
 export const getInputPlaceholderBySchemaProperty = (schemaProperty: InnerJsonSchema) => schemaProperty.examples?.[0] ?? '';
+
+export const getMenuItemsBySchemaProperty = (schemaProperty: InnerJsonSchema): SelectDropdownMenu[]|undefined => {
+    if (Array.isArray(schemaProperty.enum)) {
+        try {
+            return schemaProperty.enum.map((d) => {
+                if (typeof d === 'string') {
+                    return { name: d, label: d };
+                }
+
+                throw new Error('Invalid enum value');
+            });
+        } catch (e: unknown) {
+            console.error(e);
+            return undefined;
+        }
+    }
+    return undefined;
+};
