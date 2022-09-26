@@ -1,3 +1,10 @@
+# [1.1.0-beta.396](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.395...v1.1.0-beta.396) (2022-09-26)
+
+
+### Bug Fixes
+
+* **p-select-card:** hide icon of unselected single item ([204843b](https://github.com/cloudforet-io/mirinae/commit/204843be5a874b580d6a56030e6cd23577909f9a))
+
 # [1.1.0-beta.395](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.394...v1.1.0-beta.395) (2022-09-23)
 
 
