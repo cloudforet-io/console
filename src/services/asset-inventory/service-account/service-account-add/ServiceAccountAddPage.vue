@@ -242,6 +242,7 @@ export default {
 
             const serviceAccountId = await createServiceAccount();
             if (serviceAccountId && formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
+                // preprocessing for Google Cloud form
                 if (formState.credentialForm.customSchemaForm?.private_key) {
                     formState.credentialForm.customSchemaForm.private_key = formState.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
                 }

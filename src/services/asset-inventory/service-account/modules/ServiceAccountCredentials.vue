@@ -175,7 +175,6 @@ export default defineComponent<Props>({
                     secret_type: 'CREDENTIALS',
                     service_account_id: props.serviceAccountId,
                     project_id: props.projectId || null,
-                    trusted_secret_id: state.credentialForm.attachedTrustedAccountId,
                 });
                 showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
             } catch (e) {
@@ -213,6 +212,16 @@ export default defineComponent<Props>({
                 ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_CREDENTIALS'));
             }
         };
+        const updateServiceAccount = async () => {
+            try {
+                await SpaceConnector.client.identity.serviceAccount.update({
+                    service_account_id: props.serviceAccountId,
+                    trusted_service_account_id: state.credentialForm.attachedTrustedAccountId ?? '',
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
 
         /* Event */
         const handleClickEditButton = () => {
@@ -223,10 +232,15 @@ export default defineComponent<Props>({
         };
         const handleClickSaveButton = async () => {
             if (!state.isFormValid) return;
+            // preprocessing for Google Cloud form
+            if (state.credentialForm.customSchemaForm?.private_key) {
+                state.credentialForm.customSchemaForm.private_key = state.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
+            }
             if (props.serviceAccountType === ACCOUNT_TYPE.GENERAL) {
                 let isValid = true;
                 if (!isEmpty(state.credentialData)) isValid = await deleteGeneralSecret();
                 if (isValid) {
+                    await updateServiceAccount();
                     if (state.credentialForm.hasCredentialKey) {
                         await createGeneralSecret();
                     } else {
