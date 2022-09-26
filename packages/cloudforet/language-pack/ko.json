@@ -426,6 +426,7 @@
 					"CANCEL": "취소",
 					"CONFIRM": "확인",
 					"CREATE_BUDGET": "예산 생성",
+					"DELETE_BUDGET": "",
 					"UPDATE_BUDGET": "예산 수정 "
 				},
 				"MAIN": {
@@ -1277,7 +1278,7 @@
 				"ALT_S_DELETE_ACCOUNT": "계정 삭제 완료",
 				"ALT_S_RELEASE_PROJECT": "프로젝트 해제 완료",
 				"CHANGE_PROJECT": "프로젝트 변경",
-				"CHECK_MODAL_DELETE_DESC": "[{account}]를 완전히 삭제합니다.",
+				"CHECK_MODAL_DELETE_DESC": "{account}를 완전히 삭제합니다.",
 				"CHECK_MODAL_DELETE_TITLE": "서비스 계정 삭제",
 				"CONSOLE": "콘솔 연결",
 				"DELETE": "삭제",
@@ -1691,8 +1692,10 @@
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "",
 				"ALT_E_UPDATE_BASE_INFO": "",
+				"ALT_E_UPDATE_CREDENTIALS": "",
 				"ALT_S_CHANGE_PROJECT": "",
 				"ALT_S_UPDATE_BASE_INFO": "",
+				"ALT_S_UPDATE_CREDENTIALS": "",
 				"ATTACHED_GENERAL_ACCOUNTS_TITLE": "",
 				"BASE_INFO_HELP_TEXT": "",
 				"CANCEL": "취소",

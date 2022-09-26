@@ -155,8 +155,7 @@ export default defineComponent<Props>({
                 });
                 return true;
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
+                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_CREDENTIALS'));
                 return false;
             }
         };
@@ -178,11 +177,9 @@ export default defineComponent<Props>({
                     project_id: props.projectId || null,
                     trusted_secret_id: state.credentialForm.attachedTrustedAccountId,
                 });
-                // song-lang
-                showSuccessMessage(i18n.t('Successfully Updated Credentials'), '');
+                showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
+                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_CREDENTIALS'));
             }
         };
         const updateTrustedSecret = async (): Promise<boolean> => {
@@ -193,8 +190,7 @@ export default defineComponent<Props>({
                 });
                 return true;
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
+                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_CREDENTIALS'));
                 return false;
             }
         };
@@ -212,11 +208,9 @@ export default defineComponent<Props>({
                     data,
                 });
 
-                // song-lang
-                showSuccessMessage(i18n.t('Successfully Updated Credentials'), '');
+                showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, i18n.t('Failed to Update Credentials'));
+                ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_CREDENTIALS'));
             }
         };
 
@@ -236,8 +230,7 @@ export default defineComponent<Props>({
                     if (state.credentialForm.hasCredentialKey) {
                         await createGeneralSecret();
                     } else {
-                        // song-lang
-                        showSuccessMessage(i18n.t('Successfully Updated Credentials'), '');
+                        showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
                     }
                 }
             } else {

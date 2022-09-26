@@ -14,8 +14,6 @@
         <template #body>
             <div>
                 <slot v-if="subTitle" name="subTitle" />
-                <!--song-lang-->
-                <!--need to remove square brackets on both sides of the account-->
                 <i18n v-else class="double-check-modal-sub-title" tag="p"
                       path="IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_DESC"
                 >

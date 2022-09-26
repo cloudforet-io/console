@@ -17,6 +17,8 @@ import VueI18n from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { i18n } from '@/translations';
+
 import DoubleCheckModal from '@/common/components/modals/DoubleCheckModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -45,8 +47,7 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: false,
-            // song-lang
-            title: '$t(Delete Budget)' as TranslateResult,
+            title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.DELETE_BUDGET') as TranslateResult,
             verificationText: computed(() => props.budgetName),
         });
 
