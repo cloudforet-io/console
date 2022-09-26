@@ -1,3 +1,10 @@
+# [1.1.0-beta.397](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.396...v1.1.0-beta.397) (2022-09-26)
+
+
+### Features
+
+* **json-schema-form:** add json format ([#42](https://github.com/cloudforet-io/mirinae/issues/42)) ([d8bf9ea](https://github.com/cloudforet-io/mirinae/commit/d8bf9eabbe585e08a312f72930949b4c97abaf17))
+
 # [1.1.0-beta.396](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.395...v1.1.0-beta.396) (2022-09-26)
 
 
