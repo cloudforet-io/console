@@ -1,7 +1,7 @@
 <template>
     <div class="service-account-base-information-detail">
         <p-dynamic-layout v-if="detailSchema"
-                          v-bind="detailSchema"
+                          v-bind="convertedDetailSchema"
                           :data="serviceAccountData"
                           :field-handler="fieldHandler"
         />
@@ -10,12 +10,11 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
 
-import {
-    PDynamicLayout,
-} from '@spaceone/design-system';
+import { PDynamicLayout } from '@spaceone/design-system';
+import { cloneDeep, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -23,6 +22,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+const EXCLUDED_FIELD_KEYS = ['project_info.project_id', 'created_at'];
 
 export default {
     name: 'ServiceAccountBaseInformationDetail',
@@ -42,6 +42,13 @@ export default {
     setup(props) {
         const state = reactive({
             detailSchema: {},
+            convertedDetailSchema: computed(() => {
+                const result = cloneDeep(state.detailSchema);
+                if (!isEmpty(result)) {
+                    result.options.fields = state.detailSchema?.options?.fields.filter(d => !EXCLUDED_FIELD_KEYS.includes(d.key));
+                }
+                return result;
+            }),
             fieldHandler: [],
         });
 
