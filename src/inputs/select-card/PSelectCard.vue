@@ -112,7 +112,7 @@ export default defineComponent<Props>({
                 }
                 if (props.disabled) return 'ic_radio--disabled';
                 if (isSelected.value) return 'ic_checkbox_circle--checked';
-                return 'ic_radio';
+                return '';
             }),
             errorIcon: computed(() => {
                 if (typeof props.icon === 'string') return props.icon;
