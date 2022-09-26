@@ -180,6 +180,7 @@ export default defineComponent<Props>({
             credentialJson: '{}',
             attachTrustedAccount: false,
             attachedTrustedAccountId: undefined,
+            attachedTrustedSecretId: undefined,
             formData: computed<CredentialForm>(() => ({
                 hasCredentialKey: formState.hasCredentialKey,
                 selectedSecretType: formState.selectedSecretType,
@@ -187,6 +188,7 @@ export default defineComponent<Props>({
                 credentialJson: formState.credentialJson,
                 activeDataType: tabState.activeTab as ActiveDataType,
                 attachedTrustedAccountId: formState.attachedTrustedAccountId,
+                attachedTrustedSecretId: formState.attachedTrustedSecretId,
             })),
             isCustomSchemaFormValid: false,
             isAllValid: computed<boolean>(() => {
@@ -277,6 +279,7 @@ export default defineComponent<Props>({
                 const { results } = await SpaceConnector.client.secret.trustedSecret.list({ query: getQuery().data });
                 if (results.length) {
                     const secretType = results[0].schema;
+                    formState.attachedTrustedSecretId = results[0].trusted_secret_id;
                     state.attachedTrustedAccountCredentialSchema = await getCredentialSchema(secretType);
                 } else {
                     state.attachedTrustedAccountCredentialSchema = {};

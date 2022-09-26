@@ -25,6 +25,7 @@
         <div class="content-wrapper">
             <service-account-credentials-detail v-show="mode === 'READ'"
                                                 :credential-data="credentialData"
+                                                :attached-trusted-account-id="attachedTrustedAccountId"
             />
             <service-account-credentials-form v-if="mode === 'UPDATE'"
                                               edit-mode="UPDATE"
@@ -75,6 +76,7 @@ interface Props {
     serviceAccountType: AccountType;
     serviceAccountName?: string;
     projectId?: string;
+    attachedTrustedAccountId?: string;
     editable: boolean;
 }
 
@@ -108,6 +110,10 @@ export default defineComponent<Props>({
             type: String,
             default: undefined,
         },
+        attachedTrustedAccountId: {
+            type: String,
+            default: undefined,
+        },
         editable: {
             type: Boolean,
             default: false,
@@ -123,12 +129,12 @@ export default defineComponent<Props>({
         });
 
         /* Api */
-        const apiQuery = new ApiQueryHelper();
+        const apiQueryHelper = new ApiQueryHelper();
         const getCredentialData = async (serviceAccountId: string) => {
             try {
                 state.loading = true;
 
-                const getQuery = () => apiQuery
+                const getQuery = () => apiQueryHelper
                     .setFilters([{ k: 'service_account_id', v: serviceAccountId, o: '=' }]);
                 let listApi = SpaceConnector.client.secret.secret.list;
                 if (props.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
@@ -175,6 +181,7 @@ export default defineComponent<Props>({
                     secret_type: 'CREDENTIALS',
                     service_account_id: props.serviceAccountId,
                     project_id: props.projectId || null,
+                    trusted_secret_id: state.credentialForm.attachedTrustedSecretId,
                 });
                 showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
             } catch (e) {
