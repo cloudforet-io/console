@@ -1,3 +1,10 @@
+# [1.1.0-beta.398](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.397...v1.1.0-beta.398) (2022-09-26)
+
+
+### Features
+
+* **dict-list:** apply new design ([#43](https://github.com/cloudforet-io/mirinae/issues/43)) ([5dce15d](https://github.com/cloudforet-io/mirinae/commit/5dce15dc8e1fcda4e57fbd3dc4b5a45e681acd37))
+
 # [1.1.0-beta.397](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.396...v1.1.0-beta.397) (2022-09-26)
 
 
