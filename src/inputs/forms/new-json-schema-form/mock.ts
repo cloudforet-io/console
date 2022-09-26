@@ -76,9 +76,13 @@ export const getDefaultSchema = () => ({
             type: 'string',
             minLength: 10,
         },
+        additional: {
+            title: 'Additional Information',
+            format: 'json',
+        },
 
     },
-    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone'],
+    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional'],
 });
 
 export const getDefaultFormData = () => ({

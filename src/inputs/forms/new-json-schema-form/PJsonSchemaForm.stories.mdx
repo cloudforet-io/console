@@ -7,6 +7,7 @@ import PJsonSchemaForm from '@/inputs/forms/new-json-schema-form/PJsonSchemaForm
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 import PButton from "@/inputs/buttons/button/PButton";
 import PSelectDropdown from "@/inputs/dropdown/select-dropdown/PSelectDropdown";
+import PPanelTop from "@/data-display/titles/panel-top/PPanelTop";
 import {
      getJsonSchemaFormArgTypes,
 } from '@/inputs/forms/new-json-schema-form/story-helper';
@@ -52,26 +53,72 @@ export const Template = (args, { argTypes }) => ({
 });
 
 
+# Json Schema Form
+
+It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-format](https://www.npmjs.com/package/ajv-formats).
+
+
+## Supported Types & Formats & Keyword
+
+|Type or Format|Validator|UI Component|
+|-|-|-|
+|string type|ajv|[Text Input](?path=/docs/inputs-input--basic)|
+|number type|ajv|[Text Input](?path=/docs/inputs-input--basic)|
+|integer type|ajv|[Text Input](?path=/docs/inputs-input--basic)|
+|password format|ajv-format|[Text Input](?path=/docs/inputs-input--basic)|
+|markdown keyword|custom|[Markdown](?path=/docs/data-display-markdown--string-markdown)|
+|generate_id format|custom|GenerateIdFormat (Internal Component)|
+|json format|custom|[Text Editor](?path=/docs/inputs-text-editor--basic)|
+|array type(NOT supported yet)|custom|[Text Input](?path=/docs/inputs-input--basic)|
+|string type & enum keyword(NOT supported yet)|custom|[Select Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|
+|array type & enum keyword(NOT supported yet)|custom|[Search Dropdown](?path=/docs/inputs-dropdown-search-dropdown--basic)|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Basic
 
 <Canvas>
     <Story name="Basic" >
         {{
-            components: { PJsonSchemaForm, PTextEditor },
+            components: { PJsonSchemaForm, PTextEditor, PPanelTop },
             i18n,
             template: `
-<div class="grid grid-cols-12">
-    <p-json-schema-form
-        class="col-span-6"
-        :schema="schema"
-        :form-data="formData"
-        :language="$i18n.locale"
-    />
-    <div class="col-span-6">
+<div class="grid gap-4 grid-cols-12">
+    <div class="col-span-6 bg-blue-100 p-4">
+        <p-panel-top>Json Schema Form</p-panel-top>
+        <p-json-schema-form :schema="schema"
+                            :form-data.sync="formData"
+                            :language="$i18n.locale"
+        />
+    </div>
+    <div class="col-span-6 bg-coral-100 p-4">
+        <p-panel-top>Schema</p-panel-top>
         <p-text-editor :code="JSON.stringify(schema, null, 2)"
                        mode="readOnly"
                        folded
+                       style="height: auto"
+        />
+        <p-panel-top>Form Data</p-panel-top>
+        <p-text-editor :code="JSON.stringify(formData, null, 2)"
+                       mode="readOnly"
+                       style="height: auto"
         />
     </div>
 </div>
