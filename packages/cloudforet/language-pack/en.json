@@ -426,6 +426,7 @@
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
 					"CREATE_BUDGET": "Create Budget",
+					"DELETE_BUDGET": "Delete Budget",
 					"UPDATE_BUDGET": "Update Budget"
 				},
 				"MAIN": {
@@ -1277,7 +1278,7 @@
 				"ALT_S_DELETE_ACCOUNT": "Successfully Deleted Account",
 				"ALT_S_RELEASE_PROJECT": "Successfully Released Project",
 				"CHANGE_PROJECT": "Change Project",
-				"CHECK_MODAL_DELETE_DESC": "[{account}] will be deleted permanently.",
+				"CHECK_MODAL_DELETE_DESC": "{account} will be deleted permanently.",
 				"CHECK_MODAL_DELETE_TITLE": "Delete Service Account",
 				"CONSOLE": "Connect to Console",
 				"DELETE": "Delete",
@@ -1691,8 +1692,10 @@
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "Account Type",
 				"ALT_E_UPDATE_BASE_INFO": "Failed to Update Base Information",
+				"ALT_E_UPDATE_CREDENTIALS": "Failed to Update Credentials",
 				"ALT_S_CHANGE_PROJECT": "Successfully changed project",
 				"ALT_S_UPDATE_BASE_INFO": "Successfully Update Base Information",
+				"ALT_S_UPDATE_CREDENTIALS": "Successfully Updated Credentials",
 				"ATTACHED_GENERAL_ACCOUNTS_TITLE": "Attached General Accounts",
 				"BASE_INFO_HELP_TEXT": "Set Account's tag.\nAdd associated tags. The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
 				"CANCEL": "Cancel",
