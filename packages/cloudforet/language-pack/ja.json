@@ -1246,6 +1246,7 @@
 				"CREDENTIALS_NAME_PLACEHOLDER": "暗号化キー名",
 				"CREDENTIALS_TITLE": "暗号化キー",
 				"CREDENTIAL_HELP_TEXT": " {provider}の暗号化キーをお持ちですか？",
+				"JSON_INVALID": "",
 				"NAME_DUPLICATED": "重複した名前です。",
 				"NAME_INVALID": "2文字以上を入力してください",
 				"NAME_LABEL": "名前",
