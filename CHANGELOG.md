@@ -1,3 +1,10 @@
+# [1.1.0-beta.399](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.398...v1.1.0-beta.399) (2022-09-26)
+
+
+### Features
+
+* **json-schema-form:** add enum keyword with string type ([#44](https://github.com/cloudforet-io/mirinae/issues/44)) ([1fec0da](https://github.com/cloudforet-io/mirinae/commit/1fec0dad09a0497be1068cecf840f885f1d4d9b0))
+
 # [1.1.0-beta.398](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.397...v1.1.0-beta.398) (2022-09-26)
 
 
