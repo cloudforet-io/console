@@ -14,9 +14,12 @@
     </div>
 </template>
 <script lang="ts">
+import { defineComponent } from 'vue';
+
+import type { PanelTopProps } from '@/data-display/titles/panel-top/type';
 import { commaFormatter } from '@/util/helpers';
 
-export default {
+export default defineComponent<PanelTopProps>({
     name: 'PPanelTop',
     props: {
         useTotalCount: {
@@ -37,7 +40,7 @@ export default {
             commaFormatter,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
