@@ -229,7 +229,7 @@ export default {
         overflow-y: scroll;
         padding: 0.25rem 0.5rem 3.5rem 0.5rem;
         .pinned-header-wrapper {
-            @apply text-gray-500;
+            @apply text-gray-500 flex items-center;
             font-size: 0.75rem;
             font-weight: 700;
             line-height: 1.5;
