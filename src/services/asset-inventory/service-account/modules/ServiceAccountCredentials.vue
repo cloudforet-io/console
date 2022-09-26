@@ -232,7 +232,7 @@ export default defineComponent<Props>({
         };
         const handleClickSaveButton = async () => {
             if (!state.isFormValid) return;
-            // preprocessing data
+            // preprocessing for Google Cloud form
             if (state.credentialForm.customSchemaForm?.private_key) {
                 state.credentialForm.customSchemaForm.private_key = state.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
             }
