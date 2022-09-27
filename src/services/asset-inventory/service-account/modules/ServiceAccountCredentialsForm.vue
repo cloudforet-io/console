@@ -82,7 +82,7 @@ import {
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -141,7 +141,7 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const state = reactive({
             providerData: {} as ProviderModel,
-            showTrustedAccount: computed(() => get(state.providerData, 'capability.support_trusted_service_account', false)),
+            showTrustedAccount: computed(() => state.providerData?.capability?.support_trusted_service_account ?? false),
             trustedAccounts: [] as ServiceAccountModel[],
             trustedAccountMenuItems: computed<SelectDropdownMenu[]>(() => state.trustedAccounts.map(d => ({
                 name: d.service_account_id,
@@ -150,11 +150,11 @@ export default defineComponent<Props>({
             secretTypes: computed(() => {
                 if (props.serviceAccountType === 'GENERAL') {
                     if (formState.attachTrustedAccount) {
-                        return get(state.providerData, 'capability.general_service_account_schema', []);
+                        return state.providerData?.capability?.general_service_account_schema ?? [];
                     }
-                    return get(state.providerData, 'capability.supported_schema', []);
+                    return state.providerData?.capability?.supported_schema ?? [];
                 }
-                return get(state.providerData, 'capability.trusted_service_account_schema', []);
+                return state.providerData?.capability?.trusted_service_account_schema ?? [];
             }),
             credentialSchema: {} as JsonSchema,
         });
