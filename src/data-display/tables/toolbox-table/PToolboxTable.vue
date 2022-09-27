@@ -279,7 +279,6 @@ export default defineComponent<ToolboxTableProps>({
         watch(() => props.items, () => {
             checkSelectIndex();
         });
-
         watch(() => proxyState.thisPage, () => {
             proxyState.selectIndex = [];
         }, { immediate: false });
