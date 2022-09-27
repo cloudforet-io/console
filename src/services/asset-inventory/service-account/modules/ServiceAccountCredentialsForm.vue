@@ -171,7 +171,7 @@ export default defineComponent<Props>({
             credentialSchema: {} as JsonSchema,
             trustedAccountInfoLink: computed<string>(() => {
                 const lang = storeState.language === 'en' ? '' : `${storeState.language}/`;
-                return `https://spaceone.org/${lang}docs/guides/asset-inventory/service-account/`;
+                return `https://cloudforet.io/${lang}docs/guides/asset-inventory/service-account/`;
             }),
         });
         const formState = reactive({
