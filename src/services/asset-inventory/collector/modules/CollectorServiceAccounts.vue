@@ -80,7 +80,6 @@ import { store } from '@/store';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 const CollectDataModal = () => import('@/services/asset-inventory/collector/modules/CollectDataModal.vue');
 
@@ -117,6 +116,10 @@ export default {
             type: String,
             required: true,
         },
+        hasManagePermission: {
+            type: Boolean,
+            default: undefined,
+        },
     },
     setup(props) {
         const querySearchHandlers = {
@@ -140,7 +143,6 @@ export default {
         };
 
         const state = reactive({
-            hasManagePermission: useManagePermissionState(),
             timezone: computed(() => store.state.user.timezone),
             items: [] as any,
             totalCount: 0,
