@@ -117,9 +117,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
                 summary: 'undefined',
             },
         },
-        control: {
-            type: 'text',
-        },
     },
     copyValueFormatter: {
         name: 'copyValueFormatter',
@@ -138,9 +135,9 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
     },
     autoKeyWidth: {
         name: 'autoKeyWidth',
-        type: { name: 'string' },
+        type: { name: 'boolean' },
         description: 'Make key width auto',
-        defaultValue: undefined,
+        defaultValue: false,
         table: {
             type: {
                 summary: 'string',
@@ -149,9 +146,6 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
             defaultValue: {
                 summary: 'undefined',
             },
-        },
-        control: {
-            type: 'boolean',
         },
     },
     /* slots */

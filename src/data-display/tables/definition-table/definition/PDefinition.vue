@@ -8,7 +8,15 @@
         <td class="value-wrapper" :class="{'auto-width': autoKeyWidth}">
             <span class="value">
                 <slot v-if="disableCopy" name="default" v-bind="{name, label, data, value: displayData}">
-                    {{ displayData }}
+                    <template v-if="dataType === 'object'">
+                        <p-dict-list class="p-dict-list" :dict="displayData" />
+                    </template>
+                    <template v-else-if="dataType === 'array'">
+                        <p-text-list :items="displayData" />
+                    </template>
+                    <template v-else>
+                        {{ displayData }}
+                    </template>
                 </slot>
                 <p-copy-button v-else
                                width="0.8rem" height="0.8rem"
@@ -16,7 +24,15 @@
                                auto-hide-icon
                 >
                     <slot name="default" v-bind="{name, label, data, value: displayData}">
-                        {{ displayData }}
+                        <template v-if="dataType === 'object'">
+                            <p-dict-list class="p-dict-list" :dict="displayData" />
+                        </template>
+                        <template v-else-if="dataType === 'array'">
+                            <p-text-list :items="displayData" />
+                        </template>
+                        <template v-else>
+                            {{ displayData }}
+                        </template>
                     </slot>
                 </p-copy-button>
             </span>
@@ -32,12 +48,14 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
+import PDictList from '@/data-display/dynamic/dynamic-field/templates/list/dict-list/PDictList.vue';
 import type { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
+import PTextList from '@/others/console/text-list/PTextList.vue';
 
 export default defineComponent<DefinitionProps>({
     name: 'PDefinition',
-    components: { PCopyButton },
+    components: { PTextList, PCopyButton, PDictList },
     props: {
         name: {
             type: String,
@@ -76,11 +94,14 @@ export default defineComponent<DefinitionProps>({
             default: false,
         },
     },
-    setup(props: DefinitionProps) {
+    setup(props) {
         const state = reactive({
             displayData: computed(() => (props.formatter ? props.formatter(props.data, props) : props.data)),
+            dataType: computed(() => {
+                if (Array.isArray(props.data)) return 'array';
+                return typeof props.data;
+            }),
         });
-
 
         return {
             ...toRefs(state),
@@ -152,6 +173,10 @@ export default defineComponent<DefinitionProps>({
             width: 100%;
             max-width: 100%;
         }
+    }
+
+    .p-dict-list {
+        display: inline-grid;
     }
 }
 </style>
