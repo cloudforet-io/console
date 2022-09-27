@@ -1260,6 +1260,7 @@
 				"PROJECT_TITLE": "프로젝트",
 				"SAVE": "저장",
 				"SECRET_TYPE_LABEL": "암호화 키 유형",
+				"SEE_MORE": "",
 				"SERVICE_ACCOUNT": "서비스 계정",
 				"TAB_INPUT": "직접 입력",
 				"TAB_JSON": "JSON으로 입력",
@@ -1267,7 +1268,8 @@
 				"TAG_DESC_1": "{name}의 태그를 설정합니다.",
 				"TAG_DESC_2": "키는 문자, 숫자 및 밑줄만 사용할 수 있습니다.",
 				"TAG_LABEL": "태그",
-				"TITLE": "서비스 계정 추가"
+				"TITLE": "서비스 계정 추가",
+				"TRUSTED_ACCOUNT_HELP_TEXT": ""
 			},
 			"MAIN": {
 				"ACTION": "작업",
