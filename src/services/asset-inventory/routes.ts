@@ -160,7 +160,7 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: ':serviceAccountId',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
-                    meta: { lnbVisible: true, label: ({ params }) => params.serviceAccountId, accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { lnbVisible: true, label: ({ params }) => params.serviceAccountId },
                     props: true,
                     component: ServiceAccountDetailPage,
                 },
