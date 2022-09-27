@@ -2128,6 +2128,7 @@
 		"SERVER_TYPE": "Server Type",
 		"SERVICE_ACCOUNT": "Service Accounts",
 		"SERVICE_ACCOUNT_TYPE": "Account Type",
+		"TAGS": "Tags",
 		"UPDATED_AT": "Updated"
 	},
 	"PLUGIN": {

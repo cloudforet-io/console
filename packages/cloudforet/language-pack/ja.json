@@ -2128,6 +2128,7 @@
 		"SERVER_TYPE": "サーバタイプ",
 		"SERVICE_ACCOUNT": "サービスアカウント",
 		"SERVICE_ACCOUNT_TYPE": "",
+		"TAGS": "タグ",
 		"UPDATED_AT": "変更日"
 	},
 	"PLUGIN": {
