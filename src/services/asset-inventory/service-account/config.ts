@@ -1,5 +1,3 @@
-export const TRUSTED_ACCOUNT_ALLOWED = ['aws'] as const;
-
 export const ACCOUNT_TYPE = Object.freeze({
     GENERAL: 'GENERAL',
     TRUSTED: 'TRUSTED',

@@ -11,14 +11,14 @@
                         @click="() => handleSelectAccountType('GENERAL')"
                     />
                     <p-select-card
-                        v-if="TRUSTED_ACCOUNT_ALLOWED.some((d) => d === provider)"
+                        v-if="showTrustedAccount"
                         v-model="selectedType"
                         value="TRUSTED"
                         label="Trusted Account"
                         @click="() => handleSelectAccountType('TRUSTED')"
                     />
                 </div>
-                <div v-if="TRUSTED_ACCOUNT_ALLOWED.some((d) => d === provider)" class="information-wrapper">
+                <div v-if="showTrustedAccount" class="information-wrapper">
                     <p-i name="ic_outlined-info"
                          height="1rem" width="1rem"
                          color="inherit"
@@ -43,7 +43,6 @@ import {
     PPaneLayout, PPanelTop, PSelectCard, PI,
 } from '@spaceone/design-system';
 
-import { TRUSTED_ACCOUNT_ALLOWED } from '@/services/asset-inventory/service-account/config';
 import type { AccountType } from '@/services/asset-inventory/service-account/type';
 
 
@@ -64,6 +63,10 @@ export default defineComponent({
             type: String,
             default: undefined,
         },
+        showTrustedAccount: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -81,7 +84,6 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
-            TRUSTED_ACCOUNT_ALLOWED,
             handleSelectAccountType,
         };
     },
