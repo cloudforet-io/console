@@ -1260,6 +1260,7 @@
 				"PROJECT_TITLE": "プロジェクト",
 				"SAVE": "保存",
 				"SECRET_TYPE_LABEL": "暗号化キーのタイプ",
+				"SEE_MORE": "",
 				"SERVICE_ACCOUNT": "サービスアカウント",
 				"TAB_INPUT": "直接入力",
 				"TAB_JSON": "JSONで入力",
@@ -1267,7 +1268,8 @@
 				"TAG_DESC_1": "{name}のタグを設定します",
 				"TAG_DESC_2": "キーは、文字、数字、およびアンダースコアのみ使用できます。",
 				"TAG_LABEL": "タグ",
-				"TITLE": "サービスアカウントの追加"
+				"TITLE": "サービスアカウントの追加",
+				"TRUSTED_ACCOUNT_HELP_TEXT": ""
 			},
 			"MAIN": {
 				"ACTION": "作業",

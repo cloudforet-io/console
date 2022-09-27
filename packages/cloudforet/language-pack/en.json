@@ -1260,6 +1260,7 @@
 				"PROJECT_TITLE": "Project",
 				"SAVE": "Save",
 				"SECRET_TYPE_LABEL": "Secret Type",
+				"SEE_MORE": "See more",
 				"SERVICE_ACCOUNT": "Service Account",
 				"TAB_INPUT": "Input Form",
 				"TAB_JSON": "Json Code",
@@ -1267,7 +1268,8 @@
 				"TAG_DESC_1": "Set {name}'s tag.",
 				"TAG_DESC_2": "The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
 				"TAG_LABEL": "Tags",
-				"TITLE": "Add Service Account"
+				"TITLE": "Add Service Account",
+				"TRUSTED_ACCOUNT_HELP_TEXT": "If you choose to attach a Trusted Account, It will have access to the resources from selected account."
 			},
 			"MAIN": {
 				"ACTION": "Action",
