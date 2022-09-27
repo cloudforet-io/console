@@ -14,16 +14,19 @@
             <template #default="{invalid}">
                 <generate-id-format v-if="schemaProperty.componentName === 'GenerateIdFormat'"
                                     :value="rawFormData[schemaProperty.id]"
+                                    :disabled="schemaProperty.disabled"
                                     @update:value="handleUpdateValue(schemaProperty, ...arguments)"
                 />
                 <p-text-editor v-else-if="schemaProperty.componentName === 'PTextEditor'"
                                :code="rawFormData[schemaProperty.id]"
                                disable-auto-reformat
+                               :read-only="schemaProperty.disabled"
                                @update:code="handleUpdateValue(schemaProperty, ...arguments)"
                 />
                 <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
                                    :selected="rawFormData[schemaProperty.id]"
                                    :items="schemaProperty.menuItems"
+                                   :disabled="schemaProperty.disabled"
                                    @update:selected="handleUpdateValue(schemaProperty, ...arguments)"
                 />
                 <p-text-input v-else
@@ -33,6 +36,7 @@
                               :placeholder="schemaProperty.inputPlaceholder"
                               :masking-mode="schemaProperty.inputType === 'password'"
                               :autocomplete="false"
+                              :disabled="schemaProperty.disabled"
                               @update:value="handleUpdateValue(schemaProperty, ...arguments)"
                 />
             </template>
@@ -158,7 +162,7 @@ export default defineComponent<JsonSchemaFormProps>({
             }),
             requiredList: computed<string[]>(() => props.schema?.required ?? []),
             rawFormData: initFormDataWithSchema(props.schema, props.formData) as object,
-            refinedFormData: initFormDataWithSchema(props.schema, props.formData) as Record<string, RefinedValue>,
+            refinedFormData: initFormDataWithSchema(props.schema, props.formData, true) as Record<string, RefinedValue>,
             contextKey: Math.floor(Math.random() * Date.now()),
         });
 
@@ -172,19 +176,12 @@ export default defineComponent<JsonSchemaFormProps>({
             localize,
         });
 
-        const setFormData = (formData: object = {}) => {
-            const newFormData = {};
-            const newRefinedData = {};
-            state.schemaProperties.forEach((property) => {
-                const { id } = property;
-                newFormData[id] = formData[id];
-                newRefinedData[id] = refineValueByProperty(property, formData[id]);
-            });
-            state.rawFormData = newFormData;
-            state.refinedFormData = newRefinedData;
+        const initFormData = () => {
+            state.rawFormData = initFormDataWithSchema(props.schema, props.formData);
+            state.refinedFormData = initFormDataWithSchema(props.schema, props.formData, true) as Record<string, RefinedValue>;
         };
-        const reset = (formData?: object) => {
-            setFormData(formData);
+        const reset = () => {
+            initFormData();
             validatorErrors.value = null;
             inputOccurred.value = {};
         };
@@ -204,11 +201,11 @@ export default defineComponent<JsonSchemaFormProps>({
         /* Watchers */
         watch(() => props.schema, () => {
             state.contextKey = Math.floor(Math.random() * Date.now());
-            reset(initFormDataWithSchema(props.schema, props.formData ?? {}));
+            reset();
         });
         watch(() => props.formData, (formData) => {
             if (formData === state.refinedFormData) return;
-            setFormData(formData);
+            initFormData();
         });
         watch(() => state.refinedFormData, () => {
             const isValid = validateFormData();

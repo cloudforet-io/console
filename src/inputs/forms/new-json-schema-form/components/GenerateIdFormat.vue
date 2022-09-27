@@ -2,6 +2,7 @@
     <div class="generate-id-format">
         <p-button style-type="gray-border" :outline="true"
                   class="generate-button"
+                  :disabled="disabled"
                   @click="handleClickGenerate"
         >
             {{ $t('COMPONENT.JSON_SCHEMA_FORM.GENERATE') }}
@@ -11,6 +12,7 @@
                 {{ value || '' }}
             </p-copy-button>
             <p-icon-button v-if="value" name="ic_trashcan"
+                           :disabled="disabled"
                            class="delete-button"
                            @click="handleClickDelete"
             />
@@ -31,7 +33,8 @@ import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
 interface Props {
-    value?: string
+    value?: string;
+    disabled?: boolean;
 }
 
 export default defineComponent<Props>({
@@ -45,6 +48,10 @@ export default defineComponent<Props>({
         value: {
             type: String,
             default: undefined,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {

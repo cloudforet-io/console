@@ -6,11 +6,13 @@ export const getDefaultSchema = () => ({
         user_name: {
             minLength: 4,
             title: 'Name',
-            examples: [
-                'Wanjin',
-            ],
             description: 'Your name',
             type: 'string',
+            examples: [
+                faker.name.firstName(),
+            ],
+            default: faker.name.firstName(),
+            disabled: true,
         },
         user_nickname: {
             title: 'Nickname',

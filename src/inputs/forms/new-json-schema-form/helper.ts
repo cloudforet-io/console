@@ -29,21 +29,24 @@ const refineJsonFormatValue = (val: RawValue): RefinedValue => {
     }
 };
 
-export const refineValueByProperty = ({ type, format }: JsonSchema, val?: RawValue): RefinedValue => {
+export const refineValueByProperty = ({ type, format, disabled }: JsonSchema, val?: RawValue): RefinedValue => {
+    if (disabled) return undefined;
     if (NUMERIC_TYPES.includes(type)) return refineNumberTypeValue(val);
     if (format === 'json') return refineJsonFormatValue(val);
     if (typeof val === 'string') return val?.trim() || undefined;
     return undefined;
 };
 
-export const initFormDataWithSchema = (schema?: JsonSchema, formData: object = {}): object => {
+export const initFormDataWithSchema = (schema?: JsonSchema, formData: object = {}, refine?: boolean): object => {
     const { properties } = schema ?? {};
     if (!properties) return {};
 
     const result = {};
     Object.keys(properties).forEach((key) => {
         const property = properties[key];
-        result[key] = formData[key] ?? property.default ?? undefined;
+
+        if (refine) result[key] = refineValueByProperty(property, property.default);
+        else result[key] = formData[key] ?? property.default ?? undefined;
     });
     return result;
 };

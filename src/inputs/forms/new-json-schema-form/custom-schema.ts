@@ -30,4 +30,8 @@ export const addCustomKeywords = (ajv: Ajv): void => {
         keyword: 'order',
         schemaType: 'array',
     });
+    ajv.addKeyword({
+        keyword: 'disabled',
+        schemaType: 'boolean',
+    });
 };

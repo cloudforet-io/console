@@ -9,7 +9,11 @@ export type TextInputType = typeof TEXT_INPUT_TYPES[number]
 const COMPONENTS = ['PTextInput', 'GenerateIdFormat', 'PTextEditor', 'PSelectDropdown'] as const;
 export type ComponentName = typeof COMPONENTS[number]
 
-export type JsonSchema<Properties = object> = JSONSchemaType<Properties>
+export type JsonSchema<Properties = object> = JSONSchemaType<Properties> & {
+    title?: string;
+    order?: string[];
+    disabled?: boolean;
+}
 
 export const VALIDATION_MODES = ['input', 'all', 'none'] as const;
 export type ValidationMode = typeof VALIDATION_MODES[number]
@@ -17,11 +21,9 @@ export type ValidationMode = typeof VALIDATION_MODES[number]
 export type InnerJsonSchema = JsonSchema & {
     id: string;
     componentName: ComponentName;
-    title?: string;
     inputType?: TextInputType;
     inputPlaceholder?: string;
     menuItems?: SelectDropdownMenu[];
-    order?: string[];
 }
 
 export interface JsonSchemaFormProps {
