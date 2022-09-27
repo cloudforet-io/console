@@ -40,7 +40,8 @@
             <template #col-collect-format="{item}">
                 <p-button
                     :outline="true"
-                    style-type="gray900" @click.stop="openCollectDataModal(item)"
+                    style-type="gray900" :disabled="!hasManagePermission"
+                    @click.stop="openCollectDataModal(item)"
                 >
                     {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_COLLECT_DATA') }}
                 </p-button>
@@ -114,6 +115,10 @@ export default {
         provider: {
             type: String,
             required: true,
+        },
+        hasManagePermission: {
+            type: Boolean,
+            default: undefined,
         },
     },
     setup(props) {

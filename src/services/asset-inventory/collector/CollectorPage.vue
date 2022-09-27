@@ -87,7 +87,10 @@
                 />
             </template>
             <template #serviceAccounts>
-                <collector-service-accounts :collector-id="selectedItems[0].collector_id" :provider="selectedItems[0].plugin_info.provider" />
+                <collector-service-accounts :collector-id="selectedItems[0].collector_id"
+                                            :provider="selectedItems[0].plugin_info.provider"
+                                            :has-manage-permission="hasManagePermission"
+                />
             </template>
             <template #schedules>
                 <collector-schedules :collector="selectedItems[0]" :manage-disabled="!hasManagePermission" />
