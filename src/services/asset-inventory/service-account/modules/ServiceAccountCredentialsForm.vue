@@ -18,6 +18,13 @@
                            :label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CREDENTIALS_LABEL')"
                            required
             >
+                <template #help>
+                    <span>{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.TRUSTED_ACCOUNT_HELP_TEXT') }}</span>
+                    <p-anchor class="see-more-text"
+                              :text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SEE_MORE')"
+                              :href="trustedAccountInfoLink"
+                    />
+                </template>
                 <div class="radio-wrapper">
                     <p-radio :selected="formState.attachTrustedAccount" :value="false"
                              @change="handleChangeAttachTrustedAccount"
@@ -77,7 +84,7 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown,
+    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PAnchor,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
@@ -87,6 +94,7 @@ import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -109,6 +117,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'ServiceAccountCredentialsForm',
     components: {
+        PAnchor,
         PSelectDropdown,
         PFieldGroup,
         PRadio,
@@ -139,15 +148,18 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
+        const storeState = reactive({
+            language: computed(() => store.state.user.language),
+        });
         const state = reactive({
             providerData: {} as ProviderModel,
-            showTrustedAccount: computed(() => state.providerData?.capability?.support_trusted_service_account ?? false),
+            showTrustedAccount: computed<boolean>(() => state.providerData?.capability?.support_trusted_service_account ?? false),
             trustedAccounts: [] as ServiceAccountModel[],
             trustedAccountMenuItems: computed<SelectDropdownMenu[]>(() => state.trustedAccounts.map(d => ({
                 name: d.service_account_id,
                 label: d.name,
             }))),
-            secretTypes: computed(() => {
+            secretTypes: computed<string[]>(() => {
                 if (props.serviceAccountType === 'GENERAL') {
                     if (formState.attachTrustedAccount) {
                         return state.providerData?.capability?.general_service_account_schema ?? [];
@@ -157,6 +169,10 @@ export default defineComponent<Props>({
                 return state.providerData?.capability?.trusted_service_account_schema ?? [];
             }),
             credentialSchema: {} as JsonSchema,
+            trustedAccountInfoLink: computed<string>(() => {
+                const lang = storeState.language === 'en' ? '' : `${storeState.language}/`;
+                return `https://spaceone.org/${lang}docs/guides/asset-inventory/service-account/`;
+            }),
         });
         const formState = reactive({
             hasCredentialKey: true,
@@ -369,6 +385,14 @@ export default defineComponent<Props>({
     }
     .custom-schema-box {
         padding: 2rem 2rem 0 2rem;
+    }
+
+    /* custom design-system component - p-tab */
+    :deep(.p-field-group) {
+        .see-more-text {
+            @apply text-blue-700;
+            margin-left: 0.25rem;
+        }
     }
 
     /* custom design-system component - p-tab */
