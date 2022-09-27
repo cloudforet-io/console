@@ -29,6 +29,7 @@
         <div class="content-wrapper">
             <service-account-account-type :provider="provider"
                                           :account-type.sync="accountType"
+                                          :show-trusted-account="showTrustedAccount"
                                           @change="handleChangeAccountType"
             />
             <p-pane-layout class="form-wrapper">
@@ -138,10 +139,11 @@ export default {
             providerIcon: computed(() => store.state.reference.provider.items[state.providerData?.provider]?.icon),
             description: computed(() => get(state.providerData, 'metadata.view.layouts.help:service_account:create', undefined)),
             enableCredentialInput: computed<boolean>(() => {
-                const secretTypes = get(state.providerData, 'capability.supported_schema', []);
+                const secretTypes = state.providerData?.capability?.supported_schema ?? [];
                 return secretTypes.length > 0;
             }),
             baseInformationSchema: computed(() => state.providerData.template?.service_account?.schema),
+            showTrustedAccount: computed(() => state.providerData?.capability?.support_trusted_service_account ?? false),
         });
 
         const formState = reactive({

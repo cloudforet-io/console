@@ -14,7 +14,7 @@
             </div>
         </p-field-group>
         <template v-if="formState.hasCredentialKey">
-            <p-field-group v-if="serviceAccountType !== ACCOUNT_TYPE.TRUSTED && TRUSTED_ACCOUNT_ALLOWED.some((d) => d === provider)"
+            <p-field-group v-if="serviceAccountType !== ACCOUNT_TYPE.TRUSTED && showTrustedAccount"
                            :label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CREDENTIALS_LABEL')"
                            required
             >
@@ -82,7 +82,7 @@ import {
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -91,7 +91,7 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ACCOUNT_TYPE, TRUSTED_ACCOUNT_ALLOWED } from '@/services/asset-inventory/service-account/config';
+import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 import type {
     ActiveDataType, CredentialForm, ProviderModel, PageMode, AccountType,
     ServiceAccountModel,
@@ -141,6 +141,7 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const state = reactive({
             providerData: {} as ProviderModel,
+            showTrustedAccount: computed(() => state.providerData?.capability?.support_trusted_service_account ?? false),
             trustedAccounts: [] as ServiceAccountModel[],
             trustedAccountMenuItems: computed<SelectDropdownMenu[]>(() => state.trustedAccounts.map(d => ({
                 name: d.service_account_id,
@@ -149,11 +150,11 @@ export default defineComponent<Props>({
             secretTypes: computed(() => {
                 if (props.serviceAccountType === 'GENERAL') {
                     if (formState.attachTrustedAccount) {
-                        return get(state.providerData, 'capability.general_service_account_schema', []);
+                        return state.providerData?.capability?.general_service_account_schema ?? [];
                     }
-                    return get(state.providerData, 'capability.supported_schema', []);
+                    return state.providerData?.capability?.supported_schema ?? [];
                 }
-                return get(state.providerData, 'capability.trusted_service_account_schema', []);
+                return state.providerData?.capability?.trusted_service_account_schema ?? [];
             }),
             credentialSchema: {} as JsonSchema,
         });
@@ -341,7 +342,6 @@ export default defineComponent<Props>({
             formState,
             tabState,
             ACCOUNT_TYPE,
-            TRUSTED_ACCOUNT_ALLOWED,
             handleChangeSecretType,
             handleCredentialValidate,
             handleSelectNoCredentials,
