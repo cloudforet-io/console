@@ -32,7 +32,7 @@
                                               :service-account-type="serviceAccountType"
                                               :provider="provider"
                                               :is-valid.sync="isFormValid"
-                                              :origin-form-data="credentialForm"
+                                              :origin-form="originCredentialForm"
                                               @change="handleChangeCredentialForm"
             />
         </div>
@@ -126,6 +126,7 @@ export default defineComponent<Props>({
             isFormValid: undefined,
             credentialData: {} as CredentialModel,
             credentialForm: {} as CredentialForm,
+            originCredentialForm: {} as Partial<CredentialForm>,
         });
 
         /* Api */
@@ -141,16 +142,13 @@ export default defineComponent<Props>({
                     listApi = SpaceConnector.client.secret.trustedSecret.list;
                 }
                 const { results } = await listApi({ query: getQuery().data });
-                if (results.length) {
-                    state.credentialData = results[0];
-                    state.credentialForm.selectedSecretType = results[0].schema;
-                } else {
-                    state.credentialData = {};
-                }
+                if (results.length) state.credentialData = results[0];
+                else state.credentialData = {};
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.credentialData = {};
             } finally {
+                state.originCredentialForm.hasCredentialKey = !isEmpty(state.credentialData);
                 state.loading = false;
             }
         };
@@ -271,6 +269,9 @@ export default defineComponent<Props>({
         /* Watcher */
         watch([() => props.serviceAccountId, () => props.serviceAccountType], ([serviceAccountId]) => {
             if (serviceAccountId) getCredentialData(serviceAccountId);
+        }, { immediate: true });
+        watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
+            state.originCredentialForm.attachedTrustedAccountId = attachedTrustedAccountId;
         }, { immediate: true });
 
         return {

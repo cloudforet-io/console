@@ -73,7 +73,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, watch, toRefs,
+    computed, defineComponent, reactive, watch, toRefs, onMounted,
 } from 'vue';
 
 import {
@@ -82,7 +82,7 @@ import {
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -103,7 +103,7 @@ interface Props {
     serviceAccountType: AccountType;
     provider?: string;
     isValid: boolean;
-    originFormData: CredentialForm;
+    originForm: Partial<CredentialForm>;
 }
 
 export default defineComponent<Props>({
@@ -133,8 +133,8 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-        originFormData: {
-            type: Object as PropType<CredentialForm>,
+        originForm: {
+            type: Object as PropType<Partial<CredentialForm>>,
             default: () => ({}),
         },
     },
@@ -204,6 +204,11 @@ export default defineComponent<Props>({
             formState.isCustomSchemaFormValid = false;
             tabState.activeTab = 'input';
         };
+        const setOriginForm = (originForm: Partial<CredentialForm>) => {
+            formState.hasCredentialKey = originForm?.hasCredentialKey;
+            formState.attachTrustedAccount = !!originForm?.attachedTrustedAccountId;
+            formState.attachedTrustedAccountId = originForm?.attachedTrustedAccountId;
+        };
         const checkJsonStringAvailable = (str: string): boolean => {
             try {
                 JSON.parse(str);
@@ -221,11 +226,7 @@ export default defineComponent<Props>({
                 });
                 state.providerData = result;
                 const supportedSchema = result?.capability?.supported_schema;
-                let selectedSecretType = supportedSchema ? supportedSchema[0] : '';
-                if (props.editMode === 'UPDATE' && props.originFormData.selectedSecretType) {
-                    selectedSecretType = props.originFormData.selectedSecretType;
-                }
-                formState.selectedSecretType = selectedSecretType;
+                formState.selectedSecretType = supportedSchema ? supportedSchema[0] : '';
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.providerData = {};
@@ -304,6 +305,11 @@ export default defineComponent<Props>({
         (async () => {
             await listTrustAccounts();
         })();
+
+        /* Mounted */
+        onMounted(async () => {
+            if (!isEmpty(props.originForm)) setOriginForm(props.originForm);
+        });
 
         /* Watcher */
         watch(() => props.provider, (provider) => {
