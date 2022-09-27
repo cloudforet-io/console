@@ -1,3 +1,10 @@
+# [1.1.0-beta.401](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.400...v1.1.0-beta.401) (2022-09-27)
+
+
+### Bug Fixes
+
+* **p-toolbox-table:** add missing extraEventNames param ([a1e83f2](https://github.com/cloudforet-io/mirinae/commit/a1e83f22b173ec2f688ca7152a3a6524c2e52108))
+
 # [1.1.0-beta.400](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.399...v1.1.0-beta.400) (2022-09-27)
 
 
