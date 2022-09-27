@@ -1,3 +1,10 @@
+# [1.1.0-beta.400](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.399...v1.1.0-beta.400) (2022-09-27)
+
+
+### Features
+
+* **json-schema-form:** add order keyword ([#45](https://github.com/cloudforet-io/mirinae/issues/45)) ([f9815b2](https://github.com/cloudforet-io/mirinae/commit/f9815b27225e50a0d73535c30a837675761d02db))
+
 # [1.1.0-beta.399](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.398...v1.1.0-beta.399) (2022-09-26)
 
 
