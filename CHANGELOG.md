@@ -1,3 +1,10 @@
+# [1.1.0-beta.403](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.402...v1.1.0-beta.403) (2022-09-27)
+
+
+### Features
+
+* **json-schema-form:** add disabled keyword ([#49](https://github.com/cloudforet-io/mirinae/issues/49)) ([c53fede](https://github.com/cloudforet-io/mirinae/commit/c53fede44650c4893d5d379cc4a4b2486548c496))
+
 # [1.1.0-beta.402](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.401...v1.1.0-beta.402) (2022-09-27)
 
 
