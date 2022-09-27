@@ -246,7 +246,7 @@ export default defineComponent<ToolboxTableProps>({
     },
     setup(props, { emit }: SetupContext) {
         const proxyState = reactive({
-            selectIndex: useProxyValue<number[]>('selectIndex', props, emit),
+            selectIndex: useProxyValue<number[]>('selectIndex', props, emit, ['select']),
             sortBy: useProxyValue<string>('sortBy', props, emit),
             sortDesc: useProxyValue<boolean>('sortDesc', props, emit),
             thisPage: useProxyValue<number>('thisPage', props, emit),
