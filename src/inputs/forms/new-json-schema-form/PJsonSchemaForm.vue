@@ -123,6 +123,7 @@ export default defineComponent<JsonSchemaFormProps>({
         const state = reactive({
             schemaProperties: computed<InnerJsonSchema[]>(() => {
                 const properties: object|undefined = props.schema?.properties;
+                const order: string[] = props.schema?.order ?? [];
                 if (properties && !isEmpty(properties)) {
                     return Object.entries(properties).map(([k, schemaProperty]) => {
                         const refined: InnerJsonSchema = {
@@ -134,6 +135,23 @@ export default defineComponent<JsonSchemaFormProps>({
                             menuItems: getMenuItemsBySchemaProperty(schemaProperty),
                         };
                         return refined;
+                    }).sort((a, b) => {
+                        const orderA = order.findIndex(id => id === a.id);
+                        const orderB = order.findIndex(id => id === b.id);
+
+                        // If both do not have order information, they are sorted based on title or id(=property name).
+                        if (orderA === -1 && orderB === -1) {
+                            const textA = a.title ?? a.id;
+                            const textB = b.title ?? b.id;
+                            return textA.localeCompare(textB);
+                        }
+
+                        // If only one of them does not have order information, the item without order information is placed at the back.
+                        if (orderA === -1) return 1;
+                        if (orderB === -1) return -1;
+
+                        // If both have order information, sort based on the order information.
+                        return orderA - orderB;
                     });
                 }
                 return [];

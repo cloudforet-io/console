@@ -3,17 +3,6 @@ import { faker } from '@faker-js/faker';
 export const getDefaultSchema = () => ({
     type: 'object',
     properties: {
-        user_id: {
-            title: 'ID',
-            format: 'generate_id',
-            markdown: '[How to generate ID?](https://www.google.com)',
-        },
-        password: {
-            title: 'Password',
-            minLength: 8,
-            format: 'password',
-            default: '12345678',
-        },
         user_name: {
             minLength: 4,
             title: 'Name',
@@ -31,6 +20,17 @@ export const getDefaultSchema = () => ({
             examples: [
                 'Genie',
             ],
+        },
+        user_id: {
+            title: 'ID',
+            format: 'generate_id',
+            markdown: '[How to generate ID?](https://www.google.com)',
+        },
+        password: {
+            title: 'Password',
+            minLength: 8,
+            format: 'password',
+            default: '12345678',
         },
         country_code: {
             examples: ['82'],
@@ -84,6 +84,7 @@ export const getDefaultSchema = () => ({
 
     },
     required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional'],
+    order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'age', 'phone', 'homepage', 'additional'],
 });
 
 export const getDefaultFormData = () => ({

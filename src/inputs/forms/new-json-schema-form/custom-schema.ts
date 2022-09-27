@@ -26,4 +26,8 @@ export const addCustomKeywords = (ajv: Ajv): void => {
         keyword: 'markdown',
         schemaType: 'string',
     });
+    ajv.addKeyword({
+        keyword: 'order',
+        schemaType: 'array',
+    });
 };

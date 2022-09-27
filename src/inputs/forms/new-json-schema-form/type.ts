@@ -17,9 +17,11 @@ export type ValidationMode = typeof VALIDATION_MODES[number]
 export type InnerJsonSchema = JsonSchema & {
     id: string;
     componentName: ComponentName;
+    title?: string;
     inputType?: TextInputType;
     inputPlaceholder?: string;
     menuItems?: SelectDropdownMenu[];
+    order?: string[];
 }
 
 export interface JsonSchemaFormProps {
