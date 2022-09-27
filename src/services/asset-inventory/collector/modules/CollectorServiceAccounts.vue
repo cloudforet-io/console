@@ -40,7 +40,8 @@
             <template #col-collect-format="{item}">
                 <p-button
                     :outline="true"
-                    style-type="gray900" @click.stop="openCollectDataModal(item)"
+                    style-type="gray900" :disabled="!hasManagePermission"
+                    @click.stop="openCollectDataModal(item)"
                 >
                     {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_COLLECT_DATA') }}
                 </p-button>
@@ -79,6 +80,7 @@ import { store } from '@/store';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 const CollectDataModal = () => import('@/services/asset-inventory/collector/modules/CollectDataModal.vue');
 
@@ -138,6 +140,7 @@ export default {
         };
 
         const state = reactive({
+            hasManagePermission: useManagePermissionState(),
             timezone: computed(() => store.state.user.timezone),
             items: [] as any,
             totalCount: 0,
