@@ -56,10 +56,10 @@ export class SpaceRouter {
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             nextPath = to.fullPath;
             const isTokenAlive = SpaceConnector.isTokenAlive;
-            const userPagePermissions = SpaceRouter.router.app.$store.getters['user/pagePermissionList'];
+            const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pagePermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
             const userAccessLevel = getUserAccessLevel(to.name, userPagePermissions, isTokenAlive);
-            const userNeedPwdReset = SpaceRouter.router.app.$store.getters['user/isUserNeedPasswordReset'];
+            const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
 
             // When a user is authenticated
