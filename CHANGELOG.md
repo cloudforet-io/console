@@ -1,3 +1,10 @@
+# [1.1.0-beta.404](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.403...v1.1.0-beta.404) (2022-09-27)
+
+
+### Features
+
+* **p-definition:** add "object" & "array" type data spec ([#46](https://github.com/cloudforet-io/mirinae/issues/46)) ([b58c19a](https://github.com/cloudforet-io/mirinae/commit/b58c19adc0a2815e86d8945129e3eb15b2cb7822))
+
 # [1.1.0-beta.403](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.402...v1.1.0-beta.403) (2022-09-27)
 
 
