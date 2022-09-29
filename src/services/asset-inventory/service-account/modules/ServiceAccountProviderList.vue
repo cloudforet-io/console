@@ -62,7 +62,6 @@ export default defineComponent({
     padding-bottom: 1rem;
     margin-bottom: 2.5rem;
     overflow-x: scroll;
-
     .provider-button {
         @apply flex items-center border rounded-lg border-gray-200 bg-white;
         min-width: 10rem;
@@ -73,7 +72,6 @@ export default defineComponent({
         :deep(.img-container) {
             position: relative;
         }
-
         .provider-name {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -87,7 +85,6 @@ export default defineComponent({
             overflow: hidden;
         }
     }
-
     .selected-button {
         @apply border-blue-600;
         .selected {
