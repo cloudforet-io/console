@@ -1,46 +1,72 @@
 <template>
     <form class="p-json-schema-form" @submit.prevent>
-        <p-field-group v-for="schemaProperty in schemaProperties"
-                       :key="`field-${contextKey}-${schemaProperty.id}`"
+        <p-field-group v-if="isJsonInputMode"
                        class="input-form-wrapper"
-                       :label="schemaProperty.title"
-                       :required="requiredList.includes(schemaProperty.id)"
-                       :invalid="getPropertyInvalidState(schemaProperty)"
-                       :invalid-text="invalidMessages[schemaProperty.id]"
+                       :class="{'no-margin': !isRoot}"
+                       :invalid="getJsonInputInvalidState()"
         >
-            <template v-if="schemaProperty.markdown" #help>
-                <p-markdown :markdown="schemaProperty.markdown" :language="language" remove-spacing />
-            </template>
-            <template #default="{invalid}">
-                <generate-id-format v-if="schemaProperty.componentName === 'GenerateIdFormat'"
-                                    :value="rawFormData[schemaProperty.id]"
-                                    :disabled="schemaProperty.disabled"
-                                    @update:value="handleUpdateValue(schemaProperty, ...arguments)"
-                />
-                <p-text-editor v-else-if="schemaProperty.componentName === 'PTextEditor'"
-                               :code="rawFormData[schemaProperty.id]"
-                               disable-auto-reformat
-                               :read-only="schemaProperty.disabled"
-                               @update:code="handleUpdateValue(schemaProperty, ...arguments)"
-                />
-                <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
-                                   :selected="rawFormData[schemaProperty.id]"
-                                   :items="schemaProperty.menuItems"
-                                   :disabled="schemaProperty.disabled"
-                                   @update:selected="handleUpdateValue(schemaProperty, ...arguments)"
-                />
-                <p-text-input v-else
-                              :value="rawFormData[schemaProperty.id]"
-                              :type="schemaProperty.inputType"
-                              :invalid="invalid"
-                              :placeholder="schemaProperty.inputPlaceholder"
-                              :masking-mode="schemaProperty.inputType === 'password'"
-                              :autocomplete="false"
-                              :disabled="schemaProperty.disabled"
-                              @update:value="handleUpdateValue(schemaProperty, ...arguments)"
-                />
+            <p-text-editor :code="jsonInputData"
+                           disable-auto-reformat
+                           :read-only="schema.disabled"
+                           @update:code="handleUpdateJsonData(schema, ...arguments)"
+            />
+            <template #invalid>
+                <span v-for="invalidMessage in invalidMessages" :key="invalidMessage"
+                      class="invalid-message"
+                >
+                    {{ invalidMessage }}
+                </span>
             </template>
         </p-field-group>
+        <template v-else-if="typeof rawFormData === 'object'">
+            <p-field-group v-for="schemaProperty in schemaProperties"
+                           :key="`field-${contextKey}-${schemaProperty.propertyName}`"
+                           class="input-form-wrapper"
+                           :label="schemaProperty.title"
+                           :required="requiredList.includes(schemaProperty.propertyName)"
+                           :invalid="getPropertyInvalidState(schemaProperty)"
+            >
+                <template v-if="schemaProperty.markdown" #help>
+                    <p-markdown :markdown="schemaProperty.markdown" :language="language" remove-spacing />
+                </template>
+                <template v-if="invalidMessagesMap[schemaProperty.propertyName]" #invalid>
+                    <span v-for="invalidMessage in invalidMessagesMap[schemaProperty.propertyName]" :key="invalidMessage"
+                          class="invalid-message"
+                    >
+                        {{ invalidMessage }}
+                    </span>
+                </template>
+                <template #default="{invalid}">
+                    <generate-id-format v-if="schemaProperty.componentName === 'GenerateIdFormat'"
+                                        :value="rawFormData[schemaProperty.propertyName]"
+                                        :disabled="schemaProperty.disabled"
+                                        @update:value="handleUpdateFormValue(schemaProperty, ...arguments)"
+                    />
+                    <p-json-schema-form v-else-if="schemaProperty.componentName === 'PJsonSchemaForm'"
+                                        :form-data="rawFormData[schemaProperty.propertyName]"
+                                        :schema="schemaProperty"
+                                        :is-root="false"
+                                        @update:form-data="handleUpdateFormValue(schemaProperty, ...arguments)"
+                    />
+                    <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
+                                       :selected="rawFormData[schemaProperty.propertyName]"
+                                       :items="schemaProperty.menuItems"
+                                       :disabled="schemaProperty.disabled"
+                                       @update:selected="handleUpdateFormValue(schemaProperty, ...arguments)"
+                    />
+                    <p-text-input v-else
+                                  :value="rawFormData[schemaProperty.propertyName]"
+                                  :type="schemaProperty.inputType"
+                                  :invalid="invalid"
+                                  :placeholder="schemaProperty.inputPlaceholder"
+                                  :masking-mode="schemaProperty.inputType === 'password'"
+                                  :autocomplete="false"
+                                  :disabled="schemaProperty.disabled"
+                                  @update:value="handleUpdateFormValue(schemaProperty, ...arguments)"
+                    />
+                </template>
+            </p-field-group>
+        </template>
     </form>
 </template>
 
@@ -61,12 +87,11 @@ import GenerateIdFormat from '@/inputs/forms/new-json-schema-form/components/Gen
 import { useLocalize } from '@/inputs/forms/new-json-schema-form/composables/localize';
 import { useValidation } from '@/inputs/forms/new-json-schema-form/composables/validation';
 import { addCustomFormats, addCustomKeywords } from '@/inputs/forms/new-json-schema-form/custom-schema';
-import type { RawValue, RefinedValue } from '@/inputs/forms/new-json-schema-form/helper';
 import {
     getComponentNameBySchemaProperty,
     getInputPlaceholderBySchemaProperty,
     getInputTypeBySchemaProperty, getMenuItemsBySchemaProperty,
-    initFormDataWithSchema,
+    initFormDataWithSchema, initJsonInputDataWithSchema, initRefinedFormData, refineObjectByProperties,
     refineValueByProperty,
 } from '@/inputs/forms/new-json-schema-form/helper';
 import type {
@@ -81,9 +106,14 @@ import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 import type { SupportLanguage } from '@/translations';
 import { supportLanguages } from '@/translations';
 
+const PJsonSchemaForm = () => ({
+    // eslint-disable-next-line import/no-self-import
+    component: import('./PJsonSchemaForm.vue'),
+});
 export default defineComponent<JsonSchemaFormProps>({
     name: 'PJsonSchemaForm',
     components: {
+        PJsonSchemaForm,
         PSelectDropdown,
         PTextEditor,
         GenerateIdFormat,
@@ -97,7 +127,7 @@ export default defineComponent<JsonSchemaFormProps>({
             default: undefined,
         },
         formData: {
-            type: Object,
+            type: [Object, String, Number, Boolean, Array], // Only object is available for external usage.
             default: undefined,
         },
         language: {
@@ -114,6 +144,10 @@ export default defineComponent<JsonSchemaFormProps>({
                 return mode === undefined || VALIDATION_MODES.includes(mode);
             },
         },
+        isRoot: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props, { emit }) {
         const ajv = new Ajv({
@@ -125,6 +159,7 @@ export default defineComponent<JsonSchemaFormProps>({
         addCustomKeywords(ajv);
 
         const state = reactive({
+            isJsonInputMode: computed(() => props.schema?.json),
             schemaProperties: computed<InnerJsonSchema[]>(() => {
                 const properties: object|undefined = props.schema?.properties;
                 const order: string[] = props.schema?.order ?? [];
@@ -132,7 +167,7 @@ export default defineComponent<JsonSchemaFormProps>({
                     return Object.entries(properties).map(([k, schemaProperty]) => {
                         const refined: InnerJsonSchema = {
                             ...schemaProperty,
-                            id: k,
+                            propertyName: k,
                             componentName: getComponentNameBySchemaProperty(schemaProperty),
                             inputType: getInputTypeBySchemaProperty(schemaProperty),
                             inputPlaceholder: getInputPlaceholderBySchemaProperty(schemaProperty),
@@ -140,13 +175,13 @@ export default defineComponent<JsonSchemaFormProps>({
                         };
                         return refined;
                     }).sort((a, b) => {
-                        const orderA = order.findIndex(id => id === a.id);
-                        const orderB = order.findIndex(id => id === b.id);
+                        const orderA = order.findIndex(propertyName => propertyName === a.propertyName);
+                        const orderB = order.findIndex(propertyName => propertyName === b.propertyName);
 
-                        // If both do not have order information, they are sorted based on title or id(=property name).
+                        // If both do not have order information, they are sorted based on title or property name.
                         if (orderA === -1 && orderB === -1) {
-                            const textA = a.title ?? a.id;
-                            const textB = b.title ?? b.id;
+                            const textA = a.title ?? a.propertyName;
+                            const textB = b.title ?? b.propertyName;
                             return textA.localeCompare(textB);
                         }
 
@@ -161,41 +196,77 @@ export default defineComponent<JsonSchemaFormProps>({
                 return [];
             }),
             requiredList: computed<string[]>(() => props.schema?.required ?? []),
+            // For form input case
             rawFormData: initFormDataWithSchema(props.schema, props.formData) as object,
-            refinedFormData: initFormDataWithSchema(props.schema, props.formData, true) as Record<string, RefinedValue>,
+            // For json input case
+            jsonInputData: initJsonInputDataWithSchema(props.schema, props.formData) as string|undefined,
+            // For all cases. In root case, it can be only an object.
+            refinedFormData: initRefinedFormData(props.schema, props.formData, props.isRoot) as any,
+            //
             contextKey: Math.floor(Math.random() * Date.now()),
         });
 
         const { localize } = useLocalize(props);
         const {
-            invalidMessages, validatorErrors, inputOccurred,
-            validateFormData, getPropertyInvalidState,
+            invalidMessagesMap, validatorErrors, inputOccurredMap, invalidMessages, jsonInputOccurred,
+            validateFormData, getPropertyInvalidState, getJsonInputInvalidState, setJsonInputParsingError,
         } = useValidation(props, {
             ajv,
-            formData: computed(() => state.refinedFormData),
+            formData: computed(() => (props.isRoot ? state.refinedFormData : props.formData)),
             localize,
         });
 
         const initFormData = () => {
-            state.rawFormData = initFormDataWithSchema(props.schema, props.formData);
-            state.refinedFormData = initFormDataWithSchema(props.schema, props.formData, true) as Record<string, RefinedValue>;
+            if (state.isJsonInputMode) state.jsonInputData = initJsonInputDataWithSchema(props.schema, props.formData);
+            else state.rawFormData = initFormDataWithSchema(props.schema, props.formData);
+
+            if (props.isRoot) state.refinedFormData = initRefinedFormData(props.schema, props.formData);
         };
         const reset = () => {
             initFormData();
             validatorErrors.value = null;
-            inputOccurred.value = {};
+            inputOccurredMap.value = {};
+            jsonInputOccurred.value = false;
         };
 
+
         /* Event Handlers */
-        const handleUpdateValue = (property: InnerJsonSchema, val?: RawValue) => {
-            const { id } = property;
-            state.rawFormData[id] = val;
-            state.refinedFormData = { ...state.refinedFormData, [id]: refineValueByProperty(property, val) };
-            const isValid = validateFormData();
-            emit('update:form-data', state.refinedFormData);
-            emit('validate', isValid);
-            emit('change', isValid, state.refinedFormData);
-            if (!inputOccurred.value[id]) inputOccurred.value[id] = true;
+        // form input case
+        const handleUpdateFormValue = (property: InnerJsonSchema, val?: any) => {
+            const { propertyName } = property;
+            state.rawFormData[propertyName] = val;
+            state.refinedFormData = {
+                ...state.refinedFormData,
+                [propertyName]: refineValueByProperty(property, val),
+            };
+            if (!inputOccurredMap.value[propertyName]) inputOccurredMap.value[propertyName] = true;
+        };
+        // json input case
+        const handleUpdateJsonData = (property: JsonSchema, code?: string) => {
+            // The code below is to prevent updating jsonInputOccurred on initializing case. TextEditor component emit update:code event on initialize.
+            if (!jsonInputOccurred.value && state.jsonInputData !== code) {
+                jsonInputOccurred.value = true;
+            }
+            state.jsonInputData = code;
+            const trimmed = code?.trim();
+            let jsonParsingError: null|Error = null;
+
+            if (!trimmed) state.refinedFormData = undefined;
+            else {
+                try {
+                    const parsed = JSON.parse(trimmed);
+                    if (typeof parsed === 'object' && !Array.isArray(parsed)) {
+                        state.refinedFormData = refineObjectByProperties(property, parsed);
+                    } else {
+                        state.refinedFormData = props.isRoot ? {} : parsed;
+                    }
+                } catch (e: unknown) {
+                    jsonParsingError = e as Error;
+                    if (!props.isRoot) state.refinedFormData = trimmed;
+                }
+            }
+
+            if (props.isRoot) setJsonInputParsingError(jsonParsingError);
         };
 
         /* Watchers */
@@ -207,19 +278,39 @@ export default defineComponent<JsonSchemaFormProps>({
             if (formData === state.refinedFormData) return;
             initFormData();
         });
-        watch(() => state.refinedFormData, () => {
-            const isValid = validateFormData();
-            emit('update:form-data', state.refinedFormData);
-            emit('validate', isValid);
-            emit('change', isValid, state.refinedFormData);
-        }, { immediate: true });
+        watch(() => state.refinedFormData, (refinedFormData) => {
+            emit('update:form-data', refinedFormData);
+            if (props.isRoot) {
+                const isValid = validateFormData();
+                emit('validate', isValid);
+                emit('change', isValid, refinedFormData);
+            }
+        }, { immediate: !state.isJsonInputMode });
 
         return {
             ...toRefs(state),
+            invalidMessagesMap,
             invalidMessages,
             getPropertyInvalidState,
-            handleUpdateValue,
+            getJsonInputInvalidState,
+            handleUpdateFormValue,
+            handleUpdateJsonData,
         };
     },
 });
 </script>
+
+<style lang="postcss">
+.p-json-schema-form {
+    > .input-form-wrapper.no-margin {
+        margin-bottom: 0;
+    }
+    .invalid-message {
+        display: block;
+        margin-bottom: 0.25rem;
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+}
+</style>

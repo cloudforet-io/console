@@ -5,55 +5,78 @@ import type {
 
 export const NUMERIC_TYPES = ['number', 'integer'];
 
-export type RawValue = string|number|SelectDropdownMenu[]|undefined
-export type RefinedValue = string|number|undefined;
 
-const refineNumberTypeValue = (val: RawValue): RefinedValue => {
+const refineNumberTypeValue = (val: any): any => {
     if (typeof val === 'string' && val.trim() === '') {
         return undefined;
     }
-    let dataValue: RefinedValue = Number(val);
+    let dataValue: any = Number(val);
     if (Number.isNaN(dataValue)) dataValue = undefined;
     return dataValue;
 };
 
-const refineJsonFormatValue = (val: RawValue): RefinedValue => {
-    if (typeof val !== 'string' || val.trim() === '') return undefined;
-
-    try {
-        const parsedData = JSON.parse(val);
-        if (typeof parsedData === 'object') return parsedData;
-        return val;
-    } catch (e) {
-        return val;
-    }
-};
-
-export const refineValueByProperty = ({ type, format, disabled }: JsonSchema, val?: RawValue): RefinedValue => {
+export const refineValueByProperty = (schema: JsonSchema, val?: any): any => {
+    const { type, disabled } = schema;
     if (disabled) return undefined;
+    if (type === 'object') return val; // In case of object, child JsonSchemaForm refines the data.
     if (NUMERIC_TYPES.includes(type)) return refineNumberTypeValue(val);
-    if (format === 'json') return refineJsonFormatValue(val);
     if (typeof val === 'string') return val?.trim() || undefined;
     return undefined;
 };
 
-export const initFormDataWithSchema = (schema?: JsonSchema, formData: object = {}, refine?: boolean): object => {
+export const initFormDataWithSchema = (schema?: JsonSchema, formData?: object): object => {
     const { properties } = schema ?? {};
-    if (!properties) return {};
 
     const result = {};
+    if (!properties) return {};
     Object.keys(properties).forEach((key) => {
         const property = properties[key];
+        result[key] = formData?.[key] ?? property.default ?? undefined;
+    });
+    return result;
+};
 
-        if (refine) result[key] = refineValueByProperty(property, property.default);
-        else result[key] = formData[key] ?? property.default ?? undefined;
+export const initJsonInputDataWithSchema = (schema?: JsonSchema, formData?: object): string|undefined => {
+    if (formData === null || formData === undefined) return undefined;
+    try {
+        return JSON.stringify(initFormDataWithSchema(schema, formData), undefined, 2);
+    } catch (e) {
+        return undefined;
+    }
+};
+
+export const refineObjectByProperties = (schema: JsonSchema, formData: object): object => {
+    const { properties } = schema ?? {};
+    if (!properties) return formData;
+    const result = {};
+    Object.keys(properties).forEach((key) => {
+        result[key] = formData[key];
+    });
+    return result;
+};
+
+export const initRefinedFormData = (schema?: JsonSchema, formData?: any, isRoot?: boolean): any => {
+    if (typeof formData !== 'object' || Array.isArray(formData)) {
+        if (isRoot) {
+            console.error(new Error('[JsonSchemaForm] Only object is available for formData prop'));
+            return {};
+        }
+        return formData;
+    }
+
+    const { properties } = schema ?? {};
+    const result = {};
+    if (!properties) return formData;
+    Object.keys(properties).forEach((key) => {
+        const property = properties[key];
+        result[key] = refineValueByProperty(property, formData?.[key] ?? property.default);
     });
     return result;
 };
 
 export const getComponentNameBySchemaProperty = (schemaProperty: InnerJsonSchema): ComponentName => {
     if (schemaProperty.format === 'generate_id') return 'GenerateIdFormat';
-    if (schemaProperty.format === 'json') return 'PTextEditor';
+    if (schemaProperty.type === 'object') return 'PJsonSchemaForm';
     if (Array.isArray(schemaProperty.enum) && schemaProperty.type === 'string') return 'PSelectDropdown';
     return 'PTextInput';
 };

@@ -12,7 +12,7 @@ import {
      getJsonSchemaFormArgTypes,
 } from '@/inputs/forms/new-json-schema-form/story-helper';
 import {
-    getDefaultFormData, getDefaultSchema
+    getDefaultFormData, getDefaultSchema, getJsonInputSchema
 } from "@/inputs/forms/new-json-schema-form/mock";
 import {supportLanguages} from "@/translations";
 import {
@@ -68,7 +68,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 |password format|ajv-format|[Text Input](?path=/docs/inputs-input--basic)|
 |markdown keyword|custom|[Markdown](?path=/docs/data-display-markdown--string-markdown)|
 |generate_id format|custom|GenerateIdFormat (Internal Component)|
-|json format|custom|[Text Editor](?path=/docs/inputs-text-editor--basic)|
+|json keyword(json input mode. works only with object type)|custom|[Text Editor](?path=/docs/inputs-text-editor--basic)|
 |enum keyword(supports string type only)|custom|[Select Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|
 |order keyword(order of properties. string[])|custom|-|
 |disabled keyword(disabled status of input form. string[])|custom|-|
@@ -270,6 +270,53 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
                     formData: {},
                     validationModes: VALIDATION_MODES.map(d => ({name: d, label: d})),
                     validationMode: VALIDATION_MODES[0]
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Json Input Mode
+
+<Canvas>
+    <Story name="Json Input Mode" >
+        {{
+            components: { PJsonSchemaForm, PTextEditor, PPanelTop },
+            i18n,
+            template: `
+<div class="grid gap-4 grid-cols-12">
+    <div class="col-span-6 bg-blue-100 p-4">
+        <p-panel-top>Json Schema Form</p-panel-top>
+        <p-json-schema-form :schema="schema"
+                            :form-data.sync="formData"
+                            :language="$i18n.locale"
+        />
+    </div>
+    <div class="col-span-6 bg-coral-100 p-4">
+        <p-panel-top>Schema</p-panel-top>
+        <p-text-editor :code="JSON.stringify(schema, null, 2)"
+                       mode="readOnly"
+                       folded
+                       style="height: auto"
+        />
+        <p-panel-top>Form Data</p-panel-top>
+        <p-text-editor :code="JSON.stringify(formData, null, 2)"
+                       mode="readOnly"
+                       style="height: auto"
+        />
+    </div>
+</div>
+`,
+            setup(props) {
+                const state = reactive({
+                    schema: getJsonInputSchema(),
+                    formData: {},
                 })
                 return {
                     ...toRefs(state),

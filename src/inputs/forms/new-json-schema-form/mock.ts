@@ -81,7 +81,14 @@ export const getDefaultSchema = () => ({
         },
         additional: {
             title: 'Additional Information',
-            format: 'json',
+            type: 'object',
+            json: true,
+            properties: {
+                gender: {
+                    type: 'string',
+                },
+            },
+            required: ['gender'],
         },
 
     },
@@ -95,3 +102,10 @@ export const getDefaultFormData = () => ({
     age: faker.datatype.number(),
     phone: faker.phone.number(),
 });
+
+
+export const getJsonInputSchema = () => {
+    const schema: any = getDefaultSchema();
+    schema.json = true;
+    return schema;
+};
