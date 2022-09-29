@@ -112,7 +112,7 @@ export default {
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
         const state = reactive({
-            selectedProvider: 'atlassian',
+            selectedProvider: query.provider ?? 'atlassian',
             provider: computed(() => store.state.reference.provider.items),
             providerList: computed(() => Object.keys(state.provider).map(k => ({
                 ...state.provider[k],
