@@ -14,11 +14,11 @@
                 {{ $t('COMMON.SIGN_IN.VERSION') }} {{ version }}
             </p-badge>
             <span class="help-msg">{{ $t('COMMON.SIGN_IN.NEED_HELP') }}
-                <p-anchor :href="contactLink ? contactLink : 'mailto:support@spaceone.dev'"
-                          :icon-visible="false" highlight
+                <a :href="contactLink ? contactLink : 'mailto:support@spaceone.dev'"
+                   target="_blank"
                 >
                     <span class="text-blue-700 ml-2">{{ $t('COMMON.SIGN_IN.CONTACT') }}</span>
-                </p-anchor>
+                </a>
             </span>
         </div>
     </div>
@@ -28,7 +28,7 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PLottie, PAnchor, PBadge,
+    PLottie, PBadge,
 } from '@spaceone/design-system';
 
 
@@ -38,7 +38,6 @@ export default {
     name: 'SignInLeftContainer',
     components: {
         PLottie,
-        PAnchor,
         PBadge,
     },
     props: {
