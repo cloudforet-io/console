@@ -9,17 +9,17 @@
                             error-icon="ic_provider_other"
                 />
             </template>
-            <template #title-right-extra>
+            <template v-if="!isManagedAccount" #title-right-extra>
                 <div class="title-right-wrapper">
                     <p-icon-button name="ic_trashcan"
                                    class="w-full delete-button"
-                                   :disabled="!hasManagePermission || isManagedAccount"
+                                   :disabled="!hasManagePermission"
                                    @click="handleOpenDeleteModal"
                     />
                 </div>
             </template>
             <template #extra>
-                <p-button style-type="gray-border" :disabled="!consoleLink.length">
+                <p-button style-type="gray-border" :disabled="!consoleLink.length" class="link-button">
                     <p-anchor :href="consoleLink" :disabled="!consoleLink.length">
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CONNECT_TO_CONSOLE') }}
                     </p-anchor>
@@ -215,8 +215,18 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .service-account-detail-page {
-    .title-right-wrapper {
-        display: inline-flex;
+    .page-title {
+        .title-right-wrapper {
+            display: inline-flex;
+        }
+        .link-button {
+            /* custom design-system component - p-anchor */
+            :deep(.p-anchor) {
+                .text:hover {
+                    text-decoration: none;
+                }
+            }
+        }
     }
     .content-wrapper {
         @apply grid-cols-12;
