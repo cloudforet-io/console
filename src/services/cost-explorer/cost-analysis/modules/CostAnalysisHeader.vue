@@ -318,6 +318,11 @@ export default {
         }
     }
 
+    /* custom design-system component - p-button-modal */
+    :deep(.p-button-modal) {
+        display: block;
+    }
+
     /* custom design-system component - p-select-dropdown */
     :deep(.list-button) {
         @apply bg-transparent;
