@@ -305,8 +305,6 @@ export default {
             }
         });
 
-        watch(() => state.needRefresh, (d) => { console.log(d); });
-
         /* init */
         (async () => {
             await Promise.allSettled([
