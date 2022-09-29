@@ -51,7 +51,7 @@ export default {
 <style lang="postcss" scoped>
 .cost-dashboard-create-form {
     @apply flex flex-col row-gap-4;
-    > .p-pane-layout {
+    .p-pane-layout {
         @apply pt-8 pr-4 pb-10 pl-4 mb-4;
     }
     h2 {
