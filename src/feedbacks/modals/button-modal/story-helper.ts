@@ -204,6 +204,24 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    hideFooterConfirmButton: {
+        name: 'hideFooterConfirmButton',
+        type: { name: 'boolean' },
+        description: 'Whether to hide footer confirm button or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     loading: {
         name: 'loading',
         type: { name: 'boolean' },

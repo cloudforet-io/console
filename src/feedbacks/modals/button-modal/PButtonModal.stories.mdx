@@ -29,6 +29,7 @@ export const Template = (args, {argTypes} ) => ({
                                 :hide-footer="hideFooter"
                                 :hide-header-close-button="hideHeaderCloseButton"
                                 :hide-footer-close-button="hideFooterCloseButton"
+                                :hide-footer-confirm-button="hideFooterConfirmButton"
                                 :footer-reset-button-visible="footerResetButtonVisible"
                                 :loading="loading"
                                 :disabled="disabled"
@@ -132,6 +133,7 @@ export const Template = (args, {argTypes} ) => ({
 
 
 ## Playground
+
 <Canvas>
     <Story name="playground">
         {Template.bind({})}

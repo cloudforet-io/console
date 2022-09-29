@@ -61,6 +61,7 @@
                                 </slot>
                             </p-button>
                             <p-button
+                                v-if="!hideFooterConfirmButton"
                                 class="modal-button confirm-button"
                                 :class="{'no-cancel-button': hideFooterCloseButton}"
                                 :style-type="themeColor"
@@ -152,6 +153,10 @@ export default defineComponent<ButtonModalProps>({
             default: false,
         },
         hideFooterCloseButton: {
+            type: Boolean,
+            default: false,
+        },
+        hideFooterConfirmButton: {
             type: Boolean,
             default: false,
         },

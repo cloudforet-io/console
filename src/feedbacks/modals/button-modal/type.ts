@@ -35,6 +35,7 @@ export interface ButtonModalProps {
 
     hideHeaderCloseButton: boolean;
     hideFooterCloseButton: boolean;
+    hideFooterConfirmButton: boolean;
     footerResetButtonVisible: boolean;
 
     loading: boolean;
