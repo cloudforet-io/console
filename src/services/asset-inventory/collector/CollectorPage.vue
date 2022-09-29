@@ -557,9 +557,15 @@ export default {
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-horizontal-layout */
-:deep(.p-horizontal-layout) .horizontal-contents {
-    overflow: unset;
+:deep(.p-horizontal-layout) {
+    .horizontal-contents {
+        overflow: unset;
+    }
+    .p-toolbox-table {
+        @apply rounded-lg;
+    }
 }
+
 .left-toolbox-item {
     @apply ml-4;
     &:last-child {
