@@ -74,7 +74,6 @@ import { useNoticeStore } from '@/store/notice';
 import { getNoticeBoardId } from '@/lib/helper/notice-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
@@ -106,10 +105,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        count: {
-            type: Number,
-            default: 0,
-        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -126,7 +121,6 @@ export default {
                 const filteredData = state.noticeData.filter(d => d.options.is_pinned);
                 return convertNoticeItem(filteredData);
             }),
-            proxyCount: useProxyValue('count', props, emit),
             domainName: computed(() => store.state.domain.name),
         });
 
@@ -187,7 +181,7 @@ export default {
             state.loading = true;
             state.boardId = await getNoticeBoardId();
             if (state.boardId) {
-                await Promise.allSettled([fetchNoticeReadState(state.boardId), listNotice()]);
+                await Promise.allSettled([fetchNoticeReadState(), listNotice()]);
             }
             state.loading = false;
         };

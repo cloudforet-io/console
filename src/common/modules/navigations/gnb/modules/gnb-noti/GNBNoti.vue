@@ -24,13 +24,11 @@
             </template>
             <template #notifications>
                 <g-n-b-notifications-tab :visible="visible && activeTab === 'notifications'"
-                                         :count.sync="count.notifications"
+                                         :count.sync="notificationCount"
                 />
             </template>
             <template #notice>
-                <g-n-b-notice-tab :count.sync="count.notice"
-                                  @close="hideNotiMenu"
-                />
+                <g-n-b-notice-tab @close="hideNotiMenu" />
             </template>
         </p-tab>
     </div>
@@ -50,16 +48,14 @@ import {
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { commaFormatter } from '@cloudforet/core-lib';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { getNoticeBoardId } from '@/lib/helper/notice-helper';
+import { useNoticeStore } from '@/store/notice';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import GNBNoticeTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNoticeTab.vue';
 import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationsTab.vue';
 
@@ -97,10 +93,11 @@ export default defineComponent<Props>({
                 { label: i18n.t('COMMON.GNB.NOTICE.TITLE'), name: 'notice', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'notifications',
-            count: {
-                notifications: 0,
-                notice: 0,
-            },
+            notificationCount: 0,
+            count: computed(() => ({
+                notifications: state.notificationCount,
+                notice: unreadNoticeCount.value,
+            })),
         });
 
         /* Util */
@@ -124,20 +121,12 @@ export default defineComponent<Props>({
         if (state.domainName === 'root') {
             noticeApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
         }
-        const listNotice = async () => {
-            try {
-                const boardId = await getNoticeBoardId();
-                const { total_count } = await SpaceConnector.client.board.post.list({
-                    board_id: boardId,
-                    query: noticeApiHelper.data,
-                    domain_id: null,
-                });
-                state.count.notice = total_count;
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
-                state.count.notice = 0;
-            }
-        };
+
+        const {
+            unreadNoticeCount, fetchNoticeCount, fetchNoticeReadState,
+        } = useNoticeStore({
+            userId: computed(() => store.state.user.userId),
+        });
 
         /* Event */
         const handleNotiButtonClick = () => {
@@ -147,7 +136,8 @@ export default defineComponent<Props>({
 
         onMounted(() => {
             store.dispatch('display/startCheckNotification');
-            listNotice();
+            fetchNoticeReadState();
+            fetchNoticeCount();
         });
         onUnmounted(() => {
             store.dispatch('display/stopCheckNotification');
@@ -163,6 +153,7 @@ export default defineComponent<Props>({
             hideNotiMenu,
             handleNotiButtonClick,
             commaFormatter,
+            unreadNoticeCount,
         };
     },
 });

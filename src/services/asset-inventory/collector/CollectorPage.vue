@@ -105,8 +105,6 @@
             <template #data>
                 <p-data-table :fields="selectedDataFields"
                               :items="selectedItems"
-                              :sortable="true"
-                              sort-by="name"
                               :selectable="false"
                               col-copy
                               class="selected-data-tab"
