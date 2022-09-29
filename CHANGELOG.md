@@ -1,3 +1,10 @@
+# [1.1.0-beta.407](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.406...v1.1.0-beta.407) (2022-09-29)
+
+
+### Features
+
+* **json-schema-form:** add json keyword(remove json format) which works for object type ([#53](https://github.com/cloudforet-io/mirinae/issues/53)) ([dc64225](https://github.com/cloudforet-io/mirinae/commit/dc64225fc4e7e78322fa893dcfce30d2a9ad9611))
+
 # [1.1.0-beta.406](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.405...v1.1.0-beta.406) (2022-09-29)
 
 
