@@ -83,6 +83,7 @@ export default {
 
 <style lang="postcss" scoped>
 .service-account-project-detail {
+    font-size: 0.875rem;
     .required-span {
         @apply text-red-500 mx-1;
     }

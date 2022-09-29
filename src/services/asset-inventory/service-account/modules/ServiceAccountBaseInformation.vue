@@ -2,14 +2,13 @@
     <p-pane-layout class="service-account-base-information">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')">
             <template #extra>
-                <p-button v-if="mode === 'READ'" icon="ic_edit"
+                <p-button v-if="mode === 'READ' && editable" icon="ic_edit"
                           style-type="transparent"
-                          :disabled="!editable"
                           @click="handleClickEditButton"
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
-                <div v-else class="button-wrapper">
+                <div v-if="mode === 'UPDATE'" class="button-wrapper">
                     <p-button style-type="transparent" @click="handleClickCancelButton">
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
                     </p-button>
@@ -208,7 +207,12 @@ export default {
         }
     }
     .content-wrapper {
-        padding: 0.5rem 1rem 2.5rem 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 2.5rem;
+        .service-account-base-information-form {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
     }
 }
 </style>
