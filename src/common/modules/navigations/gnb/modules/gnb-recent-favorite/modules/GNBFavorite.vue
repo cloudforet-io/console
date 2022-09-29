@@ -116,7 +116,7 @@ export default {
             showAllType: undefined as undefined|SuggestionType,
             items: computed<SuggestionItem[]>(() => {
                 const results: SuggestionItem[] = [];
-                if (state.favoriteMenuItems) {
+                if (state.favoriteMenuItems.length) {
                     results.push({
                         name: 'title', label: i18n.t('COMMON.GNB.FAVORITES.MENU'), type: 'header', itemType: SUGGESTION_TYPE.MENU,
                     });
