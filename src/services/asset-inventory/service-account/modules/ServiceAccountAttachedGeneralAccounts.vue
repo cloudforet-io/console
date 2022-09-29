@@ -4,7 +4,7 @@
         <div class="content-wrapper">
             <p-data-table :fields="fields" :items="items"
                           sortable
-                          sort-by:="name"
+                          sort-by="name"
                           :sort-desc="true"
             >
                 <template #col-name-format="{value, item}">
