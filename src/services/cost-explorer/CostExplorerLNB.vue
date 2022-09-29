@@ -99,7 +99,7 @@ export default {
             }),
             menuSet: computed<LNBMenu[]>(() => [
                 ...state.dashboardMenuSet,
-                filterLNBMenuByPermission([
+                ...filterLNBMenuByPermission([
                     {
                         type: 'item',
                         id: MENU_ID.COST_EXPLORER_COST_ANALYSIS,
