@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     defineComponent, reactive, toRefs, watch,
 } from 'vue';
@@ -119,7 +119,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             loading: true,
             mode: 'READ' as PageMode,
@@ -222,6 +222,7 @@ export default defineComponent<Props>({
                 await SpaceConnector.client.identity.serviceAccount.update({
                     service_account_id: props.serviceAccountId,
                     trusted_service_account_id: state.credentialForm.attachedTrustedAccountId ?? '',
+                    release_trusted_service_account: !state.credentialForm.attachedTrustedAccountId,
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -261,6 +262,7 @@ export default defineComponent<Props>({
             }
             await getCredentialData(props.serviceAccountId as string);
             state.mode = 'READ';
+            emit('refresh');
         };
         const handleChangeCredentialForm = (credentialForm) => {
             state.credentialForm = credentialForm;

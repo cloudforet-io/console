@@ -60,7 +60,7 @@ interface Props {
     editMode: PageMode;
     schema: any;
     isValid: boolean;
-    originFormData: BaseInformationForm;
+    originForm: BaseInformationForm;
 }
 
 export default defineComponent<Props>({
@@ -84,7 +84,7 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-        originFormData: {
+        originForm: {
             type: Object as PropType<BaseInformationForm>,
             default: () => ({}),
         },
@@ -102,7 +102,7 @@ export default defineComponent<Props>({
                 if (val.length < 2) {
                     return i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_INVALID');
                 } if (state.serviceAccountNames.includes(val)) {
-                    if (props.originFormData?.accountName === val) return true;
+                    if (props.originForm?.accountName === val) return true;
                     return i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.NAME_DUPLICATED');
                 }
                 return true;
@@ -125,10 +125,10 @@ export default defineComponent<Props>({
         });
 
         /* Util */
-        const initFormData = () => {
-            setForm('serviceAccountName', props.originFormData?.accountName ?? '');
-            state.customSchemaForm = props.originFormData?.customSchemaForm ?? {};
-            state.tags = props.originFormData?.tags ?? {};
+        const initFormData = (originForm: BaseInformationForm) => {
+            setForm('serviceAccountName', originForm?.accountName ?? '');
+            state.customSchemaForm = originForm?.customSchemaForm ?? {};
+            state.tags = originForm?.tags ?? {};
             // init validation
             state.isCustomSchemaFormValid = true;
         };
@@ -161,10 +161,8 @@ export default defineComponent<Props>({
         watch(() => state.formData, (formData) => {
             emit('change', formData);
         });
-        watch(() => props.editMode, (editMode) => {
-            if (editMode === 'UPDATE') {
-                initFormData();
-            }
+        watch(() => props.originForm, (originForm) => {
+            if (!isEmpty(originForm)) initFormData(originForm);
         }, { immediate: true });
 
         return {

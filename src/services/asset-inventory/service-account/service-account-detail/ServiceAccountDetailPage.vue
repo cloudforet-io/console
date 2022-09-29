@@ -46,6 +46,7 @@
             <service-account-base-information :provider="providerKey"
                                               :service-account-id="serviceAccountId"
                                               :editable="!isManagedAccount"
+                                              @refresh="handleRefresh"
             />
             <service-account-credentials :provider="providerKey"
                                          :service-account-id="serviceAccountId"
@@ -54,52 +55,34 @@
                                          :project-id="projectId"
                                          :attached-trusted-account-id="attachedTrustedAccountId"
                                          :editable="!isManagedAccount"
+                                         @refresh="handleRefresh"
             />
         </div>
-        <double-check-modal :visible.sync="deleteModalVisible"
-                            :header-title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_TITLE')"
-                            :verification-text="item.name ? item.name : ''"
-                            theme-color="alert"
-                            size="sm"
-                            @confirm="handleConfirmDelete"
+        <service-account-delete-modal :visible.sync="deleteModalVisible"
+                                      :service-account-id="serviceAccountId"
+                                      :service-account-name="item.name"
+                                      :attached-general-accounts="attachedGeneralAccounts"
         />
-        <p-button-modal :visible.sync="cannotDeleteModalVisible"
-                        :header-title="$t('INVENTORY.SERVICE_ACCOUNT.DELETE_CHECK_MODAL.TITLE')"
-                        theme-color="alert"
-                        :hide-header-close-button="true"
-        >
-            <template #body>
-                {{ $t('INVENTORY.SERVICE_ACCOUNT.DELETE_CHECK_MODAL.NOTE') }}
-            </template>
-        </p-button-modal>
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
-    PAnchor, PButton, PIconButton, PPageTitle, PLazyImg, PButtonModal, PPaneLayout, PPanelTop,
+    PAnchor, PButton, PIconButton, PPageTitle, PLazyImg, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
 import { render } from 'ejs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import DoubleCheckModal from '@/common/components/modals/DoubleCheckModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 import ServiceAccountAttachedGeneralAccounts
     from '@/services/asset-inventory/service-account/modules/ServiceAccountAttachedGeneralAccounts.vue';
@@ -109,12 +92,15 @@ import ServiceAccountBaseInformation
 import ServiceAccountCredentials
     from '@/services/asset-inventory/service-account/modules/ServiceAccountCredentials.vue';
 import ServiceAccountProject from '@/services/asset-inventory/service-account/modules/ServiceAccountProject.vue';
+import ServiceAccountDeleteModal
+    from '@/services/asset-inventory/service-account/service-account-detail/modules/ServiceAccountDeleteModal.vue';
 import type { ProviderModel, ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
 
 
 export default defineComponent({
     name: 'ServiceAccountDetailPage',
     components: {
+        ServiceAccountDeleteModal,
         ServiceAccountProject,
         ServiceAccountCredentials,
         ServiceAccountAttachedGeneralAccounts,
@@ -125,10 +111,8 @@ export default defineComponent({
         PButton,
         PAnchor,
         PLazyImg,
-        PButtonModal,
         PPaneLayout,
         PPanelTop,
-        DoubleCheckModal,
     },
     props: {
         serviceAccountId: {
@@ -137,7 +121,6 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         const storeState = reactive({
             providerLoading: true,
             providers: computed(() => store.state.reference.provider.items),
@@ -165,7 +148,6 @@ export default defineComponent({
             serviceAccountType: computed(() => state.item.service_account_type),
             isManagedAccount: computed(() => state.item.tags?.is_managed === 'true' ?? false),
             deleteModalVisible: false,
-            cannotDeleteModalVisible: false,
         });
 
         /* Api */
@@ -192,32 +174,15 @@ export default defineComponent({
                 state.providerData = {};
             }
         };
-        const deleteServiceAccount = async () => {
-            try {
-                await SpaceConnector.client.identity.serviceAccount.delete({
-                    service_account_id: props.serviceAccountId,
-                });
-                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_DELETE_ACCOUNT'), '', vm.$root);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_DELETE_ACCOUNT'));
-            } finally {
-                state.deleteModalVisible = false;
-            }
-        };
 
         /* Event */
         const handleOpenDeleteModal = () => {
-            if (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED && state.attachedGeneralAccounts.length) {
-                state.cannotDeleteModalVisible = true;
-            } else {
-                state.deleteModalVisible = true;
-            }
-        };
-        const handleConfirmDelete = async () => {
-            await deleteServiceAccount();
-            await SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME });
+            state.deleteModalVisible = true;
         };
         const handleChangeProject = () => {
+            getServiceAccount(props.serviceAccountId);
+        };
+        const handleRefresh = () => {
             getServiceAccount(props.serviceAccountId);
         };
 
@@ -241,8 +206,8 @@ export default defineComponent({
             ...toRefs(storeState),
             ACCOUNT_TYPE,
             handleOpenDeleteModal,
-            handleConfirmDelete,
             handleChangeProject,
+            handleRefresh,
         };
     },
 });
