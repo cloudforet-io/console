@@ -150,14 +150,16 @@ export default {
                 { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
             ]),
             selectedAccountType: 'all',
-            searchFilters: computed<QueryStoreFilter[]>(() => [
-                ...queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters,
-            ]),
+            searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
         });
 
+        const searchFilter = new ApiQueryHelper();
         const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
             computed(() => tableState.schema?.options?.search as unknown as ConsoleSearchSchema[] ?? []),
             'identity.ServiceAccount',
+            computed(() => searchFilter.setFilters([
+                { k: 'provider', v: state.selectedProvider, o: '=' },
+            ]).apiQuery.filter),
         );
         /** Handling API with SpaceConnector * */
 
@@ -298,7 +300,7 @@ export default {
             state.selectedProvider = providerFilter || state.providerList[0].key;
             watch(() => state.selectedProvider, async (after, before) => {
                 if (after !== before) {
-                    replaceUrlQuery('provider', after);
+                    await replaceUrlQuery('provider', after);
                     await getTableSchema();
                     await listServiceAccountData();
                 }
@@ -355,6 +357,14 @@ export default {
     }
     .service-account-table {
         @apply overflow-hidden border border-gray-200 rounded-lg;
+    }
+
+    /* custom design-system component - p-horizontal-layout */
+    :deep(.service-account-table) {
+        overflow: unset;
+        .p-toolbox-table {
+            @apply rounded-lg;
+        }
     }
 }
 
