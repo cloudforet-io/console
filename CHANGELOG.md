@@ -1,3 +1,10 @@
+# [1.1.0-beta.406](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.405...v1.1.0-beta.406) (2022-09-29)
+
+
+### Bug Fixes
+
+* **p-button-modal:** add `hideFooterConfirmButton` props ([#52](https://github.com/cloudforet-io/mirinae/issues/52)) ([f1dd1cd](https://github.com/cloudforet-io/mirinae/commit/f1dd1cd338a1f237cae588344aabbc99eb3a2c78))
+
 # [1.1.0-beta.405](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.404...v1.1.0-beta.405) (2022-09-29)
 
 
