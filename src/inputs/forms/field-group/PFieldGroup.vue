@@ -13,7 +13,7 @@
             <slot name="help">{{ helpText }}</slot>
         </small>
         <slot name="default" v-bind="$props" />
-        <div v-if="invalidText" class="invalid-feedback" :style="{display: invalid? 'block':'none'}">
+        <div v-show="invalid" class="invalid-feedback">
             <slot name="invalid">
                 {{ invalidText }}
             </slot>
