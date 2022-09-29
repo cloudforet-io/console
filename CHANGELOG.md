@@ -1,3 +1,10 @@
+# [1.1.0-beta.405](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.404...v1.1.0-beta.405) (2022-09-29)
+
+
+### Bug Fixes
+
+* **field-group:** enable invalid slot when invalid prop is true ([#50](https://github.com/cloudforet-io/mirinae/issues/50)) ([ec1e801](https://github.com/cloudforet-io/mirinae/commit/ec1e8012fec7e192b5c4398e502fd8c91c93ceea))
+
 # [1.1.0-beta.404](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.403...v1.1.0-beta.404) (2022-09-27)
 
 
