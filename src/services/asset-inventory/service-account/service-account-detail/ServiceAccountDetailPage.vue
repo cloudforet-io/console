@@ -46,6 +46,7 @@
             <service-account-base-information :provider="providerKey"
                                               :service-account-id="serviceAccountId"
                                               :editable="!isManagedAccount"
+                                              @refresh="handleRefresh"
             />
             <service-account-credentials :provider="providerKey"
                                          :service-account-id="serviceAccountId"
@@ -54,6 +55,7 @@
                                          :project-id="projectId"
                                          :attached-trusted-account-id="attachedTrustedAccountId"
                                          :editable="!isManagedAccount"
+                                         @refresh="handleRefresh"
             />
         </div>
         <service-account-delete-modal :visible.sync="deleteModalVisible"
@@ -180,6 +182,9 @@ export default defineComponent({
         const handleChangeProject = () => {
             getServiceAccount(props.serviceAccountId);
         };
+        const handleRefresh = () => {
+            getServiceAccount(props.serviceAccountId);
+        };
 
         /* Init */
         (async () => {
@@ -202,6 +207,7 @@ export default defineComponent({
             ACCOUNT_TYPE,
             handleOpenDeleteModal,
             handleChangeProject,
+            handleRefresh,
         };
     },
 });

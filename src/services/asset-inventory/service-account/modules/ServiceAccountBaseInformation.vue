@@ -32,7 +32,7 @@
                                                        edit-mode="UPDATE"
                                                        :schema="baseInformationSchema"
                                                        :is-valid.sync="isFormValid"
-                                                       :origin-form-data="baseInformationForm"
+                                                       :origin-form="originBaseInformationForm"
                                                        @change="handleChangeForm"
                 />
             </p-data-loader>
@@ -41,6 +41,7 @@
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
@@ -49,6 +50,7 @@ import type { Vue } from 'vue/types/vue';
 import {
     PButton, PDataLoader, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -67,7 +69,6 @@ import type {
     BaseInformationForm, PageMode, ProviderModel, ServiceAccountModel,
     ServiceAccountModelForBinding,
 } from '@/services/asset-inventory/service-account/type';
-import { EDIT_MODE } from '@/services/asset-inventory/service-account/type';
 
 
 export default {
@@ -94,7 +95,7 @@ export default {
             default: false,
         },
     },
-    setup(props) {
+    setup(props, { emit }: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
@@ -104,6 +105,7 @@ export default {
             baseInformationSchema: computed(() => state.providerData.template?.service_account?.schema ?? null),
             serviceAccountData: {} as ServiceAccountModel,
             baseInformationForm: {} as BaseInformationForm,
+            originBaseInformationForm: {} as BaseInformationForm,
         });
 
         /* Api */
@@ -141,6 +143,7 @@ export default {
                     customSchemaForm: result.data,
                     tags: result.tags,
                 };
+                state.originBaseInformationForm = cloneDeep(state.baseInformationForm);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.serviceAccountData = {};
@@ -169,10 +172,12 @@ export default {
         const handleClickCancelButton = () => {
             state.mode = 'READ';
         };
-        const handleClickSaveButton = () => {
+        const handleClickSaveButton = async () => {
             if (!state.isFormValid) return;
-            updateServiceAccount();
+            await updateServiceAccount();
+            await getServiceAccount(props.serviceAccountId);
             state.mode = 'READ';
+            emit('refresh');
         };
         const handleChangeForm = (form) => {
             state.baseInformationForm = form;
@@ -188,7 +193,6 @@ export default {
 
         return {
             ...toRefs(state),
-            EDIT_MODE,
             handleClickEditButton,
             handleClickCancelButton,
             handleClickSaveButton,
