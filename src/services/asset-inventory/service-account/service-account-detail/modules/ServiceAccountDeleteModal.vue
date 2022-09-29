@@ -74,6 +74,10 @@ export default {
             type: Array as PropType<ServiceAccountModel[]>,
             default: () => ([]),
         },
+        providerId: {
+            type: String,
+            default: '',
+        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -100,7 +104,7 @@ export default {
         /* Event */
         const handleConfirmDelete = async () => {
             await deleteServiceAccount();
-            await SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME });
+            await SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.providerId } });
         };
 
         return {
