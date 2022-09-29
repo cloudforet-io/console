@@ -329,7 +329,7 @@ export default {
             }
             const isGetPostSuccess = !!state.noticePostData?.post_id;
             if (isGetPostSuccess) {
-                await updateNoticeReadState(props.boardId, props.postId);
+                await updateNoticeReadState(props.postId);
             }
             state.loading = false;
         };

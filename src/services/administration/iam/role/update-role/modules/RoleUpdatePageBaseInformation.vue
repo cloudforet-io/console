@@ -44,7 +44,7 @@
                     </p>
                 </p-select-card>
             </div>
-            <span v-else class="role-type-saved-text">{{ `${savedRoleType.label} (${savedRoleType.description})` }}</span>
+            <span v-else-if="savedRoleType" class="role-type-saved-text">{{ `${savedRoleType.label} (${savedRoleType.description})` }}</span>
         </div>
     </p-pane-layout>
 </template>
@@ -54,6 +54,7 @@ import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PPaneLayout, PPanelTop, PFieldGroup, PLabel, PTextInput, PSelectCard,
@@ -68,6 +69,8 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import type { RoleType } from '@/services/administration/iam/role/config';
 import { ROLE_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
 import type { BaseInfoFormData } from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
+
+interface RoleTypeForm {label: string; key: string; description: TranslateResult}
 
 export default {
     name: 'RoleUpdatePageBaseInformation',
@@ -106,12 +109,12 @@ export default {
 
         const state = reactive({
             roleDescription: undefined as undefined | string,
-            roleTypes: computed(() => [
+            roleTypes: computed<RoleTypeForm[]>(() => [
                 { label: ROLE_TYPE_BADGE_OPTION.PROJECT.label, key: ROLE_TYPE.PROJECT, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_PROJECT') },
                 { label: ROLE_TYPE_BADGE_OPTION.DOMAIN.label, key: ROLE_TYPE.DOMAIN, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_DOMAIN') },
             ]),
             selectedRoleType: ROLE_TYPE.PROJECT as RoleType,
-            savedRoleType: computed(() => {
+            savedRoleType: computed<RoleTypeForm|undefined>(() => {
                 const roleType = props.initialFormData?.roleType;
                 return state.roleTypes.find(type => type.key === roleType);
             }),
