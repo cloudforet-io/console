@@ -1,7 +1,7 @@
 <template>
     <div class="service-account-provider-list">
-        <div v-for="item in providerList" :key="item.key" :class="{'provider-button': true, 'selected-button' : item.key === selectedProvider}"
-             @click="() => handleSelectProvider(item.key)"
+        <button v-for="item in providerList" :key="item.key" :class="{'provider-button': true, 'selected-button' : item.key === selectedProvider}"
+                @click="() => handleSelectProvider(item.key)"
         >
             <p-lazy-img :src="item.icon"
                         width="1rem" height="1rem"
@@ -9,7 +9,7 @@
             <p :class="{'provider-name': true, 'selected': item.key === selectedProvider }">
                 {{ item.name }}
             </p>
-        </div>
+        </button>
     </div>
 </template>
 
@@ -59,17 +59,24 @@ export default defineComponent({
 .service-account-provider-list {
     @apply grid w-full gap-2;
     grid-template-columns: repeat(6, minmax(10rem, auto));
-    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 2.5rem;
     overflow-x: scroll;
     .provider-button {
         @apply flex items-center border rounded-lg border-gray-200 bg-white;
         min-width: 10rem;
         padding: 0.75rem 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+        /* customize p-lazy-img */
+        :deep(.img-container) {
+            position: relative;
+        }
         .provider-name {
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-            width: calc(100% - 1rem);
+            max-width: calc(100% - 1rem);
             font-size: 0.875rem;
             line-height: 1.25;
             padding-left: 0.375rem;
