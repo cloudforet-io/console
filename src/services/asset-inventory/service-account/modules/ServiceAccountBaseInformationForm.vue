@@ -189,6 +189,7 @@ export default defineComponent<Props>({
     /* custom design-system component - p-field-group */
     :deep(.account-tags) {
         .help-msg {
+            font-size: 0.875rem;
             white-space: pre-line;
         }
     }

@@ -20,7 +20,7 @@
                 </div>
                 <div v-if="showTrustedAccount" class="information-wrapper">
                     <p-i name="ic_outlined-info"
-                         height="1rem" width="1rem"
+                         height="0.875rem" width="0.875rem"
                          color="inherit"
                          class="external-icon"
                     />
@@ -114,12 +114,13 @@ export default defineComponent({
                 }
             }
             .information-wrapper {
-                @apply flex;
+                @apply flex text-gray-700;
                 gap: 0.3rem;
                 align-content: flex-start;
                 padding-bottom: 1rem;
                 .help-wrapper {
                     width: calc(100% - 1rem);
+                    font-size: 0.75rem;
                 }
             }
         }
