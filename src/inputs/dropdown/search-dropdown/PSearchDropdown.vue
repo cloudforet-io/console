@@ -90,6 +90,7 @@ import { reduce } from 'lodash';
 
 import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
+import { useProxyValue } from '@/hooks';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { SearchDropdownProps, SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
@@ -97,7 +98,6 @@ import {
     SEARCH_DROPDOWN_TYPE,
 } from '@/inputs/dropdown/search-dropdown/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
-import { makeOptionalProxy } from '@/util/composition-helpers';
 
 
 export default defineComponent<SearchDropdownProps>({
@@ -124,7 +124,7 @@ export default defineComponent<SearchDropdownProps>({
         },
         isFocused: {
             type: Boolean,
-            default: undefined,
+            default: false,
         },
         invalid: {
             type: Boolean,
@@ -211,9 +211,9 @@ export default defineComponent<SearchDropdownProps>({
                 if (!props.multiSelectable) return SEARCH_DROPDOWN_TYPE.default;
                 return undefined;
             }),
-            proxyValue: makeOptionalProxy('value', vm, ''),
-            proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
-            proxySelected: makeOptionalProxy('selected', vm, []),
+            proxyValue: useProxyValue('value', props, emit),
+            proxyIsFocused: useProxyValue('isFocused', props, emit),
+            proxySelected: useProxyValue('selected', props, emit),
             placeholderValue: undefined as string|undefined,
             filteredMenu: [] as SearchDropdownMenuItem[],
             bindingMenu: computed<SearchDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
