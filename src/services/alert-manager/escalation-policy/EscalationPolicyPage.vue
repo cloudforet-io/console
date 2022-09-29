@@ -267,7 +267,7 @@ export default {
 <style lang="postcss" scoped>
 .escalation-policy-page {
     .table-wrapper {
-        @apply bg-white border border-gray-200 rounded-md;
+        @apply bg-white border border-gray-200 rounded-lg;
     }
 
     /* custom design-system component - p-toolbox */
