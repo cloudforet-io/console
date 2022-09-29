@@ -62,7 +62,7 @@
                       :disabled="!isValid"
                       @click="handleSave"
             >
-                {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.SAVE') }}
+                {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
             </p-button>
             <p-button class="text-button" style-type="outline gray900" size="lg"
                       @click="handleGoBack"

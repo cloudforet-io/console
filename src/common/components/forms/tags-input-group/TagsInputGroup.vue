@@ -201,7 +201,7 @@ export default defineComponent({
 <style lang="postcss" scoped>
 .tags-input-group {
     .add-button {
-        margin: 0.5rem 0;
+        margin: 1rem 0 1.5rem;
         .p-i-icon {
             margin-right: 0.5rem;
         }
