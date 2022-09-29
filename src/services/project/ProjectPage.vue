@@ -450,4 +450,8 @@ export default {
     @apply flex-grow;
 }
 
+/* custom console component - vertical-page-layout */
+:deep(.right-container) .header {
+    padding: 0;
+}
 </style>
