@@ -1,11 +1,24 @@
 <template>
-    <div class="service-account-credentials-detail">
+    <p-data-loader class="service-account-credentials-detail"
+                   :data="Object.keys(convertedCredentialData)"
+                   :loading="loading"
+    >
         <p-dynamic-layout v-if="detailSchema"
                           v-bind="detailSchema"
                           :data="convertedCredentialData"
                           :field-handler="fieldHandler"
         />
-    </div>
+        <template #no-data>
+            <div class="no-data-wrapper">
+                <p class="text">
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.NO_CREDENTIALS') }}
+                </p>
+                <p-button icon="ic_plus_bold" style-type="primary1" @click="handleClickAddButton">
+                    {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ADD_CREDENTIALS') }}
+                </p-button>
+            </div>
+        </template>
+    </p-data-loader>
 </template>
 
 <script lang="ts">
@@ -15,7 +28,7 @@ import {
 } from 'vue';
 
 import {
-    PDynamicLayout,
+    PDataLoader, PDynamicLayout, PButton,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
@@ -34,6 +47,7 @@ import type { CredentialModel } from '@/services/asset-inventory/service-account
 
 
 interface Props {
+    loading: boolean;
     credentialData: CredentialModel;
     attachedTrustedAccountId?: string;
 }
@@ -41,9 +55,15 @@ interface Props {
 export default defineComponent<Props>({
     name: 'ServiceAccountCredentialsDetail',
     components: {
+        PDataLoader,
         PDynamicLayout,
+        PButton,
     },
     props: {
+        loading: {
+            type: Boolean,
+            default: true,
+        },
         credentialData: {
             type: Object as PropType<CredentialModel>,
             default: () => ({}),
@@ -53,7 +73,7 @@ export default defineComponent<Props>({
             default: undefined,
         },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const storeState = reactive({
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
         });
@@ -127,6 +147,11 @@ export default defineComponent<Props>({
             }
         };
 
+        /* Event */
+        const handleClickAddButton = () => {
+            emit('edit');
+        };
+
         /* Init */
         (async () => {
             await store.dispatch('reference/serviceAccount/load');
@@ -144,12 +169,15 @@ export default defineComponent<Props>({
         return {
             ...toRefs(state),
             fieldHandler,
+            handleClickAddButton,
         };
     },
 });
 </script>
 <style lang="postcss" scoped>
 .service-account-credentials-detail {
+    height: 100%;
+
     /* custom design-system component - p-panel-top */
     :deep(.p-panel-top) {
         display: none;
@@ -158,6 +186,12 @@ export default defineComponent<Props>({
     /* custom design-system component - p-definition-table */
     :deep(.p-definition-table) {
         min-height: auto;
+    }
+
+    .no-data-wrapper {
+        .text {
+            margin-bottom: 1rem;
+        }
     }
 }
 </style>

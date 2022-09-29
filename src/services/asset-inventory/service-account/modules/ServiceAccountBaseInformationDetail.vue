@@ -22,7 +22,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-const EXCLUDED_FIELD_KEYS = ['project_info.project_id', 'created_at'];
+const EXCLUDED_FIELD_KEYS = ['project_info.project_id', 'created_at', 'service_account_type'];
 
 export default {
     name: 'ServiceAccountBaseInformationDetail',

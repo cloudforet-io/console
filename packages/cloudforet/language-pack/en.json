@@ -1694,6 +1694,7 @@
 			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "Account Type",
+				"ADD_CREDENTIALS": "Add Credentials",
 				"ALT_E_UPDATE_BASE_INFO": "Failed to Update Base Information",
 				"ALT_E_UPDATE_CREDENTIALS": "Failed to Update Credentials",
 				"ALT_S_CHANGE_PROJECT": "Successfully changed project",
@@ -1705,6 +1706,7 @@
 				"CONNECT_TO_CONSOLE": "Connect to Console",
 				"CREDENTIALS_LABEL": "Do you want to attach an existing Trusted Account?",
 				"EDIT": "Edit",
+				"NO_CREDENTIALS": "There’s no credentials found.",
 				"PROJECT_REQUIRED_HELP_TEXT": "It's now required to select a specific\nproject for any service account.\n( Note: A randomly generated\nproject will be forcefully added to\nthe accounts with no project soon.)",
 				"REQUIRED": "** required",
 				"SAVE": "Save",

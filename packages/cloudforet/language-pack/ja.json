@@ -1694,6 +1694,7 @@
 			},
 			"DETAIL": {
 				"ACCOUNT_TYPE_TITLE": "",
+				"ADD_CREDENTIALS": "",
 				"ALT_E_UPDATE_BASE_INFO": "",
 				"ALT_E_UPDATE_CREDENTIALS": "",
 				"ALT_S_CHANGE_PROJECT": "",
@@ -1705,6 +1706,7 @@
 				"CONNECT_TO_CONSOLE": "",
 				"CREDENTIALS_LABEL": "",
 				"EDIT": "",
+				"NO_CREDENTIALS": "",
 				"PROJECT_REQUIRED_HELP_TEXT": "",
 				"REQUIRED": "",
 				"SAVE": "",
