@@ -10,6 +10,7 @@
                          :select-index.sync="selectedIndices"
                          :fields="fields"
                          :sort-desc="true"
+                         :sort-by="sortBy"
                          :total-count="totalCount"
                          :style="{height: `${tableHeight}px`}"
                          :key-item-sets="roleSearchHandler.keyItemSets"
@@ -185,6 +186,7 @@ export default defineComponent({
             selectedRoles: computed<RoleData[]>(() => state.selectedIndices.map(d => state.roles[d]) || []),
             isSelected: computed(() => state.selectedIndices.length > 0),
             tags: roleListApiQueryHelper.setKeyItemSets(roleSearchHandler.keyItemSets).queryTags,
+            sortBy: 'name',
         });
         let roleListApiQuery = roleListApiQueryHelper.data;
 
