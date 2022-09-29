@@ -43,9 +43,8 @@
 <script lang="ts">
 import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButton, PDataLoader, PPaneLayout, PPanelTop,
@@ -96,7 +95,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             providerData: {} as ProviderModel,
@@ -159,7 +157,7 @@ export default {
                     data: state.baseInformationForm.customSchemaForm,
                     tags: state.baseInformationForm.tags,
                 });
-                showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_BASE_INFO'), '', vm.$root);
+                showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_BASE_INFO'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_BASE_INFO'));
             }
