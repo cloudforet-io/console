@@ -2,7 +2,11 @@
     <p-pane-layout class="service-account-attached-general-accounts">
         <p-panel-top :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ATTACHED_GENERAL_ACCOUNTS_TITLE')" />
         <div class="content-wrapper">
-            <p-data-table :fields="fields" :items="items" sortable>
+            <p-data-table :fields="fields" :items="items"
+                          sortable
+                          sort-by="name"
+                          :sort-desc="true"
+            >
                 <template #col-name-format="{value, item}">
                     <p-anchor
                         :to="{
@@ -61,8 +65,8 @@ export default defineComponent({
             items: [] as any,
         });
         const fields = [
-            { name: 'name', label: 'Name' },
-            { name: 'service_account_id', label: 'Account ID' },
+            { name: 'name', label: 'Name', sortable: true },
+            { name: 'service_account_id', label: 'Account ID', sortable: false },
         ];
 
         const init = async () => {
