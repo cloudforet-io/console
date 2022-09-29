@@ -15,6 +15,7 @@
                            :disable-delete-all="true"
                            @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
+                           @show-menu="handleShowMenu"
         >
             <template #menu-no-data-format>
                 <div />
@@ -160,6 +161,7 @@ export default {
                 if (props.multiSelectable) return PCheckBox;
                 return PRadio;
             }),
+            needRefresh: false,
         });
 
         const getSearchPath = async (id: string|undefined, type: string|undefined): Promise<string[]> => {
@@ -222,6 +224,9 @@ export default {
                 return [];
             }
         };
+        const loadProjects = async () => {
+            await store.dispatch('reference/project/load', { force: true });
+        };
 
 
         /* Handlers */
@@ -268,6 +273,16 @@ export default {
 
         const handleClickCreateButton = () => {
             window.open(SpaceRouter.router.resolve({ name: PROJECT_ROUTE._NAME }).href);
+            state.needRefresh = true;
+            state.visibleMenu = false;
+            handleUpdateVisibleMenu(false);
+        };
+
+        const handleShowMenu = async () => {
+            if (state.needRefresh) {
+                await loadProjects();
+                state.needRefresh = false;
+            }
         };
 
         /* Watchers */
@@ -312,6 +327,7 @@ export default {
             handleDeleteTag,
             handleUpdateVisibleMenu,
             handleClickCreateButton,
+            handleShowMenu,
         };
     },
 };
