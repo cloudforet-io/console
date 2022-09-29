@@ -62,6 +62,7 @@
                                       :service-account-id="serviceAccountId"
                                       :service-account-name="item.name"
                                       :attached-general-accounts="attachedGeneralAccounts"
+                                      :provider-id="providerId"
         />
     </div>
 </template>
@@ -95,7 +96,6 @@ import ServiceAccountProject from '@/services/asset-inventory/service-account/mo
 import ServiceAccountDeleteModal
     from '@/services/asset-inventory/service-account/service-account-detail/modules/ServiceAccountDeleteModal.vue';
 import type { ProviderModel, ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
-
 
 export default defineComponent({
     name: 'ServiceAccountDetailPage',
@@ -132,9 +132,10 @@ export default defineComponent({
             attachedGeneralAccounts: [] as ServiceAccountModel[],
             attachedTrustedAccountId: computed(() => state.item.trusted_service_account_id),
             providerData: {} as ProviderModel,
+            providerId: computed(() => state.item?.provider),
             provider: computed(() => {
                 if (!storeState.providerLoading && !state.loading) {
-                    return storeState.providers[state.item?.provider] || undefined;
+                    return storeState.providers[state.providerId] || undefined;
                 }
                 return undefined;
             }),
@@ -197,7 +198,7 @@ export default defineComponent({
         watch(() => props.serviceAccountId, async (serviceAccountId) => {
             if (serviceAccountId) {
                 await getServiceAccount(serviceAccountId);
-                await getProviderData(state.item?.provider);
+                await getProviderData(state.providerId);
             }
         }, { immediate: true });
 

@@ -95,6 +95,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 import ServiceAccountAccountType
     from '@/services/asset-inventory/service-account/modules/ServiceAccountAccountType.vue';
@@ -251,7 +252,7 @@ export default {
                 const isSecretCreationSuccess = await createSecret(serviceAccountId);
                 if (!isSecretCreationSuccess) return;
             }
-            SpaceRouter.router.back();
+            SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
         };
         const handleGoBack = () => {
             const nextPath = SpaceRouter.router.currentRoute.query.nextPath as string|undefined;

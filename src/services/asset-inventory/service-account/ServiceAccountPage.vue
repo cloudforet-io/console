@@ -112,7 +112,7 @@ export default {
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
         const state = reactive({
-            selectedProvider: 'atlassian',
+            selectedProvider: query.provider ?? store.state.reference.provider.items[0],
             provider: computed(() => store.state.reference.provider.items),
             providerList: computed(() => Object.keys(state.provider).map(k => ({
                 ...state.provider[k],
@@ -150,14 +150,16 @@ export default {
                 { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
             ]),
             selectedAccountType: 'all',
-            searchFilters: computed<QueryStoreFilter[]>(() => [
-                ...queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters,
-            ]),
+            searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
         });
 
+        const searchFilter = new ApiQueryHelper();
         const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
             computed(() => tableState.schema?.options?.search as unknown as ConsoleSearchSchema[] ?? []),
             'identity.ServiceAccount',
+            computed(() => searchFilter.setFilters([
+                { k: 'provider', v: state.selectedProvider, o: '=' },
+            ]).apiQuery.filter),
         );
         /** Handling API with SpaceConnector * */
 
@@ -295,7 +297,7 @@ export default {
                 store.dispatch('reference/provider/load'),
             ]);
             const providerFilter = Array.isArray(query.provider) ? query.provider[0] : query.provider;
-            state.selectedProvider = providerFilter || state.providerList[0].key;
+            state.selectedProvider = providerFilter || state.providerList[0]?.key;
             watch(() => state.selectedProvider, async (after, before) => {
                 if (after !== before) {
                     replaceUrlQuery('provider', after);
@@ -355,6 +357,14 @@ export default {
     }
     .service-account-table {
         @apply overflow-hidden border border-gray-200 rounded-lg;
+    }
+
+    /* custom design-system component -  p-dynamic-layout */
+    :deep(.service-account-table) {
+        overflow: unset;
+        .p-toolbox-table {
+            @apply rounded-lg;
+        }
     }
 }
 
