@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :visible="_visible"
+    <p-button-modal :visible="proxyVisible"
                     :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL')"
                     :disabled="!isAllValid"
                     size="sm"
@@ -42,8 +42,9 @@
 
 <script lang="ts">
 
+import type { SetupContext } from 'vue';
 import {
-    computed,
+    computed, defineComponent,
     reactive, toRefs, watch,
 } from 'vue';
 
@@ -54,6 +55,7 @@ import { commaFormatter, getNumberFromString } from '@cloudforet/core-lib';
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     visible: boolean;
@@ -64,7 +66,7 @@ export interface AutofillOptions {
     growth?: number;
 }
 
-export default {
+export default defineComponent<Props>({
     name: 'BudgetFormAmountPlanAutofillModal',
     components: {
         PButtonModal,
@@ -80,7 +82,7 @@ export default {
             type: Boolean,
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const {
             forms: { start, growth },
             isAllValid, invalidState, invalidTexts,
@@ -93,7 +95,7 @@ export default {
         }, { growth: true });
 
         const state = reactive({
-            _visible: props.visible,
+            proxyVisible: useProxyValue('visible', props, emit),
             formattedStartBudget: computed({
                 get: () => commaFormatter(start.value),
                 set: (val: string) => { setForm('start', getNumberFromString(val)); },
@@ -101,7 +103,7 @@ export default {
         });
 
         const setVisible = (value: boolean) => {
-            state._visible = value;
+            state.proxyVisible = value;
             emit('update:visible', value);
         };
 
@@ -122,7 +124,7 @@ export default {
         };
 
         watch(() => props.visible, (visible) => {
-            if (visible !== state._visible) state._visible = visible;
+            if (visible !== state.proxyVisible) state.proxyVisible = visible;
         });
 
         return {
@@ -138,7 +140,7 @@ export default {
             handleConfirm,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .inner {
