@@ -174,9 +174,5 @@ export default defineComponent<DefinitionProps>({
             max-width: 100%;
         }
     }
-
-    .p-dict-list {
-        display: inline-grid;
-    }
 }
 </style>

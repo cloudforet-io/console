@@ -31,7 +31,7 @@ export default defineComponent({
 </script>
 <style lang="postcss">
 .p-dict-list {
-    display: grid;
+    display: inline-grid;
     grid-auto-flow: column;
     .key {
         font-weight: bold;
