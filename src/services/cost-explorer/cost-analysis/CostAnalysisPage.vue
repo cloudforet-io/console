@@ -61,8 +61,6 @@ export default {
         },
     },
     setup(props) {
-        const currentQuery = SpaceRouter.router.currentRoute.query;
-
         const state = reactive({
             costQueryList: computed<CostQuerySetModel[]>(() => costExplorerStore.state.costAnalysis.costQueryList),
             selectedQueryId: computed<string|undefined>(() => costExplorerStore.state.costAnalysis.selectedQueryId),
@@ -103,7 +101,7 @@ export default {
         });
 
         let unregisterStoreWatch;
-        const registerStoreWatch = () => {
+        const registerStoreWatch = (currentQuery) => {
             unregisterStoreWatch = watch(() => costExplorerStore.getters['costAnalysis/currentQuerySetOptions'], (options) => {
                 if (props.querySetId) return;
 
@@ -130,6 +128,7 @@ export default {
 
         /* Page Init */
         (async () => {
+            const currentQuery = SpaceRouter.router.currentRoute.query;
             // list cost query sets
             await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
 
@@ -150,7 +149,7 @@ export default {
             }
 
             // register store watch
-            registerStoreWatch();
+            registerStoreWatch(currentQuery);
         })();
 
         return {
