@@ -16,13 +16,21 @@
                            @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
         >
-            <template #search-right>
-                <p-icon-button name="ic_refresh" size="sm" @click="refreshProjectTree" />
-            </template>
             <template #menu-no-data-format>
                 <div />
             </template>
             <template #menu-menu>
+                <div class="button-wrapper top">
+                    <p-button icon="ic_refresh"
+                              style-type="gray-border"
+                              :outline="true"
+                              size="sm"
+                              :disabled="loading"
+                              @click.stop="refreshProjectTree"
+                    >
+                        프로젝트 리로드하기
+                    </p-button>
+                </div>
                 <p-tree :key="contextKey"
                         :edit-options="{disabled: true}"
                         :drag-options="{disabled: true}"
@@ -53,7 +61,8 @@
                 <div class="button-wrapper">
                     <p-button icon="ic_plus_bold"
                               class="create-button"
-                              style-type="gray-border"
+                              style-type="primary-dark"
+                              :outline="true"
                               size="sm"
                               @click="handleClickCreateButton"
                     >
@@ -73,7 +82,7 @@ import {
 } from 'vue';
 
 import {
-    PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree, PButton, PIconButton,
+    PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree, PButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -103,7 +112,6 @@ export default {
         PCheckBox,
         PI,
         PButton,
-        PIconButton,
     },
     props: {
         selectedProjectIds: {
@@ -337,6 +345,9 @@ export default {
     :deep(.p-search-dropdown) {
         .button-wrapper {
             padding: 0.5rem;
+            &.top {
+                padding-bottom: 0.25rem;
+            }
             .create-button {
                 width: 100%;
             }
@@ -346,6 +357,7 @@ export default {
     /* custom design-system component - p-tree */
     :deep(.p-tree) {
         padding: 0.25rem;
+        min-height: 12rem;
         .toggle-right {
             @apply flex-shrink-0;
         }
