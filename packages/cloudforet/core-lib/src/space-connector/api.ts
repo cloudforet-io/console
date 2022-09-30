@@ -84,7 +84,7 @@ class API {
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
         if (!this.refreshToken) {
-            return undefined;
+            return false;
         }
         if (API.checkRefreshingState() !== 'true') {
             try {
@@ -100,7 +100,7 @@ class API {
                 API.unsetRefreshingState();
             }
         } else {
-            return undefined;
+            return true;
         }
     }
 
