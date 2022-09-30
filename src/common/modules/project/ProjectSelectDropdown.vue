@@ -355,7 +355,7 @@ export default {
         }
     }
 
-    /* custom design-system component - p-select-dropdown */
+    /* custom design-system component - p-search-dropdown */
     :deep(.no-data) {
         padding: 0;
     }
