@@ -101,7 +101,7 @@ export default {
         });
 
         let unregisterStoreWatch;
-        const registerStoreWatch = () => {
+        const registerStoreWatch = (currentQuery) => {
             unregisterStoreWatch = watch(() => costExplorerStore.getters['costAnalysis/currentQuerySetOptions'], (options) => {
                 if (props.querySetId) return;
 
@@ -114,7 +114,6 @@ export default {
                     filters: objectToQueryString(options.filters),
                 };
 
-                const currentQuery = SpaceRouter.router.currentRoute.query;
                 if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
                     SpaceRouter.router.replace({ query: newQuery });
                 }
@@ -129,6 +128,7 @@ export default {
 
         /* Page Init */
         (async () => {
+            const currentQuery = SpaceRouter.router.currentRoute.query;
             // list cost query sets
             await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
 
@@ -141,13 +141,15 @@ export default {
                 } else {
                     setSelectedQueryId();
                 }
-            } else {
-                const options = getQueryOptionsFromUrlQuery(SpaceRouter.router.currentRoute.query);
+            } else if (Object.keys(currentQuery).length) {
+                const options = getQueryOptionsFromUrlQuery(currentQuery);
                 setQueryOptions(options);
+            } else {
+                await costExplorerStore.dispatch('costAnalysis/initCostAnalysisStoreState');
             }
 
             // register store watch
-            registerStoreWatch();
+            registerStoreWatch(currentQuery);
         })();
 
         return {
