@@ -155,10 +155,20 @@ export default defineComponent<Props>({
             providerData: {} as ProviderModel,
             showTrustedAccount: computed<boolean>(() => state.providerData?.capability?.support_trusted_service_account ?? false),
             trustedAccounts: [] as ServiceAccountModel[],
-            trustedAccountMenuItems: computed<SelectDropdownMenu[]>(() => state.trustedAccounts.map(d => ({
-                name: d.service_account_id,
-                label: d.name,
-            }))),
+            trustedAccountMenuItems: computed<SelectDropdownMenu[]>(() => {
+                const results: SelectDropdownMenu[] = [];
+                const baseInfoProperties: Record<string, JsonSchema> = state.baseInformationSchema?.properties;
+                state.trustedAccounts.forEach((d) => {
+                    let label = d.name;
+                    if (baseInfoProperties) {
+                        Object.entries(baseInfoProperties).forEach(([k, v]) => {
+                            label += ` | ${v.title}: ${d.data[k]}`;
+                        });
+                    }
+                    results.push({ name: d.service_account_id, label });
+                });
+                return results;
+            }),
             secretTypes: computed<string[]>(() => {
                 if (props.serviceAccountType === 'GENERAL') {
                     if (formState.attachTrustedAccount) {
@@ -173,6 +183,7 @@ export default defineComponent<Props>({
                 const lang = storeState.language === 'en' ? '' : `${storeState.language}/`;
                 return `https://cloudforet.io/${lang}docs/guides/asset-inventory/service-account/`;
             }),
+            baseInformationSchema: computed<JsonSchema>(() => state.providerData.template?.service_account?.schema ?? null),
         });
         const formState = reactive({
             hasCredentialKey: true,
@@ -378,8 +389,7 @@ export default defineComponent<Props>({
             line-height: 1.5;
         }
         .p-select-dropdown {
-            max-width: 28.5rem;
-            width: calc(50% - 1.5rem);
+            width: calc(66% - 1.5rem);
             margin-left: 1.5rem;
             margin-top: 0.25rem;
         }
