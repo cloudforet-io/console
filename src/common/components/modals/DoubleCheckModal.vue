@@ -35,7 +35,7 @@
                             </template>
                         </i18n>
                     </template>
-                    <p-text-input v-model="inputText"
+                    <p-text-input v-model.trim="inputText"
                                   :invalid="invalid"
                                   block
                                   @keyup.enter="confirm()"
@@ -134,7 +134,6 @@ export default defineComponent({
 
         watch(() => checkState.inputText, (value) => {
             // TODO: Here, too.
-            checkState.inputText = checkState.inputText.trim();
             checkState.invalid = value.trim().length > 0 && props.verificationText.trim() !== value;
         });
 
