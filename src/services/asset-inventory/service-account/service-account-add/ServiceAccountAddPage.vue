@@ -188,7 +188,7 @@ export default {
             try {
                 const res = await SpaceConnector.client.identity.serviceAccount.create({
                     provider: props.provider,
-                    name: formState.baseInformationForm.accountName,
+                    name: formState.baseInformationForm.accountName.trim(),
                     data: formState.baseInformationForm.customSchemaForm,
                     tags: formState.baseInformationForm.tags,
                     service_account_type: formState.accountType,

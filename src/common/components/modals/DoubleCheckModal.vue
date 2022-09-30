@@ -35,7 +35,7 @@
                             </template>
                         </i18n>
                     </template>
-                    <p-text-input v-model="inputText"
+                    <p-text-input v-model.trim="inputText"
                                   :invalid="invalid"
                                   block
                                   @keyup.enter="confirm()"
@@ -123,7 +123,8 @@ export default defineComponent({
             emit('close', event);
         };
         const handleConfirm = () => {
-            if (checkState.inputText === props.verificationText) {
+            // TODO: Currently, name with space exists. So, further fixes are required later.
+            if (checkState.inputText === props.verificationText.trim()) {
                 reset();
                 emit('confirm');
             } else {
@@ -132,7 +133,8 @@ export default defineComponent({
         };
 
         watch(() => checkState.inputText, (value) => {
-            checkState.invalid = value.length > 0 && props.verificationText !== value;
+            // TODO: Here, too.
+            checkState.invalid = value.trim().length > 0 && props.verificationText.trim() !== value;
         });
 
         return {
