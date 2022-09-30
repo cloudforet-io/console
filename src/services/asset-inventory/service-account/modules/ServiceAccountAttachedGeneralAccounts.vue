@@ -4,8 +4,9 @@
         <div class="content-wrapper">
             <p-data-table :fields="fields" :items="items"
                           sortable
-                          sort-by="name"
-                          :sort-desc="true"
+                          :sort-by="sortBy"
+                          :sort-desc="sortDesc"
+                          @changeSort="handleChange"
             >
                 <template #col-name-format="{value, item}">
                     <p-anchor
@@ -36,6 +37,7 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -63,16 +65,20 @@ export default defineComponent({
     setup(props, { emit }) {
         const state = reactive({
             items: [] as any,
+            sortBy: 'name',
+            sortDesc: true,
         });
         const fields = [
             { name: 'name', label: 'Name', sortable: true },
             { name: 'service_account_id', label: 'Account ID', sortable: false },
         ];
 
-        const init = async () => {
+        const apiQueryHelper = new ApiQueryHelper();
+        const getAttachedGeneralAccountList = async () => {
             try {
                 const { results } = await SpaceConnector.client.identity.serviceAccount.list({
                     trusted_service_account_id: props.serviceAccountId,
+                    query: apiQueryHelper.setSort(state.sortBy, state.sortDesc).data,
                 });
                 state.items = results;
                 emit('update:attached-general-accounts', results);
@@ -82,6 +88,20 @@ export default defineComponent({
             }
         };
 
+        const handleChange = async (sortBy, sortDesc) => {
+            state.sortBy = sortBy;
+            state.sortDesc = sortDesc;
+            try {
+                await getAttachedGeneralAccountList();
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+
+        const init = async () => {
+            await getAttachedGeneralAccountList();
+        };
+
         (async () => {
             await init();
         })();
@@ -89,6 +109,7 @@ export default defineComponent({
         return {
             ...toRefs(state),
             fields,
+            handleChange,
             ASSET_INVENTORY_ROUTE,
         };
     },
