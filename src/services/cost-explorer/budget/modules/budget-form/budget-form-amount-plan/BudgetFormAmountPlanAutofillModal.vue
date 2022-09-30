@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :visible="modalVisible"
+    <p-button-modal :visible="_visible"
                     :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL')"
                     :disabled="!isAllValid"
                     size="sm"
@@ -93,7 +93,7 @@ export default {
         }, { growth: true });
 
         const state = reactive({
-            modalVisible: props.visible,
+            _visible: props.visible,
             formattedStartBudget: computed({
                 get: () => commaFormatter(start.value),
                 set: (val: string) => { setForm('start', getNumberFromString(val)); },
@@ -101,7 +101,7 @@ export default {
         });
 
         const setVisible = (value: boolean) => {
-            state.modalVisible = value;
+            state._visible = value;
             emit('update:visible', value);
         };
 
@@ -122,7 +122,7 @@ export default {
         };
 
         watch(() => props.visible, (visible) => {
-            if (visible !== state.modalVisible) state.modalVisible = visible;
+            if (visible !== state._visible) state._visible = visible;
         });
 
         return {
