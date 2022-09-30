@@ -111,7 +111,6 @@ export default {
             //
             isAllValid: computed<boolean>(() => {
                 if (state.timeUnit === 'TOTAL') { return state.isTotalAmountValid && state.isPeriodValid; }
-
                 return state.isMonthlyInputsValid && state.isPeriodValid;
             }),
             amountPlanInfo: computed<BudgetAmountPlanInfo>(() => {
@@ -150,8 +149,8 @@ export default {
             state.isTotalAmountValid = isValid;
         };
 
-        watch(() => state.amountPlanInfo, () => {
-            emit('update', state.amountPlanInfo, state.isAllValid);
+        watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, isAllValid]) => {
+            emit('update', amountPlanInfo, isAllValid);
         });
 
         return {
