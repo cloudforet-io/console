@@ -61,6 +61,8 @@ export default {
         },
     },
     setup(props) {
+        const currentQuery = SpaceRouter.router.currentRoute.query;
+
         const state = reactive({
             costQueryList: computed<CostQuerySetModel[]>(() => costExplorerStore.state.costAnalysis.costQueryList),
             selectedQueryId: computed<string|undefined>(() => costExplorerStore.state.costAnalysis.selectedQueryId),
@@ -114,7 +116,6 @@ export default {
                     filters: objectToQueryString(options.filters),
                 };
 
-                const currentQuery = SpaceRouter.router.currentRoute.query;
                 if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
                     SpaceRouter.router.replace({ query: newQuery });
                 }
@@ -141,9 +142,11 @@ export default {
                 } else {
                     setSelectedQueryId();
                 }
-            } else {
-                const options = getQueryOptionsFromUrlQuery(SpaceRouter.router.currentRoute.query);
+            } else if (Object.keys(currentQuery).length) {
+                const options = getQueryOptionsFromUrlQuery(currentQuery);
                 setQueryOptions(options);
+            } else {
+                await costExplorerStore.dispatch('costAnalysis/initCostAnalysisStoreState');
             }
 
             // register store watch
