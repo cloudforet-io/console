@@ -389,7 +389,7 @@ export default defineComponent<Props>({
             line-height: 1.5;
         }
         .p-select-dropdown {
-            width: calc(100% - 1.5rem);
+            width: calc(66% - 1.5rem);
             margin-left: 1.5rem;
             margin-top: 0.25rem;
         }
