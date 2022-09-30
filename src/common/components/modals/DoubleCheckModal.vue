@@ -1,4 +1,5 @@
 <template>
+    <!--TODO: Currently, name with space exists. So, further fixes are required later.-->
     <p-button-modal :header-title="headerTitle"
                     :scrollable="scrollable"
                     :size="size"
@@ -6,7 +7,7 @@
                     :backdrop="backdrop"
                     :visible.sync="proxyVisible"
                     :theme-color="themeColor"
-                    :disabled="invalid || inputText.length === 0"
+                    :disabled="invalid || inputText.trim().length === 0"
                     @cancel="handleCancel"
                     @close="handleClose"
                     @confirm="handleConfirm"
@@ -123,7 +124,8 @@ export default defineComponent({
             emit('close', event);
         };
         const handleConfirm = () => {
-            if (checkState.inputText === props.verificationText) {
+            // TODO: Currently, name with space exists. So, further fixes are required later.
+            if (checkState.inputText.trim() === props.verificationText.trim()) {
                 reset();
                 emit('confirm');
             } else {
@@ -132,7 +134,9 @@ export default defineComponent({
         };
 
         watch(() => checkState.inputText, (value) => {
-            checkState.invalid = value.length > 0 && props.verificationText !== value;
+            // TODO: Currently, name with space exists. So, further fixes are required later.
+            checkState.invalid = value.trim().length > 0 && props.verificationText.trim() !== value;
+            console.log(checkState.inputText, props.verificationText, checkState.invalid);
         });
 
         return {
