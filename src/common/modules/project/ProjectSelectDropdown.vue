@@ -15,13 +15,24 @@
                            :disable-delete-all="true"
                            @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
-                           @show-menu="handleShowMenu"
         >
             <template #menu-no-data-format>
                 <div />
             </template>
             <template #menu-menu>
-                <p-tree :edit-options="{disabled: true}"
+                <div class="button-wrapper top">
+                    <p-button icon="ic_refresh"
+                              style-type="gray-border"
+                              :outline="true"
+                              size="sm"
+                              :disabled="loading"
+                              @click.stop="refreshProjectTree"
+                    >
+                        {{ $t('COMMON.PROJECT_SELECT_DROPDOWN.RELOAD_PROJECT') }}
+                    </p-button>
+                </div>
+                <p-tree :key="contextKey"
+                        :edit-options="{disabled: true}"
                         :drag-options="{disabled: true}"
                         :toggle-options="toggleOptions"
                         :select-options="selectOptions"
@@ -43,16 +54,15 @@
                                        class="mr-1"
                                        @change="handleChangeSelectState(node, path, ...arguments)"
                             />
-                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_tree_project-group' : 'ic_tree_project'"
-                                 width="1rem" height="1rem"
-                            />
+                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_tree_project-group' : 'ic_tree_project'" />
                         </span>
                     </template>
                 </p-tree>
                 <div class="button-wrapper">
                     <p-button icon="ic_plus_bold"
                               class="create-button"
-                              style-type="gray-border"
+                              style-type="primary-dark"
+                              :outline="true"
                               size="sm"
                               @click="handleClickCreateButton"
                     >
@@ -163,7 +173,7 @@ export default {
                 if (props.multiSelectable) return PCheckBox;
                 return PRadio;
             }),
-            needRefresh: false,
+            contextKey: Math.floor(Math.random() * Date.now()),
         });
 
         const getSearchPath = async (id: string|undefined, type: string|undefined): Promise<string[]> => {
@@ -226,10 +236,6 @@ export default {
                 return [];
             }
         };
-        const loadProjects = async () => {
-            await store.dispatch('reference/project/load', { force: true });
-        };
-
 
         /* Handlers */
         const handleTreeInit = async (root) => {
@@ -273,19 +279,17 @@ export default {
             if (!value) emit('close');
         };
 
+        const refreshProjectTree = async () => {
+            store.dispatch('reference/project/load', { force: true });
+            state.contextKey = Math.floor(Math.random() * Date.now());
+        };
+
         const handleClickCreateButton = () => {
             window.open(SpaceRouter.router.resolve({ name: PROJECT_ROUTE._NAME }).href);
-            state.needRefresh = true;
             state.visibleMenu = false;
             handleUpdateVisibleMenu(false);
         };
 
-        const handleShowMenu = async () => {
-            if (state.needRefresh) {
-                await loadProjects();
-                state.needRefresh = false;
-            }
-        };
 
         /* Watchers */
         watch(() => props.selectedProjectIds, async (after, before) => {
@@ -329,7 +333,7 @@ export default {
             handleDeleteTag,
             handleUpdateVisibleMenu,
             handleClickCreateButton,
-            handleShowMenu,
+            refreshProjectTree,
         };
     },
 };
@@ -341,6 +345,9 @@ export default {
     :deep(.p-search-dropdown) {
         .button-wrapper {
             padding: 0.5rem;
+            &.top {
+                padding-bottom: 0.25rem;
+            }
             .create-button {
                 width: 100%;
             }
@@ -350,6 +357,7 @@ export default {
     /* custom design-system component - p-tree */
     :deep(.p-tree) {
         padding: 0.25rem;
+        min-height: 12rem;
         .toggle-right {
             @apply flex-shrink-0;
         }
