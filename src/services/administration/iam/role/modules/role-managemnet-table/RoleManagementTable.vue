@@ -4,7 +4,6 @@
                          sortable
                          selectable
                          exportable
-                         sort-by:="name"
                          :loading="loading"
                          :items="roles"
                          :select-index.sync="selectedIndices"
