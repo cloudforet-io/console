@@ -50,8 +50,10 @@
                     </template>
                 </p-tree>
                 <div class="button-wrapper">
-                    <p-button name="ic_plus_bold" class="create-button"
+                    <p-button icon="ic_plus_bold"
+                              class="create-button"
                               style-type="gray-border"
+                              size="sm"
                               @click="handleClickCreateButton"
                     >
                         {{ $t('COMMON.PROJECT_SELECT_DROPDOWN.CREAT_PROJECT') }}
@@ -351,6 +353,11 @@ export default {
         .toggle-right {
             @apply flex-shrink-0;
         }
+    }
+
+    /* custom design-system component - p-select-dropdown */
+    :deep(.no-data) {
+        padding: 0;
     }
 }
 </style>
