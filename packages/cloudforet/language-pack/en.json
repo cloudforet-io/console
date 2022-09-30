@@ -892,7 +892,8 @@
 		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "Create Project",
-			"PLACEHOLDER": "Select Project"
+			"PLACEHOLDER": "Select Project",
+			"RELOAD_PROJECT": "Reload Projects"
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "Your session has expired.",
