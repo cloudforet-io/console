@@ -145,7 +145,7 @@ class API {
         return this.defaultAxiosConfig;
     }
 
-    private handleRequestError = async (error: AxiosError) => {
+    private handleRequestError = async (error: AxiosError): Promise<APIError|void> => {
         switch (error.response?.status) {
         case 400: {
             throw new BadRequestError(error);
@@ -198,7 +198,7 @@ class API {
         // Axios's response interceptor with error handling
         this.instance.interceptors.response.use(
             (response: AxiosResponse) => response,
-            error => Promise.reject(this.handleRequestError(error)),
+            error => this.handleRequestError(error),
         );
     }
 }

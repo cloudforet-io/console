@@ -53,21 +53,11 @@ export default class ErrorHandler {
         }
     }
 
-    static handleRequestError(error, errorMessage: TranslateResult) {
-        if (error instanceof Promise) {
-            error.catch((err) => {
-                if (!isInstanceOfAuthorizationError(err)) {
-                    if (isInstanceOfBadRequestError(err) && errorMessage) showErrorMessage(errorMessage, err);
-                    else if (isInstanceOfAPIError(err)) showErrorMessage('Something is Wrong! Please contact the administrator.', err);
-                }
-                this.handleError(err);
-            });
-        } else {
-            if (!isInstanceOfAuthorizationError(error)) {
-                if (isInstanceOfBadRequestError(error) && errorMessage) showErrorMessage(errorMessage, error);
-                else if (isInstanceOfAPIError(error)) showErrorMessage('Something is Wrong! Please contact the administrator.', error);
-            }
-            this.handleError(error);
+    static handleRequestError(error: unknown, errorMessage: TranslateResult) {
+        if (!isInstanceOfAuthorizationError(error)) {
+            if (isInstanceOfBadRequestError(error) && errorMessage) showErrorMessage(errorMessage, error);
+            else if (isInstanceOfAPIError(error)) showErrorMessage('Something is Wrong! Please contact the administrator.', error);
         }
+        this.handleError(error);
     }
 }
