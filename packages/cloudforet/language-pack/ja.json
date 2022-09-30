@@ -426,7 +426,7 @@
 					"CANCEL": "取消",
 					"CONFIRM": "確認",
 					"CREATE_BUDGET": "予算作成",
-					"DELETE_BUDGET": "",
+					"DELETE_BUDGET": "予算削除",
 					"UPDATE_BUDGET": "予算の更新"
 				},
 				"MAIN": {
@@ -891,7 +891,7 @@
 			"TITLE": "個人情報"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
-			"CREAT_PROJECT": "",
+			"CREAT_PROJECT": "プロジェクト作成",
 			"PLACEHOLDER": "プロジェクト選択"
 		},
 		"SESSION_MODAL": {
@@ -1246,7 +1246,7 @@
 				"CREDENTIALS_NAME_PLACEHOLDER": "暗号化キー名",
 				"CREDENTIALS_TITLE": "暗号化キー",
 				"CREDENTIAL_HELP_TEXT": " {provider}の暗号化キーをお持ちですか？",
-				"JSON_INVALID": "",
+				"JSON_INVALID": "無効なJsonフォマット",
 				"NAME_DUPLICATED": "重複した名前です。",
 				"NAME_INVALID": "2文字以上を入力してください",
 				"NAME_LABEL": "名前",
@@ -1260,7 +1260,7 @@
 				"PROJECT_TITLE": "プロジェクト",
 				"SAVE": "保存",
 				"SECRET_TYPE_LABEL": "暗号化キーのタイプ",
-				"SEE_MORE": "",
+				"SEE_MORE": "詳細はこちら",
 				"SERVICE_ACCOUNT": "サービスアカウント",
 				"TAB_INPUT": "直接入力",
 				"TAB_JSON": "JSONで入力",
@@ -1269,7 +1269,7 @@
 				"TAG_DESC_2": "キーは、文字、数字、およびアンダースコアのみ使用できます。",
 				"TAG_LABEL": "タグ",
 				"TITLE": "サービスアカウントの追加",
-				"TRUSTED_ACCOUNT_HELP_TEXT": ""
+				"TRUSTED_ACCOUNT_HELP_TEXT": "TrustedAccountを選択した場合、選択したアカウントのリソースにアクセスすることができます"
 			},
 			"MAIN": {
 				"ACTION": "作業",
@@ -1689,28 +1689,28 @@
 		},
 		"SERVICE_ACCOUNT": {
 			"DELETE_CHECK_MODAL": {
-				"NOTE": "",
-				"TITLE": ""
+				"NOTE": "このアカウントは現在、以下のアカウントにアタッチされています。",
+				"TITLE": "このアカウントは削除できません。"
 			},
 			"DETAIL": {
-				"ACCOUNT_TYPE_TITLE": "",
-				"ADD_CREDENTIALS": "",
-				"ALT_E_UPDATE_BASE_INFO": "",
-				"ALT_E_UPDATE_CREDENTIALS": "",
-				"ALT_S_CHANGE_PROJECT": "",
-				"ALT_S_UPDATE_BASE_INFO": "",
-				"ALT_S_UPDATE_CREDENTIALS": "",
-				"ATTACHED_GENERAL_ACCOUNTS_TITLE": "",
-				"BASE_INFO_HELP_TEXT": "",
-				"CANCEL": "",
-				"CONNECT_TO_CONSOLE": "",
-				"CREDENTIALS_LABEL": "",
-				"EDIT": "",
-				"NO_CREDENTIALS": "",
-				"PROJECT_REQUIRED_HELP_TEXT": "",
-				"REQUIRED": "",
-				"SAVE": "",
-				"TRUST_ACCOUNT_HELP_TEXT": ""
+				"ACCOUNT_TYPE_TITLE": "アカウントタイプ",
+				"ADD_CREDENTIALS": "暗号化キー追加",
+				"ALT_E_UPDATE_BASE_INFO": "基本情報の更新に失敗しました",
+				"ALT_E_UPDATE_CREDENTIALS": "暗号化キーの更新に失敗しました",
+				"ALT_S_CHANGE_PROJECT": "プロジェクトの変更に成功しました",
+				"ALT_S_UPDATE_BASE_INFO": "基本情報の更新に成功しました",
+				"ALT_S_UPDATE_CREDENTIALS": "暗号化キーの更新に成功しました",
+				"ATTACHED_GENERAL_ACCOUNTS_TITLE": "アタッチされたGeneralAccount",
+				"BASE_INFO_HELP_TEXT": "タグを追加してリソースを管理してください。\nキーは文字、数字及び下線のみ使用できます。",
+				"CANCEL": "キャンセルする",
+				"CONNECT_TO_CONSOLE": "コンソールへの接続",
+				"CREDENTIALS_LABEL": "既存のTrustedAccountにアタッチしますか？",
+				"EDIT": "編集する",
+				"NO_CREDENTIALS": "暗号化キーが見つかりません。",
+				"PROJECT_REQUIRED_HELP_TEXT": "サービスアカウントに必ず一つのプロジェクトを選択する必要があります。\n( 注意: ランダムに作成されたプロジェクトが\n強制的に選択される場合があります）",
+				"REQUIRED": "プロジェクトの追加が必要です",
+				"SAVE": "保存",
+				"TRUST_ACCOUNT_HELP_TEXT": "TrustedAccountはGeneralAccountから暗号化キーを参照することを許容します。"
 			}
 		}
 	},
@@ -1773,7 +1773,7 @@
 	"MEMBER": "構成員",
 	"MEMBER_TITLE": "メンバー",
 	"MENU": {
-		"ADDITIONAL_SETTINGS": "",
+		"ADDITIONAL_SETTINGS": "追加設定",
 		"ADMINISTRATION": "管理",
 		"ADMINISTRATION_IAM": "ユーザー及び権限管理",
 		"ADMINISTRATION_POLICY": "Policy",
@@ -1801,7 +1801,7 @@
 		"MY_PAGE_API_KEY": "アクセス設定(API&CLI)",
 		"MY_PAGE_NOTIFICATIONS": "お知らせチャンネル",
 		"PROJECT": "プロジェクト",
-		"PROVIDER": ""
+		"PROVIDER": "プロバイダー"
 	},
 	"MODAL_DELETE_MEMBER_CONTENT": "選択したメンバーをプロジェクトから削除しますか？",
 	"MODAL_DELETE_MEMBER_TITLE": "メンバー削除",
@@ -2129,7 +2129,7 @@
 		"SERVER_MODEL": "サーバモデル",
 		"SERVER_TYPE": "サーバタイプ",
 		"SERVICE_ACCOUNT": "サービスアカウント",
-		"SERVICE_ACCOUNT_TYPE": "",
+		"SERVICE_ACCOUNT_TYPE": "アカウントタイプ",
 		"TAGS": "タグ",
 		"UPDATED_AT": "変更日"
 	},
