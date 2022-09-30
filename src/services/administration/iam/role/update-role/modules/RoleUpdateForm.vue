@@ -103,7 +103,7 @@ export default {
             initialSelectedPolicyList: [] as Policy[],
             isAllValid: computed(() => isPolicySectionValid.value && state.isBaseInformationValid),
             formData: computed(() => ({
-                name: state.baseInfoFormData.roleName,
+                name: state.baseInfoFormData.roleName?.trim(),
                 role_type: state.baseInfoFormData.roleType,
                 policies: selectedPolicyList.value,
                 page_permissions: state.pageAccessFormData,

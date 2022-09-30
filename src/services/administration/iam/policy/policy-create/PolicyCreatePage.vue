@@ -123,7 +123,7 @@ export default {
         const handleCreatePolicy = async () => {
             try {
                 await SpaceConnector.client.identity.policy.create({
-                    name: policyName.value,
+                    name: policyName.value?.trim(),
                     tags: {
                         description: state.description,
                     },
