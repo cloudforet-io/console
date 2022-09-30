@@ -15,13 +15,16 @@
                            :disable-delete-all="true"
                            @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
-                           @show-menu="handleShowMenu"
         >
+            <template #search-right>
+                <p-icon-button name="ic_refresh" size="sm" @click="refreshProjectTree" />
+            </template>
             <template #menu-no-data-format>
                 <div />
             </template>
             <template #menu-menu>
-                <p-tree :edit-options="{disabled: true}"
+                <p-tree :key="contextKey"
+                        :edit-options="{disabled: true}"
                         :drag-options="{disabled: true}"
                         :toggle-options="toggleOptions"
                         :select-options="selectOptions"
@@ -43,9 +46,7 @@
                                        class="mr-1"
                                        @change="handleChangeSelectState(node, path, ...arguments)"
                             />
-                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_tree_project-group' : 'ic_tree_project'"
-                                 width="1rem" height="1rem"
-                            />
+                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_tree_project-group' : 'ic_tree_project'" />
                         </span>
                     </template>
                 </p-tree>
@@ -72,7 +73,7 @@ import {
 } from 'vue';
 
 import {
-    PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree, PButton,
+    PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree, PButton, PIconButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -102,6 +103,7 @@ export default {
         PCheckBox,
         PI,
         PButton,
+        PIconButton,
     },
     props: {
         selectedProjectIds: {
@@ -163,7 +165,7 @@ export default {
                 if (props.multiSelectable) return PCheckBox;
                 return PRadio;
             }),
-            needRefresh: false,
+            contextKey: Math.floor(Math.random() * Date.now()),
         });
 
         const getSearchPath = async (id: string|undefined, type: string|undefined): Promise<string[]> => {
@@ -226,10 +228,6 @@ export default {
                 return [];
             }
         };
-        const loadProjects = async () => {
-            await store.dispatch('reference/project/load', { force: true });
-        };
-
 
         /* Handlers */
         const handleTreeInit = async (root) => {
@@ -273,19 +271,17 @@ export default {
             if (!value) emit('close');
         };
 
+        const refreshProjectTree = async () => {
+            store.dispatch('reference/project/load', { force: true });
+            state.contextKey = Math.floor(Math.random() * Date.now());
+        };
+
         const handleClickCreateButton = () => {
             window.open(SpaceRouter.router.resolve({ name: PROJECT_ROUTE._NAME }).href);
-            state.needRefresh = true;
             state.visibleMenu = false;
             handleUpdateVisibleMenu(false);
         };
 
-        const handleShowMenu = async () => {
-            if (state.needRefresh) {
-                await loadProjects();
-                state.needRefresh = false;
-            }
-        };
 
         /* Watchers */
         watch(() => props.selectedProjectIds, async (after, before) => {
@@ -329,7 +325,7 @@ export default {
             handleDeleteTag,
             handleUpdateVisibleMenu,
             handleClickCreateButton,
-            handleShowMenu,
+            refreshProjectTree,
         };
     },
 };
