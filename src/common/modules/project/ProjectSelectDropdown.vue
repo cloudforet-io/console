@@ -28,7 +28,7 @@
                               :disabled="loading"
                               @click.stop="refreshProjectTree"
                     >
-                        프로젝트 리로드하기
+                        {{ $t('COMMON.PROJECT_SELECT_DROPDOWN.RELOAD_PROJECT') }}
                     </p-button>
                 </div>
                 <p-tree :key="contextKey"
