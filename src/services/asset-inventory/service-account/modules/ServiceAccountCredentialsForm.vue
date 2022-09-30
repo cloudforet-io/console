@@ -378,6 +378,7 @@ export default defineComponent<Props>({
             line-height: 1.5;
         }
         .p-select-dropdown {
+            max-width: 28.5rem;
             width: calc(50% - 1.5rem);
             margin-left: 1.5rem;
             margin-top: 0.25rem;
@@ -411,6 +412,7 @@ export default defineComponent<Props>({
         .p-text-input {
             width: 66%;
             .input-container {
+                min-width: 25rem;
                 width: 100%;
             }
         }

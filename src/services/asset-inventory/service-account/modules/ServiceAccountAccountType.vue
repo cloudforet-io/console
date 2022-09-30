@@ -102,6 +102,7 @@ export default defineComponent({
 
                 /* custom design-system component - p-select-card */
                 :deep(.p-select-card) {
+                    max-width: 14.75rem;
                     width: calc(50% - 0.25rem);
                     .marker {
                         display: none;
