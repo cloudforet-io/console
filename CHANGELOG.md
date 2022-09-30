@@ -1,3 +1,10 @@
+# [1.1.0-beta.409](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.408...v1.1.0-beta.409) (2022-09-30)
+
+
+### Bug Fixes
+
+* **p-dict-list:** fix block issue in dynamic field dict type ([#63](https://github.com/cloudforet-io/mirinae/issues/63)) ([52ae6bb](https://github.com/cloudforet-io/mirinae/commit/52ae6bb955170bc92c9476bf1d5bd75c8f83c269))
+
 # [1.1.0-beta.408](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.407...v1.1.0-beta.408) (2022-09-30)
 
 
