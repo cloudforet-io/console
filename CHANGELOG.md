@@ -1,3 +1,10 @@
+# [1.1.0-beta.408](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.407...v1.1.0-beta.408) (2022-09-30)
+
+
+### Bug Fixes
+
+* **p-page-title:** use <span> tag in title ([#58](https://github.com/cloudforet-io/mirinae/issues/58)) ([d50a552](https://github.com/cloudforet-io/mirinae/commit/d50a552c239b7f109399086c43fe0b24fc27a0dd))
+
 # [1.1.0-beta.407](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.406...v1.1.0-beta.407) (2022-09-29)
 
 
