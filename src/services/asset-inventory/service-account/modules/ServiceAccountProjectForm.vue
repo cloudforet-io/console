@@ -82,6 +82,7 @@ export default {
 <style lang="postcss" scoped>
 .service-account-project-form {
     .project-select-dropdown {
+        max-width: 30rem;
         width: 50%;
     }
 

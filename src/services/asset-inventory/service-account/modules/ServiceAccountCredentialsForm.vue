@@ -378,6 +378,7 @@ export default defineComponent<Props>({
             line-height: 1.5;
         }
         .p-select-dropdown {
+            max-width: 28.5rem;
             width: calc(50% - 1.5rem);
             margin-left: 1.5rem;
             margin-top: 0.25rem;
@@ -400,6 +401,8 @@ export default defineComponent<Props>({
         .json-form-wrapper {
             margin: 1rem;
         }
+
+        /* custom design-system component - p-text-editor */
         .p-text-editor {
             .CodeMirror {
                 font-family: Inconsolata, monospace;
@@ -408,9 +411,12 @@ export default defineComponent<Props>({
                 padding: 1rem;
             }
         }
+
+        /* custom design-system component - p-text-input */
         .p-text-input {
             width: 66%;
             .input-container {
+                min-width: 25rem;
                 width: 100%;
             }
         }
@@ -419,6 +425,7 @@ export default defineComponent<Props>({
     @screen tablet {
         /* custom design-system component - p-tab */
         :deep(.p-tab) {
+            /* custom design-system component - p-text-input */
             .p-text-input {
                 width: 100%;
             }
