@@ -892,7 +892,8 @@
 		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "Create Project",
-			"PLACEHOLDER": "Select Project"
+			"PLACEHOLDER": "Select Project",
+			"RELOAD_PROJECT": "Reload Projects"
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "Your session has expired.",
@@ -1246,7 +1247,7 @@
 				"CREDENTIALS_NAME_PLACEHOLDER": "Credentials Name",
 				"CREDENTIALS_TITLE": "Credentials",
 				"CREDENTIAL_HELP_TEXT": "Do you have {provider} credentials key?",
-				"JSON_INVALID": "Invalid Json format.",
+				"JSON_INVALID": "Invalid Json format",
 				"NAME_DUPLICATED": "Name is duplicated.",
 				"NAME_INVALID": "Must longer than 2 characters",
 				"NAME_LABEL": "Name",
@@ -1708,9 +1709,9 @@
 				"EDIT": "Edit",
 				"NO_CREDENTIALS": "There’s no credentials found.",
 				"PROJECT_REQUIRED_HELP_TEXT": "It's now required to select a specific\nproject for any service account.\n( Note: A randomly generated\nproject will be forcefully added to\nthe accounts with no project soon.)",
-				"REQUIRED": "** required",
+				"REQUIRED": "Project is required",
 				"SAVE": "Save",
-				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Account can allow entities in other AWS accounts belonging to you."
+				"TRUST_ACCOUNT_HELP_TEXT": "Trusted Accounts can allow entities in other General Accounts to user their credentials. "
 			}
 		}
 	},
