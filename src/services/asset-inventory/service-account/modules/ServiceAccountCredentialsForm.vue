@@ -158,14 +158,13 @@ export default defineComponent<Props>({
             trustedAccountMenuItems: computed<SelectDropdownMenu[]>(() => {
                 const results: SelectDropdownMenu[] = [];
                 const baseInfoProperties: Record<string, JsonSchema> = state.baseInformationSchema?.properties;
-                const entries = Object.entries(baseInfoProperties);
+                let entries: Array<[string, JsonSchema]> = [];
+                if (baseInfoProperties) entries = Object.entries(baseInfoProperties);
                 state.trustedAccounts.forEach((d) => {
                     let label = d.name;
-                    if (baseInfoProperties) {
-                        entries.forEach(([k, v]) => {
-                            label += ` | ${v.title}: ${d.data[k]}`;
-                        });
-                    }
+                    entries.forEach(([k, v]) => {
+                        label += ` | ${v.title}: ${d.data[k]}`;
+                    });
                     results.push({ name: d.service_account_id, label });
                 });
                 return results;
