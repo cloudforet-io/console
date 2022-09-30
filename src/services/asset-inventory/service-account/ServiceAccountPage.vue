@@ -56,8 +56,9 @@
 <script lang="ts">
 /* external library */
 
+import type Vue from 'vue';
 import {
-    computed, reactive, watch, toRefs,
+    computed, reactive, watch, toRefs, getCurrentInstance,
 } from 'vue';
 
 import {
@@ -108,7 +109,8 @@ export default {
         PSelectStatus,
     },
     setup() {
-        const { query, fullPath } = SpaceRouter.router.currentRoute;
+        const vm = getCurrentInstance()?.proxy as Vue;
+        const { query } = SpaceRouter.router.currentRoute;
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
         const state = reactive({
@@ -249,7 +251,7 @@ export default {
             SpaceRouter.router.push({
                 name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
                 params: { provider: state.selectedProvider },
-                query: { nextPath: fullPath },
+                query: { nextPath: vm.$route.fullPath },
             });
         };
 
