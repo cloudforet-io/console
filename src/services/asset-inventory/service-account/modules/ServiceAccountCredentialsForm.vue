@@ -401,6 +401,8 @@ export default defineComponent<Props>({
         .json-form-wrapper {
             margin: 1rem;
         }
+
+        /* custom design-system component - p-text-editor */
         .p-text-editor {
             .CodeMirror {
                 font-family: Inconsolata, monospace;
@@ -409,6 +411,8 @@ export default defineComponent<Props>({
                 padding: 1rem;
             }
         }
+
+        /* custom design-system component - p-text-input */
         .p-text-input {
             width: 66%;
             .input-container {
@@ -421,6 +425,7 @@ export default defineComponent<Props>({
     @screen tablet {
         /* custom design-system component - p-tab */
         :deep(.p-tab) {
+            /* custom design-system component - p-text-input */
             .p-text-input {
                 width: 100%;
             }
