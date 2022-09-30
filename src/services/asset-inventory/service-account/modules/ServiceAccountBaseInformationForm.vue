@@ -182,6 +182,7 @@ export default defineComponent<Props>({
     /* custom design-system component - p-text-input */
     :deep(.account-name-input) {
         .input-container {
+            max-width: 30rem;
             width: 50%;
         }
     }
@@ -199,6 +200,7 @@ export default defineComponent<Props>({
         .p-text-input {
             width: 100%;
             .input-container {
+                max-width: 30rem;
                 width: 50%;
             }
         }
