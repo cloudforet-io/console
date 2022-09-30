@@ -198,9 +198,7 @@ class API {
         // Axios's response interceptor with error handling
         this.instance.interceptors.response.use(
             (response: AxiosResponse) => response,
-            async (error) => {
-                await this.handleRequestError(error);
-            },
+            this.handleRequestError,
         );
     }
 }
