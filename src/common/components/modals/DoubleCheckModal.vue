@@ -136,7 +136,6 @@ export default defineComponent({
         watch(() => checkState.inputText, (value) => {
             // TODO: Currently, name with space exists. So, further fixes are required later.
             checkState.invalid = value.trim().length > 0 && props.verificationText.trim() !== value;
-            console.log(checkState.inputText, props.verificationText, checkState.invalid);
         });
 
         return {
