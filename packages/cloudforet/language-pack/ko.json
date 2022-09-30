@@ -892,8 +892,7 @@
 		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "프로젝트 생성",
-			"PLACEHOLDER": "프로젝트 선택",
-			"RELOAD_PROJECT": "프로젝트 불러오기"
+			"PLACEHOLDER": "프로젝트 선택"
 		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "세션이 만료되었습니다. ",
