@@ -110,11 +110,6 @@ export default {
         /* Api */
         const getProvider = async () => {
             try {
-                await new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve('');
-                    }, 2000);
-                });
                 state.providerData = await SpaceConnector.client.identity.provider.get({
                     provider: props.provider,
                 });
