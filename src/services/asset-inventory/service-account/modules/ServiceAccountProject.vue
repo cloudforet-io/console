@@ -157,7 +157,7 @@ export default defineComponent<Props>({
         }
     }
     .content-wrapper {
-        padding: 0.5rem 1rem 2.5rem 1rem;
+        padding: 0 1rem 2.5rem 1rem;
         .service-account-project-form {
             /* custom project-select-dropdown */
             :deep(.project-select-dropdown) {
