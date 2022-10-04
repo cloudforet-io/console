@@ -3,6 +3,9 @@
         <p-dynamic-layout v-if="detailSchema"
                           v-bind="convertedDetailSchema"
                           :data="serviceAccountData"
+                          :type-options="{
+                              loading
+                          }"
                           :field-handler="fieldHandler"
         />
     </div>
@@ -36,7 +39,11 @@ export default {
         },
         serviceAccountData: {
             type: Object,
-            default: () => ({}),
+            default: undefined,
+        },
+        loading: {
+            type: Boolean,
+            default: undefined,
         },
     },
     setup(props) {

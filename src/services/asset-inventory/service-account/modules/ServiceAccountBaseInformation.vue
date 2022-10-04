@@ -22,19 +22,18 @@
             </template>
         </p-panel-top>
         <div class="content-wrapper">
-            <p-data-loader :loading="loading">
-                <service-account-base-information-detail v-show="mode === 'READ'"
-                                                         :provider="provider"
-                                                         :service-account-data="serviceAccountData"
-                />
-                <service-account-base-information-form v-if="mode === 'UPDATE'"
-                                                       edit-mode="UPDATE"
-                                                       :schema="baseInformationSchema"
-                                                       :is-valid.sync="isFormValid"
-                                                       :origin-form="originBaseInformationForm"
-                                                       @change="handleChangeForm"
-                />
-            </p-data-loader>
+            <service-account-base-information-detail v-show="mode === 'READ'"
+                                                     :provider="provider"
+                                                     :service-account-data="serviceAccountData"
+                                                     :loading="serviceAccountLoading || loading"
+            />
+            <service-account-base-information-form v-if="mode === 'UPDATE'"
+                                                   edit-mode="UPDATE"
+                                                   :schema="baseInformationSchema"
+                                                   :is-valid.sync="isFormValid"
+                                                   :origin-form="originBaseInformationForm"
+                                                   @change="handleChangeForm"
+            />
         </div>
     </p-pane-layout>
 </template>
@@ -46,7 +45,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PDataLoader, PPaneLayout, PPanelTop,
+    PButton, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
@@ -72,7 +71,6 @@ import type {
 export default {
     name: 'ServiceAccountBaseInformation',
     components: {
-        PDataLoader,
         ServiceAccountBaseInformationForm,
         ServiceAccountBaseInformationDetail,
         PPaneLayout,
@@ -92,6 +90,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        serviceAccountLoading: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -100,7 +102,7 @@ export default {
             mode: 'READ' as PageMode,
             isFormValid: undefined,
             baseInformationSchema: computed(() => state.providerData.template?.service_account?.schema ?? null),
-            serviceAccountData: {} as ServiceAccountModel,
+            serviceAccountData: undefined as ServiceAccountModel|undefined,
             baseInformationForm: {} as BaseInformationForm,
             originBaseInformationForm: {} as BaseInformationForm,
         });
@@ -108,6 +110,11 @@ export default {
         /* Api */
         const getProvider = async () => {
             try {
+                await new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve('');
+                    }, 2000);
+                });
                 state.providerData = await SpaceConnector.client.identity.provider.get({
                     provider: props.provider,
                 });
@@ -143,7 +150,7 @@ export default {
                 state.originBaseInformationForm = cloneDeep(state.baseInformationForm);
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.serviceAccountData = {};
+                state.serviceAccountData = undefined;
             } finally {
                 state.loading = false;
             }
