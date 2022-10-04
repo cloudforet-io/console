@@ -1,3 +1,10 @@
+# [1.1.0-beta.410](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.409...v1.1.0-beta.410) (2022-10-04)
+
+
+### Bug Fixes
+
+* **p-page-title:** remove white space ([#65](https://github.com/cloudforet-io/mirinae/issues/65)) ([c27bd82](https://github.com/cloudforet-io/mirinae/commit/c27bd82bce923ae973306179e3a4fe57c6a09c05))
+
 # [1.1.0-beta.409](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.408...v1.1.0-beta.409) (2022-09-30)
 
 
