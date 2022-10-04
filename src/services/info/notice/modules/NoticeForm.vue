@@ -45,7 +45,7 @@
                            :invalid-text="invalidTexts.contents"
             >
                 <template #default="{invalid}">
-                    <text-editor :value="contents" :attachments.sync="attachments" :image-uploader="uploadFileAndGetFileInfo"
+                    <text-editor :value="contents" :attachments.sync="attachments" :image-uploader="fileUploader"
                                  :invalid="invalid" @update:value="(d) => setForm('contents', d)"
                     />
                 </template>
@@ -97,13 +97,13 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { uploadFileAndGetFileInfo } from '@/lib/file-manager';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { emptyHtmlRegExp } from '@/common/components/editor/extensions/image/helper';
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import TextEditor from '@/common/components/editor/TextEditor.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFileUploader } from '@/common/composables/file-uploader';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { NoticePostModel } from '@/services/info/notice/type';
@@ -150,7 +150,7 @@ export default {
             isPinned: false,
             isPopup: false,
             attachments: [] as Attachment[],
-            isAllDomainSelected: !!store.getters['user/hasSystemRole'],
+            isAllDomainSelected: !!store.getters['user/hasSystemRole'], // It's active only in root domain case
             boardIdState: '',
             domainList: [] as Array<DomainItem>,
             selectedDomain: store.getters['user/hasSystemRole']
@@ -193,6 +193,8 @@ export default {
                 is_popup: state.isPopup,
             },
         }));
+
+        const { fileUploader } = useFileUploader(computed(() => (state.isAllDomainSelected ? null : state.selectedDomain[0].name)));
 
         const handleConfirm = () => {
             if (props.type === 'CREATE') handleCreateNotice();
@@ -311,7 +313,7 @@ export default {
             invalidState,
             invalidTexts,
             isAllValid,
-            uploadFileAndGetFileInfo,
+            fileUploader,
         };
     },
 };
