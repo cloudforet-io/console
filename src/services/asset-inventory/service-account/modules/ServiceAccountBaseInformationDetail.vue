@@ -1,10 +1,10 @@
 <template>
     <div class="service-account-base-information-detail">
-        <p-dynamic-layout v-if="detailSchema"
-                          v-bind="convertedDetailSchema"
+        <p-dynamic-layout :type="convertedDetailSchema.type"
+                          :options="convertedDetailSchema.options"
                           :data="serviceAccountData"
                           :type-options="{
-                              loading
+                              loading: !convertedDetailSchema.type || loading
                           }"
                           :field-handler="fieldHandler"
         />
