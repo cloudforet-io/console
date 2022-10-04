@@ -34,6 +34,7 @@
                 </div>
             </p-pane-layout>
             <service-account-project :project-id="projectId"
+                                     :service-account-loading="loading"
                                      :service-account-id="serviceAccountId"
                                      :service-account-type="serviceAccountType"
                                      :editable="!isManagedAccount"
@@ -44,6 +45,7 @@
                                                        :attached-general-accounts.sync="attachedGeneralAccounts"
             />
             <service-account-base-information :provider="providerKey"
+                                              :service-account-loading="loading"
                                               :service-account-id="serviceAccountId"
                                               :editable="!isManagedAccount"
                                               @refresh="handleRefresh"

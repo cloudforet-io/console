@@ -21,7 +21,7 @@
                 </div>
             </template>
         </p-panel-top>
-        <div class="content-wrapper">
+        <div v-if="!serviceAccountLoading" class="content-wrapper">
             <service-account-project-detail v-if="mode === 'READ'"
                                             :project-id="projectId"
                                             :service-account-type="serviceAccountType"
@@ -78,6 +78,10 @@ export default defineComponent<Props>({
         PButton,
     },
     props: {
+        serviceAccountLoading: {
+            type: Boolean,
+            default: false,
+        },
         serviceAccountId: {
             type: String,
             default: undefined,
