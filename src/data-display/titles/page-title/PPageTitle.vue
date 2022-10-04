@@ -15,12 +15,8 @@
                 </slot>
             </h2>
             <slot v-if="useTotalCount" name="total-count">
-                <span v-if="useSelectedCount && selectedCount" class="total-count">
-                    ({{ $t('COMPONENT.PAGE_TITLE.SELECTED_OF',{ selectedCount, totalCount }) }})
-                </span>
-                <span v-else class="total-count">
-                    ({{ commaFormatter(totalCount) }})
-                </span>
+                <span v-if="useSelectedCount && selectedCount" class="total-count">({{ $t('COMPONENT.PAGE_TITLE.SELECTED_OF',{ selectedCount, totalCount }) }})</span>
+                <span v-else class="total-count">({{ commaFormatter(totalCount) }})</span>
             </slot>
             <slot name="title-right-extra" />
         </div>
