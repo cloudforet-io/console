@@ -85,7 +85,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
+            hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications'] || unreadNoticeCount.value > 0),
             domainName: computed(() => store.state.domain.name),
             isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
             tabs: computed(() => ([
