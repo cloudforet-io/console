@@ -1,3 +1,10 @@
+# [1.1.0-beta.411](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.410...v1.1.0-beta.411) (2022-10-04)
+
+
+### Bug Fixes
+
+* **p-lazy-img:** fix preloading skeleton position issue ([#67](https://github.com/cloudforet-io/mirinae/issues/67)) ([7407504](https://github.com/cloudforet-io/mirinae/commit/7407504947bfceeefb213e97744434d538a91faf))
+
 # [1.1.0-beta.410](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.409...v1.1.0-beta.410) (2022-10-04)
 
 
