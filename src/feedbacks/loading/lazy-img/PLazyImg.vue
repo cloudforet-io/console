@@ -127,6 +127,7 @@ export default defineComponent<Props>({
     .img-container {
         @apply inline-block w-full h-full absolute rounded-md overflow-hidden;
         z-index: 1;
+        left: 0;
         &.error {
             @apply inline-flex;
         }
