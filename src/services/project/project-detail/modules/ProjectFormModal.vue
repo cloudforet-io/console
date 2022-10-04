@@ -147,7 +147,7 @@ export default {
             state.loading = true;
             const params = {
                 project_group_id: props.projectGroupId,
-                name: state.projectName,
+                name: state.projectName.trim(),
             };
 
             try {
