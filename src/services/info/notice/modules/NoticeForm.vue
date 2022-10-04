@@ -282,11 +282,11 @@ export default {
             state.isPinned = d.options?.is_pinned ?? false;
             state.isPopup = d.options?.is_popup ?? false;
             state.attachments = d.files?.map(file => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
-            state.isAllDomainSelected = !d.domain_id;
+            state.isAllDomainSelected = !d?.domain_id;
             state.boardIdState = d?.board_id ?? '';
             state.selectedDomain = d?.domain_id
                 ? [{ name: d.domain_id, label: state.domainName || d.domain_id }]
-                : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }];
+                : [];
             state.postId = d.post_id ?? '';
             setForm('writerName', d.writer);
             setForm('noticeTitle', d.title);
