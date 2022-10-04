@@ -166,7 +166,6 @@ export default {
 
         /* Api */
         const getProvider = async () => {
-            state.providerLoading = true;
             try {
                 state.providerData = await SpaceConnector.client.identity.provider.get({
                     provider: props.provider,
@@ -174,8 +173,6 @@ export default {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.providerData = {};
-            } finally {
-                state.providerLoading = false;
             }
         };
 
@@ -277,8 +274,12 @@ export default {
 
         /* Init */
         (async () => {
-            await store.dispatch('reference/provider/load');
-            await getProvider();
+            state.providerLoading = true;
+            await Promise.allSettled([
+                store.dispatch('reference/provider/load'),
+                getProvider(),
+            ]);
+            state.providerLoading = false;
         })();
 
         return {

@@ -5,7 +5,7 @@
         >
             <template #title-left-extra>
                 <p-lazy-img :src="providerIcon"
-                            :loading="providerLoading"
+                            :loading="providerLoading || loading"
                             error-icon="ic_provider_other"
                 />
             </template>
