@@ -120,7 +120,7 @@ export default {
                 const itemsMap: CostQueryFilterItemsMap = {};
                 const resourceItemsMap = {
                     project_id: store.getters['reference/projectItems'],
-                    project_group_id: store.state.reference.projectGroup.items,
+                    project_group_id: store.getters['reference/projectGroupItems'],
                     service_account_id: store.state.reference.serviceAccount.items,
                     provider: store.state.reference.provider.items,
                     region_code: store.state.reference.region.items,

@@ -79,7 +79,7 @@ export function useQuerySearchPropsWithSearchSchema(
     })();
     const storeState = reactive({
         Project: computed(() => store.getters['reference/projectItems']),
-        ProjectGroup: computed(() => store.state.reference.projectGroup.items),
+        ProjectGroup: computed(() => store.getters['reference/projectGroupItems']),
         ServiceAccount: computed(() => store.state.reference.serviceAccount.items),
         CloudServiceType: computed(() => store.state.reference.cloudServiceType.items),
         Secret: computed(() => store.state.reference.secret.items),
@@ -88,7 +88,7 @@ export function useQuerySearchPropsWithSearchSchema(
         Region: computed(() => store.state.reference.region.items),
         Plugin: computed(() => store.state.reference.plugin.items),
         User: computed(() => store.state.reference.user.items),
-        Protocol: computed(() => store.state.reference.protocol.items),
+        Protocol: computed(() => store.getters['reference/protocolItems']),
         Webhook: computed(() => store.state.reference.webhook.items),
     });
 
