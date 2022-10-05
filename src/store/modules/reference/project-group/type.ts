@@ -1,4 +1,4 @@
-import type { ReferenceItem, ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
+import type { ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
 
 export interface ProjectGroupResourceItemData {
     parentGroupInfo?: {
@@ -11,4 +11,6 @@ export type ProjectGroupReferenceItem = Required<Pick<ReferenceItem<ProjectGroup
 
 export type ProjectGroupReferenceMap = ReferenceMap<ProjectGroupReferenceItem>;
 
-export type ProjectGroupReferenceState = ReferenceState<ProjectGroupReferenceMap>;
+export interface ProjectGroupReferenceState {
+    items?: ProjectGroupReferenceMap;
+}

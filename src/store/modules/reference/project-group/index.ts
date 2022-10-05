@@ -5,7 +5,7 @@ import * as getters from './getters';
 import * as mutations from './mutations';
 
 const state: ProjectGroupReferenceState = {
-    items: {},
+    items: undefined,
 };
 
 export default {

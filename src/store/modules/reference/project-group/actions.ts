@@ -16,8 +16,8 @@ export const load: Action<ProjectGroupReferenceState, any> = async (
     const currentTime = new Date().getTime();
 
     if (
-        ((options?.lazyLoad && Object.keys(state.items).length > 0)
-        || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
+        ((lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
+        || (options?.lazyLoad && state.items)
         ) && !options?.force
     ) return;
     lastLoadedTime = currentTime;

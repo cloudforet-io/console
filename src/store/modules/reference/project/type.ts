@@ -11,8 +11,6 @@ export type ProjectReferenceItem = Required<Pick<ReferenceItem<ProjectResourceIt
 
 export type ProjectReferenceMap = ReferenceMap<ProjectReferenceItem>;
 
-// export type ProjectReferenceState = ReferenceState<ProjectReferenceMap>
-
 export interface ProjectReferenceState {
     items?: ProjectReferenceMap;
 }
