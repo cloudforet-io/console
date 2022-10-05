@@ -100,8 +100,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -128,6 +126,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -183,7 +183,7 @@ export default {
     setup() {
         const currentQuery = SpaceRouter.router.currentRoute.query;
         const storeState = reactive({
-            collectors: computed(() => store.state.reference.collector.items),
+            collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
         });
         const handlers = reactive({
             keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -328,7 +328,7 @@ export default {
                 store.dispatch('reference/collector/load'),
             ]);
             searchQueryHelper.setReference({
-                'inventory.Collector': computed(() => store.state.reference.collector.items),
+                'inventory.Collector': computed(() => store.getters['reference/collectorItems']),
             });
             state.queryTags = searchQueryHelper.queryTags;
             await getJobs();

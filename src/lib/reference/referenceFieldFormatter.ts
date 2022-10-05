@@ -30,7 +30,7 @@ const formatterMap: FormatterMap = {
         },
     }),
     'inventory.Collector': (data, reference) => ({
-        data: store.state.reference.collector.items[data]?.label || data,
+        data: store.getters['reference/collectorItems'][data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
