@@ -21,15 +21,14 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
-
 import { computed, reactive, toRefs } from 'vue';
 
 import { PI } from '@spaceone/design-system';
 import { get, filter } from 'lodash';
 
 import { store } from '@/store';
+
+import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
 
 
 const CHANNEL_STATE = Object.freeze({
@@ -54,7 +53,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            protocols: computed(() => store.state.reference.protocol.items),
+            protocols: computed<ProtocolReferenceMap>(() => store.getters['reference/protocolItems']),
         });
 
         const channelFormatter = (level) => {
