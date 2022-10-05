@@ -19,7 +19,7 @@ export const load: Action<CloudServiceTypeReferenceState, any> = async (
     const currentTime = new Date().getTime();
 
     if (
-        ((options?.lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && state.items)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
@@ -34,6 +34,7 @@ export const load: Action<CloudServiceTypeReferenceState, any> = async (
 
         response.results.forEach((cloudServiceTypeInfo: any): void => {
             cloudServiceTypes[cloudServiceTypeInfo.cloud_service_type_id] = {
+                key: cloudServiceTypeInfo.cloud_service_type_id,
                 label: `${cloudServiceTypeInfo.group} > ${cloudServiceTypeInfo.name}`,
                 name: cloudServiceTypeInfo.name,
                 icon: assetUrlConverter(cloudServiceTypeInfo.tags['spaceone:icon']),
@@ -55,6 +56,7 @@ export const sync: Action<CloudServiceTypeReferenceState, any> = ({ state, commi
     const cloudServiceTypes: CloudServiceTypeReferenceMap = {
         ...state.items,
         [cloudServiceTypeInfo.cloud_service_type_id]: {
+            key: cloudServiceTypeInfo.cloud_service_type_id,
             label: `${cloudServiceTypeInfo.group} > ${cloudServiceTypeInfo.name}`,
             name: cloudServiceTypeInfo.name,
             icon: assetUrlConverter(cloudServiceTypeInfo.tags['spaceone:icon']),

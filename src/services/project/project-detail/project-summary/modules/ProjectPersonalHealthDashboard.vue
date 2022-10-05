@@ -72,8 +72,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
@@ -91,6 +89,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
+
+import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -136,7 +136,7 @@ export default {
             loading: false,
             regions: computed(() => store.state.reference.region.items),
             timezone: computed(() => store.state.user.timezone),
-            cloudServiceTypes: computed(() => store.state.reference.cloudServiceType.items),
+            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             pageStart: 1,
             pageLimit: 5,
             totalCount: 0,

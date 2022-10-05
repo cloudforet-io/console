@@ -1,5 +1,6 @@
 import type { Getter } from 'vuex';
 
+import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
@@ -10,3 +11,5 @@ export const projectItems: Getter<any, any> = (state): ProjectReferenceMap => st
 export const projectGroupItems: Getter<any, any> = (state): ProjectGroupReferenceMap => state.projectGroup?.items ?? {};
 
 export const protocolItems: Getter<any, any> = (state): ProtocolReferenceMap => state.protocol?.items ?? {};
+
+export const cloudServiceTypeItems: Getter<any, any> = (state): CloudServiceTypeReferenceMap => state.cloudServiceType?.items ?? {};

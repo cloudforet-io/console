@@ -65,6 +65,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 
 
+import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -111,7 +113,7 @@ export default {
 
         const state = reactive({
             loading: false,
-            cloudServiceTypes: computed(() => store.state.reference.cloudServiceType.items),
+            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             trustedAdvisorId: computed<string>(() => {
                 const trustedAdvisorId = findKey(state.cloudServiceTypes, { name: TRUSTED_ADVISOR });
                 return trustedAdvisorId || '';
