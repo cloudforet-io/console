@@ -69,19 +69,17 @@ import dayjs from 'dayjs';
 import { get } from 'lodash';
 import type { Table } from 'pdfmake/interfaces';
 
-
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-// eslint-disable-next-line import/extensions,import/no-unresolved
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { ExcelDataField } from '@/store/modules/file/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
@@ -100,6 +98,7 @@ import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explor
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
 import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type';
+
 
 interface PrintModeFieldSet {
     widths?: Table['widths'];
@@ -131,7 +130,7 @@ export default {
                 return 'YYYY-MM-DD';
             }),
             //
-            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             providers: computed(() => store.state.reference.provider.items),
             regions: computed(() => store.state.reference.region.items),

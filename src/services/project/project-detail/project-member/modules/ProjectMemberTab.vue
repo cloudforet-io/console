@@ -72,7 +72,6 @@
 </template>
 
 <script lang="ts">
-
 import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
@@ -99,6 +98,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -159,7 +159,7 @@ export default {
         const storeState = reactive({
             users: computed(() => store.state.reference.user.items),
             projects: computed(() => store.getters['reference/projectItems']),
-            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
         });
         const state = reactive({
             searchText: apiQueryHelper.filters.map(d => d.v).join(' ') || '',

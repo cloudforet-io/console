@@ -114,7 +114,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
@@ -134,6 +133,7 @@ import { store } from '@/store';
 
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 
 import {
     convertProjectConfigToReferenceData,
@@ -209,7 +209,7 @@ export default {
             projectCount: computed(() => store.state.service.project.projectCount),
             projects: computed(() => store.getters['reference/projectItems']),
             favoriteProjects: computed(() => store.state.favorite.projectItems),
-            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             projectGroupFormVisible: computed(() => store.state.service.project.projectGroupFormVisible),
             projectGroupDeleteCheckModalVisible: computed(() => store.state.service.project.projectGroupDeleteCheckModalVisible),
             favoriteProjectGroups: computed(() => store.state.favorite.projectGroupItems),

@@ -50,10 +50,10 @@ import { computed, reactive, toRefs } from 'vue';
 
 import { PPaneLayout, PAnchor } from '@spaceone/design-system';
 
-
 import { store } from '@/store';
 
 import { CURRENCY } from '@/store/modules/display/config';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -68,6 +68,7 @@ import {
     BUDGET_TIME_UNIT,
 } from '@/services/cost-explorer/budget/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+
 
 const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
 const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
@@ -100,7 +101,7 @@ export default {
     setup() {
         const state = reactive({
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             budgetData: computed<Partial<BudgetData>|null>(() => costExplorerStore.state.budget.budgetData),
             costTypeKey: computed(() => (state.budgetData ? getKeyOfCostType(state.budgetData.cost_types ?? {}) : '')),
             costTypeValue: computed(() => (state.budgetData ? getValueOfCostType(state.budgetData.cost_types ?? {}, state.costTypeKey) : [])),
