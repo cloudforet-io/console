@@ -53,8 +53,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -78,6 +76,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import BudgetToolboxUsageRange
@@ -85,6 +84,7 @@ import BudgetToolboxUsageRange
 import type { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/cost-explorer/budget/type';
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 import type { Period } from '@/services/cost-explorer/type';
+
 
 export interface Pagination {
     pageStart: number;
@@ -119,7 +119,7 @@ export default {
 
         const storeState = reactive({
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
         });
 

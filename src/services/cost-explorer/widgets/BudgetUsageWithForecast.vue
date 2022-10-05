@@ -59,6 +59,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { CURRENCY } from '@/store/modules/display/config';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -141,7 +142,7 @@ export default {
                 },
             ])),
             items: [] as BudgetItem[],
-            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;

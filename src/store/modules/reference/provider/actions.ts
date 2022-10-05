@@ -59,6 +59,7 @@ export const sync: Action<ProviderReferenceState, any> = ({ state, commit }, pro
     const providers: ProviderReferenceMap = {
         ...state.items,
         [providerInfo.provider]: {
+            key: providerInfo.provider,
             label: providerInfo.tags.label || providerInfo.name,
             name: providerInfo.name,
             icon: assetUrlConverter(providerInfo.tags.icon),

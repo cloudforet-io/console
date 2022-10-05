@@ -72,7 +72,7 @@ export default {
     setup() {
         const state = reactive({
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),
             favoriteProjects: computed<FavoriteItem[]>(() => {
                 const favoriteProjectItems = convertProjectConfigToReferenceData(store.state.favorite.projectItems, state.projects);

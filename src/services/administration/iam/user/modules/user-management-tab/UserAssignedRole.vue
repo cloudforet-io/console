@@ -52,7 +52,7 @@ import type { Tags } from '@/models';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProjectGroupReferenceItem } from '@/store/modules/reference/project-group/type';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceItem } from '@/store/modules/reference/project/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -99,7 +99,7 @@ export default {
                 { name: 'labels', label: 'Labels' },
             ]),
             items: [] as UserRoleItem[],
-            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             projects: computed(() => store.getters['reference/projectItems']),
         });
 

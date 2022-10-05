@@ -163,7 +163,7 @@ export default {
             //
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             //
             favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
                 store.state.favorite.menuItems,

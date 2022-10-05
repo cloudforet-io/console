@@ -55,7 +55,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -81,6 +80,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
@@ -124,7 +125,7 @@ export default {
     setup() {
         const storeState = reactive({
             projects: computed(() => store.getters['reference/projectItems']),
-            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
         });
         const handlerState = reactive({

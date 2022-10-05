@@ -83,10 +83,9 @@ import {
     PDivider, PI, PSkeleton,
 } from '@spaceone/design-system';
 
-
 import { store } from '@/store';
 
-import type { ProjectGroupReferenceItem } from '@/store/modules/reference/project-group/type';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceItem } from '@/store/modules/reference/project/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
@@ -136,7 +135,7 @@ export default {
     setup(props: Props) {
         const storeState = reactive({
             projects: computed(() => store.getters['reference/projectItems']),
-            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             providers: computed(() => store.state.reference.provider.items),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
             regions: computed(() => store.state.reference.region.items),

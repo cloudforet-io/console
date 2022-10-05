@@ -55,7 +55,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -69,6 +68,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -116,7 +117,7 @@ export default {
         const state = reactive({
             users: computed(() => store.state.reference.user.items),
             projects: computed(() => store.getters['reference/projectItems']),
-            projectGroups: computed(() => store.state.reference.projectGroup.items),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             loading: true,
             proxyVisible: useProxyValue('visible', props, emit),
             fields: [

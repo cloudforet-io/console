@@ -16,8 +16,8 @@ export const load: Action<ProjectGroupReferenceState, any> = async (
     const currentTime = new Date().getTime();
 
     if (
-        ((options?.lazyLoad && Object.keys(state.items).length > 0)
-        || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
+        ((lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
+        || (options?.lazyLoad && state.items)
         ) && !options?.force
     ) return;
     lastLoadedTime = currentTime;
@@ -33,6 +33,7 @@ export const load: Action<ProjectGroupReferenceState, any> = async (
         response.results.forEach((projectGroupInfo: any): void => {
             const parentGroup = projectGroupInfo.parent_project_group_info;
             projectGroups[projectGroupInfo.project_group_id] = {
+                key: projectGroupInfo.project_group_id,
                 label: (parentGroup)
                     ? `${parentGroup.name} > ${projectGroupInfo.name}` : projectGroupInfo.name,
                 name: projectGroupInfo.name,
@@ -56,6 +57,7 @@ export const sync: Action<ProjectGroupReferenceState, any> = ({ state, commit },
     const projectGroups: ProjectGroupReferenceMap = {
         ...state.items,
         [projectGroupInfo.project_group_id]: {
+            key: projectGroupInfo.project_group_id,
             label: (parentGroup)
                 ? `${parentGroup.name} > ${projectGroupInfo.name}` : projectGroupInfo.name,
             name: projectGroupInfo.name,
