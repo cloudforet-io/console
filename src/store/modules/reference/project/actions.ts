@@ -33,6 +33,7 @@ export const load: Action<ProjectReferenceState, any> = async (
         response.results.forEach((projectInfo: any): void => {
             const groupInfo = projectInfo.project_group_info;
             projects[projectInfo.project_id] = {
+                key: projectInfo.project_id,
                 label: `${groupInfo.name} > ${projectInfo.name}`,
                 name: projectInfo.name,
                 data: {
@@ -56,6 +57,7 @@ export const sync: Action<ProjectReferenceState, any> = ({ state, commit }, proj
     const projects: ProjectReferenceMap = {
         ...state.items,
         [projectInfo.project_id]: {
+            key: projectInfo.project_id,
             label: `${groupInfo.name} > ${projectInfo.name}`,
             name: projectInfo.name,
             icon: {
