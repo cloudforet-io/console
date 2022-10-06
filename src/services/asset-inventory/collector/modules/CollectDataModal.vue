@@ -50,8 +50,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     toRefs, reactive, computed, watch, getCurrentInstance,
 } from 'vue';
@@ -69,10 +67,13 @@ import type { TimeStamp } from '@/models';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
 
 interface SecretModel {
     secret_id: string;
@@ -170,7 +171,8 @@ export default {
             collector: null as CollectorModel | null,
             credential: null as SecretModel | null,
             selectedCollectMode: COLLECT_MODE.all as COLLECT_MODE,
-            plugin: computed(() => store.state.reference.plugin.items[state.collector?.plugin_info.plugin_id]),
+            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+            plugin: computed(() => state.plugins[state.collector?.plugin_info.plugin_id]),
             pluginName: computed<string>(() => get(state.plugin, 'name', '')),
             imageUrl: computed<string>(() => get(state.plugin, 'icon', '')),
             version: computed<string>(() => get(state.collector, 'plugin_info.version', '')),

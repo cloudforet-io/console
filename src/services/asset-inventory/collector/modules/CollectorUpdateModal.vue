@@ -58,8 +58,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     toRefs, reactive, computed, getCurrentInstance, watch,
 } from 'vue';
@@ -76,6 +74,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -119,14 +119,14 @@ export default {
             loading: true,
             collector: null,
             proxyVisible: useProxyValue('visible', props, emit),
-            pluginInfo: computed<CollectorPluginModel>(() => get(state.collector, 'plugin_info', {})),
-            imageUrl: computed<string>(() => get(store.state.reference.plugin.items[state.pluginInfo.plugin_id], 'icon', '')),
+            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+            pluginInfo: computed<CollectorPluginModel>(() => state.collector?.plugin_info || {}),
+            imageUrl: computed<string>(() => state.plugins[state.pluginInfo.plugin_id]?.icon || ''),
             confirmBtnBind: computed(() => {
                 const defaultStyle: any = { style: { padding: 0 } };
                 defaultStyle.styleType = state.loading ? 'gray200' : 'primary-dark';
                 return defaultStyle;
             }),
-
             collectorUpdateParam: {} as CollectorUpdateParameter,
             collectorNames: [] as string[],
             versions: [],

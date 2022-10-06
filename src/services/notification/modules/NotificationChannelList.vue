@@ -69,7 +69,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from 'vue';
@@ -84,6 +83,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -93,6 +94,7 @@ import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 import NotificationChannelItem from '@/services/notification/modules/notification-channel-item/NotificationChannelItem.vue';
 import { PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
+
 
 export default {
     name: 'NotificationChannelList',
@@ -125,7 +127,7 @@ export default {
             userId: computed(() => ((vm.$route.params.userId) ? decodeURIComponent(vm.$route.params.userId) : store.state.user.userId)),
             channelList: undefined as unknown as ChannelItem[],
             protocolResp: [] as ProtocolItem[],
-            plugins: computed(() => store.state.reference.plugin.items),
+            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
         });
         const routeState = reactive({
             routes: computed(() => ([

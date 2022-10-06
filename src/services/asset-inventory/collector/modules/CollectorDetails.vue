@@ -1,34 +1,32 @@
 <template>
     <div>
-        <p-panel-top>{{ baseState.name }}</p-panel-top>
-        <p-definition-table :fields="baseState.fields" :data="baseState.data" :loading="baseState.loading"
+        <p-panel-top>{{ name }}</p-panel-top>
+        <p-definition-table :fields="fields" :data="data" :loading="loading"
                             :skeleton-rows="7" v-on="$listeners"
         >
             <template #data-state="{data}">
                 <p-status :text="data" :theme="data === 'DISABLED' ? 'red' : 'green'" />
             </template>
             <template #data-plugin_name="{data}">
-                <p-lazy-img :src="baseState.data.plugin_icon" width="1rem" height="1rem" />
+                <p-lazy-img :src="data.plugin_icon" width="1rem" height="1rem" />
                 <span class="ml-2 leading-none">{{ data }}</span>
             </template>
             <template #data-plugin_info.metadata.metadata.supported_resource_type="{data}">
                 <p-text-list :items="data || []" delimiter="<br>" class="text-list" />
             </template>
             <template #data-created_at="{ data }">
-                {{ data ? iso8601Formatter(data, baseState.timezone) : '' }}
+                {{ data ? iso8601Formatter(data, timezone) : '' }}
             </template>
             <template #data-last_collected_at="{ data }">
-                {{ data ? iso8601Formatter(data, baseState.timezone) : '' }}
+                {{ data ? iso8601Formatter(data, timezone) : '' }}
             </template>
         </p-definition-table>
     </div>
 </template>
 
 <script lang="ts">
-
-
 import {
-    computed, getCurrentInstance, reactive, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
@@ -40,6 +38,9 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
+
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+
 
 export default {
     name: 'CollectorDetails',
@@ -58,9 +59,10 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
-        const baseState = reactive({
+        const state = reactive({
             name: computed(() => vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_TITLE')),
             timezone: computed(() => vm.$store.state.user.timezone) as unknown as string,
+            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
             loading: true,
             fields: computed(() => [
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_NAME'), name: 'name' },
@@ -81,16 +83,12 @@ export default {
                 collector_id: props.collectorId,
                 only: ['name', 'provider', 'state', 'plugin_info.version',
                     'last_collected_at', 'created_at', 'tags', 'plugin_info.plugin_id'],
-
-                // ...baseState.fields.map(d => d.name)
             });
-            baseState.loading = false;
+            state.loading = false;
             if (res) {
-                baseState.data = {
-                    // eslint-disable-next-line camelcase
-                    plugin_name: store.state.reference.plugin.items[res.plugin_info.plugin_id]?.label,
-                    // eslint-disable-next-line camelcase
-                    plugin_icon: store.state.reference.plugin.items[res.plugin_info.plugin_id]?.icon,
+                state.data = {
+                    plugin_name: state.plugins[res.plugin_info.plugin_id]?.label,
+                    plugin_icon: state.plugins[res.plugin_info.plugin_id]?.icon,
                     ...res,
                 };
             }
@@ -105,7 +103,7 @@ export default {
         })();
 
         return {
-            baseState,
+            ...toRefs(state),
             iso8601Formatter,
         };
     },

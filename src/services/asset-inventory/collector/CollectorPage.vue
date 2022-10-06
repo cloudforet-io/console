@@ -184,8 +184,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     reactive, toRefs, computed, watch, getCurrentInstance,
 } from 'vue';
@@ -209,6 +207,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -289,7 +289,7 @@ export default {
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
             timezone: computed(() => store.state.user.timezone),
-            plugins: computed(() => store.state.reference.plugin.items),
+            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
             fields: computed(() => [
                 { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },
