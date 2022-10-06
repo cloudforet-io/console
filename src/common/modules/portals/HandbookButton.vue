@@ -130,11 +130,12 @@ export default defineComponent({
 
 .handbook-contents {
     @apply relative flex h-full flex-col;
+    height: calc(32vh - 6rem);
     &::before {
         @apply absolute block bg-blue-300;
         width: 93.63%;
         height: 8.75rem;
-        bottom: 1.75rem;
+        bottom: 0.5rem;
         left: 0.589375rem;
         opacity: 0.5;
         border-radius: 0 0 1.25rem 0;
@@ -144,11 +145,12 @@ export default defineComponent({
 
     /* custom design-system component - p-tab */
     :deep(.p-tab) {
-        @apply relative flex-grow border-0;
+        @apply overflow-auto relative flex-grow border-0;
         z-index: 1;
         margin-bottom: 1rem;
         border-radius: 0 0 1.25rem 0;
         background-color: theme('colors.white');
+        min-height: auto;
 
         .p-tab-bar {
             @apply bg-secondary-2;
@@ -163,7 +165,8 @@ export default defineComponent({
         }
     }
     .no-more {
-        margin-top: auto;
+        position: fixed;
+        bottom: 0.5rem;
     }
 }
 
@@ -181,6 +184,7 @@ export default defineComponent({
         /* custom design-system component - p-tab */
         :deep(.p-tab) {
             margin-bottom: 1.5rem;
+            min-height: 19rem;
             .is-single + .tab-pane {
                 height: calc(100% - 3.5rem);
             }
@@ -188,6 +192,10 @@ export default defineComponent({
                 @apply overflow-auto;
                 height: calc(100% - 6.25rem);
             }
+        }
+        .no-more {
+            position: relative;
+            bottom: 0;
         }
     }
 }
