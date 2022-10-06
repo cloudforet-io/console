@@ -300,7 +300,7 @@ export default {
         watch(() => store.state.reference.provider.items, (providers) => {
             if (providers) {
                 const providerFilter = Array.isArray(query.provider) ? query.provider[0] : query.provider;
-                state.selectedProvider = providerFilter || Object.keys(providers)[0];
+                state.selectedProvider = providerFilter || Object.keys(providers)?.[0];
             }
         }, { immediate: true });
         watch(() => state.selectedProvider, async (after, before) => {
