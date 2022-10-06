@@ -293,19 +293,23 @@ export default {
                 store.dispatch('reference/project/load'),
                 store.dispatch('reference/provider/load'),
             ]);
-            const providerFilter = Array.isArray(query.provider) ? query.provider[0] : query.provider;
-            state.selectedProvider = providerFilter || state.providers[0]?.key;
-            watch(() => state.selectedProvider, async (after, before) => {
-                if (after !== before) {
-                    replaceUrlQuery('provider', after);
-                    await getTableSchema();
-                    await listServiceAccountData();
-                }
-            }, { immediate: true });
         };
         init();
         /** ************************* */
         const replaceQueryHelper = new QueryHelper();
+        watch(() => store.state.reference.provider.items, (providers) => {
+            if (providers) {
+                const providerFilter = Array.isArray(query.provider) ? query.provider[0] : query.provider;
+                state.selectedProvider = providerFilter || Object.keys(providers)?.[0];
+            }
+        }, { immediate: true });
+        watch(() => state.selectedProvider, async (after, before) => {
+            if (after && after !== before) {
+                await replaceUrlQuery('provider', after);
+                await getTableSchema();
+                await listServiceAccountData();
+            }
+        }, { immediate: true });
         watch(() => tableState.searchFilters, (searchFilters) => {
             replaceQueryHelper.setFilters(searchFilters);
             const filterQueryString = query.filters ?? '';
