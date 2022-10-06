@@ -13,7 +13,7 @@
                 </p-button>
             </template>
         </p-panel-top>
-
+        <slot name="table-top" />
         <p-data-table :fields="fields"
                       :items="items"
                       :loading="loading"
@@ -40,7 +40,9 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PDataTable, PPanelTop, PButton } from '@spaceone/design-system';
+import {
+    PDataTable, PPanelTop, PButton,
+} from '@spaceone/design-system';
 import { get, camelCase } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

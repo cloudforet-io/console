@@ -81,10 +81,8 @@
             </template>
 
             <template #tag>
-                <tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
-                            resource-type="inventory.CloudService"
-                            resource-key="cloud_service_id"
-                            :disabled="!tableState.hasManagePermission"
+                <cloud-service-tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
+                                          :disabled="!tableState.hasManagePermission"
                 />
             </template>
             <template #member>
@@ -189,13 +187,14 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 import type { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
-import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
 import CloudServiceUsageOverview
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverview.vue';
 import CloudServiceAdmin from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceAdmin.vue';
 import CloudServiceDetail from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceDetail.vue';
 import CloudServiceHistory from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistory.vue';
+import CloudServiceTagsPanel
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceTagsPanel.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 import type { Period } from '@/services/cost-explorer/type';
@@ -209,6 +208,7 @@ const TABLE_MIN_HEIGHT = 400;
 export default {
     name: 'CloudServiceDetailPage',
     components: {
+        CloudServiceTagsPanel,
         CloudServicePeriodFilter,
         CloudServiceUsageOverview,
         CustomFieldModal,
@@ -220,7 +220,6 @@ export default {
         PHorizontalLayout,
         PPageTitle,
         PTab,
-        TagsPanel,
         PButton,
         PEmpty,
         Monitoring,
