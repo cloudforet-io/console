@@ -92,6 +92,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
@@ -100,6 +101,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { ProjectGroup } from '@/services/asset-inventory/service-account/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import type { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/type';
+
 
 export default {
     name: 'ProjectSelectDropdown',
@@ -144,12 +146,15 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
+        const storeState = reactive({
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+        });
         const state = reactive({
             loading: true,
             visibleMenu: false,
             isFocused: false,
             root: null as ProjectTreeRoot|null,
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             // selected states
             selectedProjectItems: [] as ProjectTreeItem[],
             selectedProjects: computed<ProjectItemResp[]>(() => state.selectedProjectItems.map(d => d.node.data)),
@@ -157,8 +162,8 @@ export default {
             selectedItems: computed<MenuItem[]>({
                 get() {
                     const items: ReferenceMap = {
-                        ...state.projects,
-                        ...store.state.reference.projectGroup.items,
+                        ...storeState.projects,
+                        ...storeState.projectGroups,
                     };
                     return state._selectedProjectIds.map(id => ({
                         name: id,

@@ -81,7 +81,7 @@ export default defineComponent({
             menuItems: computed<DisplayMenu[]>(() => store.getters['display/allMenuList']),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),
+            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             recents: computed<RecentConfig[]>(() => store.state.recent.allItems),
         });
         const state = reactive({

@@ -164,7 +164,7 @@ export default defineComponent<Props>({
                 }));
             }),
             // cloud service
-            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.state.reference.cloudServiceType.items),
+            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             filteredCloudServices: [] as CloudServiceData[],
             recentCloudServices: [] as RecentConfig[],
             _cloudServiceTotalCount: 0,

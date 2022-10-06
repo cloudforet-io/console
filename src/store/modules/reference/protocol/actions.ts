@@ -16,7 +16,7 @@ export const load: Action<ProtocolReferenceState, any> = async (
     const currentTime = new Date().getTime();
 
     if (
-        ((options?.lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && state.items)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
@@ -32,6 +32,7 @@ export const load: Action<ProtocolReferenceState, any> = async (
 
         response.results.forEach((protocolInfo: any): void => {
             protocols[protocolInfo.protocol_id] = {
+                key: protocolInfo.protocol_id,
                 label: protocolInfo.name,
                 name: protocolInfo.name,
             };
@@ -47,6 +48,7 @@ export const sync: Action<ProtocolReferenceState, any> = ({ state, commit }, pro
     const protocols: ProtocolReferenceMap = {
         ...state.items,
         [protocolInfo.protocol_id]: {
+            key: protocolInfo.protocol_id,
             label: protocolInfo.name,
             name: protocolInfo.name,
         },

@@ -56,12 +56,13 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
+import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 interface Props {
     jobId: string;
@@ -80,7 +81,7 @@ export default {
         const state = reactive({
             loading: true,
             job: {} as any,
-            collectors: computed<ReferenceMap>(() => store.state.reference.collector.items || {}),
+            collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
             providers: computed<ReferenceMap>(() => store.state.reference.provider.items || {}),
             plugins: computed<ReferenceMap>(() => store.state.reference.plugin.items || {}),
             timezone: computed(() => store.state.user.timezone),

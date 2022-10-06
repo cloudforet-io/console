@@ -19,7 +19,7 @@ export const load: Action<CollectorReferenceState, any> = async (
     const currentTime = new Date().getTime();
 
     if (
-        ((options?.lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && state.items)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
@@ -35,6 +35,7 @@ export const load: Action<CollectorReferenceState, any> = async (
 
         response.results.forEach((collectorInfo: any): void => {
             collectors[collectorInfo.collector_id] = {
+                key: collectorInfo.collector_id,
                 label: collectorInfo.name,
                 name: collectorInfo.name,
                 icon: assetUrlConverter(collectorInfo.tags.icon),
@@ -51,6 +52,7 @@ export const sync: Action<CollectorReferenceState, any> = ({ state, commit }, co
     const collectors: CollectorReferenceMap = {
         ...state.items,
         [collectorInfo.collector_id]: {
+            key: collectorInfo.collector_id,
             label: collectorInfo.name,
             name: collectorInfo.name,
             icon: assetUrlConverter(collectorInfo.tags.icon),

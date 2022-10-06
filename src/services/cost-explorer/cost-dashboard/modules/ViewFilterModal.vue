@@ -85,7 +85,7 @@ export default {
             filterNames: computed(() => (props.isCustom ? CUSTOM_DASHBOARD_FILTERS : DASHBOARD_FILTERS)),
             items: computed(() => {
                 const resourceItemsMap = {
-                    [FILTER.PROJECT_GROUP]: store.state.reference.projectGroup.items,
+                    [FILTER.PROJECT_GROUP]: store.getters['reference/projectGroupItems'],
                     [FILTER.PROJECT]: store.getters['reference/projectItems'],
                     [FILTER.PROVIDER]: store.state.reference.provider.items,
                     [FILTER.SERVICE_ACCOUNT]: store.state.reference.serviceAccount.items,

@@ -1,4 +1,4 @@
-import type { ReferenceItem, ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
+import type { ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
 
 export interface CloudServiceTypeResourceItemData {
     provider?: string;
@@ -6,8 +6,10 @@ export interface CloudServiceTypeResourceItemData {
     cloudServiceTypeKey?: string;
 }
 
-export type CloudServiceTypeReferenceItem = Required<Pick<ReferenceItem<CloudServiceTypeResourceItemData>, 'label'|'name'|'icon'|'data'>>;
+export type CloudServiceTypeReferenceItem = Required<Pick<ReferenceItem<CloudServiceTypeResourceItemData>, 'key'|'label'|'name'|'icon'|'data'>>;
 
 export type CloudServiceTypeReferenceMap = ReferenceMap<CloudServiceTypeReferenceItem>;
 
-export type CloudServiceTypeReferenceState = ReferenceState<CloudServiceTypeReferenceMap>;
+export interface CloudServiceTypeReferenceState {
+    items?: CloudServiceTypeReferenceMap;
+}

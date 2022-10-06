@@ -53,6 +53,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { utcToTimezoneFormatter } from '@/services/administration/iam/user/lib/helper';
@@ -100,7 +102,7 @@ export default {
             ]),
             items: [] as ChannelItem[],
             timezone: computed(() => store.state.user.timezone),
-            protocols: computed(() => store.state.reference.protocol.items),
+            protocols: computed<ProtocolReferenceMap>(() => store.getters['reference/protocolItems']),
         });
 
         const apiQueryHelper = new ApiQueryHelper();
