@@ -16,7 +16,7 @@ export const load: Action<SecretReferenceState, any> = async (
     const currentTime = new Date().getTime();
 
     if (
-        ((options?.lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && state.items)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
@@ -32,6 +32,7 @@ export const load: Action<SecretReferenceState, any> = async (
 
         response.results.forEach((secretInfo: any): void => {
             secrets[secretInfo.secret_id] = {
+                key: secretInfo.secret_id,
                 label: secretInfo.name,
                 name: secretInfo.name,
             };
@@ -47,6 +48,7 @@ export const sync: Action<SecretReferenceState, any> = ({ state, commit }, secre
     const secrets: SecretReferenceMap = {
         ...state.items,
         [secretInfo.secret_id]: {
+            key: secretInfo.secret_id,
             label: secretInfo.name,
             name: secretInfo.name,
         },

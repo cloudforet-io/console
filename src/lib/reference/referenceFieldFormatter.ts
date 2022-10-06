@@ -49,7 +49,7 @@ const formatterMap: FormatterMap = {
         },
     }),
     'secret.Secret': data => ({
-        data: store.state.reference.secret.items[data]?.label || data,
+        data: store.getters['reference/secretItems'][data]?.label || data,
     }),
 };
 

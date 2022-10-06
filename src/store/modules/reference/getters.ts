@@ -8,6 +8,7 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import type { SecretReferenceMap } from '@/store/modules/reference/secret/type';
 
 
 export const projectItems: Getter<any, any> = (state): ProjectReferenceMap => state.project?.items ?? {};
@@ -25,3 +26,5 @@ export const pluginItems: Getter<any, any> = (state): PluginReferenceMap => stat
 export const providerItems: Getter<any, any> = (state): ProviderReferenceMap => state.provider?.items ?? {};
 
 export const regionItems: Getter<any, any> = (state): RegionReferenceMap => state.region?.items ?? {};
+
+export const secretItems: Getter<any, any> = (state): SecretReferenceMap => state.secret?.items ?? {};
