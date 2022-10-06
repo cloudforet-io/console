@@ -36,8 +36,8 @@
             </template>
             <template #data-triggered_by="{ value }">
                 <alert-triggered-by :value="value" :project-id="data.project_id"
-                                    :webhook-reference="$store.state.reference.webhook.items[value]"
-                                    :user-reference="$store.state.reference.user.items[value]"
+                                    :webhook-reference="webhooks[value]"
+                                    :user-reference="users[value]"
                                     disable-link
                 />
             </template>
@@ -67,7 +67,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs,
 } from 'vue';
@@ -83,6 +82,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -142,6 +144,8 @@ export default {
                 },
                 { name: 'reference.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
             ],
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+            webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
             data: computed(() => alertManagerStore.state.alert.alertData) || {},
             escalationPolicyName: '',
             loading: true,

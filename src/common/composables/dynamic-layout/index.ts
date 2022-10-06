@@ -87,9 +87,9 @@ export function useQuerySearchPropsWithSearchSchema(
         Provider: computed(() => store.getters['reference/providerItems']),
         Region: computed(() => store.getters['reference/regionItems']),
         Plugin: computed(() => store.getters['reference/pluginItems']),
-        User: computed(() => store.state.reference.user.items),
+        User: computed(() => store.getters['reference/userItems']),
         Protocol: computed(() => store.getters['reference/protocolItems']),
-        Webhook: computed(() => store.state.reference.webhook.items),
+        Webhook: computed(() => store.getters['reference/webhookItems']),
     });
 
     const state = reactive({

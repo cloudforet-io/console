@@ -80,7 +80,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PButton, PSelectDropdown, PTableCheckModal, PI, PBadge,
+    PBadge, PButton, PI, PSelectDropdown, PTableCheckModal,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -89,6 +89,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -99,9 +102,7 @@ import AlertResolveModal from '@/services/alert-manager/alert/modules/AlertResol
 import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
 import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-urgency-i18n';
 import type { AlertAction } from '@/services/alert-manager/lib/config';
-import {
-    ALERT_ACTION, ALERT_URGENCY, ALERT_STATE,
-} from '@/services/alert-manager/lib/config';
+import { ALERT_ACTION, ALERT_STATE, ALERT_URGENCY } from '@/services/alert-manager/lib/config';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
 
 
@@ -147,11 +148,9 @@ export default {
 
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.getters['reference/projectItems']),
-            selectedItemsState: computed(() => {
-                const selectedItemsState = props.selectedItems.map(selectedItem => selectedItem.state);
-                return selectedItemsState;
-            }),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+            webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
+            selectedItemsState: computed(() => props.selectedItems.map(selectedItem => selectedItem.state)),
             isSelectedNone: computed(() => props.selectedItems.length === 0),
             isSelectedOne: computed(() => props.selectedItems.length === 1),
             isSelectedError: computed(() => state.selectedItemsState.includes(ALERT_STATE.ERROR)),
@@ -182,7 +181,6 @@ export default {
             deleteLoading: false,
             alertStateI18n: useAlertStateI18n(),
             urgencyI18n: useAlertUrgencyI18n(),
-            webhooks: computed(() => store.state.reference.webhook.items),
         });
 
         const alertDurationFormatter = value => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), state.timezone) || '--';

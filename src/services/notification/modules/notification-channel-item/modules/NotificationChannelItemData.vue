@@ -54,7 +54,7 @@
                              style-type="gray200" shape="square"
                              class="mr-2 rounded"
                     >
-                        {{ userItems[userId] ? userItems[userId].label : userId }}
+                        {{ users[userId] ? users[userId].label : userId }}
                     </p-badge>
                 </div>
                 <div v-else-if="isSecretData" class="inline">
@@ -82,7 +82,6 @@
 </template>
 
 <script lang="ts">
-
 import { computed, reactive, toRefs } from 'vue';
 
 import {
@@ -91,6 +90,8 @@ import {
 import { cloneDeep } from 'lodash';
 
 import { store } from '@/store';
+
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 
@@ -145,7 +146,7 @@ export default {
             keyListForRead: [],
             valueList: [],
             //
-            userItems: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             schema: props.channelData?.schema,
             isSecretData: computed(() => props.channelData?.secret_id.length > 0),
             isSpaceOneUserProtocol: computed(() => state.keyListForEdit.includes('users')),

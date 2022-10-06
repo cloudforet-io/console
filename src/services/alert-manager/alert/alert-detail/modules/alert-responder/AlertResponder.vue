@@ -45,7 +45,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs,
 } from 'vue';
@@ -63,6 +62,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -121,20 +122,17 @@ export default {
         const responderState = reactive({
             loading: true,
             allMember: [] as any[],
-            allMemberItems: computed(() => {
-                const userItems = responderState.userItem;
-                return responderState.allMember.map((d) => {
-                    const userName = userItems[d.user_id]?.name;
-                    return {
-                        name: d.user_id,
-                        label: userName ? `${d.user_id} (${userName})` : d.user_id,
-                        type: 'item',
-                    };
-                });
-            }),
+            allMemberItems: computed(() => responderState.allMember.map((d) => {
+                const userName = responderState.users[d.user_id]?.name;
+                return {
+                    name: d.user_id,
+                    label: userName ? `${d.user_id} (${userName})` : d.user_id,
+                    type: 'item',
+                };
+            })),
             selectedMemberItems: props.alertData.responders.map(d => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[],
             selectedResourceIds: computed<string[]>(() => responderState.selectedMemberItems.map(d => d.name)),
-            userItem: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
         });
 
         const responderNameFormatter = (resourceId) => {

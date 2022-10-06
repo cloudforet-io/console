@@ -25,7 +25,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -40,6 +39,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
 import { store } from '@/store';
+
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
@@ -58,7 +59,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            users: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             fields: [
                 { label: 'User ID', name: 'user_id' },
                 { label: 'User Name', name: 'resource_id' },

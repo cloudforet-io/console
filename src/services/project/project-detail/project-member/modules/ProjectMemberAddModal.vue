@@ -105,7 +105,6 @@
 </template>
 
 <script lang="ts">
-
 import type { SetupContext } from 'vue';
 import {
     reactive, toRefs, computed, watch, getCurrentInstance,
@@ -124,6 +123,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import { getPagePermissionMapFromRaw } from '@/lib/access-control/page-permission-helper';
@@ -181,7 +182,7 @@ export default {
             loading: false,
             proxyVisible: useProxyValue('visible', props, emit),
             authType: computed(() => store.state.domain.extendedAuthType),
-            users: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             members: [] as MemberItem[],
             //
             tabs: computed(() => {

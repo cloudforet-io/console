@@ -30,8 +30,6 @@
 </template>
 
 <script lang="ts">
-
-
 import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
@@ -48,8 +46,9 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -94,7 +93,7 @@ export default {
             ],
             items: [] as any,
             totalCount: 0,
-            users: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
         });
 
         const reassignMember = async () => {
