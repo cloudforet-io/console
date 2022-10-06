@@ -68,7 +68,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -78,7 +77,6 @@ import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/te
 import {
     find, forEach, range, size,
 } from 'lodash';
-
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
@@ -90,6 +88,7 @@ import { i18n } from '@/translations';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -140,7 +139,7 @@ export default {
         const queryHelper = new QueryHelper();
         const state = reactive({
             loading: true,
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             favoriteProjects: computed<FavoriteItem[]>(() => store.state.favorite.projectItems),
             thisPage: 1,
             allPage: 1,

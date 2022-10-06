@@ -28,7 +28,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed,
     defineComponent,
@@ -46,12 +45,12 @@ import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce } from 'lodash';
 
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -115,6 +114,7 @@ export default defineComponent<Props>({
 
 
         const state = reactive({
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             costTypeItems: computed<BudgetCostTypes>(() => ({
                 all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
                 provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER'),
@@ -123,7 +123,7 @@ export default defineComponent<Props>({
                 product: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PRODUCT'),
             })),
             resourceMenuItems: computed<SearchDropdownMenuItem[]|undefined>(() => {
-                if (selectedCostType.value === 'provider') return getSearchDropdownItems(store.state.reference.provider.items);
+                if (selectedCostType.value === 'provider') return getSearchDropdownItems(state.providers);
                 if (selectedCostType.value === 'region_code') return getSearchDropdownItems(store.state.reference.region.items);
                 if (selectedCostType.value === 'service_account_id') return getSearchDropdownItems(store.state.reference.serviceAccount.items);
                 return undefined;

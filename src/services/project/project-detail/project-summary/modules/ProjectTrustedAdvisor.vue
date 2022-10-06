@@ -66,6 +66,7 @@ import { store } from '@/store';
 
 
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -113,6 +114,7 @@ export default {
 
         const state = reactive({
             loading: false,
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             trustedAdvisorId: computed<string>(() => {
                 const trustedAdvisorId = findKey(state.cloudServiceTypes, { name: TRUSTED_ADVISOR });
@@ -163,7 +165,7 @@ export default {
                 },
             ])),
             data: null as any,
-            awsProvider: computed(() => store.state.reference.provider.items.aws),
+            awsProvider: computed(() => state.providers.aws),
         });
 
         const linkFormatter = (category, status) => {

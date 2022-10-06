@@ -81,6 +81,7 @@ import { i18n } from '@/translations';
 import type { ExcelDataField } from '@/store/modules/file/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
@@ -132,7 +133,7 @@ export default {
             //
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed(() => store.state.reference.region.items),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
             //

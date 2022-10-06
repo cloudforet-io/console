@@ -146,6 +146,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { arrayToQueryString } from '@/lib/router-query-string';
 
@@ -220,6 +221,7 @@ export default {
                 { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
             ]),
             shouldUpdateProjectList: computed<boolean>(() => store.state.service.project.shouldUpdateProjectList),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
         });
 
         const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
@@ -231,7 +233,7 @@ export default {
             }
             return {};
         };
-        const getProvider = name => vm.$store.state.reference.provider.items[name] || {};
+        const getProvider = name => state.providers[name] || {};
         const goToServiceAccount = (provider) => {
             vm.$router.push({
                 name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,

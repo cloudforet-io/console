@@ -53,9 +53,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
-
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
@@ -68,9 +65,10 @@ import { range } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import type { TimeStamp } from '@/models';
 import { store } from '@/store';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -123,7 +121,7 @@ export default {
             loading: false,
             skeletons: range(2),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             items: [] as JobModel[],
             fields: computed(() => [
                 { label: vm.$t('COMMON.WIDGETS.COLLECTING_JOBS_TITLE_TIME'), name: 'collector_info' },

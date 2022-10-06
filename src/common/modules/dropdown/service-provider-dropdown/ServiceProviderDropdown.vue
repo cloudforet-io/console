@@ -4,11 +4,11 @@
                        :items="contextMenuItems"
                        @select="handleSelect"
     >
-        <span v-if="providerList[proxySelected]" class="text">
+        <span v-if="providers[proxySelected]" class="text">
             <p-lazy-img width="1rem" height="1rem"
-                        :src="providerList[proxySelected].icon"
+                        :src="providers[proxySelected].icon"
                         class="mr-1"
-            /><span>{{ providerList[proxySelected].name }}</span>
+            /><span>{{ providers[proxySelected].name }}</span>
         </span>
         <span v-else-if="hasAll" class="text">
             <p-lazy-img error-icon="ic_provider_other"
@@ -34,11 +34,13 @@ import { computed, reactive, toRefs } from 'vue';
 
 import { PSelectDropdown, PLazyImg } from '@spaceone/design-system';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
 import { useProxyValue } from '@/common/composables/proxy-state';
+
 
 export default {
     name: 'ServiceProviderDropdown',
@@ -63,14 +65,14 @@ export default {
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxySelected: useProxyValue('selectedProvider', props, emit),
-            providerList: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             contextMenuItems: computed(() => [
                 { type: 'header', name: 'serviceProvider', label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') },
                 ...(props.hasAll ? [{ name: 'all', label: 'All', icon: undefined }] : []),
-                ...Object.keys(state.providerList).map(k => ({
-                    label: state.providerList[k].name,
+                ...Object.keys(state.providers).map(k => ({
+                    label: state.providers[k].name,
                     name: k,
-                    icon: state.providerList[k]?.icon,
+                    icon: state.providers[k]?.icon,
                 })),
             ]),
         });

@@ -13,7 +13,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs,
 } from 'vue';
@@ -27,6 +26,8 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 interface Props {
     totalCount: number;
@@ -55,7 +56,7 @@ export default {
     },
     setup(props: Props, { emit }) {
         const state = reactive({
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             selectedProvider: computed(() => store.state.service.assetInventory.cloudService.selectedProvider),
             selectedCategories: computed(() => store.state.service.assetInventory.cloudService.selectedCategories),
             selectedRegions: computed(() => store.state.service.assetInventory.cloudService.selectedRegions),

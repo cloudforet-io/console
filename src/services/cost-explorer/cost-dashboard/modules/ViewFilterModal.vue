@@ -87,7 +87,7 @@ export default {
                 const resourceItemsMap = {
                     [FILTER.PROJECT_GROUP]: store.getters['reference/projectGroupItems'],
                     [FILTER.PROJECT]: store.getters['reference/projectItems'],
-                    [FILTER.PROVIDER]: store.state.reference.provider.items,
+                    [FILTER.PROVIDER]: store.getters['reference/providerItems'],
                     [FILTER.SERVICE_ACCOUNT]: store.state.reference.serviceAccount.items,
                     [FILTER.REGION]: store.state.reference.region.items,
                 };

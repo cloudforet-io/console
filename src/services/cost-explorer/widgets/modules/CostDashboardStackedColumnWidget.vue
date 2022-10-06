@@ -27,8 +27,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -51,7 +49,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 
 import { CURRENCY } from '@/store/modules/display/config';
-
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { toggleSeries } from '@/lib/amcharts/helper';
 import config from '@/lib/config';
@@ -129,7 +127,7 @@ export default defineComponent<Props>({
     },
     setup(props: Props, { emit }) {
         const state = reactive({
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             //
             chartRegistry: {},
             chart: null as XYChart | null,

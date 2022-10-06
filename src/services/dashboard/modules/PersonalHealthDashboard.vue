@@ -61,7 +61,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -77,6 +76,7 @@ import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -102,9 +102,9 @@ export default {
     setup(props) {
         const state = reactive({
             loading: false,
-            providers: computed(() => store.state.reference.provider.items),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.getters['reference/projectItems']),
             favoriteProjects: computed(() => store.state.favorite.projectItems),
             regions: computed(() => store.state.reference.region.items),
             data: [] as any[],

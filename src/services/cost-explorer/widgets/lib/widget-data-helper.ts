@@ -49,7 +49,7 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
  */
 export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity, groupBy?: GroupBy): Legend[] => {
     if (groupBy) {
-        const _providers = store.state.reference.provider.items;
+        const _providers = store.getters['reference/providerItems'];
         const _serviceAccounts = store.state.reference.serviceAccount.items;
         const _projects = store.getters['reference/projectItems'];
         const _projectGroups = store.getters['reference/projectGroupItems'];
@@ -110,7 +110,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
  */
 export const getReferenceLabel = (data: string, groupBy: GroupBy): string => {
     if (!data) return 'Unknown';
-    const _providers = store.state.reference.provider.items;
+    const _providers = store.getters['reference/providerItems'];
     const _serviceAccounts = store.state.reference.serviceAccount.items;
     const _projects = store.getters['reference/projectItems'];
     const _projectGroups = store.getters['reference/projectGroupItems'];
@@ -142,7 +142,7 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GroupBy):
                 else _category = 'Unknown';
             }
             if (groupBy === GROUP_BY.PROVIDER) {
-                const _providers = store.state.reference.provider.items;
+                const _providers = store.getters['reference/providerItems'];
                 _color = _providers[_category]?.color;
                 _category = _providers[_category]?.label || _category;
             } else if (groupBy === GROUP_BY.REGION) {

@@ -40,7 +40,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -63,6 +62,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { CURRENCY } from '@/store/modules/display/config';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import config from '@/lib/config';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -150,7 +150,7 @@ export default {
             chart: null as MapChart | null,
             chartRegistry: {},
             regions: computed(() => store.state.reference.region.items),
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             data: [] as Data[],
             chartData: computed<BubbleChartData[]>(() => state.data.map(d => ({
                 value: d.usd_cost > 1 ? d.usd_cost : undefined,

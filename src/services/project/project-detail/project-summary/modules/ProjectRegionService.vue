@@ -39,8 +39,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     reactive, toRefs, watch, onUnmounted, computed,
 } from 'vue';
@@ -60,6 +58,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import config from '@/lib/config';
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -105,7 +104,7 @@ export default {
         const state = reactive({
             loading: true,
             skeletons: range(3),
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed(() => store.state.reference.region.items),
             loaderRef: null,
             chartRef: null as HTMLElement | null,

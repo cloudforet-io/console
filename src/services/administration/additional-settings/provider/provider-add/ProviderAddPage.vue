@@ -35,8 +35,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     computed, reactive, toRefs,
 } from 'vue';
@@ -45,8 +43,9 @@ import {
     PPageTitle, PDivider, PDataLoader, PButtonModal, PIconModal,
 } from '@spaceone/design-system';
 
-
 import { store } from '@/store';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import ProviderListCard from '@/services/administration/additional-settings/provider/provider-add/modules/ProviderListCard.vue';
 
@@ -62,11 +61,12 @@ export default {
     },
     setup() {
         const state = reactive({
-            providerList: computed(() => Object.keys(store.state.reference.provider.items).map(k => ({
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            providerList: computed(() => Object.keys(state.providers).map(k => ({
                 name: k,
-                icon: store.state.reference.provider.items[k].icon,
+                icon: state.providers[k].icon,
                 label: k,
-                color: store.state.reference.provider.items[k].color,
+                color: state.providers[k].color,
                 installed: false,
             }))),
             selectedProvider: '',

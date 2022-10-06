@@ -83,6 +83,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
@@ -125,7 +127,7 @@ export default defineComponent({
     setup(props) {
         const storeState = reactive({
             providerLoading: true,
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
         });
         const state = reactive({
             loading: true,

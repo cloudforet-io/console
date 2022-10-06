@@ -74,6 +74,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
@@ -120,7 +122,7 @@ export default {
                 if (state.selectedDomainId) params.domain_id = state.selectedDomainId;
                 return params;
             }),
-            providers: computed(() => vm.$store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             timezone: computed(() => vm.$store.state.user.timezone || 'UTC'),
         });
 

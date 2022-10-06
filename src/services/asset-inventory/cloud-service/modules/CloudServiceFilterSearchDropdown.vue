@@ -35,7 +35,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -60,6 +59,7 @@ import type { RegionMenuItem } from '@/services/asset-inventory/cloud-service/mo
 import { getRegionFilterMenuItem } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 
+
 const categoryItems = [
     { name: CLOUD_SERVICE_CATEGORY.SERVER, label: CLOUD_SERVICE_CATEGORY.SERVER },
     { name: CLOUD_SERVICE_CATEGORY.COMPUTE, label: CLOUD_SERVICE_CATEGORY.COMPUTE },
@@ -72,18 +72,6 @@ const categoryItems = [
     { name: CLOUD_SERVICE_CATEGORY.APPLICATION_INTEGRATION, label: CLOUD_SERVICE_CATEGORY.APPLICATION_INTEGRATION },
     { name: CLOUD_SERVICE_CATEGORY.MANAGEMENT, label: CLOUD_SERVICE_CATEGORY.MANAGEMENT },
 ];
-
-
-// interface AutocompleteResult<Data> {
-//     name: string;
-//     key: string;
-//     data?: Data;
-// }
-
-// type RegionAutocompleteResult = AutocompleteResult<{
-//     provider: string;
-// }>
-
 
 interface Props {
     type: string;
@@ -113,7 +101,7 @@ export default defineComponent<Props>({
                 name: selectedName,
                 label: state.menuItems.find(d => d.name === selectedName)?.label || selectedName,
             }))),
-            providers: computed<ProviderReferenceMap>(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
             sortedRegions: computed<SortedRegionReferenceItem[]>(() => {
                 const regions: SortedRegionReferenceItem[] = store.getters['reference/region/regionsSortedByProvider'];

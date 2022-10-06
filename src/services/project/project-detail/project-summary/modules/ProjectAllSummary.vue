@@ -96,7 +96,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -119,9 +118,10 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import config from '@/lib/config';
 
@@ -174,7 +174,7 @@ export default {
             chart: null as XYChart | null,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             //
             selectedDateType: DATE_TYPE.DAILY as DateType,
             dateTypes: computed(() => ([
