@@ -37,17 +37,13 @@
 </template>
 
 <script lang="ts">
-// package
-
-// design system
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 import type { PropType } from 'vue';
 
 import {
-    PDivider, PButton,
-    PToolbox,
+    PDivider, PButton, PToolbox,
 } from '@spaceone/design-system';
 import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
@@ -59,14 +55,12 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-// core lib
-
-// global
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { ExcelPayload } from '@/store/modules/file/actions';
 import type { ExcelDataField } from '@/store/modules/file/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import {
     dynamicFieldsToExcelDataFields,
@@ -122,7 +116,7 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const searchQueryHelper = new QueryHelper().setKeyItemSets(props.handlers.keyItemSets ?? []);
         const state = reactive({
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
             period: computed(() => assetInventoryStore.state.cloudService.period),
             selectedCategories: computed(() => assetInventoryStore.getters['cloudService/selectedCategories']),

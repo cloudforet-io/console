@@ -46,7 +46,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -68,7 +67,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 
 import { CURRENCY } from '@/store/modules/display/config';
-
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -77,7 +76,6 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
-
 
 import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
@@ -163,7 +161,7 @@ export default defineComponent<WidgetProps>({
             chart: null as MapChart | null,
             chartRegistry: {},
             regions: computed(() => store.state.reference.region.items),
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             loading: true,
             chartData: [] as ChartData[],
             widgetLink: computed(() => {

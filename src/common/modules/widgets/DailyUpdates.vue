@@ -89,7 +89,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs,
 } from 'vue';
@@ -104,6 +103,8 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -155,7 +156,7 @@ export default {
     setup(props) {
         const queryHelper = new QueryHelper();
         const state = reactive({
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             serverData: [] as CloudServiceData[],
             cloudServiceData: [] as CloudServiceData[],
             data: [] as Item[],

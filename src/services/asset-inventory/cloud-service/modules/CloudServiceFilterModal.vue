@@ -125,7 +125,7 @@ export default defineComponent<Props>({
                 { name: CLOUD_SERVICE_FILTER_KEY.REGION, title: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.REGION') },
             ]),
             // references
-            providers: computed<ProviderReferenceMap>(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.state.reference.region.items),
             // asset inventory store data
             provider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),

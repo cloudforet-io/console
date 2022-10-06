@@ -54,8 +54,6 @@
     </section>
 </template>
 <script lang="ts">
-/* external library */
-
 import type Vue from 'vue';
 import {
     computed, reactive, watch, toRefs, getCurrentInstance,
@@ -75,14 +73,14 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-/* components */
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
 import type { ConsoleSearchSchema } from '@/lib/component-util/dynamic-layout/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -114,13 +112,10 @@ export default {
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
         const state = reactive({
-            selectedProvider: query.provider ?? store.state.reference.provider.items[0],
-            provider: computed(() => store.state.reference.provider.items),
-            providerList: computed(() => Object.keys(state.provider).map(k => ({
-                ...state.provider[k],
-                icon: assetUrlConverter(state.provider[k].icon),
-            }))),
-            selectedProviderName: computed(() => state.provider[state.selectedProvider]?.label),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            providerList: computed(() => Object.values(state.providers)),
+            selectedProvider: undefined,
+            selectedProviderName: computed(() => state.providers[state.selectedProvider]?.label),
         });
 
         /** States for Dynamic Layout(search table type) * */
@@ -299,7 +294,7 @@ export default {
                 store.dispatch('reference/provider/load'),
             ]);
             const providerFilter = Array.isArray(query.provider) ? query.provider[0] : query.provider;
-            state.selectedProvider = providerFilter || state.providerList[0]?.key;
+            state.selectedProvider = providerFilter || state.providers[0]?.key;
             watch(() => state.selectedProvider, async (after, before) => {
                 if (after !== before) {
                     replaceUrlQuery('provider', after);

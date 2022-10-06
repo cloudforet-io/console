@@ -91,6 +91,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -137,6 +138,7 @@ export default {
             regions: computed(() => store.state.reference.region.items),
             timezone: computed(() => store.state.user.timezone),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             pageStart: 1,
             pageLimit: 5,
             totalCount: 0,
@@ -172,7 +174,7 @@ export default {
             search: '',
             sortBy: 'last_update_time',
             sortDesc: true,
-            awsProvider: computed(() => store.state.reference.provider.items.aws),
+            awsProvider: computed(() => state.providers.aws),
         });
         const tabState = reactive({
             tabs: computed(() => [

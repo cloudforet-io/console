@@ -49,7 +49,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch, onUnmounted,
 } from 'vue';
@@ -64,9 +63,10 @@ import { forEach, range, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import config from '@/lib/config';
 
@@ -76,7 +76,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
     gray, violet, white,
 } from '@/styles/colors';
-
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
@@ -110,7 +109,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             skeletons: range(4),
             loading: true,
             loaderRef: null,

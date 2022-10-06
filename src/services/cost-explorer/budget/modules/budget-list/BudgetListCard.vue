@@ -86,7 +86,8 @@ import {
 import { store } from '@/store';
 
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceItem } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -134,9 +135,9 @@ export default {
     },
     setup(props: Props) {
         const storeState = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
             regions: computed(() => store.state.reference.region.items),
             currency: computed(() => store.state.display.currency),

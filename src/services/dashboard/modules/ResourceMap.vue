@@ -80,6 +80,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import config from '@/lib/config';
 
@@ -87,7 +88,6 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { coral, gray } from '@/styles/colors';
-
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
@@ -136,7 +136,7 @@ export default {
             chart: null as MapChart|null,
             data: [] as Resource[],
             loading: true,
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed(() => store.state.reference.region.items),
             resourceDataByRegion: [] as CloudService[],
             selectedRegionLabel: '',

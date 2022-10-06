@@ -57,7 +57,7 @@ import { store } from '@/store';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-import type { ReferenceMap } from '@/store/modules/reference/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -82,7 +82,7 @@ export default {
             loading: true,
             job: {} as any,
             collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
-            providers: computed<ReferenceMap>(() => store.state.reference.provider.items || {}),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
             timezone: computed(() => store.state.user.timezone),
             collector: computed(() => {

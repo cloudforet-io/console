@@ -90,6 +90,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -137,7 +139,8 @@ export default {
         const state = reactive({
             providerLoading: true,
             providerData: {} as ProviderModel,
-            providerIcon: computed(() => store.state.reference.provider.items[state.providerData?.provider]?.icon),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            providerIcon: computed(() => state.providers[state.providerData?.provider]?.icon),
             description: computed(() => get(state.providerData, 'metadata.view.layouts.help:service_account:create', undefined)),
             enableCredentialInput: computed<boolean>(() => {
                 const secretTypes = state.providerData?.capability?.supported_schema ?? [];

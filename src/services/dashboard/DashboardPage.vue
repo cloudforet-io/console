@@ -37,6 +37,8 @@ import {
 
 import { store } from '@/store';
 
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
@@ -67,7 +69,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
         });
 

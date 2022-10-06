@@ -44,7 +44,6 @@
 </template>
 
 <script lang="ts">
-
 import { computed, reactive, toRefs } from 'vue';
 import type { Location } from 'vue-router';
 
@@ -56,11 +55,14 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 import { store } from '@/store';
 
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { objectToQueryString } from '@/lib/router-query-string';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import type { Period } from '@/services/cost-explorer/type';
+
 
 interface Props {
     item: any;
@@ -95,7 +97,7 @@ export default {
     },
     setup(props: Props) {
         const state = reactive({
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             slicedResources: computed(() => props.item?.resources.slice(0, 2)),
         });
         const cloudServiceDetailQueryHelper = new QueryHelper();

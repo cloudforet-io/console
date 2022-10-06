@@ -37,7 +37,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs,
 } from 'vue';
@@ -52,15 +51,14 @@ import type {
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { store } from '@/store';
 
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
-
 
 import { FILTER } from '@/services/cost-explorer/lib/config';
 
@@ -93,7 +91,7 @@ export default {
                 label: state.menuItems.find(d => d.name === selectedName)?.label || selectedName,
             }))),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed(() => store.state.reference.region.items),
             menuItems: computed(() => {
                 if (props.type === FILTER.SERVICE_ACCOUNT) {

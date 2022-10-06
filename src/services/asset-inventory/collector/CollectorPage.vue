@@ -209,6 +209,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -255,7 +256,7 @@ export default {
         const queryHelper = new QueryHelper();
 
         const storeState = reactive({
-            providers: computed(() => store.state.reference.provider.items),
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
         });
 
         const handlerState = reactive({
