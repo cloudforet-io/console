@@ -7,6 +7,7 @@ import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 
 export const projectItems: Getter<any, any> = (state): ProjectReferenceMap => state.project?.items ?? {};
@@ -22,3 +23,5 @@ export const collectorItems: Getter<any, any> = (state): CollectorReferenceMap =
 export const pluginItems: Getter<any, any> = (state): PluginReferenceMap => state.plugin?.items ?? {};
 
 export const providerItems: Getter<any, any> = (state): ProviderReferenceMap => state.provider?.items ?? {};
+
+export const regionItems: Getter<any, any> = (state): RegionReferenceMap => state.region?.items ?? {};
