@@ -1,7 +1,9 @@
-import type { ReferenceItem, ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
+import type { ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
 
-export type PluginReferenceItem = Required<Pick<ReferenceItem<undefined>, 'label'|'name'|'icon'>>;
+export type PluginReferenceItem = Required<Pick<ReferenceItem<undefined>, 'key'|'label'|'name'|'icon'>>;
 
 export type PluginReferenceMap = ReferenceMap<PluginReferenceItem>;
 
-export type PluginReferenceState = ReferenceState<PluginReferenceMap>;
+export interface PluginReferenceState {
+    items?: PluginReferenceMap;
+}

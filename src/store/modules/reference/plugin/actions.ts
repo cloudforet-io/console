@@ -19,7 +19,7 @@ export const load: Action<PluginReferenceState, any> = async (
     const currentTime = new Date().getTime();
 
     if (
-        ((options?.lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && state.items)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
@@ -45,6 +45,7 @@ export const load: Action<PluginReferenceState, any> = async (
 
             pluginResponse.results.forEach((pluginInfo: any): void => {
                 plugins[pluginInfo.plugin_id] = {
+                    key: pluginInfo.plugin_id,
                     label: pluginInfo.tags.description || pluginInfo.name,
                     name: pluginInfo.name,
                     icon: assetUrlConverter(pluginInfo.tags.icon),
@@ -64,6 +65,7 @@ export const sync: Action<PluginReferenceState, any> = ({ state, commit }, plugi
     const plugins: PluginReferenceMap = {
         ...state.items,
         [pluginInfo.plugin_id]: {
+            key: pluginInfo.plugin_id,
             label: pluginInfo.tags.description || pluginInfo.name,
             name: pluginInfo.name,
             icon: assetUrlConverter(pluginInfo.tags.icon),

@@ -45,8 +45,6 @@
 </template>
 
 <script lang="ts">
-
-
 import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
@@ -63,10 +61,13 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
 
 interface WebhookType {
     plugin_id: string;
@@ -97,7 +98,7 @@ export default {
         const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
-            plugins: computed(() => store.state.reference.plugin.items),
+            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
             proxyVisible: useProxyValue('visible', props, emit),
             loading: false,
             webhookName: '',

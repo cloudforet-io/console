@@ -37,10 +37,10 @@
                 </template>
                 <template #[`col-collector_info.plugin_info-format`]="{ value }">
                     <template v-if="value">
-                        <p-lazy-img :src="plugins[value.plugin_id] ? plugins[value.plugin_id].icon : ''"
+                        <p-lazy-img :src="storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].icon : ''"
                                     width="1rem" height="1rem" class="mr-2"
                         />
-                        {{ plugins[value.plugin_id] ? plugins[value.plugin_id].label : value.plugin_id }}
+                        {{ storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].label : value.plugin_id }}
                     </template>
                 </template>
                 <template #col-status-format="{ value }">
@@ -128,6 +128,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -183,7 +184,9 @@ export default {
     setup() {
         const currentQuery = SpaceRouter.router.currentRoute.query;
         const storeState = reactive({
+            timezone: computed(() => store.state.user.timezone),
             collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
+            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
         });
         const handlers = reactive({
             keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -205,10 +208,8 @@ export default {
         const searchQueryHelper = new QueryHelper().setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters);
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
-            timezone: computed(() => store.state.user.timezone),
             loading: true,
             modalVisible: false,
-            plugins: computed(() => store.state.reference.plugin.items),
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
@@ -275,8 +276,8 @@ export default {
                 state.items = res.results.map(job => ({
                     ...job,
                     remained_tasks: job.total_tasks > 0 ? numberFormatter(((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100) : 100,
-                    created_at: iso8601Formatter(job.created_at, state.timezone),
-                    duration: durationFormatter(job.created_at, job.finished_at, state.timezone) || '--',
+                    created_at: iso8601Formatter(job.created_at, storeState.timezone),
+                    duration: durationFormatter(job.created_at, job.finished_at, storeState.timezone) || '--',
                 }));
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -344,6 +345,7 @@ export default {
 
         return {
             ...toRefs(state),
+            storeState,
             handlers,
             PROGRESS_BAR_COLOR,
             COMPLETED_ICON_COLOR,

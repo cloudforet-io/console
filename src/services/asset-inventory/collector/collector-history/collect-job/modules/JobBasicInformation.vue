@@ -42,7 +42,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, onActivated, reactive, toRefs,
 } from 'vue';
@@ -57,6 +56,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -83,7 +83,7 @@ export default {
             job: {} as any,
             collectors: computed<CollectorReferenceMap>(() => store.getters['reference/collectorItems']),
             providers: computed<ReferenceMap>(() => store.state.reference.provider.items || {}),
-            plugins: computed<ReferenceMap>(() => store.state.reference.plugin.items || {}),
+            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
             timezone: computed(() => store.state.user.timezone),
             collector: computed(() => {
                 const id = state.job.collector_info?.collector_id || '';
