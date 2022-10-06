@@ -49,7 +49,7 @@ import type {
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { SortedRegionReferenceItem } from '@/store/modules/reference/region/type';
+import type { SortedRegionReferenceItem, RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
@@ -108,7 +108,8 @@ export default defineComponent<Props>({
                 if (state.selectedProvider === 'all') return regions;
                 return regions.filter(r => r.data.provider === state.selectedProvider);
             }),
-            regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map(d => getRegionFilterMenuItem(d.id, store.state.reference.region.items, state.providers))),
+            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+            regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map(d => getRegionFilterMenuItem(d.key, state.regions, state.providers))),
             menuItems: computed<SearchDropdownMenuItem[]|RegionMenuItem[]>(() => {
                 if (props.type === CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY) {
                     return categoryItems;

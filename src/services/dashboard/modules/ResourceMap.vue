@@ -81,6 +81,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import config from '@/lib/config';
 
@@ -137,7 +138,7 @@ export default {
             data: [] as Resource[],
             loading: true,
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            regions: computed(() => store.state.reference.region.items),
+            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             resourceDataByRegion: [] as CloudService[],
             selectedRegionLabel: '',
             selectedRegionCode: '',

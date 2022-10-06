@@ -77,6 +77,7 @@ import { i18n } from '@/translations';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -104,9 +105,9 @@ export default {
             loading: false,
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             timezone: computed(() => store.state.user.timezone),
             favoriteProjects: computed(() => store.state.favorite.projectItems),
-            regions: computed(() => store.state.reference.region.items),
             data: [] as any[],
             fields: computed(() => [
                 { name: 'event', label: i18n.t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_EVENT') },

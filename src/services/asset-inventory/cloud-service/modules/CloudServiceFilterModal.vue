@@ -56,7 +56,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
@@ -126,7 +125,7 @@ export default defineComponent<Props>({
             ]),
             // references
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            regions: computed<RegionReferenceMap>(() => store.state.reference.region.items),
+            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             // asset inventory store data
             provider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
             categoryFilters: computed<CategoryMenuItem[]>(() => state.filters[CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]?.map(d => ({ name: d, label: d }))),

@@ -53,7 +53,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
         const _serviceAccounts = store.state.reference.serviceAccount.items;
         const _projects = store.getters['reference/projectItems'];
         const _projectGroups = store.getters['reference/projectGroupItems'];
-        const _regions = store.state.reference.region.items;
+        const _regions = store.getters['reference/regionItems'];
 
         const legends: Legend[] = [];
         rawData.forEach((d) => {
@@ -114,7 +114,7 @@ export const getReferenceLabel = (data: string, groupBy: GroupBy): string => {
     const _serviceAccounts = store.state.reference.serviceAccount.items;
     const _projects = store.getters['reference/projectItems'];
     const _projectGroups = store.getters['reference/projectGroupItems'];
-    const _regions = store.state.reference.region.items;
+    const _regions = store.getters['reference/regionItems'];
     if (groupBy === GROUP_BY.PROJECT_GROUP) return _projectGroups[data]?.label || data;
     if (groupBy === GROUP_BY.PROJECT) return _projects[data]?.label || data;
     if (groupBy === GROUP_BY.SERVICE_ACCOUNT) return _serviceAccounts[data]?.label || data;
@@ -146,7 +146,7 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GroupBy):
                 _color = _providers[_category]?.color;
                 _category = _providers[_category]?.label || _category;
             } else if (groupBy === GROUP_BY.REGION) {
-                const _regions = store.state.reference.region.items;
+                const _regions = store.getters['reference/regionItems'];
                 _category = _regions[_category]?.name || _category;
             } else if (groupBy === GROUP_BY.PROJECT) {
                 const _projects = store.getters['reference/projectItems'];

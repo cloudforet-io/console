@@ -89,7 +89,7 @@ export default {
                     [FILTER.PROJECT]: store.getters['reference/projectItems'],
                     [FILTER.PROVIDER]: store.getters['reference/providerItems'],
                     [FILTER.SERVICE_ACCOUNT]: store.state.reference.serviceAccount.items,
-                    [FILTER.REGION]: store.state.reference.region.items,
+                    [FILTER.REGION]: store.getters['reference/regionItems'],
                 };
                 const itemsMap: CostQueryFilterItemsMap = {};
                 Object.entries(props.selectedFilters as CostQueryFilters).forEach(([key, data]) => {
