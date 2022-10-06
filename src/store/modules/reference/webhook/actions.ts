@@ -16,7 +16,7 @@ export const load: Action<WebhookReferenceState, any> = async (
     const currentTime = new Date().getTime();
 
     if (
-        ((options?.lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && state.items)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
@@ -32,6 +32,7 @@ export const load: Action<WebhookReferenceState, any> = async (
 
         response.results.forEach((webhookInfo: any): void => {
             webhooks[webhookInfo.webhook_id] = {
+                key: webhookInfo.webhook_id,
                 label: webhookInfo.name,
                 name: webhookInfo.name,
             };
@@ -47,6 +48,7 @@ export const sync: Action<WebhookReferenceState, any> = ({ state, commit }, webh
     const webhooks: WebhookReferenceMap = {
         ...state.items,
         [webhookInfo.webhook_id]: {
+            key: webhookInfo.webhook_id,
             label: webhookInfo.name,
             name: webhookInfo.name,
         },
