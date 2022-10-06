@@ -80,7 +80,7 @@ export function useQuerySearchPropsWithSearchSchema(
     const storeState = reactive({
         Project: computed(() => store.getters['reference/projectItems']),
         ProjectGroup: computed(() => store.getters['reference/projectGroupItems']),
-        ServiceAccount: computed(() => store.state.reference.serviceAccount.items),
+        ServiceAccount: computed(() => store.getters['reference/serviceAccountItems']),
         CloudServiceType: computed(() => store.getters['reference/cloudServiceTypeItems']),
         Secret: computed(() => store.getters['reference/secretItems']),
         Collector: computed(() => store.getters['reference/collectorItems']),

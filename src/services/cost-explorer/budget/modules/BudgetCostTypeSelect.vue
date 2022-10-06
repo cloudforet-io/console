@@ -52,6 +52,7 @@ import { i18n } from '@/translations';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -117,6 +118,7 @@ export default defineComponent<Props>({
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             costTypeItems: computed<BudgetCostTypes>(() => ({
                 all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
                 provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER'),
@@ -127,7 +129,7 @@ export default defineComponent<Props>({
             resourceMenuItems: computed<SearchDropdownMenuItem[]|undefined>(() => {
                 if (selectedCostType.value === 'provider') return getSearchDropdownItems(state.providers);
                 if (selectedCostType.value === 'region_code') return getSearchDropdownItems(state.regions);
-                if (selectedCostType.value === 'service_account_id') return getSearchDropdownItems(store.state.reference.serviceAccount.items);
+                if (selectedCostType.value === 'service_account_id') return getSearchDropdownItems(state.serviceAccounts);
                 return undefined;
             }),
             resourceMenuLoading: false,

@@ -35,7 +35,7 @@ const formatterMap: FormatterMap = {
         },
     }),
     'identity.ServiceAccount': (data, reference) => ({
-        data: store.state.reference.serviceAccount.items[data]?.label || data,
+        data: store.getters['reference/serviceAccountItems'][data]?.label || data,
         options: {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },

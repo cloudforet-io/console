@@ -88,7 +88,7 @@ export default {
                     [FILTER.PROJECT_GROUP]: store.getters['reference/projectGroupItems'],
                     [FILTER.PROJECT]: store.getters['reference/projectItems'],
                     [FILTER.PROVIDER]: store.getters['reference/providerItems'],
-                    [FILTER.SERVICE_ACCOUNT]: store.state.reference.serviceAccount.items,
+                    [FILTER.SERVICE_ACCOUNT]: store.getters['reference/serviceAccountItems'],
                     [FILTER.REGION]: store.getters['reference/regionItems'],
                 };
                 const itemsMap: CostQueryFilterItemsMap = {};

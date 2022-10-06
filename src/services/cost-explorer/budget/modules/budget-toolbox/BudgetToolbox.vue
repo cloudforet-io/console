@@ -78,6 +78,7 @@ import { i18n } from '@/translations';
 
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import BudgetToolboxUsageRange
     from '@/services/cost-explorer/budget/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
@@ -120,7 +121,7 @@ export default {
         const storeState = reactive({
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
         });
 
         const handlerState = reactive({

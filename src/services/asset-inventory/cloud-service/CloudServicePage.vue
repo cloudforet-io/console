@@ -83,6 +83,7 @@ import { store } from '@/store';
 
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
@@ -127,7 +128,7 @@ export default {
         const storeState = reactive({
             projects: computed(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
         });
         const handlerState = reactive({

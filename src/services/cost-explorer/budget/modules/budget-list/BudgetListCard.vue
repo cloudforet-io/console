@@ -89,6 +89,7 @@ import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/stor
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -139,7 +140,7 @@ export default {
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
