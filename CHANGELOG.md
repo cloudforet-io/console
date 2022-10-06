@@ -1,3 +1,10 @@
+# [1.1.0-beta.414](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.413...v1.1.0-beta.414) (2022-10-06)
+
+
+### Bug Fixes
+
+* **dropdown:** refactor vm in p-search-dropdown & p-select-dropdown ([#74](https://github.com/cloudforet-io/mirinae/issues/74)) ([b081bc8](https://github.com/cloudforet-io/mirinae/commit/b081bc846232b75a13371c64a78cd045c421d9b6))
+
 # [1.1.0-beta.413](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.412...v1.1.0-beta.413) (2022-10-06)
 
 
