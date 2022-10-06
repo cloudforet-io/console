@@ -70,10 +70,10 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -83,6 +83,7 @@ import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/confi
 import type { RoleBindingType } from '@/services/administration/iam/role/modules/role-managemnet-table/modules/type';
 import type { RoleData } from '@/services/administration/iam/role/type';
 import type { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
+
 
 interface UnDeletableRole {
     roleName: string;
@@ -115,7 +116,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            users: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             projects: computed(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             loading: true,

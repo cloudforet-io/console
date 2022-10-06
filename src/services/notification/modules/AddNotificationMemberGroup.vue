@@ -9,7 +9,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -21,6 +20,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
+
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -43,16 +44,13 @@ export default {
         const state = reactive({
             loading: true,
             allMember: [] as any[],
-            allMemberItems: computed(() => {
-                const userItems = state.userItems;
-                return state.allMember.map(d => ({
-                    name: d.resource_id,
-                    label: userItems[d.resource_id]?.label,
-                    type: 'item',
-                }));
-            }),
+            allMemberItems: computed(() => state.allMember.map(d => ({
+                name: d.resource_id,
+                label: state.users[d.resource_id]?.label,
+                type: 'item',
+            }))),
             selectedMemberItems: props.users.map(d => ({ name: d, label: d })),
-            userItems: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
         });
 
         const emitChange = () => {

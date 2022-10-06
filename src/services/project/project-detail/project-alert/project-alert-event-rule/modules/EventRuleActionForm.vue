@@ -105,8 +105,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     computed, reactive, toRefs,
 } from 'vue';
@@ -118,6 +116,8 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
@@ -155,7 +155,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            users: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             userItems: computed(() => Object.keys(state.users).map(k => ({
                 name: k,
                 label: state.users[k]?.label || k,

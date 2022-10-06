@@ -99,12 +99,12 @@
                     </template>
                 </template>
                 <template #col-webhook_id-format="{ value }">
-                    {{ value ? (webhooks[value] ? webhooks[value].label : value) : ' ' }}
+                    {{ value ? (storeState.webhooks[value] ? storeState.webhooks[value].label : value) : ' ' }}
                 </template>
                 <template #col-triggered_by-format="{ value, item }">
                     <alert-triggered-by :value="value" :project-id="item.project_id"
-                                        :webhook-reference="$store.state.reference.webhook.items[value]"
-                                        :user-reference="$store.state.reference.user.items[value]"
+                                        :webhook-reference="storeState.webhooks[value]"
+                                        :user-reference="storeState.users[value]"
                                         disable-link
                     />
                 </template>
@@ -114,18 +114,12 @@
     </fragment>
 </template>
 <script lang="ts">
-
 import {
     computed, onActivated, reactive, toRefs,
 } from 'vue';
 
 import {
-    PToolboxTable,
-    PButton,
-    PPanelTop,
-    PBadge,
-    PI,
-    PAnchor,
+    PToolboxTable, PButton, PPanelTop, PBadge, PI, PAnchor,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -137,6 +131,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
+
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -215,8 +213,9 @@ export default {
 
         const storeState = reactive({
             timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.getters['reference/projectItems']),
-            webhooks: computed(() => store.state.reference.webhook.items),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+            webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
         });
 
         const querySearchHandlerState = reactive({
@@ -440,7 +439,7 @@ export default {
             ]);
             state.tags = tagQueryHelper.setReference({
                 'identity.Project': computed(() => store.getters['reference/projectItems']),
-                'monitoring.Webhook': computed(() => store.state.reference.webhook.items),
+                'monitoring.Webhook': computed(() => store.getters['reference/webhookItems']),
             }).setKeyItemSets(querySearchHandlerState.keyItemSets).queryTags;
         })();
 

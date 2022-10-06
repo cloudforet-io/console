@@ -50,7 +50,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -68,9 +67,10 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -103,7 +103,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            users: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             alertStates: computed(() => ([
                 {
                     name: ALERT_STATE.TRIGGERED,

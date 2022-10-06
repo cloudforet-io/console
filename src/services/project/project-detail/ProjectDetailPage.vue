@@ -93,7 +93,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
@@ -117,6 +116,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -191,7 +191,7 @@ export default {
                 // })),
                 { name: state.projectName },
             ]),
-            users: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             maintenanceWindowFormVisible: false,
             counts: computed(() => ({
                 TRIGGERED: find(store.state.service.projectDetail.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,

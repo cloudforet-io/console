@@ -30,8 +30,6 @@
     </p-list-card>
 </template>
 <script lang="ts">
-
-
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
@@ -49,6 +47,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -67,7 +66,7 @@ export default {
         const vm = getCurrentInstance()?.proxy as Vue;
         const storeState = reactive({
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            users: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
         });
         const state = reactive({
             loading: false,

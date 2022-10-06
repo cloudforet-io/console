@@ -101,8 +101,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -122,6 +120,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -199,7 +199,7 @@ export default {
         });
         const state = reactive({
             loading: true,
-            users: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             projects: computed(() => store.getters['reference/projectItems']),
             urgencyList: computed(() => ([
                 {

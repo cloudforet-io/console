@@ -132,7 +132,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     reactive, toRefs, computed, watch,
 } from 'vue';
@@ -151,11 +150,12 @@ import {
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { debounce } from 'lodash';
 
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
@@ -231,7 +231,7 @@ export default {
             // external user
             loading: false,
             supportFind: computed(() => !!store.state.domain.authOptions?.support_find),
-            users: computed(() => store.state.reference.user.items),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             searchText: '',
             externalItems: [] as MenuItem[],
             selectedItems: [] as MenuItem[],

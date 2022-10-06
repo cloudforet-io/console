@@ -100,6 +100,7 @@ import { i18n } from '@/translations';
 
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -157,8 +158,8 @@ export default {
 
         const apiQueryHelper = new ApiQueryHelper().setPageLimit(15).setFilters(props.filters);
         const storeState = reactive({
-            users: computed(() => store.state.reference.user.items),
-            projects: computed(() => store.getters['reference/projectItems']),
+            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
         });
         const state = reactive({
