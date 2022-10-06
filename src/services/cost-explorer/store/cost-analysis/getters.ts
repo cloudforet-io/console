@@ -18,7 +18,7 @@ export const filterItemsMap: Getter<CostAnalysisStoreState, any> = ({ filters })
         project_group_id: store.getters['reference/projectGroupItems'],
         service_account_id: store.state.reference.serviceAccount.items,
         provider: store.getters['reference/providerItems'],
-        region_code: store.state.reference.region.items,
+        region_code: store.getters['reference/regionItems'],
     };
 
     Object.entries(filters).forEach(([key, data]) => {

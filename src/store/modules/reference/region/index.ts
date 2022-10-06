@@ -5,7 +5,7 @@ import * as getters from './getters';
 import * as mutations from './mutations';
 
 const state: RegionReferenceState = {
-    items: {},
+    items: undefined,
 };
 
 export default {

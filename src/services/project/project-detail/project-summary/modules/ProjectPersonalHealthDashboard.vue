@@ -92,6 +92,7 @@ import { store } from '@/store';
 
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -135,7 +136,7 @@ export default {
 
         const state = reactive({
             loading: false,
-            regions: computed(() => store.state.reference.region.items),
+            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             timezone: computed(() => store.state.user.timezone),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),

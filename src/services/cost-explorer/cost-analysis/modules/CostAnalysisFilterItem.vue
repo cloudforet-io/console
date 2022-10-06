@@ -56,6 +56,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
@@ -92,7 +93,7 @@ export default {
             }))),
             serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            regions: computed(() => store.state.reference.region.items),
+            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             menuItems: computed(() => {
                 if (props.type === FILTER.SERVICE_ACCOUNT) {
                     return Object.keys(state.serviceAccounts).map(k => ({

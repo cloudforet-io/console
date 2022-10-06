@@ -53,16 +53,15 @@ import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-d
 import bytes from 'bytes';
 import dayjs from 'dayjs';
 
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { CURRENCY } from '@/store/modules/display/config';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import config from '@/lib/config';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -149,7 +148,7 @@ export default {
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
             chartRegistry: {},
-            regions: computed(() => store.state.reference.region.items),
+            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             data: [] as Data[],
             chartData: computed<BubbleChartData[]>(() => state.data.map(d => ({

@@ -19,7 +19,7 @@ export const load: Action<RegionReferenceState, any> = async (
     const currentTime = new Date().getTime();
 
     if (
-        ((options?.lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && state.items)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
@@ -35,6 +35,7 @@ export const load: Action<RegionReferenceState, any> = async (
 
         response.results.forEach((regionInfo: any): void => {
             regions[regionInfo.region_code] = {
+                key: regionInfo.region_code,
                 label: `${regionInfo.name} | ${regionInfo.region_code}`,
                 name: regionInfo.name,
                 continent: RegionMap[regionInfo.tags.continent] || {},
@@ -56,6 +57,7 @@ export const sync: Action<RegionReferenceState, any> = ({ state, commit }, regio
     const regions: RegionReferenceMap = {
         ...state.items,
         [regionInfo.region_code]: {
+            key: regionInfo.region_code,
             label: `${regionInfo.name} | ${regionInfo.region_code}`,
             name: regionInfo.name,
             continent: RegionMap[regionInfo.tags.continent] || {},

@@ -68,6 +68,7 @@ import { store } from '@/store';
 
 import { CURRENCY } from '@/store/modules/display/config';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -160,7 +161,7 @@ export default defineComponent<WidgetProps>({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
             chartRegistry: {},
-            regions: computed(() => store.state.reference.region.items),
+            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             loading: true,
             chartData: [] as ChartData[],
