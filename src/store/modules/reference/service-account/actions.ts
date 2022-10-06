@@ -16,7 +16,7 @@ export const load: Action<ServiceAccountReferenceState, any> = async (
     const currentTime = new Date().getTime();
 
     if (
-        ((options?.lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && state.items)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
@@ -32,6 +32,7 @@ export const load: Action<ServiceAccountReferenceState, any> = async (
 
         response.results.forEach((serviceAccountInfo: any): void => {
             serviceAccounts[serviceAccountInfo.service_account_id] = {
+                key: serviceAccountInfo.service_account_id,
                 label: serviceAccountInfo.name,
                 name: serviceAccountInfo.name,
             };
@@ -47,6 +48,7 @@ export const sync: Action<ServiceAccountReferenceState, any> = ({ state, commit 
     const serviceAccounts: ServiceAccountReferenceMap = {
         ...state.items,
         [serviceAccountInfo.service_account_id]: {
+            key: serviceAccountInfo.service_account_id,
             label: serviceAccountInfo.name,
             name: serviceAccountInfo.name,
         },

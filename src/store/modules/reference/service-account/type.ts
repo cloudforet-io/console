@@ -1,7 +1,9 @@
-import type { ReferenceItem, ReferenceMap, ReferenceState } from '@/store/modules/reference/type';
+import type { ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
 
-export type ServiceAccountReferenceItem = Required<Pick<ReferenceItem<undefined>, 'label'|'name'>>;
+export type ServiceAccountReferenceItem = Required<Pick<ReferenceItem<undefined>, 'key'|'label'|'name'>>;
 
 export type ServiceAccountReferenceMap = ReferenceMap<ServiceAccountReferenceItem>;
 
-export type ServiceAccountReferenceState = ReferenceState<ServiceAccountReferenceMap>;
+export interface ServiceAccountReferenceState {
+    items?: ServiceAccountReferenceMap;
+}
