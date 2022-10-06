@@ -5,12 +5,14 @@
                 {{ $t('COMMON.TAGS.TITLE') }}
             </template>
             <template #extra>
-                <p-button style-type="primary-dark"
-                          :disabled="disabled"
-                          @click="editTag"
-                >
-                    {{ $t('COMMON.TAGS.EDIT') }}
-                </p-button>
+                <slot name="extra">
+                    <p-button style-type="primary-dark"
+                              :disabled="disabled"
+                              @click="editTag"
+                    >
+                        {{ $t('COMMON.TAGS.EDIT') }}
+                    </p-button>
+                </slot>
             </template>
         </p-panel-top>
         <slot name="table-top" />
@@ -21,7 +23,7 @@
                       beautify-text
         />
         <transition name="slide-up">
-            <tags-overlay v-if="tagEditPageVisible"
+            <tags-overlay v-if="proxyTagEditPageVisible"
                           :tags="tags"
                           :resource-id="resourceId"
                           :resource-key="resourceKey" :resource-type="resourceType"
@@ -35,10 +37,10 @@
 <script lang="ts">
 
 
+import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs, watch, getCurrentInstance,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PDataTable, PPanelTop, PButton,
@@ -47,7 +49,10 @@ import { get, camelCase } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { i18n } from '@/translations';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 
 export default {
@@ -78,9 +83,12 @@ export default {
             type: Boolean,
             default: false,
         },
+        tagEditPageVisible: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+    setup(props, { emit }: SetupContext) {
         const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
@@ -88,13 +96,13 @@ export default {
             loading: true,
             tags: {},
             fields: computed(() => [
-                { name: 'key', label: vm.$t('COMMON.TAGS.KEY'), type: 'item' },
-                { name: 'value', label: vm.$t('COMMON.TAGS.VALUE'), type: 'item' },
+                { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
+                { name: 'value', label: i18n.t('COMMON.TAGS.VALUE'), type: 'item' },
             ]),
             items: computed(() => Object.keys(state.tags).map(k => ({ key: k, value: state.tags[k] }))),
         });
         const tagState = reactive({
-            tagEditPageVisible: false,
+            proxyTagEditPageVisible: useProxyValue('tagEditPageVisible', props, emit),
         });
 
         /* api */
@@ -121,14 +129,14 @@ export default {
 
         /* event */
         const editTag = async () => {
-            tagState.tagEditPageVisible = true;
+            tagState.proxyTagEditPageVisible = true;
         };
         const closeTag = async () => {
-            tagState.tagEditPageVisible = false;
+            tagState.proxyTagEditPageVisible = false;
         };
         const updateTag = async () => {
             await getTags();
-            tagState.tagEditPageVisible = false;
+            tagState.proxyTagEditPageVisible = false;
         };
 
         watch([() => props.resourceKey, () => props.resourceId, () => props.resourceType],

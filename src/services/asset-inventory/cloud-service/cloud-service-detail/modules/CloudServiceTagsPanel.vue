@@ -3,7 +3,20 @@
                 :disabled="disabled"
                 resource-type="inventory.CloudService"
                 resource-key="cloud_service_id"
+                :tag-edit-page-visible.sync="tagEditPageVisible"
     >
+        <template #extra>
+            <div class="edit-button-container">
+                <!--song-lang-->
+                <p-button :outline="true"
+                          icon="ic_edit"
+                          style-type="primary1"
+                          @click="handleTagEditPageVisible"
+                >
+                    {{ $t('Edit Custom Tags') }}
+                </p-button>
+            </div>
+        </template>
         <template #table-top>
             <div class="tag-type-filter">
                 <!--song-lang-->
@@ -24,7 +37,7 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import { PSelectStatus } from '@spaceone/design-system';
+import { PButton, PSelectStatus } from '@spaceone/design-system';
 
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
@@ -37,6 +50,7 @@ export default {
     name: 'CloudServiceTagsPanel',
     components: {
         PSelectStatus,
+        PButton,
         TagsPanel,
     },
     props: {
@@ -58,19 +72,25 @@ export default {
                 { name: CLOUD_SERVICE_TAG_TYPE.MANAGED, label: CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[CLOUD_SERVICE_TAG_TYPE.MANAGED].label },
             ]),
             selectedTagType: 'all',
+            tagEditPageVisible: false,
         });
         /* event handler */
         const handleSelectTagType = (tagType) => { state.selectedTagType = tagType; };
-
+        const handleTagEditPageVisible = () => { state.tagEditPageVisible = true; };
         return {
             ...toRefs(state),
             handleSelectTagType,
+            handleTagEditPageVisible,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
+.edit-button-container {
+    display: flex;
+    justify-content: flex-end;
+}
 .tag-type-filter {
     @apply flex gap-4 items-center;
     padding: 1rem;
