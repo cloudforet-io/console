@@ -16,7 +16,7 @@ export const load: Action<UserReferenceState, any> = async (
     const currentTime = new Date().getTime();
 
     if (
-        ((options?.lazyLoad && Object.keys(state.items).length > 0)
+        ((options?.lazyLoad && state.items)
         || (lastLoadedTime !== 0 && currentTime - lastLoadedTime < REFERENCE_LOAD_TTL)
         ) && !options?.force
     ) return;
@@ -32,6 +32,7 @@ export const load: Action<UserReferenceState, any> = async (
 
         response.results.forEach((userInfo: any): void => {
             users[userInfo.user_id] = {
+                key: userInfo.user_id,
                 label: userInfo.name ? `${userInfo.user_id} (${userInfo.name})` : userInfo.user_id,
                 name: userInfo.name,
             };
@@ -47,6 +48,7 @@ export const sync: Action<UserReferenceState, any> = ({ state, commit }, userInf
     const users: UserReferenceMap = {
         ...state.items,
         [userInfo.user_id]: {
+            key: userInfo.user_id,
             label: userInfo.name ? `${userInfo.user_id} (${userInfo.name})` : userInfo.user_id,
             name: userInfo.name,
         },
