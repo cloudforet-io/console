@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import type { DynamicFieldProps } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type';
 
 import { SpaceRouter } from '@/router';
