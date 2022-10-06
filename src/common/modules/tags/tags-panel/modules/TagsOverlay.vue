@@ -9,7 +9,7 @@
                                    @click="$emit('close')"
                     />
                     <div class="title">
-                        {{ $t('COMMON.TAGS.TITLE') }}
+                        {{ title ?? $t('COMMON.TAGS.TITLE') }}
                     </div>
                 </div>
                 <div class="right" />
@@ -46,10 +46,11 @@
 <script lang="ts">
 
 
-import type { SetupContext } from 'vue';
+import type { SetupContext, PropType } from 'vue';
 import {
     reactive, toRefs, computed, onMounted,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PIconButton, PPaneLayout, PButton,
@@ -78,6 +79,10 @@ export default {
         PPaneLayout,
     },
     props: {
+        title: {
+            type: String as PropType<TranslateResult|string|undefined>,
+            default: undefined,
+        },
         tags: {
             type: Object,
             default: () => ({}),
