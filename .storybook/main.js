@@ -58,8 +58,18 @@ module.exports = {
       include: path.resolve(__dirname, '../'),
     });
 
+    /* for 'Can't import the named export from non EcmaScript module' issue while using '@vueuse/components' */
+    /* https://github.com/vuejs/pinia/issues/675 */
+    config.module.rules.push({
+      test: /\.mjs$/,
+      include: /node_modules/,
+      type: 'javascript/auto',
+    });
+
     config.plugins.push(new forkTsCheckerWebpackPlugin());
 
     return config;
   },
+
+
 }

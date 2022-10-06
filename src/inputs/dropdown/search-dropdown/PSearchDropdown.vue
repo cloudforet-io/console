@@ -1,5 +1,5 @@
 <template>
-    <div class="p-search-dropdown" :class="[ {'multi-selectable' : multiSelectable} ]">
+    <div v-click-outside="forceHideMenu" class="p-search-dropdown" :class="[ {'multi-selectable' : multiSelectable} ]">
         <p-search ref="targetRef"
                   v-model="proxyValue"
                   :placeholder="placeholderValue ? placeholderValue : $t('COMPONENT.SEARCH_DROPDOWN.PLACEHOLDER')"
@@ -83,10 +83,11 @@
 import {
     computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
+import type { DirectiveFunction } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
+import { vOnClickOutside } from '@vueuse/components';
 import { reduce } from 'lodash';
-
 
 import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
@@ -107,6 +108,9 @@ export default defineComponent<SearchDropdownProps>({
         PContextMenu,
         PI,
         PTag,
+    },
+    directives: {
+        clickOutside: vOnClickOutside as DirectiveFunction,
     },
     model: {
         prop: 'value',
@@ -190,7 +194,7 @@ export default defineComponent<SearchDropdownProps>({
             default: false,
         },
     },
-    setup(props: SearchDropdownProps, { emit, slots, listeners }) {
+    setup(props, { emit, slots, listeners }) {
         const vm = getCurrentInstance()?.proxy as Vue;
 
         const {
@@ -461,14 +465,11 @@ export default defineComponent<SearchDropdownProps>({
         const forceHideMenu = () => {
             hideMenu();
         };
+
         onMounted(() => {
-            window.addEventListener('click', forceHideMenu);
-            window.addEventListener('blur', forceHideMenu);
             window.addEventListener('keydown', onWindowKeydown, false);
         });
         onUnmounted(() => {
-            window.removeEventListener('click', forceHideMenu);
-            window.removeEventListener('blur', forceHideMenu);
             window.removeEventListener('keydown', onWindowKeydown, false);
         });
 
@@ -511,6 +512,7 @@ export default defineComponent<SearchDropdownProps>({
             handleClickDropdownButton,
             handleClick,
             searchListeners,
+            forceHideMenu,
         };
     },
 });
