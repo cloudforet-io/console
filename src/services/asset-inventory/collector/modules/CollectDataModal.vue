@@ -51,10 +51,9 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, computed, watch, getCurrentInstance,
+    toRefs, reactive, computed, watch,
 } from 'vue';
 import type { SetupContext } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButtonModal, PLazyImg, PDefinition,
@@ -163,8 +162,6 @@ export default {
         },
     },
     setup(props: Props, context: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             loading: false,
             proxyVisible: useProxyValue('visible', props, context.emit),
@@ -205,7 +202,7 @@ export default {
             state.loading = true;
             try {
                 await collectorApi(getCollectParams());
-                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_COLLECT_START_TITLE'), '', vm.$root);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_COLLECT_START_TITLE'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_COLLECT_TITLE'));
             } finally {

@@ -53,9 +53,8 @@
 <script lang="ts">
 
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { PButtonModal, PSelectCard } from '@spaceone/design-system';
 
@@ -79,8 +78,6 @@ export default {
     props: {
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             visible: false,
             isSessionExpired: computed(() => store.state.user.isSessionExpired),
@@ -153,7 +150,7 @@ export default {
                         answer2: state.selectedAnswer2,
                     },
                 });
-                showSuccessMessage('소중한 의견 감사합니다.', '', vm);
+                showSuccessMessage('소중한 의견 감사합니다.', '');
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

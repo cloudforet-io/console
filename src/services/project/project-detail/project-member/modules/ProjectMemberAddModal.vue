@@ -107,10 +107,9 @@
 <script lang="ts">
 import type { SetupContext } from 'vue';
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance,
+    reactive, toRefs, computed, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButtonModal, PFieldGroup, PBoxTab, PSearchDropdown, PTooltip, PI, PTextInput,
@@ -176,8 +175,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             loading: false,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -338,7 +335,7 @@ export default {
                     params.project_id = props.projectId;
                     await SpaceConnector.client.identity.project.member.add(params);
                 }
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.MEMBER.ALT_E_ADD_MEMBER'));
             }

@@ -57,10 +57,8 @@
 
 import type { SetupContext } from 'vue';
 import {
-    getCurrentInstance,
     reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PDivider, PIconButton, PPaneLayout, PToggleButton,
@@ -131,8 +129,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             isActivated: props.channelData?.state === STATE_TYPE.ENABLED,
             userChannelId: props.channelData?.user_channel_id,
@@ -150,7 +146,7 @@ export default {
                     project_channel_id: state.projectChannelId,
                 });
                 state.isActivated = true;
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_PROJECT_CHANNEL'), '', vm);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_PROJECT_CHANNEL'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_PROJECT_CHANNEL'));
             }
@@ -162,7 +158,7 @@ export default {
                     user_channel_id: state.userChannelId,
                 });
                 state.isActivated = true;
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_USER_CHANNEL'), '', vm);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_USER_CHANNEL'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_USER_CHANNEL'));
             }
@@ -179,7 +175,7 @@ export default {
                     project_channel_id: state.projectChannelId,
                 });
                 state.isActivated = false;
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_PROJECT_CHANNEL'), '', vm);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_PROJECT_CHANNEL'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_PROJECT_CHANNEL'));
             }
@@ -191,7 +187,7 @@ export default {
                     user_channel_id: state.userChannelId,
                 });
                 state.isActivated = false;
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '', vm);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'));
             }
@@ -221,7 +217,7 @@ export default {
                 await SpaceConnector.client.notification.projectChannel.delete({
                     project_channel_id: state.projectChannelId,
                 });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_PROJECT_CHANNEL'), '', vm);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_PROJECT_CHANNEL'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_PROJECT_CHANNEL'));
             } finally {
@@ -235,7 +231,7 @@ export default {
                 await SpaceConnector.client.notification.userChannel.delete({
                     user_channel_id: state.userChannelId,
                 });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '', vm);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'));
             } finally {

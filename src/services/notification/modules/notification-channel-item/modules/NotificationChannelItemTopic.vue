@@ -47,8 +47,7 @@
 <script lang="ts">
 
 import type { SetupContext } from 'vue';
-import { getCurrentInstance, reactive, toRefs } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { reactive, toRefs } from 'vue';
 
 import {
     PBadge, PButton, PI,
@@ -94,8 +93,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             topicModeForEdit: undefined,
             topicForEdit: props.channelData?.subscriptions,
@@ -122,7 +119,7 @@ export default {
                     is_subscribe: state.topicModeForEdit,
                     subscriptions: state.topicForEdit,
                 });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', vm);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '');
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {
@@ -136,7 +133,7 @@ export default {
                     is_subscribe: state.topicModeForEdit,
                     subscriptions: state.topicForEdit,
                 });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', vm);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '');
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {

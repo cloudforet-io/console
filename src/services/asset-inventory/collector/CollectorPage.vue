@@ -446,17 +446,17 @@ export default {
                     await SpaceConnector.client.inventory.collector.enable({
                         collectors: state.selectedItems.map(d => d.collector_id),
                     });
-                    showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_ENABLE_TITLE', state.selectedItems.length), '', vm.$root);
+                    showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_ENABLE_TITLE', state.selectedItems.length), '');
                 } else if (checkModalState.mode === 'disable') {
                     await SpaceConnector.client.inventory.collector.disable({
                         collectors: state.selectedItems.map(d => d.collector_id),
                     });
-                    showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DISABLE_TITLE', state.selectedItems.length), '', vm.$root);
+                    showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DISABLE_TITLE', state.selectedItems.length), '');
                 } else if (checkModalState.mode === 'delete') {
                     await SpaceConnector.client.inventory.collector.delete({
                         collectors: state.selectedItems.map(d => d.collector_id),
                     });
-                    showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_TITLE', state.selectedItems.length), '', vm.$root);
+                    showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_TITLE', state.selectedItems.length), '');
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);

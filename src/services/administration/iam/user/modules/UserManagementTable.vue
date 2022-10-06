@@ -113,6 +113,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -387,7 +388,7 @@ export default {
                 if (roleId.length > 0 || roleId !== '') {
                     await bindRole(item.user_id, roleId);
                 }
-                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '', vm.$root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
             } finally {
@@ -407,7 +408,7 @@ export default {
                     await unbindRole(item.user_id, roleId);
                     userFormState.roleOfSelectedUser = roleId;
                 }
-                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', vm.$root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
             } finally {

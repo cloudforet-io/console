@@ -67,11 +67,9 @@
 <script lang="ts">
 
 import {
-    computed, getCurrentInstance,
-    reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButton, PIconButton, PPageTitle, PSelectDropdown,
@@ -126,8 +124,6 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
             costQueryList: computed<CostQuerySetModel[]>(() => costExplorerStore.state.costAnalysis.costQueryList),
@@ -243,7 +239,7 @@ export default {
                     },
                 });
                 await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', vm);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
             }
@@ -254,7 +250,7 @@ export default {
             try {
                 await SpaceConnector.client.costAnalysis.costQuerySet.delete({ cost_query_set_id: state.itemIdForDeleteQuery });
                 await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', vm);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '');
                 if (state.selectedQueryId === state.itemIdForDeleteQuery) {
                     await SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });
                     setQueryOptions();

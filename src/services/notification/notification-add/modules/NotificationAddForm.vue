@@ -60,6 +60,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
+import { i18n } from '@/translations';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -105,7 +107,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props, context) {
+    setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             type: '',
@@ -140,9 +142,9 @@ export default {
                     is_scheduled: state.isScheduled,
                     user_id: props.userId,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '', context.root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'));
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'));
             }
         };
 
@@ -161,9 +163,9 @@ export default {
                     notification_level: state.notificationLevel,
                     project_id: props.projectId,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_PROJECT_CHANNEL'), '', context.root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_PROJECT_CHANNEL'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_PROJECT_CHANNEL'));
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_PROJECT_CHANNEL'));
             }
         };
 

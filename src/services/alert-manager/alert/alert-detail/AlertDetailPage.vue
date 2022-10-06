@@ -148,7 +148,7 @@ export default {
                 await SpaceConnector.client.monitoring.alert.delete({
                     alerts: [props.id],
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '', vm);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '');
                 await vm.$router.push({ name: ALERT_MANAGER_ROUTE.ALERT._NAME });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'));

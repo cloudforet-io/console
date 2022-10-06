@@ -27,10 +27,8 @@
 
 import type { SetupContext } from 'vue';
 import {
-    getCurrentInstance,
     reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 
@@ -69,8 +67,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             inputModel: {} as EscalationPolicyFormModel,
@@ -81,7 +77,7 @@ export default {
         const createEscalationPolicy = async () => {
             try {
                 await SpaceConnector.client.monitoring.escalationPolicy.create(state.inputModel);
-                showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_CREATE_POLICY'), '', vm);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_CREATE_POLICY'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_CREATE_POLICY'));
             } finally {
@@ -97,7 +93,7 @@ export default {
                     repeat_count: state.inputModel.repeat_count,
                     finish_condition: state.inputModel.finish_condition,
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_UPDATE_POLICY'), '', vm);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_UPDATE_POLICY'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_UPDATE_POLICY'));
             } finally {

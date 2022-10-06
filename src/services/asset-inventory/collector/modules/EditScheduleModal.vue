@@ -87,10 +87,9 @@
 
 
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance,
+    reactive, toRefs, computed, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButtonModal, PSearchDropdown, PFieldGroup, PRadio, PButton, PTextInput, PI, PSelectDropdown,
@@ -163,8 +162,6 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const formState = reactive({
             name: '',
             timezone: ([{
@@ -312,7 +309,7 @@ export default {
                 await SpaceConnector.client.inventory.collector.schedule.add(params);
 
                 emit('success');
-                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_ADD_SCHEDULE_TITLE'), '', vm.$root);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_ADD_SCHEDULE_TITLE'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_ADD_SCHEDULE_TITLE'));
             }
@@ -334,7 +331,7 @@ export default {
                 await SpaceConnector.client.inventory.collector.schedule.update(params);
 
                 emit('success');
-                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', vm.$root);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'));
             }

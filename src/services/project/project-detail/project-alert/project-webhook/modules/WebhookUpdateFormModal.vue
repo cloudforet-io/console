@@ -29,9 +29,8 @@
 
 import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButtonModal, PFieldGroup, PTextInput,
@@ -64,8 +63,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             loading: false,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -106,7 +103,7 @@ export default {
 
             try {
                 await updateWebhook();
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_WEBHOOK'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_WEBHOOK'), '');
                 state.proxyVisible = false;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_WEBHOOK'));

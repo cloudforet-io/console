@@ -29,10 +29,9 @@
 
 
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
 import VueI18n from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
@@ -63,8 +62,6 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             proxyVisible: computed({
                 get() { return store.state.service.project.projectGroupFormVisible; },
@@ -120,7 +117,7 @@ export default {
                 await store.dispatch('service/project/createProjectGroup', item);
                 await store.dispatch('reference/projectGroup/load');
                 await store.commit('service/project/setShouldUpdateProjectList', true);
-                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
             }
@@ -129,7 +126,7 @@ export default {
         const updateProjectGroup = async (item) => {
             try {
                 await store.dispatch('service/project/updateProjectGroup', item);
-                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
             }

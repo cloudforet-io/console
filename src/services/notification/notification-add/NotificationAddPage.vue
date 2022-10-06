@@ -20,9 +20,12 @@ import {
     PPageTitle,
 } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
 import NotificationAddForm from '@/services/notification/notification-add/modules/NotificationAddForm.vue';
 
 import TranslateResult = VueI18n.TranslateResult;
+
 
 export default {
     name: 'NotificationAddPage',
@@ -45,12 +48,12 @@ export default {
 
         (async () => {
             const protocolLabel = decodeURIComponent(vm.$route.query?.protocolLabel as any);
-            state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: protocolLabel })) as unknown as TranslateResult;
+            state.pageTitle = computed(() => i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: protocolLabel })) as unknown as TranslateResult;
         })();
 
         onActivated(() => {
             const protocolLabel = decodeURIComponent(vm.$route.query?.protocolLabel as any);
-            state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: protocolLabel })) as unknown as TranslateResult;
+            state.pageTitle = computed(() => i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: protocolLabel })) as unknown as TranslateResult;
         });
 
         return {

@@ -1,5 +1,4 @@
-import { getCurrentInstance, reactive } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { reactive } from 'vue';
 
 import { cloneDeep } from 'lodash';
 
@@ -30,7 +29,6 @@ interface ParamType {
 }
 
 export const useAlertInfoItem = (obj: AlertDetailItemState) => {
-    const vm = getCurrentInstance()?.proxy as Vue;
     const state = reactive<AlertDetailItemState>(obj);
     const cancelEdit = (initialData) => {
         state.isEditMode = false;
@@ -73,7 +71,7 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
                 updateParams: getParams(editMode),
                 alertId: state.alertId,
             });
-            showSuccessMessage(getMessage(editMode, true), '', vm.$root);
+            showSuccessMessage(getMessage(editMode, true), '');
             state.isEditMode = false;
         } catch (e) {
             ErrorHandler.handleRequestError(e, getMessage(editMode, false));

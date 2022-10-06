@@ -22,9 +22,8 @@
 
 import type { SetupContext } from 'vue';
 import {
-    getCurrentInstance, reactive, toRefs, watch,
+    reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { PButtonModal, PCheckBox } from '@spaceone/design-system';
 
@@ -59,8 +58,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             isAssignedToMe: true,
@@ -84,7 +81,7 @@ export default {
             try {
                 await updateToAcknowledge();
                 emit('confirm');
-                showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_STATE_CHANGED'), '', vm);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_STATE_CHANGED'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_STATE_CHANGED'));
             } finally {

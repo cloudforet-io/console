@@ -48,9 +48,8 @@
 <script lang="ts">
 import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PRadio, PSelectButton, PSelectDropdown,
@@ -59,6 +58,7 @@ import { range } from 'lodash';
 
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -92,7 +92,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         const timezoneForFormatter = computed(() => store.state.user.timezone).value;
         const {
             forms: {
@@ -117,9 +116,9 @@ export default {
         });
         const state = reactive({
             scheduleMode: computed(() => [{
-                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME'), value: false,
+                label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME'), value: false,
             }, {
-                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.CUSTOM'), value: true,
+                label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.CUSTOM'), value: true,
             }]),
             proxyIsScheduled: props.isScheduled ? props.isScheduled : false,
             weekDay: [{ label: 'Monday', value: 'MON' }, { label: 'Tuesday', value: 'TUE' }, { label: 'Wednesday', value: 'WED' },

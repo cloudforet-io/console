@@ -64,6 +64,8 @@ import { get, some } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
+import { i18n } from '@/translations';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
@@ -220,7 +222,7 @@ export default {
 
             try {
                 await SpaceConnector.client.inventory.collector.create(params);
-                showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_S_CREATE_TITLE'), '', vm.$root);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.CREATE.ALT_S_CREATE_TITLE'), '');
                 await vm.$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_CREATE_TITLE'));

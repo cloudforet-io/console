@@ -110,9 +110,8 @@
 <script lang="ts">
 
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PPageTitle, PBreadcrumbs, PCard, PI, PButton,
@@ -161,8 +160,6 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             loading: true,
             project: {},
@@ -237,10 +234,10 @@ export default {
                     event_rule_id: data.event_rule_id,
                     order: tempOrder - 1,
                 });
-                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_REORDER_EVENT_RULES'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_REORDER_EVENT_RULES'), '');
             } catch (e) {
                 changeOrder(tempCardData[data.order], tempCardData[data.order - 1], tempOrder);
-                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_REORDER_EVENT_RULES'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_REORDER_EVENT_RULES'), '');
             } finally {
                 state.cardData = tempCardData;
             }
@@ -255,10 +252,10 @@ export default {
                     order: tempOrder + 1,
                 });
                 state.cardData = tempCardData;
-                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_REORDER_EVENT_RULES'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_REORDER_EVENT_RULES'), '');
             } catch (e) {
                 changeOrder(tempCardData[data.order - 2], tempCardData[data.order - 1], tempOrder);
-                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_REORDER_EVENT_RULES'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_REORDER_EVENT_RULES'), '');
             } finally {
                 state.cardData = tempCardData;
             }
@@ -268,7 +265,7 @@ export default {
                 await SpaceConnector.client.monitoring.eventRule.delete({
                     event_rule_id: state.orderedCardData[state.selectedOrder - 1].event_rule_id,
                 });
-                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_DELETE_EVENT_RULE'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_DELETE_EVENT_RULE'), '');
                 await listEventRule();
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.EVENT_RULE.ALT_E_DELETE_EVENT_RULE'));

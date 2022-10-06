@@ -59,9 +59,8 @@
 
 <script lang="ts">
 
-import { getCurrentInstance, reactive, toRefs } from 'vue';
+import { reactive, toRefs } from 'vue';
 import type { PropType, SetupContext } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButtonModal, PFieldGroup, PSearchDropdown, PTextInput,
@@ -122,8 +121,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             loading: false,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -196,11 +193,11 @@ export default {
                 if (props.isProjectGroup) {
                     params.project_group_id = props.projectGroupId;
                     await SpaceConnector.client.identity.projectGroup.member.add(params);
-                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '', vm);
+                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '');
                 } else {
                     params.project_id = props.projectId;
                     await SpaceConnector.client.identity.project.member.add(params);
-                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '', vm);
+                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '');
                 }
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'));
@@ -215,11 +212,11 @@ export default {
                 if (props.isProjectGroup) {
                     params.project_group_id = props.projectGroupId;
                     await SpaceConnector.client.identity.projectGroup.member.modify(params);
-                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '', vm);
+                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '');
                 } else {
                     params.project_id = props.projectId;
                     await SpaceConnector.client.identity.project.member.modify(params);
-                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '', vm);
+                    showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '');
                 }
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'));

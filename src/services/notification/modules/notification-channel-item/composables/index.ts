@@ -55,7 +55,7 @@ export const useNotificationItem = (obj: NotificationItemState) => {
             if (paramKey === PARAM_KEY_TYPE.NAME) param.name = paramValue;
             else if (paramKey === PARAM_KEY_TYPE.DATA) param.data = paramValue;
             await SpaceConnector.client.notification.userChannel.update(param);
-            showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', vm.$root);
+            showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '');
             state.isEditMode = false;
             vm.$emit('edit', undefined);
         } catch (e) {
@@ -74,7 +74,7 @@ export const useNotificationItem = (obj: NotificationItemState) => {
             // eslint-disable-next-line camelcase
             else if (paramKey === PARAM_KEY_TYPE.LEVEL) param.notification_level = paramValue;
             await SpaceConnector.client.notification.projectChannel.update(param);
-            showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '', vm.$root);
+            showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '');
             state.isEditMode = false;
             vm.$emit('edit', undefined);
         } catch (e) {
