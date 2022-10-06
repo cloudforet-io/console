@@ -1,3 +1,10 @@
+# [1.1.0-beta.412](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.411...v1.1.0-beta.412) (2022-10-06)
+
+
+### Bug Fixes
+
+* **p-search-dropdown:** fix dropbox overlap issue ([#72](https://github.com/cloudforet-io/mirinae/issues/72)) ([7ce75f4](https://github.com/cloudforet-io/mirinae/commit/7ce75f43b066658c272e2570b5fe21850670c782))
+
 # [1.1.0-beta.411](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.410...v1.1.0-beta.411) (2022-10-04)
 
 
