@@ -6,6 +6,7 @@ import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 
 export const projectItems: Getter<any, any> = (state): ProjectReferenceMap => state.project?.items ?? {};
@@ -19,3 +20,5 @@ export const cloudServiceTypeItems: Getter<any, any> = (state): CloudServiceType
 export const collectorItems: Getter<any, any> = (state): CollectorReferenceMap => state.collector?.items ?? {};
 
 export const pluginItems: Getter<any, any> = (state): PluginReferenceMap => state.plugin?.items ?? {};
+
+export const providerItems: Getter<any, any> = (state): ProviderReferenceMap => state.provider?.items ?? {};
