@@ -56,9 +56,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
-
 import {
     reactive, toRefs, computed, watch,
 } from 'vue';
@@ -73,9 +70,11 @@ import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/q
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import type { TimeStamp } from '@/models';
 import { store } from '@/store';
+
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -162,8 +161,8 @@ export default {
             collectDataVisible: false,
             targetCredentialId: null as string | null,
             queryTags: [],
-            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
-            projects: computed(() => store.getters['reference/projectItems']),
+            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
         });
 
         const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);

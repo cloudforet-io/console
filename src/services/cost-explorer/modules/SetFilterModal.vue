@@ -121,7 +121,7 @@ export default {
                 const resourceItemsMap = {
                     project_id: store.getters['reference/projectItems'],
                     project_group_id: store.getters['reference/projectGroupItems'],
-                    service_account_id: store.state.reference.serviceAccount.items,
+                    service_account_id: store.getters['reference/serviceAccountItems'],
                     provider: store.getters['reference/providerItems'],
                     region_code: store.getters['reference/regionItems'],
                 };

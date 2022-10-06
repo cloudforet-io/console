@@ -57,6 +57,7 @@ import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
@@ -91,7 +92,7 @@ export default {
                 name: selectedName,
                 label: state.menuItems.find(d => d.name === selectedName)?.label || selectedName,
             }))),
-            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             menuItems: computed(() => {

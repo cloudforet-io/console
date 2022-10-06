@@ -38,6 +38,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
+import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -75,7 +77,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }) {
         const storeState = reactive({
-            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
         });
         const state = reactive({
             attachedTrustedAccount: computed(() => {

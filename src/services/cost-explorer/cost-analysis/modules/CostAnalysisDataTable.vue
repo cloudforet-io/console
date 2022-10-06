@@ -52,8 +52,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -83,6 +81,7 @@ import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
@@ -136,7 +135,7 @@ export default {
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-            serviceAccounts: computed(() => store.state.reference.serviceAccount.items),
+            serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             //
             granularity: computed(() => costExplorerStore.state.costAnalysis.granularity),
             stack: computed(() => costExplorerStore.state.costAnalysis.stack),
