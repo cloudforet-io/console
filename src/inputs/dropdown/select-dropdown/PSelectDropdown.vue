@@ -70,10 +70,11 @@ import {
     reactive,
     toRefs,
 } from 'vue';
+import type { DirectiveFunction } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
+import { vOnClickOutside } from '@vueuse/components';
 import { groupBy, reduce } from 'lodash';
-import vClickOutside from 'v-click-outside';
 
 
 import PI from '@/foundation/icons/PI.vue';
@@ -92,7 +93,7 @@ import { makeOptionalProxy } from '@/util/composition-helpers';
 export default defineComponent<SelectDropdownProps>({
     name: 'PSelectDropdown',
     directives: {
-        clickOutside: vClickOutside.directive,
+        clickOutside: vOnClickOutside as DirectiveFunction,
     },
     components: {
         PI,
@@ -162,7 +163,7 @@ export default defineComponent<SelectDropdownProps>({
             default: false,
         },
     },
-    setup(props: SelectDropdownProps, { emit, slots }) {
+    setup(props, { emit, slots }) {
         const vm = getCurrentInstance()?.proxy as Vue;
 
         const {
