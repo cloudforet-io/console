@@ -4,6 +4,7 @@
         <div class="content-wrapper">
             <p-data-table :fields="fields" :items="items"
                           sortable
+                          :loading="loading"
                           :sort-by="sortBy"
                           :sort-desc="sortDesc"
                           @changeSort="handleChange"
@@ -64,6 +65,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const state = reactive({
+            loading: true,
             items: [] as any,
             sortBy: 'name',
             sortDesc: true,
@@ -75,6 +77,7 @@ export default defineComponent({
 
         const apiQueryHelper = new ApiQueryHelper();
         const getAttachedGeneralAccountList = async () => {
+            state.loading = true;
             try {
                 const { results } = await SpaceConnector.client.identity.serviceAccount.list({
                     trusted_service_account_id: props.serviceAccountId,
@@ -85,6 +88,8 @@ export default defineComponent({
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.items = [];
+            } finally {
+                state.loading = false;
             }
         };
 
