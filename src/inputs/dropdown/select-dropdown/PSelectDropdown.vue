@@ -66,18 +66,18 @@
 import {
     computed,
     defineComponent,
-    getCurrentInstance,
     reactive,
     toRefs,
+    nextTick,
 } from 'vue';
-import type { DirectiveFunction } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import type { DirectiveFunction, SetupContext } from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components';
 import { groupBy, reduce } from 'lodash';
 
 
 import PI from '@/foundation/icons/PI.vue';
+import { useProxyValue } from '@/hooks';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
@@ -87,7 +87,6 @@ import {
     SELECT_DROPDOWN_STYLE_TYPE,
     CONTEXT_MENU_POSITION,
 } from '@/inputs/dropdown/select-dropdown/type';
-import { makeOptionalProxy } from '@/util/composition-helpers';
 
 
 export default defineComponent<SelectDropdownProps>({
@@ -163,9 +162,7 @@ export default defineComponent<SelectDropdownProps>({
             default: false,
         },
     },
-    setup(props, { emit, slots }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
+    setup(props, { emit, slots }: SetupContext) {
         const {
             proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
         } = useContextMenuFixedStyle({
@@ -178,7 +175,7 @@ export default defineComponent<SelectDropdownProps>({
 
         const state = reactive({
             contextMenuRef: null as null|any,
-            proxySelected: makeOptionalProxy('selected', vm, props.selected),
+            proxySelected: useProxyValue('selected', props, emit),
             selectedItem: computed<MenuItem|null>(() => {
                 if (!Array.isArray(props.items)) return null;
 
@@ -223,7 +220,7 @@ export default defineComponent<SelectDropdownProps>({
         };
         const handlePressDownKey = () => {
             if (!contextMenuFixedStyleState.proxyVisibleMenu) contextMenuFixedStyleState.proxyVisibleMenu = true;
-            vm.$nextTick(() => {
+            nextTick(() => {
                 if (state.contextMenuRef) {
                     if (slots['menu-menu']) emit('focus-menu');
                     else state.contextMenuRef.focus();

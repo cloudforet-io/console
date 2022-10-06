@@ -81,10 +81,9 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch, nextTick,
 } from 'vue';
-import type { DirectiveFunction } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import type { DirectiveFunction, SetupContext } from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components';
 import { reduce } from 'lodash';
@@ -194,9 +193,7 @@ export default defineComponent<SearchDropdownProps>({
             default: false,
         },
     },
-    setup(props, { emit, slots, listeners }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
+    setup(props, { emit, slots, listeners }: SetupContext) {
         const {
             proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
         } = useContextMenuFixedStyle({
@@ -415,7 +412,7 @@ export default defineComponent<SearchDropdownProps>({
                 emit('search', trimmed);
             }
 
-            vm.$nextTick(() => {
+            nextTick(() => {
                 allFocusOut();
             });
         };
