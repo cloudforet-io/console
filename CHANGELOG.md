@@ -1,3 +1,10 @@
+# [1.1.0-beta.413](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.412...v1.1.0-beta.413) (2022-10-06)
+
+
+### Bug Fixes
+
+* **p-select-dropdown:** apply vOnClickOutside ([#73](https://github.com/cloudforet-io/mirinae/issues/73)) ([84829c7](https://github.com/cloudforet-io/mirinae/commit/84829c70f239ee8ad325d4b3341972a412b261f9))
+
 # [1.1.0-beta.412](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.411...v1.1.0-beta.412) (2022-10-06)
 
 
