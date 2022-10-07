@@ -55,6 +55,7 @@ It uses the [Definition component](?path=/docs/data-display-tables-definition-ta
 <p-definition-table
     :fields="fields"
     :data="data"
+    :loading="loading"
 />
 `,
     setup() {
@@ -64,12 +65,17 @@ It uses the [Definition component](?path=/docs/data-display-tables-definition-ta
                 { label: 'Name', name: 'name' },
                 { label: 'Provider', name: 'provider' },
             ],
-            data: {
+            data: {},
+            loading: true
+        });
+        setTimeout(() => {
+            state.data = {
                 collector_id: 'collector-6746d641c98b',
-                name: 'collector name',
+                    name: 'collector name',
                 provider: 'aws',
             }
-        });
+            state.loading = false
+        }, 2000)
         return {
             ...toRefs(state),
         }

@@ -1,11 +1,15 @@
 <template>
-    <div class="p-definition-table" :class="styleType">
-        <p-empty v-if="!loading && isNoData" class="no-data">
+    <p-data-loader class="p-definition-table"
+                   :class="styleType"
+                   :loading="loading"
+                   :data="!isNoData"
+    >
+        <template #no-data>
             <slot name="no-data">
                 {{ $t('COMPONENT.DEFINITION_TABLE.NO_DATA') }}
             </slot>
-        </p-empty>
-        <table v-else-if="!isNoData">
+        </template>
+        <table>
             <tbody>
                 <p-definition v-for="(item, idx) in items" :key="`${contextKey}-${idx}`"
                               class="def-row"
@@ -43,15 +47,10 @@
             </tbody>
         </table>
 
-        <div v-if="loading" class="loading-backdrop fade-in" />
-        <div v-if="loading" class="loading">
-            <slot name="loading">
-                <p-lottie name="thin-spinner" :size="2.5"
-                          auto
-                />
-            </slot>
-        </div>
-    </div>
+        <template #loader>
+            <slot name="loading" />
+        </template>
+    </p-data-loader>
 </template>
 
 <script lang="ts">
@@ -64,14 +63,13 @@ import { every, get, range } from 'lodash';
 
 
 import { getValueByPath } from '@/data-display/dynamic/helper';
-import PEmpty from '@/data-display/empty/PEmpty.vue';
 import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
 import type { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
 import type {
     DefinitionTableProps, DefinitionData, DefinitionField,
 } from '@/data-display/tables/definition-table/type';
-import PLottie from '@/foundation/lottie/PLottie.vue';
+import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
 const makeDefItems = (fields: DefinitionField[], data?: DefinitionData|DefinitionData[]): DefinitionProps[] => fields.map(field => ({
     ...field,
@@ -82,7 +80,8 @@ const makeDefItems = (fields: DefinitionField[], data?: DefinitionData|Definitio
 export default defineComponent<DefinitionTableProps>({
     name: 'PDefinitionTable',
     components: {
-        PLottie, PEmpty, PDefinition,
+        PDataLoader,
+        PDefinition,
     },
     props: {
         fields: {
@@ -116,12 +115,8 @@ export default defineComponent<DefinitionTableProps>({
             type: Boolean,
             default: false,
         },
-        copyRawData: {
-            type: Boolean,
-            default: false,
-        },
     },
-    setup(props: DefinitionTableProps) {
+    setup(props) {
         const state = reactive({
             contextKey: Math.floor(Math.random() * Date.now()),
             isNoData: computed(() => every(state.items, def => !def.data)),
@@ -142,11 +137,12 @@ export default defineComponent<DefinitionTableProps>({
 
 <style lang="postcss">
 .p-definition-table {
-    position: relative;
     min-height: 11.25rem;
-    .no-data {
-        min-height: 11.25rem;
+
+    &.p-data-loader > .data-loader-container > .loader-wrapper > .loader {
+        max-height: 10rem;
     }
+
     table {
         @apply w-full;
         table-layout: fixed;
@@ -159,18 +155,6 @@ export default defineComponent<DefinitionTableProps>({
         td:first-child {
             @apply border-r-2;
         }
-    }
-    .loading-backdrop {
-        @apply absolute w-full h-full overflow-hidden;
-        background-color: rgba(theme('colors.white'), 0.5);
-        top: 0;
-        z-index: 1;
-    }
-    .loading {
-        @apply absolute flex w-full h-full justify-center items-center;
-        top: 0;
-        max-height: 10rem;
-        z-index: 2;
     }
 
     /* style types */
@@ -212,21 +196,6 @@ export default defineComponent<DefinitionTableProps>({
                 }
             }
         }
-    }
-
-    /* transitions */
-
-    .fade-in-enter-active {
-        transition: opacity 0.2s;
-    }
-    .fade-in-leave-active {
-        transition: opacity 0.2s;
-    }
-    .fade-in-enter, .fade-in-leave-to {
-        opacity: 0;
-    }
-    .fade-in-leave, .fade-in-enter-to {
-        opacity: 0.5;
     }
 
     /* responsive */

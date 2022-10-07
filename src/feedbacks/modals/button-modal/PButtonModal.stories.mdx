@@ -19,7 +19,7 @@ export const Template = (args, {argTypes} ) => ({
     components: { PButtonModal, PButton, PSelectDropdown },
     template: `<div>
                 <p-button :styleType="themeColor" @click="launchModal">Launch a modal</p-button>
-                <p-button-modal :visible.sync="_visible"
+                <p-button-modal :visible.sync="modalVisible"
                                 :size="size"
                                 :backdrop="backdrop"
                                 :theme-color="themeColor"
@@ -51,7 +51,7 @@ export const Template = (args, {argTypes} ) => ({
     setup(props) {
         const selectItem = ref('init');
         const state = reactive({
-            _visible: props.visible,
+            modalVisible: props.visible,
             contents: computed(() => faker.lorem.lines(props.contentsHeight)),
             menu: [
                 {
@@ -111,10 +111,10 @@ export const Template = (args, {argTypes} ) => ({
             ],
         });
         const launchModal = () => {
-            state._visible = true;
+            state.modalVisible = true;
         };
         const closeModal = () => {
-            state._visible = false;
+            state.modalVisible = false;
         };
         return {
             selectItem,
