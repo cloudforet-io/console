@@ -65,9 +65,8 @@
 <script lang="ts">
 
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButton, PPaneLayout, PSelectDropdown, PI, PBadge,
@@ -135,8 +134,6 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             alertInfo: computed(() => alertManagerStore.state.alert.alertData),
             alertState: computed(() => state.alertInfo?.state),
@@ -166,7 +163,7 @@ export default {
                     },
                     alertId: props.id,
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_STATE'), '', vm);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_STATE'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_URGENCY'));
             }
@@ -180,7 +177,7 @@ export default {
                     },
                     alertId: props.id,
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_URGENCY'), '', vm);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_URGENCY'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_URGENCY'));
             }

@@ -67,6 +67,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { TimeStamp } from '@/models';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
@@ -124,8 +125,8 @@ export default {
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             items: [] as JobModel[],
             fields: computed(() => [
-                { label: vm.$t('COMMON.WIDGETS.COLLECTING_JOBS_TITLE_TIME'), name: 'collector_info' },
-                { label: vm.$t('COMMON.WIDGETS.COLLECTING_JOBS_STATUS'), name: 'progress' },
+                { label: i18n.t('COMMON.WIDGETS.COLLECTING_JOBS_TITLE_TIME'), name: 'collector_info' },
+                { label: i18n.t('COMMON.WIDGETS.COLLECTING_JOBS_STATUS'), name: 'progress' },
             ]),
         });
 

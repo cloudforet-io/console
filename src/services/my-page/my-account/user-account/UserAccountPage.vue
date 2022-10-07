@@ -97,10 +97,9 @@
 <script lang="ts">
 
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PPaneLayout, PButton, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PSearchDropdown,
@@ -140,8 +139,6 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             userId: computed(() => store.state.user.userId),
             userRole: computed(() => {
@@ -214,7 +211,7 @@ export default {
         const updateUser = async (userParam) => {
             try {
                 await store.dispatch('user/setUser', userParam);
-                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', vm);
+                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
             }

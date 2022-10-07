@@ -82,6 +82,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
@@ -138,7 +139,7 @@ export default {
 
         const enrichProtocol = async (protocolResp) => {
             const enrichedProtocolList: EnrichedProtocolItem[] = await Promise.all(protocolResp.map(async d => ({
-                label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
+                label: computed(() => i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
                 link: {
                     name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
                     params: {

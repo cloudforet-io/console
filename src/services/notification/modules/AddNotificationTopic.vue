@@ -30,11 +30,12 @@
 <script lang="ts">
 import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { PRadio, PCheckBox } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
 
 
 const TOPIC_LIST = [
@@ -59,12 +60,11 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             topicModeList: computed(() => [{
-                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL'), value: false,
+                label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL'), value: false,
             }, {
-                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ON_TOPIC'), value: true,
+                label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ON_TOPIC'), value: true,
             }]),
             isTopicModeSelected: props.topicMode ? props.topicMode : false,
             selectedTopic: props.topic.length > 0 ? props.topic : [] as string[],

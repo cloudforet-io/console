@@ -47,9 +47,8 @@
 <script lang="ts">
 import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectCard,
@@ -95,8 +94,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
             proxyVisible: useProxyValue('visible', props, emit),
@@ -154,7 +151,7 @@ export default {
                     },
                     project_id: props.projectId,
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'));
             } finally {

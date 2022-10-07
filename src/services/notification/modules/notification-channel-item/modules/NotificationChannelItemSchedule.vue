@@ -43,9 +43,8 @@
 
 import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButton, PI,
@@ -92,8 +91,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const timezoneForFormatter = computed(() => store.state.user.timezone).value;
         const state = reactive({
             scheduleModeForEdit: props.channelData?.is_scheduled,
@@ -128,7 +125,7 @@ export default {
                     is_scheduled: state.scheduleModeForEdit,
                     schedule: state.scheduleForEdit,
                 });
-                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', vm);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '');
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {
@@ -142,7 +139,7 @@ export default {
                     is_scheduled: state.scheduleModeForEdit,
                     schedule: state.scheduleForEdit,
                 });
-                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', vm);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '');
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {

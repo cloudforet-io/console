@@ -91,9 +91,8 @@
 
 
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance,
+    reactive, toRefs, computed, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PLottie, PPanelTop,
@@ -111,6 +110,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -140,7 +140,6 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             totalCount: 0,
@@ -151,10 +150,10 @@ export default {
             supportedSchedules: computed(() => get(props.collector, 'plugin_info.metadata.supported_schedules')),
             dropdown: computed<MenuItem[]>(() => [
                 {
-                    name: 'update', label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_UPDATE'), disabled: state.selectIndex.length !== 1,
+                    name: 'update', label: i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_UPDATE'), disabled: state.selectIndex.length !== 1,
                 },
                 {
-                    name: 'delete', label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_DELETE'), disabled: state.selectIndex.length === 0,
+                    name: 'delete', label: i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_DELETE'), disabled: state.selectIndex.length === 0,
                 },
             ]),
             multiItems: computed(() => state.selectIndex.map(idx => state.items[idx])),
@@ -246,10 +245,10 @@ export default {
                     collector_id: props.collector.collector_id,
                     schedule_id: state.items[state.selectIndex[0]].schedule_id,
                 });
-                showSuccessMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_SCHEDULE_TITLE', 1), '', vm.$root);
+                showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_SCHEDULE_TITLE', 1), '');
                 await listSchedules();
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_SCHEDULE_TITLE', 1));
+                ErrorHandler.handleRequestError(e, i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_SCHEDULE_TITLE', 1));
             } finally {
                 state.deleteVisible = false;
             }

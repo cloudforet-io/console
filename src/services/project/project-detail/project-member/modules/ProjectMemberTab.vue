@@ -74,9 +74,8 @@
 <script lang="ts">
 import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PAnchor,
@@ -154,8 +153,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const apiQueryHelper = new ApiQueryHelper().setPageLimit(15).setFilters(props.filters);
         const storeState = reactive({
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
@@ -261,7 +258,7 @@ export default {
                     project_id: props.projectId,
                     users: items.map(it => it.resource_id),
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
             }
@@ -272,7 +269,7 @@ export default {
                     project_group_id: props.projectGroupId,
                     users: items.map(it => it.resource_id),
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
             }

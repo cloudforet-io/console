@@ -48,6 +48,8 @@ import { map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { i18n } from '@/translations';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -108,7 +110,7 @@ export default {
             try {
                 await SpaceConnector.client.identity.user.delete(getUsersParam(items));
                 await administrationStore.dispatch('user/selectIndex', []);
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', state.selectedIndex.length), '', vm);
+                showSuccessMessage(i18n.tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', state.selectedIndex.length), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length));
             } finally {

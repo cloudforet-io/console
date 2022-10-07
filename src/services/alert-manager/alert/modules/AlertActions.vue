@@ -75,9 +75,8 @@
 
 import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PBadge, PButton, PI, PSelectDropdown, PTableCheckModal,
@@ -144,8 +143,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
@@ -191,7 +188,7 @@ export default {
                 await SpaceConnector.client.monitoring.alert.delete({
                     alerts: props.selectedItems.map(d => d.alert_id),
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_DELETE'), '', vm);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_DELETE'), '');
                 state.visibleDeleteModal = false;
                 emit('refresh');
                 await store.dispatch('service/projectDetail/getAlertCounts');

@@ -41,9 +41,8 @@
 
 import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButtonModal, PBoxTab,
@@ -95,8 +94,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const tableState = reactive({
             loading: true,
             items: [] as any,
@@ -203,7 +200,7 @@ export default {
             }
             if (newEscalationPolicyId) {
                 await updateProjectAlertConfig(newEscalationPolicyId);
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_ESCALATION_POLICY'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_ESCALATION_POLICY'), '');
             }
             emit('confirm');
             state.proxyVisible = false;

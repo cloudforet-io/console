@@ -16,11 +16,11 @@
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -33,7 +33,6 @@ export default {
         DeleteModal,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             proxyVisible: computed({
                 get() { return store.state.service.project.projectGroupDeleteCheckModalVisible; },
@@ -46,9 +45,9 @@ export default {
             try {
                 await store.dispatch('service/project/deleteProjectGroup');
                 // await store.dispatch('favorite/projectGroup/removeItem', { id: state.groupId });
-                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '', vm.$root);
+                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: vm.$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
             } finally {
                 store.commit('service/project/setProjectGroupDeleteCheckModalVisible', false);
             }

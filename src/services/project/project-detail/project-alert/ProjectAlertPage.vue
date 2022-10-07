@@ -94,7 +94,7 @@ export default {
                 });
                 state.isActivated = true;
                 tabState.activeTab = 'settings';
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ACTIVATE_ALERT'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ACTIVATE_ALERT'), '');
             } catch (e) {
                 state.isActivated = false;
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ACTIVATE_ALERT'));

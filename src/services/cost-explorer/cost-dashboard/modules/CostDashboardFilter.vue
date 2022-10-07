@@ -31,9 +31,8 @@
 
 import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import { PButton, PIconButton } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
@@ -84,8 +83,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             proxyFilters: useProxyValue<CostQueryFilters>('filters', props, emit),
             filterLabel: computed(() => {
@@ -113,7 +110,7 @@ export default {
                     default_filter: filters,
                 });
                 state.proxyFilters = filters;
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_S_EDIT_FILTER'), '', vm);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_S_EDIT_FILTER'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_E_EDIT_FILTER'));
             }
@@ -126,7 +123,7 @@ export default {
                     default_filter: filters,
                 });
                 state.proxyFilters = filters;
-                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_S_EDIT_FILTER'), '', vm);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_S_EDIT_FILTER'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.MAIN.ALT_E_EDIT_FILTER'));
             }

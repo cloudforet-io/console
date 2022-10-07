@@ -75,9 +75,8 @@
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButton, PLazyImg, PMarkdown, PPageTitle, PPaneLayout, PPanelTop,
@@ -134,8 +133,6 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             providerLoading: true,
             providerData: {} as ProviderModel,
@@ -225,7 +222,7 @@ export default {
                     trusted_secret_id: formState.credentialForm.attachedTrustedSecretId,
                 });
 
-                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm);
+                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '');
                 isSucceed = true;
             } catch (e) {
                 isSucceed = false;

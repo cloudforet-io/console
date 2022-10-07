@@ -25,9 +25,8 @@
 
 import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButtonModal, PSelectCard,
@@ -70,8 +69,6 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             selectOptions: computed(() => ([
@@ -95,7 +92,7 @@ export default {
                         recovery_mode: state.recoveryMode,
                     },
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_AUTO_RECOVERY'), '', vm);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_AUTO_RECOVERY'), '');
                 emit('confirm');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_AUTO_RECOVERY'));

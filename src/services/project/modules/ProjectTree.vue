@@ -96,9 +96,8 @@
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PI, PIconButton, PTree, PButton, PDataLoader,
@@ -108,6 +107,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -143,8 +143,6 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
         const state = reactive({
             hasRootProjectGroupManagePermission: computed(() => !props.manageDisabled && store.getters['user/hasDomainRole']),
             hasCurrentProjectGroupManagePermission: computed(() => !props.manageDisabled && state.permissionInfo[store.getters['service/project/groupId']]),
@@ -177,7 +175,7 @@ export default {
                 },
             })),
             allProjectRoot: null as any,
-            allProjectNode: computed(() => ([vm.$t('PROJECT.LANDING.ALL_PROJECT')])),
+            allProjectNode: computed(() => ([i18n.t('PROJECT.LANDING.ALL_PROJECT')])),
         });
 
         const toggleOptions = {
@@ -312,9 +310,9 @@ export default {
                 await SpaceConnector.client.identity.projectGroup.update(params);
 
                 dataSetter(editText, node);
-                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
+                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
             }
         };
 
@@ -329,9 +327,9 @@ export default {
             }
             try {
                 await SpaceConnector.client.identity.projectGroup.update(params);
-                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
+                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
                 throw (e);
             }
         };
@@ -353,9 +351,9 @@ export default {
                     store.commit('service/project/setSelectedItem', { ...store.state.service.project.selectedItem });
                 }
 
-                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '', vm.$root);
+                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT'));
+                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT'));
                 throw (e);
             }
         };

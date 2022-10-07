@@ -130,6 +130,7 @@ import {
 } from '@cloudforet/core-lib/space-connector/error';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -224,15 +225,15 @@ export default {
                 ...convertProjectConfigToReferenceData(storeState.favoriteProjects, storeState.projects),
             ]),
             settingMenu: computed(() => [
-                { name: 'edit', label: vm.$t('PROJECT.LANDING.ACTION_EDIT_GROUP_NAME'), type: 'item' },
-                { name: 'delete', label: vm.$t('PROJECT.LANDING.ACTION_DELETE_THIS_GROUP'), type: 'item' },
+                { name: 'edit', label: i18n.t('PROJECT.LANDING.ACTION_EDIT_GROUP_NAME'), type: 'item' },
+                { name: 'delete', label: i18n.t('PROJECT.LANDING.ACTION_DELETE_THIS_GROUP'), type: 'item' },
             ] as MenuItem[]),
             projectGroupNavigation: computed(() => {
                 const result = storeState.parentGroups.map(d => ({ name: d.name, data: d }));
                 if (storeState.selectedNodeData) {
                     result.push({ name: storeState.groupName, data: storeState.selectedNodeData });
                 }
-                return [{ name: vm.$t('MENU.PROJECT'), data: null }, ...result];
+                return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...result];
             }),
             groupMemberCount: undefined as number|undefined,
             groupMemberPageVisible: false,

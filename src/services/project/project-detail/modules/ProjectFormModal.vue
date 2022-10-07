@@ -132,7 +132,7 @@ export default {
                     ...params,
                     project_id: props.project?.project_id || vm.$router.currentRoute.params.id,
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '', vm.$root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
             } catch (e: any) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
                 throw new Error(e);

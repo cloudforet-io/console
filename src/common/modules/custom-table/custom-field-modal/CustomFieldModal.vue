@@ -80,9 +80,8 @@
 
 import type { SetupContext } from 'vue';
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 import draggable from 'vuedraggable';
 
 import {
@@ -166,7 +165,6 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         let schema: any = {};
 
         const state = reactive({
@@ -295,7 +293,7 @@ export default defineComponent<Props>({
                     options,
                 });
 
-                showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '', vm);
+                showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '');
                 emit('complete');
                 state.proxyVisible = false;
             } catch (e) {

@@ -59,9 +59,8 @@
 
 <script lang="ts">
 import {
-    toRefs, reactive, computed, getCurrentInstance, watch,
+    toRefs, reactive, computed, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButtonModal, PSelectDropdown, PLazyImg, PFieldGroup, PButton, PTextInput, PToggleButton,
@@ -114,7 +113,6 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
             collector: null,
@@ -225,7 +223,7 @@ export default {
                         collector_id: props.collectorId,
                         ...state.collectorUpdateParam,
                     });
-                    showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_TITLE'), '', vm.$root);
+                    showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_TITLE'), '');
                 } catch (e) {
                     ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_TITLE'));
                 } finally {

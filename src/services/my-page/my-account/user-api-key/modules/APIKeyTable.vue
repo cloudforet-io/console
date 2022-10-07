@@ -90,6 +90,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { TimeStamp } from '@/models';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import {
     showSuccessMessage, showLoadingMessage, hideLoadingMessage,
@@ -161,19 +162,19 @@ export default {
                 {
                     type: 'item',
                     name: 'enable',
-                    label: vm.$t('IDENTITY.USER.MAIN.ENABLE'),
+                    label: i18n.t('IDENTITY.USER.MAIN.ENABLE'),
                     disabled: state.selectedIndex.length !== 1 || state.selectedItems[0].state === 'ENABLED',
                 },
                 { type: 'divider' },
                 {
                     type: 'item',
                     name: 'disable',
-                    label: vm.$t('IDENTITY.USER.MAIN.DISABLE'),
+                    label: i18n.t('IDENTITY.USER.MAIN.DISABLE'),
                     disabled: state.selectedIndex.length !== 1 || state.selectedItems[0].state === 'DISABLED',
                 },
                 { type: 'divider' },
                 {
-                    type: 'item', name: 'delete', label: vm.$t('IDENTITY.USER.MAIN.DELETE'), disabled: state.selectedIndex.length !== 1,
+                    type: 'item', name: 'delete', label: i18n.t('IDENTITY.USER.MAIN.DELETE'), disabled: state.selectedIndex.length !== 1,
                 },
             ] as MenuItem[])),
             visible: false,
@@ -229,7 +230,7 @@ export default {
         const openAPIKeyConfirmModal = async () => {
             try {
                 modalState.loading = true;
-                showLoadingMessage('Create API Key', '', vm.$root);
+                showLoadingMessage('Create API Key', '');
                 const resp = await SpaceConnector.client.identity.apiKey.create({
                     user_id: state.user,
                 });
@@ -253,9 +254,9 @@ export default {
                 await SpaceConnector.client.identity.apiKey.enable({
                     api_key_id: item[0].api_key_id,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'), '', vm.$root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'));
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'));
             } finally {
                 await listAPIKey(state.user);
                 checkModalState.visible = false;
@@ -267,9 +268,9 @@ export default {
                 await SpaceConnector.client.identity.apiKey.disable({
                     api_key_id: item[0].api_key_id,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_DISABLE_API_KEY'), '', vm.$root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_DISABLE_API_KEY'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_DISABLE_API_KEY'));
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_DISABLE_API_KEY'));
             } finally {
                 await listAPIKey(state.user);
                 checkModalState.visible = false;
@@ -281,9 +282,9 @@ export default {
                 await SpaceConnector.client.identity.apiKey.delete({
                     api_key_id: item[0].api_key_id,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_DELETE_API_KEY'), '', vm.$root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_DELETE_API_KEY'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_DELETE_API_KEY'));
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_DELETE_API_KEY'));
             } finally {
                 state.selectedIndex = [];
                 await listAPIKey(state.user);
@@ -293,24 +294,24 @@ export default {
 
         const onClickEnable = async () => {
             checkModalState.mode = 'enable';
-            checkModalState.title = vm.$t('IDENTITY.USER.API_KEY.ENABLE_MODAL_TITLE') as string;
-            checkModalState.subTitle = vm.$tc('IDENTITY.USER.API_KEY.ENABLE_MODAL_DESC', state.selectedIndex.length);
+            checkModalState.title = i18n.t('IDENTITY.USER.API_KEY.ENABLE_MODAL_TITLE') as string;
+            checkModalState.subTitle = i18n.tc('IDENTITY.USER.API_KEY.ENABLE_MODAL_DESC', state.selectedIndex.length);
             checkModalState.themeColor = 'safe';
             checkModalState.visible = true;
         };
 
         const onClickDisable = async () => {
             checkModalState.mode = 'disable';
-            checkModalState.title = vm.$t('IDENTITY.USER.API_KEY.DISABLE_MODAL_TITLE') as string;
-            checkModalState.subTitle = vm.$tc('IDENTITY.USER.API_KEY.DISABLE_MODAL_DESC', state.selectedIndex.length);
+            checkModalState.title = i18n.t('IDENTITY.USER.API_KEY.DISABLE_MODAL_TITLE') as string;
+            checkModalState.subTitle = i18n.tc('IDENTITY.USER.API_KEY.DISABLE_MODAL_DESC', state.selectedIndex.length);
             checkModalState.themeColor = 'alert';
             checkModalState.visible = true;
         };
 
         const onClickDelete = async () => {
             checkModalState.mode = 'delete';
-            checkModalState.title = vm.$t('IDENTITY.USER.API_KEY.DELETE_MODAL_TITLE') as string;
-            checkModalState.subTitle = vm.$tc('IDENTITY.USER.API_KEY.DELETE_MODAL_DESC', state.selectedIndex.length);
+            checkModalState.title = i18n.t('IDENTITY.USER.API_KEY.DELETE_MODAL_TITLE') as string;
+            checkModalState.subTitle = i18n.tc('IDENTITY.USER.API_KEY.DELETE_MODAL_DESC', state.selectedIndex.length);
             checkModalState.themeColor = 'alert';
             checkModalState.visible = true;
         };

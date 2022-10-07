@@ -29,7 +29,7 @@ export const showErrorMessage = (errorTitle, error) => {
  *   @returns
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const showSuccessMessage = (successTitle, successMessage, root?) => {
+export const showSuccessMessage = (successTitle, successMessage) => {
     if (Vue) {
         (Vue as any).notify({
             group: 'toastTopCenter',
@@ -43,7 +43,7 @@ export const showSuccessMessage = (successTitle, successMessage, root?) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const showLoadingMessage = (loadingTitle, loadingMessage, root?) => {
+export const showLoadingMessage = (loadingTitle, loadingMessage) => {
     if (Vue) {
         (Vue as any).notify({
             group: 'toastTopCenter',
