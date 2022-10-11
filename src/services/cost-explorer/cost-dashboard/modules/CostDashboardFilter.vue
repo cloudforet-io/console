@@ -19,10 +19,10 @@
         <view-filter-modal :visible.sync="viewFilterModalVisible"
                            :selected-filters="proxyFilters"
         />
-        <set-filter-modal :visible.sync="selectFilterModalVisible"
-                          :filter-items="filterItems"
-                          :selected-filters="proxyFilters"
-                          @confirm="handleConfirmSetFilter"
+        <cost-explorer-set-filter-modal :visible.sync="selectFilterModalVisible"
+                                        :filter-items="filterItems"
+                                        :selected-filters="proxyFilters"
+                                        @confirm="handleConfirmSetFilter"
         />
     </div>
 </template>
@@ -51,7 +51,7 @@ import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/conf
 import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import SetFilterModal from '@/services/cost-explorer/modules/SetFilterModal.vue';
+import CostExplorerSetFilterModal from '@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue';
 import type { CostQueryFilters } from '@/services/cost-explorer/type';
 
 
@@ -59,7 +59,7 @@ export default {
     name: 'CostDashboardFilter',
     components: {
         ViewFilterModal,
-        SetFilterModal,
+        CostExplorerSetFilterModal,
         PButton,
         PIconButton,
     },
