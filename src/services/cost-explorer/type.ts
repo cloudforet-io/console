@@ -1,3 +1,5 @@
+import type { Tags } from '@/models';
+
 import type { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 
 
@@ -9,13 +11,14 @@ export interface Period {
 interface FilterItem {
     name: string;
     label: string;
+    disabled?: boolean;
 }
 
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
 export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 export type Filter = typeof FILTER[keyof typeof FILTER];
 
-export type CostQueryFilters = Partial<Record<Filter, string[]>>;
+export type CostQueryFilters = Partial<Record<Filter, Array<string | Tags>>>;
 export type CostQueryFilterItemsMap = Partial<Record<Filter, FilterItem[]>>;
 
 export interface CostQuerySetOption {

@@ -1,11 +1,11 @@
 <template>
     <!--    song-lang-->
     <p-button-modal
-        class="cost-analysis-add-more-modal"
+        class="cost-analysis-group-by-filter-more-modal"
         :header-title="$t('Add More')"
         :visible.sync="proxyVisible"
         size="sm"
-        @confirm="handleFormConfirm"
+        @confirm="handleConfirm"
     >
         <template #body>
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_TAG')" required>
@@ -50,7 +50,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 
 export default {
-    name: 'CostAnalysisSetMoreModal',
+    name: 'CostAnalysisGroupByFilterMoreModal',
     components: {
         PFieldGroup,
         PButtonModal,
@@ -82,15 +82,15 @@ export default {
             ],
         });
 
-        const handleFormConfirm = () => {
+        /* Event */
+        const handleConfirm = () => {
             state.proxyVisible = false;
         };
 
         return {
             ...toRefs(state),
-            handleFormConfirm,
+            handleConfirm,
         };
     },
 };
-
 </script>
