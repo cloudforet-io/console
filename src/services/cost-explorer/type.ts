@@ -9,6 +9,7 @@ export interface Period {
 interface FilterItem {
     name: string;
     label: string;
+    disabled?: boolean;
 }
 
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];

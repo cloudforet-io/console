@@ -13,7 +13,7 @@
             {{ groupByItem.label }}
         </p-select-button>
         <p-divider :vertical="true" />
-        <cost-analysis-group-by-more-button />
+        <cost-analysis-group-by-filter-more />
     </div>
 </template>
 
@@ -24,7 +24,7 @@ import {
     PSelectButton, PDivider,
 } from '@spaceone/design-system';
 
-import CostAnalysisGroupByMoreButton from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByMoreButton.vue';
+import CostAnalysisGroupByFilterMore from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilterMore.vue';
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
@@ -33,7 +33,7 @@ import type { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/t
 export default {
     name: 'CostAnalysisGroupByFilter',
     components: {
-        CostAnalysisGroupByMoreButton,
+        CostAnalysisGroupByFilterMore,
         PSelectButton,
         PDivider,
     },
@@ -85,7 +85,7 @@ export default {
     .p-divider {
         @apply bg-gray-300;
         height: 1rem;
-        margin-left: 0.375rem;
+        margin: 0 0.375rem;
     }
 }
 </style>
