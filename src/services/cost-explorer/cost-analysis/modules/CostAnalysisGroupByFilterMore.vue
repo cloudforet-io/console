@@ -62,11 +62,13 @@ import type { CostQueryFilters } from '@/services/cost-explorer/type';
 
 const SAMPLE_FILTERS: CostQueryFilters = {
     tags: [
-        { name: 'name', label: 'Sample Tag' },
-        { name: 'team', label: 'Team', disabled: true },
+        'name', 'team',
+        // { name: 'name', label: 'Sample Tag' },
+        // { name: 'team', label: 'Team', disabled: true },
     ],
     additional_info: [
-        { name: 'raw_usage_type', label: 'sample_sample' },
+        'raw_usage_type',
+        // { name: 'raw_usage_type', label: 'sample_sample' },
     ],
 };
 export default defineComponent({
@@ -85,8 +87,8 @@ export default defineComponent({
             popoverVisible: false,
             moreGroupByItems: computed<GroupByItem[]>(() => {
                 const results: GroupByItem[] = [];
-                Object.values(SAMPLE_FILTERS).forEach((v: any) => {
-                    results.push(...v.filter(d => !d?.disabled));
+                Object.values(SAMPLE_FILTERS).forEach((v) => {
+                    results.push(...v.map(d => ({ name: d, label: d })));
                 });
                 return results;
             }),
@@ -134,13 +136,14 @@ export default defineComponent({
 
     /* custom design-system component - p-popover */
     :deep(.p-popover) {
-        > .popper {
+        .popper {
             padding: 0;
         }
     }
     .popover-content-wrapper {
         display: grid;
         gap: 1.25rem;
+        padding: 0.875rem 1rem;
         .count-text {
             padding-left: 0.25rem;
         }
