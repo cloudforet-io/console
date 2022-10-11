@@ -149,8 +149,11 @@ export default {
         const menuHandler: AutocompleteHandler = async (value: string) => {
             if (!props.type) return { results: [] };
 
+            // TODO: additional_info, tags
+            if (['additional_info', 'tags'].includes(props.type)) return { results: [] };
+
             state.menuLoading = true;
-            const results = await getResources(value, props.type.toLowerCase());
+            const results = await getResources(value, props.type);
             state.menuLoading = false;
 
             return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };

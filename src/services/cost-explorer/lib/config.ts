@@ -40,8 +40,12 @@ export const GROUP_BY_ITEM_MAP = Object.freeze({
 
 export const FILTER = Object.freeze({
     ...GROUP_BY,
+    TAGS: 'tags',
+    ADDITIONAL_INFO: 'additional_info',
 } as const);
 
 export const FILTER_ITEM_MAP = Object.freeze({
     ...GROUP_BY_ITEM_MAP,
+    tags: { name: 'tags', label: 'Tags' },
+    additional_info: { name: 'additional_info', label: 'Additional Info' },
 });
