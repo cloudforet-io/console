@@ -149,7 +149,7 @@ export default {
         const menuHandler: AutocompleteHandler = async (value: string) => {
             if (!props.type) return { results: [] };
 
-            // todo additional_info, tags
+            // TODO: additional_info, tags
             if (['additional_info', 'tags'].includes(props.type)) return { results: [] };
 
             state.menuLoading = true;
