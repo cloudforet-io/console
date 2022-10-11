@@ -100,11 +100,11 @@
                 </template>
             </p-data-loader>
         </section>
-        <set-filter-modal v-if="!printMode"
-                          :visible.sync="filterModalVisible"
-                          :selected-filters="filters"
-                          :filter-items="filterItems"
-                          @confirm="handleConfirmFilterModal"
+        <cost-explorer-set-filter-modal v-if="!printMode"
+                                        :visible.sync="filterModalVisible"
+                                        :selected-filters="filters"
+                                        :filter-items="filterItems"
+                                        @confirm="handleConfirmFilterModal"
         />
     </div>
 </template>
@@ -161,7 +161,7 @@ import type {
 } from '@/services/cost-explorer/widgets/type';
 
 
-const SetFilterModal = () => import('@/services/cost-explorer/modules/SetFilterModal.vue');
+const CostExplorerSetFilterModal = () => import('@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue');
 
 
 export default {
@@ -169,7 +169,7 @@ export default {
     components: {
         CostAnalysisStackedColumnChart,
         CostAnalysisPieChart,
-        SetFilterModal,
+        CostExplorerSetFilterModal,
         PButton,
         PIconButton,
         PSelectDropdown,

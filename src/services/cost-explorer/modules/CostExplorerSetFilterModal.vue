@@ -1,7 +1,7 @@
 <template>
     <p-button-modal
         v-if="visible"
-        class="set-filter-modal"
+        class="cost-explorer-set-filter-modal"
         :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SET_FILTER')"
         :visible.sync="proxyVisible"
         :footer-reset-button-visible="true"
@@ -91,7 +91,7 @@ interface Props {
 }
 
 export default {
-    name: 'SetFilterModal',
+    name: 'CostExplorerSetFilterModal',
     components: {
         CostAnalysisFilterItem,
         PButtonModal,
@@ -220,7 +220,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.set-filter-modal {
+.cost-explorer-set-filter-modal {
     /* custom design-system component - p-button-modal */
     :deep(&.p-button-modal) {
         .modal-content {
