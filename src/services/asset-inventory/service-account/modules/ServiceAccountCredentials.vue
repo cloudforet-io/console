@@ -170,7 +170,7 @@ export default defineComponent<Props>({
                 if (state.credentialForm.activeDataType === 'json') {
                     data = JSON.parse(state.credentialForm.credentialJson);
                 } else if (state.credentialForm.activeDataType === 'input') {
-                    data = state.credentialForm;
+                    data = state.credentialForm.customSchemaForm;
                 }
 
                 await SpaceConnector.client.secret.secret.create({
@@ -205,7 +205,7 @@ export default defineComponent<Props>({
                 if (state.credentialForm.activeDataType === 'json') {
                     data = JSON.parse(state.credentialForm.credentialJson);
                 } else if (state.credentialForm.activeDataType === 'input') {
-                    data = state.credentialForm;
+                    data = state.credentialForm.customSchemaForm;
                 }
 
                 await SpaceConnector.client.secret.trustedSecret.updateData({
