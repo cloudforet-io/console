@@ -6,8 +6,8 @@
                     v-if="isLengthOverFive(idx)" class="menu"
                     :to="getLocation(route)"
                 >
-                    <span v-if="idx !== routes.length - 1" class="inline-block link">{{ route.name }}</span>
-                    <span v-else class="inline-block current-page">
+                    <span v-if="idx !== routes.length - 1" class="link">{{ route.name }}</span>
+                    <span v-else class="current-page">
                         {{ route.name }}
                         <p-copy-button v-if="copiable" :value="route.name" />
                     </span>
@@ -19,11 +19,11 @@
                 </router-link>
             </span>
             <span v-else>
-                <div v-if="isLengthOverFive(idx)" class="menu">
-                    <span v-if="idx !== routes.length - 1" class="inline-block link"
+                <span v-if="isLengthOverFive(idx)" class="menu">
+                    <span v-if="idx !== routes.length - 1" class="link"
                           @click="$emit('click', route, idx)"
                     >{{ route.name }}</span>
-                    <span v-else class="inline-block current-page">
+                    <span v-else class="current-page">
                         {{ route.name }}
                         <p-copy-button v-if="copiable" :value="route.name" />
                     </span>
@@ -32,10 +32,10 @@
                              class="arrow-icon" color="inherit white"
                         />
                     </span>
-                </div>
+                </span>
             </span>
             <span v-if="routes.length >= 5 && idx === 2 && !state.isShown">
-                <span class="inline-block link" @click="showHidden">...</span>
+                <span class="link" @click="showHidden">...</span>
                 <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem"
                      class="arrow-icon" color="inherit white"
                 />
@@ -104,8 +104,9 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-breadcrumbs {
-    display: inline-flex;
-
+    .menu {
+        word-break: break-all;
+    }
     .link {
         @apply text-xs text-gray-700 cursor-pointer;
 
@@ -113,17 +114,14 @@ export default defineComponent<Props>({
             @apply text-gray-900 underline;
         }
     }
-
     .current-page {
         @apply text-xs text-gray-900 cursor-default;
-        display: inline-flex;
-        align-items: center;
         > .p-copy-button {
             font-size: inherit;
             margin-left: 0.25rem;
+            vertical-align: 0.1rem;
         }
     }
-
     .arrow-icon {
         @apply text-gray-500;
         margin-left: 0.375rem;
