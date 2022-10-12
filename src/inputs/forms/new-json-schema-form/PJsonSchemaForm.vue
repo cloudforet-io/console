@@ -40,6 +40,7 @@
                     <generate-id-format v-if="schemaProperty.componentName === 'GenerateIdFormat'"
                                         :value="rawFormData[schemaProperty.propertyName]"
                                         :disabled="schemaProperty.disabled"
+                                        :invalid="invalid"
                                         @update:value="handleUpdateFormValue(schemaProperty, ...arguments)"
                     />
                     <p-json-schema-form v-else-if="schemaProperty.componentName === 'PJsonSchemaForm'"
