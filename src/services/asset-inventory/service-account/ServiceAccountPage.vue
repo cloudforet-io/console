@@ -366,6 +366,11 @@ export default {
         .p-toolbox-table {
             @apply rounded-lg;
         }
+        .p-data-table {
+            .row-height-fixed {
+                cursor: pointer;
+            }
+        }
     }
 }
 
