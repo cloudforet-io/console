@@ -1,5 +1,5 @@
 <template>
-    <div class="service-account-provider-list">
+    <div class="service-account-provider-list" :class="{'low-count-provider-list': providerList.length < 6}">
         <button v-for="item in providerList" :key="item.key" :class="{'provider-button': true, 'selected-button' : item.key === selectedProvider}"
                 @click="() => handleSelectProvider(item.key)"
         >
@@ -90,6 +90,15 @@ export default defineComponent({
         .selected {
             @apply text-blue-600;
         }
+    }
+}
+
+.low-count-provider-list {
+    @apply flex;
+    grid-template-columns: unset;
+    .provider-button {
+        flex-grow: 1;
+        max-width: 18.75rem;
     }
 }
 
