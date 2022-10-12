@@ -95,6 +95,7 @@ export default defineComponent({
 
 .low-count-provider-list {
     @apply flex;
+    grid-template-columns: unset;
     .provider-button {
         flex-grow: 1;
         max-width: 18.75rem;
