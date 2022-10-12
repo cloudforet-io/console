@@ -64,6 +64,7 @@ class API {
         this.refreshToken = refreshToken;
         window.localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
         window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        API.unsetRefreshingState();
     }
 
     getRefreshToken(): string|undefined {

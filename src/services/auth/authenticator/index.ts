@@ -1,5 +1,3 @@
-import API from '@cloudforet/core-lib/space-connector/api';
-
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
@@ -24,8 +22,6 @@ abstract class Authenticator {
             ]);
         } catch (e: unknown) {
             throw e;
-        } finally {
-            API.unsetRefreshingState();
         }
     }
 
