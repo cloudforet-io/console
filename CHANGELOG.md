@@ -1,3 +1,10 @@
+# [1.1.0-beta.415](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.414...v1.1.0-beta.415) (2022-10-12)
+
+
+### Features
+
+* **text-input:** add right-edge slot and rename right-extra slot to input-right ([#78](https://github.com/cloudforet-io/mirinae/issues/78)) ([c3e8302](https://github.com/cloudforet-io/mirinae/commit/c3e83024282369b80f12778f30162791bb9e803d))
+
 # [1.1.0-beta.414](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.413...v1.1.0-beta.414) (2022-10-06)
 
 
