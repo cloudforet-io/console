@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'service-account-provider-list': true, 'low-count-provider-list': providerList.length < 6}">
+    <div class="service-account-provider-list" :class="{'low-count-provider-list': providerList.length < 6}">
         <button v-for="item in providerList" :key="item.key" :class="{'provider-button': true, 'selected-button' : item.key === selectedProvider}"
                 @click="() => handleSelectProvider(item.key)"
         >
