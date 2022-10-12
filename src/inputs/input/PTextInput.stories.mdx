@@ -30,8 +30,11 @@ export const Template = (args, { argTypes }) => ({
                       :masking-mode="maskingMode"
                       :show-password="showPassword"
         >
-            <template v-if="rightExtraSlot" #right-extra>
-                <span v-html="rightExtraSlot"></span>
+            <template v-if="inputRightSlot" #input-right>
+                <span v-html="inputRightSlot"></span>
+            </template>
+            <template v-if="rightEdgeSlot" #right-edge>
+                <span v-html="rightEdgeSlot"></span>
             </template>
         </p-text-input>
     `,
@@ -308,23 +311,37 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Right Extra Slot
+## Slots
 
 <Canvas>
-    <Story name="Right Extra Slot" args={{
+    <Story name="Slots" args={{
         value: 100,
-        rightExtraSlot: '%'
+        inputRightSlot: '%'
     }}>
         {{
-            components: { PTextInput },
+            components: { PTextInput, PButton },
             template: `
-                <p-text-input style="width: 96px;" type="number" multi-input v-model="value" >
-                    <template #right-extra>%</template>
-                </p-text-input>
+<div>
+<p class="text-lg font-bold mb-4">input-right slot</p>
+<p-text-input type="number" multi-input v-model="value" >
+    <template #input-right>%</template>
+</p-text-input>
+<p class="text-lg font-bold my-4">right-edge slot</p>
+<p-text-input multi-input v-model="value2" >
+    <template #right-edge><p-button style-type="primary" size="sm">Click me!</p-button></template>
+</p-text-input>
+<p class="text-lg font-bold my-4">default slot</p>
+<p-text-input multi-input v-model="value2" >
+    <input style="background-color: lavenderblush; padding: 0 0.25rem;" v-model="value3" />
+</p-text-input>
+</div>
+<!-- <div> -->
             `,
             setup() {
                 const state = reactive({
-                    value: 70
+                    value: 70,
+                    value2: 'wanzargen',
+                    value3: 'yuda'
                 })
                 return {
                     ...toRefs(state)

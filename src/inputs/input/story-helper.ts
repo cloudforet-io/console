@@ -336,7 +336,41 @@ export const getTextInputArgTypes = (): ArgTypes => {
         },
         rightExtraSlot: {
             name: 'right-extra',
-            description: 'Slot for right area of input.',
+            description: 'Slot for right area of input. This slot will be deprecated.',
+            defaultValue: '',
+            table: {
+                type: {
+                    summary: null,
+                },
+                defaultValue: {
+                    summary: null,
+                },
+                category: 'slots',
+            },
+            control: {
+                type: 'text',
+            },
+        },
+        inputRightSlot: {
+            name: 'input-right',
+            description: 'Slot on the right next to the input.',
+            defaultValue: '',
+            table: {
+                type: {
+                    summary: null,
+                },
+                defaultValue: {
+                    summary: null,
+                },
+                category: 'slots',
+            },
+            control: {
+                type: 'text',
+            },
+        },
+        rightEdgeSlot: {
+            name: 'right-edge',
+            description: 'Slot on the right edge of the input.',
             defaultValue: '',
             table: {
                 type: {

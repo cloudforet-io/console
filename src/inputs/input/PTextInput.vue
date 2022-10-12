@@ -38,10 +38,12 @@
                        v-on="inputListeners"
                 >
             </slot>
+            <!-- right-extra slot will be deprecated. use input-right slot. -->
             <span v-if="$slots['right-extra']" class="right-extra">
-                <slot name="right-extra" v-bind="{ value }">
-                    {{ value }}
-                </slot>
+                <slot name="right-extra" v-bind="{ value }" />
+            </span>
+            <span v-if="$slots['input-right']" class="input-right">
+                <slot name="input-right" v-bind="{ value }" />
             </span>
             <p-button v-if="($attrs.type === 'password') && maskingMode"
                       size="sm"
@@ -60,6 +62,9 @@
                  @mousedown.native.prevent
                  @click="handleDeleteAllTags"
             />
+            <span v-if="$slots['right-edge']" class="right-edge">
+                <slot name="right-edge" v-bind="{ value }" />
+            </span>
         </div>
         <p-context-menu v-if="proxyVisibleMenu && useAutoComplete"
                         ref="menuRef"
@@ -469,8 +474,17 @@ export default defineComponent<TextInputProps>({
             }
         }
 
-        > .right-extra {
+        > .right-extra, > .input-right {
             @apply text-gray-400;
+            display: inline-flex;
+            flex-shrink: 0;
+            height: 100%;
+            overflow: hidden;
+            line-height: inherit;
+            font-size: inherit;
+        }
+
+        > .right-edge {
             display: inline-flex;
             flex-shrink: 0;
             height: 100%;
