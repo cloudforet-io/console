@@ -6,6 +6,10 @@
                 resource-key="cloud_service_id"
                 :tag-edit-button-text="$t('Edit Custom Tags')"
                 :overlay-title="$t('Custom Tags')"
+                :custom-fields="fields"
+                :custom-items="items"
+                :custom-tags="tags"
+                @tags-updated="handleTagsUpdated"
     >
         <template #table-top>
             <div class="tag-type-filter">
@@ -29,6 +33,12 @@ import { computed, reactive, toRefs } from 'vue';
 
 import { PSelectStatus } from '@spaceone/design-system';
 
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
 import {
@@ -53,7 +63,7 @@ export default {
             default: false,
         },
     },
-    setup() {
+    setup(props) {
         const state = reactive({
             tagTypeList: computed(() => [
                 { name: 'all', label: 'All' }, // song-lang
@@ -61,12 +71,53 @@ export default {
                 { name: CLOUD_SERVICE_TAG_TYPE.MANAGED, label: CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[CLOUD_SERVICE_TAG_TYPE.MANAGED].label },
             ]),
             selectedTagType: 'all',
+            cloudServiceTagList: [],
+            tags: computed(() => {
+                const tagObject = {};
+                (state.cloudServiceTagList ?? []).forEach((tag) => {
+                    tagObject[tag.key] = tag.value;
+                });
+                return tagObject;
+            }),
+            fields: computed(() => [
+                { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
+                { name: 'value', label: i18n.t('COMMON.TAGS.VALUE'), type: 'item' },
+                {
+                    name: 'type', label: i18n.t('Type'), type: 'item', disableCopy: true,
+                }, // song-lang
+                {
+                    name: 'provider', label: i18n.t('Provider'), type: 'item', disableCopy: true,
+                }, // song-lang
+            ]),
+            items: computed(() => state.cloudServiceTagList?.map(k => ({
+                key: k.key,
+                value: k.value,
+                type: k.type,
+                provider: k.provider,
+            }))),
         });
         /* event handler */
         const handleSelectTagType = (tagType) => { state.selectedTagType = tagType; };
+        const handleTagsUpdated = async () => { await getCloudServiceTags(); };
+
+        const getCloudServiceTags = async () => {
+            try {
+                const { results } = await SpaceConnector.client.inventory.cloudServiceTag.list({
+                    cloud_service_id: props.resourceId,
+                });
+                state.cloudServiceTagList = results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        };
+
+        (async () => {
+            await getCloudServiceTags();
+        })();
         return {
             ...toRefs(state),
             handleSelectTagType,
+            handleTagsUpdated,
         };
     },
 };
