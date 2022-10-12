@@ -18,8 +18,8 @@
             </template>
         </p-panel-top>
         <slot name="table-top" />
-        <p-data-table :fields="fields"
-                      :items="items"
+        <p-data-table :fields="isCustomMode ? customFields : fields"
+                      :items="isCustomMode ? customItems : items"
                       :loading="loading"
                       :col-copy="true"
                       beautify-text
@@ -27,7 +27,7 @@
         <transition name="slide-up">
             <tags-overlay v-if="tagEditPageVisible"
                           :title="overlayTitle"
-                          :tags="tags"
+                          :tags="isCustomMode ? customTags : tags"
                           :resource-id="resourceId"
                           :resource-key="resourceKey" :resource-type="resourceType"
                           @close="closeTag"
@@ -40,7 +40,7 @@
 <script lang="ts">
 
 
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -94,14 +94,27 @@ export default {
             type: String as PropType<TranslateResult|string|undefined>,
             default: undefined,
         },
+        customTags: {
+            type: Object,
+            default: undefined,
+        },
+        customFields: {
+            type: Array,
+            default: undefined,
+        },
+        customItems: {
+            type: Array,
+            default: undefined,
+        },
     },
-    setup(props) {
+    setup(props, { emit }: SetupContext) {
         const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
         const state = reactive({
             loading: true,
             tags: {},
+            isCustomMode: computed<boolean>(() => props.customTags, props.displayItem && props.displayFields),
             fields: computed(() => [
                 { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
                 { name: 'value', label: i18n.t('COMMON.TAGS.VALUE'), type: 'item' },
@@ -142,14 +155,17 @@ export default {
             tagState.tagEditPageVisible = false;
         };
         const updateTag = async () => {
-            await getTags();
+            emit('tags-updated');
+            if (!state.isCustomMode) await getTags();
             tagState.tagEditPageVisible = false;
         };
 
         watch([() => props.resourceKey, () => props.resourceId, () => props.resourceType],
             async ([resourceKey, resourceId, resourceType]) => {
-                if (resourceKey && resourceId && resourceType) {
+                if (resourceKey && resourceId && resourceType && !state.isCustomMode) {
                     await getTags();
+                } else {
+                    state.loading = false;
                 }
             }, { immediate: true });
 
