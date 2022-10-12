@@ -57,7 +57,7 @@
                                :deletable="!printMode"
                                @delete="handleDeleteFilterTag(filterName, itemIdx)"
                         >
-                            <b>{{ FILTER_ITEM_MAP[filterName].label }}: </b>{{ item.label }}
+                            <b>[{{ FILTER_ITEM_MAP[filterName].label }}] </b>{{ item.label }}
                         </p-tag>
                     </template>
                 </template>
