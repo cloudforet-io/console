@@ -38,7 +38,7 @@
                                 <p-tag v-for="(item, itemIdx) in items" :key="`selected-tag-${idx}-${item.name}`"
                                        @delete="handleDeleteTag(filterName, itemIdx)"
                                 >
-                                    <b>{{ FILTER_ITEM_MAP[filterName].label }}: </b>{{ item.label }}
+                                    <b>[{{ FILTER_ITEM_MAP[filterName].label }}] </b>{{ item.label }}
                                 </p-tag>
                             </template>
                         </div>
