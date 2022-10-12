@@ -1,3 +1,10 @@
+# [1.1.0-beta.418](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.417...v1.1.0-beta.418) (2022-10-12)
+
+
+### Features
+
+* **p-data-table:** add disableCopy option to DataTableField ([#84](https://github.com/cloudforet-io/mirinae/issues/84)) ([e60d365](https://github.com/cloudforet-io/mirinae/commit/e60d3658bba59255c1c93ba64d2729956e7e3847))
+
 # [1.1.0-beta.417](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.416...v1.1.0-beta.417) (2022-10-12)
 
 
