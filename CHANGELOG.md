@@ -1,3 +1,10 @@
+# [1.1.0-beta.417](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.416...v1.1.0-beta.417) (2022-10-12)
+
+
+### Bug Fixes
+
+* **bredcrumbs:** fix breadcrumbs word-break ([b229001](https://github.com/cloudforet-io/mirinae/commit/b229001e9112c8592dba47638fd5c385d9692c55))
+
 # [1.1.0-beta.416](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.415...v1.1.0-beta.416) (2022-10-12)
 
 
