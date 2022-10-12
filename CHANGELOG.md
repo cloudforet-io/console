@@ -1,3 +1,10 @@
+# [1.1.0-beta.416](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.415...v1.1.0-beta.416) (2022-10-12)
+
+
+### Features
+
+* **json-schema-form:** make generate_id form editable ([#79](https://github.com/cloudforet-io/mirinae/issues/79)) ([92feb5b](https://github.com/cloudforet-io/mirinae/commit/92feb5b3b7c7f2a13aee30c71519e41a52f65481))
+
 # [1.1.0-beta.415](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.414...v1.1.0-beta.415) (2022-10-12)
 
 
