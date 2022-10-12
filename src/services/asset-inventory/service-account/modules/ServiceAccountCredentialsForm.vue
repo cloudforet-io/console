@@ -35,11 +35,24 @@
                     <p-radio :selected="formState.attachTrustedAccount" :value="true" @change="handleChangeAttachTrustedAccount">
                         {{ $t('APP.MAIN.YES') }}<br>
                     </p-radio>
-                    <p-select-dropdown :selected="formState.attachedTrustedAccountId"
-                                       :items="trustedAccountMenuItems"
-                                       :disabled="!formState.attachTrustedAccount"
-                                       @select="handleChangeAttachedTrustedAccountId"
-                    />
+                    <div class="yes-dropdown">
+                        <p-select-dropdown :selected="formState.attachedTrustedAccountId"
+                                           :items="trustedAccountMenuItems"
+                                           :disabled="!formState.attachTrustedAccount"
+                                           @select="handleChangeAttachedTrustedAccountId"
+                        />
+                        <div v-if="formState.attachTrustedAccount && formState.attachedTrustedAccountId" class="copy-text-wrapper">
+                            <p-i name="ic_outlined-info" width="0.875rem" height="0.875rem" />
+                            <div class="right-part">
+                                <div v-for="(data, idx) in selectedTrustedAccountDataList" :key="`text-${data.key}-${idx}`">
+                                    <b>{{ data.key }} </b>
+                                    <p-copy-button class="value-text">
+                                        {{ data.value }}
+                                    </p-copy-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </p-field-group>
             <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SECRET_TYPE_LABEL')" required class="mb-8">
@@ -84,7 +97,7 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PAnchor,
+    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PAnchor, PCopyButton, PI,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
@@ -124,6 +137,8 @@ export default defineComponent<Props>({
         PTab,
         PJsonSchemaForm,
         PTextEditor,
+        PCopyButton,
+        PI,
     },
     props: {
         editMode: {
@@ -155,19 +170,20 @@ export default defineComponent<Props>({
             providerData: {} as ProviderModel,
             showTrustedAccount: computed<boolean>(() => state.providerData?.capability?.support_trusted_service_account ?? false),
             trustedAccounts: [] as ServiceAccountModel[],
-            trustedAccountMenuItems: computed<SelectDropdownMenu[]>(() => {
-                const results: SelectDropdownMenu[] = [];
+            trustedAccountMenuItems: computed<SelectDropdownMenu[]>(() => state.trustedAccounts.map(d => ({
+                name: d.service_account_id,
+                label: d.name,
+            }))),
+            selectedTrustedAccountDataList: computed(() => {
+                const selectedTrustedAccount = state.trustedAccounts.find(d => d.service_account_id === formState.attachedTrustedAccountId);
+                if (!selectedTrustedAccount) return [];
                 const baseInfoProperties: Record<string, JsonSchema> = state.baseInformationSchema?.properties;
                 let entries: Array<[string, JsonSchema]> = [];
                 if (baseInfoProperties) entries = Object.entries(baseInfoProperties);
-                state.trustedAccounts.forEach((d) => {
-                    let label = d.name;
-                    entries.forEach(([k, v]) => {
-                        label += ` | ${v.title}: ${d.data[k]}`;
-                    });
-                    results.push({ name: d.service_account_id, label });
-                });
-                return results;
+                return entries.map(([k, v]) => ({
+                    key: v.title,
+                    value: selectedTrustedAccount.data[k],
+                }));
             }),
             secretTypes: computed<string[]>(() => {
                 if (props.serviceAccountType === 'GENERAL') {
@@ -388,10 +404,30 @@ export default defineComponent<Props>({
         .p-radio {
             line-height: 1.5;
         }
-        .p-select-dropdown {
+        .yes-dropdown {
+            @apply bg-gray-100;
             width: calc(66% - 1.5rem);
+            padding: 0.5rem;
             margin-left: 1.5rem;
             margin-top: 0.25rem;
+            .p-select-dropdown {
+                width: 100%;
+            }
+            .copy-text-wrapper {
+                display: flex;
+                padding-top: 0.75rem;
+                .right-part {
+                    @apply text-gray-700;
+                    display: grid;
+                    gap: 0.25rem;
+                    font-size: 0.75rem;
+                    margin-left: 0.375rem;
+                    .value-text {
+                        @apply text-gray-900;
+                        font-size: 0.75rem;
+                    }
+                }
+            }
         }
     }
     .custom-schema-box {
