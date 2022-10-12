@@ -1,4 +1,4 @@
-export const BUTTON_STYLE = Object.freeze({
+export const BUTTON_STYLE = {
     'primary-dark': 'primary-dark',
     primary: 'primary',
     primary1: 'primary1',
@@ -12,20 +12,18 @@ export const BUTTON_STYLE = Object.freeze({
     safe: 'safe',
     'gray-border': 'gray-border',
     transparent: 'transparent',
-    // 'gray900-hover' = 'gray900-hover',
-    // 'gray900-border' = 'gray900-border'
-} as const);
+} as const;
 
-export const BUTTON_SIZE = Object.freeze({
+export const BUTTON_SIZE = {
     sm: 'sm',
     md: 'md',
     lg: 'lg',
-}as const);
+} as const;
 
-export const BUTTON_FONT_WEIGHT = Object.freeze({
+export const BUTTON_FONT_WEIGHT = {
     normal: 'normal',
     bold: 'bold',
-} as const);
+} as const;
 
 export type ButtonStyle = typeof BUTTON_STYLE[keyof typeof BUTTON_STYLE];
 export type ButtonSize = typeof BUTTON_SIZE[keyof typeof BUTTON_SIZE];

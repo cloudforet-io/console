@@ -42,21 +42,6 @@ export const getButtonArgTypes = (): ArgTypes => ({
             options: ['md', 'sm', 'lg'],
         },
     },
-    default: {
-        name: 'default',
-        type: { name: 'string' },
-        description: 'Slot for contents of button',
-        defaultValue: 'button',
-        table: {
-            type: {
-                summary: null,
-            },
-            category: 'slots',
-        },
-        control: {
-            type: 'text',
-        },
-    },
     href: {
         name: 'href',
         type: { name: 'string' },
@@ -185,8 +170,24 @@ export const getButtonArgTypes = (): ArgTypes => ({
             options: [null, ...Object.keys(icon.icons)],
         },
     },
+    // slots
+    default: {
+        name: 'default',
+        type: { name: 'string' },
+        description: 'Slot for contents of button',
+        defaultValue: 'button',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
     // events
-    onClick: {
+    handleClick: {
         name: 'click',
         type: { name: 'function' },
         description: 'Click function',

@@ -1,100 +1,120 @@
+<template>
+    <component :is="component"
+               :href="disabled ? undefined : href"
+               class="p-button"
+               :class="{
+                   [styleType]: true,
+                   [size]: true,
+                   [fontWeight]: true,
+                   'loading': !!loading,
+                   'block': !!block,
+                   'outline': !!outline,
+                   'disabled': !!disabled,
+               } "
+               v-on="$listeners"
+    >
+        <p-lottie v-if="loading" name="thin-spinner" :size="loadingIconSize" />
+        <p-i v-if="icon"
+             :name="icon"
+             width="1rem" height="1rem"
+             color="inherit"
+        />
+        <slot name="default" />
+    </component>
+</template>
+
 <script lang="ts">
-import type { VNode } from 'vue/types/vnode';
+import type { SetupContext } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import type { ButtonProps, ButtonSize } from '@/inputs/buttons/button/type';
-import { getBindClass } from '@/util/functional-helpers';
+import { BUTTON_FONT_WEIGHT, BUTTON_SIZE, BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
-
-const getClass = (attrs: ButtonProps) => {
-    const cls = {
-        'p-button': true,
-        loading: !!attrs.loading,
-        disabled: !!attrs.disabled,
-        outline: !!attrs.outline,
-        block: !!attrs.block,
-    };
-    if (attrs.size) {
-        cls[attrs.size] = true;
-    }
-    if (attrs.styleType) {
-        cls[attrs.styleType] = true;
-    }
-    if (attrs.fontWeight) {
-        cls[attrs.fontWeight] = true;
-    }
-    return cls;
-};
 
 const LOADING_SIZE: Record<ButtonSize, number> = {
     sm: 0.75,
     md: 1,
     lg: 1,
 };
-export default {
+export default defineComponent<ButtonProps>({
     name: 'PButton',
-    functional: true,
     components: {
         PLottie,
         PI,
     },
-    render(h, {
-        props, listeners, children, data,
-    }: { props: ButtonProps; listeners: any; children: any[]; data: any }) {
-        const tag = props.href ? 'a' : 'button';
-
-        const childrenEl: VNode[] = children ? [...children] : [];
-        if (props.loading) {
-            childrenEl.splice(0, 0, h(PLottie, {
-                class: 'spinner',
-                props: {
-                    name: 'thin-spinner',
-                    auto: true,
-                    size: LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md,
-                },
-            }));
-        } else if (props.icon) {
-            childrenEl.splice(0, 0, h(PI, {
-                class: 'icon',
-                props: {
-                    name: props.icon,
-                    width: '1em',
-                    height: '1em',
-                    color: 'inherit',
-                },
-            }));
-        }
-
-        return h(tag, {
-            ...data,
-            attrs: {
-                ...data.attrs,
-                href: props.disabled ? undefined : props.href,
-            },
-            class: {
-                ...getClass({ ...data.attrs, ...props }),
-                ...getBindClass(data.class),
-            },
-            on: {
-                ...listeners,
-                click: (event) => {
-                    if (!props.disabled && !props.loading) {
-                        if (listeners.click) {
-                            if (typeof listeners.click === 'function') listeners.click(event);
-                            else listeners.click.forEach(func => func(event));
-                        }
-                    }
-                },
+    props: {
+        styleType: {
+            type: String,
+            default: BUTTON_STYLE.primary,
+            validator(value: string): boolean {
+                return Object.keys(BUTTON_STYLE).includes(value);
             },
         },
-        childrenEl);
+        size: {
+            type: String,
+            default: BUTTON_SIZE.md,
+            validator(value: string): boolean {
+                return Object.keys(BUTTON_SIZE).includes(value);
+            },
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        href: {
+            type: String,
+            default: undefined,
+        },
+        icon: {
+            type: String,
+            default: undefined,
+        },
+        outline: {
+            type: Boolean,
+            default: false,
+        },
+        block: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        fontWeight: {
+            type: String,
+            default: BUTTON_FONT_WEIGHT.bold,
+            validator(value: string): boolean {
+                return Object.keys(BUTTON_FONT_WEIGHT).includes(value);
+            },
+        },
     },
-};
+    setup(props, { emit }: SetupContext) {
+        const state = reactive({
+            component: computed(() => (props.href ? 'a' : 'button')),
+            loadingIconSize: computed(() => LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md),
+        });
+
+        /* Event */
+        const handleClick = () => {
+            if (!props.disabled && !props.loading) {
+                emit('click');
+            }
+        };
+
+        return {
+            ...toRefs(state),
+            handleClick,
+        };
+    },
+});
 </script>
 
 <style lang="postcss">
-
 @define-mixin btn-color $theme, $bg-color, $text-color {
     &.$(theme) {
         background-color: $bg-color;
@@ -202,13 +222,9 @@ export default {
     @mixin btn-color secondary1, theme('colors.secondary1'), theme('colors.white');
     @mixin btn-color gray, theme('colors.gray.default'), theme('colors.white');
     @mixin btn-color gray900, theme('colors.gray.900'), theme('colors.white');
-    @mixin btn-color gray900-hover, theme('colors.white'), theme('colors.gray.900');
     @mixin btn-color alert, theme('colors.alert'), theme('colors.white');
     @mixin btn-color safe, theme('colors.safe'), theme('colors.white');
 
-    &.gray900-hover {
-        @apply bg-white text-gray-900;
-    }
     &.gray-border {
         @apply bg-white text-gray-900 border-gray-300;
         &.outline {

@@ -16,7 +16,7 @@ export const Template = (args, {argTypes})=>({
     template: `
         <div style="display:flex; align-items:center; justify-content:center; height:150px;">
             <p-button
-                @click="onClick"
+                @click="handleClick"
                 :href="href"
                 :styleType="styleType"
                 :size="size"
@@ -103,6 +103,9 @@ export const Template = (args, {argTypes})=>({
                         </p-button>
                     </div>
                     <div style="display:flex; margin-top: 20px">
+                        <p-button styleType="secondary-dark" style="margin-right: 20px">
+                            <div>secondary-dark</div>
+                        </p-button>
                         <p-button styleType="secondary" style="margin-right: 20px">
                             <div>secondary</div>
                         </p-button>
@@ -114,9 +117,6 @@ export const Template = (args, {argTypes})=>({
                         </p-button>
                         <p-button styleType="gray900" style="margin-right: 20px">
                             <div>gray900</div>
-                        </p-button>
-                        <p-button styleType="gray900-hover" style="margin-right: 20px">
-                            <div>gray900-hover</div>
                         </p-button>
                     </div>
                     <div style="display:flex; margin-top: 20px">
