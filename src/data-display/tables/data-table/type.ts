@@ -16,6 +16,7 @@ export interface DataTableFieldType {
     label?: string;
     sortable?: boolean;
     sortKey?: string;
+    disableCopy?: boolean;
     width?: string;
     textAlign?: DataTableCellTextAlign;
     children?: DataTableFieldType[];

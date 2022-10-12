@@ -45,7 +45,7 @@
                                                 >
                                                     {{ field.label ? field.label : field.name }}
                                                 </slot>
-                                                <p-copy-button v-if="colCopy && isLeafField(field)"
+                                                <p-copy-button v-if="colCopy && !field.disableCopy && isLeafField(field)"
                                                                copy-manually
                                                                @copy="onClickColCopy(field)"
                                                 />

@@ -91,6 +91,7 @@ interface DataTableFieldType {
     label?: string;
     sortable?: boolean;
     sortKey?: string;
+    disableCopy?: boolean;
     width?: string;
     textAlign?: DataTableCellTextAlign;
     children?: DataTableFieldType[];
@@ -105,6 +106,7 @@ interface DataTableFieldType {
 |label|Display name for the column(field) head.|
 |sortable|Whether to sortable the table by the column or not. If it's not given, it follows the `sortable` props.|
 |sortKey|If you give the value to this property, the value of `sortBy` passed to the `changeSort` and `update:sortBy` events is replaced with this value when sorting based on the corresponding column. default is the column `name`.|
+|disableCopy|Use it when you want to disable copy functions in some columns.|
 |width|If you want to fix the cell width, give the value.|
 |textAlign|If you want to align text in the cell, give the value. <Description markdown={`${Object.values(DATA_TABLE_CELL_TEXT_ALIGN).map(d => `\`${d}\``).join(', ')} are available.`}/> |
 |children|If you want to make a header cell span over multiple columns, give child fields to this property.|
