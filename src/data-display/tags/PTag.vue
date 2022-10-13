@@ -9,13 +9,13 @@
              width="0.8rem"
              height="0.8rem"
         />
-        <slot name="default">
-            <span class="tag-contents">
+        <span class="tag-contents">
+            <slot name="default">
                 <span v-if="categoryItem" class="category"><slot name="category">[{{ categoryItem.label || categoryItem.name }}]</slot></span>
                 <span v-if="keyItem" class="key"><slot name="key">{{ keyItem.label || keyItem.name }}:</slot></span>
                 <span v-if="valueItem"><slot name="value">{{ valueItem.label || valueItem.name }}</slot></span>
-            </span>
-        </slot>
+            </slot>
+        </span>
         <p-i v-if="deletable"
              name="ic_delete"
              width="1rem"
