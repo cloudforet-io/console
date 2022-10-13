@@ -432,6 +432,12 @@ export default defineComponent<Props>({
     }
     .custom-schema-box {
         padding: 2rem 2rem 0 2rem;
+        width: 66%;
+
+        /* custom design-system component - p-text-input */
+        :deep(.p-text-input) {
+            width: 100%;
+        }
     }
 
     /* custom design-system component - p-tab */
@@ -457,24 +463,11 @@ export default defineComponent<Props>({
                 padding: 1rem;
             }
         }
-
-        /* custom design-system component - p-text-input */
-        .p-text-input {
-            width: 66%;
-            .input-container {
-                min-width: 25rem;
-                width: 100%;
-            }
-        }
     }
 
     @screen tablet {
-        /* custom design-system component - p-tab */
-        :deep(.p-tab) {
-            /* custom design-system component - p-text-input */
-            .p-text-input {
-                width: 100%;
-            }
+        .custom-schema-box {
+            width: 100%;
         }
     }
 }
