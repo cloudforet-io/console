@@ -18,8 +18,8 @@
             </template>
         </p-panel-top>
         <slot name="table-top" />
-        <p-data-table :fields="fields"
-                      :items="items"
+        <p-data-table :fields="isCustomMode ? customFields : fields"
+                      :items="isCustomMode ? customItems : items"
                       :loading="loading"
                       :col-copy="true"
                       beautify-text
@@ -27,11 +27,12 @@
         <transition name="slide-up">
             <tags-overlay v-if="tagEditPageVisible"
                           :title="overlayTitle"
-                          :tags="tags"
+                          :tags="isCustomMode ? customTags : tags"
                           :resource-id="resourceId"
                           :resource-key="resourceKey" :resource-type="resourceType"
+                          :loading="loading"
                           @close="closeTag"
-                          @update="updateTag"
+                          @update="handleTagUpdate"
             />
         </transition>
     </div>
@@ -40,7 +41,7 @@
 <script lang="ts">
 
 
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -54,6 +55,8 @@ import { get, camelCase } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
@@ -94,14 +97,27 @@ export default {
             type: String as PropType<TranslateResult|string|undefined>,
             default: undefined,
         },
+        customTags: {
+            type: Object,
+            default: undefined,
+        },
+        customFields: {
+            type: Array,
+            default: undefined,
+        },
+        customItems: {
+            type: Array,
+            default: undefined,
+        },
     },
-    setup(props) {
+    setup(props, { emit }: SetupContext) {
         const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
         const state = reactive({
             loading: true,
             tags: {},
+            isCustomMode: computed<boolean>(() => props.customTags && props.customItems && props.customFields),
             fields: computed(() => [
                 { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
                 { name: 'value', label: i18n.t('COMMON.TAGS.VALUE'), type: 'item' },
@@ -141,15 +157,35 @@ export default {
         const closeTag = async () => {
             tagState.tagEditPageVisible = false;
         };
-        const updateTag = async () => {
-            await getTags();
+        const handleTagUpdate = async (newTags) => {
+            if (!api) {
+                ErrorHandler.handleRequestError(new Error(), i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
+                return;
+            }
+
+            try {
+                state.loading = true;
+                await api.value.update({
+                    [props.resourceKey]: props.resourceId,
+                    tags: newTags,
+                });
+                showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
+            } finally {
+                state.loading = false;
+            }
+            emit('tags-updated');
+            if (!state.isCustomMode) await getTags();
             tagState.tagEditPageVisible = false;
         };
 
         watch([() => props.resourceKey, () => props.resourceId, () => props.resourceType],
             async ([resourceKey, resourceId, resourceType]) => {
-                if (resourceKey && resourceId && resourceType) {
+                if (resourceKey && resourceId && resourceType && !state.isCustomMode) {
                     await getTags();
+                } else {
+                    state.loading = false;
                 }
             }, { immediate: true });
 
@@ -158,7 +194,7 @@ export default {
             ...toRefs(tagState),
             editTag,
             closeTag,
-            updateTag,
+            handleTagUpdate,
         };
     },
 };

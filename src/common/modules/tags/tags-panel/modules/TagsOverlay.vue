@@ -55,19 +55,11 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PIconButton, PPaneLayout, PButton,
 } from '@spaceone/design-system';
-import {
-    camelCase, isEmpty, get,
-} from 'lodash';
+import { isEmpty } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export default {
@@ -87,25 +79,13 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        resourceKey: {
-            type: String,
-            default: '',
-            required: true,
-        },
-        resourceId: {
-            type: String,
-            default: '',
-            required: true,
-        },
-        resourceType: {
-            type: String,
-            default: '',
-            required: true,
+        loading: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            loading: false,
             showHeader: computed(() => state.newTags.length > 0),
             newTags: { ...props.tags },
             isTagsValid: false,
@@ -115,28 +95,7 @@ export default {
         /* Api */
         const handleSaveTags = async () => {
             if (!state.isTagsValid) return;
-
-            const apiKeys = props.resourceType.split('.').map(d => camelCase(d));
-            const api = get(SpaceConnector.client, apiKeys);
-            if (!api) {
-                ErrorHandler.handleRequestError(new Error(), i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
-                return;
-            }
-
-            try {
-                state.loading = true;
-                await api.update({
-                    [props.resourceKey]: props.resourceId,
-                    tags: state.newTags,
-                });
-                showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
-            } finally {
-                state.loading = false;
-            }
-
-            emit('update');
+            emit('update', state.newTags);
         };
 
         /* Event */
