@@ -41,12 +41,15 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 
 import { PBadge, PSelectStatus } from '@spaceone/design-system';
 
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -115,10 +118,13 @@ export default {
         const handleSelectTagType = (tagType) => { state.selectedTagType = tagType; };
         const handleTagsUpdated = async () => { await getCloudServiceTags(); };
 
+        const apiQuery = new ApiQueryHelper();
         const getCloudServiceTags = async () => {
             try {
+                apiQuery.setFilters([{ k: 'type', v: state.selectedTagType, o: '=' }]);
                 const { results } = await SpaceConnector.client.inventory.cloudServiceTag.list({
                     cloud_service_id: props.resourceId,
+                    ...((state.selectedTagType !== 'all') && { query: apiQuery.data }),
                 });
                 state.cloudServiceTagList = results;
             } catch (e) {
@@ -132,9 +138,9 @@ export default {
             label: state.providers[provider]?.name,
         });
 
-        (async () => {
-            await getCloudServiceTags();
-        })();
+        watch([() => state.selectedTagType, () => props.resourceId], () => { getCloudServiceTags(); }, {
+            immediate: true,
+        });
         return {
             ...toRefs(state),
             handleSelectTagType,

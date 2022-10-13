@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top :use-total-count="true" :total-count="items.length">
+        <p-panel-top :use-total-count="true" :total-count="isCustomMode ? customItems.length : items.length">
             <template #default>
                 {{ $t('COMMON.TAGS.TITLE') }}
             </template>
