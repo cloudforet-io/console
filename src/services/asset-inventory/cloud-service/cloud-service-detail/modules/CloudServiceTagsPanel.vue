@@ -138,11 +138,9 @@ export default {
             label: state.providers[provider]?.name,
         });
 
-        watch([() => state.selectedTagType, () => props.resourceId], () => { getCloudServiceTags(); });
-
-        (async () => {
-            await getCloudServiceTags();
-        })();
+        watch([() => state.selectedTagType, () => props.resourceId], () => { getCloudServiceTags(); }, {
+            immediate: true,
+        });
         return {
             ...toRefs(state),
             handleSelectTagType,
