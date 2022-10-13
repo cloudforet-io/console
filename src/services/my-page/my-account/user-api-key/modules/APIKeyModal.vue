@@ -129,7 +129,7 @@ export default {
             isSpacectlCollapsed: true,
             apiItem: {} as APIItem,
             yamlItem: '',
-            githubLink: 'https://github.com/spaceone-dev/spacectl',
+            githubLink: 'https://github.com/cloudforet-io/spacectl',
         });
 
         const onClickDownloadFile = (fileType: FileType) => {
