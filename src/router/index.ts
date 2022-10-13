@@ -76,9 +76,11 @@ export class SpaceRouter {
                 }
             // When an unauthenticated(or token expired) user tries to access a page that only authenticated users can enter, refresh token
             } else if (routeAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
-                const res = await SpaceConnector.refreshAccessToken(false);
-                // When refreshing token is failed, redirect to sign in page
-                if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
+                if (!isTokenAlive) {
+                    // When refreshing token is failed, redirect to sign in page
+                    const res = await SpaceConnector.refreshAccessToken(false);
+                    if (!res) nextLocation = { name: AUTH_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
+                }
             }
 
             next(nextLocation);
