@@ -1,3 +1,10 @@
+# [1.1.0-beta.419](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.418...v1.1.0-beta.419) (2022-10-13)
+
+
+### Features
+
+* **p-tag:** renewal p-tag ([#86](https://github.com/cloudforet-io/mirinae/issues/86)) ([070cada](https://github.com/cloudforet-io/mirinae/commit/070cadadd5090d94e46700098ff561d63165c242))
+
 # [1.1.0-beta.418](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.417...v1.1.0-beta.418) (2022-10-12)
 
 
