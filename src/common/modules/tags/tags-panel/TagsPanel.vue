@@ -23,7 +23,11 @@
                       :loading="loading"
                       :col-copy="true"
                       beautify-text
-        />
+        >
+            <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
+                <slot :name="slot" v-bind="scope" />
+            </template>
+        </p-data-table>
         <transition name="slide-up">
             <tags-overlay v-if="tagEditPageVisible"
                           :title="overlayTitle"
