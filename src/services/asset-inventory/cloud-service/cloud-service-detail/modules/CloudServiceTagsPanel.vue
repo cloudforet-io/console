@@ -25,17 +25,30 @@
                 </p-select-status>
             </div>
         </template>
+        <template #col-type-format="{ value }">
+            <p-badge :style-type="getTagTypeBadgeOption(value).styleType"
+                     outline
+            >
+                {{ getTagTypeBadgeOption(value).label }}
+            </p-badge>
+        </template>
+        <template #col-provider-format="{ value }">
+            <p-badge v-if="value" :background-color="getProviderBadgeOption(value).color">
+                {{ getProviderBadgeOption(value)?.label }}
+            </p-badge>
+        </template>
     </tags-panel>
 </template>
 
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import { PSelectStatus } from '@spaceone/design-system';
+import { PBadge, PSelectStatus } from '@spaceone/design-system';
 
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -50,6 +63,7 @@ export default {
     name: 'CloudServiceTagsPanel',
     components: {
         PSelectStatus,
+        PBadge,
         TagsPanel,
     },
     props: {
@@ -70,6 +84,7 @@ export default {
                 { name: CLOUD_SERVICE_TAG_TYPE.CUSTOM, label: CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[CLOUD_SERVICE_TAG_TYPE.CUSTOM].label },
                 { name: CLOUD_SERVICE_TAG_TYPE.MANAGED, label: CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[CLOUD_SERVICE_TAG_TYPE.MANAGED].label },
             ]),
+            providers: computed(() => store.getters['reference/provider/fieldItems']?.options),
             selectedTagType: 'all',
             cloudServiceTagList: [],
             tags: computed(() => {
@@ -111,6 +126,12 @@ export default {
             }
         };
 
+        const getTagTypeBadgeOption = (tagType: keyof typeof CLOUD_SERVICE_TAG_TYPE) => CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[tagType];
+        const getProviderBadgeOption = provider => ({
+            color: state.providers[provider]?.options.background_color,
+            label: state.providers[provider]?.name,
+        });
+
         (async () => {
             await getCloudServiceTags();
         })();
@@ -118,6 +139,8 @@ export default {
             ...toRefs(state),
             handleSelectTagType,
             handleTagsUpdated,
+            getTagTypeBadgeOption,
+            getProviderBadgeOption,
         };
     },
 };
