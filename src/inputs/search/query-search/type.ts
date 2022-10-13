@@ -20,6 +20,11 @@ export const OPERATOR = Object.freeze({
 export const operators = Object.values(OPERATOR);
 export type OperatorType = typeof OPERATOR[keyof typeof OPERATOR];
 
+export interface CategoryItem {
+    label?: string;
+    name: any;
+}
+
 export interface ValueItem {
     label: string;
     name: any;

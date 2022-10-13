@@ -1,13 +1,16 @@
 import PTag from '@/data-display/tags/PTag.vue';
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import { getTagArgTypes } from '@/data-display/tags/story-helper';
+import {
+    getBasicTagArgs
+} from '@/data-display/tags/mock';
 
 <Meta title='Data Display/Tag' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124044',
     }
-}} component={ PTag } argTypes={getTagArgTypes()}
+}} argTypes={getTagArgTypes()}
 />
 
 export const Template = (args,{argTypes})=>({
@@ -16,14 +19,15 @@ export const Template = (args,{argTypes})=>({
     template: `
         <div style="display:flex; align-items:center; justify-content:center; height:100px;">
             <p-tag
+                :category-item="categoryItem"
+                :key-item="keyItem"
+                :value-item="valueItem"
                 :deletable="deletable"
                 :outline="outline"
                 :selected="selected"
                 :invalid="invalid"
                 :error-message="errorMessage"
-            >
-                <template #default>{{$props.default}}</template>
-            </p-tag>
+            />
         </div>
     `,
 })
@@ -33,6 +37,31 @@ export const Template = (args,{argTypes})=>({
 <br/>
 <br/>
 <br/>
+
+## Basic
+<Canvas>
+    <Story name="Basic">
+        {{
+            components:{ PTag },
+            template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-tag :category-item="fullArgs.categoryItem" :key-item="fullArgs.keyItem" :value-item="fullArgs.valueItem" style="margin: 1rem"/>
+    <p-tag :key-item="keyValueArgs.keyItem" :value-item="keyValueArgs.valueItem" style="margin: 1rem"/>
+    <p-tag :value-item="onlyValueArg.valueItem" style="margin: 1rem"/>
+</div>`,
+            setup() {
+                const state = {
+                    fullArgs: getBasicTagArgs().fullArgs,
+                    keyValueArgs: getBasicTagArgs().keyValueArgs,
+                    onlyValueArg: getBasicTagArgs().onlyValueArg,
+                };
+                return {
+                    ...state,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
 
 ## Deletable Tag
 <Canvas>
@@ -82,7 +111,7 @@ export const Template = (args,{argTypes})=>({
 ## Playground
 
 <Canvas>
-    <Story name="Playground" height="100px">
+    <Story name="Playground" height="100px" >
         {Template.bind({})}
     </Story>
 </Canvas>
