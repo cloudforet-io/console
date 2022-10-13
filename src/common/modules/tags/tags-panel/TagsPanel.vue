@@ -30,8 +30,9 @@
                           :tags="isCustomMode ? customTags : tags"
                           :resource-id="resourceId"
                           :resource-key="resourceKey" :resource-type="resourceType"
+                          :loading="loading"
                           @close="closeTag"
-                          @update="updateTag"
+                          @update="handleTagUpdate"
             />
         </transition>
     </div>
@@ -54,6 +55,8 @@ import { get, camelCase } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
@@ -114,7 +117,7 @@ export default {
         const state = reactive({
             loading: true,
             tags: {},
-            isCustomMode: computed<boolean>(() => props.customTags, props.displayItem && props.displayFields),
+            isCustomMode: computed<boolean>(() => props.customTags && props.customItems && props.customFields),
             fields: computed(() => [
                 { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
                 { name: 'value', label: i18n.t('COMMON.TAGS.VALUE'), type: 'item' },
@@ -154,7 +157,24 @@ export default {
         const closeTag = async () => {
             tagState.tagEditPageVisible = false;
         };
-        const updateTag = async () => {
+        const handleTagUpdate = async (newTags) => {
+            if (!api) {
+                ErrorHandler.handleRequestError(new Error(), i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
+                return;
+            }
+
+            try {
+                state.loading = true;
+                await api.value.update({
+                    [props.resourceKey]: props.resourceId,
+                    tags: newTags,
+                });
+                showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
+            } finally {
+                state.loading = false;
+            }
             emit('tags-updated');
             if (!state.isCustomMode) await getTags();
             tagState.tagEditPageVisible = false;
@@ -174,7 +194,7 @@ export default {
             ...toRefs(tagState),
             editTag,
             closeTag,
-            updateTag,
+            handleTagUpdate,
         };
     },
 };
