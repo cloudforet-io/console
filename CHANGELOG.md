@@ -1,3 +1,10 @@
+# [1.1.0-beta.420](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.419...v1.1.0-beta.420) (2022-10-13)
+
+
+### Bug Fixes
+
+* **p-tag:** fix side effect in default slot ([#87](https://github.com/cloudforet-io/mirinae/issues/87)) ([8d2c57e](https://github.com/cloudforet-io/mirinae/commit/8d2c57ed3e2316408cc0328a5ea5bcd602515e3d))
+
 # [1.1.0-beta.419](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.418...v1.1.0-beta.419) (2022-10-13)
 
 
