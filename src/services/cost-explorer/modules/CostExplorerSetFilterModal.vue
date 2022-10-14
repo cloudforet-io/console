@@ -64,8 +64,6 @@ import {
 import type { CollapsibleItem } from '@spaceone/design-system/dist/src/data-display/collapsibles/collapsible-list/type';
 import { cloneDeep } from 'lodash';
 
-import { store } from '@/store';
-
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import CostAnalysisFilterItem from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFilterItem.vue';
@@ -141,17 +139,6 @@ export default defineComponent<Props>({
         watch(() => props.visible, (after) => {
             if (after) init();
         });
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
-                store.dispatch('reference/serviceAccount/load'),
-                store.dispatch('reference/provider/load'),
-                store.dispatch('reference/region/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

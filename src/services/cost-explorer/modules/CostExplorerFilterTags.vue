@@ -94,6 +94,17 @@ export default defineComponent<Props>({
             emit('update-filter-tags', _filters);
         };
 
+        /* Init */
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/serviceAccount/load'),
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/region/load'),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
             categoryItemFormatter,
