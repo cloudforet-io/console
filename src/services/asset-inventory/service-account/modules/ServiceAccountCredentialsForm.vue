@@ -35,7 +35,7 @@
                     <p-radio :selected="formState.attachTrustedAccount" :value="true" @change="handleChangeAttachTrustedAccount">
                         {{ $t('APP.MAIN.YES') }}<br>
                     </p-radio>
-                    <div class="yes-dropdown">
+                    <div v-if="formState.attachTrustedAccount" class="yes-dropdown">
                         <p-select-dropdown :selected="formState.attachedTrustedAccountId"
                                            :items="trustedAccountMenuItems"
                                            :disabled="!formState.attachTrustedAccount"
