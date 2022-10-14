@@ -1,3 +1,10 @@
+# [1.1.0-beta.422](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.421...v1.1.0-beta.422) (2022-10-14)
+
+
+### Bug Fixes
+
+* **select-card:** do not hover when `disabled` ([#88](https://github.com/cloudforet-io/mirinae/issues/88)) ([defe934](https://github.com/cloudforet-io/mirinae/commit/defe93437fac27d46d19e6b8307af268267aec29))
+
 # [1.1.0-beta.421](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.420...v1.1.0-beta.421) (2022-10-14)
 
 
