@@ -461,6 +461,8 @@
 			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "Accumulated",
+				"ADDITIONAL_INFO": "Additional Info",
+				"ADD_MORE": "Add More",
 				"ALT_E_DELETE_QUERY": "Failed to Delete Query",
 				"ALT_E_EDITED_QUERY": "Failed to Edit Query",
 				"ALT_E_SAVED_QUERY": "Failed to Save Query",
@@ -474,6 +476,7 @@
 				"COST_ANALYSIS": "Cost Analysis",
 				"CURRENCY": "Currency",
 				"DAILY": "Daily",
+				"DEFAULT": "Default",
 				"DONUT": "Donut",
 				"EDIT_QUERY": "Edit Query",
 				"END_DATE": "End Date",
@@ -535,6 +538,7 @@
 				"STACKED_COLUMN": "Stacked Column",
 				"STACKED_LINE": "Stacked Line",
 				"START_DATE": "Start Date",
+				"TAGS": "Tags",
 				"TOO_MANY_ITEMS": "Showing Top 15 items only. Set filter to view specific items.",
 				"TOTAL_COST": "Total Cost",
 				"YEARLY": "Yearly"
@@ -1645,6 +1649,7 @@
 			},
 			"PAGE": {
 				"ACTION": "Action",
+				"ALL": "All",
 				"ALT_E_CHANGE_PROJECT": "Failed to Change Project",
 				"ALT_E_RELEASE_PROJECT_TITLE": "Failed to Release Project",
 				"ALT_S_CHANGE_PROJECT": "Successfully Changed Project",
@@ -1652,15 +1657,21 @@
 				"CHANGE_PROJECT": "Change Project",
 				"COLLECT_DATA": "Collect Data",
 				"CONSOLE": "Connect to Console",
+				"CUSTOM_TAGS": "Custom Tags",
 				"DELETE": "Delete",
+				"EDIT_CUSTOM_TAGS": "Edit Custom Tags",
 				"NO_SELECTED": "Select a cloud service for more details.",
+				"PROVIDER": "Provider",
 				"TAB_DATA": "Data ",
 				"TAB_DETAILS": "Details",
 				"TAB_HISTORY": "History",
 				"TAB_MEMBER": "Related Member",
 				"TAB_MONITORING": "Monitoring",
 				"TAB_SELECTED_DATA": "Selected Data",
-				"TAB_TAG": "Tag"
+				"TAB_TAG": "Tag",
+				"TAG_CUSTOM": "Custom",
+				"TAG_MANAGED": "Managed",
+				"TYPE": "Type"
 			}
 		},
 		"SERVER": {

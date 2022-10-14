@@ -1,11 +1,10 @@
 <template>
-    <!--song-lang : overlayTitle is located in the TagsOverlay.vue-->
     <tags-panel :resource-id="resourceId"
                 :disabled="disabled"
                 resource-type="inventory.CloudService"
                 resource-key="cloud_service_id"
-                :tag-edit-button-text="$t('Edit Custom Tags')"
-                :overlay-title="$t('Custom Tags')"
+                :tag-edit-button-text="$t('INVENTORY.CLOUD_SERVICE.PAGE.EDIT_CUSTOM_TAGS')"
+                :overlay-title="$t('INVENTORY.CLOUD_SERVICE.PAGE.CUSTOM_TAGS')"
                 :custom-fields="fields"
                 :custom-items="items"
                 :custom-tags="tags"
@@ -13,8 +12,7 @@
     >
         <template #table-top>
             <div class="tag-type-filter">
-                <!--song-lang-->
-                <span class="label">{{ $t('Type') }}</span>
+                <span class="label">{{ $t('INVENTORY.CLOUD_SERVICE.PAGE.TYPE') }}</span>
                 <p-select-status v-for="(status, idx) in tagTypeList" :key="`${status.name}-${idx}`"
                                  :selected="selectedTagType"
                                  :value="status.name"
@@ -83,7 +81,7 @@ export default {
     setup(props) {
         const state = reactive({
             tagTypeList: computed(() => [
-                { name: 'all', label: 'All' }, // song-lang
+                { name: 'all', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.ALL') },
                 { name: CLOUD_SERVICE_TAG_TYPE.CUSTOM, label: CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[CLOUD_SERVICE_TAG_TYPE.CUSTOM].label },
                 { name: CLOUD_SERVICE_TAG_TYPE.MANAGED, label: CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[CLOUD_SERVICE_TAG_TYPE.MANAGED].label },
             ]),
@@ -101,11 +99,11 @@ export default {
                 { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
                 { name: 'value', label: i18n.t('COMMON.TAGS.VALUE'), type: 'item' },
                 {
-                    name: 'type', label: i18n.t('Type'), type: 'item', disableCopy: true,
-                }, // song-lang
+                    name: 'type', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TYPE'), type: 'item', disableCopy: true,
+                },
                 {
-                    name: 'provider', label: i18n.t('Provider'), type: 'item', disableCopy: true,
-                }, // song-lang
+                    name: 'provider', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.PROVIDER'), type: 'item', disableCopy: true,
+                },
             ]),
             items: computed(() => state.cloudServiceTagList?.map(k => ({
                 key: k.key,

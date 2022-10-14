@@ -1,8 +1,7 @@
 <template>
-    <!--    song-lang-->
     <p-button-modal
         class="cost-analysis-group-by-filter-more-modal"
-        :header-title="$t('Add More')"
+        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ADD_MORE')"
         :visible.sync="proxyVisible"
         size="sm"
         @confirm="handleConfirm"

@@ -18,25 +18,21 @@
             <template #content>
                 <div class="popover-content-wrapper">
                     <div class="group-by-wrapper">
-                        <!--    song-lang-->
-                        <b>{{ $t('Default') }}</b>
+                        <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DEFAULT') }}</b>
                         <span class="count-text"> ({{ count.default }})</span>
                     </div>
                     <div class="group-by-wrapper">
-                        <!--    song-lang-->
-                        <b>{{ $t('Tags') }}</b>
+                        <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TAGS') }}</b>
                         <span class="count-text"> ({{ count.tags }})</span>
                     </div>
                     <div class="group-by-wrapper">
-                        <!--    song-lang-->
-                        <b>{{ $t('Additional Info') }}</b>
+                        <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ADDITIONAL_INFO') }}</b>
                         <span class="count-text"> ({{ count.additionalInfo }})</span>
                     </div>
                     <p-button icon="ic_plus_bold" style-type="primary1" :outline="true"
                               @click="handleClickAddMoreButton"
                     >
-                        <!--    song-lang-->
-                        {{ $t('Add More') }}
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ADD_MORE') }}
                     </p-button>
                 </div>
             </template>
