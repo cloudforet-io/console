@@ -9,7 +9,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type { CostAnalysisStoreState } from '@/services/cost-explorer/store/cost-analysis/type';
-import type { CostQuerySetModel, CostQuerySetOption } from '@/services/cost-explorer/type';
+import type {
+    CostQuerySetModel, CostQuerySetOption, CostQueryFilterItem, CostQueryFilters,
+} from '@/services/cost-explorer/type';
 
 
 export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = ({ commit }): void => {
@@ -17,10 +19,26 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
     commit('setStack', false);
     commit('setGroupBy', []);
     commit('setPrimaryGroupBy', undefined);
+    commit('setMoreGroupBy', []);
     commit('setPeriod', getInitialDates());
-    commit('setFilters', {});
+    commit('setFilters', []);
 };
 
+
+const convertFilterFromObjectToArray = (filters: CostQueryFilters) => {
+    const results: CostQueryFilterItem[] = [];
+    Object.entries(filters).forEach(([category, values]) => {
+        if (values) {
+            values.forEach((v) => {
+                results.push({
+                    category,
+                    value: v as string,
+                });
+            });
+        }
+    });
+    return results;
+};
 
 export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit }, options: Partial<CostQuerySetOption>): void => {
     if (options.granularity) commit('setGranularity', options.granularity);
@@ -29,8 +47,16 @@ export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit },
         commit('setGroupBy', options.group_by);
         commit('setPrimaryGroupBy', options.primary_group_by);
     } else commit('setPrimaryGroupBy', undefined);
+    if (options.more_group_by?.length) commit('setMoreGroupBy', options.more_group_by);
     if (options.period) commit('setPeriod', { start: options.period.start, end: options.period.end });
-    if (options.filters) commit('setFilters', options.filters);
+    if (options.filters) {
+        let filters = options.filters;
+        // TODO: will be deprecated someday
+        if (!Array.isArray(options.filters)) {
+            filters = convertFilterFromObjectToArray(options.filters);
+        }
+        commit('setFilters', filters);
+    }
 };
 
 export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ commit }): Promise<void|Error> => {
@@ -51,7 +77,7 @@ export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, co
     try {
         const {
             granularity, stack, period,
-            groupBy, filters, primaryGroupBy,
+            groupBy, filters, primaryGroupBy, moreGroupBy,
         } = state;
         const options: CostQuerySetOption = {
             granularity,
@@ -60,6 +86,7 @@ export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, co
             group_by: groupBy,
             primary_group_by: groupBy?.length ? (primaryGroupBy || groupBy[0]) : undefined,
             filters,
+            more_group_by: moreGroupBy,
         };
         const updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
             name,

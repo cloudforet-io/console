@@ -15,36 +15,33 @@
         <p-search-dropdown
             v-else-if="type === FILTER.SERVICE_ACCOUNT || type === FILTER.REGION || type === FILTER.PROVIDER"
             :menu="menuItems"
-            :selected="selectedItems"
+            :selected="selectedSearchDropdownItems"
             multi-selectable
             use-fixed-menu-style
             :exact-mode="false"
             @update:selected="handleUpdateSelected"
-            @search="handleSearch"
         />
         <p-search-dropdown
             v-else
             :handler="menuHandler"
-            :selected="selectedItems"
+            :selected="selectedSearchDropdownItems"
             :loading="menuLoading"
             multi-selectable
             use-fixed-menu-style
             :exact-mode="false"
             @update:selected="handleUpdateSelected"
-            @search="handleSearch"
         />
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
 import {
     PSearchDropdown,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type {
     AutocompleteHandler, SearchDropdownMenuItem,
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
@@ -60,17 +57,19 @@ import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { FILTER } from '@/services/cost-explorer/lib/config';
+import { ADDITIONAL_FILTER, FILTER } from '@/services/cost-explorer/lib/config';
+import type { CostQueryFilterItem } from '@/services/cost-explorer/type';
 
 
 interface Props {
     type: string;
-    selected: string[];
+    selected: CostQueryFilterItem[];
 }
 
-export default {
+export default defineComponent<Props>({
     name: 'CostAnalysisFilterItem',
     components: {
         ProjectSelectDropdown,
@@ -86,28 +85,44 @@ export default {
             default: () => ([]),
         },
     },
-    setup(props: Props, { emit }) {
-        const state = reactive({
-            selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selected.map(selectedName => ({
-                name: selectedName,
-                label: state.menuItems.find(d => d.name === selectedName)?.label || selectedName,
-            }))),
+    setup(props, { emit }) {
+        const storeState = reactive({
             serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-            menuItems: computed(() => {
+        });
+        const state = reactive({
+            proxySelected: useProxyValue('selected', props, emit),
+            selectedSearchDropdownItems: computed<SearchDropdownMenuItem[]>(() => state.proxySelected?.map(d => ({
+                name: d.value,
+                label: state.menuItems.find(menuItem => menuItem.name === d.value)?.label || d.value,
+            }))),
+            menuItems: computed<SearchDropdownMenuItem[]>(() => {
                 if (props.type === FILTER.SERVICE_ACCOUNT) {
-                    return Object.keys(state.serviceAccounts).map(k => ({
-                        name: k, label: state.serviceAccounts[k].label,
+                    return Object.keys(storeState.serviceAccounts).map(k => ({
+                        name: k, label: storeState.serviceAccounts[k].label,
                     }));
                 } if (props.type === FILTER.PROVIDER) {
-                    return Object.keys(state.providers).map(k => ({
-                        name: k, label: state.providers[k].name,
+                    return Object.keys(storeState.providers).map(k => ({
+                        name: k, label: storeState.providers[k].name,
                     }));
                 } if (props.type === FILTER.REGION) {
-                    return Object.keys(state.regions).map(k => ({
-                        name: k, label: state.regions[k].name,
+                    return Object.keys(storeState.regions).map(k => ({
+                        name: k, label: storeState.regions[k].name,
                     }));
+                }
+                // TODO: tags, additional_info
+                if (props.type === ADDITIONAL_FILTER.TAGS) {
+                    // return [
+                    //     {
+                    //         keyItem: { name: 'tag_key1', label: 'tag_key1' },
+                    //         valueItem: { name: 'tag_value1', label: 'tag_value1' },
+                    //     },
+                    //     {
+                    //         keyItem: { name: 'tag_key2', label: 'tag_key2' },
+                    //         valueItem: { name: 'tag_value2', label: 'tag_value2' },
+                    //     },
+                    // ];
                 }
                 return [];
             }),
@@ -161,14 +176,20 @@ export default {
 
         /* event */
         const handleSelectedProjectIds = (selectedProjectIds) => {
-            emit('update:selected', selectedProjectIds);
+            state.proxySelected = selectedProjectIds.map(d => ({
+                category: props.type,
+                value: d,
+            }));
         };
-        const handleUpdateSelected = (selectedItem: MenuItem[]) => {
-            emit('update:selected', selectedItem.map(d => d.name));
+        const handleUpdateSelected = (selectedItems: SearchDropdownMenuItem[]) => {
+            state.proxySelected = selectedItems.map(d => ({
+                category: props.type,
+                value: d.name,
+            }));
         };
-        const handleSearch = (val: string) => {
-            emit('update:selected', state.selectedItems.map(d => d.name).concat([val]));
-        };
+        // const handleSearch = (val: string) => {
+        //     emit('update:selected', state.selectedItems.map(d => d.name).concat([val]));
+        // };
 
         // LOAD REFERENCE STORE
         (async () => {
@@ -185,8 +206,7 @@ export default {
             menuHandler,
             handleSelectedProjectIds,
             handleUpdateSelected,
-            handleSearch,
         };
     },
-};
+});
 </script>

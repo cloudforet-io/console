@@ -1,5 +1,6 @@
 import type {
-    CostQueryFilters, CostQuerySetModel, Period, Granularity, GroupBy,
+    CostQuerySetModel, Period, Granularity, GroupBy, MoreGroupByItem,
+    CostQueryFilterItem,
 } from '@/services/cost-explorer/type';
 
 export interface GroupByItem {
@@ -12,8 +13,9 @@ export interface CostAnalysisStoreState {
     stack: boolean;
     groupBy: GroupBy[];
     primaryGroupBy?: GroupBy;
+    moreGroupBy: MoreGroupByItem[];
     period: Period;
-    filters: CostQueryFilters;
+    filters: CostQueryFilterItem[];
     selectedQueryId?: string;
     costQueryList: CostQuerySetModel[];
 }

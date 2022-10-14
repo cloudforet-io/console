@@ -30,7 +30,7 @@ export const getCostDashboardFilterLabel = (filters?: CostQueryFilters): string|
     const desc: string[] = [];
     Object.entries(FILTER_ITEM_MAP).forEach(([k, v]) => {
         if (filters[k]?.length) {
-            const filterLength = filters[k].length;
+            const filterLength = filters[k]?.length ?? 0;
             const suffix = filterLength > 1 ? `${v.label}s` : v.label;
             desc.push(`${filterLength} ${suffix}`);
         }
