@@ -52,12 +52,13 @@
                     </p-empty>
                 </template>
                 <template v-else>
-                    <p-tag v-for="(filterItem, idx) in refinedFilterItems" :key="`selected-tag-${idx}-${filterItem.resourceName}`"
+                    <p-tag v-for="(refinedItem, idx) in refinedFilterItems" :key="`selected-tag-${idx}-${refinedItem.value}`"
                            :deletable="!printMode"
-                           @delete="handleDeleteFilterTag(filterItem)"
-                    >
-                        <b>[{{ FILTER_ITEM_MAP[filterItem.category].label }}] </b>{{ filterItem.value }}
-                    </p-tag>
+                           :category-item="categoryItemFormatter(refinedItem)"
+                           :key-item="keyItemFormatter(refinedItem)"
+                           :value-item="valueItemFormatter(refinedItem)"
+                           @delete="handleDeleteFilterTag(refinedItem)"
+                    />
                 </template>
             </div>
 
@@ -108,7 +109,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -146,7 +146,7 @@ import {
 } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type {
-    Period, Granularity, GroupBy, CostQueryFilterItem,
+    Period, Granularity, GroupBy, CostQueryFilterItem, RefinedFilterItem,
 } from '@/services/cost-explorer/type';
 import {
     getLegends,
@@ -199,7 +199,7 @@ export default {
                 provider: store.getters['reference/providerItems'],
                 region_code: store.getters['reference/regionItems'],
             })),
-            refinedFilterItems: computed<CostQueryFilterItem[]>(() => getRefinedFilterItems(state.resourceMap, state.filters)),
+            refinedFilterItems: computed<RefinedFilterItem[]>(() => getRefinedFilterItems(state.resourceMap, state.filters)),
             filterCategories: computed<CollapsibleItem[]>(() => Object.values(FILTER_ITEM_MAP).map(item => ({
                 title: item.label, data: item.name,
             }))),
@@ -228,6 +228,16 @@ export default {
             if (legend?.disabled) return DISABLED_LEGEND_COLOR;
             return null;
         };
+        const categoryItemFormatter = (refinedItem: RefinedFilterItem) => ({
+            name: FILTER_ITEM_MAP[refinedItem.category].label,
+        });
+        const keyItemFormatter = (refinedItem: RefinedFilterItem) => {
+            if (!refinedItem.key) return undefined;
+            return { name: refinedItem.key };
+        };
+        const valueItemFormatter = (refinedItem: RefinedFilterItem) => ({
+            name: refinedItem.label,
+        });
 
         /* api */
         let listCostAnalysisRequest: CancelTokenSource | undefined;
@@ -297,9 +307,15 @@ export default {
         const handleClearAllFilters = () => {
             costExplorerStore.commit('costAnalysis/setFilters', []);
         };
-        const handleDeleteFilterTag = (filterItem: CostQueryFilterItem) => {
-            const _filters = [...state.filters];
-            const _index = _filters.findIndex(f => f.resourceName === filterItem.resourceName);
+        const handleDeleteFilterTag = (item: RefinedFilterItem) => {
+            const _filters: CostQueryFilterItem[] = [...state.filters];
+            const _index = _filters.findIndex((f) => {
+                if (f.category !== item.category) return false;
+                if (item.key) {
+                    return f.key === item.key && f.value === item.value;
+                }
+                return f.value === item.value;
+            });
             _filters.splice(_index, 1);
             costExplorerStore.commit('costAnalysis/setFilters', _filters);
         };
@@ -338,6 +354,9 @@ export default {
             handleClearAllFilters,
             handleConfirmFilterModal,
             handleChartRendered,
+            categoryItemFormatter,
+            keyItemFormatter,
+            valueItemFormatter,
         };
     },
 };

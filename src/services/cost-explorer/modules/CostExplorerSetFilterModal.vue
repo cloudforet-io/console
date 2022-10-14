@@ -34,11 +34,12 @@
                             {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTER') }} ({{ selectedFilterItems.length }})
                         </div>
                         <div v-if="selectedFilterItems.length" class="selected-tags-wrapper">
-                            <p-tag v-for="(filterItem, idx) in refinedSelectedFilterItems" :key="`selected-tag-${idx}-${filterItem.resourceName}`"
-                                   @delete="handleDeleteTag(filterItem)"
-                            >
-                                <b>[{{ FILTER_ITEM_MAP[filterItem.category].label }}] </b>{{ filterItem.value }}
-                            </p-tag>
+                            <p-tag v-for="(refinedItem, idx) in refinedSelectedFilterItems" :key="`selected-tag-${idx}-${refinedItem.value}`"
+                                   :category-item="categoryItemFormatter(refinedItem)"
+                                   :key-item="keyItemFormatter(refinedItem)"
+                                   :value-item="valueItemFormatter(refinedItem)"
+                                   @delete="handleDeleteTag(refinedItem)"
+                            />
                         </div>
                         <div v-else class="no-item-wrapper">
                             <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER_MODAL_HELP_TEXT_1') }}</p>
@@ -72,7 +73,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { getRefinedFilterItems } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import CostAnalysisFilterItem from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFilterItem.vue';
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import type { CostQueryFilterItem } from '@/services/cost-explorer/type';
+import type { CostQueryFilterItem, RefinedFilterItem } from '@/services/cost-explorer/type';
 
 
 interface Props {
@@ -114,7 +115,7 @@ export default defineComponent<Props>({
                 [FILTER.PROVIDER]: store.getters['reference/providerItems'],
                 [FILTER.REGION]: store.getters['reference/regionItems'],
             })),
-            refinedSelectedFilterItems: computed<CostQueryFilterItem[]>(() => getRefinedFilterItems(state.resourceMap, state.selectedFilterItems)),
+            refinedSelectedFilterItems: computed<RefinedFilterItem[]>(() => getRefinedFilterItems(state.resourceMap, state.selectedFilterItems)),
             unfoldedIndices: [] as number[],
             menuLoading: false,
         });
@@ -130,11 +131,27 @@ export default defineComponent<Props>({
             state.unfoldedIndices = _unfoldedIndices;
             state.selectedFilterItems = [...props.prevFilterItems];
         };
+        const categoryItemFormatter = (refinedItem: RefinedFilterItem) => ({
+            name: FILTER_ITEM_MAP[refinedItem.category].label,
+        });
+        const keyItemFormatter = (refinedItem: RefinedFilterItem) => {
+            if (!refinedItem.key) return undefined;
+            return { name: refinedItem.key };
+        };
+        const valueItemFormatter = (refinedItem: RefinedFilterItem) => ({
+            name: refinedItem.label,
+        });
 
         /* Event */
-        const handleDeleteTag = (filterItem: CostQueryFilterItem) => {
-            const _filters = [...state.selectedFilterItems];
-            const _index = _filters.findIndex(f => f.resourceName === filterItem.resourceName);
+        const handleDeleteTag = (item: RefinedFilterItem) => {
+            const _filters: CostQueryFilterItem[] = [...state.selectedFilterItems];
+            const _index = _filters.findIndex((f) => {
+                if (f.category !== item.category) return false;
+                if (item.key) {
+                    return f.key === item.key && f.value === item.value;
+                }
+                return f.value === item.value;
+            });
             _filters.splice(_index, 1);
             state.selectedFilterItems = _filters;
         };
@@ -174,6 +191,9 @@ export default defineComponent<Props>({
             handleClearAll,
             handleDeleteTag,
             handleFilterUpdate,
+            categoryItemFormatter,
+            keyItemFormatter,
+            valueItemFormatter,
         };
     },
 });

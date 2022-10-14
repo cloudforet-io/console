@@ -27,13 +27,12 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
 
 const convertFilterFromObjectToArray = (filters: CostQueryFilters) => {
     const results: CostQueryFilterItem[] = [];
-    Object.entries(filters).forEach(([category, resourceNames]) => {
-        if (resourceNames) {
-            resourceNames.forEach((name) => {
+    Object.entries(filters).forEach(([category, values]) => {
+        if (values) {
+            values.forEach((v) => {
                 results.push({
                     category,
-                    value: name as string,
-                    resourceName: name as string,
+                    value: v as string,
                 });
             });
         }

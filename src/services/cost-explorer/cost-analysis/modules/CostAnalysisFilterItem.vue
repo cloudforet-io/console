@@ -94,8 +94,8 @@ export default defineComponent<Props>({
         const state = reactive({
             proxySelected: useProxyValue('selected', props, emit),
             selectedSearchDropdownItems: computed<SearchDropdownMenuItem[]>(() => state.proxySelected?.map(d => ({
-                name: d.resourceName,
-                label: state.menuItems.find(menuItem => menuItem.name === d.resourceName)?.label || d.value,
+                name: d.value,
+                label: state.menuItems.find(menuItem => menuItem.name === d.value)?.label || d.value,
             }))),
             menuItems: computed<SearchDropdownMenuItem[]>(() => {
                 if (props.type === FILTER.SERVICE_ACCOUNT) {
@@ -178,14 +178,12 @@ export default defineComponent<Props>({
         const handleSelectedProjectIds = (selectedProjectIds) => {
             state.proxySelected = selectedProjectIds.map(d => ({
                 category: props.type,
-                resourceName: d,
                 value: d,
             }));
         };
         const handleUpdateSelected = (selectedItems: SearchDropdownMenuItem[]) => {
             state.proxySelected = selectedItems.map(d => ({
                 category: props.type,
-                resourceName: d.name,
                 value: d.name,
             }));
         };

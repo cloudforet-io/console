@@ -18,6 +18,11 @@ export const GROUP_BY = {
     ACCOUNT: 'account',
 } as const;
 
+export const MORE_GROUP_BY = {
+    TAGS: 'tags',
+    ADDITIONAL_INFO: 'additional_info',
+};
+
 export const GRANULARITY_ITEM_MAP = {
     [GRANULARITY.ACCUMULATED]: { name: GRANULARITY.ACCUMULATED, label: 'Accumulated' },
     [GRANULARITY.DAILY]: { name: GRANULARITY.DAILY, label: 'Daily' },

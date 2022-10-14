@@ -7,10 +7,13 @@ export interface Period {
 }
 
 export interface CostQueryFilterItem {
-    resourceName: string;
-    key?: string;
     category: string;
+    key?: string;
     value: string;
+}
+
+export interface RefinedFilterItem extends CostQueryFilterItem {
+    label: string;
 }
 
 export interface MoreGroupByItem {

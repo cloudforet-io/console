@@ -7,7 +7,7 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 import { FILTER, GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type {
-    CostQueryFilters, Period, Granularity, CostQueryFilterItem,
+    CostQueryFilters, Period, Granularity, CostQueryFilterItem, RefinedFilterItem,
 } from '@/services/cost-explorer/type';
 
 
@@ -32,17 +32,17 @@ export const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[
     return result;
 };
 
-export const getRefinedFilterItems = (resourceMap: Record<string, any>, filterItems: CostQueryFilterItem[]): CostQueryFilterItem[] => {
-    const results: CostQueryFilterItem[] = [];
+export const getRefinedFilterItems = (resourceMap: Record<string, any>, filterItems: CostQueryFilterItem[]): RefinedFilterItem[] => {
+    const results: RefinedFilterItem[] = [];
     filterItems.forEach((f) => {
-        const resourceItem = resourceMap[f.category]?.[f.resourceName];
-        let value = f.value;
+        const resourceItem = resourceMap[f.category]?.[f.value];
+        let label = f.value;
         if (resourceItem) {
-            value = f.category === FILTER.REGION ? resourceItem?.name : resourceItem?.label;
+            label = f.category === FILTER.REGION ? resourceItem?.name : resourceItem?.label;
         }
         results.push({
             ...f,
-            value,
+            label,
         });
     });
     return results;
