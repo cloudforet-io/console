@@ -46,20 +46,10 @@
                 </div>
             </div>
             <div class="filter-wrapper">
-                <template v-if="!filters.length">
-                    <p-empty>
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_FILTERS') }}
-                    </p-empty>
-                </template>
-                <template v-else>
-                    <p-tag v-for="(refinedItem, idx) in refinedFilterItems" :key="`selected-tag-${idx}-${refinedItem.value}`"
-                           :deletable="!printMode"
-                           :category-item="categoryItemFormatter(refinedItem)"
-                           :key-item="keyItemFormatter(refinedItem)"
-                           :value-item="valueItemFormatter(refinedItem)"
-                           @delete="handleDeleteFilterTag(refinedItem)"
-                    />
-                </template>
+                <cost-explorer-filter-tags :print-mode="printMode"
+                                           :filter-items="filters"
+                                           @update-filter-tags="handleUpdateFilterTags"
+                />
             </div>
 
             <!--legend-->
@@ -115,7 +105,7 @@ import {
 
 import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 import {
-    PButton, PIconButton, PSelectDropdown, PStatus, PTag, PDataLoader, PEmpty,
+    PButton, PIconButton, PSelectDropdown, PStatus, PDataLoader,
 } from '@spaceone/design-system';
 import type { CollapsibleItem } from '@spaceone/design-system/dist/src/data-display/collapsibles/collapsible-list/type';
 import type { CancelTokenSource } from 'axios';
@@ -135,7 +125,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import {
-    convertFilterItemToQueryStoreFilter, getRefinedFilterItems,
+    convertFilterItemToQueryStoreFilter,
 } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import CostAnalysisPieChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue';
@@ -144,14 +134,13 @@ import CostAnalysisStackedColumnChart
 import {
     FILTER_ITEM_MAP, GRANULARITY,
 } from '@/services/cost-explorer/lib/config';
+import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type {
-    Period, Granularity, GroupBy, CostQueryFilterItem, RefinedFilterItem,
+    Period, Granularity, GroupBy, CostQueryFilterItem,
 } from '@/services/cost-explorer/type';
 import {
-    getLegends,
-    getPieChartData,
-    getXYChartData,
+    getLegends, getPieChartData, getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import type {
     Legend, PieChartData, XYChartData,
@@ -164,6 +153,7 @@ const CostExplorerSetFilterModal = () => import('@/services/cost-explorer/module
 export default {
     name: 'CostAnalysisChart',
     components: {
+        CostExplorerFilterTags,
         CostAnalysisStackedColumnChart,
         CostAnalysisPieChart,
         CostExplorerSetFilterModal,
@@ -171,9 +161,7 @@ export default {
         PIconButton,
         PSelectDropdown,
         PStatus,
-        PTag,
         PDataLoader,
-        PEmpty,
     },
     props: {
         printMode: {
@@ -192,14 +180,6 @@ export default {
             primaryGroupBy: computed(() => costExplorerStore.state.costAnalysis.primaryGroupBy),
             //
             groupByItems: computed(() => costExplorerStore.getters['costAnalysis/groupByItems']),
-            resourceMap: computed(() => ({
-                project_id: store.getters['reference/projectItems'],
-                project_group_id: store.getters['reference/projectGroupItems'],
-                service_account_id: store.getters['reference/serviceAccountItems'],
-                provider: store.getters['reference/providerItems'],
-                region_code: store.getters['reference/regionItems'],
-            })),
-            refinedFilterItems: computed<RefinedFilterItem[]>(() => getRefinedFilterItems(state.resourceMap, state.filters)),
             filterCategories: computed<CollapsibleItem[]>(() => Object.values(FILTER_ITEM_MAP).map(item => ({
                 title: item.label, data: item.name,
             }))),
@@ -228,16 +208,6 @@ export default {
             if (legend?.disabled) return DISABLED_LEGEND_COLOR;
             return null;
         };
-        const categoryItemFormatter = (refinedItem: RefinedFilterItem) => ({
-            name: FILTER_ITEM_MAP[refinedItem.category].label,
-        });
-        const keyItemFormatter = (refinedItem: RefinedFilterItem) => {
-            if (!refinedItem.key) return undefined;
-            return { name: refinedItem.key };
-        };
-        const valueItemFormatter = (refinedItem: RefinedFilterItem) => ({
-            name: refinedItem.label,
-        });
 
         /* api */
         let listCostAnalysisRequest: CancelTokenSource | undefined;
@@ -307,22 +277,12 @@ export default {
         const handleClearAllFilters = () => {
             costExplorerStore.commit('costAnalysis/setFilters', []);
         };
-        const handleDeleteFilterTag = (item: RefinedFilterItem) => {
-            const _filters: CostQueryFilterItem[] = [...state.filters];
-            const _index = _filters.findIndex((f) => {
-                if (f.category !== item.category) return false;
-                if (item.key) {
-                    return f.key === item.key && f.value === item.value;
-                }
-                return f.value === item.value;
-            });
-            _filters.splice(_index, 1);
-            costExplorerStore.commit('costAnalysis/setFilters', _filters);
+        const handleUpdateFilterTags = (filterItems: CostQueryFilterItem[]) => {
+            costExplorerStore.commit('costAnalysis/setFilters', filterItems);
         };
         const handleConfirmFilterModal = (filters) => {
             costExplorerStore.commit('costAnalysis/setFilters', filters);
         };
-
         const handleChartRendered = () => {
             if (state.chartRef && state.queryRef) emit('rendered', [state.queryRef, state.chartRef]);
         };
@@ -350,13 +310,10 @@ export default {
             handleToggleAllLegends,
             handlePrimaryGroupByItem,
             handleClickSelectFilter,
-            handleDeleteFilterTag,
+            handleUpdateFilterTags,
             handleClearAllFilters,
             handleConfirmFilterModal,
             handleChartRendered,
-            categoryItemFormatter,
-            keyItemFormatter,
-            valueItemFormatter,
         };
     },
 };
@@ -402,11 +359,6 @@ export default {
 
         .filter-wrapper {
             height: 8rem;
-            overflow-y: auto;
-            padding: 0.75rem 1rem;
-            .p-tag {
-                margin-bottom: 0.5rem;
-            }
         }
         .legend-wrapper {
             height: 16.75rem;
@@ -468,12 +420,6 @@ export default {
         .filter-wrapper {
             height: auto;
             padding: 0.75rem 1rem;
-            .p-tag {
-                margin-bottom: 0.5rem;
-            }
-            .p-empty {
-                @apply flex justify-start;
-            }
         }
         .legend-wrapper {
             height: auto;
