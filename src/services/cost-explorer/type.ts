@@ -6,9 +6,16 @@ export interface Period {
     end?: string;
 }
 
-interface FilterItem {
-    name: string;
-    label: string;
+export interface CostQueryFilterItem {
+    resourceName: string;
+    key?: string;
+    category: string;
+    value: string;
+}
+
+export interface MoreGroupByItem {
+    category: string;
+    key: string;
     disabled?: boolean;
 }
 
@@ -17,15 +24,15 @@ export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 export type Filter = typeof FILTER[keyof typeof FILTER];
 
 export type CostQueryFilters = Partial<Record<Filter, string[]>>;
-export type CostQueryFilterItemsMap = Partial<Record<Filter, FilterItem[]>>;
 
 export interface CostQuerySetOption {
     group_by?: GroupBy[];
     primary_group_by?: GroupBy;
+    more_group_by: MoreGroupByItem[];
     granularity: Granularity;
     stack?: boolean;
     period: Period;
-    filters?: CostQueryFilters;
+    filters?: CostQueryFilterItem[];
 }
 
 export interface CostQuerySetModel {
