@@ -2,6 +2,7 @@
     <fragment>
         <notice-popup-item
             v-for="(item, index) in popupList"
+            v-show="!isSessionExpired"
             :key="`notice-item-${index}`"
             :popup-index="index"
             :item="item"
@@ -33,8 +34,8 @@ export default {
     },
     setup() {
         const state = reactive({
-            isSessionExpired: computed(() => store.state.user.isSessionExpired),
-            isNoRoleUser: computed(() => store.getters['user/isNoRoleUser']),
+            isSessionExpired: computed<boolean>(() => store.state.user.isSessionExpired),
+            isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
             popupList: [] as Array<NoticePostModel>,
         });
 
@@ -54,6 +55,7 @@ export default {
             v: true,
             o: '=',
         }]).setSort('created_at', false).data;
+
 
         // API
         const getUserConfigBoardPostIdList = async (): Promise<Array<string>> => {
@@ -80,7 +82,7 @@ export default {
             }
         };
 
-        const getPostList = async () => {
+        const getPostList = async (): Promise<void> => {
             try {
                 const noticeBoard = await getNoticeBoard();
                 if (!noticeBoard) return;
@@ -97,8 +99,9 @@ export default {
             }
         };
 
+
         watch(() => state.isSessionExpired, async (isSessionExpired) => {
-            if (isSessionExpired === false && !state.isNoRoleUser) await getPostList();
+            if (!isSessionExpired && !state.isNoRoleUser) await getPostList();
         }, { immediate: true });
 
         return {

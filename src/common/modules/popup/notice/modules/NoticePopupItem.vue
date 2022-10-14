@@ -97,7 +97,7 @@ export default {
         });
         const { attachments } = useFileAttachments(files);
 
-        const handleClose = async (neverShowPopup?: boolean) => {
+        const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
             state.popupVisible = false;
             if (neverShowPopup) {
                 try {
