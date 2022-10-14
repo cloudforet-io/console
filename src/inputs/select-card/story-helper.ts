@@ -237,7 +237,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
-    bottom: {
+    bottomSlot: {
         name: 'bottom',
         description: 'Bottom slot for extra contents',
         defaultValue: '',

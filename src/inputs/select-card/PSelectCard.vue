@@ -237,7 +237,7 @@ export default defineComponent<Props>({
     }
 
     @media (hover: hover) {
-        &:hover {
+        &:hover:not(.disabled) {
             @apply bg-secondary2;
         }
     }
