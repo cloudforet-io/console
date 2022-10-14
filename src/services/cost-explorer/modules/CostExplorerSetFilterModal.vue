@@ -13,17 +13,17 @@
                 <div class="left-select-filter-section">
                     <p-collapsible-list
                         class="collapsible-list-section"
-                        :items="filterItems"
+                        :items="filterCategories"
                         toggle-type="switch"
                         :multi-unfoldable="true"
                         :unfolded-indices.sync="unfoldedIndices"
                     >
-                        <template #default="{name, isCollapsed}">
+                        <template #default="{data, isCollapsed}">
                             <cost-analysis-filter-item
                                 v-if="!isCollapsed"
-                                :type="name"
-                                :selected="filters[name]"
-                                @update:selected="handleFilterUpdate(name, $event)"
+                                :type="data"
+                                :selected="selectedFilterItems.filter(d => d.category === data)"
+                                @update:selected="handleFilterUpdate(data, $event)"
                             />
                         </template>
                     </p-collapsible-list>
@@ -31,16 +31,14 @@
                 <div class="right-select-filter-section">
                     <div class="selected-filter-section">
                         <div class="title">
-                            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTER') }} ({{ selectedItemsLength }})
+                            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTER') }} ({{ selectedFilterItems.length }})
                         </div>
-                        <div v-if="selectedItemsLength" class="selected-tags-wrapper">
-                            <template v-for="([filterName, items], idx) in Object.entries(selectedItemsMap)">
-                                <p-tag v-for="(item, itemIdx) in items" :key="`selected-tag-${idx}-${item.name}`"
-                                       @delete="handleDeleteTag(filterName, itemIdx)"
-                                >
-                                    <b>[{{ FILTER_ITEM_MAP[filterName].label }}] </b>{{ item.label }}
-                                </p-tag>
-                            </template>
+                        <div v-if="selectedFilterItems.length" class="selected-tags-wrapper">
+                            <p-tag v-for="(filterItem, idx) in refinedSelectedFilterItems" :key="`selected-tag-${idx}-${filterItem.resourceName}`"
+                                   @delete="handleDeleteTag(filterItem)"
+                            >
+                                <b>[{{ FILTER_ITEM_MAP[filterItem.category].label }}] </b>{{ filterItem.value }}
+                            </p-tag>
                         </div>
                         <div v-else class="no-item-wrapper">
                             <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER_MODAL_HELP_TEXT_1') }}</p>
@@ -57,40 +55,33 @@
 </template>
 
 <script lang="ts">
-
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import {
     PButtonModal, PCollapsibleList, PTag,
 } from '@spaceone/design-system';
-import { sum } from 'lodash';
-
+import type { CollapsibleItem } from '@spaceone/design-system/dist/src/data-display/collapsibles/collapsible-list/type';
+import { cloneDeep } from 'lodash';
 
 import { store } from '@/store';
 
-import type { ReferenceItem } from '@/store/modules/reference/type';
-
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { getRefinedFilterItems } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import CostAnalysisFilterItem from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFilterItem.vue';
-import { FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import type { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
+import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import type { CostQueryFilterItem } from '@/services/cost-explorer/type';
 
-
-interface FilterItem {
-    name: string;
-    title: string;
-}
 
 interface Props {
     visible: boolean;
-    filterItems: FilterItem[];
-    selectedFilters: CostQueryFilters;
+    filterCategories: CollapsibleItem[];
+    prevFilterItems: CostQueryFilterItem[];
 }
 
-export default {
+export default defineComponent<Props>({
     name: 'CostExplorerSetFilterModal',
     components: {
         CostAnalysisFilterItem,
@@ -103,95 +94,64 @@ export default {
             type: Boolean,
             default: false,
         },
-        filterItems: {
+        filterCategories: {
             type: Array,
             default: () => ([]),
         },
-        selectedFilters: {
-            type: Object,
-            default: () => ({}),
+        prevFilterItems: {
+            type: Array,
+            default: () => ([]),
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
-            filters: {} as CostQueryFilters,
-            selectedItemsMap: computed<CostQueryFilterItemsMap>(() => {
-                const itemsMap: CostQueryFilterItemsMap = {};
-                const resourceItemsMap = {
-                    project_id: store.getters['reference/projectItems'],
-                    project_group_id: store.getters['reference/projectGroupItems'],
-                    service_account_id: store.getters['reference/serviceAccountItems'],
-                    provider: store.getters['reference/providerItems'],
-                    region_code: store.getters['reference/regionItems'],
-                };
-
-                Object.entries(state.filters as CostQueryFilters).forEach(([key, data]) => {
-                    const resourceItems = resourceItemsMap[key];
-                    if (resourceItems) {
-                        itemsMap[key] = data?.map((d) => {
-                            const resourceItem: ReferenceItem = resourceItems[d];
-                            const label = key === 'region_code' ? resourceItem?.name : resourceItem?.label;
-                            return { name: d, label: label ?? d };
-                        });
-                    } else itemsMap[key] = data?.map(d => ({ name: d, label: d }));
-                });
-                return itemsMap;
-            }),
-            selectedItemsLength: computed<number>(() => {
-                const selectedValues = Object.values(state.selectedItemsMap);
-                return sum(selectedValues.map(v => v?.length || 0));
-            }),
+            selectedFilterItems: [] as CostQueryFilterItem[],
+            resourceMap: computed(() => ({
+                [FILTER.PROJECT]: store.getters['reference/projectItems'],
+                [FILTER.PROJECT_GROUP]: store.getters['reference/projectGroupItems'],
+                [FILTER.SERVICE_ACCOUNT]: store.getters['reference/serviceAccountItems'],
+                [FILTER.PROVIDER]: store.getters['reference/providerItems'],
+                [FILTER.REGION]: store.getters['reference/regionItems'],
+            })),
+            refinedSelectedFilterItems: computed<CostQueryFilterItem[]>(() => getRefinedFilterItems(state.resourceMap, state.selectedFilterItems)),
             unfoldedIndices: [] as number[],
             menuLoading: false,
         });
 
-        /* util */
+        /* Util */
         const init = () => {
             const _unfoldedIndices: number[] = [];
-            props.filterItems.forEach((item, idx) => {
-                if (props.selectedFilters[item.name]?.length) {
+            props.filterCategories.forEach((item, idx) => {
+                if (props.prevFilterItems?.find(d => d.category === item.data)) {
                     _unfoldedIndices.push(idx);
                 }
             });
             state.unfoldedIndices = _unfoldedIndices;
-            state.filters = { ...props.selectedFilters };
+            state.selectedFilterItems = [...props.prevFilterItems];
         };
 
-        /* event */
-        const handleDeleteTag = (filterName: string, itemIdx: number) => {
-            const _filters = { ...state.filters };
-            const _filterItems = [..._filters[filterName]];
-            _filterItems.splice(itemIdx, 1);
-            if (_filterItems.length) {
-                _filters[filterName] = _filterItems;
-            } else {
-                _filters[filterName] = undefined;
-            }
-            state.filters = _filters;
+        /* Event */
+        const handleDeleteTag = (filterItem: CostQueryFilterItem) => {
+            const _filters = [...state.selectedFilterItems];
+            const _index = _filters.findIndex(f => f.resourceName === filterItem.resourceName);
+            _filters.splice(_index, 1);
+            state.selectedFilterItems = _filters;
         };
         const handleFormConfirm = () => {
-            emit('confirm', state.filters);
+            emit('confirm', state.selectedFilterItems);
             state.proxyVisible = false;
         };
         const handleClearAll = () => {
-            state.filters = {};
+            state.selectedFilterItems = [];
             state.unfoldedIndices = [];
         };
-
-        const handleFilterUpdate = (name: string, selected: string[]) => {
-            state.filters = { ...state.filters, [name]: selected };
+        const handleFilterUpdate = (category: string, selected: CostQueryFilterItem[]) => {
+            const _prevFilterItems = cloneDeep(state.selectedFilterItems).filter(item => item.category !== category);
+            state.selectedFilterItems = [..._prevFilterItems, ...selected];
         };
 
-        watch(() => state.unfoldedIndices, (after, before) => {
-            if (after.length < before.length) {
-                const _filters = { ...state.filters };
-                const deletedIndex: number = before.filter(idx => !after.includes(idx))[0];
-                const deletedFilterName = props.filterItems[deletedIndex].name;
-                _filters[deletedFilterName] = undefined;
-                state.filters = _filters;
-            }
-        });
+        /* Watcher */
         watch(() => props.visible, (after) => {
             if (after) init();
         });
@@ -216,7 +176,7 @@ export default {
             handleFilterUpdate,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

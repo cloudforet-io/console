@@ -2,7 +2,7 @@ import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type { CostAnalysisPageUrlQueryKey } from '@/services/cost-explorer/cost-analysis/lib/config';
 import type {
-    CostQueryFilters, Period, Granularity, GroupBy,
+    Period, Granularity, GroupBy, CostQueryFilterItem,
 } from '@/services/cost-explorer/type';
 
 
@@ -12,7 +12,7 @@ export interface CostAnalysisPageQueryValue {
     period?: Period;
     groupBy?: GroupBy[];
     primaryGroupBy?: GroupBy;
-    filters?: CostQueryFilters;
+    filters?: CostQueryFilterItem[];
     stack?: boolean;
     granularity?: Granularity;
 }
