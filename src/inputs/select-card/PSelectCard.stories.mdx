@@ -8,6 +8,7 @@ import { getAllAvailableIcons } from '@/foundation/icons/story-helper';
 import { getSelectCardArgTypes } from '@/inputs/select-card/story-helper';
 import PSelectCard from './PSelectCard.vue';
 import { peacock } from '@/styles/colors'
+import PAnchor from '@/inputs/anchors/PAnchor';
 
 <Meta title='Inputs/Select Card' parameters={{
     design: {
@@ -63,7 +64,8 @@ export const Template = (args, { argTypes }) => ({
             components: { PSelectCard },
             template: `
     <div class="w-full overflow p-8 flex flex-wrap">
-        <p-select-card v-for="value in values" :key="value"
+        <p-select-card v-for="(value, index) in values" :key="value"
+            :tab-index="index"
             :value="value"
             v-model="selected"
             :icon="icons[value]"
@@ -97,7 +99,8 @@ export const Template = (args, { argTypes }) => ({
             components: { PSelectCard },
             template: `
     <div class="h-full w-full overflow p-8">
-        <p-select-card v-for="value in values" :key="value"
+        <p-select-card v-for="(value, index) in values" :key="value"
+            :tab-index="index"
             :value="value" block
             v-model="selected"
             :icon="icons[value]"
@@ -131,7 +134,8 @@ export const Template = (args, { argTypes }) => ({
             components: { PSelectCard },
             template: `
     <div class="h-full w-full overflow p-8">
-        <p-select-card v-for="value in values" :key="value"
+        <p-select-card v-for="(value, index) in values" :key="value"
+            :tab-index="index"
             :value="value" block
             v-model="selected"
             :label="icons[value]"
@@ -165,7 +169,8 @@ export const Template = (args, { argTypes }) => ({
             components: { PSelectCard },
             template: `
     <div class="h-full w-full overflow p-8">
-        <p-select-card v-for="value in values" :key="value"
+        <p-select-card v-for="(value, index) in values" :key="value"
+            :tab-index="index"
             :value="value"
             v-model="selected"
             :label="'label-' + value"
@@ -199,7 +204,8 @@ export const Template = (args, { argTypes }) => ({
             components: { PSelectCard },
             template: `
     <div class="w-full overflow p-8 flex flex-wrap">
-        <p-select-card v-for="value in values" :key="value"
+        <p-select-card v-for="(value, index) in values" :key="value"
+            :tab-index="index"
             multi-selectable
             :value="value"
             v-model="selected"
@@ -235,7 +241,8 @@ export const Template = (args, { argTypes }) => ({
             components: { PSelectCard },
             template: `
     <div class="w-full overflow p-8 grid gap-4 grid-cols-3">
-        <p-select-card v-for="value in values" :key="value.key"
+        <p-select-card v-for="(value, index) in values" :key="value.key"
+            :tab-index="index"
             v-model="selected"
             :value="value"
             :label="value.name"
@@ -276,7 +283,8 @@ export const Template = (args, { argTypes }) => ({
             components: { PSelectCard },
             template: `
     <div class="w-full overflow p-8 flex flex-wrap">
-        <p-select-card v-for="value in values" :key="value"
+        <p-select-card v-for="(value, index) in values" :key="value"
+            :tab-index="index"
             :value="value"
             v-model="selected"
             style="min-width: 8rem; min-height: 8rem; margin: 1rem;"
@@ -289,6 +297,43 @@ export const Template = (args, { argTypes }) => ({
                 const state = reactive({
                     selected: undefined,
                     values: range(8).map(d => peacock[(d + 1) * 100]),
+                })
+                return {
+                    ...toRefs(state),
+                    peacock
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Bottom Slot
+
+<Canvas>
+    <Story name="Bottom Slot">
+        {{
+            components: { PSelectCard, PAnchor },
+            template: `
+    <div class="w-full overflow p-8 flex flex-wrap">
+        <p-select-card v-for="(value, index) in values" :key="value"
+            :value="value"
+            v-model="selected"
+            :label="icons[index]"
+            :icon="icons[index]"
+            :tab-index="index"
+            style="min-width: 8rem; min-height: 8rem; margin: 1rem;"
+        >
+            <template #bottom>
+                <p-anchor highlight>Preview</p-anchor>
+            </template>
+        </p-select-card>
+    </div>
+    `,
+            setup(props) {
+                const state = reactive({
+                    selected: undefined,
+                    values: range(4).map(d => peacock[(d + 1) * 100]),
+                    icons: getAllAvailableIcons(),
                 })
                 return {
                     ...toRefs(state),

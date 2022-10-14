@@ -201,10 +201,45 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
+    tabIndex: {
+        name: 'tabIndex',
+        type: { name: 'number' },
+        description: 'Tab Index, used for keydown event and Web Accessibility',
+        defaultValue: 0,
+        table: {
+            type: {
+                summary: 'number',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 0,
+            },
+        },
+        control: {
+            type: 'number',
+        },
+    },
     /* slot */
     defaultSlot: {
         name: 'default',
         description: 'Slot for card contents.',
+        defaultValue: '',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    bottom: {
+        name: 'bottom',
+        description: 'Bottom slot for extra contents',
         defaultValue: '',
         table: {
             type: {

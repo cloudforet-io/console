@@ -1,7 +1,10 @@
 <template>
-    <div class="p-select-card" :class="{selected: isSelected, block, disabled}"
-         @click="onClick"
+    <div class="p-select-card"
+         :class="{selected: isSelected, block, disabled}"
+         :tabindex="tabIndex"
+         @click="handleClick"
          v-on="$listeners"
+         @keydown="handleKeydown"
     >
         <p-i :name="markerIconName"
              class="marker" width="1.25rem" height="1.25rem"
@@ -14,11 +17,13 @@
                 />
                 <span v-if="label" class="label">{{ label }}</span>
             </slot>
+            <slot name="bottom" />
         </div>
     </div>
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -35,7 +40,10 @@ interface Props extends SelectProps {
     icon?: string|boolean;
     iconColor?: string;
     label?: string;
+    tabIndex?: number|undefined;
 }
+// FIXME:: tabIndex should be a required member;
+
 
 export default defineComponent<Props>({
     name: 'PSelectCard',
@@ -90,8 +98,12 @@ export default defineComponent<Props>({
             type: String,
             default: '',
         },
+        tabIndex: {
+            type: Number,
+            default: undefined,
+        },
     },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const {
             isSelected,
             getSelected,
@@ -122,7 +134,7 @@ export default defineComponent<Props>({
         });
 
         /* event */
-        const onClick = () => {
+        const handleClick = () => {
             const newSelected = getSelected();
             if (props.multiSelectable) {
                 emit('change', newSelected, !isSelected.value);
@@ -131,10 +143,35 @@ export default defineComponent<Props>({
             }
         };
 
+        // FIXME:: Modularize keyboard event
+        const handleKeydown = (e: KeyboardEvent) => {
+            if (typeof props.tabIndex !== 'number'
+                || !e.key.includes('Arrow')
+                || props.multiSelectable
+            ) return;
+
+            // sibling means other cards on the same depth
+            const siblings = (e?.target as HTMLDivElement)?.parentElement?.children as HTMLCollectionOf<HTMLDivElement>;
+            const lastIndex = siblings.length - 1;
+
+            let nextTarget = 0;
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                if (props.tabIndex === lastIndex) nextTarget = 0;
+                else nextTarget = props.tabIndex + 1;
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                if (props.tabIndex === 0) nextTarget = lastIndex;
+                else nextTarget = props.tabIndex - 1;
+            }
+
+            siblings[nextTarget].focus();
+            siblings[nextTarget].click();
+        };
+
         return {
             ...toRefs(state),
             isSelected,
-            onClick,
+            handleClick,
+            handleKeydown,
         };
     },
 });
