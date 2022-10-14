@@ -461,6 +461,8 @@
 			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "누적 데이터",
+				"ADDITIONAL_INFO": "",
+				"ADD_MORE": "",
 				"ALT_E_DELETE_QUERY": "쿼리 삭제 실패",
 				"ALT_E_EDITED_QUERY": "쿼리 편집 실패",
 				"ALT_E_SAVED_QUERY": "쿼리 저장 실패",
@@ -474,6 +476,7 @@
 				"COST_ANALYSIS": "비용 분석",
 				"CURRENCY": "통화",
 				"DAILY": "일별 데이터",
+				"DEFAULT": "",
 				"DONUT": "도넛",
 				"EDIT_QUERY": "쿼리 편집",
 				"END_DATE": "종료 일",
@@ -535,6 +538,7 @@
 				"STACKED_COLUMN": "누적 컬럼",
 				"STACKED_LINE": "누적 라인",
 				"START_DATE": "시작 일",
+				"TAGS": "",
 				"TOO_MANY_ITEMS": "상위 15개 항목만을 보여줍니다. 자세한 보기를 위해 필터를 설정하세요.",
 				"TOTAL_COST": "총 비용",
 				"YEARLY": "연도별 데이터"
@@ -1645,6 +1649,7 @@
 			},
 			"PAGE": {
 				"ACTION": "작업",
+				"ALL": "",
 				"ALT_E_CHANGE_PROJECT": "프로젝트 변경 실패",
 				"ALT_E_RELEASE_PROJECT_TITLE": "프로젝트 해제 실패",
 				"ALT_S_CHANGE_PROJECT": "프로젝트 변경 완료",
@@ -1652,15 +1657,21 @@
 				"CHANGE_PROJECT": "프로젝트 변경",
 				"COLLECT_DATA": "데이터 수집",
 				"CONSOLE": "콘솔 연결",
+				"CUSTOM_TAGS": "",
 				"DELETE": "삭제",
+				"EDIT_CUSTOM_TAGS": "",
 				"NO_SELECTED": "클라우드 서비스를 선택하면 자세한 정보를 볼 수 있습니다.",
+				"PROVIDER": "",
 				"TAB_DATA": "데이터 ",
 				"TAB_DETAILS": "상세 정보",
 				"TAB_HISTORY": "변경 이력",
 				"TAB_MEMBER": "연관된 멤버",
 				"TAB_MONITORING": "모니터링",
 				"TAB_SELECTED_DATA": "선택한 데이터 ",
-				"TAB_TAG": "태그"
+				"TAB_TAG": "태그",
+				"TAG_CUSTOM": "",
+				"TAG_MANAGED": "",
+				"TYPE": ""
 			}
 		},
 		"SERVER": {

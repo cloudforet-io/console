@@ -461,6 +461,8 @@
 			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "累積データ",
+				"ADDITIONAL_INFO": "",
+				"ADD_MORE": "",
 				"ALT_E_DELETE_QUERY": "クエリの削除に失敗しました",
 				"ALT_E_EDITED_QUERY": "クエリの編集に失敗しました",
 				"ALT_E_SAVED_QUERY": "クエリの保存に失敗しました",
@@ -474,6 +476,7 @@
 				"COST_ANALYSIS": "コスト分析",
 				"CURRENCY": "通貨",
 				"DAILY": "日別データ",
+				"DEFAULT": "",
 				"DONUT": "ドーナツ",
 				"EDIT_QUERY": "クエリの編集",
 				"END_DATE": "終了日",
@@ -535,6 +538,7 @@
 				"STACKED_COLUMN": "累積カラム",
 				"STACKED_LINE": "累積ライン",
 				"START_DATE": "開始日",
+				"TAGS": "",
 				"TOO_MANY_ITEMS": "上位15項目のみを表示しています。 特定の項目を表示するにはフィルタを設定してください",
 				"TOTAL_COST": "トータルコスト",
 				"YEARLY": "年間"
@@ -1645,6 +1649,7 @@
 			},
 			"PAGE": {
 				"ACTION": "作業",
+				"ALL": "",
 				"ALT_E_CHANGE_PROJECT": "プロジェクト変更に失敗",
 				"ALT_E_RELEASE_PROJECT_TITLE": "プロジェクト解除に失敗",
 				"ALT_S_CHANGE_PROJECT": "プロジェクト変更完了",
@@ -1652,15 +1657,21 @@
 				"CHANGE_PROJECT": "プロジェクト変更",
 				"COLLECT_DATA": "データ収集",
 				"CONSOLE": "コンソールに接続",
+				"CUSTOM_TAGS": "",
 				"DELETE": "削除",
+				"EDIT_CUSTOM_TAGS": "",
 				"NO_SELECTED": "クラウドサービスを選択すると、詳細な情報が表示されます",
+				"PROVIDER": "",
 				"TAB_DATA": "データ",
 				"TAB_DETAILS": "詳細情報",
 				"TAB_HISTORY": "変更履歴",
 				"TAB_MEMBER": "関連するメンバー",
 				"TAB_MONITORING": "モニタリング",
 				"TAB_SELECTED_DATA": "選択したデータ",
-				"TAB_TAG": "タグ"
+				"TAB_TAG": "タグ",
+				"TAG_CUSTOM": "",
+				"TAG_MANAGED": "",
+				"TYPE": ""
 			}
 		},
 		"SERVER": {
