@@ -1,3 +1,10 @@
+# [1.1.0-beta.421](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.420...v1.1.0-beta.421) (2022-10-14)
+
+
+### Features
+
+* **select-card:** add `keydown` selecting event & add `bottom slot` ([#85](https://github.com/cloudforet-io/mirinae/issues/85)) ([4261505](https://github.com/cloudforet-io/mirinae/commit/426150546a3de1633db14b567e670f24428f8254))
+
 # [1.1.0-beta.420](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.419...v1.1.0-beta.420) (2022-10-13)
 
 
