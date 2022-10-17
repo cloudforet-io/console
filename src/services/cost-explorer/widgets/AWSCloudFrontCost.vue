@@ -28,9 +28,9 @@
 </template>
 
 <script lang="ts">
-
+import type { SetupContext } from 'vue';
 import {
-    computed, onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -59,11 +59,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import {
+    convertFilterItemToQueryStoreFilter,
+} from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import type { CostQueryFilterItem } from '@/services/cost-explorer/type';
 import {
+    getAWSFilters,
     getCurrencyAppliedChartData,
     getReferenceLabel,
     getTooltipText,
@@ -97,8 +101,9 @@ interface TableItem {
 
 const CATEGORY_KEY = 'groupBy';
 const DATA_LIMIT = 10;
+const PRODUCT_NAME = 'AmazonCloudFront';
 
-export default {
+export default defineComponent<WidgetProps>({
     name: 'AWSCloudFrontCost',
     components: {
         CostDashboardCardWidgetLayout,
@@ -128,15 +133,15 @@ export default {
             default: () => ({}),
         },
         filters: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
         printMode: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props: WidgetProps, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             loading: false,
             groupBy: computed(() => props.options?.group_by ?? GROUP_BY.PROJECT), // todo: temporary
@@ -149,7 +154,7 @@ export default {
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         groupBy: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(props.period),
-                        filters: objectToQueryString({ ...props.filters, provider: ['aws'], product: ['AmazonCloudFront'] }),
+                        filters: arrayToQueryString(getAWSFilters(props.filters, PRODUCT_NAME)),
                     },
                 };
             }),
@@ -335,14 +340,12 @@ export default {
 
         /* Api */
         const queryHelper = new QueryHelper();
-        const listData = async (period, filters): Promise<CostAnalyzeModel[]> => {
+        const listData = async (period, filters: CostQueryFilterItem[]): Promise<CostAnalyzeModel[]> => {
             state.loading = true;
 
-            queryHelper.setFilters([
-                ...getConvertedFilter(filters),
-                { k: 'provider', v: 'aws', o: '=' },
-                { k: 'product', v: 'AmazonCloudFront', o: '=' },
-            ]);
+            const convertedFilters = getAWSFilters(filters, PRODUCT_NAME);
+            queryHelper.setFilters(convertFilterItemToQueryStoreFilter(convertedFilters));
+
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: true,
@@ -390,7 +393,7 @@ export default {
             DATA_LIMIT,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .aws-cloud-front-cost {

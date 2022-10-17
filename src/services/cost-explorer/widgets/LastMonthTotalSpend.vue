@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-
+import type { SetupContext } from 'vue';
 import {
     onUnmounted, computed, reactive, toRefs, watch, defineComponent,
 } from 'vue';
@@ -43,7 +43,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray, violet } from '@/styles/colors';
 
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import {
+    convertFilterItemToQueryStoreFilter,
+} from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { getXYChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
@@ -87,15 +89,15 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
         filters: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
         printMode: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props: WidgetProps, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as XYChart | null,
@@ -192,7 +194,7 @@ export default defineComponent<WidgetProps>({
 
         const costQueryHelper = new QueryHelper();
         const fetchData = async () => {
-            costQueryHelper.setFilters(getConvertedFilter(props.filters));
+            costQueryHelper.setFilters(convertFilterItemToQueryStoreFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,

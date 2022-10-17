@@ -37,9 +37,9 @@
 </template>
 
 <script lang="ts">
-
+import type { SetupContext } from 'vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
@@ -86,7 +86,7 @@ interface BudgetItem {
 type I18nDataTableField = DataTableField | {
     label: string | TranslateResult;
 };
-export default {
+export default defineComponent<WidgetProps>({
     name: 'BudgetUsageWithForecast',
     components: {
         CostDashboardCardWidgetLayout,
@@ -108,8 +108,8 @@ export default {
             default: () => ({}),
         },
         filters: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
         currency: {
             type: String,
@@ -124,7 +124,7 @@ export default {
             default: false,
         },
     },
-    setup(props: WidgetProps, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const budgetQueryHelper = new QueryHelper();
 
@@ -240,7 +240,7 @@ export default {
             projectGroupNameFormatter,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

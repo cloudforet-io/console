@@ -46,6 +46,7 @@
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -78,7 +79,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import {
+    convertFilterItemToQueryStoreFilter,
+} from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { RegionMap } from '@/services/cost-explorer/widgets/lib/config';
@@ -140,8 +143,8 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
         filters: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
         currency: {
             type: String,
@@ -156,7 +159,7 @@ export default defineComponent<WidgetProps>({
             default: false,
         },
     },
-    setup(props: WidgetProps, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
@@ -174,7 +177,7 @@ export default defineComponent<WidgetProps>({
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         groupBy: arrayToQueryString([GROUP_BY.REGION]),
                         period: objectToQueryString(props.period),
-                        filters: objectToQueryString(props.filters),
+                        filters: arrayToQueryString(props.filters),
                     },
                 };
             }),
@@ -313,7 +316,7 @@ export default defineComponent<WidgetProps>({
 
         const costQueryHelper = new QueryHelper();
         const fetchData = async (): Promise<OriginData[]> => {
-            costQueryHelper.setFilters(getConvertedFilter(props.filters));
+            costQueryHelper.setFilters(convertFilterItemToQueryStoreFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,

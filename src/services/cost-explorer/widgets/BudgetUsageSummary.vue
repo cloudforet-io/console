@@ -11,6 +11,7 @@
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -55,8 +56,8 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
         filters: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
         currency: {
             type: String,
@@ -71,7 +72,7 @@ export default defineComponent<WidgetProps>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const budgetQueryHelper = new QueryHelper();
         const state = reactive({
             widgetOptions: getWidgetOption(props.options, props.widgetId),

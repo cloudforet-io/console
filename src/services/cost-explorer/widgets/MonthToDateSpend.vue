@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts">
-
+import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
@@ -58,24 +58,26 @@ import dayjs from 'dayjs';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
-
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import {
+    convertFilterItemToQueryStoreFilter,
+} from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardSimpleCardWidget from '@/services/cost-explorer/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
 
+
 const thisDay = dayjs.utc().format('DD');
 const thisMonth = dayjs.utc().format('MM');
+
 export default defineComponent<WidgetProps>({
     name: 'MonthToDateSpend',
     components: {
@@ -107,15 +109,15 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
         filters: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
         printMode: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props: WidgetProps, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const checkThisMonth = () => dayjs.utc(props.period?.end).format('MM') === thisMonth;
         const thisMonthFormatter = (targetDate: Dayjs) => {
@@ -150,7 +152,7 @@ export default defineComponent<WidgetProps>({
 
         const costQueryHelper = new QueryHelper();
         const getData = async (start: Dayjs, end: Dayjs|string) => {
-            costQueryHelper.setFilters(getConvertedFilter(props.filters));
+            costQueryHelper.setFilters(convertFilterItemToQueryStoreFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
@@ -195,7 +197,6 @@ export default defineComponent<WidgetProps>({
             if (after) {
                 await getChartData();
                 await vm.$nextTick();
-                await getChartData();
                 emit('rendered');
             }
         }, { immediate: true });
