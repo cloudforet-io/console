@@ -31,9 +31,8 @@
 </template>
 
 <script lang="ts">
-
 import {
-    computed, onMounted, reactive, toRefs, watch,
+    computed, defineComponent, onMounted, reactive, toRefs, watch,
 } from 'vue';
 
 import {
@@ -53,11 +52,19 @@ import CostDashboardPeriodSelectDropdown
 import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
 import type { CustomLayout, DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import type { CostQueryFilterItem, Period } from '@/services/cost-explorer/type';
+
+
+interface Props {
+    dashboardId: string;
+    period: Period;
+    filters: CostQueryFilterItem[];
+}
 
 const HEADER_ELEMENT = 1;
 const DASHBOARD_LAYOUT = 1;
 
-export default {
+export default defineComponent<Props>({
     name: 'CostDashboardPreview',
     components: {
         CostDashboardPeriodSelectDropdown,
@@ -75,8 +82,8 @@ export default {
             default: () => ({}),
         },
         filters: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
     },
     setup(props, { emit }) {
@@ -138,7 +145,9 @@ export default {
             const dashboard = await fetchDashboard(dashboardId);
             state.dashboard = dashboard;
             state.layout = await getDashboardLayout(dashboard);
-            state.filters = dashboard.default_filter;
+            // TODO: default_filter will be changed from `object` to `object[]`
+            // state.filters = dashboard.default_filter;
+            state.filters = [];
             state.period = dashboard.period ?? {};
             state.periodType = dashboard.period_type;
 
@@ -167,7 +176,7 @@ export default {
             handleAllRenderedWidgets,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

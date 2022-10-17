@@ -1,7 +1,7 @@
 import type { Tags, TimeStamp } from '@/models';
 
 import type {
-    CostQueryFilters, Period, Granularity, GroupBy,
+    Period, Granularity, GroupBy, CostQueryFilterItem,
 } from '@/services/cost-explorer/type';
 
 const DASHBOARD_SCOPE = {
@@ -11,12 +11,12 @@ const DASHBOARD_SCOPE = {
 
 export type DashboardScope = typeof DASHBOARD_SCOPE[keyof typeof DASHBOARD_SCOPE];
 
-interface DefaultFilter {
-    projects?: string[];
-    project_groups?: string[];
-    service_accounts?: string[];
-    provider?: string[];
-}
+// export interface DefaultFilter {
+//     projects?: string[];
+//     project_groups?: string[];
+//     service_accounts?: string[];
+//     provider?: string[];
+// }
 
 
 export const CHART_TYPE = Object.freeze({
@@ -35,7 +35,7 @@ export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 export interface WidgetOptions {
     stack?: boolean;
     granularity?: Granularity;
-    filters?: CostQueryFilters;
+    filters?: CostQueryFilterItem[];
     period?: Period;
     group_by?: string | GroupBy;
     chart_type?: ChartType;
@@ -52,11 +52,11 @@ export interface WidgetInfo {
 
 export type CustomLayout = WidgetInfo[];
 
-export interface DashboardItem {
+export interface DashboardModel {
     created_at: TimeStamp;
     updated_at: TimeStamp;
     custom_layouts: CustomLayout[];
-    default_filter: DefaultFilter;
+    default_filter: CostQueryFilterItem[];
     default_layout_id: string;
     domain_id?: string;
     name: string;
@@ -67,11 +67,11 @@ export interface DashboardItem {
     period?: Period;
 }
 
-export interface PublicDashboardInfo extends DashboardItem {
+export interface PublicDashboardInfo extends DashboardModel {
     public_dashboard_id: string;
 }
 
-export interface UserDashboardInfo extends DashboardItem {
+export interface UserDashboardInfo extends DashboardModel {
     user_dashboard_id: string;
 }
 
@@ -100,7 +100,7 @@ export interface DashboardCreateParam {
     name: string;
     default_layout_id?: string;
     custom_layouts?: CustomLayout[];
-    default_filter?: DefaultFilter;
+    default_filter?: CostQueryFilterItem[];
     period_type: PeriodType;
     period?: Period;
     tags?: Tags;

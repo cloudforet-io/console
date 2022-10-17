@@ -19,7 +19,7 @@
             </div>
             <div>
                 <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_FILTERS') }}</p-label>
-                <span :class="{'text-gray-500': noFilters }">{{ filterLabel }}</span>
+                <span :class="{'text-gray-500': !filters.length }">{{ filterLabel }}</span>
             </div>
         </template>
         <template #extra>
@@ -31,7 +31,6 @@
 </template>
 
 <script lang="ts">
-
 import { computed, reactive, toRefs } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
@@ -51,7 +50,7 @@ import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashb
 import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { CostQuerySetModel } from '@/services/cost-explorer/type';
+import type { CostQueryFilterItem, CostQuerySetModel } from '@/services/cost-explorer/type';
 
 
 const LAYOUT = 100;
@@ -86,8 +85,9 @@ export default {
                 if (state.granularity === GRANULARITY.MONTHLY) return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY');
                 return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY');
             }),
-            filters: computed(() => props.selectedItem?.options.filters),
-            noFilters: computed(() => !state.filters || !Object.keys(state.filters).length),
+            // TODO: should be changed to object[] type
+            filters: computed<CostQueryFilterItem[]>(() => []),
+            // filters: computed(() => props.selectedItem?.options.filters ?? []),
             filterLabel: computed(() => {
                 const label = getCostDashboardFilterLabel(state.filters);
                 return label ?? i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');

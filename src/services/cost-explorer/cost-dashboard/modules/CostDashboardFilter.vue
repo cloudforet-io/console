@@ -4,7 +4,7 @@
             <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}: </span>
             <span class="text">{{ filterLabel }}</span>
         </p>
-        <p-button v-if="!showSetting && !noFilter && !printMode"
+        <p-button v-if="!showSetting && !!proxyFilters.length && !printMode"
                   style-type="gray-border"
                   size="sm"
                   @click.stop="handleClickViewFilter"
@@ -20,22 +20,20 @@
                            :selected-filters="proxyFilters"
         />
         <cost-explorer-set-filter-modal :visible.sync="selectFilterModalVisible"
-                                        :filter-items="filterItems"
-                                        :selected-filters="proxyFilters"
+                                        :filter-categories="filterCategories"
+                                        :prev-filter-items="proxyFilters"
                                         @confirm="handleConfirmSetFilter"
         />
     </div>
 </template>
 
 <script lang="ts">
-
 import type { SetupContext } from 'vue';
 import {
     computed, reactive, toRefs,
 } from 'vue';
 
 import { PButton, PIconButton } from '@spaceone/design-system';
-import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -52,7 +50,7 @@ import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashb
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import CostExplorerSetFilterModal from '@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue';
-import type { CostQueryFilters } from '@/services/cost-explorer/type';
+import type { CostQueryFilterItem } from '@/services/cost-explorer/type';
 
 
 export default {
@@ -70,8 +68,8 @@ export default {
         },
         /* sync */
         filters: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
         printMode: {
             type: Boolean,
@@ -84,18 +82,17 @@ export default {
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            proxyFilters: useProxyValue<CostQueryFilters>('filters', props, emit),
+            proxyFilters: useProxyValue<CostQueryFilterItem[]>('filters', props, emit),
             filterLabel: computed(() => {
                 const label = getCostDashboardFilterLabel(state.proxyFilters);
                 return label ?? i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');
             }),
-            filterItems: [
+            filterCategories: [
                 { name: FILTER.PROJECT_GROUP, title: FILTER_ITEM_MAP[FILTER.PROJECT_GROUP].label },
                 { name: FILTER.PROJECT, title: FILTER_ITEM_MAP[FILTER.PROJECT].label },
                 { name: FILTER.SERVICE_ACCOUNT, title: FILTER_ITEM_MAP[FILTER.SERVICE_ACCOUNT].label },
                 { name: FILTER.PROVIDER, title: FILTER_ITEM_MAP[FILTER.PROVIDER].label },
             ],
-            noFilter: computed(() => isEmpty(state.proxyFilters) || Object.values(state.proxyFilters).every(d => !d)),
             viewFilterModalVisible: false,
             selectFilterModalVisible: false,
             isUserDashboard: computed(() => (props.dashboardId?.startsWith(DASHBOARD_TYPE.USER))),
@@ -103,7 +100,7 @@ export default {
         });
 
         /* api */
-        const updatePublicDashboardFilters = async (filters) => {
+        const updatePublicDashboardFilters = async (filters: CostQueryFilterItem[]) => {
             try {
                 await SpaceConnector.client.costAnalysis.publicDashboard.update({
                     public_dashboard_id: props.dashboardId,
@@ -116,7 +113,7 @@ export default {
             }
         };
 
-        const updateUserDashboardFilters = async (filters) => {
+        const updateUserDashboardFilters = async (filters: CostQueryFilterItem[]) => {
             try {
                 await SpaceConnector.client.costAnalysis.userDashboard.update({
                     user_dashboard_id: props.dashboardId,
@@ -136,7 +133,7 @@ export default {
         const handleClickViewFilter = () => {
             state.viewFilterModalVisible = true;
         };
-        const handleConfirmSetFilter = (filters) => {
+        const handleConfirmSetFilter = (filters: CostQueryFilterItem[]) => {
             if (state.isUserDashboard) {
                 updateUserDashboardFilters(filters);
             } else {
