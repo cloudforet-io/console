@@ -7,7 +7,7 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 import { FILTER, GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type {
-    CostQueryFilters, Period, Granularity, CostQueryFilterItem, RefinedFilterItem,
+    Period, Granularity, CostQueryFilterItem, RefinedFilterItem, Filter,
 } from '@/services/cost-explorer/type';
 
 
@@ -16,21 +16,6 @@ export const convertFilterItemToQueryStoreFilter = (filterItems: CostQueryFilter
     v: f.value,
     o: '=',
 }));
-
-// TODO: will be deprecated soon
-export const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
-    const result: QueryStoreFilter[] = [];
-    Object.entries(filters).forEach(([key, data]) => {
-        if (data?.length) {
-            result.push({
-                k: key,
-                v: data,
-                o: '=',
-            });
-        }
-    });
-    return result;
-};
 
 export const getRefinedFilterItems = (resourceMap: Record<string, any>, filterItems: CostQueryFilterItem[]): RefinedFilterItem[] => {
     const results: RefinedFilterItem[] = [];
@@ -48,28 +33,26 @@ export const getRefinedFilterItems = (resourceMap: Record<string, any>, filterIt
     return results;
 };
 
-export const getConvertedBudgetFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
+export const getConvertedBudgetFilter = (filters: CostQueryFilterItem[]): QueryStoreFilter[] => {
     const result: QueryStoreFilter[] = [];
-    Object.entries(filters).forEach(([key, data]) => {
-        if ((key === 'project_id' || key === 'project_group_id') && data?.length) {
-            result.push({
-                k: key,
-                v: data,
-                o: '=',
-            });
-        } else {
-            const values = [] as Array<string|null>;
-            if (data?.length) {
-                data.forEach((value) => {
-                    values.push(value);
-                });
-                result.push({
-                    k: `cost_types.${key}`,
-                    v: [null, ...values],
-                    o: '=',
-                });
-            }
-        }
+
+    const projectCategories: Filter[] = [FILTER.PROJECT, FILTER.PROJECT_GROUP];
+    const projectFilterItems = filters.filter(d => projectCategories.includes(d.category));
+    projectFilterItems.forEach((d) => {
+        result.push({ k: d.category, v: d.value, o: '=' });
+    });
+
+    const extraCategories: Filter[] = [...new Set(filters.filter(d => !projectCategories.includes(d.category)).map(d => d.category))];
+    extraCategories.forEach((category) => {
+        const filterItems = filters.filter(d => d.category === category);
+        const filterKey = filterItems.length ? filterItems[0]?.key : undefined;
+        const k = filterKey ? `${category}.${filterKey}` : category;
+        const values = filterItems.map(d => d.value);
+        result.push({
+            k: `cost_types.${k}`,
+            v: [null, ...values],
+            o: '=',
+        });
     });
     return result;
 };
