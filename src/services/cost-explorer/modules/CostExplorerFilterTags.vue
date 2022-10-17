@@ -9,7 +9,7 @@
         </template>
         <template v-else>
             <p-tag v-for="(refinedItem, idx) in refinedFilterItems" :key="`selected-tag-${idx}-${refinedItem.value}`"
-                   :deletable="!printMode"
+                   :deletable="!printMode && deletable"
                    :category-item="categoryItemFormatter(refinedItem)"
                    :key-item="keyItemFormatter(refinedItem)"
                    :value-item="valueItemFormatter(refinedItem)"
@@ -27,6 +27,7 @@ import {
 import {
     PEmpty, PTag,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { store } from '@/store';
 
@@ -55,6 +56,10 @@ export default defineComponent<Props>({
             type: Array,
             default: () => ([]),
         },
+        deletable: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -82,7 +87,7 @@ export default defineComponent<Props>({
 
         /* Event */
         const handleDeleteFilterTag = (item: RefinedFilterItem) => {
-            const _filters: CostQueryFilterItem[] = [...props.filterItems];
+            const _filters: CostQueryFilterItem[] = cloneDeep(props.filterItems);
             const _index = _filters.findIndex((f) => {
                 if (f.category !== item.category) return false;
                 if (item.key) {
@@ -119,7 +124,6 @@ export default defineComponent<Props>({
 .cost-explorer-filter-tags {
     height: 100%;
     overflow-y: auto;
-    padding: 0.75rem 1rem;
     .p-tag {
         margin-bottom: 0.5rem;
     }
