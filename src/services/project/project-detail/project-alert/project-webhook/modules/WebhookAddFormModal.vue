@@ -30,7 +30,9 @@
                 <div class="select-card-wrapper">
                     <p-select-card
                         v-for="(item, index) in webhookTypeList"
-                        :key="index" v-model="selectedWebhookType"
+                        :key="index"
+                        v-model="selectedWebhookType"
+                        :tab-index="index"
                         :image-url="item.tags.icon"
                         icon="ic_webhook"
                         :value="item"

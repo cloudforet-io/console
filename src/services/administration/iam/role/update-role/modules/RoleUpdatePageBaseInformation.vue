@@ -30,8 +30,9 @@
             </p-field-group>
             <p-label :label="$t('IAM.ROLE.DETAIL.ROLE_TYPE')" />
             <div v-if="!roleTypeInputDisabled" class="select-card-wrapper">
-                <p-select-card v-for="roleType in roleTypes" :key="roleType.key"
+                <p-select-card v-for="(roleType, index) in roleTypes" :key="roleType.key"
                                v-model="selectedRoleType"
+                               :tab-index="index"
                                class="card"
                                :value="roleType.key"
                                :label="roleType.label"

@@ -1,7 +1,8 @@
 <template>
     <div class="budget-form-amount-plan-unit-select">
-        <p-select-card v-for="({title, desc, unit}) in plans"
+        <p-select-card v-for="({title, desc, unit}, index) in plans"
                        :key="unit"
+                       :tab-index="index"
                        :value="unit"
                        :selected="selectedUnit"
                        @change="handleUnitChange"

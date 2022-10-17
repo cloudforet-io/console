@@ -3,6 +3,7 @@
         <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.BASIC_TEMPLATE') }}</h3>
         <div class="dashboard-list">
             <div v-for="(layoutData, idx) in defaultLayoutData" :key="layoutData.name" class="dashboard-item">
+                <!--                TODO:: apply keyboard event below this SelectCard-->
                 <p-select-card
                     :selected="selectedTemplate"
                     :value="layoutData"

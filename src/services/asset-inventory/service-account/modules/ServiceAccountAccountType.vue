@@ -6,6 +6,7 @@
                 <div class="card-wrapper">
                     <p-select-card
                         v-model="selectedType"
+                        :tab-index="0"
                         value="GENERAL"
                         label="General Account"
                         @click="() => handleSelectAccountType('GENERAL')"
@@ -13,6 +14,7 @@
                     <p-select-card
                         v-if="showTrustedAccount"
                         v-model="selectedType"
+                        :tab-index="1"
                         value="TRUSTED"
                         label="Trusted Account"
                         @click="() => handleSelectAccountType('TRUSTED')"
