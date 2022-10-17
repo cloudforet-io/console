@@ -13,7 +13,7 @@
                 </template>
                 <p-search-dropdown
                     :menu="tagItems"
-                    :selected="selectedTags"
+                    :selected.sync="selectedTags"
                     use-fixed-menu-style
                     multi-selectable
                     :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SEARCH_PLACEHOLDER')"
@@ -25,7 +25,7 @@
                 </template>
                 <p-search-dropdown
                     :menu="additionalInfoItems"
-                    :selected="selectedAdditionalInfo"
+                    :selected.sync="selectedAdditionalInfo"
                     use-fixed-menu-style
                     multi-selectable
                     :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SEARCH_PLACEHOLDER')"
@@ -36,8 +36,9 @@
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import {
-    reactive, toRefs,
+    defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import {
@@ -47,8 +48,18 @@ import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { costExplorerStore } from '@/services/cost-explorer/store';
+import type { MoreGroupByItem } from '@/services/cost-explorer/type';
 
-export default {
+
+interface Props {
+    visible: boolean;
+    headerTitle: string;
+    prevMoreGroupByItems: MoreGroupByItem[];
+}
+
+export default defineComponent<Props>({
     name: 'CostAnalysisGroupByFilterMoreModal',
     components: {
         PFieldGroup,
@@ -64,32 +75,59 @@ export default {
             type: String,
             default: '',
         },
+        prevMoreGroupByItems: {
+            type: Array,
+            default: () => ([]),
+        },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             additionalInfoItems: [
-                { name: '14a565a8-d519-434e-abdd-cebf367a1a78', label: 'channels' },
-                { name: '14a565a8-d519-434e-abdd-cebf367a1c78', label: 'Internal' },
+                { name: 'additional_info_sample', label: 'additional_info_sample' },
+                { name: 'additional_info_sample2', label: 'additional_info_sample2' },
             ] as SelectDropdownMenu[],
-            selectedAdditionalInfo: [],
+            selectedAdditionalInfo: [] as SelectDropdownMenu[],
             tagItems: [
-                { name: 'sample_tag', label: 'Sample Tag' },
+                { name: 'tag_sample', label: 'tag_sample' },
+                { name: 'tag_sample2', label: 'tag_sample2' },
             ] as SelectDropdownMenu[],
-            selectedTags: [
-                { name: 'sample_tag', label: 'Sample Tag' },
-            ],
+            selectedTags: [] as SelectDropdownMenu[],
         });
 
         /* Event */
         const handleConfirm = () => {
+            const tagsGroupBy: MoreGroupByItem[] = state.selectedTags.map(d => ({
+                category: MORE_GROUP_BY.TAGS,
+                key: d.name,
+            }));
+            const additionalInfoGroupBy = state.selectedAdditionalInfo.map(d => ({
+                category: MORE_GROUP_BY.ADDITIONAL_INFO,
+                key: d.name,
+            }));
             state.proxyVisible = false;
+            costExplorerStore.commit('costAnalysis/setMoreGroupBy', [
+                ...tagsGroupBy,
+                ...additionalInfoGroupBy,
+            ]);
         };
+
+        /* Watcher */
+        watch(() => props.visible, (visible) => {
+            if (visible) {
+                state.selectedTags = props.prevMoreGroupByItems?.filter(d => d.category === MORE_GROUP_BY.TAGS).map(d => ({
+                    name: d.key, label: d.key,
+                }));
+                state.selectedAdditionalInfo = props.prevMoreGroupByItems?.filter(d => d.category === MORE_GROUP_BY.ADDITIONAL_INFO).map(d => ({
+                    name: d.key, label: d.key,
+                }));
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
             handleConfirm,
         };
     },
-};
+});
 </script>

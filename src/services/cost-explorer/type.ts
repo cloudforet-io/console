@@ -20,6 +20,7 @@ export interface MoreGroupByItem {
     category: string;
     key: string;
     disabled?: boolean;
+    selected?: boolean;
 }
 
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
