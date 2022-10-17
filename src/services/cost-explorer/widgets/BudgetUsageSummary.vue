@@ -4,15 +4,16 @@
                                        :show-top-text="false"
                                        :print-mode="printMode"
     >
-        <budget-stat :filters="queryStoreFilters" :period="period" :print-mode="printMode"
+        <budget-stat :query-store-filters="queryStoreFilters" :period="period" :print-mode="printMode"
                      @rendered="handleRendered"
         />
     </cost-dashboard-card-widget-layout>
 </template>
 
 <script lang="ts">
-
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
@@ -30,7 +31,7 @@ import CostDashboardCardWidgetLayout
 import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
 
 
-export default {
+export default defineComponent<WidgetProps>({
     name: 'BudgetUsageSummary',
     components: {
         CostDashboardCardWidgetLayout,
@@ -70,7 +71,7 @@ export default {
             default: false,
         },
     },
-    setup(props: WidgetProps, { emit }) {
+    setup(props, { emit }) {
         const budgetQueryHelper = new QueryHelper();
         const state = reactive({
             widgetOptions: getWidgetOption(props.options, props.widgetId),
@@ -96,5 +97,5 @@ export default {
             handleRendered,
         };
     },
-};
+});
 </script>

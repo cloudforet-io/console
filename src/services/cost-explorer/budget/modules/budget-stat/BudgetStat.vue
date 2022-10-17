@@ -27,10 +27,8 @@
 </template>
 
 <script lang="ts">
-
-
 import {
-    computed, getCurrentInstance,
+    computed, defineComponent, getCurrentInstance,
     reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
@@ -62,7 +60,7 @@ import type { Period } from '@/services/cost-explorer/type';
 
 
 interface Props {
-    filters: QueryStoreFilter[];
+    queryStoreFilters: QueryStoreFilter[];
     period: Period;
     usageRange: BudgetUsageRange;
     printMode?: boolean;
@@ -80,10 +78,10 @@ interface Card {
     unit: Unit;
 }
 
-export default {
+export default defineComponent<Props>({
     name: 'BudgetStat',
     props: {
-        filters: {
+        queryStoreFilters: {
             type: Array,
             default: () => ([]),
         },
@@ -164,7 +162,7 @@ export default {
                     include_budget_count: true,
                 };
 
-                const { filter, keyword } = budgetUsageApiQueryHelper.setFilters(props.filters).data;
+                const { filter, keyword } = budgetUsageApiQueryHelper.setFilters(props.queryStoreFilters).data;
                 if (keyword) param.keyword = keyword;
                 if (filter?.length) param.filter = filter;
                 if (isNotEmpty(props.usageRange)) param.usage_range = props.usageRange;
@@ -187,7 +185,7 @@ export default {
         };
 
         /* Watchers */
-        watch([() => props.filters, () => props.period, () => props.usageRange], async () => {
+        watch([() => props.queryStoreFilters, () => props.period, () => props.usageRange], async () => {
             await fetchBudgetUsage();
             await vm.$nextTick();
             emit('rendered');
@@ -201,7 +199,7 @@ export default {
             UNIT,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .budget-stat {
