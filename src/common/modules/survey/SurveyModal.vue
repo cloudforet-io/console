@@ -32,9 +32,10 @@
                         SpaceONE v.2에 Server 메뉴를 삭제하려 하는데 어떻게 생각하시나요?
                     </p>
                     <div class="select-card-wrapper">
-                        <p-select-card v-for="item in answerItems2"
+                        <p-select-card v-for="(item, index) in answerItems2"
                                        :key="`answer2-${item.name}`"
                                        v-model="selectedAnswer2"
+                                       :tab-index="index"
                                        :image-url="require(`@/assets/images/${item.name === selectedAnswer2 ? item.selectedImage : item.unselectedImage}.svg`)"
                                        icon="ic_webhook"
                                        :value="item.name"

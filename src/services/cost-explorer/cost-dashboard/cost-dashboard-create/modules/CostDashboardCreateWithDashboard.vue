@@ -6,6 +6,7 @@
             <div v-for="(dashboardData, idx) in slicedDashboardData" :key="`$dashboard-${idx}-${getUUID()}`"
                  class="dashboard-item"
             >
+                <!--                TODO:: apply keyboard event below this SelectCard-->
                 <p-select-card
                     :selected="selectedTemplate"
                     :value="dashboardData"

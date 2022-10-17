@@ -9,14 +9,17 @@
         <template #body>
             <div class="content-wrapper">
                 <p>{{ $t('PROJECT.DETAIL.ALERT.SET_NOTIFICATION_MODAL_HELP_TEXT') }}</p>
-                <p-select-card v-for="option in selectOptions" :key="option.name"
-                               v-model="notificationUrgency"
-                               :value="option.name"
-                               :label="option.label"
-                               :icon="option.icon"
-                               :icon-color="urgencyColor"
-                               block
-                />
+                <div class="select-card-wrapper">
+                    <p-select-card v-for="(option, index) in selectOptions" :key="option.name"
+                                   v-model="notificationUrgency"
+                                   :tab-index="index"
+                                   :value="option.name"
+                                   :label="option.label"
+                                   :icon="option.icon"
+                                   :icon-color="urgencyColor"
+                                   block
+                    />
+                </div>
             </div>
         </template>
     </p-button-modal>
@@ -110,5 +113,8 @@ export default {
     @apply grid gap-2;
     line-height: 1.6;
     padding: 1rem 0;
+}
+.select-card-wrapper {
+    @apply grid gap-2;
 }
 </style>
