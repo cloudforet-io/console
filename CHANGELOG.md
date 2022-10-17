@@ -1,3 +1,10 @@
+# [1.1.0-beta.423](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.422...v1.1.0-beta.423) (2022-10-17)
+
+
+### Features
+
+* **query-search-dropdown:** create query-search-dropdown & query-search-hook ([#89](https://github.com/cloudforet-io/mirinae/issues/89)) ([0d22216](https://github.com/cloudforet-io/mirinae/commit/0d22216476bb734dbd3c2bdb13c5c1e5bdf25b21))
+
 # [1.1.0-beta.422](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.421...v1.1.0-beta.422) (2022-10-14)
 
 
