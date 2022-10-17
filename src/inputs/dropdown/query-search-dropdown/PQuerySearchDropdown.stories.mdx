@@ -1,0 +1,116 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import {
+    getQuerySearchDropdownArgTypes
+} from "@/inputs/dropdown/query-search-dropdown/story-helper";
+
+import PQuerySearchDropdown
+    from "@/inputs/dropdown/query-search-dropdown/PQuerySearchDropdown";
+import { reactive, toRefs } from "vue";
+import {
+    useProxyValue
+} from "@/hooks"; import {SetupContext} from "vue";
+import { getKeyItems, getKeyItemSets, getValueHandlerMap, getValueItems } from '@/inputs/dropdown/query-search-dropdown/mock';
+
+<Meta title='Inputs/Dropdown/Query Search Dropdown' parameters={{
+    design: {
+        type: 'figma',
+        url: 'figma url',
+    }
+}} argTypes={getQuerySearchDropdownArgTypes()}/>
+
+
+export const Template = (args, {argTypes}) => ({
+    props: Object.keys(argTypes),
+    components: { PQuerySearchDropdown },
+    template: `
+        <div class="h-full w-full overflow p-8">
+            <p-query-search-dropdown v-model="proxyValue"
+                            :keyItemSets="keyItemSets"
+                            :valueHandlerMap="valueHandlerMap"
+            ></p-query-search-dropdown>
+        </div>
+    `,
+    setup(props, { emit }) {
+        const state = reactive({
+            proxyValue: useProxyValue('value', props, emit)
+        });
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+# Query Search Dropdown
+<br/>
+
+Query Search Dropdown is <b>```key:value``` format search dropdown.</b> <br/>
+
+
+## Basic
+<Canvas>
+    <Story name="Basic" height="300px">
+        {{
+            components: { PQuerySearchDropdown },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p-query-search-dropdown
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+    ></p-query-search-dropdown>
+</div>
+    `,
+            setup() {
+                const keyItemSets = getKeyItemSets(5, 1)
+                const valueHandlerMap = getValueHandlerMap(keyItemSets)
+                return {
+                    keyItemSets,
+                    valueHandlerMap
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+<br/>
+<br/>
+
+
+## Multi Selectable
+<Canvas>
+    <Story name="Multi Selectable" height="300px">
+        {{
+            components: { PQuerySearchDropdown },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p-query-search-dropdown
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+        multi-selectable
+    ></p-query-search-dropdown>
+</div>
+    `,
+            setup() {
+                const keyItemSets = getKeyItemSets(5, 1)
+                const valueHandlerMap = getValueHandlerMap(keyItemSets)
+                return {
+                    keyItemSets,
+                    valueHandlerMap
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" height="300px">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

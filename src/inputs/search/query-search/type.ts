@@ -92,3 +92,11 @@ export interface QuerySearchProps {
 export interface QuerySearchEventArgs {
     search: [QueryItem];
 }
+
+export interface MenuFormatterArgs {
+    menuResponse: HandlerResponse;
+    selectedKeys: KeyItem[];
+    operator?: OperatorType;
+    subPath?: string;
+    hideKey?: boolean;
+}

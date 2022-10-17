@@ -17,7 +17,7 @@
     "baseUrl": ".",
     "declaration": true,
     "outDir": "dist",
-    "types": ["webpack-env", "@types/jest"],
+    "types": ["webpack-env", "@types/jest", "jest"],
     "paths": {
       "@/*": ["src/*"]
     },
@@ -28,6 +28,7 @@
     "node_modules",
     "src/assets",
     "dist",
-    ".out"
+    ".out",
+    "**/__tests__/**/*.ts"
   ]
 }

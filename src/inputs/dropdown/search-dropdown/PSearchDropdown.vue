@@ -16,7 +16,6 @@
                      proxySelected.length &&
                      !proxyVisibleMenu &&
                      !proxyIsFocused"
-                 ref="selectedRadioRef"
                  class="selected-radio-label"
             >
                 <span><slot name="selected-radio-label" :selected="proxySelected[0]">{{ proxySelected[0].label || proxySelected[0].name }}</slot></span>
@@ -83,6 +82,7 @@
 import {
     computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch, nextTick,
 } from 'vue';
+import type Vue from 'vue';
 import type { DirectiveFunction, SetupContext } from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components';
@@ -205,8 +205,7 @@ export default defineComponent<SearchDropdownProps>({
         });
 
         const state = reactive({
-            menuRef: null,
-            selectedRadioRef: null as null|HTMLElement,
+            menuRef: null as null|Vue,
             searchDropdownType: computed<SEARCH_DROPDOWN_TYPE | undefined>(() => {
                 if (props.type) return props.type;
                 if (!props.multiSelectable) return SEARCH_DROPDOWN_TYPE.default;

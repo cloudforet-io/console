@@ -10,7 +10,7 @@ const extraArgTypes: ArgTypes = {
     type: {
         name: 'type',
         type: { name: 'string' },
-        description: 'Type of PSearchDropdown. There are 3 types: `default` and `radioButton`.',
+        description: 'Type of single selection. Do not work in multi select mode. There are 2 types: `default` and `radioButton`.',
         defaultValue: SEARCH_DROPDOWN_TYPE.default,
         table: {
             type: {

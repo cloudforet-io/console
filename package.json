@@ -46,6 +46,7 @@
     "stylelint": "stylelint \"src/**/*.{css,vue,pcss,scss}\"",
     "lint": "npm run eslint && npm run stylelint",
     "test": "jest",
+    "test:watch": "jest --watch",
     "cm": "cz",
     "prepare": "husky install",
     "tsc-alias": "tsc-alias -p tsconfig.build.json",
