@@ -1,3 +1,10 @@
+# [1.1.0-beta.424](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.423...v1.1.0-beta.424) (2022-10-17)
+
+
+### Bug Fixes
+
+* **button:** do not fire click event when `disabled` ([#91](https://github.com/cloudforet-io/mirinae/issues/91)) ([07aec65](https://github.com/cloudforet-io/mirinae/commit/07aec65f52781fed9aca83b279da1bb720799581))
+
 # [1.1.0-beta.423](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.422...v1.1.0-beta.423) (2022-10-17)
 
 
