@@ -36,6 +36,7 @@
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import {
     defineComponent, reactive, toRefs, watch,
 } from 'vue';
@@ -79,7 +80,7 @@ export default defineComponent<Props>({
             default: () => ([]),
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             additionalInfoItems: [
