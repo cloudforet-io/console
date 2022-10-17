@@ -11,7 +11,15 @@
                    'outline': !!outline,
                    'disabled': !!disabled,
                } "
-               v-on="$listeners"
+               v-on="{
+                   ...$listeners,
+                   click: (event) => {
+                       if (!disabled && !loading) {
+                           if (typeof $listeners.click === 'function') $listeners.click(event);
+                           else $listeners.click.forEach(func => func(event));
+                       }
+                   }
+               }"
     >
         <p-lottie v-if="loading" name="thin-spinner" :size="loadingIconSize" />
         <p-i v-if="icon"
