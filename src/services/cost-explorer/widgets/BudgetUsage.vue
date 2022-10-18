@@ -54,7 +54,7 @@ import { indigo, red } from '@/styles/colors';
 
 import {
     getConvertedBudgetFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
+} from '@/services/cost-explorer/lib/helper';
 import BudgetUsageProgressBar
     from '@/services/cost-explorer/modules/BudgetUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';

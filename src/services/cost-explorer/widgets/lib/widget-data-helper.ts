@@ -9,9 +9,9 @@ import type { CurrencyRates } from '@/store/modules/display/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
-import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type {
     Period, Granularity, GroupBy, CostQueryFilterItem,
 } from '@/services/cost-explorer/type';

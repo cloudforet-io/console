@@ -20,8 +20,6 @@
 </template>
 
 <script lang="ts">
-
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -32,13 +30,12 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-
 import { i18n } from '@/translations';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { getInitialDates } from '@/services/cost-explorer/lib/helper';
 import CostManagementCustomRangeModal from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { Period, Granularity } from '@/services/cost-explorer/type';

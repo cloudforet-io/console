@@ -31,8 +31,8 @@ import { cloneDeep } from 'lodash';
 
 import { store } from '@/store';
 
-import { getRefinedFilterItems } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import { getRefinedFilterItems } from '@/services/cost-explorer/lib/helper';
 import type { CostQueryFilterItem, RefinedFilterItem } from '@/services/cost-explorer/type';
 
 

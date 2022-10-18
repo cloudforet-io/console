@@ -66,10 +66,10 @@ import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import {
     convertFilterItemToQueryStoreFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+} from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardSimpleCardWidget from '@/services/cost-explorer/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import type { WidgetProps } from '@/services/cost-explorer/widgets/type';

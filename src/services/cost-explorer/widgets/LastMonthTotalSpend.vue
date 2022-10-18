@@ -34,7 +34,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
-
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -43,10 +42,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray, violet } from '@/styles/colors';
 
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import {
     convertFilterItemToQueryStoreFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+} from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { getXYChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardSimpleCardWidget

@@ -71,11 +71,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import {
-    convertFilterItemToQueryStoreFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+import {
+    convertFilterItemToQueryStoreFilter,
+} from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { getAWSFilters } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';

@@ -58,11 +58,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
-import {
-    convertFilterItemToQueryStoreFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import {
+    convertFilterItemToQueryStoreFilter,
+} from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { CostQueryFilterItem, Period } from '@/services/cost-explorer/type';
 import {

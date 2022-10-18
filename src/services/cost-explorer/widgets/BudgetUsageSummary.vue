@@ -22,7 +22,7 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { CURRENCY } from '@/store/modules/display/config';
 
 import BudgetStat from '@/services/cost-explorer/budget/modules/budget-stat/BudgetStat.vue';
-import { getConvertedBudgetFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { getConvertedBudgetFilter } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import {
     getWidgetOption,

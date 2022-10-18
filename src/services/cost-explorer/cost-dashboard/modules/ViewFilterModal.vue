@@ -33,8 +33,8 @@ import { store } from '@/store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { getRefinedFilterItems } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import { getRefinedFilterItems } from '@/services/cost-explorer/lib/helper';
 import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import type { CostQueryFilterItem, RefinedFilterItem } from '@/services/cost-explorer/type';
 
