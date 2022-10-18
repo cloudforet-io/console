@@ -147,6 +147,8 @@ export default defineComponent<QuerySearchDropdownProps>({
 
         /* util */
         const selectItem = (queryItem: QueryItem) => {
+            const duplicatedIndex = state.proxySelected.findIndex(item => item.key.label === queryItem.key?.label || item.key.name === queryItem.key?.name);
+            if (duplicatedIndex !== -1) state.proxySelected.splice(duplicatedIndex, 1);
             if (props.multiSelectable) {
                 state.proxySelected = [...state.proxySelected, queryItem];
             } else {
