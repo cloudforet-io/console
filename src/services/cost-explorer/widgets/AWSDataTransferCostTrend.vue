@@ -27,9 +27,9 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
+
 import {
-    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -53,7 +53,7 @@ import { i18n } from '@/translations';
 import { CURRENCY } from '@/store/modules/display/config';
 
 import config from '@/lib/config';
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
@@ -62,15 +62,13 @@ import {
     gray, green, red, yellow,
 } from '@/styles/colors';
 
-import {
-    convertFilterItemToQueryStoreFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Period } from '@/services/cost-explorer/type';
 import {
-    getAWSFilters, getTooltipText, getXYChartData,
+    getTooltipText, getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
@@ -79,7 +77,6 @@ import type {
 } from '@/services/cost-explorer/widgets/type';
 
 
-const PRODUCT_NAME = 'AWSDataTransfer';
 const GROUP_BY = 'usage_type';
 const CATEGORY_KEY = 'date';
 const TRANSFER_OUT_COLOR = red[400];
@@ -96,7 +93,7 @@ interface Field extends DataTableFieldType {
 interface TableData extends TrafficWidgetTableData {
     month?: string;
 }
-export default defineComponent<WidgetProps>({
+export default {
     name: 'AWSDataTransferCostTrend',
     components: {
         CostDashboardDataTable,
@@ -126,15 +123,15 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
         filters: {
-            type: Array,
-            default: () => ([]),
+            type: Object,
+            default: () => ({}),
         },
         printMode: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props: WidgetProps, { emit }) {
         const { i18nDayjs } = useI18nDayjs();
         const state = reactive({
             loading: false,
@@ -150,7 +147,7 @@ export default defineComponent<WidgetProps>({
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
                         period: objectToQueryString(_period),
-                        filters: arrayToQueryString(getAWSFilters(props.filters, PRODUCT_NAME)),
+                        filters: objectToQueryString({ ...props.filters, provider: ['aws'], product: ['AWSDataTransfer'] }),
                     },
                 };
             }),
@@ -346,9 +343,11 @@ export default defineComponent<WidgetProps>({
         const listData = async (period: Period, filters): Promise<Data[]> => {
             state.loading = true;
 
-            const convertedFilters = getAWSFilters(filters, PRODUCT_NAME);
-            queryHelper.setFilters(convertFilterItemToQueryStoreFilter(convertedFilters));
-
+            queryHelper.setFilters([
+                ...getConvertedFilter(filters),
+                { k: 'provider', v: 'aws', o: '=' },
+                { k: 'product', v: 'AWSDataTransfer', o: '=' },
+            ]);
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: true,
@@ -399,7 +398,7 @@ export default defineComponent<WidgetProps>({
             ...toRefs(state),
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

@@ -29,6 +29,9 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
+import {
+    getConvertedFilter,
+} from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { CostQueryFilters, Granularity } from '@/services/cost-explorer/type';
 
 
@@ -111,22 +114,6 @@ export default {
             }),
         });
 
-        /* Util */
-        const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
-            const result: QueryStoreFilter[] = [];
-            Object.entries(filters).forEach(([key, data]) => {
-                if (data?.length) {
-                    result.push({
-                        k: key,
-                        v: data,
-                        o: '=',
-                    });
-                }
-            });
-            return result;
-        };
-
-        /* Api */
         const getRecentBudgets = async () => {
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze(state.budgetListParams);
@@ -148,6 +135,7 @@ export default {
         return {
             ...toRefs(state),
             currencyMoneyFormatter,
+
         };
     },
 

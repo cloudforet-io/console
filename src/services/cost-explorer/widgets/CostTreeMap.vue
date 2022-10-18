@@ -43,7 +43,8 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
+
+
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -76,9 +77,7 @@ import {
     gray, violet, white,
 } from '@/styles/colors';
 
-import {
-    convertFilterItemToQueryStoreFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -98,7 +97,7 @@ interface CostTreeMapData extends PieChartData {
     textColor?: string;
 }
 
-export default defineComponent<WidgetProps<WidgetOptions>>({
+export default defineComponent<WidgetProps>({
     name: 'CostTreeMap',
     components: {
         CostDashboardCardWidgetLayout,
@@ -121,8 +120,8 @@ export default defineComponent<WidgetProps<WidgetOptions>>({
             default: () => ({}),
         },
         filters: {
-            type: Array,
-            default: () => ([]),
+            type: Object,
+            default: () => ({}),
         },
         currency: {
             type: String,
@@ -140,7 +139,7 @@ export default defineComponent<WidgetProps<WidgetOptions>>({
             default: false,
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props: WidgetProps<WidgetOptions>, { emit }) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as TreeMap | null,
@@ -157,7 +156,7 @@ export default defineComponent<WidgetProps<WidgetOptions>>({
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         groupBy: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(props.period),
-                        filters: arrayToQueryString(props.filters),
+                        filters: objectToQueryString(props.filters),
                     },
                 };
             }),
@@ -255,7 +254,7 @@ export default defineComponent<WidgetProps<WidgetOptions>>({
         /* Api */
         const costQueryHelper = new QueryHelper();
         const fetchData = async (): Promise<CostAnalyzeModel[]> => {
-            costQueryHelper.setFilters(convertFilterItemToQueryStoreFilter(props.filters));
+            costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.ACCUMULATED,

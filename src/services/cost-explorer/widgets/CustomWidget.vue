@@ -58,8 +58,9 @@
 </template>
 
 <script lang="ts">
+
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
 
 import { PButton } from '@spaceone/design-system';
@@ -83,7 +84,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
-    convertFilterItemToQueryStoreFilter, getDataTableCostFields, getInitialDates,
+    getConvertedFilter, getDataTableCostFields, getInitialDates,
 } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
@@ -91,7 +92,7 @@ import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type {
-    CostQuerySetOption, Period, Granularity, GroupBy, CostQueryFilterItem,
+    CostQuerySetOption, Period, Granularity, GroupBy,
 } from '@/services/cost-explorer/type';
 import {
     getLegends,
@@ -114,7 +115,7 @@ const PAGE_SIZE = 5;
 const DAILY_CHART_COUNT = 14;
 const MONTHLY_CHART_COUNT = 6;
 
-export default defineComponent<WidgetProps<WidgetOptions>>({
+export default {
     name: 'CustomWidget',
     components: {
         CostDashboardCardWidgetLayout,
@@ -150,7 +151,7 @@ export default defineComponent<WidgetProps<WidgetOptions>>({
             default: false,
         },
     },
-    setup(props) {
+    setup(props: WidgetProps<WidgetOptions>) {
         const state = reactive({
             loading: false,
             chartData: [] as Array<XYChartData | PieChartData>,
@@ -178,9 +179,7 @@ export default defineComponent<WidgetProps<WidgetOptions>>({
                     end: dayjs.utc(period.end).format('YYYY-MM'),
                 };
             }),
-            // TODO: should be changed to object[] type
-            // filters: computed<CostQueryFilterItem[]>(() => props.options?.filters ?? []),
-            filters: computed<CostQueryFilterItem[]>(() => []),
+            filters: computed(() => props.options?.filters),
             filterLabel: computed(() => {
                 const label = getCostDashboardFilterLabel(state.filters);
                 return label ?? i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');
@@ -192,7 +191,7 @@ export default defineComponent<WidgetProps<WidgetOptions>>({
                     granularity: primitiveToQueryString(props.options?.granularity),
                     groupBy: arrayToQueryString([props.options?.group_by]),
                     period: objectToQueryString(state.convertedPeriod),
-                    filters: arrayToQueryString(state.filters),
+                    filters: objectToQueryString(props.options?.filters),
                     stack: primitiveToQueryString(props.options?.stack),
                 },
             })),
@@ -219,7 +218,7 @@ export default defineComponent<WidgetProps<WidgetOptions>>({
         const listCostAnalysisData = async () => {
             try {
                 tableState.loading = true;
-                costQueryHelper.setFilters(convertFilterItemToQueryStoreFilter(state.filters));
+                costQueryHelper.setFilters(getConvertedFilter(props.options?.filters ?? {}));
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: props.options?.granularity,
                     group_by: [props.options?.group_by],
@@ -277,7 +276,7 @@ export default defineComponent<WidgetProps<WidgetOptions>>({
             handleClickViewFilter,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss">

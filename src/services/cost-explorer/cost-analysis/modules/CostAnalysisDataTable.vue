@@ -93,14 +93,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import {
-    convertFilterItemToQueryStoreFilter, getDataTableCostFields, getTimeUnitByPeriod,
+    getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod,
 } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import {
-    FILTER, GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP,
-} from '@/services/cost-explorer/lib/config';
+import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
-import type { CostQueryFilterItem } from '@/services/cost-explorer/type';
 import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type';
 
 
@@ -143,7 +140,7 @@ export default {
             granularity: computed(() => costExplorerStore.state.costAnalysis.granularity),
             stack: computed(() => costExplorerStore.state.costAnalysis.stack),
             period: computed(() => costExplorerStore.state.costAnalysis.period),
-            filters: computed<CostQueryFilterItem[]>(() => costExplorerStore.state.costAnalysis.filters),
+            filters: computed(() => costExplorerStore.state.costAnalysis.filters),
             groupBy: computed(() => costExplorerStore.state.costAnalysis.groupBy),
             //
             groupByItems: computed<GroupByItem[]>(() => costExplorerStore.getters['costAnalysis/groupByItems']),
@@ -187,36 +184,18 @@ export default {
         });
 
         /* util */
-        const getFiltersByCategory = (item: CostAnalyzeModel, category: string, filterKey): QueryStoreFilter[] => {
-            const filters: QueryStoreFilter[] = [];
-            if (item[category]) {
-                filters.push({ k: filterKey, v: item[category], o: '=' });
-            } else {
-                const filtersByCategory = state.filters.filter(d => d.category === category);
-                if (filtersByCategory.length) {
-                    filters.push({ k: filterKey, v: filtersByCategory.map(d => d.value), o: '=' });
-                }
-            }
-            return filters;
-        };
         const getLink = (item: CostAnalyzeModel, fieldName: string) => {
             const queryHelper = new QueryHelper();
             const query: Location['query'] = {};
             if (item.region_code) {
                 query.region = arrayToQueryString([item.region_code]);
-            } else {
-                const filtersByCategory = state.filters.filter(d => d.category === FILTER.REGION);
-                if (filtersByCategory.length) {
-                    query.region = arrayToQueryString(filtersByCategory.map(d => d.value));
-                }
+            } else if (state.filters.region_code?.length) {
+                query.region = arrayToQueryString(state.filters.region_code);
             }
             if (item.provider) {
                 query.provider = primitiveToQueryString(item.provider);
-            } else {
-                const filtersByCategory = state.filters.filter(d => d.category === FILTER.PROVIDER);
-                if (filtersByCategory.length) {
-                    query.provider = arrayToQueryString(filtersByCategory[0].value);
-                }
+            } else if (state.filters.provider?.length) {
+                query.provider = primitiveToQueryString(state.filters.provider[0]);
             }
 
             if (state.granularity === GRANULARITY.ACCUMULATED) {
@@ -231,11 +210,36 @@ export default {
                 query.period = objectToQueryString(_period);
             }
 
-            const projectFilters = getFiltersByCategory(item, FILTER.PROJECT, 'project_id');
-            const projectGroupFilters = getFiltersByCategory(item, FILTER.PROJECT_GROUP, 'project_group_id');
-            const serviceAccountFilters = getFiltersByCategory(item, FILTER.SERVICE_ACCOUNT, 'collection_info.service_accounts');
-            const productFilters = getFiltersByCategory(item, FILTER.PRODUCT, 'service_code');
-            const filters = [...projectFilters, ...projectGroupFilters, ...serviceAccountFilters, ...productFilters];
+            const filters: QueryStoreFilter[] = [];
+            if (item.project_id) {
+                filters.push({ k: 'project_id', v: item.project_id, o: '=' });
+            } else if (state.filters.project_id?.length) {
+                filters.push({ k: 'project_id', v: state.filters.project_id, o: '=' });
+            }
+
+            if (item.project_group_id) {
+                filters.push({ k: 'project_group_id', v: item.project_group_id, o: '=' });
+            } else if (state.filters.project_group_id?.length) {
+                filters.push({ k: 'project_group_id', v: state.filters.project_group_id, o: '=' });
+            }
+
+            if (item.service_account_id) {
+                filters.push({ k: 'collection_info.service_accounts', v: item.service_account_id, o: '=' });
+            } else if (state.filters.service_account_id?.length) {
+                filters.push({ k: 'collection_info.service_accounts', v: state.filters.service_account_id, o: '=' });
+            }
+
+            if (item.account) {
+                filters.push({ k: 'account', v: item.account, o: '=' });
+            } else if (state.filters.account?.length) {
+                filters.push({ k: 'account', v: state.filters.account, o: '=' });
+            }
+
+            if (item.product) {
+                filters.push({ k: 'service_code', v: item.product, o: '=' });
+            } else if (state.filters.product?.length) {
+                filters.push({ k: 'service_code', v: state.filters.product, o: '=' });
+            }
 
             return {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
@@ -296,7 +300,7 @@ export default {
             listCostAnalysisRequest = axios.CancelToken.source();
             try {
                 tableState.loading = true;
-                const _convertedFilters = convertFilterItemToQueryStoreFilter(filters);
+                const _convertedFilters = getConvertedFilter(filters);
                 costApiQueryHelper.setFilters(_convertedFilters);
 
                 const query = costApiQueryHelper.data;
@@ -334,7 +338,7 @@ export default {
         };
         const handleExport = async () => {
             try {
-                const _convertedFilters = convertFilterItemToQueryStoreFilter(state.filters);
+                const _convertedFilters = getConvertedFilter(state.filters);
                 costApiQueryHelper.setFilters(_convertedFilters);
 
                 const dateFormat = state.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';

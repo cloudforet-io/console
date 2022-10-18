@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
 
 import { CURRENCY } from '@/store/modules/display/config';
@@ -30,7 +30,7 @@ interface Props extends WidgetProps {
     widgetFileName: string;
 }
 
-export default defineComponent<Props>({
+export default {
     name: 'DynamicWidget',
     props: {
         widgetId: {
@@ -54,8 +54,8 @@ export default defineComponent<Props>({
             default: () => ({}),
         },
         filters: {
-            type: Array,
-            default: () => ([]),
+            type: Object,
+            default: () => ({}),
         },
         currency: {
             type: String,
@@ -70,7 +70,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props) {
+    setup(props: Props) {
         // noinspection TypeScriptCheckImport
         const state = reactive({
             component: null as any,
@@ -95,5 +95,5 @@ export default defineComponent<Props>({
             getComponent,
         };
     },
-});
+};
 </script>
