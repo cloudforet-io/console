@@ -42,7 +42,7 @@ import { capitalize } from 'lodash';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import CostDashboardCustomizeWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetPreview.vue';
@@ -115,7 +115,7 @@ export default {
                 query: {
                     granularity: primitiveToQueryString(state.granularity),
                     groupBy: arrayToQueryString([state.groupBy]),
-                    filters: objectToQueryString(state.filters),
+                    filters: arrayToQueryString(state.filters),
                     stack: primitiveToQueryString(state.stack),
                 },
             };
