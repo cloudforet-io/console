@@ -64,7 +64,8 @@
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
             </p-button>
-            <p-button class="text-button" style-type="outline gray900" size="lg"
+            <p-button class="text-button" style-type="gray900" size="lg"
+                      outline
                       @click="handleGoBack"
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CANCEL') }}

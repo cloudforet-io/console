@@ -32,7 +32,7 @@
                 <div v-if="!printMode" class="button-wrapper">
                     <p-button style-type="gray-border"
                               font-weight="normal" size="sm"
-                              :disabled="!filters.length"
+                              :disabled="!filtersLength"
                               @click="handleClearAllFilters"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CLEAR_ALL') }}
@@ -46,10 +46,21 @@
                 </div>
             </div>
             <div class="filter-wrapper">
-                <cost-explorer-filter-tags :print-mode="printMode"
-                                           :filter-items="filters"
-                                           @update-filter-tags="handleUpdateFilterTags"
-                />
+                <template v-if="noFilter">
+                    <p-empty>
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_FILTERS') }}
+                    </p-empty>
+                </template>
+                <template v-else>
+                    <template v-for="(selectedItems, filterName, idx) in filterItemsMap">
+                        <p-tag v-for="(item, itemIdx) in selectedItems" :key="`selected-tag-${idx}-${item.name}`"
+                               :deletable="!printMode"
+                               @delete="handleDeleteFilterTag(filterName, itemIdx)"
+                        >
+                            <b>[{{ FILTER_ITEM_MAP[filterName].label }}] </b>{{ item.label }}
+                        </p-tag>
+                    </template>
+                </template>
             </div>
 
             <!--legend-->
@@ -91,32 +102,36 @@
         </section>
         <cost-explorer-set-filter-modal v-if="!printMode"
                                         :visible.sync="filterModalVisible"
-                                        :prev-filter-items="filters"
-                                        :filter-categories="filterCategories"
+                                        :selected-filters="filters"
+                                        :filter-items="filterItems"
                                         @confirm="handleConfirmFilterModal"
         />
     </div>
 </template>
 
 <script lang="ts">
+
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
 import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 import {
-    PButton, PIconButton, PSelectDropdown, PStatus, PDataLoader,
+    PButton, PIconButton, PSelectDropdown, PStatus, PTag, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
-import type { CollapsibleItem } from '@spaceone/design-system/dist/src/data-display/collapsibles/collapsible-list/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
-import { debounce } from 'lodash';
+import {
+    cloneDeep, debounce, sum, isEmpty,
+} from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+
 import { store } from '@/store';
+
 
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helper';
 
@@ -125,7 +140,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import {
-    convertFilterItemToQueryStoreFilter,
+    getConvertedFilter,
 } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import CostAnalysisPieChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue';
@@ -134,13 +149,12 @@ import CostAnalysisStackedColumnChart
 import {
     FILTER_ITEM_MAP, GRANULARITY,
 } from '@/services/cost-explorer/lib/config';
-import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import type {
-    Period, Granularity, GroupBy, CostQueryFilterItem,
-} from '@/services/cost-explorer/type';
+import type { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
 import {
-    getLegends, getPieChartData, getXYChartData,
+    getLegends,
+    getPieChartData,
+    getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import type {
     Legend, PieChartData, XYChartData,
@@ -153,7 +167,6 @@ const CostExplorerSetFilterModal = () => import('@/services/cost-explorer/module
 export default {
     name: 'CostAnalysisChart',
     components: {
-        CostExplorerFilterTags,
         CostAnalysisStackedColumnChart,
         CostAnalysisPieChart,
         CostExplorerSetFilterModal,
@@ -161,7 +174,9 @@ export default {
         PIconButton,
         PSelectDropdown,
         PStatus,
+        PTag,
         PDataLoader,
+        PEmpty,
     },
     props: {
         printMode: {
@@ -179,12 +194,18 @@ export default {
             groupBy: computed(() => costExplorerStore.state.costAnalysis.groupBy),
             primaryGroupBy: computed(() => costExplorerStore.state.costAnalysis.primaryGroupBy),
             //
+            noFilter: computed(() => isEmpty(state.filterItemsMap) || Object.values(state.filters).every(d => !d)),
             groupByItems: computed(() => costExplorerStore.getters['costAnalysis/groupByItems']),
-            filterCategories: computed<CollapsibleItem[]>(() => Object.values(FILTER_ITEM_MAP).map(item => ({
-                title: item.label, data: item.name,
+            filterItemsMap: computed(() => costExplorerStore.getters['costAnalysis/filterItemsMap']),
+            filterItems: computed(() => Object.values(FILTER_ITEM_MAP).map(item => ({
+                name: item.name, title: item.label,
             }))),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
+            filtersLength: computed<number>(() => {
+                const selectedValues: Array<string[]> = Object.values(state.filters);
+                return sum(selectedValues.map(v => v?.length || 0));
+            }),
             //
             loading: true,
             legends: [] as Legend[],
@@ -219,7 +240,7 @@ export default {
             }
             listCostAnalysisRequest = axios.CancelToken.source();
             try {
-                costQueryHelper.setFilters(convertFilterItemToQueryStoreFilter(state.filters));
+                costQueryHelper.setFilters(getConvertedFilter(state.filters));
                 const dateFormat = state.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_others: !!state.primaryGroupBy,
@@ -275,14 +296,23 @@ export default {
             state.filterModalVisible = true;
         };
         const handleClearAllFilters = () => {
-            costExplorerStore.commit('costAnalysis/setFilters', []);
+            costExplorerStore.commit('costAnalysis/setFilters', {});
         };
-        const handleUpdateFilterTags = (filterItems: CostQueryFilterItem[]) => {
-            costExplorerStore.commit('costAnalysis/setFilters', filterItems);
+        const handleDeleteFilterTag = (filterName: string, itemIdx: number) => {
+            const _filters = cloneDeep(state.filters);
+            const _selectedItems = [..._filters[filterName]];
+            _selectedItems.splice(itemIdx, 1);
+            if (_selectedItems.length) {
+                _filters[filterName] = _selectedItems;
+            } else {
+                _filters[filterName] = undefined;
+            }
+            costExplorerStore.commit('costAnalysis/setFilters', _filters);
         };
         const handleConfirmFilterModal = (filters) => {
             costExplorerStore.commit('costAnalysis/setFilters', filters);
         };
+
         const handleChartRendered = () => {
             if (state.chartRef && state.queryRef) emit('rendered', [state.queryRef, state.chartRef]);
         };
@@ -310,7 +340,7 @@ export default {
             handleToggleAllLegends,
             handlePrimaryGroupByItem,
             handleClickSelectFilter,
-            handleUpdateFilterTags,
+            handleDeleteFilterTag,
             handleClearAllFilters,
             handleConfirmFilterModal,
             handleChartRendered,
@@ -359,6 +389,11 @@ export default {
 
         .filter-wrapper {
             height: 8rem;
+            overflow-y: auto;
+            padding: 0.75rem 1rem;
+            .p-tag {
+                margin-bottom: 0.5rem;
+            }
         }
         .legend-wrapper {
             height: 16.75rem;
@@ -420,6 +455,12 @@ export default {
         .filter-wrapper {
             height: auto;
             padding: 0.75rem 1rem;
+            .p-tag {
+                margin-bottom: 0.5rem;
+            }
+            .p-empty {
+                @apply flex justify-start;
+            }
         }
         .legend-wrapper {
             height: auto;

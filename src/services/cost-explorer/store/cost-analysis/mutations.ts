@@ -4,7 +4,8 @@ import type {
     CostAnalysisStoreState,
 } from '@/services/cost-explorer/store/cost-analysis/type';
 import type {
-    CostQuerySetModel, GroupBy, Period, Granularity, MoreGroupByItem, CostQueryFilterItem,
+    CostQueryFilters, CostQuerySetModel, GroupBy, Period,
+    Granularity, MoreGroupByItem,
 } from '@/services/cost-explorer/type';
 
 
@@ -32,7 +33,7 @@ export const setPeriod: Mutation<CostAnalysisStoreState> = (state, period: Perio
     state.period = period;
 };
 
-export const setFilters: Mutation<CostAnalysisStoreState> = (state, filters: CostQueryFilterItem[]) => {
+export const setFilters: Mutation<CostAnalysisStoreState> = (state, filters: CostQueryFilters) => {
     state.filters = filters;
 };
 

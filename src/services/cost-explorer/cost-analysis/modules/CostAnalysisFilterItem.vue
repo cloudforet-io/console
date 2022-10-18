@@ -15,11 +15,11 @@
         <p-search-dropdown
             v-else-if="type === FILTER.SERVICE_ACCOUNT || type === FILTER.REGION || type === FILTER.PROVIDER"
             :menu="menuItems"
-            :selected="selectedSearchDropdownItems"
-            :exact-mode="false"
+            :selected="selectedItems"
             multi-selectable
             use-fixed-menu-style
             @update:selected="handleUpdateSelected"
+            @search="handleSearch"
         />
         <p-query-search-dropdown
             v-else-if="type === FILTER.TAGS || type === FILTER.ADDITIONAL_INFO"
@@ -32,25 +32,27 @@
         <p-search-dropdown
             v-else
             :handler="menuHandler"
-            :selected="selectedSearchDropdownItems"
+            :selected="selectedItems"
             :loading="menuLoading"
             multi-selectable
             use-fixed-menu-style
             :exact-mode="false"
             @update:selected="handleUpdateSelected"
+            @search="handleSearch"
         />
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
 
 import {
     PQuerySearchDropdown,
     PSearchDropdown,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type {
     AutocompleteHandler, SearchDropdownMenuItem,
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
@@ -68,18 +70,16 @@ import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { FILTER } from '@/services/cost-explorer/lib/config';
-import type { CostQueryFilterItem } from '@/services/cost-explorer/type';
 
 interface Props {
     type: string;
-    selected: CostQueryFilterItem[];
+    selected: string[];
 }
 
-export default defineComponent<Props>({
+export default {
     name: 'CostAnalysisFilterItem',
     components: {
         PQuerySearchDropdown,
@@ -96,30 +96,27 @@ export default defineComponent<Props>({
             default: () => ([]),
         },
     },
-    setup(props, { emit }) {
-        const storeState = reactive({
+    setup(props: Props, { emit }) {
+        const state = reactive({
+            selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selected.map(selectedName => ({
+                name: selectedName,
+                label: state.menuItems.find(d => d.name === selectedName)?.label || selectedName,
+            }))),
             serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-        });
-        const state = reactive({
-            proxySelected: useProxyValue('selected', props, emit),
-            selectedSearchDropdownItems: computed<SearchDropdownMenuItem[]>(() => state.proxySelected?.map(d => ({
-                name: d.value,
-                label: state.menuItems.find(menuItem => menuItem.name === d.value)?.label || d.value,
-            }))),
-            menuItems: computed<SearchDropdownMenuItem[]>(() => {
+            menuItems: computed(() => {
                 if (props.type === FILTER.SERVICE_ACCOUNT) {
-                    return Object.keys(storeState.serviceAccounts).map(k => ({
-                        name: k, label: storeState.serviceAccounts[k].label,
+                    return Object.keys(state.serviceAccounts).map(k => ({
+                        name: k, label: state.serviceAccounts[k].label,
                     }));
                 } if (props.type === FILTER.PROVIDER) {
-                    return Object.keys(storeState.providers).map(k => ({
-                        name: k, label: storeState.providers[k].name,
+                    return Object.keys(state.providers).map(k => ({
+                        name: k, label: state.providers[k].name,
                     }));
                 } if (props.type === FILTER.REGION) {
-                    return Object.keys(storeState.regions).map(k => ({
-                        name: k, label: storeState.regions[k].name,
+                    return Object.keys(state.regions).map(k => ({
+                        name: k, label: state.regions[k].name,
                     }));
                 }
                 return [];
@@ -213,18 +210,14 @@ export default defineComponent<Props>({
 
         /* event */
         const handleSelectedProjectIds = (selectedProjectIds) => {
-            state.proxySelected = selectedProjectIds.map(d => ({
-                category: props.type,
-                value: d,
-            }));
+            emit('update:selected', selectedProjectIds);
         };
-        const handleUpdateSelected = (selectedItems: SearchDropdownMenuItem[]) => {
-            state.proxySelected = selectedItems.map(d => ({
-                category: props.type,
-                value: d.name,
-            }));
+        const handleUpdateSelected = (selectedItem: MenuItem[]) => {
+            emit('update:selected', selectedItem.map(d => d.name));
         };
-
+        const handleSearch = (val: string) => {
+            emit('update:selected', state.selectedItems.map(d => d.name).concat([val]));
+        };
         const handleUpdateSelectedQueryItems = (selectedQueryItems: QueryItem[]) => {
             state.proxySelected = selectedQueryItems.map(d => ({
                 category: props.type,
@@ -258,7 +251,8 @@ export default defineComponent<Props>({
             handleSelectedProjectIds,
             handleUpdateSelected,
             handleUpdateSelectedQueryItems,
+            handleSearch,
         };
     },
-});
+};
 </script>

@@ -6,19 +6,9 @@ export interface Period {
     end?: string;
 }
 
-export interface CostQueryFilterItem {
-    category: string;
-    key?: string;
-    value: string;
-}
-
-export interface RefinedFilterItem extends CostQueryFilterItem {
+interface FilterItem {
+    name: string;
     label: string;
-}
-
-export interface MoreGroupByItem {
-    category: string;
-    key: string;
     disabled?: boolean;
     selected?: boolean;
 }
@@ -28,6 +18,7 @@ export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 export type Filter = typeof FILTER[keyof typeof FILTER];
 
 export type CostQueryFilters = Partial<Record<Filter, string[]>>;
+export type CostQueryFilterItemsMap = Partial<Record<Filter, FilterItem[]>>;
 
 export interface CostQuerySetOption {
     group_by?: GroupBy[];
@@ -36,11 +27,18 @@ export interface CostQuerySetOption {
     granularity: Granularity;
     stack?: boolean;
     period: Period;
-    filters?: CostQueryFilterItem[];
+    filters?: CostQueryFilters;
 }
 
 export interface CostQuerySetModel {
     cost_query_set_id: string;
     name: string;
     options?: CostQuerySetOption;
+}
+
+export interface MoreGroupByItem {
+    category: string;
+    key: string;
+    disabled?: boolean;
+    selected?: boolean;
 }

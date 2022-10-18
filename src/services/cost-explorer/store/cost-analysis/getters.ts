@@ -1,11 +1,38 @@
 import type { Getter } from 'vuex';
 
+import { store } from '@/store';
+
+import type { ReferenceItem } from '@/store/modules/reference/type';
+
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import type {
     CostAnalysisStoreState, GroupByItem,
 } from '@/services/cost-explorer/store/cost-analysis/type';
-import type { CostQuerySetModel } from '@/services/cost-explorer/type';
+import type { CostQueryFilterItemsMap, CostQuerySetModel } from '@/services/cost-explorer/type';
 
+
+export const filterItemsMap: Getter<CostAnalysisStoreState, any> = ({ filters }): CostQueryFilterItemsMap => {
+    const itemsMap: CostQueryFilterItemsMap = {};
+    const resourceItemsMap = {
+        project_id: store.getters['reference/projectItems'],
+        project_group_id: store.getters['reference/projectGroupItems'],
+        service_account_id: store.getters['reference/serviceAccountItems'],
+        provider: store.getters['reference/providerItems'],
+        region_code: store.getters['reference/regionItems'],
+    };
+
+    Object.entries(filters).forEach(([key, data]) => {
+        const resourceItems = resourceItemsMap[key];
+        if (resourceItems) {
+            itemsMap[key] = data?.map((d) => {
+                const resourceItem: ReferenceItem = resourceItems[d];
+                const label = key === 'region_code' ? resourceItem?.name : resourceItem?.label;
+                return { name: d, label: label ?? d };
+            });
+        } else itemsMap[key] = data?.map(d => ({ name: d, label: d }));
+    });
+    return itemsMap;
+};
 
 export const groupByItems: Getter<CostAnalysisStoreState, any> = ({ groupBy }): GroupByItem[] => groupBy.map(d => GROUP_BY_ITEM_MAP[d]);
 

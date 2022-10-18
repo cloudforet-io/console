@@ -3,21 +3,13 @@ import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-d
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
+
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
-import { FILTER, GRANULARITY } from '@/services/cost-explorer/lib/config';
-import type {
-    CostQueryFilters, Period, Granularity, CostQueryFilterItem, RefinedFilterItem,
-} from '@/services/cost-explorer/type';
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import type { CostQueryFilters, Period, Granularity } from '@/services/cost-explorer/type';
 
 
-export const convertFilterItemToQueryStoreFilter = (filterItems: CostQueryFilterItem[]): QueryStoreFilter[] => filterItems.map(f => ({
-    k: f.key ? `${f.category}.${f.key}` : f.category,
-    v: f.value,
-    o: '=',
-}));
-
-// TODO: will be deprecated soon
 export const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
     const result: QueryStoreFilter[] = [];
     Object.entries(filters).forEach(([key, data]) => {
@@ -30,22 +22,6 @@ export const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[
         }
     });
     return result;
-};
-
-export const getRefinedFilterItems = (resourceMap: Record<string, any>, filterItems: CostQueryFilterItem[]): RefinedFilterItem[] => {
-    const results: RefinedFilterItem[] = [];
-    filterItems.forEach((f) => {
-        const resourceItem = resourceMap[f.category]?.[f.value];
-        let label = f.value;
-        if (resourceItem) {
-            label = f.category === FILTER.REGION ? resourceItem?.name : resourceItem?.label;
-        }
-        results.push({
-            ...f,
-            label,
-        });
-    });
-    return results;
 };
 
 export const getConvertedBudgetFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {

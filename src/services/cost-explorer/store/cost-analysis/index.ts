@@ -14,7 +14,7 @@ const state: CostAnalysisStoreState = {
     primaryGroupBy: undefined,
     moreGroupBy: [],
     period: getInitialDates(),
-    filters: [],
+    filters: {},
     selectedQueryId: undefined,
     costQueryList: [],
 };

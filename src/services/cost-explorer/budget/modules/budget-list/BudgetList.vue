@@ -9,7 +9,7 @@
                         @export="handleExport"
                         @update-sort="handleUpdateSort"
         />
-        <budget-stat :filters="queryStoreFilters" :period="period" :usage-range="range"
+        <budget-stat :query-store-filters="queryStoreFilters" :period="period" :usage-range="range"
                      class="budget-stat"
         />
         <div class="budget-list-card-box">
@@ -24,7 +24,7 @@
 <script lang="ts">
 
 import {
-    computed, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
 import dayjs from 'dayjs';
@@ -56,7 +56,7 @@ interface Props {
     filters: QueryStoreFilter[];
 }
 
-export default {
+export default defineComponent<Props>({
     name: 'BudgetList',
     components: { BudgetListCard, BudgetToolbox, BudgetStat },
     props: {
@@ -199,7 +199,7 @@ export default {
             handleUpdateSort,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .budget-list {
