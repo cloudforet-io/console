@@ -3,7 +3,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
-import type { Period } from '@/services/cost-explorer/type';
+import type { CostQueryFilterItem, Period } from '@/services/cost-explorer/type';
 
 /* widget spec */
 export interface ChartData {
@@ -48,7 +48,7 @@ export interface WidgetProps<Options = any> {
     name?: string;
     options: Options;
     period: Period;
-    filters: Record<string, string[]>;
+    filters: CostQueryFilterItem[];
     currency: Currency;
     currencyRates: CurrencyRates;
     printMode?: boolean;

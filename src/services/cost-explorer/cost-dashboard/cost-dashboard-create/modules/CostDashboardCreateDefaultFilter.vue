@@ -12,7 +12,7 @@
             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.VIEW_FILTER') }}
         </p-button>
         <view-filter-modal :visible.sync="defaultFilterModalVisible"
-                           :selected-filters="defaultFilter"
+                           :selected-filters="defaultFilters"
         />
     </fragment>
 </template>
@@ -48,7 +48,9 @@ export default {
                 },
             }),
             defaultFilterModalVisible: false,
-            defaultFilter: computed(() => costExplorerStore.state.dashboard.defaultFilter ?? {}),
+            // TODO: default_filter will be changed from `object` to `object[]`
+            // defaultFilter: computed(() => costExplorerStore.state.dashboard.defaultFilter ?? {}),
+            defaultFilters: computed(() => []),
             isDashboardTemplate: computed(() => has(costExplorerStore.state.dashboard.selectedTemplate, 'public_dashboard_id')
                 || has(costExplorerStore.state.dashboard.selectedTemplate, 'user_dashboard_id')),
         });

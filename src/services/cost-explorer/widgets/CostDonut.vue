@@ -33,8 +33,7 @@
 </template>
 
 <script lang="ts">
-
-
+import type { SetupContext } from 'vue';
 import {
     computed, reactive, toRefs, watch, onUnmounted, defineComponent,
 } from 'vue';
@@ -63,7 +62,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import {
+    convertFilterItemToQueryStoreFilter,
+} from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -101,8 +102,8 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
         filters: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
         currency: {
             type: String,
@@ -117,7 +118,7 @@ export default defineComponent<WidgetProps>({
             default: false,
         },
     },
-    setup(props: WidgetProps, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chartRegistry: {},
@@ -136,7 +137,7 @@ export default defineComponent<WidgetProps>({
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         groupBy: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(props.period),
-                        filters: objectToQueryString(props.filters),
+                        filters: arrayToQueryString(props.filters),
                     },
                 };
             }),
@@ -229,7 +230,7 @@ export default defineComponent<WidgetProps>({
         const costQueryHelper = new QueryHelper();
         const getData = async () => {
             state.loading = true;
-            costQueryHelper.setFilters(getConvertedFilter(props.filters));
+            costQueryHelper.setFilters(convertFilterItemToQueryStoreFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.ACCUMULATED,

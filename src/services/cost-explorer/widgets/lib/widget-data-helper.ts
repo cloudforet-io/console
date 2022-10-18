@@ -11,8 +11,10 @@ import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
-import type { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
+import { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+import type {
+    Period, Granularity, GroupBy, CostQueryFilterItem,
+} from '@/services/cost-explorer/type';
 import { DATE_FORMAT } from '@/services/cost-explorer/widgets/lib/config';
 import type {
     ChartData,
@@ -264,11 +266,29 @@ export const getCurrencyAppliedChartData = (
 });
 
 
+/**
+ * @name getTooltipText
+ * @description Get formatted tooltip text for charts.
+ */
 export const getTooltipText = (categoryKey, valueKey, money, disablePercentage = true) => {
     if (disablePercentage) {
         return `{${categoryKey}}: [bold]${money}[/]`;
     }
     return `{${categoryKey}}: [bold]${money}[/] ({${valueKey}.percent.formatNumber('#.00')}%)`;
+};
+
+
+/**
+ * @name getAWSFilters
+ * @description Get filters for aws widgets only.
+ */
+export const getAWSFilters = (filters: CostQueryFilterItem[], productName: string): CostQueryFilterItem[] => {
+    const results = filters.filter(d => d.category !== FILTER.PROVIDER && d.category !== FILTER.PRODUCT);
+    results.concat([
+        { category: FILTER.PROVIDER, value: 'aws' },
+        { category: FILTER.PRODUCT, value: productName },
+    ]);
+    return results;
 };
 
 

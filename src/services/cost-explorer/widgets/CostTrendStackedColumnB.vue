@@ -17,6 +17,7 @@
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -66,15 +67,15 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
         filters: {
-            type: Object,
-            default: () => ({}),
+            type: Array,
+            default: () => ([]),
         },
         printMode: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props: WidgetProps, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             groupBy: computed(() => props.options?.group_by),
             widgetLink: computed(() => {
@@ -89,7 +90,7 @@ export default defineComponent<WidgetProps>({
                         granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
                         groupBy: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(_period),
-                        filters: objectToQueryString(props.filters),
+                        filters: arrayToQueryString(props.filters),
                     },
                 };
             }),
