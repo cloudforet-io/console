@@ -1,3 +1,10 @@
+# [1.1.0-beta.427](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.426...v1.1.0-beta.427) (2022-10-18)
+
+
+### Features
+
+* **p-spinner:** add p-spinner ([#95](https://github.com/cloudforet-io/mirinae/issues/95)) ([aed004b](https://github.com/cloudforet-io/mirinae/commit/aed004b0b5d7c045cfc892fda63555592f051ce1))
+
 # [1.1.0-beta.426](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.425...v1.1.0-beta.426) (2022-10-18)
 
 
