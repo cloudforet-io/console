@@ -16,10 +16,18 @@
             v-else-if="type === FILTER.SERVICE_ACCOUNT || type === FILTER.REGION || type === FILTER.PROVIDER"
             :menu="menuItems"
             :selected="selectedSearchDropdownItems"
+            :exact-mode="false"
             multi-selectable
             use-fixed-menu-style
-            :exact-mode="false"
             @update:selected="handleUpdateSelected"
+        />
+        <p-query-search-dropdown
+            v-else-if="type === FILTER.TAGS || type === FILTER.ADDITIONAL_INFO"
+            :key-item-sets="querySearchHandlerState.keyItemSets"
+            :value-handler-map="querySearchHandlerState.valueHandlerMap"
+            :selected.sync="querySearchHandlerState.selectedQueryItems"
+            multi-selectable
+            @update:selected="handleUpdateSelectedQueryItems"
         />
         <p-search-dropdown
             v-else
@@ -40,6 +48,7 @@ import {
 } from 'vue';
 
 import {
+    PQuerySearchDropdown,
     PSearchDropdown,
 } from '@spaceone/design-system';
 import type {
@@ -48,6 +57,8 @@ import type {
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type { KeyItemSet, QueryItem } from '@cloudforet/core-lib/component-util/query-search/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
@@ -60,9 +71,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { ADDITIONAL_FILTER, FILTER } from '@/services/cost-explorer/lib/config';
+import { FILTER } from '@/services/cost-explorer/lib/config';
 import type { CostQueryFilterItem } from '@/services/cost-explorer/type';
-
 
 interface Props {
     type: string;
@@ -72,6 +82,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'CostAnalysisFilterItem',
     components: {
+        PQuerySearchDropdown,
         ProjectSelectDropdown,
         PSearchDropdown,
     },
@@ -111,22 +122,37 @@ export default defineComponent<Props>({
                         name: k, label: storeState.regions[k].name,
                     }));
                 }
-                // TODO: tags, additional_info
-                if (props.type === ADDITIONAL_FILTER.TAGS) {
-                    // return [
-                    //     {
-                    //         keyItem: { name: 'tag_key1', label: 'tag_key1' },
-                    //         valueItem: { name: 'tag_value1', label: 'tag_value1' },
-                    //     },
-                    //     {
-                    //         keyItem: { name: 'tag_key2', label: 'tag_key2' },
-                    //         valueItem: { name: 'tag_value2', label: 'tag_value2' },
-                    //     },
-                    // ];
-                }
                 return [];
             }),
             menuLoading: false,
+        });
+        const querySearchHandlerState = reactive({
+            querySearchResource: undefined,
+            selectedQueryItems: computed<QueryItem[]>(() => state.proxySelected?.map(d => ({
+                key: {
+                    label: d.key,
+                    name: d.key,
+                },
+                value: {
+                    label: d.value,
+                    name: d.value,
+                },
+            }))),
+            keyItemSets: computed<KeyItemSet[]>(() => {
+                if (querySearchHandlerState.querySearchResource) {
+                    return queryItemFormatter(querySearchHandlerState.querySearchResource, props.type);
+                }
+                return [];
+            }),
+            valueHandlerMap: computed(() => {
+                const result = {};
+                querySearchHandlerState.keyItemSets.forEach(({ items }) => {
+                    items.forEach(({ name }) => {
+                        result[name] = makeDistinctValueHandler('cost_analysis.Cost', `${props.type}.${name}`);
+                    });
+                });
+                return result;
+            }),
         });
 
         /* api */
@@ -164,14 +190,25 @@ export default defineComponent<Props>({
         const menuHandler: AutocompleteHandler = async (value: string) => {
             if (!props.type) return { results: [] };
 
-            // TODO: additional_info, tags
-            if (['additional_info', 'tags'].includes(props.type)) return { results: [] };
-
             state.menuLoading = true;
             const results = await getResources(value, props.type);
             state.menuLoading = false;
 
             return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };
+        };
+
+        const queryItemFormatter = (data: {name: string; key: string}[], distinct: string) => {
+            const result: {name: string; label: string}[] = data.map(item => ({
+                name: item.name || item.key,
+                label: item.name || item.key,
+            }));
+
+            return [
+                {
+                    title: distinct,
+                    items: result,
+                },
+            ];
         };
 
         /* event */
@@ -187,9 +224,14 @@ export default defineComponent<Props>({
                 value: d.name,
             }));
         };
-        // const handleSearch = (val: string) => {
-        //     emit('update:selected', state.selectedItems.map(d => d.name).concat([val]));
-        // };
+
+        const handleUpdateSelectedQueryItems = (selectedQueryItems: QueryItem[]) => {
+            state.proxySelected = selectedQueryItems.map(d => ({
+                category: props.type,
+                value: d.value.label || d.value.name,
+                key: d.key?.label || d.key?.name,
+            }));
+        };
 
         // LOAD REFERENCE STORE
         (async () => {
@@ -200,12 +242,22 @@ export default defineComponent<Props>({
             ]);
         })();
 
+        // LOAD QUERY SEARCH DROPDOWN DATA
+        (async () => {
+            if (props.type === FILTER.ADDITIONAL_INFO || props.type === FILTER.TAGS) {
+                const result = await getResources('', props.type);
+                if (result) querySearchHandlerState.querySearchResource = result;
+            }
+        })();
+
         return {
             ...toRefs(state),
+            querySearchHandlerState,
             FILTER,
             menuHandler,
             handleSelectedProjectIds,
             handleUpdateSelected,
+            handleUpdateSelectedQueryItems,
         };
     },
 });
