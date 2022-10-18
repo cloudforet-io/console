@@ -1,3 +1,10 @@
+# [1.1.0-beta.426](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.425...v1.1.0-beta.426) (2022-10-18)
+
+
+### Bug Fixes
+
+* **query-search-dropdown:** add duplicated query-item handling spec ([#94](https://github.com/cloudforet-io/mirinae/issues/94)) ([1805ebd](https://github.com/cloudforet-io/mirinae/commit/1805ebdd2087618060c9f6ef3fac639819f9973e))
+
 # [1.1.0-beta.425](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.424...v1.1.0-beta.425) (2022-10-18)
 
 
