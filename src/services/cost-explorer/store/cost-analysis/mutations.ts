@@ -5,7 +5,7 @@ import type {
 } from '@/services/cost-explorer/store/cost-analysis/type';
 import type {
     CostQueryFilters, CostQuerySetModel, GroupBy, Period,
-    Granularity,
+    Granularity, MoreGroupByItem,
 } from '@/services/cost-explorer/type';
 
 
@@ -23,6 +23,10 @@ export const setGroupBy: Mutation<CostAnalysisStoreState> = (state, groupBy: Gro
 
 export const setPrimaryGroupBy: Mutation<CostAnalysisStoreState> = (state, primaryGroupBy?: GroupBy) => {
     state.primaryGroupBy = primaryGroupBy;
+};
+
+export const setMoreGroupBy: Mutation<CostAnalysisStoreState> = (state, moreGroupBy: MoreGroupByItem[]) => {
+    state.moreGroupBy = moreGroupBy;
 };
 
 export const setPeriod: Mutation<CostAnalysisStoreState> = (state, period: Period) => {
