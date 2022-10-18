@@ -11,11 +11,20 @@ import type {
 } from '@/services/cost-explorer/type';
 
 
-export const convertFilterItemToQueryStoreFilter = (filterItems: CostQueryFilterItem[]): QueryStoreFilter[] => filterItems.map(f => ({
-    k: f.key ? `${f.category}.${f.key}` : f.category,
-    v: f.value,
-    o: '=',
-}));
+export const convertFilterItemToQueryStoreFilter = (filters: CostQueryFilterItem[]): QueryStoreFilter[] => {
+    const results: QueryStoreFilter[] = [];
+    const categories: Filter[] = [...new Set(filters.map(d => d.category))];
+    categories.forEach((category) => {
+        const filterItems = filters.filter(d => d.category === category);
+        const filterKey = filterItems.length ? filterItems[0]?.key : undefined;
+        results.push({
+            k: filterKey ? `${category}.${filterKey}` : category,
+            v: filterItems.map(d => d.value),
+            o: '=',
+        });
+    });
+    return results;
+};
 
 export const getRefinedFilterItems = (resourceMap: Record<string, any>, filterItems: CostQueryFilterItem[]): RefinedFilterItem[] => {
     const results: RefinedFilterItem[] = [];
