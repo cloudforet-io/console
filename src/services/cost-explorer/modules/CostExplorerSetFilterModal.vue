@@ -34,6 +34,7 @@
                             {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTER') }} ({{ selectedFilterItems.length }})
                         </div>
                         <cost-explorer-filter-tags :filter-items="selectedFilterItems"
+                                                   deletable
                                                    @update-filter-tags="handleUpdateFilterTags"
                         >
                             <template #no-filter>
@@ -117,7 +118,7 @@ export default defineComponent<Props>({
                 }
             });
             state.unfoldedIndices = _unfoldedIndices;
-            state.selectedFilterItems = [...props.prevFilterItems];
+            state.selectedFilterItems = cloneDeep(props.prevFilterItems);
         };
         const handleFormConfirm = () => {
             emit('confirm', state.selectedFilterItems);

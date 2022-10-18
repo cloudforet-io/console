@@ -48,6 +48,7 @@
             <div class="filter-wrapper">
                 <cost-explorer-filter-tags :print-mode="printMode"
                                            :filter-items="filters"
+                                           deletable
                                            @update-filter-tags="handleUpdateFilterTags"
                 />
             </div>
@@ -359,6 +360,7 @@ export default {
 
         .filter-wrapper {
             height: 8rem;
+            padding: 0.75rem 1rem;
         }
         .legend-wrapper {
             height: 16.75rem;
