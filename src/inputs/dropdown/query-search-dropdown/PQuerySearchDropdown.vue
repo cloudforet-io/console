@@ -16,12 +16,13 @@
                     <span v-for="(keyItem, idx) in querySearchState.selectedKeys" :key="idx" class="key-tag">
                         {{ keyItem.label }}:
                     </span>
-                    <input ref="inputRef" v-focus.lazy="querySearchState.isFocused"
+                    <input ref="inputRef" v-focus.lazy="querySearchState.isFocused" class="input-element"
                            :value="querySearchState.searchText"
                            :placeholder="querySearchState.currentPlaceholder || scope.placeholder"
                            :type="querySearchState.inputElType"
                            :step="querySearchState.currentDataType === 'integer' ? 1 : undefined"
                            :min="querySearchState.currentDataType === 'integer' ? 0 : undefined"
+                           size="1"
                            @input="onInput"
                            @keyup.enter="onEnter"
                            @keydown="onKeydownCheck"
@@ -211,6 +212,9 @@ export default defineComponent<QuerySearchDropdownProps>({
         width: auto;
         min-width: 7rem;
         height: 1.125rem;
+        .input-element {
+            flex-grow: 1;
+        }
     }
     .p-context-menu {
         @apply font-normal;
@@ -228,6 +232,7 @@ export default defineComponent<QuerySearchDropdownProps>({
         @apply px-2 text-sm font-bold;
         height: 1.125rem;
         line-height: 1.125rem;
+        width: max-content;
     }
     .right {
         display: inline-flex;
@@ -247,9 +252,9 @@ export default defineComponent<QuerySearchDropdownProps>({
             position: relative;
             height: 1.5rem;
             width: 1.5rem;
-            .icon {
-                position: absolute;
-            }
+        }
+        .icon {
+            position: absolute;
         }
     }
 }
