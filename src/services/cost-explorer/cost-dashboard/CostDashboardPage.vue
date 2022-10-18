@@ -80,6 +80,7 @@
 </template>
 
 <script lang="ts">
+
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -117,7 +118,7 @@ import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/Da
 import type { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { CostQueryFilterItem, Period } from '@/services/cost-explorer/type';
+import type { CostQueryFilters, Period } from '@/services/cost-explorer/type';
 
 const PUBLIC_ICON_COLOR = gray[500];
 
@@ -170,7 +171,7 @@ export default {
             layout: [] as any[],
             period: {} as Period,
             periodType: '',
-            filters: [] as CostQueryFilterItem[],
+            filters: {} as CostQueryFilters,
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
@@ -232,9 +233,7 @@ export default {
             const dashboard = await fetchDashboard(dashboardId);
             state.dashboard = dashboard;
             state.layout = await getDashboardLayout(dashboard);
-            // TODO: default_filter will be changed from `object` to `object[]`
-            // state.filters = dashboard.default_filter;
-            state.filters = [];
+            state.filters = dashboard.default_filter;
             state.period = dashboard.period ?? {};
             state.periodType = dashboard.period_type;
 

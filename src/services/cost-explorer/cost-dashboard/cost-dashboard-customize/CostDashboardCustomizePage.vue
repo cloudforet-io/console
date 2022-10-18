@@ -56,7 +56,7 @@ import type {
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { CostQueryFilterItem, Period } from '@/services/cost-explorer/type';
+import type { CostQueryFilters, Period } from '@/services/cost-explorer/type';
 
 
 export default {
@@ -92,7 +92,7 @@ export default {
             defaultFilter: computed<Record<string, string[]>>(() => costExplorerStore.state.dashboard.defaultFilter),
             period: {} as Period,
             periodType: '',
-            filters: [] as CostQueryFilterItem[],
+            filters: {} as CostQueryFilters,
             widgetPosition: computed(() => costExplorerStore.state.dashboard.widgetPosition),
             layoutOfSpace: computed(() => costExplorerStore.state.dashboard.layoutOfSpace),
         });
@@ -176,9 +176,7 @@ export default {
                 }
                 state.dashboardTitle = state.dashboardData?.name || '';
                 state.layout = await getDashboardLayout(state.dashboardData);
-                // TODO: default_filter will be changed from `object` to `object[]`
-                // state.filters = state.dashboardData.default_filter ?? {};
-                state.filters = [];
+                state.filters = state.dashboardData.default_filter ?? {};
                 state.period = state.dashboardData.period ?? {};
                 state.periodType = state.dashboardData.period_type ?? 'AUTO';
                 state.loading = false;

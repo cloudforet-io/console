@@ -3,65 +3,49 @@ import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-d
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
+
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
-import { FILTER, GRANULARITY } from '@/services/cost-explorer/lib/config';
-import type {
-    Period, Granularity, CostQueryFilterItem, RefinedFilterItem, Filter,
-} from '@/services/cost-explorer/type';
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import type { CostQueryFilters, Period, Granularity } from '@/services/cost-explorer/type';
 
 
-export const convertFilterItemToQueryStoreFilter = (filters: CostQueryFilterItem[]): QueryStoreFilter[] => {
-    const results: QueryStoreFilter[] = [];
-    const categories: Filter[] = [...new Set(filters.map(d => d.category))];
-    categories.forEach((category) => {
-        const filterItems = filters.filter(d => d.category === category);
-        const filterKey = filterItems.length ? filterItems[0]?.key : undefined;
-        results.push({
-            k: filterKey ? `${category}.${filterKey}` : category,
-            v: filterItems.map(d => d.value),
-            o: '=',
-        });
-    });
-    return results;
-};
-
-export const getRefinedFilterItems = (resourceMap: Record<string, any>, filterItems: CostQueryFilterItem[]): RefinedFilterItem[] => {
-    const results: RefinedFilterItem[] = [];
-    filterItems.forEach((f) => {
-        const resourceItem = resourceMap[f.category]?.[f.value];
-        let label = f.value;
-        if (resourceItem) {
-            label = f.category === FILTER.REGION ? resourceItem?.name : resourceItem?.label;
-        }
-        results.push({
-            ...f,
-            label,
-        });
-    });
-    return results;
-};
-
-export const getConvertedBudgetFilter = (filters: CostQueryFilterItem[]): QueryStoreFilter[] => {
+export const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
     const result: QueryStoreFilter[] = [];
-
-    const PROJECT_CATEGORIES: Filter[] = [FILTER.PROJECT, FILTER.PROJECT_GROUP];
-    const projectFilterItems = filters.filter(d => PROJECT_CATEGORIES.includes(d.category));
-    projectFilterItems.forEach((d) => {
-        result.push({ k: d.category, v: d.value, o: '=' });
+    Object.entries(filters).forEach(([key, data]) => {
+        if (data?.length) {
+            result.push({
+                k: key,
+                v: data,
+                o: '=',
+            });
+        }
     });
+    return result;
+};
 
-    const extraCategories: Filter[] = [...new Set(filters.filter(d => !PROJECT_CATEGORIES.includes(d.category)).map(d => d.category))];
-    extraCategories.forEach((category) => {
-        const filterItems = filters.filter(d => d.category === category);
-        const filterKey = filterItems.length ? filterItems[0]?.key : undefined;
-        const k = filterKey ? `${category}.${filterKey}` : category;
-        const values = filterItems.map(d => d.value);
-        result.push({
-            k: `cost_types.${k}`,
-            v: [null, ...values],
-            o: '=',
-        });
+export const getConvertedBudgetFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
+    const result: QueryStoreFilter[] = [];
+    Object.entries(filters).forEach(([key, data]) => {
+        if ((key === 'project_id' || key === 'project_group_id') && data?.length) {
+            result.push({
+                k: key,
+                v: data,
+                o: '=',
+            });
+        } else {
+            const values = [] as Array<string|null>;
+            if (data?.length) {
+                data.forEach((value) => {
+                    values.push(value);
+                });
+                result.push({
+                    k: `cost_types.${key}`,
+                    v: [null, ...values],
+                    o: '=',
+                });
+            }
+        }
     });
     return result;
 };

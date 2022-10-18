@@ -149,6 +149,7 @@ export default {
         display: flex;
         justify-content: space-between;
         font-size: 0.875rem;
+        margin-bottom: 1rem;
         .timezone-text {
             @apply text-gray-400;
             font-size: 0.875rem;

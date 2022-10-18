@@ -59,11 +59,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import {
-    convertFilterItemToQueryStoreFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import type { CostQueryFilterItem, GroupBy, Period } from '@/services/cost-explorer/type';
+import type { GroupBy, Period } from '@/services/cost-explorer/type';
 import {
     getCurrencyAppliedChartData, getLegends, getTooltipText, getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
@@ -119,8 +117,8 @@ export default defineComponent<Props>({
             default: () => ({}),
         },
         filters: {
-            type: Array,
-            default: () => ([]),
+            type: Object,
+            default: () => ({}),
         },
         printMode: {
             type: Boolean,
@@ -266,8 +264,8 @@ export default defineComponent<Props>({
 
         /* api */
         const costQueryHelper = new QueryHelper();
-        const listCostAnalysisData = async (period: Period, filters: CostQueryFilterItem[]): Promise<CostAnalyzeModel[]> => {
-            costQueryHelper.setFilters(convertFilterItemToQueryStoreFilter(filters));
+        const listCostAnalysisData = async (period: Period, filters): Promise<CostAnalyzeModel[]> => {
+            costQueryHelper.setFilters(getConvertedFilter(filters));
             try {
                 const start = props.widgetType === 'SHORT' ? dayjs.utc(props.period.end).subtract(SHORT_TYPE_RANGE - 1, 'month') : dayjs.utc(props.period.start);
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({

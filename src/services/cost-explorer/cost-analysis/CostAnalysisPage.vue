@@ -82,7 +82,7 @@ export default {
             group_by: queryStringToArray(urlQuery.groupBy),
             primary_group_by: queryStringToString(urlQuery.primaryGroupBy) as GroupBy,
             period: queryStringToObject(urlQuery.period),
-            filters: queryStringToArray(urlQuery.filters),
+            filters: queryStringToObject(urlQuery.filters),
         });
 
         const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (state.costQueryList.find(item => item.cost_query_set_id === queryItemKey)) || {};
@@ -111,7 +111,7 @@ export default {
                     groupBy: arrayToQueryString(options.groupBy),
                     primaryGroupBy: primitiveToQueryString(options.primaryGroupBy),
                     period: objectToQueryString(options.period),
-                    filters: arrayToQueryString(options.filters),
+                    filters: objectToQueryString(options.filters),
                 };
 
                 if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {

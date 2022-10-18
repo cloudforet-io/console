@@ -29,9 +29,9 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
+
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
@@ -60,10 +60,8 @@ import BudgetUsageProgressBar
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardSimpleCardWidget
     from '@/services/cost-explorer/widgets/modules/CostDashboardSimpleCardWidget.vue';
-import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
 
-
-export default defineComponent<WidgetProps>({
+export default {
     name: 'BudgetUsage',
     components: {
         CostDashboardSimpleCardWidget,
@@ -80,8 +78,8 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
         filters: {
-            type: Array,
-            default: () => ([]),
+            type: Object,
+            default: () => ({}),
         },
         period: {
             type: Object,
@@ -103,7 +101,7 @@ export default defineComponent<WidgetProps>({
             default: false,
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: true,
@@ -177,7 +175,7 @@ export default defineComponent<WidgetProps>({
             getUsageCostColor,
         };
     },
-});
+};
 </script>
 <style lang="postcss" scoped>
 /* custom progress-bar */

@@ -29,9 +29,10 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
+
+
 import {
-    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 
 import type { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
@@ -42,11 +43,13 @@ import type { DataTableField } from '@spaceone/design-system/dist/src/data-displ
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
+
 import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { CURRENCY } from '@/store/modules/display/config';
+
 
 import { toggleSeries } from '@/lib/amcharts/helper';
 import config from '@/lib/config';
@@ -58,13 +61,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
-import {
-    convertFilterItemToQueryStoreFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { CostQueryFilterItem, Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/type';
 import {
     getCurrencyAppliedChartData,
     getLegends,
@@ -81,7 +82,7 @@ import type {
 const PAGE_SIZE = 5;
 const CATEGORY_KEY = 'date';
 
-export default defineComponent<WidgetProps>({
+export default {
     name: 'CostTrendLine',
     components: {
         CostDashboardCardWidgetLayout,
@@ -111,15 +112,15 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
         filters: {
-            type: Array,
-            default: () => ([]),
+            type: Object,
+            default: () => ({}),
         },
         printMode: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props: WidgetProps, { emit }) {
         const state = reactive({
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
@@ -134,7 +135,7 @@ export default defineComponent<WidgetProps>({
                         granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
                         groupBy: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(_period),
-                        filters: arrayToQueryString(props.filters),
+                        filters: objectToQueryString(props.filters),
                     },
                 };
             }),
@@ -299,8 +300,8 @@ export default defineComponent<WidgetProps>({
 
         /* api */
         const costQueryHelper = new QueryHelper();
-        const listCostAnalysisData = async (period: Period, filters: CostQueryFilterItem[]): Promise<CostAnalyzeModel[]> => {
-            costQueryHelper.setFilters(convertFilterItemToQueryStoreFilter(filters));
+        const listCostAnalysisData = async (period: Period, filters): Promise<CostAnalyzeModel[]> => {
+            costQueryHelper.setFilters(getConvertedFilter(filters));
             try {
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
@@ -359,7 +360,7 @@ export default defineComponent<WidgetProps>({
             handleToggleLegend,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>

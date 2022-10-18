@@ -35,7 +35,8 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
+
+
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
@@ -64,7 +65,6 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
-
 
 interface ChartData {
     budgetId: string;
@@ -101,15 +101,15 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
         filters: {
-            type: Array,
-            default: () => ([]),
+            type: Object,
+            default: () => ({}),
         },
         printMode: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props: WidgetProps, { emit }) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const budgetQueryHelper = new QueryHelper();
         const state = reactive({

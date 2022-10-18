@@ -40,9 +40,8 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
 import {
-    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 
 import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
@@ -71,20 +70,16 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import {
-    convertFilterItemToQueryStoreFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { getAWSFilters } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
-import type { TrafficWidgetTableData, WidgetProps } from '@/services/cost-explorer/widgets/type';
+import type { TrafficWidgetTableData } from '@/services/cost-explorer/widgets/type';
 
 
 const valueName = 'value';
-const PRODUCT_NAME = 'AWSDataTransfer';
 
 interface Data {
   region_code: string;
@@ -111,7 +106,7 @@ const dataToTableFieldMap = {
     'data-transfer.etc': ['transferEtcCost', 'transferEtcSize'],
 };
 
-export default defineComponent<WidgetProps>({
+export default {
     name: 'AWSDataTransferByRegion',
     components: {
         CostDashboardCardWidgetLayout,
@@ -132,8 +127,8 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
         filters: {
-            type: Array,
-            default: () => ([]),
+            type: Object,
+            default: () => ({}),
         },
         currency: {
             type: String,
@@ -148,7 +143,7 @@ export default defineComponent<WidgetProps>({
             default: false,
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props, { emit }) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
@@ -172,7 +167,7 @@ export default defineComponent<WidgetProps>({
                         groupBy: arrayToQueryString([GROUP_BY.REGION]),
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         period: objectToQueryString(props.period),
-                        filters: arrayToQueryString(getAWSFilters(props.filters, PRODUCT_NAME)),
+                        filters: objectToQueryString({ ...props.filters, provider: ['aws'], product: ['AWSDataTransfer'] }),
                     },
                 };
             }),
@@ -304,8 +299,11 @@ export default defineComponent<WidgetProps>({
 
         const costQueryHelper = new QueryHelper();
         const fetchData = async () => {
-            const convertedFilters = getAWSFilters(props.filters, PRODUCT_NAME);
-            costQueryHelper.setFilters(convertFilterItemToQueryStoreFilter(convertedFilters));
+            costQueryHelper
+                .setFilters(getConvertedFilter(props.filters))
+                .addFilter(
+                    { k: 'provider', v: 'aws', o: '=' }, { k: 'product', v: 'AWSDataTransfer', o: '=' },
+                );
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: true,
@@ -370,7 +368,7 @@ export default defineComponent<WidgetProps>({
             tableState,
         };
     },
-});
+};
 </script>
 
 <style lang="postcss" scoped>
