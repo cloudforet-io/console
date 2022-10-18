@@ -72,6 +72,7 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
+import type { QueryItemResource } from '@/services/cost-explorer/cost-analysis/type';
 import { FILTER } from '@/services/cost-explorer/lib/config';
 
 interface Props {
@@ -124,7 +125,7 @@ export default {
             menuLoading: false,
         });
         const querySearchHandlerState = reactive({
-            querySearchResource: undefined,
+            querySearchResource: undefined as QueryItemResource[] | undefined,
             selectedQueryItems: computed<QueryItem[]>(() => state.proxySelected?.map(d => ({
                 key: {
                     label: d.key,
@@ -194,7 +195,7 @@ export default {
             return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };
         };
 
-        const queryItemFormatter = (data: {name: string; key: string}[], distinct: string) => {
+        const queryItemFormatter = (data: QueryItemResource[], distinct: string) => {
             const result: {name: string; label: string}[] = data.map(item => ({
                 name: item.name || item.key,
                 label: item.name || item.key,
