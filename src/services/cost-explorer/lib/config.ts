@@ -1,11 +1,11 @@
-export const GRANULARITY = Object.freeze({
+export const GRANULARITY = {
     ACCUMULATED: 'ACCUMULATED',
     DAILY: 'DAILY',
     MONTHLY: 'MONTHLY',
     YEARLY: 'YEARLY',
-});
+} as const;
 
-export const GROUP_BY = Object.freeze({
+export const GROUP_BY = {
     PROJECT_GROUP: 'project_group_id',
     PROJECT: 'project_id',
     PROVIDER: 'provider',
@@ -16,16 +16,21 @@ export const GROUP_BY = Object.freeze({
     REGION: 'region_code',
     TYPE: 'usage_type',
     ACCOUNT: 'account',
-} as const);
+} as const;
 
-export const GRANULARITY_ITEM_MAP = Object.freeze({
+export const MORE_GROUP_BY = {
+    TAGS: 'tags',
+    ADDITIONAL_INFO: 'additional_info',
+};
+
+export const GRANULARITY_ITEM_MAP = {
     [GRANULARITY.ACCUMULATED]: { name: GRANULARITY.ACCUMULATED, label: 'Accumulated' },
     [GRANULARITY.DAILY]: { name: GRANULARITY.DAILY, label: 'Daily' },
     [GRANULARITY.MONTHLY]: { name: GRANULARITY.MONTHLY, label: 'Monthly' },
     [GRANULARITY.YEARLY]: { name: GRANULARITY.YEARLY, label: 'Yearly' },
-});
+} as const;
 
-export const GROUP_BY_ITEM_MAP = Object.freeze({
+export const GROUP_BY_ITEM_MAP = {
     [GROUP_BY.PROJECT_GROUP]: { name: GROUP_BY.PROJECT_GROUP, label: 'Project Group' },
     [GROUP_BY.PROJECT]: { name: GROUP_BY.PROJECT, label: 'Project' },
     [GROUP_BY.PROVIDER]: { name: GROUP_BY.PROVIDER, label: 'Provider' },
@@ -36,16 +41,19 @@ export const GROUP_BY_ITEM_MAP = Object.freeze({
     [GROUP_BY.REGION]: { name: GROUP_BY.REGION, label: 'Region' },
     [GROUP_BY.TYPE]: { name: GROUP_BY.TYPE, label: 'Type' },
     [GROUP_BY.ACCOUNT]: { name: GROUP_BY.ACCOUNT, label: 'Account ID' },
-});
+} as const;
 
-export const FILTER = Object.freeze({
-    ...GROUP_BY,
+export const ADDITIONAL_FILTER = {
     TAGS: 'tags',
     ADDITIONAL_INFO: 'additional_info',
-} as const);
+};
+export const FILTER = {
+    ...GROUP_BY,
+    ...ADDITIONAL_FILTER,
+} as const;
 
-export const FILTER_ITEM_MAP = Object.freeze({
+export const FILTER_ITEM_MAP = {
     ...GROUP_BY_ITEM_MAP,
-    tags: { name: 'tags', label: 'Tags' },
-    additional_info: { name: 'additional_info', label: 'Additional Info' },
-});
+    [ADDITIONAL_FILTER.TAGS]: { name: ADDITIONAL_FILTER.TAGS, label: 'Tags' },
+    [ADDITIONAL_FILTER.ADDITIONAL_INFO]: { name: ADDITIONAL_FILTER.ADDITIONAL_INFO, label: 'Additional Info' },
+};
