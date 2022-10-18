@@ -21,3 +21,8 @@ export const CHART_TYPE = Object.freeze({
     STACKED_COLUMN: 'STACKED_COLUMN',
     DONUT: 'DONUT',
 });
+
+export interface QueryItemResource {
+    key: string;
+    name: string;
+}
