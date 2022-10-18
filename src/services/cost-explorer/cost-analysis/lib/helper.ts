@@ -45,13 +45,13 @@ export const getRefinedFilterItems = (resourceMap: Record<string, any>, filterIt
 export const getConvertedBudgetFilter = (filters: CostQueryFilterItem[]): QueryStoreFilter[] => {
     const result: QueryStoreFilter[] = [];
 
-    const projectCategories: Filter[] = [FILTER.PROJECT, FILTER.PROJECT_GROUP];
-    const projectFilterItems = filters.filter(d => projectCategories.includes(d.category));
+    const PROJECT_CATEGORIES: Filter[] = [FILTER.PROJECT, FILTER.PROJECT_GROUP];
+    const projectFilterItems = filters.filter(d => PROJECT_CATEGORIES.includes(d.category));
     projectFilterItems.forEach((d) => {
         result.push({ k: d.category, v: d.value, o: '=' });
     });
 
-    const extraCategories: Filter[] = [...new Set(filters.filter(d => !projectCategories.includes(d.category)).map(d => d.category))];
+    const extraCategories: Filter[] = [...new Set(filters.filter(d => !PROJECT_CATEGORIES.includes(d.category)).map(d => d.category))];
     extraCategories.forEach((category) => {
         const filterItems = filters.filter(d => d.category === category);
         const filterKey = filterItems.length ? filterItems[0]?.key : undefined;
