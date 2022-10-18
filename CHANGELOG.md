@@ -1,3 +1,10 @@
+# [1.1.0-beta.425](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.424...v1.1.0-beta.425) (2022-10-18)
+
+
+### Bug Fixes
+
+* **query-search-dropdown:** fix input css for handling width issue ([#93](https://github.com/cloudforet-io/mirinae/issues/93)) ([f29bd1a](https://github.com/cloudforet-io/mirinae/commit/f29bd1a59ced62b61bd3cb4af5e3819f4edcbf1a))
+
 # [1.1.0-beta.424](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.423...v1.1.0-beta.424) (2022-10-17)
 
 
