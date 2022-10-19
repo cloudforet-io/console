@@ -28,11 +28,11 @@ export const getDashboardLayout = async (dashboard: DashboardInfo): Promise<Cust
 export const getCostDashboardFilterLabel = (filters?: CostFiltersMap): string|undefined => {
     if (!filters) return undefined;
     const desc: string[] = [];
-    Object.entries(FILTER_ITEM_MAP).forEach(([k, v]) => {
-        if (filters[k]?.length) {
-            const filterLength = filters[k]?.length ?? 0;
-            const suffix = filterLength > 1 ? `${v.label}s` : v.label;
-            desc.push(`${filterLength} ${suffix}`);
+    Object.entries(filters).forEach(([category, filterItems]) => {
+        if (filterItems.length) {
+            const categoryLabel = FILTER_ITEM_MAP[category].label;
+            const suffix = filterItems.length > 1 ? `${categoryLabel}s` : categoryLabel;
+            desc.push(`${filterItems.length} ${suffix}`);
         }
     });
     if (desc.length) return desc.join(' & ');
