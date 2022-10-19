@@ -6,9 +6,9 @@ import { cloneDeep } from 'lodash';
 
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { FILTER, GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type {
-    CostQueryFilters, Period, Granularity, CostFiltersMap,
+    Period, Granularity, CostFiltersMap,
 } from '@/services/cost-explorer/type';
 
 
@@ -35,30 +35,29 @@ export const getConvertedFilter = (filters: CostFiltersMap): QueryStoreFilter[] 
     return results;
 };
 
-export const getConvertedBudgetFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
-    const result: QueryStoreFilter[] = [];
-    Object.entries(filters).forEach(([key, data]) => {
-        if ((key === 'project_id' || key === 'project_group_id') && data?.length) {
-            result.push({
-                k: key,
-                v: data,
+export const getConvertedBudgetFilter = (filters: CostFiltersMap): QueryStoreFilter[] => {
+    // there's no tag filters in budget widgets
+    const results: QueryStoreFilter[] = [];
+    Object.entries(filters).forEach(([category, filterItems]) => {
+        if ((category === FILTER.PROJECT || category === FILTER.PROJECT_GROUP)) {
+            results.push({
+                k: category,
+                v: filterItems.map(d => d.v),
                 o: '=',
             });
         } else {
             const values = [] as Array<string|null>;
-            if (data?.length) {
-                data.forEach((value) => {
-                    values.push(value);
-                });
-                result.push({
-                    k: `cost_types.${key}`,
-                    v: [null, ...values],
-                    o: '=',
-                });
-            }
+            filterItems.forEach((f) => {
+                values.push(f.v);
+            });
+            results.push({
+                k: `cost_types.${category}`,
+                v: [null, ...values],
+                o: '=',
+            });
         }
     });
-    return result;
+    return results;
 };
 
 export const getTimeUnitByPeriod = (granularity: Granularity, start: Dayjs, end: Dayjs): TimeUnit => {
