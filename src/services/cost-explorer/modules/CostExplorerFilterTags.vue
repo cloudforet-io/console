@@ -89,7 +89,7 @@ export default defineComponent<Props>({
             const targetFilterItems = _filters[targetCategory];
             const targetIndex = targetFilterItems.findIndex((f) => {
                 if (targetKey) {
-                    return f.k === targetKey && f.v === targetValue;
+                    return f.k === `${targetCategory}.${targetKey}` && f.v === targetValue;
                 }
                 return f.v === targetValue;
             });

@@ -230,8 +230,8 @@ export default {
         };
         const handleUpdateSelectedQueryItems = (selectedQueryItems: QueryItem[]) => {
             const updatedFilterItems = selectedQueryItems.map(d => ({
-                k: d.key?.label,
-                v: d.value.label,
+                k: `${props.category}.${d.key?.name}`,
+                v: d.value.name,
                 o: '=',
             }));
             emit('update-filter-items', updatedFilterItems);
