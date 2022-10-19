@@ -166,3 +166,66 @@ const semanticColors = {
 const kebabColors = {};
 forEach(semanticColors, (d, k) => { kebabColors[kebabCase(k)] = d; });
 forEach(colorSet, (d, k) => { kebabColors[kebabCase(k)] = d; });
+
+
+
+// TEMPORARY CONSTANTS FOR colorSets
+
+export const transparent = 'transparent';
+export const black = palette.black;
+export const white = palette.white;
+export const pointViolet = palette.pointViolet;
+export const gray = {
+    ...palette.gray,
+    default: palette.gray[500],
+    dark: palette.gray[900],
+};
+export const red = {
+    ...palette.red,
+    default: palette.red[500],
+};
+export const coral = {
+    ...palette.coral,
+    default: palette.coral[500],
+};
+export const yellow = {
+    ...palette.yellow,
+    default: palette.yellow[500],
+};
+export const green = {
+    ...palette.green,
+    default: palette.green[600],
+};
+export const blue = {
+    ...palette.blue,
+    default: palette.blue[600],
+};
+export const violet = {
+    ...palette.violet,
+    default: palette.violet[600],
+};
+export const peacock = {
+    ...palette.peacock,
+    default: palette.peacock[600],
+};
+export const indigo = {
+    ...palette.indigo,
+    default: palette.indigo[500],
+};
+
+
+// TEMPORARY CONSTANTS FOR semanticColors
+
+export const primary = palette.violet[600];
+export const primaryDark = palette.violet[800];
+export const primary1 = palette.violet[400];
+export const primary2 = palette.violet[300];
+export const primary3 = palette.violet[200];
+export const primary4 = palette.violet[100];
+export const secondary = palette.blue[600];
+export const secondary1 = palette.blue[500];
+export const secondary2 = palette.blue[100];
+export const alert = palette.red[500];
+export const safe = palette.green[600];
+
+//
