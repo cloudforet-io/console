@@ -155,10 +155,6 @@ export default defineComponent<Props>({
             ]);
         };
 
-        (async () => {
-
-        })();
-
         /* Watcher */
         watch(() => props.visible, (visible) => {
             if (visible) {
