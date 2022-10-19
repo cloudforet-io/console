@@ -88,7 +88,7 @@ import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/Vie
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import {
-    getChangedFiltersWithNewType,
+    convertFiltersInToNewType,
     getConvertedFilter, getDataTableCostFields, getInitialDates,
 } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -180,7 +180,7 @@ export default {
                     end: dayjs.utc(period.end).format('YYYY-MM'),
                 };
             }),
-            filters: computed<CostFiltersMap>(() => getChangedFiltersWithNewType(props.options?.filters ?? {})),
+            filters: computed<CostFiltersMap>(() => convertFiltersInToNewType(props.options?.filters ?? {})),
             filterLabel: computed(() => {
                 const label = getCostDashboardFilterLabel(state.filters);
                 return label ?? i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');

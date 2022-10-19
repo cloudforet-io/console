@@ -139,7 +139,7 @@ export const getDataTableCostFields = (granularity: Granularity, period: Period,
 interface OldType {
     [key: string]: string[];
 }
-export const getChangedFiltersWithNewType = (filters: OldType | CostFiltersMap): CostFiltersMap => {
+export const convertFiltersInToNewType = (filters: OldType | CostFiltersMap): CostFiltersMap => {
     const _filters: OldType | CostFiltersMap = cloneDeep(filters);
     Object.entries(_filters).forEach(([category, values]) => {
         if (values?.length && typeof values[0] === 'string') {

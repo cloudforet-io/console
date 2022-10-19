@@ -53,7 +53,7 @@ import type {
     PublicDashboardInfo,
     UserDashboardInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
-import { getChangedFiltersWithNewType } from '@/services/cost-explorer/lib/helper';
+import { convertFiltersInToNewType } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
@@ -86,7 +86,7 @@ export default {
 
         const handleDashboardChange = (value: Partial<DashboardInfo>) => {
             costExplorerStore.commit('dashboard/setDashboardTemplate', value);
-            costExplorerStore.commit('dashboard/setDefaultFilter', getChangedFiltersWithNewType(value.default_filter ?? {}));
+            costExplorerStore.commit('dashboard/setDefaultFilter', convertFiltersInToNewType(value.default_filter ?? {}));
         };
 
         const listDashboard = async () => {

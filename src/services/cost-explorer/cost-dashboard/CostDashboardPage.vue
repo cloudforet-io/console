@@ -116,7 +116,7 @@ import CostDashboardUpdateModal
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardUpdateModal.vue';
 import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
 import type { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { getChangedFiltersWithNewType } from '@/services/cost-explorer/lib/helper';
+import { convertFiltersInToNewType } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { CostFiltersMap, Period } from '@/services/cost-explorer/type';
@@ -234,7 +234,7 @@ export default {
             const dashboard = await fetchDashboard(dashboardId);
             state.dashboard = dashboard;
             state.layout = await getDashboardLayout(dashboard);
-            state.filters = getChangedFiltersWithNewType(dashboard.default_filter);
+            state.filters = convertFiltersInToNewType(dashboard.default_filter);
             state.period = dashboard.period ?? {};
             state.periodType = dashboard.period_type;
 
