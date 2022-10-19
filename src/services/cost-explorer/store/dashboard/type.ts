@@ -5,13 +5,14 @@ import type {
     PublicDashboardInfo,
     WidgetInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
+import type { CostFiltersMap } from '@/services/cost-explorer/type';
 
 export interface CostDashboardState {
     originSelectedWidget: WidgetInfo;
     editedSelectedWidget?: WidgetInfo;
     //
     selectedTemplate: Record<string, DefaultLayout> | PublicDashboardInfo;
-    defaultFilter: Record<string, string[]>;
+    defaultFilter: CostFiltersMap;
     includesFilter: boolean;
     selectedDashboardPrivacy: DashboardPrivacyType;
     //
