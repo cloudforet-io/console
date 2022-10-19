@@ -21,7 +21,7 @@
                     <template v-if="fields[0].name === name && showIndex">
                         <p-status v-if="showLegend"
                                   class="toggle-button"
-                                  :text="(getConvertedIndex(index) + 1).toString()"
+                                  :text="(getConvertedIndex(index) + 1)?.toString()"
                                   :icon-color="getLegendIconColor(index)"
                                   :text-color="getLegendTextColor(index)"
                                   @click="handleClickLegend(index)"
@@ -176,7 +176,7 @@ export default {
         const labelTextFormatter = index => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].label : '');
         const getIndexNumber = (index) => {
             const tableIndex = index + ((state.proxyThisPage - 1) * props.pageSize) + 1;
-            return tableIndex.toString();
+            return tableIndex?.toString();
         };
         const getLegendIconColor = (index) => {
             const legend = props.legends[getConvertedIndex(index)];

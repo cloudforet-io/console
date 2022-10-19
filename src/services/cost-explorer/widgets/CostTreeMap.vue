@@ -27,7 +27,7 @@
                     <div class="right">
                         <template v-if="field.name === groupBy">
                             <p-status class="group-by-index"
-                                      :text="getConvertedIndex(index, itemSetIdx).toString()"
+                                      :text="getConvertedIndex(index, itemSetIdx)?.toString()"
                                       :icon-color="item.backgroundColor"
                             />
                             <span>{{ item.category }}</span>

@@ -97,7 +97,7 @@ export default defineComponent<Props>({
                     }
                     let keyItem: KeyItem | undefined;
                     if (category !== item.k) {
-                        const convertedTagKey = (item.k as string).replace(`${category}.`, '');
+                        const convertedTagKey = item.k.replace(`${category}.`, '');
                         keyItem = { name: convertedTagKey, label: convertedTagKey };
                     }
                     results.push({
