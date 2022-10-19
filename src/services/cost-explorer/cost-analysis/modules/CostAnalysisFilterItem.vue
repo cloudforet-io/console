@@ -103,7 +103,6 @@ export default {
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
         });
         const state = reactive({
-            // TODO: this cannot be used to tags
             selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selectedFilterItems?.map(filterItem => ({
                 name: filterItem.v,
                 label: state.menuItems.find(d => d.name === filterItem.v)?.label || filterItem.v,
@@ -130,8 +129,8 @@ export default {
             querySearchResource: undefined as QueryItemResource[] | undefined,
             selectedQueryItems: computed<QueryItem[]>(() => props.selectedFilterItems?.map(filterItem => ({
                 key: {
-                    label: filterItem.k,
-                    name: filterItem.k,
+                    label: filterItem.k.replaceAll(`${props.category}.`, ''),
+                    name: filterItem.k.replaceAll(`${props.category}.`, ''),
                 },
                 value: {
                     label: filterItem.v,
@@ -230,8 +229,8 @@ export default {
         };
         const handleUpdateSelectedQueryItems = (selectedQueryItems: QueryItem[]) => {
             const updatedFilterItems = selectedQueryItems.map(d => ({
-                k: `${props.category}.${d.key?.name}`,
-                v: d.value.name,
+                k: `${props.category}.${d.key?.label}`,
+                v: d.value.label,
                 o: '=',
             }));
             emit('update-filter-items', updatedFilterItems);
