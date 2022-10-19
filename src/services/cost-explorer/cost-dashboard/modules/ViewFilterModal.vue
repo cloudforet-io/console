@@ -2,31 +2,26 @@
     <p-button-modal
         class="view-filter-modal"
         :header-title="$t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER')"
-        size="md"
         fade
         backdrop
+        hide-footer-confirm-button
         :visible.sync="proxyVisible"
-        @confirm="handleClickConfirm"
     >
         <template #body>
-            <div v-for="filterName in filterNames" :key="`filter-wrapper-${filterName}`" class="filter-wrapper">
+            <div v-for="category in categories" :key="`filter-wrapper-${category}`" class="filter-wrapper">
                 <p class="title">
-                    {{ FILTER_ITEM_MAP[filterName].label }} ({{ items[filterName] ? items[filterName].length : 0 }})
+                    {{ FILTER_ITEM_MAP[category].label }} ({{ selectedFilters[category] ? selectedFilters[category].length : 0 }})
                 </p>
-                <p-empty v-if="!items[filterName] || !items[filterName].length">
-                    {{ $t('BILLING.COST_MANAGEMENT.MAIN.NO_SELECTED_FILTER') }}
-                </p-empty>
-                <div v-else class="filters">
-                    <p-tag v-for="(item, idx) in items[filterName]" :key="`filter-${item.name}-${idx}`"
-                           :deletable="false"
-                    >
-                        {{ item.label }}
-                    </p-tag>
-                </div>
+                <cost-explorer-filter-tags :filters="{ [category]: selectedFilters[category] ? selectedFilters[category] : [] }"
+                                           hide-category
+                >
+                    <template #no-filter>
+                        <p-empty>
+                            {{ $t('BILLING.COST_MANAGEMENT.MAIN.NO_SELECTED_FILTER') }}
+                        </p-empty>
+                    </template>
+                </cost-explorer-filter-tags>
             </div>
-        </template>
-        <template #confirm-button>
-            {{ $t('BILLING.COST_MANAGEMENT.MAIN.CLOSE') }}
         </template>
     </p-button-modal>
 </template>
@@ -35,18 +30,16 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PButtonModal, PEmpty, PTag,
+    PButtonModal, PEmpty,
 } from '@spaceone/design-system';
 
-
 import { store } from '@/store';
-
-import type { ReferenceItem } from '@/store/modules/reference/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import type { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
+import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
+import type { CostFiltersMap } from '@/services/cost-explorer/type';
 
 
 const DASHBOARD_FILTERS = [FILTER.PROJECT_GROUP, FILTER.PROJECT, FILTER.SERVICE_ACCOUNT, FILTER.PROVIDER];
@@ -54,16 +47,16 @@ const CUSTOM_DASHBOARD_FILTERS = Object.values(FILTER);
 
 interface Props {
     visible: boolean;
-    selectedFilters: CostQueryFilters;
+    selectedFilters: CostFiltersMap;
     isCustom?: boolean;
 }
 
 export default {
     name: 'ViewFilterModal',
     components: {
+        CostExplorerFilterTags,
         PButtonModal,
         PEmpty,
-        PTag,
     },
     props: {
         visible: {
@@ -82,33 +75,8 @@ export default {
     setup(props: Props, { emit }) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
-            filterNames: computed(() => (props.isCustom ? CUSTOM_DASHBOARD_FILTERS : DASHBOARD_FILTERS)),
-            items: computed(() => {
-                const resourceItemsMap = {
-                    [FILTER.PROJECT_GROUP]: store.getters['reference/projectGroupItems'],
-                    [FILTER.PROJECT]: store.getters['reference/projectItems'],
-                    [FILTER.PROVIDER]: store.getters['reference/providerItems'],
-                    [FILTER.SERVICE_ACCOUNT]: store.getters['reference/serviceAccountItems'],
-                    [FILTER.REGION]: store.getters['reference/regionItems'],
-                };
-                const itemsMap: CostQueryFilterItemsMap = {};
-                Object.entries(props.selectedFilters as CostQueryFilters).forEach(([key, data]) => {
-                    const resourceItems = resourceItemsMap[key];
-                    if (resourceItems) {
-                        itemsMap[key] = data?.map((d) => {
-                            const resourceItem: ReferenceItem = resourceItems[d];
-                            return { name: d, label: resourceItem?.label ?? d };
-                        });
-                    } else itemsMap[key] = data?.map(d => ({ name: d, label: d }));
-                });
-                return itemsMap;
-            }),
+            categories: computed(() => (props.isCustom ? CUSTOM_DASHBOARD_FILTERS : DASHBOARD_FILTERS)),
         });
-
-        /* event */
-        const handleClickConfirm = () => {
-            state.proxyVisible = false;
-        };
 
         // LOAD REFERENCE STORE
         (async () => {
@@ -125,7 +93,6 @@ export default {
             ...toRefs(state),
             FILTER,
             FILTER_ITEM_MAP,
-            handleClickConfirm,
         };
     },
 };
@@ -136,14 +103,6 @@ export default {
 .view-filter-modal {
     :deep(.modal-body) {
         max-height: 20rem;
-    }
-    :deep(.modal-footer) {
-        .cancel-button {
-            display: none;
-        }
-        .modal-button {
-            margin-left: auto;
-        }
     }
 }
 

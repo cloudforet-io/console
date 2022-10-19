@@ -6,8 +6,8 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { convertFiltersInToNewType, getInitialDates } from '@/services/cost-explorer/lib/helper';
 import type { CostAnalysisStoreState } from '@/services/cost-explorer/store/cost-analysis/type';
 import type { CostQuerySetModel, CostQuerySetOption } from '@/services/cost-explorer/type';
 
@@ -32,7 +32,9 @@ export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit },
     } else commit('setPrimaryGroupBy', undefined);
     if (options.more_group_by?.length) commit('setMoreGroupBy', options.more_group_by);
     if (options.period) commit('setPeriod', { start: options.period.start, end: options.period.end });
-    if (options.filters) commit('setFilters', options.filters);
+    if (options.filters) {
+        commit('setFilters', convertFiltersInToNewType(options.filters));
+    }
 };
 
 export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ commit }): Promise<void|Error> => {

@@ -1,3 +1,5 @@
+import type { RawQueryOperator } from '@/query/type';
+
 import type { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 
 
@@ -6,11 +8,10 @@ export interface Period {
     end?: string;
 }
 
-interface FilterItem {
-    name: string;
-    label: string;
-    disabled?: boolean;
-    selected?: boolean;
+export interface FilterItem {
+    k: string | Filter;
+    v: string;
+    o: RawQueryOperator;
 }
 
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
@@ -18,7 +19,7 @@ export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 export type Filter = typeof FILTER[keyof typeof FILTER];
 
 export type CostQueryFilters = Partial<Record<Filter, string[]>>;
-export type CostQueryFilterItemsMap = Partial<Record<Filter, FilterItem[]>>;
+export type CostFiltersMap = Record<Filter, FilterItem[]>;
 
 export interface CostQuerySetOption {
     group_by?: GroupBy[];
@@ -27,7 +28,7 @@ export interface CostQuerySetOption {
     granularity: Granularity;
     stack?: boolean;
     period: Period;
-    filters?: CostQueryFilters;
+    filters?: CostFiltersMap;
 }
 
 export interface CostQuerySetModel {

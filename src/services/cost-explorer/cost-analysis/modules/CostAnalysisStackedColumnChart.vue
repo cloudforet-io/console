@@ -37,8 +37,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { gray } from '@/styles/colors';
 
-import { getTimeUnitByPeriod } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { Granularity } from '@/services/cost-explorer/type';
 import {
     getStackedChartData, getCurrencyAppliedChartData,

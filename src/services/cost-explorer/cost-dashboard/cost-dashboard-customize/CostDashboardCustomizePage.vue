@@ -56,7 +56,7 @@ import type {
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { CostQueryFilters, Period } from '@/services/cost-explorer/type';
+import type { CostFiltersMap, Period } from '@/services/cost-explorer/type';
 
 
 export default {
@@ -89,10 +89,10 @@ export default {
             dashboardTitle: '',
             selectedWidget: computed<WidgetInfo|undefined>(() => costExplorerStore.state.dashboard.editedSelectedWidget),
             selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => costExplorerStore.state.dashboard.selectedTemplate),
-            defaultFilter: computed<Record<string, string[]>>(() => costExplorerStore.state.dashboard.defaultFilter),
+            defaultFilter: computed<CostFiltersMap>(() => costExplorerStore.state.dashboard.defaultFilter),
             period: {} as Period,
             periodType: '',
-            filters: {} as CostQueryFilters,
+            filters: {} as CostFiltersMap,
             widgetPosition: computed(() => costExplorerStore.state.dashboard.widgetPosition),
             layoutOfSpace: computed(() => costExplorerStore.state.dashboard.layoutOfSpace),
         });

@@ -78,8 +78,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { getConvertedFilter } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { RegionMap } from '@/services/cost-explorer/widgets/lib/config';
 import { getTooltipText } from '@/services/cost-explorer/widgets/lib/widget-data-helper';

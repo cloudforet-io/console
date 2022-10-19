@@ -62,9 +62,9 @@ import {
     gray, green, red, yellow,
 } from '@/styles/colors';
 
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { getConvertedFilter } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Period } from '@/services/cost-explorer/type';
 import {

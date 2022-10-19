@@ -70,9 +70,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import { getConvertedFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import { getConvertedFilter } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import {
     getLegends,
