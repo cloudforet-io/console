@@ -80,7 +80,7 @@ interface Props {
 }
 
 export default {
-    name: 'CostAnalysisFilterItem',
+    name: 'CostExplorerFilterItem',
     components: {
         PQuerySearchDropdown,
         ProjectSelectDropdown,

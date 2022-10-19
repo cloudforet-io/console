@@ -19,7 +19,7 @@
                         :unfolded-indices.sync="unfoldedIndices"
                     >
                         <template #default="{name, isCollapsed}">
-                            <cost-analysis-filter-item
+                            <cost-explorer-filter-item
                                 v-if="!isCollapsed"
                                 :category="name"
                                 :selected-filter-items="selectedFilters[name]"
@@ -69,8 +69,8 @@ import { store } from '@/store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import CostAnalysisFilterItem from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFilterItem.vue';
 import { FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import CostExplorerFilterItem from '@/services/cost-explorer/modules/CostExplorerFilterItem.vue';
 import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import type { CostFiltersMap, Filter, FilterItem } from '@/services/cost-explorer/type';
 
@@ -85,7 +85,7 @@ export default {
     name: 'CostExplorerSetFilterModal',
     components: {
         CostExplorerFilterTags,
-        CostAnalysisFilterItem,
+        CostExplorerFilterItem,
         PButtonModal,
         PCollapsibleList,
     },
