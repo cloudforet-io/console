@@ -88,11 +88,12 @@ import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/Vie
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import {
+    getChangedFiltersWithNewType,
     getConvertedFilter, getDataTableCostFields, getInitialDates,
 } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type {
-    CostQuerySetOption, Period, Granularity, GroupBy,
+    CostQuerySetOption, Period, Granularity, GroupBy, CostFiltersMap,
 } from '@/services/cost-explorer/type';
 import {
     getLegends,
@@ -179,7 +180,7 @@ export default {
                     end: dayjs.utc(period.end).format('YYYY-MM'),
                 };
             }),
-            filters: computed(() => props.options?.filters),
+            filters: computed<CostFiltersMap>(() => getChangedFiltersWithNewType(props.options?.filters ?? {})),
             filterLabel: computed(() => {
                 const label = getCostDashboardFilterLabel(state.filters);
                 return label ?? i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');
@@ -191,7 +192,7 @@ export default {
                     granularity: primitiveToQueryString(props.options?.granularity),
                     groupBy: arrayToQueryString([props.options?.group_by]),
                     period: objectToQueryString(state.convertedPeriod),
-                    filters: objectToQueryString(props.options?.filters),
+                    filters: objectToQueryString(state.filters),
                     stack: primitiveToQueryString(props.options?.stack),
                 },
             })),
@@ -218,7 +219,7 @@ export default {
         const listCostAnalysisData = async () => {
             try {
                 tableState.loading = true;
-                costQueryHelper.setFilters(getConvertedFilter(props.options?.filters ?? {}));
+                costQueryHelper.setFilters(getConvertedFilter(state.filters));
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: props.options?.granularity,
                     group_by: [props.options?.group_by],
@@ -257,8 +258,8 @@ export default {
         /* Init */
         const refreshAll = (options, period) => {
             if (!options || !options?.granularity) return;
-            setChartData(options.granularity, period, options.group_by as GroupBy);
-            tableState.fields = getFields(options.granularity, period, options.group_by as GroupBy);
+            setChartData(options.granularity, period, options.group_by);
+            tableState.fields = getFields(options.granularity, period, options.group_by);
         };
 
         watch([() => props.options, () => state.convertedPeriod], (after, before) => {
