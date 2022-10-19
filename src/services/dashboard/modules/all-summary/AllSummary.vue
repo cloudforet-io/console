@@ -27,13 +27,15 @@
                         <span v-if="activeTab === 'billing'" class="suffix">(USD)</span>
                     </div>
                     <div class="toggle-button-group">
-                        <p-button v-for="(d, idx) in dateTypes"
-                                  :key="idx"
-                                  :class="{'selected': selectedDateType === d.name}"
-                                  @click="handleChangeDateType(d.name)"
+                        <p-select-button v-for="(d, idx) in dateTypes"
+                                         :key="`date-${d.name}-${idx}`"
+                                         :class="{'selected': selectedDateType === d.name}"
+                                         style-type="gray"
+                                         size="sm"
+                                         @click="handleChangeDateType(d.name)"
                         >
                             {{ d.label }}
-                        </p-button>
+                        </p-select-button>
                     </div>
                     <p-data-loader :loading="chartState.loading">
                         <template #loader>
@@ -64,7 +66,7 @@ import type { Location } from 'vue-router';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import {
-    PBalloonTab, PButton, PDataLoader, PSkeleton,
+    PBalloonTab, PSelectButton, PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
@@ -117,10 +119,10 @@ export default {
     name: 'AllSummary',
     components: {
         AllSummaryDataSummary,
-        PButton,
         PSkeleton,
         PDataLoader,
         PBalloonTab,
+        PSelectButton,
     },
     props: {
         extraParams: {
@@ -621,18 +623,9 @@ export default {
             position: absolute;
             right: 0.5rem;
             top: 0;
-            .p-button {
-                @apply border border-gray-200 text-gray-300 rounded-xs;
-                height: 1.25rem;
-                min-width: 2rem;
-                line-height: 1.25rem;
-                font-size: 0.75rem;
-                font-weight: normal;
-                padding: 0.25rem;
-                margin-left: 0.25rem;
-                &.selected {
-                    @apply bg-gray-600 border-gray-600 text-white;
-                }
+            .p-select-button {
+                margin-right: 0.375rem;
+                min-width: 2.4375rem;
             }
         }
         .chart {
