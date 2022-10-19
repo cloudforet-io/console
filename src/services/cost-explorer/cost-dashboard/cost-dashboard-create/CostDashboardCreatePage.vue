@@ -43,7 +43,7 @@ import {
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { Period } from '@/services/cost-explorer/type';
+import type { CostFiltersMap, Period } from '@/services/cost-explorer/type';
 
 export default {
     name: 'CostDashboardCreatePage',
@@ -56,7 +56,7 @@ export default {
     setup() {
         const state = reactive({
             selectedTemplate: computed(() => costExplorerStore.state.dashboard.selectedTemplate),
-            defaultFilter: computed<Record<string, string[]>>(() => costExplorerStore.state.dashboard.defaultFilter),
+            defaultFilter: computed<CostFiltersMap>(() => costExplorerStore.state.dashboard.defaultFilter),
             includesFilter: computed<boolean>(() => costExplorerStore.state.dashboard.includesFilter),
             selectedPrivacy: computed<DashboardPrivacyType>(() => costExplorerStore.state.dashboard.selectedDashboardPrivacy),
             hasManagePermission: useManagePermissionState(),

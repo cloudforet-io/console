@@ -3,7 +3,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { CustomLayout, DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { CostQueryFilters } from '@/services/cost-explorer/type';
+import type { CostFiltersMap } from '@/services/cost-explorer/type';
 
 export const fetchDefaultLayoutData = async (layoutId: string) => {
     try {
@@ -25,7 +25,7 @@ export const getDashboardLayout = async (dashboard: DashboardInfo): Promise<Cust
     return layout;
 };
 
-export const getCostDashboardFilterLabel = (filters?: CostQueryFilters): string|undefined => {
+export const getCostDashboardFilterLabel = (filters?: CostFiltersMap): string|undefined => {
     if (!filters) return undefined;
     const desc: string[] = [];
     Object.entries(FILTER_ITEM_MAP).forEach(([k, v]) => {
