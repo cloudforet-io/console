@@ -3,6 +3,7 @@ import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-d
 import type { CategoryItem, KeyItem, ValueItem } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
 
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
@@ -43,18 +44,27 @@ export const getRefinedTagItems = (resourceMap, filters: CostFiltersMap): TagIte
     return results;
 };
 
-export const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
-    const result: QueryStoreFilter[] = [];
-    Object.entries(filters).forEach(([key, data]) => {
-        if (data?.length) {
-            result.push({
-                k: key,
-                v: data,
+export const getConvertedFilter = (filters: CostFiltersMap): QueryStoreFilter[] => {
+    const results: QueryStoreFilter[] = [];
+    Object.entries(filters).forEach(([category, filterItems]) => {
+        const keys = [...new Set(filterItems.map(d => d.k))];
+        if (keys[0] === category) { // ex. provider
+            results.push({
+                k: category,
+                v: filterItems.map(d => d.v),
                 o: '=',
+            });
+        } else { // ex. tags.Name
+            keys.forEach((key) => {
+                results.push({
+                    k: key,
+                    v: filterItems.filter(d => d.k === key).map(d => d.v),
+                    o: '=',
+                });
             });
         }
     });
-    return result;
+    return results;
 };
 
 export const getConvertedBudgetFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
@@ -154,4 +164,21 @@ export const getDataTableCostFields = (granularity: Granularity, period: Period,
     }
     const dateFields = getDataTableDateFields(granularity, period);
     return costFields.concat(dateFields);
+};
+
+
+// TODO: will be deprecated someday
+interface OldType {
+    [key: string]: string[];
+}
+export const getChangedFiltersWithNewType = (filters: OldType | CostFiltersMap): CostFiltersMap => {
+    const _filters: OldType | CostFiltersMap = cloneDeep(filters);
+    Object.entries(_filters).forEach(([category, values]) => {
+        if (values?.length && typeof values[0] === 'string') {
+            _filters[category] = values.map(d => ({
+                k: category, v: d as string, o: '=',
+            }));
+        }
+    });
+    return _filters as CostFiltersMap;
 };
