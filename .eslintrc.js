@@ -7,20 +7,20 @@ module.exports = {
 
     extends: [
         'plugin:@typescript-eslint/recommended',
-        'plugin:vue/recommended',
-        '@vue/airbnb',
+        // 'plugin:vue/recommended',
+        // '@vue/airbnb',
         '@vue/typescript',
         'plugin:import/recommended',
         'plugin:import/typescript',
     ],
 
     rules: {
-        'vue/component-name-in-template-casing': ['error', 'kebab-case'],
-        'vue/valid-v-slot': ['error', { allowModifiers: true }],
+        // 'vue/component-name-in-template-casing': ['error', 'kebab-case'],
+        // 'vue/valid-v-slot': ['error', { allowModifiers: true }],
         'max-len': ['error', { code: 200 }],
-        'no-console': import.meta.env.MODE === 'production' ? 'error' : 'off',
-        'no-debugger': import.meta.env.MODE === 'production' ? 'error' : 'off',
-        'vue/html-indent': ['error', 4],
+        // 'no-console': import.meta.env.MODE === 'production' ? 'error' : 'off',
+        // 'no-debugger': import.meta.env.MODE === 'production' ? 'error' : 'off',
+        // 'vue/html-indent': ['error', 4],
         indent: ['error', 4],
         'prefer-destructuring': ['error', { object: false, array: false }],
         radix: ['error', 'as-needed'],
@@ -37,16 +37,16 @@ module.exports = {
             },
         ],
         camelcase: 'off',
-        'vue/max-attributes-per-line': [
-            'error',
-            {
-                singleline: 3,
-                multiline: {
-                    max: 3,
-                    allowFirstLine: true,
-                },
-            },
-        ],
+        // 'vue/max-attributes-per-line': [
+        //     'error',
+        //     {
+        //         singleline: 3,
+        //         multiline: {
+        //             max: 3,
+        //             allowFirstLine: true,
+        //         },
+        //     },
+        // ],
         'no-this-before-super': ['off'],
         'no-useless-constructor': ['off'],
         'no-empty-function': ['error', { allow: ['constructors', 'arrowFunctions'] }],

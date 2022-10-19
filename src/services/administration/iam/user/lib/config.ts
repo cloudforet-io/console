@@ -4,7 +4,7 @@ import {
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItem } from '@cloudforet/core-lib/component-util/query-search/type';
 
-import styles from '@/styles/colors';
+import * as styles from '@/styles/colors';
 
 import { USER_STATE, USER_TYPE_LABEL } from '@/services/administration/iam/user/type';
 
