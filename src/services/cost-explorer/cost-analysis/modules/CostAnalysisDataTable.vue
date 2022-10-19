@@ -11,6 +11,10 @@
                      @refresh="handleChange()"
                      @export="handleExport"
     >
+        <template #th-format="{field}">
+            {{ field.label }}
+            <span class="field-description">{{ fieldDescriptionFormatter(field) }}</span>
+        </template>
         <template #col-format="{field, value, item}">
             <span v-if="tableState.loading" />
             <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
@@ -92,7 +96,9 @@ import type { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDown
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import {
+    GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, MORE_GROUP_BY, MORE_GROUP_BY_ITEM_MAP,
+} from '@/services/cost-explorer/lib/config';
 import {
     getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod,
 } from '@/services/cost-explorer/lib/helper';
@@ -292,6 +298,15 @@ export default {
             });
             return results;
         };
+        const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
+            if (field.name.startsWith(`${MORE_GROUP_BY.TAGS}_`)) {
+                return ` (${MORE_GROUP_BY_ITEM_MAP[MORE_GROUP_BY.TAGS].label})`;
+            }
+            if (field.name.startsWith(`${MORE_GROUP_BY.ADDITIONAL_INFO}_`)) {
+                return ` (${MORE_GROUP_BY_ITEM_MAP[MORE_GROUP_BY.ADDITIONAL_INFO].label})`;
+            }
+            return '';
+        };
 
         /* api */
         let listCostAnalysisRequest: CancelTokenSource | undefined;
@@ -453,6 +468,7 @@ export default {
             handleExport,
             getLink,
             getIsRaised,
+            fieldDescriptionFormatter,
             currencyMoneyFormatter,
         };
     },
@@ -465,6 +481,11 @@ export default {
         &.raised {
             @apply text-alert;
         }
+    }
+
+    .field-description {
+        @apply text-gray-400;
+        white-space: pre-wrap;
     }
 }
 </style>

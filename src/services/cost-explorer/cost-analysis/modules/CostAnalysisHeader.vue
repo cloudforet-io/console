@@ -225,7 +225,7 @@ export default {
             try {
                 const {
                     granularity, stack, period,
-                    groupBy, filters, primaryGroupBy,
+                    groupBy, filters, primaryGroupBy, moreGroupBy,
                 } = costExplorerStore.state.costAnalysis;
                 await SpaceConnector.client.costAnalysis.costQuerySet.update({
                     cost_query_set_id: state.selectedQueryId,
@@ -235,6 +235,7 @@ export default {
                         period,
                         group_by: groupBy,
                         primary_group_by: primaryGroupBy,
+                        more_group_by: moreGroupBy,
                         filters,
                     },
                 });
