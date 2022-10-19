@@ -12,7 +12,7 @@
                     <span>({{ selectedTags.length }})</span>
                 </template>
                 <p-search-dropdown
-                    :menu="tagItems"
+                    :handler="tagsMenuHandler"
                     :selected.sync="selectedTags"
                     use-fixed-menu-style
                     multi-selectable
@@ -24,7 +24,7 @@
                     <span>({{ selectedAdditionalInfo.length }})</span>
                 </template>
                 <p-search-dropdown
-                    :menu="additionalInfoItems"
+                    :handler="additionalInfoMenuHandler"
                     :selected.sync="selectedAdditionalInfo"
                     use-fixed-menu-style
                     multi-selectable
@@ -44,11 +44,17 @@ import {
 import {
     PButtonModal, PSearchDropdown, PFieldGroup,
 } from '@spaceone/design-system';
+import type { AutocompleteHandler } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { FILTER, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { MoreGroupByItem } from '@/services/cost-explorer/type';
 
@@ -82,28 +88,65 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
+            loading: false,
             proxyVisible: useProxyValue('visible', props, emit),
-            additionalInfoItems: [
-                { name: 'additional_info_sample', label: 'additional_info_sample' },
-                { name: 'additional_info_sample2', label: 'additional_info_sample2' },
-            ] as SelectDropdownMenu[],
             selectedAdditionalInfo: [] as SelectDropdownMenu[],
-            tagItems: [
-                { name: 'tag_sample', label: 'tag_sample' },
-                { name: 'tag_sample2', label: 'tag_sample2' },
-            ] as SelectDropdownMenu[],
             selectedTags: [] as SelectDropdownMenu[],
         });
+
+        /* Api */
+        let resourceToken: CancelTokenSource | undefined;
+        const getResources = async (inputText: string, distinctKey: string): Promise<{name: string; key: string}[]|void> => {
+            if (resourceToken) {
+                resourceToken.cancel('Next request has been called.');
+                resourceToken = undefined;
+            }
+
+            resourceToken = axios.CancelToken.source();
+
+            try {
+                state.loading = true;
+                const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
+                    resource_type: 'cost_analysis.Cost',
+                    distinct_key: distinctKey,
+                    search: inputText,
+                    options: {
+                        limit: 10,
+                    },
+                }, {
+                    cancelToken: resourceToken.token,
+                });
+                resourceToken = undefined;
+
+                return results;
+            } catch (e: any) {
+                if (!axios.isCancel(e.axiosError)) {
+                    ErrorHandler.handleError(e);
+                }
+
+                return undefined;
+            } finally {
+                state.loading = false;
+            }
+        };
+        const tagsMenuHandler: AutocompleteHandler = async (value: string) => {
+            const results = await getResources(value, FILTER.TAGS);
+            return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };
+        };
+        const additionalInfoMenuHandler: AutocompleteHandler = async (value: string) => {
+            const results = await getResources(value, FILTER.ADDITIONAL_INFO);
+            return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };
+        };
 
         /* Event */
         const handleConfirm = () => {
             const tagsGroupBy: MoreGroupByItem[] = state.selectedTags.map(d => ({
                 category: MORE_GROUP_BY.TAGS,
-                key: d.name,
+                key: d.name as string,
             }));
-            const additionalInfoGroupBy = state.selectedAdditionalInfo.map(d => ({
+            const additionalInfoGroupBy: MoreGroupByItem[] = state.selectedAdditionalInfo.map(d => ({
                 category: MORE_GROUP_BY.ADDITIONAL_INFO,
-                key: d.name,
+                key: d.name as string,
             }));
             state.proxyVisible = false;
             costExplorerStore.commit('costAnalysis/setMoreGroupBy', [
@@ -111,6 +154,10 @@ export default defineComponent<Props>({
                 ...additionalInfoGroupBy,
             ]);
         };
+
+        (async () => {
+
+        })();
 
         /* Watcher */
         watch(() => props.visible, (visible) => {
@@ -127,6 +174,8 @@ export default defineComponent<Props>({
         return {
             ...toRefs(state),
             handleConfirm,
+            tagsMenuHandler,
+            additionalInfoMenuHandler,
         };
     },
 });

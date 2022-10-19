@@ -10,7 +10,7 @@ import type { CurrencyRates } from '@/store/modules/display/type';
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { GRANULARITY, GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { Period, Granularity, GroupBy } from '@/services/cost-explorer/type';
 import { DATE_FORMAT } from '@/services/cost-explorer/widgets/lib/config';
@@ -49,6 +49,11 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
  */
 export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity, groupBy?: GroupBy): Legend[] => {
     if (groupBy) {
+        let _groupBy: string = groupBy;
+        // Parsing to match api data (ex. tags.Name -> tags_Name)
+        if (groupBy.startsWith(MORE_GROUP_BY.TAGS) || groupBy.startsWith(MORE_GROUP_BY.ADDITIONAL_INFO)) {
+            _groupBy = groupBy.replace('.', '_');
+        }
         const _providers = store.getters['reference/providerItems'];
         const _serviceAccounts = store.getters['reference/serviceAccountItems'];
         const _projects = store.getters['reference/projectItems'];
@@ -61,18 +66,18 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
                 (granularity === GRANULARITY.ACCUMULATED && d.usd_cost > 0)
                 || (granularity !== GRANULARITY.ACCUMULATED && Object.keys(d.usd_cost).length)
             ) {
-                let _name = d[groupBy];
-                let _label = d[groupBy];
+                let _name = d[_groupBy];
+                let _label = d[_groupBy];
                 let _color;
-                if (groupBy === GROUP_BY.PROJECT_GROUP) {
+                if (_groupBy === GROUP_BY.PROJECT_GROUP) {
                     _label = _projectGroups[_name]?.label || _name;
-                } else if (groupBy === GROUP_BY.PROJECT) {
+                } else if (_groupBy === GROUP_BY.PROJECT) {
                     _label = _projects[_name]?.label || _name;
-                } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
+                } else if (_groupBy === GROUP_BY.SERVICE_ACCOUNT) {
                     _label = _serviceAccounts[_name]?.label || _name;
-                } else if (groupBy === GROUP_BY.REGION) {
+                } else if (_groupBy === GROUP_BY.REGION) {
                     _label = _regions[_name]?.name || _name;
-                } else if (groupBy === GROUP_BY.PROVIDER) {
+                } else if (_groupBy === GROUP_BY.PROVIDER) {
                     _label = _providers[_name]?.name || _name;
                     _color = _providers[_name]?.color;
                 }
@@ -81,7 +86,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
                         _name = 'aggregation';
                         _label = 'Etc.';
                     } else {
-                        _name = `no_${groupBy}`;
+                        _name = `no_${_groupBy}`;
                         _label = 'Unknown';
                     }
                 }
@@ -134,27 +139,32 @@ export const getReferenceLabel = (data: string, groupBy: GroupBy): string => {
 export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GroupBy): PieChartData[] => {
     let chartData: PieChartData[] = [];
     if (groupBy) {
+        let _groupBy: string = groupBy;
+        // Parsing to match api data (ex. tags.Name -> tags_Name)
+        if (groupBy.startsWith(MORE_GROUP_BY.TAGS) || groupBy.startsWith(MORE_GROUP_BY.ADDITIONAL_INFO)) {
+            _groupBy = groupBy.replace('.', '_');
+        }
         rawData.forEach((d) => {
-            let _category = d[groupBy];
+            let _category = d[_groupBy];
             let _color;
             if (!_category) {
                 if (d.is_others) _category = 'Etc.';
                 else _category = 'Unknown';
             }
-            if (groupBy === GROUP_BY.PROVIDER) {
+            if (_groupBy === GROUP_BY.PROVIDER) {
                 const _providers = store.getters['reference/providerItems'];
                 _color = _providers[_category]?.color;
                 _category = _providers[_category]?.label || _category;
-            } else if (groupBy === GROUP_BY.REGION) {
+            } else if (_groupBy === GROUP_BY.REGION) {
                 const _regions = store.getters['reference/regionItems'];
                 _category = _regions[_category]?.name || _category;
-            } else if (groupBy === GROUP_BY.PROJECT) {
+            } else if (_groupBy === GROUP_BY.PROJECT) {
                 const _projects = store.getters['reference/projectItems'];
                 _category = _projects[_category]?.label || _category;
-            } else if (groupBy === GROUP_BY.PROJECT_GROUP) {
+            } else if (_groupBy === GROUP_BY.PROJECT_GROUP) {
                 const _projectGroups = store.getters['reference/projectGroupItems'];
                 _category = _projectGroups[_category]?.label || _category;
-            } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
+            } else if (_groupBy === GROUP_BY.SERVICE_ACCOUNT) {
                 const _serviceAccounts = store.getters['reference/serviceAccountItems'];
                 _category = _serviceAccounts[_category]?.name || _category;
             }
@@ -189,16 +199,22 @@ export const getXYChartData = (
     const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
     const dateFormat = DATE_FORMAT[timeUnit];
 
+    let _groupBy: string | undefined = groupBy;
+    // Parsing to match api data (ex. tags.Name -> tags_Name)
+    if (groupBy?.startsWith(MORE_GROUP_BY.TAGS) || groupBy?.startsWith(MORE_GROUP_BY.ADDITIONAL_INFO)) {
+        _groupBy = groupBy.replace('.', '_');
+    }
+
     let now = dayjs.utc(period.start).clone();
     while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
         const _date = now.format(dateFormat);
         const chartDataByDate: XYChartData = { date: _date };
         rawData.forEach((d) => {
-            if (groupBy) {
-                let groupByName = d[groupBy];
+            if (_groupBy) {
+                let groupByName = d[_groupBy];
                 if (!groupByName) {
                     if (d.is_others) groupByName = 'aggregation';
-                    else groupByName = `no_${groupBy}`;
+                    else groupByName = `no_${_groupBy}`;
                 }
                 chartDataByDate[groupByName] = d[valueKey]?.[_date] ?? 0;
             } else {
