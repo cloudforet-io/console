@@ -19,7 +19,7 @@ export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 export type Filter = typeof FILTER[keyof typeof FILTER];
 
 export type CostQueryFilters = Partial<Record<Filter, string[]>>;
-export type CostFiltersMap = Partial<Record<Filter, FilterItem[]>>;
+export type CostFiltersMap = Record<Filter, FilterItem[]>;
 
 export interface CostQuerySetOption {
     group_by?: GroupBy[];
@@ -28,7 +28,7 @@ export interface CostQuerySetOption {
     granularity: Granularity;
     stack?: boolean;
     period: Period;
-    filters?: CostQueryFilters;
+    filters?: CostFiltersMap;
 }
 
 export interface CostQuerySetModel {

@@ -1,5 +1,7 @@
 import type { Action } from 'vuex';
 
+import { cloneDeep } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
@@ -9,7 +11,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type { CostAnalysisStoreState } from '@/services/cost-explorer/store/cost-analysis/type';
-import type { CostQuerySetModel, CostQuerySetOption } from '@/services/cost-explorer/type';
+import type { CostFiltersMap, CostQuerySetModel, CostQuerySetOption } from '@/services/cost-explorer/type';
 
 
 export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = ({ commit }): void => {
@@ -22,6 +24,21 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
     commit('setFilters', {});
 };
 
+// TODO: will be deprecated someday
+interface OldType {
+    [key: string]: string[];
+}
+const getChangedFiltersWithNewType = (filters: OldType | CostFiltersMap): CostFiltersMap => {
+    const _filters: OldType | CostFiltersMap = cloneDeep(filters);
+    Object.entries(_filters).forEach(([category, values]) => {
+        if (values?.length && typeof values[0] === 'string') {
+            _filters[category] = values.map(d => ({
+                k: category, v: d as string, o: '=',
+            }));
+        }
+    });
+    return _filters as CostFiltersMap;
+};
 
 export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit }, options: Partial<CostQuerySetOption>): void => {
     if (options.granularity) commit('setGranularity', options.granularity);
@@ -32,7 +49,9 @@ export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit },
     } else commit('setPrimaryGroupBy', undefined);
     if (options.more_group_by?.length) commit('setMoreGroupBy', options.more_group_by);
     if (options.period) commit('setPeriod', { start: options.period.start, end: options.period.end });
-    if (options.filters) commit('setFilters', options.filters);
+    if (options.filters) {
+        commit('setFilters', getChangedFiltersWithNewType(options.filters));
+    }
 };
 
 export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ commit }): Promise<void|Error> => {
