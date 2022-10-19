@@ -18,7 +18,6 @@ export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
 export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 export type Filter = typeof FILTER[keyof typeof FILTER];
 
-export type CostQueryFilters = Partial<Record<Filter, string[]>>;
 export type CostFiltersMap = Record<Filter, FilterItem[]>;
 
 export interface CostQuerySetOption {

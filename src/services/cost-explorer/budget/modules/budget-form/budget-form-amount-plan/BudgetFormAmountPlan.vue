@@ -49,8 +49,9 @@ import BudgetFormAmountPlanUnitSelect
     from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanUnitSelect.vue';
 import BudgetPeriodSelect
     from '@/services/cost-explorer/budget/modules/BudgetPeriodSelect.vue';
-import type { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
-import type { CostQueryFilters, Period } from '@/services/cost-explorer/type';
+import type { BudgetData, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/type';
+import type { Period } from '@/services/cost-explorer/type';
+
 
 export interface BudgetAmountPlanInfo {
     limit?: BudgetData['limit'];
@@ -64,7 +65,7 @@ interface Props {
     budgetId?: string;
     projectId?: string;
     projectGroupId?: string;
-    costTypes?: CostQueryFilters;
+    costTypes?: CostTypes;
 }
 
 export default {
