@@ -70,34 +70,37 @@ export default defineComponent({
                     favoriteType: FAVORITE_TYPE.CLOUD_SERVICE,
                 }
             )), { type: 'divider' }]),
-            menuSet: computed<LNBMenu[]>(() => [
-                (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : {
+            menuSet: computed<LNBMenu[]>(() => {
+                const menu: LNBMenu[] = (state.isCloudServiceDetailPage ? [] : [{
                     type: 'item',
                     id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE,
                     label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId),
                     to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
-                }),
-                ...filterLNBMenuByPermission([
-                    {
-                        type: 'item',
-                        id: MENU_ID.ASSET_INVENTORY_SERVER,
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVER].translationId),
-                        to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME },
-                    },
-                    {
-                        type: 'item',
-                        id: MENU_ID.ASSET_INVENTORY_COLLECTOR,
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_COLLECTOR].translationId),
-                        to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME },
-                    },
-                    {
-                        type: 'item',
-                        id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT,
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT].translationId),
-                        to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
-                    },
-                ], store.getters['user/pagePermissionList']),
-            ]),
+                }]);
+                return [
+                    (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : []),
+                    ...filterLNBMenuByPermission(menu.concat([
+                        {
+                            type: 'item',
+                            id: MENU_ID.ASSET_INVENTORY_SERVER,
+                            label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVER].translationId),
+                            to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME },
+                        },
+                        {
+                            type: 'item',
+                            id: MENU_ID.ASSET_INVENTORY_COLLECTOR,
+                            label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_COLLECTOR].translationId),
+                            to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME },
+                        },
+                        {
+                            type: 'item',
+                            id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT,
+                            label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT].translationId),
+                            to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
+                        },
+                    ]), store.getters['user/pagePermissionList']),
+                ];
+            }),
         });
 
         const initCloudServiceDetailLNB = async (params: CloudServiceDetailPageParams) => {
