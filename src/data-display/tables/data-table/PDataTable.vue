@@ -40,10 +40,12 @@
                                               }"
                                         >
                                             <span class="th-text">
-                                                <slot :name="`th-${field.name}-format`"
-                                                      v-bind="getHeadSlotProps(field, fieldColIndex, fieldRowIdx)"
-                                                >
-                                                    {{ field.label ? field.label : field.name }}
+                                                <slot name="th-format" v-bind="getHeadSlotProps(field, fieldColIndex, fieldRowIdx)">
+                                                    <slot :name="`th-${field.name}-format`"
+                                                          v-bind="getHeadSlotProps(field, fieldColIndex, fieldRowIdx)"
+                                                    >
+                                                        {{ field.label ? field.label : field.name }}
+                                                    </slot>
                                                 </slot>
                                                 <p-copy-button v-if="colCopy && !field.disableCopy && isLeafField(field)"
                                                                copy-manually

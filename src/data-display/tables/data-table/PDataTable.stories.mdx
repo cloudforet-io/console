@@ -122,6 +122,7 @@ interface DataTableFieldType {
 |Name|Description|Props|
 |--|--|--|
 |head|It replaces table head row.|fields(`DataTableFieldType[]`)|
+|th-format|It replaces table header cells.|field(`DataTableFieldType`), fieldColIndex(`number`), fieldRowIdx(`number`)|
 |th-{field.name}|It replaces th cell corresponding to `field.name`.|field(`DataTableFieldType`), sortable(`boolean`), colIndex(`number`), index(`number`. will be DEPRECATED)|
 |th-{field.name}-format|It replaces the table head cell corresponding to `field.name` while keeping the style.|field(`DataTableFieldType`), sortable(`boolean`), colIndex(`number`), index(`number`. will be DEPRECATED)|
 |no-data|It replaces what is displayed in the no data case.|fields(`DataTableFieldType[]`)|
