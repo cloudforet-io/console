@@ -32,7 +32,7 @@ import { cloneDeep } from 'lodash';
 
 import { store } from '@/store';
 
-import { getRefinedTagItems } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { getRefinedTagItems } from '@/services/cost-explorer/lib/helper';
 import type { CostFiltersMap } from '@/services/cost-explorer/type';
 
 

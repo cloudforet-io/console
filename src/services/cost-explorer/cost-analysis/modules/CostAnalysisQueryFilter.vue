@@ -59,10 +59,10 @@ import dayjs from 'dayjs';
 
 import { i18n } from '@/translations';
 
-import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { getInitialDates } from '@/services/cost-explorer/lib/helper';
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { Period } from '@/services/cost-explorer/type';

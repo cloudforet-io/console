@@ -69,7 +69,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { yellow, red, gray } from '@/styles/colors';
 
-import { getConvertedBudgetFilter } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import { getConvertedBudgetFilter } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';

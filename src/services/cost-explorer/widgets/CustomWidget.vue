@@ -83,13 +83,13 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import {
-    getConvertedFilter, getDataTableCostFields, getInitialDates,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { getCostDashboardFilterLabel } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
 import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import {
+    getConvertedFilter, getDataTableCostFields, getInitialDates,
+} from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type {
     CostQuerySetOption, Period, Granularity, GroupBy,

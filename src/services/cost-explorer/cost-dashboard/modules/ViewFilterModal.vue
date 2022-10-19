@@ -46,7 +46,7 @@ import type { ReferenceItem } from '@/store/modules/reference/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import type { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/cost-explorer/type';
+import type { CostQueryFilters } from '@/services/cost-explorer/type';
 
 
 const DASHBOARD_FILTERS = [FILTER.PROJECT_GROUP, FILTER.PROJECT, FILTER.SERVICE_ACCOUNT, FILTER.PROVIDER];
@@ -91,7 +91,7 @@ export default {
                     [FILTER.SERVICE_ACCOUNT]: store.getters['reference/serviceAccountItems'],
                     [FILTER.REGION]: store.getters['reference/regionItems'],
                 };
-                const itemsMap: CostQueryFilterItemsMap = {};
+                const itemsMap = {};
                 Object.entries(props.selectedFilters as CostQueryFilters).forEach(([key, data]) => {
                     const resourceItems = resourceItemsMap[key];
                     if (resourceItems) {

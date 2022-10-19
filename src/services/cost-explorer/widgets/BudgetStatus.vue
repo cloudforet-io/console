@@ -60,7 +60,7 @@ import { indigo, yellow, red } from '@/styles/colors';
 
 import {
     getConvertedBudgetFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
+} from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';

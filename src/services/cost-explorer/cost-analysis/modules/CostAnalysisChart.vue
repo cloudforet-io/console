@@ -129,9 +129,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
-import {
-    getConvertedFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
 import CostAnalysisPieChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue';
 import CostAnalysisStackedColumnChart
@@ -140,6 +137,9 @@ import {
     FILTER,
     FILTER_ITEM_MAP, GRANULARITY,
 } from '@/services/cost-explorer/lib/config';
+import {
+    getConvertedFilter,
+} from '@/services/cost-explorer/lib/helper';
 import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type {

@@ -31,7 +31,7 @@ import type { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
 import {
     getConvertedFilter,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
+} from '@/services/cost-explorer/lib/helper';
 import type { CostQueryFilters, Granularity } from '@/services/cost-explorer/type';
 
 

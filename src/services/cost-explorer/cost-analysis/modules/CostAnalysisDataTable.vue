@@ -92,10 +92,10 @@ import type { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDown
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import {
     getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod,
-} from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+} from '@/services/cost-explorer/lib/helper';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
 import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type';
