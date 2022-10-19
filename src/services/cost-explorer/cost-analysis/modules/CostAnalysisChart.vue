@@ -55,8 +55,8 @@
 
             <!--legend-->
             <div class="title-wrapper">
-                <p-select-dropdown v-if="groupByItems.length"
-                                   :items="groupByItems"
+                <p-select-dropdown v-if="groupByMenuItems.length"
+                                   :items="groupByMenuItems"
                                    :selected="primaryGroupBy"
                                    style-type="transparent"
                                    :read-only="printMode"
@@ -109,6 +109,7 @@ import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 import {
     PButton, PIconButton, PSelectDropdown, PStatus, PDataLoader,
 } from '@spaceone/design-system';
+import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -135,7 +136,7 @@ import CostAnalysisStackedColumnChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
 import {
     FILTER,
-    FILTER_ITEM_MAP, GRANULARITY,
+    FILTER_ITEM_MAP, GRANULARITY, GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/lib/config';
 import {
     getConvertedFilter,
@@ -186,9 +187,17 @@ export default {
             selectedQueryId: computed(() => costExplorerStore.state.costAnalysis.selectedQueryId),
             groupBy: computed(() => costExplorerStore.state.costAnalysis.groupBy),
             primaryGroupBy: computed(() => costExplorerStore.state.costAnalysis.primaryGroupBy),
+            moreGroupBy: computed(() => costExplorerStore.state.costAnalysis.moreGroupBy),
             //
             noFilter: computed(() => isEmpty(state.filters) || Object.values(state.filters).every(d => !d)),
-            groupByItems: computed(() => costExplorerStore.getters['costAnalysis/groupByItems']),
+            groupByMenuItems: computed<SelectDropdownMenu[]>(() => {
+                const groupByItems = state.groupBy.map(d => GROUP_BY_ITEM_MAP[d]);
+                const moreGroupByItems = state.moreGroupBy.filter(d => d.selected).map(d => ({
+                    name: `${d.category}.${d.key}`,
+                    label: d.key,
+                }));
+                return [...groupByItems, ...moreGroupByItems];
+            }),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             filtersLength: computed<number>(() => {
@@ -297,7 +306,7 @@ export default {
             costExplorerStore.commit('costAnalysis/setFilters', filters);
         };
 
-        watch(() => state.groupByItems, (after, before) => {
+        watch(() => state.groupByMenuItems, (after, before) => {
             if (!after.length) {
                 costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', undefined);
             } else if ((!before.length && after.length) || !after.filter(d => d.name === state.primaryGroupBy).length) {
