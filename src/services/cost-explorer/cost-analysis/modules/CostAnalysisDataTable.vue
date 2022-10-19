@@ -97,7 +97,6 @@ import {
     getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod,
 } from '@/services/cost-explorer/lib/helper';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
 import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type';
 
 
@@ -142,8 +141,8 @@ export default {
             period: computed(() => costExplorerStore.state.costAnalysis.period),
             filters: computed(() => costExplorerStore.state.costAnalysis.filters),
             groupBy: computed(() => costExplorerStore.state.costAnalysis.groupBy),
+            moreGroupBy: computed(() => costExplorerStore.state.costAnalysis.moreGroupBy),
             //
-            groupByItems: computed<GroupByItem[]>(() => costExplorerStore.getters['costAnalysis/groupByItems']),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             groupByStoreMap: computed<Record<string, ReferenceMap>>(() => ({
@@ -172,11 +171,18 @@ export default {
                 }
                 return field;
             })),
-            groupByFields: computed<DataTableFieldType[]>(() => state.groupByItems.map(d => ({
-                name: d.name,
-                label: d.label,
-                sortable: false,
-            }))),
+            groupByFields: computed<DataTableFieldType[]>(() => {
+                const groupByItems = state.groupBy.map(d => ({
+                    ...GROUP_BY_ITEM_MAP[d],
+                    sortable: false,
+                }));
+                const moreGroupByItems = state.moreGroupBy.filter(d => d.selected).map(d => ({
+                    name: `${d.category}_${d.key}`,
+                    label: d.key,
+                    sortable: false,
+                }));
+                return [...groupByItems, ...moreGroupByItems];
+            }),
             costFields: [] as DataTableFieldType[],
             fields: computed<DataTableFieldType[]>(() => tableState.groupByFields.concat(tableState.costFields)),
             items: [] as CostAnalyzeModel[],
@@ -292,7 +298,7 @@ export default {
         const costApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(15)
             .setSort('total_usd_cost', true);
-        const listCostAnalysisTableData = async (granularity, groupBy, period, filters, stack) => {
+        const listCostAnalysisTableData = async (granularity, groupBy, moreGroupBy, period, filters, stack) => {
             if (listCostAnalysisRequest) {
                 listCostAnalysisRequest.cancel('Next request has been called.');
                 listCostAnalysisRequest = undefined;
@@ -306,10 +312,12 @@ export default {
                 const query = costApiQueryHelper.data;
                 if (props.printMode) query.page = undefined;
 
+                const moreGroupByKeyList = moreGroupBy.filter(d => d.selected).map(d => `${d.category}.${d.key}`);
+
                 const dateFormat = state.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity,
-                    group_by: groupBy,
+                    group_by: [...groupBy, ...moreGroupByKeyList],
                     start: dayjs.utc(period.start).format(dateFormat),
                     end: dayjs.utc(period.end).format(dateFormat),
                     ...query,
@@ -331,10 +339,10 @@ export default {
         /* event */
         const handleChange = async (options: any = {}) => {
             setApiQueryWithToolboxOptions(costApiQueryHelper, options, { queryTags: true });
-            await listCostAnalysisTableData(state.granularity, state.groupBy, state.period, state.filters, state.stack);
+            await listCostAnalysisTableData(state.granularity, state.groupBy, state.moreGroupBy, state.period, state.filters, state.stack);
         };
         const handleRefresh = async () => {
-            await listCostAnalysisTableData(state.granularity, state.groupBy, state.period, state.filters, state.stack);
+            await listCostAnalysisTableData(state.granularity, state.groupBy, state.moreGroupBy, state.period, state.filters, state.stack);
         };
         const handleExport = async () => {
             try {
@@ -362,7 +370,7 @@ export default {
 
         // Link for setting table widths: https://pdfmake.github.io/docs/0.1/document-definition-object/tables/
         const getPrintModeFieldSets = (): PrintModeFieldSet[] => {
-            const groupByLength = state.groupByItems.length;
+            const groupByLength = state.groupByMenuItems.length;
             const costFieldLength = tableState.costFields.length;
             const totalLength = costFieldLength + groupByLength;
             const costColumnCount = PRINT_MODE_MAX_COL - groupByLength;
@@ -416,8 +424,10 @@ export default {
             });
         };
 
-        watch([() => state.granularity, () => state.groupBy, () => state.period, () => state.filters, () => state.stack], async ([granularity, groupBy, period, filters, stack]) => {
-            await listCostAnalysisTableData(granularity, groupBy, period, filters, stack);
+        watch([
+            () => state.granularity, () => state.groupBy, () => state.moreGroupBy, () => state.period, () => state.filters, () => state.stack],
+        async ([granularity, groupBy, moreGroupBy, period, filters, stack]) => {
+            await listCostAnalysisTableData(granularity, groupBy, moreGroupBy, period, filters, stack);
             tableState.costFields = getDataTableCostFields(granularity, period, !!tableState.groupByFields.length);
             if (props.printMode) emit('rendered', getPdfItems());
         }, { immediate: true, deep: true });
