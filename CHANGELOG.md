@@ -1,3 +1,10 @@
+# [1.1.0-beta.428](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.427...v1.1.0-beta.428) (2022-10-19)
+
+
+### Bug Fixes
+
+* **p-data-table:** add `th-format` slot ([#96](https://github.com/cloudforet-io/mirinae/issues/96)) ([f18dbd8](https://github.com/cloudforet-io/mirinae/commit/f18dbd85c427ce2c3a1b5b5484e4626354679069))
+
 # [1.1.0-beta.427](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.426...v1.1.0-beta.427) (2022-10-18)
 
 
