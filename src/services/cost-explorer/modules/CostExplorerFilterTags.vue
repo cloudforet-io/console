@@ -1,6 +1,6 @@
 <template>
     <div class="cost-explorer-filter-tags" :class="{'print-mode': printMode}">
-        <template v-if="!filterItems.length">
+        <template v-if="!tagItems.length">
             <slot name="no-filter">
                 <p-empty>
                     {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_FILTERS') }}
@@ -8,12 +8,12 @@
             </slot>
         </template>
         <template v-else>
-            <p-tag v-for="(refinedItem, idx) in refinedFilterItems" :key="`selected-tag-${idx}-${refinedItem.value}`"
+            <p-tag v-for="(item, idx) in tagItems" :key="`selected-tag-${idx}-${item.value}`"
                    :deletable="!printMode && deletable"
-                   :category-item="categoryItemFormatter(refinedItem)"
-                   :key-item="keyItemFormatter(refinedItem)"
-                   :value-item="valueItemFormatter(refinedItem)"
-                   @delete="handleDeleteFilterTag(refinedItem)"
+                   :category-item="item.categoryItem"
+                   :key-item="item.keyItem"
+                   :value-item="item.valueItem"
+                   @delete="handleDeleteFilterTag(item)"
             />
         </template>
     </div>
@@ -27,18 +27,25 @@ import {
 import {
     PEmpty, PTag,
 } from '@spaceone/design-system';
+import type { CategoryItem, KeyItem, ValueItem } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { cloneDeep } from 'lodash';
 
 import { store } from '@/store';
 
-import { getRefinedFilterItems } from '@/services/cost-explorer/cost-analysis/lib/helper';
-import { FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import type { CostQueryFilterItem, RefinedFilterItem } from '@/services/cost-explorer/type';
+import { getRefinedTagItems } from '@/services/cost-explorer/cost-analysis/lib/helper';
+import type { CostFiltersMap } from '@/services/cost-explorer/type';
 
 
 interface Props {
     printMode: boolean;
-    filterItems: CostQueryFilterItem[];
+    filters: CostFiltersMap;
+    deletable: boolean;
+}
+
+interface TagItem {
+    categoryItem: CategoryItem;
+    keyItem?: KeyItem;
+    valueItem: ValueItem
 }
 
 export default defineComponent<Props>({
@@ -52,9 +59,9 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-        filterItems: {
-            type: Array,
-            default: () => ([]),
+        filters: {
+            type: Object,
+            default: () => ({}),
         },
         deletable: {
             type: Boolean,
@@ -70,32 +77,23 @@ export default defineComponent<Props>({
                 provider: store.getters['reference/providerItems'],
                 region_code: store.getters['reference/regionItems'],
             })),
-            refinedFilterItems: computed<RefinedFilterItem[]>(() => getRefinedFilterItems(state.resourceMap, props.filterItems)),
-        });
-
-        /* Util */
-        const categoryItemFormatter = (refinedItem: RefinedFilterItem) => ({
-            name: FILTER_ITEM_MAP[refinedItem.category].label,
-        });
-        const keyItemFormatter = (refinedItem: RefinedFilterItem) => {
-            if (!refinedItem.key) return undefined;
-            return { name: refinedItem.key };
-        };
-        const valueItemFormatter = (refinedItem: RefinedFilterItem) => ({
-            name: refinedItem.label,
+            tagItems: computed<TagItem[]>(() => getRefinedTagItems(state.resourceMap, props.filters)),
         });
 
         /* Event */
-        const handleDeleteFilterTag = (item: RefinedFilterItem) => {
-            const _filters: CostQueryFilterItem[] = cloneDeep(props.filterItems);
-            const _index = _filters.findIndex((f) => {
-                if (f.category !== item.category) return false;
-                if (item.key) {
-                    return f.key === item.key && f.value === item.value;
+        const handleDeleteFilterTag = (item: TagItem) => {
+            const _filters: CostFiltersMap = cloneDeep(props.filters);
+            const targetCategory = item.categoryItem.name;
+            const targetKey = item.keyItem?.name;
+            const targetValue = item.valueItem.name;
+            const targetFilterItems = _filters[targetCategory];
+            const targetIndex = targetFilterItems.findIndex((f) => {
+                if (targetKey) {
+                    return f.k === `${targetCategory}.${targetKey}` && f.v === targetValue;
                 }
-                return f.value === item.value;
+                return f.v === targetValue;
             });
-            _filters.splice(_index, 1);
+            targetFilterItems.splice(targetIndex, 1);
             emit('update-filter-tags', _filters);
         };
 
@@ -112,9 +110,6 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            categoryItemFormatter,
-            keyItemFormatter,
-            valueItemFormatter,
             handleDeleteFilterTag,
         };
     },

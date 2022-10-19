@@ -1,14 +1,47 @@
 import type { TimeUnit } from '@amcharts/amcharts4/core';
 import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { CategoryItem, KeyItem, ValueItem } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import type { CostQueryFilters, Period, Granularity } from '@/services/cost-explorer/type';
+import { FILTER, FILTER_ITEM_MAP, GRANULARITY } from '@/services/cost-explorer/lib/config';
+import type {
+    CostQueryFilters, Period, Granularity, CostFiltersMap,
+} from '@/services/cost-explorer/type';
 
+
+interface TagItem {
+    categoryItem: CategoryItem;
+    keyItem?: KeyItem;
+    valueItem: ValueItem
+}
+
+export const getRefinedTagItems = (resourceMap, filters: CostFiltersMap): TagItem[] => {
+    const results: TagItem[] = [];
+    Object.entries(filters).forEach(([category, filterItems]) => {
+        const resourceItems = resourceMap[category];
+        filterItems.forEach((item) => {
+            let valueLabel = item.v;
+            const resourceItem = resourceItems?.[item.v];
+            if (resourceItem) {
+                valueLabel = category === FILTER.REGION ? resourceItem?.name : resourceItem?.label;
+            }
+            let keyItem: KeyItem | undefined;
+            if (category !== item.k) {
+                const convertedTagKey = (item.k as string).replace(`${category}.`, '');
+                keyItem = { name: convertedTagKey, label: convertedTagKey };
+            }
+            results.push({
+                categoryItem: { name: category, label: FILTER_ITEM_MAP[category].label },
+                keyItem,
+                valueItem: { name: item.v, label: valueLabel },
+            });
+        });
+    });
+    return results;
+};
 
 export const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
     const result: QueryStoreFilter[] = [];

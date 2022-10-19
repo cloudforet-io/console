@@ -1,31 +1,30 @@
 <template>
     <div>
-        <project-select-dropdown v-if="type === FILTER.PROJECT"
+        <project-select-dropdown v-if="category === FILTER.PROJECT"
                                  multi-selectable
                                  project-selectable
-                                 :selected-project-ids="selected"
+                                 :selected-project-ids="selectedItems.map(d => d.name)"
                                  @update:selectedProjectIds="handleSelectedProjectIds"
         />
-        <project-select-dropdown v-else-if="type === FILTER.PROJECT_GROUP"
+        <project-select-dropdown v-else-if="category === FILTER.PROJECT_GROUP"
                                  multi-selectable
                                  project-group-selectable
-                                 :selected-project-ids="selected"
+                                 :selected-project-ids="selectedItems.map(d => d.name)"
                                  @update:selectedProjectIds="handleSelectedProjectIds"
         />
         <p-search-dropdown
-            v-else-if="type === FILTER.SERVICE_ACCOUNT || type === FILTER.REGION || type === FILTER.PROVIDER"
+            v-else-if="category === FILTER.SERVICE_ACCOUNT || category === FILTER.REGION || category === FILTER.PROVIDER"
             :menu="menuItems"
             :selected="selectedItems"
             multi-selectable
             use-fixed-menu-style
             @update:selected="handleUpdateSelected"
-            @search="handleSearch"
         />
         <p-query-search-dropdown
-            v-else-if="type === FILTER.TAGS || type === FILTER.ADDITIONAL_INFO"
+            v-else-if="category === FILTER.TAGS || category === FILTER.ADDITIONAL_INFO"
             :key-item-sets="querySearchHandlerState.keyItemSets"
             :value-handler-map="querySearchHandlerState.valueHandlerMap"
-            :selected.sync="querySearchHandlerState.selectedQueryItems"
+            :selected="querySearchHandlerState.selectedQueryItems"
             multi-selectable
             @update:selected="handleUpdateSelectedQueryItems"
         />
@@ -38,7 +37,6 @@
             use-fixed-menu-style
             :exact-mode="false"
             @update:selected="handleUpdateSelected"
-            @search="handleSearch"
         />
     </div>
 </template>
@@ -52,7 +50,6 @@ import {
     PQuerySearchDropdown,
     PSearchDropdown,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import type {
     AutocompleteHandler, SearchDropdownMenuItem,
 } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
@@ -74,10 +71,12 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import type { QueryItemResource } from '@/services/cost-explorer/cost-analysis/type';
 import { FILTER } from '@/services/cost-explorer/lib/config';
+import type { FilterItem } from '@/services/cost-explorer/type';
+
 
 interface Props {
-    type: string;
-    selected: string[];
+    category: string;
+    selectedFilterItems: FilterItem[];
 }
 
 export default {
@@ -88,36 +87,39 @@ export default {
         PSearchDropdown,
     },
     props: {
-        type: {
+        category: {
             type: String,
             default: undefined,
         },
-        selected: {
+        selectedFilterItems: {
             type: Array,
             default: () => ([]),
         },
     },
     setup(props: Props, { emit }) {
-        const state = reactive({
-            selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selected.map(selectedName => ({
-                name: selectedName,
-                label: state.menuItems.find(d => d.name === selectedName)?.label || selectedName,
-            }))),
+        const storeState = reactive({
             serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+        });
+        const state = reactive({
+            // TODO: this cannot be used to tags
+            selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selectedFilterItems?.map(filterItem => ({
+                name: filterItem.v,
+                label: state.menuItems.find(d => d.name === filterItem.v)?.label || filterItem.v,
+            }))),
             menuItems: computed(() => {
-                if (props.type === FILTER.SERVICE_ACCOUNT) {
-                    return Object.keys(state.serviceAccounts).map(k => ({
-                        name: k, label: state.serviceAccounts[k].label,
+                if (props.category === FILTER.SERVICE_ACCOUNT) {
+                    return Object.keys(storeState.serviceAccounts).map(k => ({
+                        name: k, label: storeState.serviceAccounts[k].label,
                     }));
-                } if (props.type === FILTER.PROVIDER) {
-                    return Object.keys(state.providers).map(k => ({
-                        name: k, label: state.providers[k].name,
+                } if (props.category === FILTER.PROVIDER) {
+                    return Object.keys(storeState.providers).map(k => ({
+                        name: k, label: storeState.providers[k].name,
                     }));
-                } if (props.type === FILTER.REGION) {
-                    return Object.keys(state.regions).map(k => ({
-                        name: k, label: state.regions[k].name,
+                } if (props.category === FILTER.REGION) {
+                    return Object.keys(storeState.regions).map(k => ({
+                        name: k, label: storeState.regions[k].name,
                     }));
                 }
                 return [];
@@ -126,19 +128,19 @@ export default {
         });
         const querySearchHandlerState = reactive({
             querySearchResource: undefined as QueryItemResource[] | undefined,
-            selectedQueryItems: computed<QueryItem[]>(() => state.proxySelected?.map(d => ({
+            selectedQueryItems: computed<QueryItem[]>(() => props.selectedFilterItems?.map(filterItem => ({
                 key: {
-                    label: d.key,
-                    name: d.key,
+                    label: filterItem.k,
+                    name: filterItem.k,
                 },
                 value: {
-                    label: d.value,
-                    name: d.value,
+                    label: filterItem.v,
+                    name: filterItem.v,
                 },
             }))),
             keyItemSets: computed<KeyItemSet[]>(() => {
                 if (querySearchHandlerState.querySearchResource) {
-                    return queryItemFormatter(querySearchHandlerState.querySearchResource, props.type);
+                    return queryItemFormatter(querySearchHandlerState.querySearchResource, props.category);
                 }
                 return [];
             }),
@@ -146,7 +148,7 @@ export default {
                 const result = {};
                 querySearchHandlerState.keyItemSets.forEach(({ items }) => {
                     items.forEach(({ name }) => {
-                        result[name] = makeDistinctValueHandler('cost_analysis.Cost', `${props.type}.${name}`);
+                        result[name] = makeDistinctValueHandler('cost_analysis.Cost', `${props.category}.${name}`);
                     });
                 });
                 return result;
@@ -186,10 +188,10 @@ export default {
             }
         };
         const menuHandler: AutocompleteHandler = async (value: string) => {
-            if (!props.type) return { results: [] };
+            if (!props.category) return { results: [] };
 
             state.menuLoading = true;
-            const results = await getResources(value, props.type);
+            const results = await getResources(value, props.category);
             state.menuLoading = false;
 
             return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };
@@ -211,20 +213,28 @@ export default {
 
         /* event */
         const handleSelectedProjectIds = (selectedProjectIds) => {
-            emit('update:selected', selectedProjectIds);
+            const updatedFilterItems = selectedProjectIds.map(d => ({
+                k: props.category,
+                v: d,
+                o: '=',
+            }));
+            emit('update-filter-items', updatedFilterItems);
         };
-        const handleUpdateSelected = (selectedItem: MenuItem[]) => {
-            emit('update:selected', selectedItem.map(d => d.name));
-        };
-        const handleSearch = (val: string) => {
-            emit('update:selected', state.selectedItems.map(d => d.name).concat([val]));
+        const handleUpdateSelected = (selectedItems: SearchDropdownMenuItem[]) => {
+            const updatedFilterItems = selectedItems.map(d => ({
+                k: props.category,
+                v: d.name,
+                o: '=',
+            }));
+            emit('update-filter-items', updatedFilterItems);
         };
         const handleUpdateSelectedQueryItems = (selectedQueryItems: QueryItem[]) => {
-            state.proxySelected = selectedQueryItems.map(d => ({
-                category: props.type,
-                value: d.value.label || d.value.name,
-                key: d.key?.label || d.key?.name,
+            const updatedFilterItems = selectedQueryItems.map(d => ({
+                k: `${props.category}.${d.key?.name}`,
+                v: d.value.name,
+                o: '=',
             }));
+            emit('update-filter-items', updatedFilterItems);
         };
 
         // LOAD REFERENCE STORE
@@ -238,8 +248,8 @@ export default {
 
         // LOAD QUERY SEARCH DROPDOWN DATA
         (async () => {
-            if (props.type === FILTER.ADDITIONAL_INFO || props.type === FILTER.TAGS) {
-                const result = await getResources('', props.type);
+            if (props.category === FILTER.ADDITIONAL_INFO || props.category === FILTER.TAGS) {
+                const result = await getResources('', props.category);
                 if (result) querySearchHandlerState.querySearchResource = result;
             }
         })();
@@ -252,7 +262,6 @@ export default {
             handleSelectedProjectIds,
             handleUpdateSelected,
             handleUpdateSelectedQueryItems,
-            handleSearch,
         };
     },
 };
