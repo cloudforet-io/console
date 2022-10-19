@@ -116,9 +116,10 @@ import CostDashboardUpdateModal
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardUpdateModal.vue';
 import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
 import type { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import { convertFiltersInToNewType } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { CostQueryFilters, Period } from '@/services/cost-explorer/type';
+import type { CostFiltersMap, Period } from '@/services/cost-explorer/type';
 
 const PUBLIC_ICON_COLOR = gray[500];
 
@@ -171,7 +172,7 @@ export default {
             layout: [] as any[],
             period: {} as Period,
             periodType: '',
-            filters: {} as CostQueryFilters,
+            filters: {} as CostFiltersMap,
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
@@ -233,7 +234,7 @@ export default {
             const dashboard = await fetchDashboard(dashboardId);
             state.dashboard = dashboard;
             state.layout = await getDashboardLayout(dashboard);
-            state.filters = dashboard.default_filter;
+            state.filters = convertFiltersInToNewType(dashboard.default_filter);
             state.period = dashboard.period ?? {};
             state.periodType = dashboard.period_type;
 

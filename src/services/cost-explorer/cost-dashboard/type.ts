@@ -1,7 +1,7 @@
 import type { Tags, TimeStamp } from '@/models';
 
 import type {
-    CostQueryFilters, Period, Granularity, GroupBy,
+    Period, Granularity, GroupBy, CostFiltersMap,
 } from '@/services/cost-explorer/type';
 
 const DASHBOARD_SCOPE = {
@@ -10,13 +10,6 @@ const DASHBOARD_SCOPE = {
 } as const;
 
 export type DashboardScope = typeof DASHBOARD_SCOPE[keyof typeof DASHBOARD_SCOPE];
-
-interface DefaultFilter {
-    projects?: string[];
-    project_groups?: string[];
-    service_accounts?: string[];
-    provider?: string[];
-}
 
 
 export const CHART_TYPE = Object.freeze({
@@ -35,7 +28,7 @@ export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 export interface WidgetOptions {
     stack?: boolean;
     granularity?: Granularity;
-    filters?: CostQueryFilters;
+    filters?: CostFiltersMap;
     period?: Period;
     group_by?: string | GroupBy;
     chart_type?: ChartType;
@@ -56,7 +49,7 @@ export interface DashboardItem {
     created_at: TimeStamp;
     updated_at: TimeStamp;
     custom_layouts: CustomLayout[];
-    default_filter: DefaultFilter;
+    default_filter: CostFiltersMap;
     default_layout_id: string;
     domain_id?: string;
     name: string;
@@ -100,7 +93,7 @@ export interface DashboardCreateParam {
     name: string;
     default_layout_id?: string;
     custom_layouts?: CustomLayout[];
-    default_filter?: DefaultFilter;
+    default_filter?: CostFiltersMap;
     period_type: PeriodType;
     period?: Period;
     tags?: Tags;

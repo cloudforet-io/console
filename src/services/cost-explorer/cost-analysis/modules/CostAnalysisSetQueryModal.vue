@@ -70,8 +70,8 @@ import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { getInitialDates } from '@/services/cost-explorer/cost-analysis/lib/helper';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { getInitialDates } from '@/services/cost-explorer/lib/helper';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { Granularity } from '@/services/cost-explorer/type';
 
