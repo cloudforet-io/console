@@ -7,14 +7,15 @@
             <div class="col-span-12 title">
                 <span>{{ $t('COMMON.WIDGETS.BILLING.TREND_TITLE') }}</span>
                 <div class="date-button-group">
-                    <p-button v-for="(d, idx) in dateTypes"
-                              :key="idx"
-                              class="date-button"
-                              :class="{'selected': selectedDateType === d.name}"
-                              @click="selectedDateType = d.name"
+                    <p-select-button v-for="(d, idx) in dateTypes"
+                                     :key="`date-${d.name}-${idx}`"
+                                     :class="{'selected': selectedDateType === d.name}"
+                                     style-type="gray"
+                                     size="sm"
+                                     @click="selectedDateType = d.name"
                     >
                         {{ d.label }}
-                    </p-button>
+                    </p-select-button>
                 </div>
             </div>
             <div class="col-span-12 md:col-span-9">
@@ -116,7 +117,7 @@ import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import {
-    PButton,
+    PSelectButton,
     PDataLoader,
     PCollapsibleToggle,
     PDataTable,
@@ -169,7 +170,7 @@ export default {
     components: {
         PDataLoader,
         PSkeleton,
-        PButton,
+        PSelectButton,
         PDataTable,
         PCollapsibleToggle,
         PIconButton,
@@ -592,18 +593,9 @@ export default {
             position: absolute;
             right: 0.5rem;
             top: 0;
-            .date-button {
-                @apply border border-gray-200 text-gray-300 rounded-xs;
-                height: 1.25rem;
-                min-width: 2rem;
-                line-height: 1.25rem;
-                font-size: 0.75rem;
-                font-weight: normal;
-                padding: 0.25rem;
-                margin-left: 0.25rem;
-                &.selected {
-                    @apply bg-gray-600 border-gray-600 text-white;
-                }
+            .p-select-button {
+                margin-right: 0.375rem;
+                min-width: 2.4375rem;
             }
         }
     }
