@@ -8,7 +8,7 @@
                 <span>{{ $t('COMMON.WIDGETS.BILLING.TREND_TITLE') }}</span>
                 <div class="date-button-group">
                     <p-select-button v-for="(d, idx) in dateTypes"
-                                     :key="idx"
+                                     :key="`date-${d.name}-${idx}`"
                                      :class="{'selected': selectedDateType === d.name}"
                                      style-type="gray"
                                      size="sm"
