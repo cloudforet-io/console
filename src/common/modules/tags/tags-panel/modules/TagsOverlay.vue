@@ -137,7 +137,7 @@ export default {
         min-height: 100%;
         border: none;
         .page-nav {
-            @apply my-6 ml-8;
+            @apply mt-6 ml-8;
             flex-shrink: 0;
             .left {
                 @apply flex;
@@ -168,7 +168,7 @@ export default {
             overflow-y: auto;
         }
         .buttons {
-            @apply flex mt-8 mb-8 pr-12 justify-end;
+            @apply flex mb-8 pr-6 justify-end;
             .p-button {
                 @apply ml-4;
             }
