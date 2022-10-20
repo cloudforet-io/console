@@ -280,7 +280,9 @@ export const useQuerySearch = (props: QuerySearchProps, options: QuerySearchOpti
             return refineQueryItem({ label: state.searchText, name: state.searchText });
         }
 
-        if (state.searchText) await findAndSetKey(state.searchText, true);
+        if (state.searchText) {
+            return refineQueryItem({ label: state.searchText, name: state.searchText });
+        }
         return undefined;
     };
 
