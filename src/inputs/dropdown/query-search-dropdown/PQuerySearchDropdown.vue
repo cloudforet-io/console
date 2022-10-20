@@ -147,8 +147,6 @@ export default defineComponent<QuerySearchDropdownProps>({
 
         /* util */
         const selectItem = (queryItem: QueryItem) => {
-            const duplicatedIndex = state.proxySelected.findIndex(item => item.key.label === queryItem.key?.label || item.key.name === queryItem.key?.name);
-            if (duplicatedIndex !== -1) state.proxySelected.splice(duplicatedIndex, 1);
             if (props.multiSelectable) {
                 state.proxySelected = [...state.proxySelected, queryItem];
             } else {
@@ -245,9 +243,6 @@ export default defineComponent<QuerySearchDropdownProps>({
             position: relative;
             height: 1rem;
             width: 1rem;
-            &:hover {
-                @apply bg-gray-200;
-            }
         }
         .dropdown-button {
             @apply cursor-pointer inline-block flex-shrink-0 rounded-full;
