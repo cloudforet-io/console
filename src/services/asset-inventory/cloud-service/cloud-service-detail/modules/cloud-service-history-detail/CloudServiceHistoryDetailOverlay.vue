@@ -10,7 +10,7 @@
                             <p-divider :vertical="true" />
                         </template>
                         <span class="label-text">Resource ID: </span>
-                        <p-copy-button class="value-text">
+                        <p-copy-button>
                             {{ resourceId }}
                         </p-copy-button>
                     </div>
@@ -272,10 +272,6 @@ export default defineComponent<Props>({
                 align-items: center;
                 float: right;
                 font-size: 0.875rem;
-                .value-text {
-                    @apply truncate;
-                    width: 16ch;
-                }
                 .p-divider {
                     margin: 0 0.75rem;
                     height: 0.875rem;
@@ -308,6 +304,7 @@ export default defineComponent<Props>({
                     }
                     .total-count {
                         @apply text-gray-500;
+                        padding-left: 0.25rem;
                     }
                 }
                 .timeline-wrapper {
