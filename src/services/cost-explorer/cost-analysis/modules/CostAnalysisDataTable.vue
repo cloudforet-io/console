@@ -41,10 +41,11 @@
             <span v-else-if="typeof value !== 'string'" class="text-center">
                 <p-anchor :to="value ? getLink(item, field.name) : undefined"
                           :icon-visible="false"
+                          class="!align-middle"
                 >
                     <template v-if="getIsRaised(item, field.name)">
                         <span class="cell-text raised">{{ currencyMoneyFormatter(value, currency, currencyRates, true) }}</span>
-                        <p-i name="ic_bold-arrow-up" width="0.75rem" />
+                        <p-i name="ic_bold-arrow-up" width="0.75rem" height="0.75rem" />
                     </template>
                     <template v-else>
                         {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
@@ -262,11 +263,11 @@ export default {
                 },
             };
         };
-        const getIsRaised = (item: CostAnalyzeModel, fieldName: string) => {
-            const currDate = fieldName.split('.')[1]; // usd_cost.2022-01-04
-            const prevDate = dayjs.utc(currDate).subtract(1, state.timeUnit).format(state.dateFormat);
-            const currValue = item.usd_cost[currDate];
-            const prevValue = item.usd_cost[prevDate];
+        const getIsRaised = (item: CostAnalyzeModel, fieldName: string): boolean => {
+            const currDate: string = fieldName.split('.')[1]; // usd_cost.2022-01-04
+            const prevDate: string = dayjs.utc(currDate).subtract(1, state.timeUnit).format(state.dateFormat);
+            const currValue: number|undefined = item.usd_cost[currDate];
+            const prevValue: number|undefined = item.usd_cost[prevDate];
 
             if (prevValue === undefined || currValue === undefined) return false;
             if (currValue < prevValue) return false;
