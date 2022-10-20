@@ -1,3 +1,10 @@
+# [1.1.0-beta.431](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.430...v1.1.0-beta.431) (2022-10-20)
+
+
+### Bug Fixes
+
+* **query-search-dropdown:** fix design issue & duplicate selected issue rollback ([#102](https://github.com/cloudforet-io/mirinae/issues/102)) ([013b6ee](https://github.com/cloudforet-io/mirinae/commit/013b6ee39c36ae8f8ae10c0f0224485f13a6b400))
+
 # [1.1.0-beta.430](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.429...v1.1.0-beta.430) (2022-10-20)
 
 
