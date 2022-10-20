@@ -47,6 +47,8 @@ export interface BudgetNotifications {
 	notification_type: BudgetNotificationsType;
 }
 
+export type CostTypes = Partial<Record<CostType, string[]>>;
+
 export interface BudgetData {
 	budget_id: string;
 	name: string;
@@ -56,7 +58,7 @@ export interface BudgetData {
 	planned_limits: BudgetPlannedLimit[];
 	total_usage_usd_cost: number;
 	monthly_costs?: BudgetMonthlyCost[];
-	cost_types?: Partial<Record<CostType, string[]>>;
+	cost_types?: CostTypes;
 	time_unit: BudgetTimeUnit;
 	start: string;
 	end: string;
