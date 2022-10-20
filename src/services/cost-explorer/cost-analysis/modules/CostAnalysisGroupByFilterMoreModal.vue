@@ -9,26 +9,24 @@
         <template #body>
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_TAG')" required>
                 <template #label-extra>
-                    <span>({{ selectedTags.length }})</span>
+                    <span class="font-normal">({{ selectedTags.length }})</span>
                 </template>
                 <p-search-dropdown
                     :handler="tagsMenuHandler"
                     :selected.sync="selectedTags"
                     use-fixed-menu-style
                     multi-selectable
-                    :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SEARCH_PLACEHOLDER')"
                 />
             </p-field-group>
-            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_ADDITIONAL_FIELD')" required>
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ADDITIONAL_INFO')" required>
                 <template #label-extra>
-                    <span>({{ selectedAdditionalInfo.length }})</span>
+                    <span class="font-normal">({{ selectedAdditionalInfo.length }})</span>
                 </template>
                 <p-search-dropdown
                     :handler="additionalInfoMenuHandler"
                     :selected.sync="selectedAdditionalInfo"
                     use-fixed-menu-style
                     multi-selectable
-                    :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SEARCH_PLACEHOLDER')"
                 />
             </p-field-group>
         </template>
