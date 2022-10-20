@@ -1,3 +1,10 @@
+# [1.1.0-beta.429](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.428...v1.1.0-beta.429) (2022-10-20)
+
+
+### Bug Fixes
+
+* **query-search:** fix keyword search bug ([#97](https://github.com/cloudforet-io/mirinae/issues/97)) ([4b7a23b](https://github.com/cloudforet-io/mirinae/commit/4b7a23b8fae9c61a16e6be24b7d48a75c9f48220))
+
 # [1.1.0-beta.428](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.427...v1.1.0-beta.428) (2022-10-19)
 
 
