@@ -27,18 +27,15 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import type { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
+import type { BudgetData, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/type';
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
-import {
-    getConvertedFilter,
-} from '@/services/cost-explorer/lib/helper';
-import type { CostQueryFilters, Granularity } from '@/services/cost-explorer/type';
+import type { Granularity } from '@/services/cost-explorer/type';
 
 
 interface Props {
     projectId?: string;
     projectGroupId?: string;
-    costTypes?: CostQueryFilters;
+    costTypes?: CostTypes;
     timeUnit: BudgetTimeUnit;
 }
 
@@ -114,6 +111,22 @@ export default {
             }),
         });
 
+        /* Util */
+        const getConvertedFilter = (costTypes: CostTypes): QueryStoreFilter[] => {
+            const results: QueryStoreFilter[] = [];
+            Object.entries(costTypes).forEach(([type, values]) => {
+                if (values?.length) {
+                    results.push({
+                        k: type,
+                        v: values,
+                        o: '=',
+                    });
+                }
+            });
+            return results;
+        };
+
+        /* Api */
         const getRecentBudgets = async () => {
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze(state.budgetListParams);
