@@ -177,16 +177,12 @@ export default defineComponent<Props>({
 
 
         const getDataListWithSchema = async () => {
-            state.dataLoading = true;
-
             const results: any[] = await Promise.allSettled(state.chartWidgetSchemaList.map(schema => fetchDataWithSchema(schema)));
 
             state.chartDataList = results.map((d) => {
                 if (d.status === 'fulfilled') return d.value;
                 return [];
             });
-
-            state.dataLoading = false;
         };
 
         /* Component Props */
@@ -205,27 +201,36 @@ export default defineComponent<Props>({
 
 
         /* Watchers */
-        watch(() => props.visible, (visible) => {
-            if (visible !== state.proxyVisible) state.proxyVisible = visible;
-        });
-
-        watch([() => props.filters, () => state.proxyVisible], async ([filters, visible]) => {
-            if (visible) {
-                const { filter, keyword } = queryHelper.setFilters(filters as QueryStoreFilter[]).apiQuery;
-
-                state.apiQuery.filter = filter;
-                state.apiQuery.keyword = keyword;
-                state.queryTags = queryHelper.queryTags;
-                await getDataListWithSchema();
-            } else {
-                state.chartDataList = [];
+        watch([() => state.proxyVisible, () => props.schemaList, () => props.filters], async ([visible, schemaList, filters], [, prevSchemaList, prevFilters]) => {
+            if (!visible) {
+                if (schemaList !== prevSchemaList) state.chartDataList = [];
+                state.dataLoading = true;
+                return;
             }
+
+            if (filters === prevFilters) {
+                return;
+            }
+
+            if (!state.dataLoading) state.dataLoading = true;
+            const { filter, keyword } = queryHelper.setFilters(filters).apiQuery;
+
+            state.apiQuery.filter = filter;
+            state.apiQuery.keyword = keyword;
+            state.queryTags = queryHelper.queryTags;
+            await getDataListWithSchema();
+            state.dataLoading = false;
         }, { immediate: true });
 
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/loadAll');
-        })();
+
+        let initiated = false;
+        watch(() => props.visible, async (visible) => {
+            if (visible !== state.proxyVisible) state.proxyVisible = visible;
+            if (!initiated) {
+                await store.dispatch('reference/loadAll');
+                initiated = true;
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
