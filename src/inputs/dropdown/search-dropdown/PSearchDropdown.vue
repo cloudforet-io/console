@@ -60,6 +60,7 @@
                         @keyup:up:end="focusSearch"
                         @keyup:esc="focusSearch"
                         @focus="onFocusMenuItem"
+                        @click-done="forceHideMenu"
         >
             <template #item--format="{item}">
                 <span class="p-search-dropdown__item-label">

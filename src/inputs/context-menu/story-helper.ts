@@ -21,6 +21,7 @@ const events: [string, string][] = [
     ['keyup:down:end', 'This event is emitted when a menu item is tracked through the arrow down key, and the down key is pressed at the last menu item.'],
     ['keyup:esc', 'This event is emitted when a esc key is pressed.'],
     ['click-button', 'This event is emitted when the button(in the item whose type is button) is clicked. As arguments, item, index and click event will be passed.'],
+    ['click-done', 'This event is emitted when the done-button(in multi-selectable case) is clicked.'],
 ];
 
 const getArgTypes = (category: string, info: [string, string][]) => {
