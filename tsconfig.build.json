@@ -3,7 +3,6 @@
   "compilerOptions": {
     "declaration": true,
     "outDir": "dist",
-    "types": ["webpack-env"],
     "paths": {
       "@/*": ["src/*", "packages/cloudforet/core-lib/dist/*"],
       "@cloudforet/*": ["packages/cloudforet/*"],
