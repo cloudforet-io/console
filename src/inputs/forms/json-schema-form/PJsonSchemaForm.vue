@@ -84,24 +84,24 @@ import { isEmpty } from 'lodash';
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
-import GenerateIdFormat from '@/inputs/forms/new-json-schema-form/components/GenerateIdFormat.vue';
-import { useLocalize } from '@/inputs/forms/new-json-schema-form/composables/localize';
-import { useValidation } from '@/inputs/forms/new-json-schema-form/composables/validation';
-import { addCustomFormats, addCustomKeywords } from '@/inputs/forms/new-json-schema-form/custom-schema';
+import GenerateIdFormat from '@/inputs/forms/json-schema-form/components/GenerateIdFormat.vue';
+import { useLocalize } from '@/inputs/forms/json-schema-form/composables/localize';
+import { useValidation } from '@/inputs/forms/json-schema-form/composables/validation';
+import { addCustomFormats, addCustomKeywords } from '@/inputs/forms/json-schema-form/custom-schema';
 import {
     getComponentNameBySchemaProperty,
     getInputPlaceholderBySchemaProperty,
     getInputTypeBySchemaProperty, getMenuItemsBySchemaProperty,
     initFormDataWithSchema, initJsonInputDataWithSchema, initRefinedFormData, refineObjectByProperties,
     refineValueByProperty,
-} from '@/inputs/forms/new-json-schema-form/helper';
+} from '@/inputs/forms/json-schema-form/helper';
 import type {
     InnerJsonSchema,
     JsonSchema,
     JsonSchemaFormProps,
     ValidationMode,
-} from '@/inputs/forms/new-json-schema-form/type';
-import { VALIDATION_MODES } from '@/inputs/forms/new-json-schema-form/type';
+} from '@/inputs/forms/json-schema-form/type';
+import { VALIDATION_MODES } from '@/inputs/forms/json-schema-form/type';
 import PTextInput from '@/inputs/input/PTextInput.vue';
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 import type { SupportLanguage } from '@/translations';

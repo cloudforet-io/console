@@ -66,7 +66,7 @@ export { default as PDefinition } from './data-display/tables/definition-table/d
 export { default as PSelectDropdown } from './inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 export { default as PDynamicField } from './data-display/dynamic/dynamic-field/PDynamicField.vue';
 export { default as PDynamicLayout } from './data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
-export { default as PJsonSchemaForm } from './inputs/forms/new-json-schema-form/PJsonSchemaForm.vue';
+export { default as PJsonSchemaForm } from './inputs/forms/json-schema-form/PJsonSchemaForm.vue';
 export { default as PHorizontalLayout } from './layouts/horizontal-layout/PHorizontalLayout.vue';
 export { default as PToolboxGridLayout } from './others/deprecated/toolbox-grid-layout/PToolboxGridLayout.vue';
 export { default as PVerticalLayout } from './layouts/vertical-layout/PVerticalLayout.vue';

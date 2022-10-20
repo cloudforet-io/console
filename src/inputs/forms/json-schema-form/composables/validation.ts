@@ -8,7 +8,7 @@ import type Ajv from 'ajv';
 import type { Localize } from 'ajv-i18n/localize/types';
 import { isEmpty } from 'lodash';
 
-import type { JsonSchemaFormProps, InnerJsonSchema } from '@/inputs/forms/new-json-schema-form/type';
+import type { JsonSchemaFormProps, InnerJsonSchema } from '@/inputs/forms/json-schema-form/type';
 
 const getErrorMessage = ({ instancePath, message, params }: ErrorObject) => {
     const dataKey = instancePath.slice(1).replace('/', '.');

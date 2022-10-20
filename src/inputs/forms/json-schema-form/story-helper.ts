@@ -1,7 +1,7 @@
 import type { ArgTypes } from '@storybook/addons';
 
-import { getDefaultFormData, getDefaultSchema } from '@/inputs/forms/new-json-schema-form/mock';
-import { VALIDATION_MODES } from '@/inputs/forms/new-json-schema-form/type';
+import { getDefaultFormData, getDefaultSchema } from '@/inputs/forms/json-schema-form/mock';
+import { VALIDATION_MODES } from '@/inputs/forms/json-schema-form/type';
 import { supportLanguages } from '@/translations';
 
 export const getJsonSchemaFormArgTypes = (): ArgTypes => ({

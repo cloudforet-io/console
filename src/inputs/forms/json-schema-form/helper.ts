@@ -1,7 +1,7 @@
 import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
 import type {
     JsonSchema, InnerJsonSchema, ComponentName, TextInputType,
-} from '@/inputs/forms/new-json-schema-form/type';
+} from '@/inputs/forms/json-schema-form/type';
 
 export const NUMERIC_TYPES = ['number', 'integer'];
 

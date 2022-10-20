@@ -2,7 +2,7 @@ import { reactive, toRefs, watch } from 'vue';
 
 import type { Localize } from 'ajv-i18n/localize/types';
 
-import type { JsonSchemaFormProps } from '@/inputs/forms/new-json-schema-form/type';
+import type { JsonSchemaFormProps } from '@/inputs/forms/json-schema-form/type';
 import type { SupportLanguage } from '@/translations';
 
 export const LOCALIZE_LOADERS: Record<SupportLanguage, () => Promise<Localize>> = {
