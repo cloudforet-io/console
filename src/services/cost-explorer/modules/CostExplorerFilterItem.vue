@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="cost-explorer-filter-item">
         <project-select-dropdown v-if="category === FILTER.PROJECT"
                                  multi-selectable
                                  project-selectable
@@ -22,6 +22,7 @@
         />
         <p-query-search-dropdown
             v-else-if="category === FILTER.TAGS || category === FILTER.ADDITIONAL_INFO"
+            class="query-search-dropdown"
             :key-item-sets="querySearchHandlerState.keyItemSets"
             :value-handler-map="querySearchHandlerState.valueHandlerMap"
             :selected="querySearchHandlerState.selectedQueryItems"
@@ -265,3 +266,14 @@ export default {
     },
 };
 </script>
+
+<style lang="postcss" scoped>
+.cost-explorer-filter-item {
+    /* custom p-query-search-dropdown */
+    :deep(.query-search-dropdown) {
+        .input-wrapper {
+            word-break: initial;
+        }
+    }
+}
+</style>
