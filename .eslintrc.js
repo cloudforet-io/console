@@ -7,7 +7,7 @@ module.exports = {
 
     extends: [
         'plugin:@typescript-eslint/recommended',
-        // 'plugin:vue/recommended',
+        'plugin:vue/recommended',
         // '@vue/airbnb',
         '@vue/typescript',
         'plugin:import/recommended',
@@ -20,7 +20,7 @@ module.exports = {
         'max-len': ['error', { code: 200 }],
         // 'no-console': import.meta.env.MODE === 'production' ? 'error' : 'off',
         // 'no-debugger': import.meta.env.MODE === 'production' ? 'error' : 'off',
-        // 'vue/html-indent': ['error', 4],
+        'vue/html-indent': ['error', 4],
         indent: ['error', 4],
         'prefer-destructuring': ['error', { object: false, array: false }],
         radix: ['error', 'as-needed'],
