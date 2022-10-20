@@ -203,22 +203,28 @@ export default defineComponent<Props>({
         /* Watchers */
         watch([() => state.proxyVisible, () => props.schemaList, () => props.filters], async ([visible, schemaList, filters], [, prevSchemaList, prevFilters]) => {
             if (!visible) {
+                // If the schema is the same, do not flush the data.
+                // We can reuse the data if the filters are the same.
                 if (schemaList !== prevSchemaList) state.chartDataList = [];
+
+                // Show users loading UI at the first time.
                 state.dataLoading = true;
                 return;
             }
 
-            if (filters === prevFilters) {
-                return;
-            }
+            // Do not get data if filters are the same with the previous one.
+            if (filters === prevFilters) return;
 
+            // set filters and get data
             if (!state.dataLoading) state.dataLoading = true;
+
             const { filter, keyword } = queryHelper.setFilters(filters).apiQuery;
 
             state.apiQuery.filter = filter;
             state.apiQuery.keyword = keyword;
             state.queryTags = queryHelper.queryTags;
             await getDataListWithSchema();
+
             state.dataLoading = false;
         }, { immediate: true });
 
