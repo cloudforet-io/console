@@ -273,10 +273,10 @@ export default {
             if (currValue < prevValue) return false;
             if (currValue > 0) {
                 if (prevValue < 0) return true;
-                if (currValue - prevValue > 0) return ((currValue - prevValue) / currValue) * 100 > 50;
+                if (currValue - prevValue > 0) return ((currValue - prevValue) / currValue) * 100 >= 50;
             }
             if (currValue < 0 && currValue > prevValue) {
-                return currValue * 2 > prevValue;
+                return currValue * 2 >= prevValue;
             }
             return false;
         };
