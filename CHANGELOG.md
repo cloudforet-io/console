@@ -1,3 +1,10 @@
+# [1.1.0-beta.430](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.429...v1.1.0-beta.430) (2022-10-20)
+
+
+### Bug Fixes
+
+* **search-dropdown:** fix done-button not working issue ([#98](https://github.com/cloudforet-io/mirinae/issues/98)) ([e6277b0](https://github.com/cloudforet-io/mirinae/commit/e6277b0663f3585442fe49ee2fbe270369386317))
+
 # [1.1.0-beta.429](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.428...v1.1.0-beta.429) (2022-10-20)
 
 
