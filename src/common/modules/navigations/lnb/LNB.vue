@@ -133,6 +133,8 @@ export default {
     .top-title {
         @apply text-gray-800 font-bold flex justify-between items-center;
         font-size: 0.75rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
         padding-left: 0.5rem;
         .icon-label-wrapper {
             @apply flex items-center;
