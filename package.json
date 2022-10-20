@@ -8,7 +8,7 @@
     "serve": "vite",
     "serve:init": "npm install && npm run build --workspace=@cloudforet/core-lib && npm run serve",
     "serve:wipe": "rm -rf ./node_modules && rm -rf packages/cloudforet/core-lib/node_modules && npm run serve:init",
-    "build": "NODE_OPTIONS=--max_old_space_size=4096 vue-cli-service build",
+    "build": "NODE_OPTIONS=--max_old_space_size=8192 vite build",
     "build:watch:core": "cd packages/cloudforet/core-lib && npm run build:watch --workpsace=@cloudforet/core-lib",
     "test:unit": "vue-cli-service test:unit",
     "test:unit:watch": "vue-cli-service test:unit --watchAll",
