@@ -36,7 +36,7 @@ import CostAnalysisQueryFilter from '@/services/cost-explorer/cost-analysis/modu
 import type { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/cost-analysis/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type {
-    CostQuerySetModel, CostQuerySetOption, Granularity, GroupBy,
+    CostQuerySetModel, CostQuerySetOption, Granularity,
 } from '@/services/cost-explorer/type';
 
 
@@ -80,7 +80,8 @@ export default {
             granularity: queryStringToString(urlQuery.granularity) as Granularity,
             stack: queryStringToBoolean(urlQuery.stack),
             group_by: queryStringToArray(urlQuery.groupBy),
-            primary_group_by: queryStringToString(urlQuery.primaryGroupBy) as GroupBy,
+            primary_group_by: queryStringToString(urlQuery.primaryGroupBy) as string,
+            more_group_by: queryStringToArray(urlQuery.moreGroupBy),
             period: queryStringToObject(urlQuery.period),
             filters: queryStringToObject(urlQuery.filters),
         });
@@ -110,6 +111,7 @@ export default {
                     stack: primitiveToQueryString(options.stack),
                     groupBy: arrayToQueryString(options.groupBy),
                     primaryGroupBy: primitiveToQueryString(options.primaryGroupBy),
+                    moreGroupBy: arrayToQueryString(options.moreGroupBy),
                     period: objectToQueryString(options.period),
                     filters: objectToQueryString(options.filters),
                 };

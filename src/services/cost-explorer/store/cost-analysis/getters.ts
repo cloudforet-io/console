@@ -15,14 +15,15 @@ export const selectedQuerySet: Getter<CostAnalysisStoreState, any> = ({ selected
     return costQueryList.find(item => item.cost_query_set_id === selectedQueryId);
 };
 
-type QuerySetOptions = Pick<CostAnalysisStoreState, 'stack'|'granularity'|'groupBy'|'primaryGroupBy'|'period'|'filters'>;
+type QuerySetOptions = Pick<CostAnalysisStoreState, 'stack'|'granularity'|'groupBy'|'primaryGroupBy'|'moreGroupBy'|'period'|'filters'>;
 export const currentQuerySetOptions: Getter<CostAnalysisStoreState, any> = ({
-    stack, granularity, groupBy, primaryGroupBy, period, filters,
+    stack, granularity, groupBy, primaryGroupBy, moreGroupBy, period, filters,
 }): QuerySetOptions => ({
     stack,
     granularity,
     groupBy,
     primaryGroupBy,
+    moreGroupBy,
     period,
     filters,
 });
