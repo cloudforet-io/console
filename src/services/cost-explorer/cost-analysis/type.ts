@@ -2,7 +2,7 @@ import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type { CostAnalysisPageUrlQueryKey } from '@/services/cost-explorer/cost-analysis/lib/config';
 import type {
-    Period, Granularity, GroupBy, CostFiltersMap,
+    Period, Granularity, GroupBy, CostFiltersMap, MoreGroupByItem,
 } from '@/services/cost-explorer/type';
 
 
@@ -11,7 +11,8 @@ export type CostAnalysisPageUrlQuery = Partial<Record<CostAnalysisPageUrlQueryKe
 export interface CostAnalysisPageQueryValue {
     period?: Period;
     groupBy?: GroupBy[];
-    primaryGroupBy?: GroupBy;
+    primaryGroupBy?: GroupBy | string;
+    moreGroupBy?: MoreGroupByItem[];
     filters?: CostFiltersMap;
     stack?: boolean;
     granularity?: Granularity;
