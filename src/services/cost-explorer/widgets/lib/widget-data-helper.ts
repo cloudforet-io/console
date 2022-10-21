@@ -47,7 +47,7 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
  * @description Extract legends from raw data.
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary
  */
-export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity, groupBy?: GroupBy): Legend[] => {
+export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity, groupBy?: GroupBy | string): Legend[] => {
     if (groupBy) {
         let _groupBy: string = groupBy;
         // Parsing to match api data (ex. tags.Name -> tags_Name)
@@ -113,7 +113,7 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
  * @usage AWSCloudFrontCost
  * @example ('project-111111', 'project_id') => 'SpaceOne Dev Project'
  */
-export const getReferenceLabel = (data: string, groupBy: GroupBy): string => {
+export const getReferenceLabel = (data: string, groupBy: GroupBy | string): string => {
     if (!data) return 'Unknown';
     const _providers = store.getters['reference/providerItems'];
     const _serviceAccounts = store.getters['reference/serviceAccountItems'];
@@ -136,7 +136,7 @@ export const getReferenceLabel = (data: string, groupBy: GroupBy): string => {
  *       => [{ category: 'aws', value: 100 }, { category: 'azure', value: 30 }]
  * @usage SpcProjectWiseUsageSummary, CostAnalysisChart
  */
-export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GroupBy): PieChartData[] => {
+export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GroupBy | string): PieChartData[] => {
     let chartData: PieChartData[] = [];
     if (groupBy) {
         let _groupBy: string = groupBy;
@@ -193,7 +193,7 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GroupBy):
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary, LastMonthTotalSpend, BudgetSummaryChart
  */
 export const getXYChartData = (
-    rawData: CostAnalyzeModel[], granularity: Granularity, period: Period, groupBy?: GroupBy, valueKey = 'usd_cost',
+    rawData: CostAnalyzeModel[], granularity: Granularity, period: Period, groupBy?: GroupBy | string, valueKey = 'usd_cost',
 ): XYChartData[] => {
     const chartData: XYChartData[] = [];
     const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));

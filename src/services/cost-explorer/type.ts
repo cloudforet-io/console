@@ -22,7 +22,7 @@ export type CostFiltersMap = Record<Filter, FilterItem[]>;
 
 export interface CostQuerySetOption {
     group_by?: GroupBy[];
-    primary_group_by?: GroupBy;
+    primary_group_by?: GroupBy | string;
     more_group_by: MoreGroupByItem[];
     granularity: Granularity;
     stack?: boolean;
