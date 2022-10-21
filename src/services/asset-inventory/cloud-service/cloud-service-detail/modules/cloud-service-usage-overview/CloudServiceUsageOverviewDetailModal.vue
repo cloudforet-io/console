@@ -177,16 +177,20 @@ export default defineComponent<Props>({
 
 
         const getDataListWithSchema = async () => {
-            state.dataLoading = true;
-
             const results: any[] = await Promise.allSettled(state.chartWidgetSchemaList.map(schema => fetchDataWithSchema(schema)));
 
             state.chartDataList = results.map((d) => {
                 if (d.status === 'fulfilled') return d.value;
                 return [];
             });
+        };
 
-            state.dataLoading = false;
+        const setFilters = (filters: QueryStoreFilter[]) => {
+            const { filter, keyword } = queryHelper.setFilters(filters).apiQuery;
+
+            state.apiQuery.filter = filter;
+            state.apiQuery.keyword = keyword;
+            state.queryTags = queryHelper.queryTags;
         };
 
         /* Component Props */
@@ -205,27 +209,36 @@ export default defineComponent<Props>({
 
 
         /* Watchers */
-        watch(() => props.visible, (visible) => {
-            if (visible !== state.proxyVisible) state.proxyVisible = visible;
-        });
+        watch([() => state.proxyVisible, () => props.schemaList, () => props.filters], async ([visible, schemaList, filters], [, prevSchemaList, prevFilters]) => {
+            if (!visible) {
+                // If the schema is the same, do not flush the data.
+                // We can reuse the data if the filters are the same.
+                if (schemaList !== prevSchemaList) state.chartDataList = [];
 
-        watch([() => props.filters, () => state.proxyVisible], async ([filters, visible]) => {
-            if (visible) {
-                const { filter, keyword } = queryHelper.setFilters(filters as QueryStoreFilter[]).apiQuery;
-
-                state.apiQuery.filter = filter;
-                state.apiQuery.keyword = keyword;
-                state.queryTags = queryHelper.queryTags;
-                await getDataListWithSchema();
-            } else {
-                state.chartDataList = [];
+                // Show users loading UI at the first time.
+                state.dataLoading = true;
+                return;
             }
+
+            // Do not get data if filters are the same with the previous one.
+            if (filters === prevFilters) return;
+
+            // set filters and get data
+            if (!state.dataLoading) state.dataLoading = true;
+            setFilters(filters);
+            await getDataListWithSchema();
+            state.dataLoading = false;
         }, { immediate: true });
 
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/loadAll');
-        })();
+
+        let initiated = false;
+        watch(() => props.visible, async (visible) => {
+            if (visible !== state.proxyVisible) state.proxyVisible = visible;
+            if (!initiated) {
+                await store.dispatch('reference/loadAll');
+                initiated = true;
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
