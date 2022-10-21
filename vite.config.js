@@ -10,6 +10,10 @@ export default defineConfig({
     server: {
         port: 8080,
     },
+    test: {
+        globals: true,
+        environment: 'jsdom',
+    },
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),

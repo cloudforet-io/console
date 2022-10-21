@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "types": ["vitest/globals"],
     "paths": {
       "@/*": ["src/*", "packages/cloudforet/core-lib/src/*"],
       "@cloudforet/*": ["packages/cloudforet/*"],
