@@ -31,7 +31,7 @@
         <transition name="slide-up">
             <tags-overlay v-if="tagEditPageVisible"
                           :title="overlayTitle"
-                          :tags="isCustomMode ? customTags : tags"
+                          :tags="tags"
                           :resource-id="resourceId"
                           :resource-key="resourceKey" :resource-type="resourceType"
                           :loading="loading"
@@ -101,10 +101,6 @@ export default {
             type: String as PropType<TranslateResult|string|undefined>,
             default: undefined,
         },
-        customTags: {
-            type: Object,
-            default: undefined,
-        },
         customFields: {
             type: Array,
             default: undefined,
@@ -121,7 +117,7 @@ export default {
         const state = reactive({
             loading: true,
             tags: {},
-            isCustomMode: computed<boolean>(() => props.customTags && props.customItems && props.customFields),
+            isCustomMode: computed<boolean>(() => props.customItems && props.customFields),
             fields: computed(() => [
                 { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
                 { name: 'value', label: i18n.t('COMMON.TAGS.VALUE'), type: 'item' },
@@ -186,10 +182,8 @@ export default {
 
         watch([() => props.resourceKey, () => props.resourceId, () => props.resourceType],
             async ([resourceKey, resourceId, resourceType]) => {
-                if (resourceKey && resourceId && resourceType && !state.isCustomMode) {
+                if (resourceKey && resourceId && resourceType) {
                     await getTags();
-                } else {
-                    state.loading = false;
                 }
             }, { immediate: true });
 

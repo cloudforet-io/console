@@ -7,7 +7,6 @@
                 :overlay-title="$t('INVENTORY.CLOUD_SERVICE.PAGE.CUSTOM_TAGS')"
                 :custom-fields="fields"
                 :custom-items="items"
-                :custom-tags="tags"
                 @tags-updated="handleTagsUpdated"
     >
         <template #table-top>
@@ -88,13 +87,6 @@ export default {
             providers: computed(() => store.getters['reference/provider/fieldItems']?.options),
             selectedTagType: 'all',
             cloudServiceTagList: [],
-            tags: computed(() => {
-                const tagObject = {};
-                (state.cloudServiceTagList ?? []).forEach((tag) => {
-                    tagObject[tag.key] = tag.value;
-                });
-                return tagObject;
-            }),
             fields: computed(() => [
                 { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
                 { name: 'value', label: i18n.t('COMMON.TAGS.VALUE'), type: 'item' },
