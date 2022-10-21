@@ -25,76 +25,13 @@
                                                 @rendered="handleChartRendered"
             />
         </section>
-        <section ref="queryRef" class="query-section">
-            <!--filter-->
-            <div class="title-wrapper">
-                <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER') }}</span>
-                <div v-if="!printMode" class="button-wrapper">
-                    <p-button style-type="gray-border"
-                              font-weight="normal" size="sm"
-                              :disabled="!filtersLength"
-                              @click="handleClearAllFilters"
-                    >
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CLEAR_ALL') }}
-                    </p-button>
-                    <p-icon-button
-                        name="ic_plus"
-                        style-type="gray900"
-                        size="sm"
-                        @click="handleClickSelectFilter"
-                    />
-                </div>
-            </div>
-            <div class="filter-wrapper">
-                <cost-explorer-filter-tags :print-mode="printMode"
-                                           :filters="filters"
-                                           deletable
-                                           @update-filter-tags="handleUpdateFilterTags"
-                />
-            </div>
-
-            <!--legend-->
-            <div class="title-wrapper">
-                <p-select-dropdown v-if="groupByMenuItems.length"
-                                   :items="groupByMenuItems"
-                                   :selected="primaryGroupBy"
-                                   style-type="transparent"
-                                   :read-only="printMode"
-                                   @select="handlePrimaryGroupByItem"
-                />
-                <span v-else class="title">Total Cost</span>
-                <div v-if="!printMode" class="button-wrapper">
-                    <p-button style-type="gray-border"
-                              size="sm" font-weight="normal"
-                              @click="handleToggleAllLegends"
-                    >
-                        {{ showHideAll ? $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') : $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SHOW_ALL') }}
-                    </p-button>
-                </div>
-            </div>
-            <p-data-loader :loading="loading" :data="legends" class="legend-wrapper">
-                <p v-if="legends.length > 15" class="too-many-text">
-                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOO_MANY_ITEMS') }}
-                </p>
-                <div v-for="(legend, idx) in legends" :key="`legend-${legend.name}`"
-                     class="legend"
-                     @click="handleClickLegend(idx)"
-                >
-                    <p-status :text="legend.label"
-                              :icon-color="getLegendIconColor(idx)"
-                              :text-color="getLegendTextColor(idx)"
-                    />
-                </div>
-                <template #no-data>
-                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_ITEMS') }}
-                </template>
-            </p-data-loader>
-        </section>
-        <cost-explorer-set-filter-modal v-if="!printMode"
-                                        :visible.sync="filterModalVisible"
-                                        :prev-selected-filters="filters"
-                                        :categories="CATEGORIES"
-                                        @confirm="handleConfirmFilterModal"
+        <cost-analysis-chart-query-section ref="queryRef"
+                                           :print-mode="printMode"
+                                           :loading="loading"
+                                           :legends.sync="legends"
+                                           @toggle-series="handleToggleSeries"
+                                           @show-all-series="handleAllSeries('show')"
+                                           @hide-all-series="handleAllSeries('hide')"
         />
     </div>
 </template>
@@ -106,71 +43,52 @@ import {
 } from 'vue';
 
 import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
-import {
-    PButton, PIconButton, PSelectDropdown, PStatus, PDataLoader,
-} from '@spaceone/design-system';
-import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import {
-    debounce, sum, isEmpty,
+    debounce,
 } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { store } from '@/store';
-
 
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
-
+import CostAnalysisChartQuerySection
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChartQuerySection.vue';
 import CostAnalysisPieChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue';
 import CostAnalysisStackedColumnChart
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
 import {
-    FILTER,
-    FILTER_ITEM_MAP, GRANULARITY, GROUP_BY_ITEM_MAP,
+    GRANULARITY,
 } from '@/services/cost-explorer/lib/config';
 import {
     getConvertedFilter,
 } from '@/services/cost-explorer/lib/helper';
-import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type {
-    Period, Granularity, GroupBy, CostFiltersMap, Filter,
+    Period, Granularity, GroupBy,
 } from '@/services/cost-explorer/type';
 import {
-    getLegends,
-    getPieChartData,
-    getXYChartData,
+    getLegends, getPieChartData, getXYChartData,
 } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 import type {
     Legend, PieChartData, XYChartData,
 } from '@/services/cost-explorer/widgets/type';
 
 
-const CostExplorerSetFilterModal = () => import('@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue');
-const CATEGORIES: Filter[] = Object.values(FILTER);
-
 export default {
     name: 'CostAnalysisChart',
     components: {
-        CostExplorerFilterTags,
+        CostAnalysisChartQuerySection,
         CostAnalysisStackedColumnChart,
         CostAnalysisPieChart,
-        CostExplorerSetFilterModal,
-        PButton,
-        PIconButton,
-        PSelectDropdown,
-        PStatus,
-        PDataLoader,
     },
     props: {
         printMode: {
@@ -187,46 +105,17 @@ export default {
             selectedQueryId: computed(() => costExplorerStore.state.costAnalysis.selectedQueryId),
             groupBy: computed(() => costExplorerStore.state.costAnalysis.groupBy),
             primaryGroupBy: computed(() => costExplorerStore.state.costAnalysis.primaryGroupBy),
-            moreGroupBy: computed(() => costExplorerStore.state.costAnalysis.moreGroupBy),
             //
-            noFilter: computed(() => isEmpty(state.filters) || Object.values(state.filters).every(d => !d)),
-            groupByMenuItems: computed<SelectDropdownMenu[]>(() => {
-                const groupByItems = state.groupBy.map(d => GROUP_BY_ITEM_MAP[d]);
-                const moreGroupByItems = state.moreGroupBy.filter(d => d.selected).map(d => ({
-                    name: `${d.category}.${d.key}`,
-                    label: d.key,
-                }));
-                return [...groupByItems, ...moreGroupByItems];
-            }),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            filtersLength: computed<number>(() => {
-                const selectedValues: Array<string[]> = Object.values(state.filters);
-                return sum(selectedValues.map(v => v?.length || 0));
-            }),
             //
             loading: true,
             legends: [] as Legend[],
-            showHideAll: computed(() => state.legends.some(legend => !legend.disabled)),
             chartData: [] as Array<XYChartData|PieChartData>,
             chart: null as XYChart | PieChart | null,
-            filterModalVisible: false,
             queryRef: null as null|HTMLElement,
             chartRef: null as null|HTMLElement,
         });
-
-        /* util */
-        const getLegendIconColor = (index) => {
-            const legend = state.legends[index];
-            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-            if (legend?.color) return legend.color;
-            return DEFAULT_CHART_COLORS[index];
-        };
-        const getLegendTextColor = (index) => {
-            const legend = state.legends[index];
-            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-            return null;
-        };
 
         /* api */
         let listCostAnalysisRequest: CancelTokenSource | undefined;
@@ -256,7 +145,7 @@ export default {
                 return [];
             }
         };
-        const setChartData = debounce(async (granularity: Granularity, period: Period, groupBy?: GroupBy) => {
+        const setChartData = debounce(async (granularity: Granularity, period: Period, groupBy?: GroupBy | string) => {
             state.loading = true;
 
             const rawData = await listCostAnalysisData();
@@ -270,70 +159,30 @@ export default {
         }, 300);
 
         /* event */
-        const handleClickLegend = (index) => {
+        const handleToggleSeries = (index) => {
             toggleSeries(state.chart as XYChart | PieChart, index);
-            state.legends[index].disabled = !state.legends[index]?.disabled;
         };
-        const handleToggleAllLegends = () => {
-            if (state.showHideAll) {
-                hideAllSeries(state.chart as XYChart | PieChart);
-                state.legends.forEach((d) => {
-                    d.disabled = true;
-                });
-            } else {
+        const handleAllSeries = (type) => {
+            if (type === 'show') {
                 showAllSeries(state.chart as XYChart | PieChart);
-                state.legends.forEach((d) => {
-                    d.disabled = false;
-                });
+            } else {
+                hideAllSeries(state.chart as XYChart | PieChart);
             }
-        };
-        const handlePrimaryGroupByItem = async (groupBy?: string) => {
-            costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', groupBy);
-        };
-        const handleClickSelectFilter = () => {
-            state.filterModalVisible = true;
-        };
-        const handleClearAllFilters = () => {
-            costExplorerStore.commit('costAnalysis/setFilters', {});
-        };
-        const handleConfirmFilterModal = (filters) => {
-            costExplorerStore.commit('costAnalysis/setFilters', filters);
         };
         const handleChartRendered = () => {
             if (state.chartRef && state.queryRef) emit('rendered', [state.queryRef, state.chartRef]);
         };
-        const handleUpdateFilterTags = (filters: CostFiltersMap) => {
-            costExplorerStore.commit('costAnalysis/setFilters', filters);
-        };
 
-        watch(() => state.groupByMenuItems, (after, before) => {
-            if (!after.length) {
-                costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', undefined);
-            } else if ((!before.length && after.length) || !after.filter(d => d.name === state.primaryGroupBy).length) {
-                costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', after[0].name);
-            }
-        });
         watch([() => state.granularity, () => state.period, () => state.primaryGroupBy, () => state.filters], ([granularity, period, groupBy]) => {
             setChartData(granularity, period, groupBy);
         }, { immediate: true, deep: true });
 
         return {
             ...toRefs(state),
-            FILTER_ITEM_MAP,
-            DISABLED_LEGEND_COLOR,
-            DEFAULT_CHART_COLORS,
             GRANULARITY,
-            CATEGORIES,
-            getLegendIconColor,
-            getLegendTextColor,
-            handleClickLegend,
-            handleToggleAllLegends,
-            handlePrimaryGroupByItem,
-            handleClickSelectFilter,
-            handleClearAllFilters,
-            handleConfirmFilterModal,
             handleChartRendered,
-            handleUpdateFilterTags,
+            handleToggleSeries,
+            handleAllSeries,
         };
     },
 };
@@ -350,93 +199,11 @@ export default {
         padding: 1rem 1rem 1.5rem 1rem;
         min-height: 480px;
     }
-    .query-section {
-        @apply col-span-3 bg-white rounded-md border border-gray-200;
-        .title-wrapper {
-            @apply border-b border-gray-200;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 2.5rem;
-            padding: 0.5rem 1rem;
-            .title {
-                font-size: 0.875rem;
-                font-weight: bold;
-            }
-
-            /* custom design-system component - p-select-dropdown */
-            :deep(.p-select-dropdown) {
-                .dropdown-button {
-                    font-weight: bold;
-                }
-            }
-            .button-wrapper {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-        }
-
-        .filter-wrapper {
-            height: 8rem;
-            overflow-y: auto;
-            padding: 0.75rem 1rem;
-            .p-tag {
-                margin-bottom: 0.5rem;
-            }
-        }
-        .legend-wrapper {
-            height: 16.75rem;
-            overflow-y: auto;
-            padding: 0.5rem 0;
-
-            .too-many-text {
-                @apply text-gray-400;
-                font-size: 0.75rem;
-                padding: 0 1rem 0.5rem 1rem;
-            }
-            .legend {
-                height: 25px;
-                display: flex;
-                align-items: center;
-                font-size: 0.875rem;
-                cursor: pointer;
-                padding: 0 1rem;
-
-                &:hover {
-                    @apply bg-gray-100;
-                }
-                &.disabled {
-                    @apply text-gray-300;
-                }
-
-                /* custom design-system component - p-status */
-                :deep(.p-status) {
-                    .text {
-                        white-space: nowrap;
-                    }
-                }
-            }
-        }
-    }
 
     @define-mixin row-stack {
         height: auto;
         .chart-section {
             @apply col-span-12;
-        }
-        .query-section {
-            @apply col-span-12 row-start-1;
-            .legend-wrapper {
-                height: auto;
-                padding: 0.5rem;
-                .legend {
-                    display: inline-block;
-                    .p-status {
-                        height: 100%;
-                    }
-                }
-            }
         }
     }
 

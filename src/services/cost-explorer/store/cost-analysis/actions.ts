@@ -26,10 +26,8 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
 export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit }, options: Partial<CostQuerySetOption>): void => {
     if (options.granularity) commit('setGranularity', options.granularity);
     if (typeof options.stack === 'boolean') commit('setStack', options.stack);
-    if (options.group_by?.length) {
-        commit('setGroupBy', options.group_by);
-        commit('setPrimaryGroupBy', options.primary_group_by);
-    } else commit('setPrimaryGroupBy', undefined);
+    if (options.group_by?.length) commit('setGroupBy', options.group_by);
+    if (options.primary_group_by) commit('setPrimaryGroupBy', options.primary_group_by);
     if (options.more_group_by?.length) commit('setMoreGroupBy', options.more_group_by);
     if (options.period) commit('setPeriod', { start: options.period.start, end: options.period.end });
     if (options.filters) {
@@ -62,7 +60,7 @@ export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, co
             stack,
             period,
             group_by: groupBy,
-            primary_group_by: groupBy?.length ? (primaryGroupBy || groupBy[0]) : undefined,
+            primary_group_by: primaryGroupBy,
             more_group_by: moreGroupBy,
             filters,
         };

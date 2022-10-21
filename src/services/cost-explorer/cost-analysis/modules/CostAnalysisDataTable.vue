@@ -386,7 +386,7 @@ export default {
 
         // Link for setting table widths: https://pdfmake.github.io/docs/0.1/document-definition-object/tables/
         const getPrintModeFieldSets = (): PrintModeFieldSet[] => {
-            const groupByLength = state.groupByMenuItems.length;
+            const groupByLength = tableState.groupByFields.length;
             const costFieldLength = tableState.costFields.length;
             const totalLength = costFieldLength + groupByLength;
             const costColumnCount = PRINT_MODE_MAX_COL - groupByLength;

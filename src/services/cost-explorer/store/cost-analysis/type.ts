@@ -11,7 +11,7 @@ export interface CostAnalysisStoreState {
     granularity: Granularity;
     stack: boolean;
     groupBy: GroupBy[];
-    primaryGroupBy?: GroupBy;
+    primaryGroupBy?: GroupBy | string;
     moreGroupBy: MoreGroupByItem[];
     period: Period;
     filters: CostFiltersMap;
