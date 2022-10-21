@@ -1,6 +1,10 @@
 <template>
-    <router-link v-if="show" class="gnb-sub-menu" :to="to">
-        <div class="contents">
+    <router-link
+        v-if="show"
+        class="gnb-sub-menu"
+        :to="to"
+    >
+        <div class="gnb-sub-contents">
             <span>{{ label }}</span>
             <beta-mark v-if="isBeta" />
             <new-mark v-if="isNew" />
@@ -42,7 +46,7 @@ export default {
 
 <style lang="postcss" scoped>
 .gnb-sub-menu {
-    .contents {
+    .gnb-sub-contents {
         @apply text-gray-900 rounded;
         position: relative;
         width: 100%;
