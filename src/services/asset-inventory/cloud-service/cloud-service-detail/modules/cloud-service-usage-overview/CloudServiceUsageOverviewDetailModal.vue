@@ -185,6 +185,14 @@ export default defineComponent<Props>({
             });
         };
 
+        const setFilters = (filters: QueryStoreFilter[]) => {
+            const { filter, keyword } = queryHelper.setFilters(filters).apiQuery;
+
+            state.apiQuery.filter = filter;
+            state.apiQuery.keyword = keyword;
+            state.queryTags = queryHelper.queryTags;
+        };
+
         /* Component Props */
         const fieldHandler: DynamicWidgetFieldHandler<Record<'reference', Reference>> = (field) => {
             if (field.extraData?.reference) {
@@ -217,14 +225,8 @@ export default defineComponent<Props>({
 
             // set filters and get data
             if (!state.dataLoading) state.dataLoading = true;
-
-            const { filter, keyword } = queryHelper.setFilters(filters).apiQuery;
-
-            state.apiQuery.filter = filter;
-            state.apiQuery.keyword = keyword;
-            state.queryTags = queryHelper.queryTags;
+            setFilters(filters);
             await getDataListWithSchema();
-
             state.dataLoading = false;
         }, { immediate: true });
 
