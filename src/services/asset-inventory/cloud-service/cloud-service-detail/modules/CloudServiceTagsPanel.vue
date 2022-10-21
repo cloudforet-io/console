@@ -52,6 +52,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
@@ -104,7 +105,7 @@ export default {
                 type: k.type,
                 provider: k.provider,
             }))),
-            customTags: computed(() => {
+            customTags: computed<Tag>(() => {
                 const tagObject = {};
                 (state.cloudServiceTagList ?? []).forEach((tag) => {
                     if (tag.type === CLOUD_SERVICE_TAG_TYPE.CUSTOM) {

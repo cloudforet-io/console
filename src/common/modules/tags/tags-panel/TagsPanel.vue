@@ -62,6 +62,7 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 
@@ -110,7 +111,7 @@ export default {
             default: undefined,
         },
         customTags: {
-            type: Object,
+            type: Object as PropType<Tag>,
             default: undefined,
         },
     },
