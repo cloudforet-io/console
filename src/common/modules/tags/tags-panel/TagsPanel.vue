@@ -31,7 +31,7 @@
         <transition name="slide-up">
             <tags-overlay v-if="tagEditPageVisible"
                           :title="overlayTitle"
-                          :tags="tags"
+                          :tags="isCustomMode ? customTags : tags"
                           :resource-id="resourceId"
                           :resource-key="resourceKey" :resource-type="resourceType"
                           :loading="loading"
@@ -62,6 +62,7 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 
@@ -107,6 +108,10 @@ export default {
         },
         customItems: {
             type: Array,
+            default: undefined,
+        },
+        customTags: {
+            type: Object as PropType<Tag>,
             default: undefined,
         },
     },
@@ -182,8 +187,10 @@ export default {
 
         watch([() => props.resourceKey, () => props.resourceId, () => props.resourceType],
             async ([resourceKey, resourceId, resourceType]) => {
-                if (resourceKey && resourceId && resourceType) {
+                if (resourceKey && resourceId && resourceType && !state.isCustomMode) {
                     await getTags();
+                } else {
+                    state.loading = false;
                 }
             }, { immediate: true });
 
