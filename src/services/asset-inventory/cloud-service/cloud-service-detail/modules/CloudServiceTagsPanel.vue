@@ -7,6 +7,7 @@
                 :overlay-title="$t('INVENTORY.CLOUD_SERVICE.PAGE.CUSTOM_TAGS')"
                 :custom-fields="fields"
                 :custom-items="items"
+                :custom-tags="customTags"
                 @tags-updated="handleTagsUpdated"
     >
         <template #table-top>
@@ -51,6 +52,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
@@ -103,6 +105,15 @@ export default {
                 type: k.type,
                 provider: k.provider,
             }))),
+            customTags: computed<Tag>(() => {
+                const tagObject = {};
+                (state.cloudServiceTagList ?? []).forEach((tag) => {
+                    if (tag.type === CLOUD_SERVICE_TAG_TYPE.CUSTOM) {
+                        tagObject[tag.key] = tag.value;
+                    }
+                });
+                return tagObject;
+            }),
         });
         /* event handler */
         const handleSelectTagType = (tagType) => { state.selectedTagType = tagType; };
