@@ -29,6 +29,15 @@ directive(Vue);
 Vue.use(SpaceDesignSystem);
 
 
+/** ********** WINDOW MODULES ************** */
+declare global {
+    interface Window {
+        __APP_VER__: string;
+    }
+}
+
+
+/** ********** INITIALIZE ************** */
 (async () => {
     await siteInit();
 

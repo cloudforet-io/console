@@ -1,16 +1,27 @@
 <template>
-    <div class="sign-in-left-container" :class="{ admin: isDomainOwner }">
+    <div
+        class="sign-in-left-container"
+        :class="{ admin: isDomainOwner }"
+    >
         <div class="lottie-wrapper">
-            <img v-if="signInImage" :src="signInImage">
-            <p-lottie v-else
-                      :name="isDomainOwner ? 'lottie_planet_signin' : 'lottie_floating-astronaut_signin'"
-                      auto
-                      width="100%"
-                      height="80%"
+            <img
+                v-if="signInImage"
+                :src="signInImage"
+            >
+            <p-lottie
+                v-else
+                :name="isDomainOwner ? 'lottie_planet_signin' : 'lottie_floating-astronaut_signin'"
+                auto
+                width="100%"
+                height="80%"
             />
         </div>
         <div class="version">
-            <p-badge style-type="primary" outline shape="square">
+            <p-badge
+                style-type="primary"
+                outline
+                shape="square"
+            >
                 {{ $t('COMMON.SIGN_IN.VERSION') }} {{ version }}
             </p-badge>
             <span class="help-msg">{{ $t('COMMON.SIGN_IN.NEED_HELP') }}
@@ -34,6 +45,7 @@ import {
 
 import config from '@/lib/config';
 
+
 export default {
     name: 'SignInLeftContainer',
     components: {
@@ -48,8 +60,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            // version: import.meta.VUE_APP_VERSION,
-            version: '1',
+            version: window.__APP_VER__,
             signInImage: computed(() => config.get('DOMAIN_IMAGE.SIGN_IN')),
             contactLink: computed(() => config.get('CONTACT_LINK')),
         });
