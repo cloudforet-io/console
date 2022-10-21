@@ -31,7 +31,7 @@
         <transition name="slide-up">
             <tags-overlay v-if="tagEditPageVisible"
                           :title="overlayTitle"
-                          :tags="tags"
+                          :tags="isCustomMode ? customTags : tags"
                           :resource-id="resourceId"
                           :resource-key="resourceKey" :resource-type="resourceType"
                           :loading="loading"
@@ -109,6 +109,10 @@ export default {
             type: Array,
             default: undefined,
         },
+        customTags: {
+            type: Object,
+            default: undefined,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
@@ -182,8 +186,10 @@ export default {
 
         watch([() => props.resourceKey, () => props.resourceId, () => props.resourceType],
             async ([resourceKey, resourceId, resourceType]) => {
-                if (resourceKey && resourceId && resourceType) {
+                if (resourceKey && resourceId && resourceType && !state.isCustomMode) {
                     await getTags();
+                } else {
+                    state.loading = false;
                 }
             }, { immediate: true });
 

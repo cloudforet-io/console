@@ -7,6 +7,7 @@
                 :overlay-title="$t('INVENTORY.CLOUD_SERVICE.PAGE.CUSTOM_TAGS')"
                 :custom-fields="fields"
                 :custom-items="items"
+                :custom-tags="customTags"
                 @tags-updated="handleTagsUpdated"
     >
         <template #table-top>
@@ -103,6 +104,15 @@ export default {
                 type: k.type,
                 provider: k.provider,
             }))),
+            customTags: computed(() => {
+                const tagObject = {};
+                (state.cloudServiceTagList ?? []).forEach((tag) => {
+                    if (tag.type === CLOUD_SERVICE_TAG_TYPE.CUSTOM) {
+                        tagObject[tag.key] = tag.value;
+                    }
+                });
+                return tagObject;
+            }),
         });
         /* event handler */
         const handleSelectTagType = (tagType) => { state.selectedTagType = tagType; };
