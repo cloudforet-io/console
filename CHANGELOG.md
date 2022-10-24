@@ -1,3 +1,10 @@
+# [1.1.0-beta.432](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.431...v1.1.0-beta.432) (2022-10-24)
+
+
+### Bug Fixes
+
+* **p-spinner:** thin-spinner lotties to p-spinner ([#103](https://github.com/cloudforet-io/mirinae/issues/103)) ([c51ce1a](https://github.com/cloudforet-io/mirinae/commit/c51ce1abb9d311cd2207fcbd984036869506f3e0))
+
 # [1.1.0-beta.431](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.430...v1.1.0-beta.431) (2022-10-20)
 
 
