@@ -1,22 +1,24 @@
 <template>
-    <svg class="p-spinner"
-         :class="[styleType, size]"
-         viewBox="0 0 32 32"
-         fill="none" xmlns="http://www.w3.org/2000/svg"
-    >
-        <g>
-            <circle class="spinner-bg"
-                    cx="16" cy="16" r="14"
-                    stroke-opacity="0.3"
-                    stroke-width="9%"
-            />
-            <circle class="spinner"
-                    cx="16" cy="16" r="14"
-                    stroke-width="9%"
-                    stroke-linecap="round" stroke-dasharray="32 200"
-            />
-        </g>
-    </svg>
+    <span>
+        <svg class="p-spinner"
+             :class="[styleType, size]"
+             viewBox="0 0 32 32"
+             fill="none" xmlns="http://www.w3.org/2000/svg"
+        >
+            <g>
+                <circle class="spinner-bg"
+                        cx="16" cy="16" r="14"
+                        stroke-opacity="0.3"
+                        stroke-width="9%"
+                />
+                <circle class="spinner"
+                        cx="16" cy="16" r="14"
+                        stroke-width="9%"
+                        stroke-linecap="round" stroke-dasharray="32 200"
+                />
+            </g>
+        </svg>
+    </span>
 </template>
 
 <script lang="ts">
@@ -54,12 +56,12 @@ export default defineComponent<Props>({
     --spinner-speed: 2s;
     vertical-align: middle;
     transform-origin: center;
-    animation: rotate var(--spinner-speed) linear infinite;
+    animation: rotate var(--spinner-speed) 0.3s linear infinite;
     .spinner {
         stroke-dasharray: 1, 200;
         stroke-dashoffset: 0;
         stroke-linecap: round;
-        animation: stretch calc(var(--spinner-speed) * 0.75) ease-in-out infinite;
+        animation: stretch calc(var(--spinner-speed) * 0.75) 0.3s ease-in-out infinite;
     }
 
     @keyframes stretch {

@@ -3,6 +3,7 @@ import type { ArgTypes } from '@storybook/addons';
 import { range } from 'lodash';
 
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
+import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 
 export const getDataLoaderArgTypes = (): ArgTypes => ({
     loading: {
@@ -63,18 +64,19 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
         name: 'spinnerSize',
         type: { name: 'string' },
         description: `Spinner loader size. It works only when \`loaderType\` props is ${LOADER_TYPES.spinner}.`,
-        defaultValue: 2.5,
+        defaultValue: SPINNER_SIZE.xl,
         table: {
             type: {
                 summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: 2.5,
+                summary: SPINNER_SIZE.xl,
             },
         },
         control: {
-            type: 'number',
+            type: 'select',
+            options: Object.values(SPINNER_SIZE),
         },
     },
     disableEmptyCase: {

@@ -1,11 +1,8 @@
 <template>
     <div class="p-selectable-list" :class="[theme]">
-        <slot v-if="loading" name="loading">
+        <slot v-if="true" name="loading">
             <div class="spinner-container">
-                <p-lottie name="thin-spinner" auto
-                          :size="1.5"
-                          class="flex items-center justify-center"
-                />
+                <p-spinner class="flex items-center justify-center" />
             </div>
         </slot>
         <slot v-else-if="items.length === 0" name="no-data">
@@ -47,7 +44,7 @@ import type { Vue } from 'vue/types/vue';
 import { get, findIndex } from 'lodash';
 
 import PEmpty from '@/data-display/empty/PEmpty.vue';
-import PLottie from '@/foundation/lottie/PLottie.vue';
+import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { themes } from '@/others/deprecated/selectable-item/config';
 import PSelectableItem from '@/others/deprecated/selectable-item/PSelectableItem.vue';
 import type { SelectableListProps, MapperKeyType } from '@/others/deprecated/selectable-list/type';
@@ -56,7 +53,9 @@ import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export default {
     name: 'PSelectableList',
-    components: { PEmpty, PSelectableItem, PLottie },
+    components: {
+        PSpinner, PEmpty, PSelectableItem,
+    },
     props: {
         items: {
             type: Array,

@@ -21,7 +21,7 @@
                    }
                }"
     >
-        <p-lottie v-if="loading" name="thin-spinner" :size="loadingIconSize" />
+        <p-spinner v-if="loading" :size="loadingIconSize" />
         <p-i v-if="icon"
              :name="icon"
              width="1rem" height="1rem"
@@ -37,22 +37,25 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
+import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
+import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import PI from '@/foundation/icons/PI.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import type { ButtonProps, ButtonSize } from '@/inputs/buttons/button/type';
 import { BUTTON_FONT_WEIGHT, BUTTON_SIZE, BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 
-const LOADING_SIZE: Record<ButtonSize, number> = {
-    sm: 0.75,
-    md: 1,
-    lg: 1,
+const LOADING_SIZE: Record<ButtonSize, string> = {
+    sm: SPINNER_SIZE.xs,
+    md: SPINNER_SIZE.sm,
+    lg: SPINNER_SIZE.sm,
 };
 export default defineComponent<ButtonProps>({
     name: 'PButton',
     components: {
         PLottie,
         PI,
+        PSpinner,
     },
     props: {
         styleType: {

@@ -7,10 +7,7 @@
         :disabled="disabled || loading"
         v-on="$listeners"
     >
-        <p-lottie v-if="loading" name="thin-spinner" auto
-                  :width="sizeValue"
-                  :height="sizeValue"
-        />
+        <p-spinner v-if="loading" :size="loadingSize" />
         <slot v-else>
             <p-i :name="name"
                  :width="sizeValue"
@@ -27,18 +24,25 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
+import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
+import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
-import PLottie from '@/foundation/lottie/PLottie.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
+import type { ButtonSize } from '@/inputs/buttons/button/type';
 import {
     ICON_BUTTON_SIZE, ICON_BUTTON_STYLE_TYPE,
 } from '@/inputs/buttons/icon-button/type';
 
 
+const LOADING_SIZE: Record<ButtonSize, string> = {
+    sm: SPINNER_SIZE.sm,
+    md: SPINNER_SIZE.lg,
+    lg: SPINNER_SIZE.xl,
+};
 export default defineComponent({
     name: 'PIconButton',
-    components: { PLottie, PButton, PI },
+    components: { PSpinner, PButton, PI },
     props: {
         name: {
             type: String,
@@ -85,6 +89,7 @@ export default defineComponent({
     setup(props) {
         const state = reactive({
             sizeValue: computed(() => ICON_BUTTON_SIZE[props.size] || '1.5rem'),
+            loadingSize: computed(() => LOADING_SIZE[props.size] ?? LOADING_SIZE.md),
         });
         return {
             ...toRefs(state),

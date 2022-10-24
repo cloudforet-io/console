@@ -27,10 +27,7 @@
                           @click.stop="onToggle(node, path)"
                     >
                         <slot name="toggle" v-bind="{node, path, selected: getSelectState(path)}">
-                            <p-i v-if="node.loading" name="ic_loading"
-                                 width="1rem" height="1rem"
-                                 animation="spin"
-                            />
+                            <p-spinner v-if="node.loading" size="sm" />
                             <p-i v-else-if="!toggleOptions.validator || (toggleOptions.validator && toggleOptions.validator(node))"
                                  :name="node.$folded ? 'ic_tree_arrow' : 'ic_tree_arrow--opened'"
                                  width="1em" height="1em"
@@ -93,6 +90,7 @@ import type {
     DataSetter,
     GetClassNames, DataFetcher,
 } from '@/data-display/tree/type';
+import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import PI from '@/foundation/icons/PI.vue';
 import PTextInput from '@/inputs/input/PTextInput.vue';
 
@@ -118,6 +116,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'PTree',
     components: {
+        PSpinner,
         PTextInput,
         PI,
         Tree: {

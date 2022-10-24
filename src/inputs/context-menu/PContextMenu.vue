@@ -77,9 +77,7 @@
         </div>
         <div v-show="loading" class="loader-wrapper">
             <div class="loader-backdrop" />
-            <div class="loader">
-                <p-lottie name="thin-spinner" auto :size="1.5" />
-            </div>
+            <p-spinner class="loader" />
         </div>
     </div>
 </template>
@@ -90,8 +88,8 @@ import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 
+import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import PI from '@/foundation/icons/PI.vue';
-import PLottie from '@/foundation/lottie/PLottie.vue';
 import { useListFocus } from '@/hooks/list-focus';
 import { useProxyValue } from '@/hooks/proxy-state';
 import PButton from '@/inputs/buttons/button/PButton.vue';
@@ -111,8 +109,8 @@ const FOCUS_GROUP_ID = 'context-item';
 export default defineComponent<ContextMenuProps>({
     name: 'PContextMenu',
     components: {
+        PSpinner,
         PContextMenuItem,
-        PLottie,
         PI,
         PButton,
     },

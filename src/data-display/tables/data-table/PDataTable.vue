@@ -144,9 +144,7 @@
         <div v-if="showLoading" class="loading-backdrop fade-in" />
         <div v-if="showLoading" class="loading">
             <slot name="loading">
-                <p-lottie name="thin-spinner" :size="2.5"
-                          :auto="true"
-                />
+                <p-spinner size="xl" />
             </slot>
         </div>
         <div v-if="invalid" class="invalid-cover" />
@@ -163,6 +161,7 @@ import { get, range } from 'lodash';
 
 import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
 import type { DataTableField, DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
+import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { useProxyValue } from '@/hooks';
 import { copyAnyData } from '@/util/helpers';
 
@@ -170,7 +169,6 @@ const PCheckBox = () => import('@/inputs/checkbox/PCheckBox.vue');
 const PTextBeautifier = () => import('@/data-display/text-beautifier/PTextBeautifier.vue');
 const PRadio = () => import('@/inputs/radio/PRadio.vue');
 const PI = () => import('@/foundation/icons/PI.vue');
-const PLottie = () => import('@/foundation/lottie/PLottie.vue');
 const PCopyButton = () => import('@/inputs/buttons/copy-button/PCopyButton.vue');
 
 interface TableField extends DataTableFieldType {
@@ -180,11 +178,11 @@ interface TableField extends DataTableFieldType {
 export default defineComponent<DataTableProps>({
     name: 'PDataTable',
     components: {
+        PSpinner,
         PTextBeautifier,
         PI,
         PCheckBox,
         PCopyButton,
-        PLottie,
         PRadio,
     },
     props: {

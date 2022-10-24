@@ -28,9 +28,7 @@
                 <div class="loader" :class="{[loaderType]: !$scopedSlots.loader}">
                     <slot name="loader">
                         <template v-if="loaderType === LOADER_TYPES.spinner">
-                            <p-lottie name="thin-spinner" :size="spinnerSize"
-                                      auto
-                            />
+                            <p-spinner :size="spinnerSize" />
                         </template>
                         <template v-else-if="loaderType === LOADER_TYPES.skeleton">
                             <p-skeleton />
@@ -52,7 +50,8 @@ import { isEmpty } from 'lodash';
 
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
-import PLottie from '@/foundation/lottie/PLottie.vue';
+import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
+import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import { i18n } from '@/translations';
 import { getColor } from '@/util/helpers';
 
@@ -70,7 +69,7 @@ interface Props {
 }
 export default defineComponent<Props>({
     name: 'PDataLoader',
-    components: { PSkeleton, PLottie },
+    components: { PSpinner, PSkeleton },
     i18n,
     props: {
         loading: {
@@ -90,7 +89,7 @@ export default defineComponent<Props>({
         },
         spinnerSize: {
             type: Number,
-            default: 2.5,
+            default: SPINNER_SIZE.xl,
         },
         disableEmptyCase: {
             type: Boolean,

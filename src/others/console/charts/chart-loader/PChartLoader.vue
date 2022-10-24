@@ -3,10 +3,7 @@
         <transition name="fade-in">
             <div v-show="loading" class="loader w-full h-full">
                 <slot name="loader" :loading="loading">
-                    <p-lottie name="thin-spinner"
-                              auto
-                              :size="1.5"
-                    />
+                    <p-spinner />
                 </slot>
             </div>
         </transition>
@@ -19,11 +16,11 @@
 </template>
 
 <script lang="ts">
-import PLottie from '@/foundation/lottie/PLottie.vue';
+import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 
 export default {
     name: 'PChartLoader',
-    components: { PLottie },
+    components: { PSpinner },
     props: {
         loading: {
             type: Boolean,
