@@ -23,6 +23,7 @@ export { default as PI } from './foundation/icons/PI.vue';
 export { default as PTextInput } from './inputs/input/PTextInput.vue';
 export { default as PLabel } from './data-display/label/PLabel.vue';
 export { default as PSkeleton } from './feedbacks/loading/skeleton/PSkeleton.vue';
+export { default as PSpinner } from './feedbacks/loading/spinner/PSpinner.vue';
 export { default as PCollapsibleToggle } from './data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
 
 export { default as PNoticeAlert } from './feedbacks/alert/notice/PNoticeAlert.vue';
