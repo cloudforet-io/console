@@ -55,16 +55,20 @@
                                        :disabled="schemaProperty.disabled"
                                        @update:selected="handleUpdateFormValue(schemaProperty, ...arguments)"
                     />
-                    <p-text-input v-else
-                                  :value="rawFormData[schemaProperty.propertyName]"
-                                  :type="schemaProperty.inputType"
-                                  :invalid="invalid"
-                                  :placeholder="schemaProperty.inputPlaceholder"
-                                  :masking-mode="schemaProperty.inputType === 'password'"
-                                  :autocomplete="false"
-                                  :disabled="schemaProperty.disabled"
-                                  @update:value="handleUpdateFormValue(schemaProperty, ...arguments)"
-                    />
+                    <template v-else>
+                        <p-text-input :value="schemaProperty.multiInputMode ? undefined : rawFormData[schemaProperty.propertyName]"
+                                      :selected="schemaProperty.multiInputMode ? rawFormData[schemaProperty.propertyName] : undefined"
+                                      :type="schemaProperty.inputType"
+                                      :invalid="invalid"
+                                      :placeholder="schemaProperty.inputPlaceholder"
+                                      :masking-mode="schemaProperty.inputType === 'password'"
+                                      :autocomplete="false"
+                                      :disabled="schemaProperty.disabled"
+                                      :multi-input="schemaProperty.multiInputMode"
+                                      @update:value="!schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, ...arguments)"
+                                      @update:selected="schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, ...arguments)"
+                        />
+                    </template>
                 </template>
             </p-field-group>
         </template>
@@ -173,6 +177,7 @@ export default defineComponent<JsonSchemaFormProps>({
                             inputType: getInputTypeBySchemaProperty(schemaProperty),
                             inputPlaceholder: getInputPlaceholderBySchemaProperty(schemaProperty),
                             menuItems: getMenuItemsBySchemaProperty(schemaProperty),
+                            multiInputMode: schemaProperty.type === 'array',
                         };
                         return refined;
                     }).sort((a, b) => {

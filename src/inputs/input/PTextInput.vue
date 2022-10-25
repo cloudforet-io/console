@@ -387,9 +387,7 @@ export default defineComponent<TextInputProps>({
         const init = () => {
             state.filteredMenu = props.menu;
             if (props.selected && props.multiInput) {
-                if (Array.isArray(props.selected)) {
-                    state.proxySelectedValue = props.selected;
-                } else {
+                if (!Array.isArray(props.selected)) {
                     state.proxySelectedValue = [props.selected];
                 }
             }

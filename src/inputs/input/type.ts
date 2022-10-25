@@ -4,7 +4,7 @@ import type { MenuItem } from '@/inputs/context-menu/type';
 
 export interface SelectedItem {
     value: string;
-    label: string;
+    label?: string;
     invalid?: boolean;
     invalidText?: string | TranslateResult;
     duplicated?: boolean;

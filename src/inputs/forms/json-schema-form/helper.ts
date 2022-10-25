@@ -1,6 +1,6 @@
 import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
 import type {
-    JsonSchema, InnerJsonSchema, ComponentName, TextInputType,
+    ComponentName, InnerJsonSchema, JsonSchema, TextInputType,
 } from '@/inputs/forms/json-schema-form/type';
 
 export const NUMERIC_TYPES = ['number', 'integer'];
@@ -15,10 +15,17 @@ const refineNumberTypeValue = (val: any): any => {
     return dataValue;
 };
 
+const refineArrayTypeValue = (val?: any[]): string[] | undefined => {
+    if (!val?.length) return undefined;
+    if (typeof val[0] === 'string') return val;
+    return val.map(d => d.value);
+};
+
 export const refineValueByProperty = (schema: JsonSchema, val?: any): any => {
     const { type, disabled } = schema;
     if (disabled) return undefined;
     if (type === 'object') return val; // In case of object, child JsonSchemaForm refines the data.
+    if (type === 'array') return refineArrayTypeValue(val);
     if (NUMERIC_TYPES.includes(type)) return refineNumberTypeValue(val);
     if (typeof val === 'string') return val?.trim() || undefined;
     return undefined;
@@ -32,6 +39,13 @@ export const initFormDataWithSchema = (schema?: JsonSchema, formData?: object): 
     Object.keys(properties).forEach((key) => {
         const property = properties[key];
         result[key] = formData?.[key] ?? property.default ?? undefined;
+        if (property.type === 'array' && result[key]) { // array type needs conversion for component.
+            if (!Array.isArray(result[key])) {
+                result[key] = undefined;
+            } else {
+                result[key] = result[key].map(d => ({ value: d }));
+            }
+        }
     });
     return result;
 };

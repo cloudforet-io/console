@@ -52,13 +52,17 @@ export const getDefaultSchema = () => ({
         emails: {
             description: 'Email addresses',
             title: 'Email Addresses',
-            minLength: 10,
             type: 'array',
-            pattern: '^[\\W]*([\\w+\\-.%]+@[\\w\\-.]+\\.[A-Za-z]{2,4}[\\W]*,{1}[\\W]*)*([\\w+\\-.%]+@[\\w\\-.]+\\.[A-Za-z]{2,4})[\\W]*$',
-            items: [{ type: 'string' }],
+            items: {
+                type: 'string',
+                minLength: 10,
+                pattern: '^[\\W]*([\\w+\\-.%]+@[\\w\\-.]+\\.[A-Za-z]{2,4}[\\W]*,{1}[\\W]*)*([\\w+\\-.%]+@[\\w\\-.]+\\.[A-Za-z]{2,4})[\\W]*$',
+            },
             examples: [
                 'user1@test.com, user2@test.com',
             ],
+            default: ['user1@test.com'],
+            uniqueItems: true,
         },
         homepage: {
             type: 'string',
@@ -92,7 +96,7 @@ export const getDefaultSchema = () => ({
         },
 
     },
-    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional'],
+    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails'],
     order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'age', 'phone', 'homepage', 'additional'],
 });
 
