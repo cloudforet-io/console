@@ -262,10 +262,10 @@ export const useQuerySearch = (props: QuerySearchProps, options: QuerySearchOpti
     // TODO: need to refactor
     const onKeyupEnter = async (): Promise<QueryItem | undefined> => {
         if (strict) {
-            if (state.rootKey) {
-                const res = find(state.handlerResp.results, (item: ValueMenuItem) => item.label === state.searchText || item.name === state.searchText);
-                if (res) return refineQueryItem(res);
-                return undefined;
+            const res = find(state.handlerResp.results, (item: ValueMenuItem) => item.label === state.searchText || item.name === state.searchText);
+            if (res) {
+                if (state.rootKey) return refineQueryItem(res);
+                await findAndSetKey(state.searchText);
             }
         } else if (state.currentDataType === 'object') {
             if (state.searchText) await findAndSetKey(state.searchText, false);
@@ -278,11 +278,10 @@ export const useQuerySearch = (props: QuerySearchProps, options: QuerySearchOpti
                 return refineQueryItem({ label: 'Null', name: null });
             }
             return refineQueryItem({ label: state.searchText, name: state.searchText });
-        }
-
-        if (state.searchText) {
+        } else if (state.searchText) {
             return refineQueryItem({ label: state.searchText, name: state.searchText });
         }
+
         return undefined;
     };
 
