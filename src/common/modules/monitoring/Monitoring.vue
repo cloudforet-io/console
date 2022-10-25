@@ -52,9 +52,7 @@
                     <strong>{{ $t('COMMON.MONITORING.LOCAL_TIME') }}</strong>
                 </template>
             </i18n>
-            <template v-if="showLoader">
-                <p-spinner size="xl" />
-            </template>
+            <p-spinner v-if="showLoader" size="xl" />
             <div v-else-if="metrics.length === 0" class="text-center text-gray">
                 {{ $t('COMMON.MONITORING.NO_METRICS') }}
             </div>

@@ -14,9 +14,7 @@
             </template>
             <template #default>
                 <section class="card-body">
-                    <template v-if="isBudgetLoading">
-                        <p-spinner size="xl" />
-                    </template>
+                    <p-spinner v-if="isBudgetLoading" size="xl" />
                     <template v-else-if="hasBudgetAlert">
                         <article class="noti-condition">
                             <span class="sub-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.CONDITION') }}</span>
