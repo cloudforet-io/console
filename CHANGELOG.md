@@ -1,3 +1,10 @@
+# [1.1.0-beta.437](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.436...v1.1.0-beta.437) (2022-10-25)
+
+
+### Bug Fixes
+
+* **query-search-dropdown:** fix non-strict input issue on strict-mode ([#108](https://github.com/cloudforet-io/mirinae/issues/108)) ([b5d7368](https://github.com/cloudforet-io/mirinae/commit/b5d7368adbbfb7a3456d7ecda95817191258f577))
+
 # [1.1.0-beta.436](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.435...v1.1.0-beta.436) (2022-10-25)
 
 
