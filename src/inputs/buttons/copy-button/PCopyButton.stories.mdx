@@ -4,7 +4,10 @@ import { copyAnyData } from '@/util/helpers';
 
 import PTextarea from '@/inputs/textarea/PTextarea';
 import PCopyButton from "@/inputs/buttons/copy-button/PCopyButton";
-import { getCopyButtonArgTypes } from '@/inputs/buttons/copy-button/story-helper';
+import { getCopyButtonArgTypes } from '@/inputs/buttons/copy-button/story-helper'; import {
+    SIZE
+} from "@/inputs/buttons/copy-button/type";
+import {reactive, toRefs} from "vue";
 
 
 
@@ -22,6 +25,7 @@ export const Template = (args, {argTypes}) => ({
         <div style="display:flex; align-items:center; justify-content:center; height:150px;">
             <p-copy-button
                 :value="value"
+                :size="size"
                 :auto-hide-icon="autoHideIcon"
                 :copy-manually="copyManually"
                 @copy="onCopy"
@@ -50,6 +54,33 @@ export const Template = (args, {argTypes}) => ({
             Hello, World!
         </p-copy-button>
     </div>`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Size
+
+<Canvas>
+    <Story name="Size">
+        {{
+            components: { PCopyButton },
+            template: `
+    <div style="display:flex; align-items:center; height:150px; column-gap: 10px;">
+        <p-copy-button v-for="size in sizes" :size="size" >
+            Hello, World!
+        </p-copy-button>
+    </div>`,
+            setup() {
+                const state = reactive({
+                    sizes: Object.values(SIZE)
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
         }}
     </Story>
 </Canvas>

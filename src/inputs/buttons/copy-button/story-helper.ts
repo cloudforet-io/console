@@ -1,5 +1,7 @@
 import type { ArgTypes } from '@storybook/addons';
 
+import { SIZE } from '@/inputs/buttons/copy-button/type';
+
 export const getCopyButtonArgTypes = (): ArgTypes => ({
     value: {
         name: 'value',
@@ -17,6 +19,25 @@ export const getCopyButtonArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'text',
+        },
+    },
+    size: {
+        name: 'size',
+        type: { name: 'string' },
+        description: 'Copy button size',
+        defaultValue: SIZE.md,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: SIZE.md,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(SIZE),
         },
     },
     autoHideIcon: {

@@ -1,5 +1,5 @@
 <template>
-    <span class="p-copy-button">
+    <span class="p-copy-button" :class="size">
         <span v-if="$scopedSlots.default" ref="textRef"
               class="copy-text"
         >
@@ -34,15 +34,19 @@
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
+import type { PropType } from 'vue';
 import type Vue from 'vue';
 
 
 import PI from '@/foundation/icons/PI.vue';
+import type { Size } from '@/inputs/buttons/copy-button/type';
+import { SIZE } from '@/inputs/buttons/copy-button/type';
 import { copyAnyData, isNotEmpty } from '@/util/helpers';
 
 
 interface Props {
     value?: string;
+    size?: string;
     autoHideIcon?: boolean;
     copyManually?: boolean;
 }
@@ -56,6 +60,10 @@ export default defineComponent<Props>({
         value: {
             type: String,
             default: null,
+        },
+        size: {
+            type: String as PropType<Size>,
+            default: SIZE.md,
         },
         autoHideIcon: {
             type: Boolean,
@@ -163,12 +171,12 @@ export default defineComponent<Props>({
 .p-copy-button {
     @apply text-gray-900;
     display: inline-block;
-    font-size: 0.875rem;
     vertical-align: middle;
 
     .copy-text {
-        margin-right: 0.5rem;
+        margin-right: 0.25rem;
         cursor: text;
+        line-height: 1.25;
     }
 
     .copy-icon {
@@ -203,6 +211,16 @@ export default defineComponent<Props>({
         &.fade-enter, &.fade-leave-to {
             opacity: 0;
         }
+    }
+
+    @define-mixin size $text-size {
+        font-size: $text-size;
+    }
+    &.md {
+        @mixin size 0.875rem;
+    }
+    &.sm {
+        @mixin size 0.75rem;
     }
 }
 
