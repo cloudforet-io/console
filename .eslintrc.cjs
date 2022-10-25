@@ -8,19 +8,20 @@ module.exports = {
     extends: [
         'plugin:@typescript-eslint/recommended',
         'plugin:vue/recommended',
-        // '@vue/airbnb',
-        '@vue/typescript',
+        'plugin:vue/base',
         'plugin:import/recommended',
         'plugin:import/typescript',
+        'airbnb',
     ],
 
     rules: {
-        // 'vue/component-name-in-template-casing': ['error', 'kebab-case'],
-        // 'vue/valid-v-slot': ['error', { allowModifiers: true }],
+        'vue/component-name-in-template-casing': ['error', 'kebab-case'],
+        'vue/valid-v-slot': ['error', { allowModifiers: true }],
         'max-len': ['error', { code: 200 }],
         // 'no-console': import.meta.env.MODE === 'production' ? 'error' : 'off',
         // 'no-debugger': import.meta.env.MODE === 'production' ? 'error' : 'off',
         'vue/html-indent': ['error', 4],
+        'vue/first-attribute-linebreak': ['off'],
         indent: ['error', 4],
         'prefer-destructuring': ['error', { object: false, array: false }],
         radix: ['error', 'as-needed'],
@@ -37,16 +38,7 @@ module.exports = {
             },
         ],
         camelcase: 'off',
-        // 'vue/max-attributes-per-line': [
-        //     'error',
-        //     {
-        //         singleline: 3,
-        //         multiline: {
-        //             max: 3,
-        //             allowFirstLine: true,
-        //         },
-        //     },
-        // ],
+        'vue/max-attributes-per-line': 1,
         'no-this-before-super': ['off'],
         'no-useless-constructor': ['off'],
         'no-empty-function': ['error', { allow: ['constructors', 'arrowFunctions'] }],
