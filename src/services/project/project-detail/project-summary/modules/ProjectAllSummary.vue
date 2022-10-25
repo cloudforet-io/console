@@ -12,9 +12,7 @@
                 <div class="box" :class="{selected: name === activeTab}">
                     <span>{{ labelMap[name] }}</span>
                     <span v-if="name === SERVICE_CATEGORY.STORAGE" class="suffix">({{ storageSuffix }})</span>
-                    <p-lottie v-if="summaryLoading" name="thin-spinner" auto
-                              :size="1"
-                    />
+                    <p-spinner v-if="summaryLoading" size="sm" />
                     <span v-else class="count"> {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(countMap[name]).split(' ')[0] : commaFormatter(countMap[name]) }}</span>
                 </div>
             </template>
@@ -108,7 +106,7 @@ import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import {
-    PBalloonTab, PSelectButton, PDataLoader, PSkeleton, PLottie,
+    PBalloonTab, PSelectButton, PDataLoader, PSkeleton, PSpinner,
 } from '@spaceone/design-system';
 import type { Unit } from 'bytes';
 import dayjs from 'dayjs';
@@ -160,7 +158,7 @@ export default {
         PSkeleton,
         PDataLoader,
         PBalloonTab,
-        PLottie,
+        PSpinner,
     },
     props: {
         projectId: {
@@ -552,7 +550,7 @@ export default {
             @apply text-white;
         }
     }
-    .p-lottie {
+    .p-spinner {
         padding-left: 0.25rem;
     }
 }

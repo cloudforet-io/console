@@ -44,9 +44,7 @@
                                 </div>
                             </template>
                         </vertical-timeline>
-                        <p-lottie v-if="loading" name="thin-spinner" auto
-                                  :size="2"
-                        />
+                        <p-spinner v-if="loading" size="xl" />
                     </div>
                 </div>
                 <div class="right-part">
@@ -93,7 +91,7 @@ import type { PropType } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PPaneLayout, PPageTitle, PTab, PLottie, PCopyButton, PBadge, PDivider,
+    PPaneLayout, PPageTitle, PTab, PCopyButton, PBadge, PDivider, PSpinner,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
@@ -140,10 +138,10 @@ export default defineComponent<Props>({
         PPageTitle,
         PTab,
         CloudServiceHistoryDetailNote,
-        PLottie,
         PCopyButton,
         PBadge,
         PDivider,
+        PSpinner,
     },
     props: {
         loading: {
@@ -313,7 +311,7 @@ export default defineComponent<Props>({
                     .vertical-timeline {
                         padding-right: 1rem;
                     }
-                    .p-lottie {
+                    .p-spinner {
                         display: flex;
                         height: 5rem;
                         justify-content: center;

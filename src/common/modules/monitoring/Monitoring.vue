@@ -52,11 +52,9 @@
                     <strong>{{ $t('COMMON.MONITORING.LOCAL_TIME') }}</strong>
                 </template>
             </i18n>
-            <div v-if="showLoader">
-                <p-lottie class="loader" name="thin-spinner" auto
-                          :size="2"
-                />
-            </div>
+            <template v-if="showLoader">
+                <p-spinner size="xl" />
+            </template>
             <div v-else-if="metrics.length === 0" class="text-center text-gray">
                 {{ $t('COMMON.MONITORING.NO_METRICS') }}
             </div>
@@ -94,7 +92,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PSelectButtonGroup, PSelectDropdown, PIconButton, PLottie, PButton, PAnchor,
+    PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PAnchor, PSpinner,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -134,12 +132,12 @@ export default {
     name: 'Monitoring',
     components: {
         PButton,
-        PLottie,
         PSelectDropdown,
         PSelectButtonGroup,
         PIconButton,
         PAnchor,
         MetricChart,
+        PSpinner,
     },
     props: {
         loading: {
@@ -491,7 +489,7 @@ section {
         margin-right: auto;
     }
 
-    .loader {
+    .p-spinner {
         display: flex;
         align-items: center;
         justify-content: center;

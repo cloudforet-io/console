@@ -15,9 +15,7 @@
             <template #default>
                 <section class="card-body">
                     <template v-if="isBudgetLoading">
-                        <p-lottie name="thin-spinner" :size="2.5"
-                                  auto class="spinner w-full flex justify-center"
-                        />
+                        <p-spinner size="xl" />
                     </template>
                     <template v-else-if="hasBudgetAlert">
                         <article class="noti-condition">
@@ -97,7 +95,7 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PAnchor, PBadge, PButton, PCard, PIconButton, PLottie,
+    PAnchor, PBadge, PButton, PCard, PIconButton, PSpinner,
 } from '@spaceone/design-system';
 
 import { commaFormatter } from '@cloudforet/core-lib';
@@ -123,13 +121,13 @@ export default {
     components: {
         BudgetNotificationsModal,
         BudgetNotificationsChannel,
-        PLottie,
         PCard,
         PIconButton,
         PButton,
         PAnchor,
         PBadge,
         DeleteModal,
+        PSpinner,
     },
     props: {
         manageDisabled: {
@@ -273,7 +271,7 @@ export default {
             margin-bottom: 1rem;
         }
     }
-    .spinner {
+    .p-spinner {
         @apply flex w-full justify-center;
     }
 
