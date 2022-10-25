@@ -5,7 +5,7 @@
         <template v-if="$scopedSlots.header" #header>
             <slot name="header" />
         </template>
-        <p-data-loader :data="items" :loading="loading" :spinner-size="1.5"
+        <p-data-loader :data="items" :loading="loading" spinner-size="lg"
                        :disable-empty-case="disableEmptyCase"
         >
             <template #loader>

@@ -51,6 +51,7 @@ import { isEmpty } from 'lodash';
 import { LOADER_TYPES } from '@/feedbacks/loading/data-loader/config';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
+import type { SpinnerSize } from '@/feedbacks/loading/spinner/type';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import { i18n } from '@/translations';
 import { getColor } from '@/util/helpers';
@@ -88,8 +89,11 @@ export default defineComponent<Props>({
             },
         },
         spinnerSize: {
-            type: Number,
+            type: String as PropType<SpinnerSize>,
             default: SPINNER_SIZE.xl,
+            validator(spinnerSize: SpinnerSize) {
+                return Object.values(SPINNER_SIZE).includes(spinnerSize);
+            },
         },
         disableEmptyCase: {
             type: Boolean,
