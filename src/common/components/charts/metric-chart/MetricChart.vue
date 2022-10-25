@@ -3,7 +3,7 @@
         <div class="flex justify-between">
             <span class="text-sm font-bold capitalize">{{ title }}</span>
             <span class="text-sm text-gray flex-grow">&nbsp; {{ unit.y ? `(${unit.y})` : '' }}</span>
-            <p-lottie v-if="loading && chart" name="thin-spinner" auto />
+            <p-spinner v-if="loading && chart" />
         </div>
         <p-data-loader :loading="loading && !chart" :data="data" class="chart-wrapper">
             <template #loader>
@@ -61,7 +61,9 @@ import type { PropType } from 'vue';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
-import { PDataLoader, PLottie, PSkeleton } from '@spaceone/design-system';
+import {
+    PDataLoader, PSkeleton, PSpinner,
+} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 
@@ -94,7 +96,7 @@ interface Tooltip {
 
 export default defineComponent<MetricChartProps>({
     name: 'PMetricChart',
-    components: { PLottie, PSkeleton, PDataLoader },
+    components: { PSkeleton, PDataLoader, PSpinner },
     props: {
         loading: {
             type: Boolean,

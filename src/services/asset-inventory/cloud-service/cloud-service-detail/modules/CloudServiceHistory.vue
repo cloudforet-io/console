@@ -57,9 +57,7 @@
                         </div>
                     </template>
                 </vertical-timeline>
-                <p-lottie v-if="loading && !!items.length" name="thin-spinner" auto
-                          :size="2"
-                />
+                <p-spinner v-if="loading && !!items.length" size="xl" />
             </div>
         </p-data-loader>
         <transition name="slide-up">
@@ -87,7 +85,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PPanelTop, PToolbox, PDataLoader, PLottie, PBadge,
+    PPanelTop, PToolbox, PDataLoader, PBadge, PSpinner,
 } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
@@ -134,8 +132,8 @@ export default {
         PPanelTop,
         PToolbox,
         PDataLoader,
-        PLottie,
         PBadge,
+        PSpinner,
     },
     props: {
         cloudServiceItem: {
@@ -357,7 +355,7 @@ export default {
         height: 30rem;
         overflow: auto;
         padding: 0 1.125rem;
-        .p-lottie {
+        .p-spinner {
             display: flex;
             height: 5rem;
             justify-content: center;

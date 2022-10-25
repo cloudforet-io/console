@@ -26,9 +26,7 @@
         </div>
         <div v-if="loading" class="loader-wrapper">
             <div class="loader">
-                <p-i name="ic_working" animation="spin"
-                     width="2.5rem" height="2.5rem"
-                />
+                <p-spinner size="sm" />
                 <div class="progress-rate">
                     {{ progressRate }}%
                 </div>
@@ -48,7 +46,7 @@ import {
 } from 'vue';
 import type { PropType, SetupContext } from 'vue';
 
-import { PButton, PI } from '@spaceone/design-system';
+import { PButton, PSpinner } from '@spaceone/design-system';
 import { toPng } from 'html-to-image';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import type { TCreatedPdf } from 'pdfmake/build/pdfmake';
@@ -105,7 +103,7 @@ export default defineComponent<Props>({
     name: 'PdfDownloadOverlay',
     components: {
         PButton,
-        PI,
+        PSpinner,
     },
     model: {
         prop: 'visible',
