@@ -1,3 +1,10 @@
+# [1.1.0-beta.435](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.434...v1.1.0-beta.435) (2022-10-25)
+
+
+### Bug Fixes
+
+* **p-copy-button:** add small size ([#107](https://github.com/cloudforet-io/mirinae/issues/107)) ([6a0fef6](https://github.com/cloudforet-io/mirinae/commit/6a0fef615b1df9fce6c2d24d0aaf4c1a083c6931))
+
 # [1.1.0-beta.434](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.433...v1.1.0-beta.434) (2022-10-25)
 
 
