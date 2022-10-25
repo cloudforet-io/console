@@ -1,3 +1,10 @@
+# [1.1.0-beta.436](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.435...v1.1.0-beta.436) (2022-10-25)
+
+
+### Features
+
+* **p-json-schema-form:** add `array` type ([#106](https://github.com/cloudforet-io/mirinae/issues/106)) ([e7f41a8](https://github.com/cloudforet-io/mirinae/commit/e7f41a84be07de9f6259c50de54616d924a3d4f5))
+
 # [1.1.0-beta.435](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.434...v1.1.0-beta.435) (2022-10-25)
 
 
