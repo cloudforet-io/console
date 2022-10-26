@@ -46,7 +46,7 @@
                             <div class="right-part">
                                 <div v-for="(data, idx) in selectedTrustedAccountDataList" :key="`text-${data.key}-${idx}`">
                                     <b>{{ data.key }} </b>
-                                    <p-copy-button class="value-text">
+                                    <p-copy-button size="sm">
                                         {{ data.value }}
                                     </p-copy-button>
                                 </div>
@@ -422,10 +422,6 @@ export default defineComponent<Props>({
                     gap: 0.25rem;
                     font-size: 0.75rem;
                     margin-left: 0.375rem;
-                    .value-text {
-                        @apply text-gray-900;
-                        font-size: 0.75rem;
-                    }
                 }
             }
         }
