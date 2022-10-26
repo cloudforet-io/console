@@ -15,9 +15,7 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "types": [
-      "jest"
-    ],
+    "types": ["vitest/globals"],
     "lib": [
       "esnext",
       "dom",
