@@ -37,16 +37,17 @@ jobs:
         run: |
           npm run tsc --workspace=@cloudforet/core-lib
 
-      - name: ESLint
-        run: |
-          npm run eslint
+# FIXME:: Turn on ESLint on review after uploading doodle
+#      - name: ESLint
+#        run: |
+#          npm run eslint
 
+# FIXME:: Turn on StyleLint on review after uploading doodle
+#      - name: StyleLint
+#        run: |
+#          npm run stylelint --workspaces --if-present
 
-      - name: StyleLint
-        run: |
-          npm run stylelint --workspaces --if-present
-
-# FIXME:: Turn on Unit Test on review
+# FIXME:: Turn on Unit Test on review after uploading doodle
 #      - name: Unit Test
 #        run: |
 #          npm run test:unit --workspaces
