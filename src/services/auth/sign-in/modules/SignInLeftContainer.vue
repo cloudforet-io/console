@@ -42,9 +42,7 @@ import {
     PLottie, PBadge,
 } from '@spaceone/design-system';
 
-
 import config from '@/lib/config';
-
 
 export default {
     name: 'SignInLeftContainer',
