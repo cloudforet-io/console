@@ -7,12 +7,16 @@ public/config/*
 # Logs
 npm-debug.log*
 
+
 # NPM
 node_modules/
+node_modules.nosync/
+
 
 # Transpiled code
 dist
 .out
+
 
 # Dev tools
 .DS_Store
@@ -21,6 +25,10 @@ dist
 *.swp
 *.bak
 
-src/assets
 
-node_modules.nosync/
+# Tests
+coverage/
+
+
+# Assets
+src/assets
