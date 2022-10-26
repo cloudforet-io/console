@@ -2,6 +2,7 @@ import path from 'path';
 
 import vuePlugin from '@vitejs/plugin-vue2';
 import { defineConfig, loadEnv } from 'vite';
+import StylelintPlugin from 'vite-plugin-stylelint';
 
 export default defineConfig(({ command, mode }) => {
     const env = loadEnv(mode, process.env.npm_package_version, '');
@@ -14,6 +15,12 @@ export default defineConfig(({ command, mode }) => {
     return {
         plugins: [
             vuePlugin(),
+            StylelintPlugin({
+                include: ['src/**/*.{css,vue,pcss,scss}'],
+                exclude: ['node_modules'],
+                lintOnStart: true,
+                emitErrorAsWarning: true,
+            }),
         ],
         server: {
             port: 8080,
