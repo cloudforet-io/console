@@ -8,18 +8,18 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
-const AdministrationContainer = () => import(/* webpackChunkName: "AdministrationContainer" */ '@/services/administration/AdministrationContainer.vue');
+const AdministrationContainer = () => import('@/services/administration/AdministrationContainer.vue');
 
-const UserPage = () => import(/* webpackChunkName: "UserPage" */ '@/services/administration/iam/user/UserPage.vue');
-const RolePage = () => import(/* webpackChunkName: "RolePage" */'@/services/administration/iam/role/RolePage.vue');
-const RoleCreatePage = () => import(/* webpackChunkName: "RoleCreatePage" */'@/services/administration/iam/role/update-role/RoleCreatePage.vue');
-const RoleEditPage = () => import(/* webpackChunkName: "RoleEditPage" */'@/services/administration/iam/role/update-role/RoleEditPage.vue');
-const PolicyPage = () => import(/* webpackChunkName: "PolicyPage" */ '@/services/administration/iam/policy/PolicyPage.vue');
-const PolicyCreatePage = () => import(/* webpackChunkName: "PolicyPage" */ '@/services/administration/iam/policy/policy-create/PolicyCreatePage.vue');
-const PolicyDetailPage = () => import(/* webpackChunkName: "PolicyDetailPage" */ '@/services/administration/iam/policy/policy-detail/PolicyDetailPage.vue');
+const UserPage = () => import('@/services/administration/iam/user/UserPage.vue');
+const RolePage = () => import('@/services/administration/iam/role/RolePage.vue');
+const RoleCreatePage = () => import('@/services/administration/iam/role/update-role/RoleCreatePage.vue');
+const RoleEditPage = () => import('@/services/administration/iam/role/update-role/RoleEditPage.vue');
+const PolicyPage = () => import('@/services/administration/iam/policy/PolicyPage.vue');
+const PolicyCreatePage = () => import('@/services/administration/iam/policy/policy-create/PolicyCreatePage.vue');
+const PolicyDetailPage = () => import('@/services/administration/iam/policy/policy-detail/PolicyDetailPage.vue');
 // TODO: provider 부분이 1.10.2 스프린트에서 제외되어 주석 처리
-// const ProviderPage = () => import(/* webpackChunkName: "ProviderPage" */ '@/services/administration/additional-settings/provider/ProviderPage.vue');
-// const ProviderAddPage = () => import(/* webpackChunkName: "ProviderAddPage" */ '@/services/administration/additional-settings/provider/provider-add/ProviderAddPage.vue');
+// const ProviderPage = () => import('@/services/administration/additional-settings/provider/ProviderPage.vue');
+// const ProviderAddPage = () => import('@/services/administration/additional-settings/provider/provider-add/ProviderAddPage.vue');
 
 const administrationRoutes: RouteConfig = {
     path: 'administration',

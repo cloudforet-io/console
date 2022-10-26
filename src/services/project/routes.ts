@@ -5,23 +5,23 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-const ProjectPage = () => import(/* webpackChunkName: "ProjectPage" */ '@/services/project/ProjectPage.vue');
-const ProjectDetailPage = () => import(/* webpackChunkName: "ProjectDetailPage" */ '@/services/project/project-detail/ProjectDetailPage.vue');
+const ProjectPage = () => import('@/services/project/ProjectPage.vue');
+const ProjectDetailPage = () => import('@/services/project/project-detail/ProjectDetailPage.vue');
 
-const ProjectDashboardPage = () => import(/* webpackChunkName: "ProjectDashboardPage" */ '@/services/project/project-detail/project-summary/ProjectSummaryPage.vue');
-const ProjectMemberPage = () => import(/* webpackChunkName: "ProjectMemberPage" */ '@/services/project/project-detail/project-member/ProjectMemberPage.vue');
-const ProjectAlertPage = () => import(/* webpackChunkName: "ProjectAlertPage" */ '@/services/project/project-detail/project-alert/ProjectAlertPage.vue');
-const ProjectNotificationsPage = () => import(/* webpackChunkName: "ProjectNotificationsPage" */ '@/services/project/project-detail/project-notification/ProjectNotificationPage.vue');
-const ProjectTagPage = () => import(/* webpackChunkName: "ProjectTagPage" */ '@/services/project/project-detail/project-tag/ProjectTagPage.vue');
+const ProjectDashboardPage = () => import('@/services/project/project-detail/project-summary/ProjectSummaryPage.vue');
+const ProjectMemberPage = () => import('@/services/project/project-detail/project-member/ProjectMemberPage.vue');
+const ProjectAlertPage = () => import('@/services/project/project-detail/project-alert/ProjectAlertPage.vue');
+const ProjectNotificationsPage = () => import('@/services/project/project-detail/project-notification/ProjectNotificationPage.vue');
+const ProjectTagPage = () => import('@/services/project/project-detail/project-tag/ProjectTagPage.vue');
 // eslint-disable-next-line max-len
-const ProjectAlertEventRulePage = () => import(/* webpackChunkName: "ProjectAlertEventRulePage" */ '@/services/project/project-detail/project-alert/project-alert-event-rule/ProjectAlertEventRulePage.vue');
-const ProjectNotificationAddPage = () => import(/* webpackChunkName: "ProjectNotificationAddPage" */ '@/services/project/project-detail/project-notification/ProjectNotificationAddPage.vue');
+const ProjectAlertEventRulePage = () => import('@/services/project/project-detail/project-alert/project-alert-event-rule/ProjectAlertEventRulePage.vue');
+const ProjectNotificationAddPage = () => import('@/services/project/project-detail/project-notification/ProjectNotificationAddPage.vue');
 
-const ProjectAlertListPage = () => import(/* webpackChunkName: "ProjectAlertListPage" */ '@/services/project/project-detail/project-alert/project-alert-list/ProjectAlertListPage.vue');
+const ProjectAlertListPage = () => import('@/services/project/project-detail/project-alert/project-alert-list/ProjectAlertListPage.vue');
 // eslint-disable-next-line max-len
-const ProjectMaintenanceWindowPage = () => import(/* webpackChunkName: "ProjectMaintenanceWindowPage" */ '@/services/project/project-detail/project-alert/project-maintenance-window/ProjectMaintenanceWindowPage.vue');
-const ProjectWebhookPage = () => import(/* webpackChunkName: "ProjectWebhookPage" */ '@/services/project/project-detail/project-alert/project-webhook/ProjectWebhookPage.vue');
-const ProjectAlertSettingsPage = () => import(/* webpackChunkName: "ProjectAlertSettingsPage" */ '@/services/project/project-detail/project-alert/project-alert-settings/ProjectAlertSettingsPage.vue');
+const ProjectMaintenanceWindowPage = () => import('@/services/project/project-detail/project-alert/project-maintenance-window/ProjectMaintenanceWindowPage.vue');
+const ProjectWebhookPage = () => import('@/services/project/project-detail/project-alert/project-webhook/ProjectWebhookPage.vue');
+const ProjectAlertSettingsPage = () => import('@/services/project/project-detail/project-alert/project-alert-settings/ProjectAlertSettingsPage.vue');
 
 export default {
     path: 'project',
@@ -116,7 +116,7 @@ export default {
                 {
                     path: 'event-rule',
                     name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
-                    props: route => ({ projectId: route.params.id }),
+                    props: (route) => ({ projectId: route.params.id }),
                     component: ProjectAlertEventRulePage,
                 },
                 {

@@ -8,15 +8,15 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
-const MyPageContainer = () => import(/* webpackChunkName: "MyPageContainer" */'@/services/my-page/MyPageContainer.vue');
+const MyPageContainer = () => import('@/services/my-page/MyPageContainer.vue');
 
-const UserAccountPage = () => import(/* webpackChunkName: "UserAccountPage" */ '@/services/my-page/my-account/user-account/UserAccountPage.vue');
-const UserAPIKeyPage = () => import(/* webpackChunkName: "UserAPIKeyPage" */ '@/services/my-page/my-account/user-api-key/UserAPIKeyPage.vue');
-const UserNotificationPage = () => import(/* webpackChunkName: "UserNotificationPage" */ '@/services/my-page/my-account/user-notification/UserNotificationPage.vue');
-const NotificationAddPage = () => import(/* webpackChunkName: "NotificationAddPage" */ '@/services/notification/notification-add/NotificationAddPage.vue');
+const UserAccountPage = () => import('@/services/my-page/my-account/user-account/UserAccountPage.vue');
+const UserAPIKeyPage = () => import('@/services/my-page/my-account/user-api-key/UserAPIKeyPage.vue');
+const UserNotificationPage = () => import('@/services/my-page/my-account/user-notification/UserNotificationPage.vue');
+const NotificationAddPage = () => import('@/services/notification/notification-add/NotificationAddPage.vue');
 
 // eslint-disable-next-line max-len
-// const ManageUserNotificationPage = () => import(/* webpackChunkName: "ManageUserNotificationPage" */ '@/services/administration/iam/user/manage-user-notification/ManageUserNotificationPage.vue');
+// const ManageUserNotificationPage = () => import('@/services/administration/iam/user/manage-user-notification/ManageUserNotificationPage.vue');
 
 const myPageRoutes: RouteConfig = {
     path: 'my-page',

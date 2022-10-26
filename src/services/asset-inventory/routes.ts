@@ -10,28 +10,27 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
-const AssetInventoryContainer = () => import(/* webpackChunkName: "AssetInventoryContainer" */ '@/services/asset-inventory/AssetInventoryContainer.vue');
+const AssetInventoryContainer = () => import('@/services/asset-inventory/AssetInventoryContainer.vue');
 
-const CloudServiceDetailPage = () => import(/* webpackChunkName: "CloudServiceDetailPage" */ '@/services/asset-inventory/cloud-service/cloud-service-detail/CloudServiceDetailPage.vue');
-const CloudServiceSearch = () => import(/* webpackChunkName: "CloudServiceSearch" */ '@/services/asset-inventory/cloud-service/cloud-service-search/CloudServiceSearchPage.vue');
-const CloudServiceTypeSearch = () => import(/* webpackChunkName: "CloudServiceTypeSearch" */ '@/services/asset-inventory/cloud-service/cloud-service-type-search/CloudServiceTypeSearchPage.vue');
+const CloudServiceDetailPage = () => import('@/services/asset-inventory/cloud-service/cloud-service-detail/CloudServiceDetailPage.vue');
+const CloudServiceSearch = () => import('@/services/asset-inventory/cloud-service/cloud-service-search/CloudServiceSearchPage.vue');
+const CloudServiceTypeSearch = () => import('@/services/asset-inventory/cloud-service/cloud-service-type-search/CloudServiceTypeSearchPage.vue');
 
-const ServerPage = () => import(/* webpackChunkName: "ServerPage" */ '@/services/asset-inventory/server/ServerPage.vue');
-const CloudServicePage = () => import(/* webpackChunkName: "CloudServicePage" */ '@/services/asset-inventory/cloud-service/CloudServicePage.vue');
-const NoResourcePage = () => import(/* webpackChunkName: "NoResourcePage" */ '@/common/pages/NoResourcePage.vue');
+const ServerPage = () => import('@/services/asset-inventory/server/ServerPage.vue');
+const CloudServicePage = () => import('@/services/asset-inventory/cloud-service/CloudServicePage.vue');
+const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 
-const CollectorPage = () => import(/* webpackChunkName: "CollectorPage" */ '@/services/asset-inventory/collector/CollectorPage.vue');
-const CollectorPluginPage = () => import(/* webpackChunkName: "CollectorPlugin" */ '@/services/asset-inventory/collector/collector-plugins/CollectorPluginsPage.vue');
-const CreateCollectorPage = () => import(/* webpackChunkName: "CreateCollector" */ '@/services/asset-inventory/collector/create-collector/CreateCollectorPage.vue');
+const CollectorPage = () => import('@/services/asset-inventory/collector/CollectorPage.vue');
+const CollectorPluginPage = () => import('@/services/asset-inventory/collector/collector-plugins/CollectorPluginsPage.vue');
+const CreateCollectorPage = () => import('@/services/asset-inventory/collector/create-collector/CreateCollectorPage.vue');
 
-const ServiceAccountPage = () => import(/* webpackChunkName: "ServiceAccountPage" */ '@/services/asset-inventory/service-account/ServiceAccountPage.vue');
-const ServiceAccountDetailPage = () => import(/* webpackChunkName: "ServiceAccountDetailPage" */ '@/services/asset-inventory/service-account/service-account-detail/ServiceAccountDetailPage.vue');
-const ServiceAccountAddPage = () => import(/* webpackChunkName: "ServiceAccountAddPage" */ '@/services/asset-inventory/service-account/service-account-add/ServiceAccountAddPage.vue');
-const ServiceAccountSearchPage = () => import(/* webpackChunkName: "ServiceAccountSearchPage" */ '@/services/asset-inventory/service-account/service-account-search/ServiceAccountSearchPage.vue');
+const ServiceAccountPage = () => import('@/services/asset-inventory/service-account/ServiceAccountPage.vue');
+const ServiceAccountDetailPage = () => import('@/services/asset-inventory/service-account/service-account-detail/ServiceAccountDetailPage.vue');
+const ServiceAccountAddPage = () => import('@/services/asset-inventory/service-account/service-account-add/ServiceAccountAddPage.vue');
+const ServiceAccountSearchPage = () => import('@/services/asset-inventory/service-account/service-account-search/ServiceAccountSearchPage.vue');
 
-const CollectorHistoryPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/services/asset-inventory/collector/collector-history/CollectorHistoryPage.vue');
-const CollectJobPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/services/asset-inventory/collector/collector-history/collect-job/CollectJobPage.vue');
-
+const CollectorHistoryPage = () => import('@/services/asset-inventory/collector/collector-history/CollectorHistoryPage.vue');
+const CollectJobPage = () => import('@/services/asset-inventory/collector/collector-history/collect-job/CollectJobPage.vue');
 
 const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
