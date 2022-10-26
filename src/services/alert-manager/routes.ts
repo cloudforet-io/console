@@ -8,12 +8,12 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
-const AlertManagerContainer = () => import(/* webpackChunkName: "AlertManagerContainer" */ '@/services/alert-manager/AlertManagerContainer.vue');
+const AlertManagerContainer = () => import('@/services/alert-manager/AlertManagerContainer.vue');
 
-const AlertDashboardPage = () => import(/* webpackChunkName: "AlertDashboardPage" */ '@/services/alert-manager/alert-dashboard/AlertDashboardPage.vue');
-const AlertPage = () => import(/* webpackChunkName: "AlertPage" */ '@/services/alert-manager/alert/AlertPage.vue');
-const EscalationPolicyPage = () => import(/* webpackChunkName: "EscalationPolicyPage" */ '@/services/alert-manager/escalation-policy/EscalationPolicyPage.vue');
-const AlertDetailPage = () => import(/* webpackChunkName: "AlertDetailPage" */ '@/services/alert-manager/alert/alert-detail/AlertDetailPage.vue');
+const AlertDashboardPage = () => import('@/services/alert-manager/alert-dashboard/AlertDashboardPage.vue');
+const AlertPage = () => import('@/services/alert-manager/alert/AlertPage.vue');
+const EscalationPolicyPage = () => import('@/services/alert-manager/escalation-policy/EscalationPolicyPage.vue');
+const AlertDetailPage = () => import('@/services/alert-manager/alert/alert-detail/AlertDetailPage.vue');
 
 const alertManagerRoutes: RouteConfig = {
     path: 'alert-manager',

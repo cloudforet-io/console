@@ -8,18 +8,18 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
-const CostExplorerContainer = () => import(/* webpackChunkName: "CostExplorerContainer" */ '@/services/cost-explorer/CostExplorerContainer.vue');
+const CostExplorerContainer = () => import('@/services/cost-explorer/CostExplorerContainer.vue');
 
-const CostDashboardCreatePage = () => import(/* webpackChunkName: "CostDashboardCreatePage" */ '@/services/cost-explorer/cost-dashboard/cost-dashboard-create/CostDashboardCreatePage.vue');
+const CostDashboardCreatePage = () => import('@/services/cost-explorer/cost-dashboard/cost-dashboard-create/CostDashboardCreatePage.vue');
 // eslint-disable-next-line max-len
-const CostDashboardCustomizePage = () => import(/* webpackChunkName: "CostDashboardCustomizePage" */'@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/CostDashboardCustomizePage.vue');
-const CostDashboardPage = () => import(/* webpackChunkName: "CostDashboardPage" */ '@/services/cost-explorer/cost-dashboard/CostDashboardPage.vue');
-const CostAnalysisPage = () => import(/* webpackChunkName: "CostAnalysisPage" */ '@/services/cost-explorer/cost-analysis/CostAnalysisPage.vue');
-const BudgetPage = () => import(/* webpackChunkName: "BudgetPage" */ '@/services/cost-explorer/budget/BudgetPage.vue');
-const BudgetCreatePage = () => import(/* webpackChunkName: "BudgetCreatePage" */ '@/services/cost-explorer/budget/budget-create/BudgetCreatePage.vue');
-const BudgetBulkCreatePage = () => import(/* webpackChunkName: "BudgetBulkCreatePage" */ '@/services/cost-explorer/budget/budget-bulk-create/BudgetBulkCreatePage.vue');
-const BudgetUpdatePage = () => import(/* webpackChunkName: "BudgetUpdatePage" */ '@/services/cost-explorer/budget/budget-update/BudgetUpdatePage.vue');
-const BudgetDetailPage = () => import(/* webpackChunkName: "BudgetDetailPage" */ '@/services/cost-explorer/budget/budget-detail/BudgetDetailPage.vue');
+const CostDashboardCustomizePage = () => import('@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/CostDashboardCustomizePage.vue');
+const CostDashboardPage = () => import('@/services/cost-explorer/cost-dashboard/CostDashboardPage.vue');
+const CostAnalysisPage = () => import('@/services/cost-explorer/cost-analysis/CostAnalysisPage.vue');
+const BudgetPage = () => import('@/services/cost-explorer/budget/BudgetPage.vue');
+const BudgetCreatePage = () => import('@/services/cost-explorer/budget/budget-create/BudgetCreatePage.vue');
+const BudgetBulkCreatePage = () => import('@/services/cost-explorer/budget/budget-bulk-create/BudgetBulkCreatePage.vue');
+const BudgetUpdatePage = () => import('@/services/cost-explorer/budget/budget-update/BudgetUpdatePage.vue');
+const BudgetDetailPage = () => import('@/services/cost-explorer/budget/budget-detail/BudgetDetailPage.vue');
 
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
