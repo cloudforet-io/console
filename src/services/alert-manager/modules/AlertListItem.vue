@@ -3,7 +3,8 @@
         <div class="content-wrapper">
             <div class="left-part">
                 <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_urgency_low'"
-                     width="1em" height="1em"
+                     width="1em"
+                     height="1em"
                 />
                 <p-anchor class="title"
                           :icon-visible="false"
@@ -28,14 +29,21 @@
                 >
                     {{ projectNameFormatter(item.project_id) }}
                 </p-anchor>
-                <p-badge :style-type="badgeStyleTypeFormatter(item.state)" class="badge">
+                <p-badge :style-type="badgeStyleTypeFormatter(item.state)"
+                         class="badge"
+                >
                     {{ alertStateI18n[item.state] }}
                 </p-badge>
                 <span class="date">{{ dateFormatter(item.created_at) }}</span>
             </div>
         </div>
-        <div v-if="showStatusMessage && item.status_message" class="status-message">
-            <p-i name="ic_reply" width="1rem" height="1rem" />
+        <div v-if="showStatusMessage && item.status_message"
+             class="status-message"
+        >
+            <p-i name="ic_reply"
+                 width="1rem"
+                 height="1rem"
+            />
             <span>{{ item.status_message }}</span>
         </div>
     </div>
@@ -65,7 +73,6 @@ import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-st
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 
 import { ALERT_STATE } from '../lib/config';
-
 
 const ALERT_URGENCY = Object.freeze({
     HIGH: 'HIGH',
@@ -122,8 +129,7 @@ export default {
             const timezoneDate = dayjs(date).utcOffset(offset);
             return timezoneDate.format('MM/DD HH:mm');
         };
-        const projectNameFormatter = projectId => props.projectReference?.label || projectId;
-
+        const projectNameFormatter = (projectId) => props.projectReference?.label || projectId;
 
         return {
             ...toRefs(state),

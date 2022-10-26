@@ -4,7 +4,8 @@ import displayPlugins from '@/store/modules/display/plugins';
 import settingsPlugins from '@/store/modules/settings/plugins';
 import userPlugins from '@/store/modules/user/plugins';
 
-const DEBUG = import.meta.env.MODE !== 'production';
+const DEBUG = import.meta.env.PROD;
+
 const PLUGINS = [
     ...userPlugins,
     ...settingsPlugins,
@@ -16,5 +17,4 @@ const logger = createLogger({
     logActions: false,
 });
 
-// export default DEBUG ? [logger, ...PLUGINS] : PLUGINS;
-export default DEBUG ? [...PLUGINS] : PLUGINS;
+export default DEBUG ? [logger, ...PLUGINS] : PLUGINS;

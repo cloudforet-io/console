@@ -33,7 +33,7 @@ export default defineConfig(({ command, mode }) => {
             },
         },
         define: {
-            __APP_VER__: JSON.stringify(env.npm_package_version)
-        }
+            __APP_VER__: JSON.stringify(env.npm_package_version),
+        },
     };
 });
