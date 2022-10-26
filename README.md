@@ -3,7 +3,7 @@
   
 <br/>  
 <div align="center" style="display:flex;">  
-  <img width="245" src="https://user-images.githubusercontent.com/35549653/76694897-de236300-66bb-11ea-9ace-b9edde9c12da.png">  
+  <img width="300" src="https://user-images.githubusercontent.com/65589909/197983716-71a1bd21-4d6a-4217-b509-177afbadf5bc.png">  
   <p> <br>
 <img  alt="Version"  src="https://img.shields.io/badge/version-0.9-blue.svg?cacheSeconds=2592000"  />  
 <a  href="https://cloudforet.io/"  target="_blank">  
@@ -20,7 +20,7 @@
   
 </div>    
   
-&nbsp;  
+
 &nbsp;
   
 > Front-end Project for Cloudforet. Components made with Vue2 Composition API.  
