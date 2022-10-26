@@ -9,7 +9,12 @@
             <span class="value">
                 <slot v-if="disableCopy" name="default" v-bind="{name, label, data, value: displayData}">
                     <template v-if="dataType === 'object'">
-                        <p-dict-list class="p-dict-list" :dict="displayData" />
+                        <p-tag v-for="([objKey, objValue], idx) in Object.entries(displayData)"
+                               :key="`tag-${idx}-${objKey}`"
+                               :key-item="{ name: objKey, label: objKey }"
+                               :value-item="{ name: objValue, label: objValue }"
+                               :deletable="false"
+                        />
                     </template>
                     <template v-else-if="dataType === 'array'">
                         <p-text-list :items="displayData" />
@@ -25,7 +30,12 @@
                 >
                     <slot name="default" v-bind="{name, label, data, value: displayData}">
                         <template v-if="dataType === 'object'">
-                            <p-dict-list class="p-dict-list" :dict="displayData" />
+                            <p-tag v-for="([objKey, objValue], idx) in Object.entries(displayData)"
+                                   :key="`tag-${idx}-${objKey}`"
+                                   :key-item="{ name: objKey, label: objKey }"
+                                   :value-item="{ name: objValue, label: objValue }"
+                                   :deletable="false"
+                            />
                         </template>
                         <template v-else-if="dataType === 'array'">
                             <p-text-list :items="displayData" />
@@ -48,14 +58,16 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import PDictList from '@/data-display/dynamic/dynamic-field/templates/list/dict-list/PDictList.vue';
 import type { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
+import PTag from '@/data-display/tags/PTag.vue';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 import PTextList from '@/others/console/text-list/PTextList.vue';
 
 export default defineComponent<DefinitionProps>({
     name: 'PDefinition',
-    components: { PTextList, PCopyButton, PDictList },
+    components: {
+        PTag, PTextList, PCopyButton,
+    },
     props: {
         name: {
             type: String,
