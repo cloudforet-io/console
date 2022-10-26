@@ -190,6 +190,7 @@ module.exports = {
         'import/namespace': [0, { allowComputed: true }],
     },
     ignorePatterns: ['src/assets/**', '**/node_modules/**', 'packages/cloudforet/language-pack/**', 'public/lottie.js'],
+    parser: 'vue-eslint-parser',
     parserOptions: {
         parser: '@typescript-eslint/parser',
         sourceType: 'module',
