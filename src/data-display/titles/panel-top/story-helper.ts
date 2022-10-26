@@ -41,7 +41,7 @@ export const getPanelTopArgTypes = (): ArgTypes => ({
         name: 'title',
         type: { name: ' string' },
         description: 'The title to display.',
-        defaultValue: '',
+        defaultValue: 'Panel Top',
         table: {
             type: {
                 summary: 'string',

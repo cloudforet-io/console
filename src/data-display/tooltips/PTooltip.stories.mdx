@@ -1,0 +1,74 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+
+import PTooltip from './PTooltip.vue';
+import {
+    getTooltipArgTypes
+} from '@/data-display/tooltips/story-helpers';
+
+
+<Meta title='Data Display/Tooltips' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124040'
+    }
+}} argTypes={getTooltipArgTypes()} />
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTooltip },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-tooltip
+            :tag="tag"
+            :contents="contents"
+            :position="position"
+            :options="options"
+        >Show Tooltip</p-tooltip>
+    </div>
+    `,
+    setup() {
+        return {
+        }
+    }
+});
+
+
+# Tooltip
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PTooltip },
+            template: `
+    <div class="h-full w-full overflow p-8 text-center">
+        <p-tooltip contents="tooltip contents" position="top">Top</p-tooltip><br/><br/>
+        <p-tooltip contents="tooltip contents" position="bottom">Bottom</p-tooltip><br/><br/>
+        <p-tooltip contents="tooltip contents" position="left">Left</p-tooltip><br/><br/>
+        <p-tooltip contents="tooltip contents" position="right">Right</p-tooltip>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
