@@ -1,4 +1,5 @@
 module.exports = {
+    parser: 'postcss-comment',
     plugins: [
         require('tailwindcss'),
         require('autoprefixer'),
