@@ -1,3 +1,10 @@
+# [1.1.0-beta.438](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.437...v1.1.0-beta.438) (2022-10-26)
+
+
+### Bug Fixes
+
+* **p-json-schema-form:** use PSearchDropdown if schema has `prefixItems` ([#109](https://github.com/cloudforet-io/mirinae/issues/109)) ([95cc1a4](https://github.com/cloudforet-io/mirinae/commit/95cc1a46f28a35b9aeb86ddbbac2a4c0669bc0a4))
+
 # [1.1.0-beta.437](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.436...v1.1.0-beta.437) (2022-10-25)
 
 
