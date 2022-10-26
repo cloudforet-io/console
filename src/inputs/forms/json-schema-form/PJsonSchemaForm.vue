@@ -55,6 +55,14 @@
                                        :disabled="schemaProperty.disabled"
                                        @update:selected="handleUpdateFormValue(schemaProperty, ...arguments)"
                     />
+                    <p-search-dropdown v-else-if="schemaProperty.componentName === 'PSearchDropdown'"
+                                       :menu="schemaProperty.menuItems"
+                                       :selected="rawFormData[schemaProperty.propertyName]"
+                                       multi-selectable
+                                       use-fixed-menu-style
+                                       :invalid="invalid"
+                                       @update:selected="handleUpdateFormValue(schemaProperty, ...arguments)"
+                    />
                     <template v-else>
                         <p-text-input :value="schemaProperty.multiInputMode ? undefined : rawFormData[schemaProperty.propertyName]"
                                       :selected="schemaProperty.multiInputMode ? rawFormData[schemaProperty.propertyName] : undefined"
@@ -86,6 +94,7 @@ import addFormats from 'ajv-formats';
 import { isEmpty } from 'lodash';
 
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
+import PSearchDropdown from '@/inputs/dropdown/search-dropdown/PSearchDropdown.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import GenerateIdFormat from '@/inputs/forms/json-schema-form/components/GenerateIdFormat.vue';
@@ -118,6 +127,7 @@ const PJsonSchemaForm = () => ({
 export default defineComponent<JsonSchemaFormProps>({
     name: 'PJsonSchemaForm',
     components: {
+        PSearchDropdown,
         PJsonSchemaForm,
         PSelectDropdown,
         PTextEditor,

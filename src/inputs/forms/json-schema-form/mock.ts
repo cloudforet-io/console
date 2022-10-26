@@ -64,6 +64,16 @@ export const getDefaultSchema = () => ({
             default: ['user1@test.com'],
             uniqueItems: true,
         },
+        colors: {
+            description: 'Favorite Colors',
+            title: 'Favorite Colors',
+            type: 'array',
+            prefixItems: [
+                { type: 'string' },
+                { enum: ['red', 'blue', 'gold', 'purple', 'gray'] },
+            ],
+            default: ['gray', 'blue'],
+        },
         homepage: {
             type: 'string',
             minLength: 4,
@@ -96,7 +106,7 @@ export const getDefaultSchema = () => ({
         },
 
     },
-    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails'],
+    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails', 'colors'],
     order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'age', 'phone', 'homepage', 'additional'],
 });
 
