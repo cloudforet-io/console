@@ -17,6 +17,7 @@ RUN mkdir -p ${BUILD_PATH} \
 
 COPY pkg/nginx.conf ${NGINX_CONF_PATH}/cloudforet_console.conf
 COPY public ${BUILD_PATH}/public
+COPY index.html ${BUILD_PATH}/
 COPY package.json package-lock.json *.js ${BUILD_PATH}/
 COPY packages ${BUILD_PATH}/packages
 
