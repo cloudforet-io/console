@@ -50,3 +50,4 @@ declare global {
 })();
 
 console.log('Vite Attached');
+console.log('env: ', import.meta.env);
