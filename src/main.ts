@@ -10,14 +10,12 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-
 import { siteInit } from '@/lib/site-initializer';
 
 import App from './App.vue';
 
 import '@/styles/style.pcss';
 import '@spaceone/design-system/css/light-style.css';
-
 
 /** ********** SET VUE PLUGINS ************** */
 Vue.use(Fragment.Plugin);
@@ -28,14 +26,12 @@ directive(Vue);
 
 Vue.use(SpaceDesignSystem);
 
-
 /** ********** WINDOW MODULES ************** */
 declare global {
     interface Window {
         __APP_VER__: string;
     }
 }
-
 
 /** ********** INITIALIZE ************** */
 (async () => {
@@ -52,3 +48,5 @@ declare global {
         template: '<App/>',
     });
 })();
+
+console.log('Vite Attached');
