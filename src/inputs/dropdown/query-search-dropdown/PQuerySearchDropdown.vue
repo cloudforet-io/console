@@ -1,6 +1,7 @@
 <template>
     <div v-click-outside="hideMenu" class="p-query-search-dropdown">
-        <p-search :class="{'no-menu': querySearchState.menu ? querySearchState.menu.length === 0 : false}"
+        <p-search ref="targetRef"
+                  :class="{'no-menu': querySearchState.menu ? querySearchState.menu.length === 0 : false}"
                   :value="querySearchState.searchText"
                   :placeholder="placeholder ? placeholder : 'Select Key: value'"
                   disable-icon
@@ -41,18 +42,19 @@
                         />
                     </span>
                     <span class="dropdown-button" :class="{'text-blue-600': querySearchState.isFocused}" @click="handleClickDropdownButton">
-                        <p-i class="icon" :name="querySearchState.visibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                        <p-i class="icon" :name="visibleMenuRef ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                              color="inherit"
                         />
                     </span>
                 </div>
             </template>
         </p-search>
-        <div v-show="querySearchState.visibleMenu" class="menu-container">
+        <div v-show="visibleMenuRef" class="menu-container">
             <p-context-menu ref="menuRef"
                             :loading="querySearchState.lazyLoading"
                             :menu="querySearchState.menu"
                             :highlight-term="querySearchState.searchText"
+                            :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
                             no-select-indication
                             @keyup:up:end="focus"
                             @keyup:down:end="focus"
@@ -64,8 +66,11 @@
 </template>
 
 <script lang="ts">
-import type { PropType, DirectiveFunction, SetupContext } from 'vue';
+import type {
+    PropType, DirectiveFunction, SetupContext, Ref,
+} from 'vue';
 import {
+    computed, ref,
     defineComponent, reactive, toRefs,
 } from 'vue';
 
@@ -73,7 +78,7 @@ import { vOnClickOutside } from '@vueuse/components';
 import { focus as vFocus } from 'vue-focus';
 
 import PI from '@/foundation/icons/PI.vue';
-import { useProxyValue } from '@/hooks';
+import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
 import { useQuerySearch } from '@/hooks/query-search';
 import { PTag } from '@/index';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
@@ -111,6 +116,14 @@ export default defineComponent<QuerySearchDropdownProps>({
             type: Boolean,
             default: false,
         },
+        visibleMenu: {
+            type: Boolean,
+            default: false,
+        },
+        useFixedMenuStyle: {
+            type: Boolean,
+            default: false,
+        },
         keyItemSets: {
             // FIXME:: below any type
             type: Array as PropType<any>,
@@ -130,6 +143,21 @@ export default defineComponent<QuerySearchDropdownProps>({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const state = reactive({
+            proxySelected: useProxyValue('selected', props, emit),
+        });
+        const visibleMenuRef: Ref<boolean> = ref<boolean>(props.visibleMenu || false);
+
+        const {
+            targetRef, targetElement, contextMenuStyle,
+        } = useContextMenuFixedStyle({
+            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+            visibleMenu: visibleMenuRef,
+        });
+        const contextMenuFixedStyleState = reactive({
+            visibleMenuRef, targetRef, targetElement, contextMenuStyle,
+        });
+
         const {
             state: querySearchState,
             focus, blur, hideMenu, showMenu,
@@ -141,9 +169,6 @@ export default defineComponent<QuerySearchDropdownProps>({
             preTreatSelectedMenuItem,
         } = useQuerySearch(props, { strict: true });
 
-        const state = reactive({
-            proxySelected: useProxyValue('selected', props, emit),
-        });
 
         /* util */
         const selectItem = (queryItem: QueryItem) => {
@@ -178,6 +203,7 @@ export default defineComponent<QuerySearchDropdownProps>({
         return {
             querySearchState,
             ...toRefs(state),
+            ...toRefs(contextMenuFixedStyleState),
             focus,
             blur,
             showMenu,

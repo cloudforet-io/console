@@ -5,13 +5,13 @@
              invalid,
              disabled,
              'read-only': readOnly,
-             active: proxyVisibleMenu && !readOnly,
+             active: visibleMenuRef && !readOnly,
          }"
     >
         <p-icon-button v-if="styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
                        ref="targetRef"
-                       :name="buttonIcon || (proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom')"
-                       :activated="proxyVisibleMenu"
+                       :name="buttonIcon || (visibleMenuRef ? 'ic_arrow_top' : 'ic_arrow_bottom')"
+                       :activated="visibleMenuRef"
                        :disabled="disabled"
                        color="inherit"
                        class="icon-button"
@@ -34,14 +34,14 @@
                 </slot>
             </span>
             <p-i v-if="!(styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && readOnly)"
-                 :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                 :activated="proxyVisibleMenu"
+                 :name="visibleMenuRef ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                 :activated="visibleMenuRef"
                  :disabled="disabled"
                  color="inherit"
                  class="dropdown-icon"
             />
         </button>
-        <p-context-menu v-show="proxyVisibleMenu"
+        <p-context-menu v-show="visibleMenuRef"
                         ref="contextMenuRef"
                         :class="{ [menuPosition]: !useFixedMenuStyle }"
                         :menu="items"
@@ -68,9 +68,9 @@ import {
     defineComponent,
     reactive,
     toRefs,
-    nextTick,
+    nextTick, ref,
 } from 'vue';
-import type { DirectiveFunction, SetupContext } from 'vue';
+import type { DirectiveFunction, SetupContext, Ref } from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components';
 import { groupBy, reduce } from 'lodash';
@@ -163,14 +163,15 @@ export default defineComponent<SelectDropdownProps>({
         },
     },
     setup(props, { emit, slots }: SetupContext) {
+        const visibleMenuRef: Ref<boolean> = ref<boolean>(props.visibleMenu || false);
         const {
-            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+            targetRef, targetElement, contextMenuStyle,
         } = useContextMenuFixedStyle({
             useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
-            visibleMenu: computed(() => props.visibleMenu),
+            visibleMenu: visibleMenuRef,
         });
         const contextMenuFixedStyleState = reactive({
-            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+            visibleMenuRef, targetRef, targetElement, contextMenuStyle,
         });
 
         const state = reactive({
@@ -208,18 +209,18 @@ export default defineComponent<SelectDropdownProps>({
                 emit('select', item.name, event);
                 state.proxySelected = item.name;
             }
-            contextMenuFixedStyleState.proxyVisibleMenu = false;
+            contextMenuFixedStyleState.visibleMenuRef = false;
         };
         const handleClick = (e: MouseEvent) => {
             if (props.readOnly || props.disabled) return;
-            contextMenuFixedStyleState.proxyVisibleMenu = !contextMenuFixedStyleState.proxyVisibleMenu;
+            contextMenuFixedStyleState.visibleMenuRef = !contextMenuFixedStyleState.visibleMenuRef;
             e.stopPropagation();
         };
         const handleClickOutside = (): void => {
-            contextMenuFixedStyleState.proxyVisibleMenu = false;
+            contextMenuFixedStyleState.visibleMenuRef = false;
         };
         const handlePressDownKey = () => {
-            if (!contextMenuFixedStyleState.proxyVisibleMenu) contextMenuFixedStyleState.proxyVisibleMenu = true;
+            if (!contextMenuFixedStyleState.visibleMenuRef) contextMenuFixedStyleState.visibleMenuRef = true;
             nextTick(() => {
                 if (state.contextMenuRef) {
                     if (slots['menu-menu']) emit('focus-menu');

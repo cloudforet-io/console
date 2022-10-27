@@ -1,14 +1,12 @@
-import type { ComputedRef } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import {
-    computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, nextTick, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import type { ResizeObserverEntry } from '@juggle/resize-observer';
 import { ResizeObserver } from '@juggle/resize-observer';
 import { throttle } from 'lodash';
-
-import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export interface ContextMenuFixedStyleProps {
     useFixedMenuStyle?: boolean;
@@ -17,7 +15,7 @@ export interface ContextMenuFixedStyleProps {
 
 interface StateArgs {
     useFixedMenuStyle?: ComputedRef<boolean|undefined> | boolean;
-    visibleMenu?: ComputedRef<boolean|undefined> | boolean;
+    visibleMenu: Ref<boolean>;
 }
 
 const isScrollable = (ele: Element) => {
@@ -35,20 +33,19 @@ const getScrollableParent = (ele?: Element|null): Element => {
 };
 
 export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu }: StateArgs) => {
-    const vm = getCurrentInstance()?.proxy as Vue;
     const state = reactive({
         useFixedMenuStyle,
         visibleMenu,
     });
+
     const contextMenuFixedStyleState = reactive({
-        proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, false),
         targetRef: null as Vue|Element|null,
         targetElement: computed<Element|null>(() => (contextMenuFixedStyleState.targetRef as Vue)?.$el ?? contextMenuFixedStyleState.targetRef),
         contextMenuStyle: {},
     });
 
     const hideMenu = throttle(() => {
-        if (contextMenuFixedStyleState.proxyVisibleMenu) contextMenuFixedStyleState.proxyVisibleMenu = false;
+        if (state.visibleMenu) state.visibleMenu = false;
     }, 300);
 
     const setStyleOfContextMenu = () => {
@@ -82,12 +79,12 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu }: Sta
         contextMenuFixedStyleState.contextMenuStyle = contextMenuStyle;
     };
 
-    watch(() => contextMenuFixedStyleState.proxyVisibleMenu, async () => {
-        if (!contextMenuFixedStyleState.proxyVisibleMenu || !contextMenuFixedStyleState.targetRef) {
+    watch(() => state.visibleMenu, async () => {
+        if (!state.visibleMenu || !contextMenuFixedStyleState.targetRef) {
             contextMenuFixedStyleState.contextMenuStyle = {};
         }
 
-        await vm.$nextTick(); // Needed codes for timing issues between painting DOM and proxyVisibleMenu
+        await nextTick(); // Needed codes for timing issues between painting DOM and visibleMenu
 
         setStyleOfContextMenu();
     }, { immediate: true });

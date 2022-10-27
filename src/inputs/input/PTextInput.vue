@@ -66,7 +66,7 @@
                 <slot name="right-edge" v-bind="{ value }" />
             </span>
         </div>
-        <p-context-menu v-if="proxyVisibleMenu && useAutoComplete"
+        <p-context-menu v-if="visibleMenuRef && useAutoComplete"
                         ref="menuRef"
                         :menu="bindingMenu"
                         :highlight-term="proxyValue"
@@ -79,9 +79,9 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
+import type { PropType, Ref } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, defineComponent, reactive, ref, toRefs, watch,
 } from 'vue';
 
 import vClickOutside from 'v-click-outside';
@@ -208,14 +208,15 @@ export default defineComponent<TextInputProps>({
     },
 
     setup(props, { emit, listeners, attrs }) {
+        const visibleMenuRef: Ref<boolean> = ref<boolean>(props.visibleMenu || false);
         const {
-            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+            targetRef, targetElement, contextMenuStyle,
         } = useContextMenuFixedStyle({
             useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
-            visibleMenu: computed(() => props.visibleMenu),
+            visibleMenu: visibleMenuRef,
         });
         const contextMenuFixedStyleState = reactive({
-            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+            visibleMenuRef, targetRef, targetElement, contextMenuStyle,
         });
 
         const state = reactive({
@@ -256,12 +257,12 @@ export default defineComponent<TextInputProps>({
         };
 
         const hideMenu = () => {
-            contextMenuFixedStyleState.proxyVisibleMenu = false;
+            contextMenuFixedStyleState.visibleMenuRef = false;
             emit('hide-menu');
         };
 
         const showMenu = () => {
-            contextMenuFixedStyleState.proxyVisibleMenu = true;
+            contextMenuFixedStyleState.visibleMenuRef = true;
             emit('show-menu');
         };
 

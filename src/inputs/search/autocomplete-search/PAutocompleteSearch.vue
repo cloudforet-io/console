@@ -13,7 +13,7 @@
                 <slot :name="`search-${slot}`" v-bind="{...scope}" />
             </template>
         </p-search>
-        <p-context-menu v-if="proxyVisibleMenu"
+        <p-context-menu v-if="visibleMenuRef"
                         ref="menuRef"
                         :menu="bindingMenu"
                         :loading="loading"
@@ -33,8 +33,9 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, ref, toRefs, watch,
 } from 'vue';
+import type { Ref } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import Fuse from 'fuse.js';
@@ -142,15 +143,16 @@ export default defineComponent<AutocompleteSearchProps>({
     },
     setup(props: AutocompleteSearchProps, { emit, slots, listeners }) {
         const vm = getCurrentInstance()?.proxy as Vue;
+        const visibleMenuRef: Ref<boolean> = ref<boolean>(props.visibleMenu || false);
 
         const {
-            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+            targetRef, targetElement, contextMenuStyle,
         } = useContextMenuFixedStyle({
             useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
-            visibleMenu: computed(() => props.visibleMenu),
+            visibleMenu: visibleMenuRef,
         });
         const contextMenuFixedStyleState = reactive({
-            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+            visibleMenuRef, targetRef, targetElement, contextMenuStyle,
         });
 
         const state = reactive({
@@ -219,12 +221,12 @@ export default defineComponent<AutocompleteSearchProps>({
         };
 
         const hideMenu = () => {
-            if (state.isAutoMode) contextMenuFixedStyleState.proxyVisibleMenu = false;
+            if (state.isAutoMode) contextMenuFixedStyleState.visibleMenuRef = false;
             emit('hide-menu');
         };
 
         const showMenu = () => {
-            if (state.isAutoMode) contextMenuFixedStyleState.proxyVisibleMenu = true;
+            if (state.isAutoMode) contextMenuFixedStyleState.visibleMenuRef = true;
             emit('show-menu');
         };
 
@@ -241,7 +243,7 @@ export default defineComponent<AutocompleteSearchProps>({
         };
 
         const onWindowKeydown = (e: KeyboardEvent) => {
-            if (contextMenuFixedStyleState.proxyVisibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
+            if (contextMenuFixedStyleState.visibleMenuRef && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
                 e.preventDefault();
             }
         };
@@ -276,7 +278,7 @@ export default defineComponent<AutocompleteSearchProps>({
         }, {}));
 
         const onInput = (val: string, e) => {
-            if (!contextMenuFixedStyleState.proxyVisibleMenu) showMenu();
+            if (!contextMenuFixedStyleState.visibleMenuRef) showMenu();
 
             state.proxyValue = val;
             emit('input', val, e);
