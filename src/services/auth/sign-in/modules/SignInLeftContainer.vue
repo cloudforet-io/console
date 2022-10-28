@@ -63,6 +63,8 @@ export default {
             contactLink: computed(() => config.get('CONTACT_LINK')),
         });
 
+        console.log('state.version: ', state.version);
+
         return {
             ...toRefs(state),
         };

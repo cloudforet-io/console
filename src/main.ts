@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Fragment from 'vue-fragment';
 
+import * as process from 'process';
+
 import SpaceDesignSystem from '@spaceone/design-system';
 import PortalVue from 'portal-vue';
 import VTooltip from 'v-tooltip';
@@ -25,6 +27,8 @@ Vue.use(PortalVue);
 directive(Vue);
 
 Vue.use(SpaceDesignSystem);
+
+Vue.config.productionTip = import.meta.env.DEV;
 
 /** ********** WINDOW MODULES ************** */
 declare global {
@@ -51,3 +55,5 @@ declare global {
 
 console.log('Vite Attached');
 console.log('env: ', import.meta.env);
+console.log('ver: ', import.meta.env.__APP_VER__);
+console.log('main.ts process.env: ', process.env);
