@@ -40,7 +40,7 @@ export default defineConfig(({ command, mode }) => {
             },
         },
         define: {
-            __APP_VER__: JSON.stringify(process.env.npm_package_version),
+            VITE_APP_VER: JSON.stringify(process.env.npm_package_version),
         },
     };
 });

@@ -58,7 +58,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            version: window.__APP_VER__,
+            version: window.VITE_APP_VER,
             signInImage: computed(() => config.get('DOMAIN_IMAGE.SIGN_IN')),
             contactLink: computed(() => config.get('CONTACT_LINK')),
         });

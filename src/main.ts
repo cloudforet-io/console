@@ -33,7 +33,7 @@ Vue.config.productionTip = import.meta.env.DEV;
 /** ********** WINDOW MODULES ************** */
 declare global {
     interface Window {
-        __APP_VER__: string;
+        VITE_APP_VER: string;
     }
 }
 
@@ -55,5 +55,5 @@ declare global {
 
 console.log('Vite Attached');
 console.log('env: ', import.meta.env);
-console.log('ver: ', import.meta.env.__APP_VER__);
+console.log('ver: ', import.meta.env.VITE_APP_VER);
 console.log('main.ts process.env: ', process.env);
