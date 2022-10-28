@@ -41,6 +41,7 @@ export default defineConfig(({ command, mode }) => {
         },
         define: {
             VITE_APP_VER: JSON.stringify(process.env.npm_package_version),
+            VITE_SOME_KEY: '123'
         },
     };
 });
