@@ -1,3 +1,10 @@
+# [1.1.0-beta.439](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.438...v1.1.0-beta.439) (2022-10-31)
+
+
+### Bug Fixes
+
+* **p-button:** delete `fontWeight`, `outline` and update `styleType` ([#114](https://github.com/cloudforet-io/mirinae/issues/114)) ([4d9af9b](https://github.com/cloudforet-io/mirinae/commit/4d9af9b12b4ce4e3915f2bf04ae05d40721310e7))
+
 # [1.1.0-beta.438](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.437...v1.1.0-beta.438) (2022-10-26)
 
 
