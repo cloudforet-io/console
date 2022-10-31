@@ -1,3 +1,10 @@
+# [1.1.0-beta.440](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.439...v1.1.0-beta.440) (2022-10-31)
+
+
+### Features
+
+* **radio-group:** add radio-group component ([#117](https://github.com/cloudforet-io/mirinae/issues/117)) ([4b56c80](https://github.com/cloudforet-io/mirinae/commit/4b56c80555c96128bab77d3da92be585b474eedc))
+
 # [1.1.0-beta.439](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.438...v1.1.0-beta.439) (2022-10-31)
 
 
