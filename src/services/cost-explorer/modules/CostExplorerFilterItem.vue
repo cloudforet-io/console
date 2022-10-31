@@ -26,6 +26,7 @@
             :key-item-sets="querySearchHandlerState.keyItemSets"
             :value-handler-map="querySearchHandlerState.valueHandlerMap"
             :selected="querySearchHandlerState.selectedQueryItems"
+            use-fixed-menu-style
             multi-selectable
             @update:selected="handleUpdateSelectedQueryItems"
         />
