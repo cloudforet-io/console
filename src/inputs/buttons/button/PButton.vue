@@ -146,13 +146,10 @@ export default defineComponent<ButtonProps>({
             outline-color: theme('colors.blue.500');
         }
         &.disabled {
-            @apply bg-gray-200 text-gray-400;
+            @apply bg-gray-200 text-gray-400 border-transparent;
             cursor: not-allowed;
-        }
-        &.loading {
-            cursor: not-allowed;
-            > .p-spinner {
-                margin-right: 0.25em;
+            &:hover, &:active {
+                @apply bg-gray-200;
             }
         }
     }
@@ -210,6 +207,13 @@ export default defineComponent<ButtonProps>({
         @apply font-normal;
     }
 
+    &.loading {
+        cursor: not-allowed;
+        > .p-spinner {
+            margin-right: 0.25em;
+        }
+    }
+
     > .icon {
         flex-shrink: 0;
         &.left {
@@ -235,10 +239,20 @@ export default defineComponent<ButtonProps>({
         &:hover, &:focus {
             @apply text-blue-600;
         }
+        &.disabled {
+            &:hover, &:active, &:focus {
+                @apply bg-gray-200 text-gray-400 border-transparent;
+            }
+        }
     }
     &.negative-secondary {
         &:hover, &:active {
             @apply text-red-500 border-red-200;
+        }
+        &.disabled {
+            &:hover, &:active, &:focus {
+                @apply bg-gray-200 text-gray-400 border-transparent;
+            }
         }
     }
     &.negative-transparent {
@@ -248,6 +262,11 @@ export default defineComponent<ButtonProps>({
         }
         &:active {
             @apply text-white;
+        }
+        &.disabled {
+            &:hover, &:active, &:focus {
+                @apply bg-gray-200 text-gray-400 border-transparent;
+            }
         }
     }
 }

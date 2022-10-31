@@ -136,14 +136,31 @@ export const Template = (args, {argTypes})=>({
         {{
             components:{ PButton, PLottie },
             template: `
-                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
-                    <p-button
-                        styleType="primary"
-                        :disabled="true"
-                    >
-                        <div>Disabled</div>
+                <div style="display: flex; flex-direction: column; align-items: center; background-color: white">
+                <div style="display:flex">
+                    <p-button v-for="styleType in buttonStyles.slice(0, 4)" :style-type="styleType" disabled style="margin-right: 20px">
+                        <div>{{ styleType }}</div>
                     </p-button>
+                </div>
+                <div style="display:flex; margin-top: 20px">
+                    <p-button v-for="styleType in buttonStyles.slice(4, 7)" :style-type="styleType" disabled style="margin-right: 20px">
+                        <div>{{ styleType }}</div>
+                    </p-button>
+                </div>
+                <div style="display:flex; margin-top: 20px">
+                    <p-button v-for="styleType in buttonStyles.slice(7)" :style-type="styleType" disabled style="margin-right: 20px">
+                        <div>{{ styleType }}</div>
+                    </p-button>
+                </div>
                 </div>`,
+            setup() {
+                const state = reactive({
+                    buttonStyles: Object.values(BUTTON_STYLE),
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
         }}
     </Story>
 </Canvas>

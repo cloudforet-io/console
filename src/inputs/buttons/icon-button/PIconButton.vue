@@ -1,7 +1,7 @@
 <template>
     <p-button
         class="p-icon-button"
-        :class="{ activated, [size]: true, loading}"
+        :class="{ activated, [size]: true, loading, [shape]: true }"
         :style-type="styleType"
         :disabled="disabled || loading"
         v-on="$listeners"
@@ -29,8 +29,11 @@ import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import type { ButtonSize } from '@/inputs/buttons/button/type';
+import type {
+    IconButtonProps, IconButtonShape, IconButtonSize, IconButtonStyleType,
+} from '@/inputs/buttons/icon-button/type';
 import {
-    ICON_BUTTON_SIZE, ICON_BUTTON_STYLE_TYPE,
+    ICON_BUTTON_SHAPE, ICON_BUTTON_SIZE, ICON_BUTTON_STYLE_TYPE,
 } from '@/inputs/buttons/icon-button/type';
 
 
@@ -39,7 +42,7 @@ const LOADING_SIZE: Record<ButtonSize, string> = {
     md: SPINNER_SIZE.lg,
     lg: SPINNER_SIZE.xl,
 };
-export default defineComponent({
+export default defineComponent<IconButtonProps>({
     name: 'PIconButton',
     components: { PSpinner, PButton, PI },
     props: {
@@ -49,8 +52,10 @@ export default defineComponent({
         },
         styleType: {
             type: String,
-            default: 'transparent',
-            validator: value => Object.keys(ICON_BUTTON_STYLE_TYPE).includes(value as string),
+            default: ICON_BUTTON_STYLE_TYPE.transparent,
+            validator(value: IconButtonStyleType) {
+                return Object.values(ICON_BUTTON_STYLE_TYPE).includes(value);
+            },
         },
         color: {
             type: String,
@@ -68,20 +73,25 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
-        outline: {
-            type: Boolean,
-            default: false,
-        },
         size: {
             type: String,
             default: 'md',
-            validator: value => Object.keys(ICON_BUTTON_SIZE).includes(value as string),
+            validator(value: IconButtonSize) {
+                return Object.keys(ICON_BUTTON_SIZE).includes(value);
+            },
         },
         animation: {
             type: String,
             default: undefined,
             validator(animation: any) {
                 return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
+            },
+        },
+        shape: {
+            type: String,
+            default: ICON_BUTTON_SHAPE.circle,
+            validator(value: IconButtonShape) {
+                return Object.values(ICON_BUTTON_SHAPE).includes(value);
             },
         },
     },
@@ -104,7 +114,7 @@ export default defineComponent({
     min-height: 2rem;
     max-width: 2rem;
     max-height: 2rem;
-    > .p-lottie {
+    > .p-spinner {
         flex-shrink: 0;
     }
     > .p-i-icon {
@@ -124,25 +134,41 @@ export default defineComponent({
         max-height: 1.5rem;
     }
 
-    /* style types */
-    &.transparent {
-        @apply rounded-full;
-        &.loading:hover {
-            @apply bg-transparent;
-        }
-        &.activated {
-            @apply text-secondary;
+    &.loading {
+        > .p-spinner {
+            margin-right: 0;
         }
     }
-    &.gray-border {
-        &:not(.loading):not(.disabled) {
-            @apply border-gray-300;
+
+    &.circle {
+        @apply rounded-full;
+    }
+
+    &.disabled {
+        @apply border-transparent;
+        &:hover, &:active, &:focus {
+            @apply border-transparent;
         }
-        &:not(.disabled):not(.loading):not(.activated):hover {
-            @apply text-gray-900 border-gray-900;
-        }
+    }
+
+    /* style types */
+    &.transparent {
         &.activated {
-            @apply text-secondary border-secondary;
+            @apply text-blue-600;
+        }
+        &.disabled {
+            @apply bg-transparent;
+            &:hover, &:active, &:focus {
+                @apply bg-transparent;
+            }
+        }
+    }
+    &.negative-transparent {
+        &.disabled {
+            @apply bg-transparent;
+            &:hover, &:active, &:focus {
+                @apply bg-transparent;
+            }
         }
     }
 }

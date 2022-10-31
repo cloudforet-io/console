@@ -4,6 +4,7 @@ import PIconButton from "@/inputs/buttons/icon-button/PIconButton";
 
 import { getIconButtonArgTypes } from '@/inputs/buttons/icon-button/story-helper';
 import {ICON_BUTTON_STYLE_TYPE} from '@/inputs/buttons/icon-button/type';
+import { reactive, toRefs } from 'vue';
 
 <Meta title='Inputs/Buttons/IconButton' parameters={{
     design: {
@@ -26,7 +27,6 @@ export const Template = (args, { argTypes }) => ({
                 :disabled="disabled"
                 :activated="activated"
                 :loading="loading"
-                :outline="outline"
                 :size="size"
                 :animation="animation"
             />
@@ -64,25 +64,81 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Outlined
+## Style
 
 <Canvas>
     <Story name="Outlined">
         {{
             components:{ PIconButton },
             template: `
-                <div style="text-align:center">
-                    <p-icon-button style-type="primary" :outline="true" style="margin: 1rem" name="ic_refresh" />
-                    <p-icon-button style-type="secondary" :outline="true" style="margin: 1rem" name="ic_refresh" />
-                    <p-icon-button style-type="alert" :outline="true" style="margin: 1rem" name="ic_refresh" />
-                    <p-icon-button style-type="safe" :outline="true" style="margin: 1rem" name="ic_refresh" />
-                </div>`,
+<table>
+    <tr>
+        <td>tertiary</td>
+        <td><p-icon-button style-type="tertiary" style="margin: 0.5rem" name="ic_refresh" /></td>
+    </tr>
+    <tr>
+        <td>transparent</td>
+        <td><p-icon-button style-type="transparent" style="margin: 0.5rem" name="ic_refresh" /></td>
+    </tr>
+    <tr>
+        <td>negative-secondary</td>
+        <td><p-icon-button style-type="negative-secondary" style="margin: 0.5rem" name="ic_refresh" /></td>
+    </tr>
+    <tr>
+        <td>negative-transparent</td>
+        <td><p-icon-button style-type="negative-transparent" style="margin: 0.5rem" name="ic_refresh" /></td>
+    </tr>
+</table>`,
+            setup() {
+                const state = reactive({
+                    buttonStyles: Object.values(ICON_BUTTON_STYLE_TYPE),
+                })
+                return {
+                    ...toRefs(state),
+                }
+            }
         }}
     </Story>
 </Canvas>
 
 <br/>
 <br/>
+
+## Shape
+<Canvas>
+    <Story name="Shape">
+        {{
+            components:{ PIconButton },
+            template: `
+<table>
+    <tr>
+        <td>tertiary</td>
+        <td><p-icon-button style-type="tertiary" style="margin: 0.5rem" name="ic_refresh" /></td>
+        <td><p-icon-button style-type="tertiary" style="margin: 0.5rem" name="ic_refresh" shape="circle" /></td>
+    </tr>
+    <tr>
+        <td>transparent</td>
+        <td><p-icon-button style-type="transparent" style="margin: 0.5rem" name="ic_refresh" /></td>
+        <td><p-icon-button style-type="transparent" style="margin: 0.5rem" name="ic_refresh" shape="circle" /></td>
+    </tr>
+    <tr>
+        <td>negative-secondary</td>
+        <td><p-icon-button style-type="negative-secondary" style="margin: 0.5rem" name="ic_refresh" /></td>
+        <td><p-icon-button style-type="negative-secondary" style="margin: 0.5rem" name="ic_refresh" shape="circle" /></td>
+    </tr>
+    <tr>
+        <td>negative-transparent</td>
+        <td><p-icon-button style-type="negative-transparent" style="margin: 0.5rem" name="ic_refresh" /></td>
+        <td><p-icon-button style-type="negative-transparent" style="margin: 0.5rem" name="ic_refresh" shape="circle" /></td>
+    </tr>
+</table>`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Disabled
 
@@ -91,13 +147,24 @@ export const Template = (args, { argTypes }) => ({
         {{
             components:{ PIconButton },
             template: `
-                <div style="text-align:center">
-                    <p-icon-button style-type="primary" style="margin: 1rem" name="ic_refresh" />
-                    <p-icon-button style-type="primary" :disabled="true" style="margin: 1rem" name="ic_refresh" />
-                    <br/>
-                    <p-icon-button style-type="transparent" style="margin: 1rem" name="ic_refresh" />
-                    <p-icon-button style-type="transparent" :disabled="true" style="margin: 1rem" name="ic_refresh" />
-                </div>`,
+<table>
+    <tr>
+        <td>tertiary</td>
+        <td><p-icon-button style-type="tertiary" style="margin: 0.5rem" name="ic_refresh" disabled /></td>
+    </tr>
+    <tr>
+        <td>transparent</td>
+        <td><p-icon-button style-type="transparent" style="margin: 0.5rem" name="ic_refresh" disabled /></td>
+    </tr>
+    <tr>
+        <td>negative-secondary</td>
+        <td><p-icon-button style-type="negative-secondary" style="margin: 0.5rem" name="ic_refresh" disabled /></td>
+    </tr>
+    <tr>
+        <td>negative-transparent</td>
+        <td><p-icon-button style-type="negative-transparent" style="margin: 0.5rem" name="ic_refresh" disabled /></td>
+    </tr>
+</table>`,
         }}
     </Story>
 </Canvas>
@@ -113,11 +180,8 @@ export const Template = (args, { argTypes }) => ({
             components:{ PIconButton },
             template: `
                 <div style="text-align:center">
-                    <p-icon-button style-type="primary" animation="spin" style="margin: 1rem" name="ic_refresh" />
-                    <br/>
-                    <p-icon-button style-type="transparent" animation="spin" style="margin: 1rem" name="ic_refresh" />
-                    <br/>
-                    <p-icon-button style-type="gray-border" animation="spin" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="tertiary" animation="spin" style="margin: 0.5rem" name="ic_refresh" />
+                    <p-icon-button style-type="transparent" animation="spin" style="margin: 0.5rem" name="ic_refresh" />
                 </div>`,
         }}
     </Story>
@@ -135,8 +199,8 @@ export const Template = (args, { argTypes }) => ({
             components:{ PIconButton },
             template: `
                 <div style="text-align:center">
-                    <p-icon-button style-type="gray-border" style="margin: 1rem" name="ic_refresh" />
-                    <p-icon-button style-type="gray-border" :activated="true" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="transparent" style="margin: 0.5rem" name="ic_refresh" />
+                    <p-icon-button style-type="transparent" :activated="true" style="margin: 0.5rem" name="ic_refresh" />
                 </div>`,
         }}
     </Story>
@@ -163,35 +227,19 @@ export const Template = (args, { argTypes }) => ({
     </thead>
     <tbody>
         <template v-for="(styleType) in styleTypes">
-        <tr :key="styleType+'default'">
-            <th rowspan="2">{{styleType}}</th>
-            <th>default</th>
-            <td><p-icon-button :style-type="styleType" name="ic_search" /></td>
-            <td><p-icon-button :style-type="styleType" name="ic_search" disabled /></td>
-            <td><p-icon-button :style-type="styleType" name="ic_search" loading /></td>
-            <td><p-icon-button :style-type="styleType" name="ic_search" activated /></td>
-        </tr>
-        <tr :key="styleType+'outline'">
-            <th>outline</th>
-            <td><p-icon-button :style-type="styleType" name="ic_search" outline /></td>
-            <td><p-icon-button :style-type="styleType" name="ic_search" outline disabled /></td>
-            <td><p-icon-button :style-type="styleType" name="ic_search" outline loading /></td>
-            <td><p-icon-button :style-type="styleType" name="ic_search" outline activated /></td>
-        </tr>
+            <tr :key="styleType">
+                <th colspan="2">{{styleType}}</th>
+                <td><p-icon-button :style-type="styleType" name="ic_search" /></td>
+                <td><p-icon-button :style-type="styleType" name="ic_search" disabled /></td>
+                <td><p-icon-button :style-type="styleType" name="ic_search" loading /></td>
+                <td><p-icon-button :style-type="styleType" name="ic_search" activated /></td>
+            </tr>
         </template>
     </tbody>
 </table>`,
             setup() {
                 return {
-                    styleTypes: Object.values(ICON_BUTTON_STYLE_TYPE).sort((a, b) => {
-                        if (a === 'transparent') return -1
-                        if (a === 'gray-border') {
-                            if (b === 'transparent') return 1
-                            return -1
-                        }
-                        if (a < b) return -1;
-                        if (a > b) return 1;
-                    })
+                    styleTypes: Object.values(ICON_BUTTON_STYLE_TYPE)
                 }
             }
         }}
