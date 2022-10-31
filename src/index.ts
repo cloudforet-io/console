@@ -39,6 +39,7 @@ export { default as PCollapsiblePanel } from './data-display/collapsibles/collap
 export { default as PCheckBox } from './inputs/checkbox/PCheckBox.vue';
 export { default as PFieldGroup } from './inputs/forms/field-group/PFieldGroup.vue';
 export { default as PRadio } from './inputs/radio/PRadio.vue';
+export { default as PRadioGroup } from './inputs/radio-group/PRadioGroup.vue';
 export { default as PGridLayout } from './others/deprecated/grid-layout/PGridLayout.vue';
 export { default as PPaneLayout } from './layouts/pane-layout/PPaneLayout.vue';
 export { default as PSidebar } from './layouts/sidebar/PSidebar.vue';
