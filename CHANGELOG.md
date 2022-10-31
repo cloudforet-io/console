@@ -1,3 +1,10 @@
+# [1.1.0-beta.443](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.442...v1.1.0-beta.443) (2022-10-31)
+
+
+### Features
+
+* **p-search:** add autocomplete function to PSearch component ([#113](https://github.com/cloudforet-io/mirinae/issues/113)) ([a871b09](https://github.com/cloudforet-io/mirinae/commit/a871b09fd138a885e00802eab7aa584caa662f34))
+
 # [1.1.0-beta.442](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.441...v1.1.0-beta.442) (2022-10-31)
 
 
