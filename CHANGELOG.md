@@ -1,3 +1,10 @@
+# [1.1.0-beta.442](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.441...v1.1.0-beta.442) (2022-10-31)
+
+
+### Bug Fixes
+
+* **p-icon-button:** update style ([#119](https://github.com/cloudforet-io/mirinae/issues/119)) ([22d82e7](https://github.com/cloudforet-io/mirinae/commit/22d82e70c81281542196b8b0f2724f046ec59781))
+
 # [1.1.0-beta.441](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.440...v1.1.0-beta.441) (2022-10-31)
 
 
