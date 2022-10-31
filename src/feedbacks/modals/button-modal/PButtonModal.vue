@@ -42,7 +42,7 @@
                             <p-button
                                 v-if="footerResetButtonVisible"
                                 class="modal-button reset-button"
-                                style-type="gray-border"
+                                style-type="tertiary"
                                 :disabled="loading"
                                 @click="onResetClick"
                             >
@@ -64,7 +64,7 @@
                                 v-if="!hideFooterConfirmButton"
                                 class="modal-button confirm-button"
                                 :class="{'no-cancel-button': hideFooterCloseButton}"
-                                :style-type="themeColor"
+                                :style-type="buttonThemeColor"
                                 :loading="loading"
                                 :disabled="disabled"
                                 @click="onConfirmClick"
@@ -92,6 +92,7 @@ import { SizeMapping } from '@/feedbacks/modals/type';
 import '@/feedbacks/modals/modal.pcss';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
+import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { makeProxy } from '@/util/composition-helpers';
 
@@ -180,6 +181,15 @@ export default defineComponent<ButtonModalProps>({
                 const res: string[] = [];
                 if (props.size) res.push(props.size);
                 return res;
+            }),
+            buttonThemeColor: computed(() => {
+                if (props.themeColor === 'primary1') return BUTTON_STYLE.substitutive;
+                if (props.themeColor === 'gray900') return BUTTON_STYLE.tertiary;
+                if (props.themeColor === 'secondary') return BUTTON_STYLE.highlight;
+                if (props.themeColor === 'safe') return BUTTON_STYLE.positive;
+                if (props.themeColor === 'alert') return BUTTON_STYLE['negative-primary'];
+                if (['primary2', 'secondary1'].includes(props.themeColor)) return BUTTON_STYLE.secondary;
+                return BUTTON_STYLE.primary;
             }),
         });
         const dialogClassObject = computed(() => [
@@ -343,13 +353,12 @@ export default defineComponent<ButtonModalProps>({
 .modal-primary { @mixin modal-color theme('colors.primary'); }
 .modal-primary-dark { @mixin modal-color theme('colors.primary-dark'); }
 .modal-primary1 { @mixin modal-color theme('colors.primary1'); }
-.modal-primary2 { @mixin modal-color theme('colors.primary2'); }
+.modal-primary2 { @mixin modal-color theme('colors.primary'); }
 .modal-secondary { @mixin modal-color theme('colors.secondary'); }
-.modal-secondary1 { @mixin modal-color theme('colors.secondary1'); }
+.modal-secondary1 { @mixin modal-color theme('colors.primary'); }
 .modal-safe { @mixin modal-color theme('colors.gray.900'); }
 .modal-alert { @mixin modal-color theme('colors.alert'); }
 .modal-gray900 { @mixin modal-color theme('colors.gray.900'); }
-.modal-gray { @mixin modal-color theme('colors.gray.default'); }
 
 @screen mobile {
     .modal-mask {

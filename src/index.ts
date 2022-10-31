@@ -31,7 +31,6 @@ export { default as PToastAlert } from './feedbacks/alert/toast/PToastAlert.vue'
 export { default as PAnchor } from './inputs/anchors/PAnchor.vue';
 export { default as PCopyButton } from './inputs/buttons/copy-button/PCopyButton.vue';
 export { default as PIconButton } from './inputs/buttons/icon-button/PIconButton.vue';
-export { default as PLoadingButton } from './others/deprecated/loading-button/PLoadingButton.vue';
 export { default as PToggleButton } from './inputs/buttons/toggle-button/PToggleButton.vue';
 export { default as PCard } from './data-display/cards/card/PCard.vue';
 export { default as PCardItem } from './others/deprecated/card-item/PCardItem.vue';

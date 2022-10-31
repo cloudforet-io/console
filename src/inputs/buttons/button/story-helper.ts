@@ -96,24 +96,6 @@ export const getButtonArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    outline: {
-        name: 'outline',
-        type: { name: 'boolean' },
-        description: 'Outlined when true',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false,
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
     block: {
         name: 'block',
         type: { name: 'boolean' },
@@ -132,29 +114,29 @@ export const getButtonArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    fontWeight: {
-        name: 'fontWeight',
+    iconLeft: {
+        name: 'iconLeft',
         type: { name: 'string' },
-        description: 'Font Weight',
-        defaultValue: 'bold',
+        description: 'Name of icon to the left of the text.',
+        defaultValue: null,
         table: {
             type: {
                 summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: 'bold',
+                summary: 'null',
             },
         },
         control: {
             type: 'select',
-            options: ['light', 'normal', 'bold'],
+            options: [null, ...Object.keys(icon.icons)],
         },
     },
-    icon: {
-        name: 'icon',
+    iconRight: {
+        name: 'iconRight',
         type: { name: 'string' },
-        description: 'Icon name',
+        description: 'Name of icon to the right of the text.',
         defaultValue: null,
         table: {
             type: {

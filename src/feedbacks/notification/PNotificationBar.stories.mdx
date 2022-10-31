@@ -103,7 +103,7 @@ export const Template = (args, { argTypes }) => ({
     components: { PNotificationBar, PButton },
     template: `
         <div class="w-full h-full">
-            <p-button :style-type="visible ? 'primary' : 'secondary'"
+            <p-button :style-type="visible ? 'primary' : 'highlight'"
                       @click="visible = !visible;">
                 {{visible ? 'close' : 'open' }}
             </p-button>

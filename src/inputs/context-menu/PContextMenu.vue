@@ -8,7 +8,7 @@
                     <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
                     <span class="pl-2">({{ selectedCountInFilteredMenu }} / {{ menuItemLength }})</span>
                 </div>
-                <p-button size="sm" style-type="primary-dark" :disabled="!proxySelected.length"
+                <p-button size="sm" style-type="primary" :disabled="!proxySelected.length"
                           @click="$emit('click-done', $event)"
                 >
                     {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
@@ -58,11 +58,9 @@
                 >
                     <p-button :disabled="item.disabled"
                               size="sm"
-                              style-type="gray-border"
-                              font-weight="bold"
-                              :outline="true"
+                              style-type="tertiary"
                               :block="true"
-                              :icon="item.icon"
+                              :icon-left="item.icon"
                               @click="$emit('click-button', item, index, $event)"
                     >
                         {{ item.label }}

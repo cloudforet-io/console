@@ -105,7 +105,7 @@ export const Template = (args, { argTypes }) => ({
             components: { PAutocompleteSearch, PButton },
             template: `
         <div>
-            <p class="mb-4">To focus search and show menu, click the button <p-button style-type="primary" @click="focusMenu">Search</p-button></p>
+            <p class="mb-4">To focus search and show menu, click the button <p-button @click="focusMenu">Search</p-button></p>
             <p class="mb-4">To hide menu, select menu item</p>
             <p-autocomplete-search :menu="menu"
                 v-model="proxyValue"

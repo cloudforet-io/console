@@ -71,8 +71,7 @@
 
         <slot name="bottom">
             <div class="bottom">
-                <p-button :outline="true"
-                          style-type="gray900"
+                <p-button style-type="tertiary"
                           :disabled="loading"
                           size="lg"
                           class="txt-btn" @click="$emit('cancel', $event)"
@@ -81,18 +80,16 @@
                 </p-button>
                 <div class="nav-btn-box">
                     <p-button v-if="!isFirstTab"
-                              :outline="true"
                               :disabled="loading"
-                              style-type="secondary"
+                              style-type="highlight"
                               size="lg"
                               @click="onClickPrev"
                     >
                         <p-i name="ic_back" color="inherit" />{{ $t('COMPONENT.PROGRESS_WIZARD.PREV') }}
                     </p-button>
                     <p-button v-if="!isLastTab"
-                              :outline="true"
                               :disabled="loading"
-                              style-type="secondary"
+                              style-type="highlight"
                               size="lg"
                               @click="onClickNext"
                     >
@@ -101,7 +98,7 @@
                     <p-button :loading="loading"
                               :disabled="disabled"
                               class="txt-btn"
-                              style-type="secondary"
+                              style-type="highlight"
                               size="lg"
                               @click="$emit('confirm', tabs, $event)"
                     >

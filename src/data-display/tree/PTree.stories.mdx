@@ -21,19 +21,19 @@ export const ExpertTemplate = (args, { argTypes }) => ({
     template: `
         <div class="h-full w-full p-4 overflow-auto">
             <div class="mb-4">
-                <p-button style-type="primary1" @click="refresh">Refresh</p-button>
-                <p-button style-type="secondary" @click="add">Add node to root</p-button>
-                <p-button style-type="safe" @click="onClickEdit">
+                <p-button style-type="substitutive" @click="refresh">Refresh</p-button>
+                <p-button style-type="highlight" @click="add">Add node to root</p-button>
+                <p-button style-type="positive" @click="onClickEdit">
                     {{editMode ? 'Done' : 'Edit' }}
                 </p-button>
-                <p-button style-type="primary" @click="find">Find node</p-button>
+                <p-button @click="find">Find node</p-button>
                 <div class="mt-4">
                     <p-text-input v-model="target"/>
-                    <p-button style-type="secondary1" @click="fetchAndFind">Fetch and find node</p-button>
+                    <p-button style-type="secondary" @click="fetchAndFind">Fetch and find node</p-button>
                 </div>
                 <div class="mt-4">
                     <p-text-input v-model="editText"/>
-                    <p-button style-type="alert" @click="updateData">Update selected node</p-button>
+                    <p-button style-type="negative-primary" @click="updateData">Update selected node</p-button>
                 </div>
             </div>
             <p-tree :edit-options="editOptions"

@@ -5,10 +5,8 @@
                :class="{
                    [styleType]: true,
                    [size]: true,
-                   [fontWeight]: true,
                    'loading': !!loading,
                    'block': !!block,
-                   'outline': !!outline,
                    'disabled': !!disabled,
                } "
                v-on="{
@@ -22,12 +20,19 @@
                }"
     >
         <p-spinner v-if="loading" :size="loadingIconSize" />
-        <p-i v-if="icon"
-             :name="icon"
-             width="1rem" height="1rem"
+        <p-i v-if="iconLeft"
+             :name="iconLeft"
+             :width="iconSize" :height="iconSize"
              color="inherit"
+             class="icon left"
         />
         <slot name="default" />
+        <p-i v-if="iconRight"
+             :name="iconRight"
+             :width="iconSize" :height="iconSize"
+             color="inherit"
+             class="icon right"
+        />
     </component>
 </template>
 
@@ -42,9 +47,14 @@ import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import PI from '@/foundation/icons/PI.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import type { ButtonProps, ButtonSize } from '@/inputs/buttons/button/type';
-import { BUTTON_FONT_WEIGHT, BUTTON_SIZE, BUTTON_STYLE } from '@/inputs/buttons/button/type';
+import { BUTTON_SIZE, BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 
+const ICON_SIZE: Record<ButtonSize, string> = {
+    sm: '0.75rem',
+    md: '1rem',
+    lg: '1.25rem',
+};
 const LOADING_SIZE: Record<ButtonSize, string> = {
     sm: SPINNER_SIZE.xs,
     md: SPINNER_SIZE.sm,
@@ -80,13 +90,13 @@ export default defineComponent<ButtonProps>({
             type: String,
             default: undefined,
         },
-        icon: {
+        iconLeft: {
             type: String,
             default: undefined,
         },
-        outline: {
-            type: Boolean,
-            default: false,
+        iconRight: {
+            type: String,
+            default: undefined,
         },
         block: {
             type: Boolean,
@@ -96,17 +106,11 @@ export default defineComponent<ButtonProps>({
             type: Boolean,
             default: false,
         },
-        fontWeight: {
-            type: String,
-            default: BUTTON_FONT_WEIGHT.bold,
-            validator(value: string): boolean {
-                return Object.keys(BUTTON_FONT_WEIGHT).includes(value);
-            },
-        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             component: computed(() => (props.href ? 'a' : 'button')),
+            iconSize: computed(() => ICON_SIZE[props.size ?? ''] ?? ICON_SIZE.md),
             loadingIconSize: computed(() => LOADING_SIZE[props.size ?? ''] ?? LOADING_SIZE.md),
         });
 
@@ -126,31 +130,29 @@ export default defineComponent<ButtonProps>({
 </script>
 
 <style lang="postcss">
-@define-mixin btn-color $theme, $bg-color, $text-color {
+@define-mixin btn-color $theme, $default-color, $text-color, $hover-color, $active-color, $focus-color, $border-color {
     &.$(theme) {
-        background-color: $bg-color;
+        background-color: $default-color;
         color: $text-color;
-        &.outline {
-            border-color: $bg-color;
-            color: $bg-color;
-            background-color: #fff;
-            &:not(.disabled):hover {
-                background-color: $bg-color;
-                color: $text-color;
+        border-color: $border-color;
+        &:hover {
+            background-color: $hover-color;
+            &:active {
+                background-color: $active-color;
             }
+        }
+        &:focus {
+            background-color: $focus-color;
+            outline-color: theme('colors.blue.500');
         }
         &.disabled {
-            @apply bg-gray-200 text-gray-400 border-gray-100;
+            @apply bg-gray-200 text-gray-400;
             cursor: not-allowed;
-            &.outline {
-                @apply text-gray-300 border-gray-300;
-            }
         }
         &.loading {
-            @apply bg-gray-200 text-gray-400 border-gray-100;
             cursor: not-allowed;
-            > .spinner {
-                margin-right: 0.5em;
+            > .p-spinner {
+                margin-right: 0.25em;
             }
         }
     }
@@ -190,9 +192,6 @@ export default defineComponent<ButtonProps>({
         &.block {
             min-width: 100%;
         }
-        > .icon {
-            font-size: 1.5rem;
-        }
     }
 
     &.sm {
@@ -205,13 +204,6 @@ export default defineComponent<ButtonProps>({
         &.block {
             min-width: 100%;
         }
-        > .icon {
-            font-size: 1rem;
-        }
-    }
-
-    &.bold {
-        @apply font-bold;
     }
 
     &.normal {
@@ -220,43 +212,42 @@ export default defineComponent<ButtonProps>({
 
     > .icon {
         flex-shrink: 0;
-        margin-right: 0.25em;
-        font-size: 1.25rem;
-    }
-
-    @mixin btn-color primary-dark, theme('colors.primary-dark'), theme('colors.white');
-    @mixin btn-color primary, theme('colors.primary'), theme('colors.white');
-    @mixin btn-color primary1, theme('colors.primary1'), theme('colors.white');
-    @mixin btn-color primary2, theme('colors.primary2'), theme('colors.white');
-    @mixin btn-color secondary, theme('colors.secondary'), theme('colors.white');
-    @mixin btn-color secondary-dark, theme('colors.secondary-dark'), theme('colors.white');
-    @mixin btn-color secondary1, theme('colors.secondary1'), theme('colors.white');
-    @mixin btn-color gray, theme('colors.gray.default'), theme('colors.white');
-    @mixin btn-color gray900, theme('colors.gray.900'), theme('colors.white');
-    @mixin btn-color alert, theme('colors.alert'), theme('colors.white');
-    @mixin btn-color safe, theme('colors.safe'), theme('colors.white');
-
-    &.gray-border {
-        @apply bg-white text-gray-900 border-gray-300;
-        &.outline {
-            @apply border-gray-300;
+        &.left {
+            margin-right: 0.25em;
         }
-        &:hover {
-            @apply bg-gray-dark text-white border-gray-dark;
-        }
-        &.disabled {
-            @apply bg-transparent text-gray-300 border-gray-300;
-            cursor: not-allowed;
+        &.right {
+            margin-left: 0.25rem;
         }
     }
+
+    @mixin btn-color primary, theme('colors.primary-dark'), theme('colors.white'), theme('colors.violet.900'), theme('colors.violet.900'), theme('colors.primary-dark');
+    @mixin btn-color substitutive, theme('colors.primary1'), theme('colors.white'), theme('colors.violet.500'), theme('colors.primary'), theme('colors.primary1');
+    @mixin btn-color secondary, theme('colors.white'), theme('colors.primary'), theme('colors.primary3'), theme('colors.primary2'), theme('colors.white'), theme('colors.primary1');
+    @mixin btn-color tertiary, theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.300'), theme('colors.white'), theme('colors.gray.300');
+    @mixin btn-color transparent, theme('colors.transparent'), theme('colors.gray.900'), theme('colors.blue.200'), theme('colors.blue.300'), theme('colors.white');
+    @mixin btn-color highlight, theme('colors.blue.600'), theme('colors.white'), theme('colors.blue.700'), theme('colors.blue.800'), theme('colors.blue.600');
+    @mixin btn-color positive, theme('colors.green.600'), theme('colors.white'), theme('colors.green.700'), theme('colors.green.800'), theme('colors.green.600');
+    @mixin btn-color negative-primary, theme('colors.red.500'), theme('colors.white'), theme('colors.red.600'), theme('colors.red.700');
+    @mixin btn-color negative-secondary, theme('colors.white'), theme('colors.gray.900'), theme('colors.red.100'), theme('colors.red.200'), theme('colors.white'), theme('colors.gray.300');
+    @mixin btn-color negative-transparent, theme('colors.transparent'), theme('colors.gray.900'), theme('colors.red.400'), theme('colors.red.500'), theme('colors.white');
+
     &.transparent {
+        &:hover, &:focus {
+            @apply text-blue-600;
+        }
+    }
+    &.negative-secondary {
+        &:hover, &:active {
+            @apply text-red-500 border-red-200;
+        }
+    }
+    &.negative-transparent {
         @apply bg-transparent text-gray-900;
         &:hover {
-            @apply bg-blue-200 text-blue-600 bg-blue-200;
+            @apply bg-red-400 border-red-400 text-white;
         }
-        &.disabled {
-            @apply bg-transparent text-gray-400;
-            cursor: not-allowed;
+        &:active {
+            @apply text-white;
         }
     }
 }

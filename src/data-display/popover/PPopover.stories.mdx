@@ -22,7 +22,7 @@ export const Template = (args, { argTypes }) => ({
             <p-popover :position="proxyPosition" :isVisible="proxyIsVisible"
                        :ignore-target-click="ignoreTargetClick" :trigger="trigger">
                 <div v-if="defaultSlot" v-html="defaultSlot" />
-                <p-button v-else style-type="primary" :outline="true" @click="handleClick">default</p-button>
+                <p-button v-else @click="handleClick">default</p-button>
                 <template #content>
                     <div v-if="contentRefSlot" v-html="contentRefSlot" />
                     <div v-else>
@@ -67,7 +67,7 @@ export const Template = (args, { argTypes }) => ({
             <b>click (default)</b>
             <br/>
             <p-popover>
-                <p-button style-type="primary" :outline="true">default</p-button>
+                <p-button>default</p-button>
                 <template #content>
                     <p style="margin-top:12px">content slot</p>
                 </template>
@@ -77,7 +77,7 @@ export const Template = (args, { argTypes }) => ({
             <b>hover</b>
             <br/>
             <p-popover trigger="hover">
-                <p-button style-type="primary" :outline="true">default</p-button>
+                <p-button>default</p-button>
                 <template #content>
                     <p style="margin-top:12px">content slot</p>
                 </template>

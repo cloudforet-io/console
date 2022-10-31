@@ -31,7 +31,7 @@
                             <slot name="body" />
                         </div>
                         <p-button
-                            :style-type="buttonType" :outline="outline"
+                            :style-type="buttonType"
                             @click="onClickButton"
                         >
                             {{ buttonText }}
@@ -98,7 +98,7 @@ export default {
         },
         buttonType: {
             type: String,
-            default: 'gray900',
+            default: 'tertiary',
         },
         outline: {
             type: Boolean,

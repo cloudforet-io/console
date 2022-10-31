@@ -52,7 +52,7 @@ When you simply want to control whether an empty screen is shown or not, you can
             components: { PDataLoader, PButton },
             template: `
 <div class="w-full">
-    <p-button class="mb-2" style-type="primary" :outline="true" @click="fetchData">Reload Data</p-button>
+    <p-button class="mb-2" @click="fetchData">Reload Data</p-button>
     <p-data-loader :loading="loading" :data="data"
         class="p-3 bg-gray-100 border border-gray-200"
         style="width: 100%; height: 300px;"
@@ -97,7 +97,7 @@ When you simply want to control whether an empty screen is shown or not, you can
             components: { PDataLoader, PButton },
             template: `
 <div class="w-full">
-    <p-button class="mb-2" style-type="primary" :outline="true" @click="fetchData">{{data.length ? 'Empty Data' : 'Load Data'}}</p-button>
+    <p-button class="mb-2" @click="fetchData">{{data.length ? 'Empty Data' : 'Load Data'}}</p-button>
     <p-data-loader :loading="loading" :data="data" disable-empty-case
         class="p-3 bg-gray-100 border border-gray-200"
         style="width: 100%; height: 300px;"
@@ -196,7 +196,7 @@ When you simply want to control whether an empty screen is shown or not, you can
             components: { PDataLoader, PButton },
             template: `
 <div class="w-full">
-    <p-button class="mb-2" style-type="primary" :outline="true" @click="fetchData">Reload Data</p-button>
+    <p-button class="mb-2" @click="fetchData">Reload Data</p-button>
     <p-data-loader :loading="loading" :data="data" :min-loading-time="1000"
         class="p-3 bg-gray-100 border border-gray-200"
         style="width: 100%; height: 300px;"
@@ -242,7 +242,7 @@ When you simply want to control whether an empty screen is shown or not, you can
             components: { PDataLoader, PButton },
             template: `
 <div class="w-full">
-    <p-button class="mb-2" style-type="primary" :outline="true" @click="fetchData">Reload Data (data loading time: 1500)</p-button>
+    <p-button class="mb-2" @click="fetchData">Reload Data (data loading time: 1500)</p-button>
     <div class="grid grid-cols-2">
         <div class="mx-2">
             <p class="font-lg font-bold my-4">Lazy Loading(time: 1000)</p>
@@ -389,7 +389,7 @@ e.g. `gray.900`
             components: { PDataLoader, PButton },
             template: `
 <div class="w-full">
-    <p-button class="flex-shrink-0 mb-2" style-type="primary" :outline="true" @click="fetchData">Refresh</p-button>
+    <p-button class="flex-shrink-0 mb-2" @click="fetchData">Refresh</p-button>
     <div class="grid grid-cols-2">
         <div class="mx-2">
             <p class="font-lg font-bold my-4">normal</p>

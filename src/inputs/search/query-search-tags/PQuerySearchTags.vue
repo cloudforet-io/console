@@ -2,9 +2,9 @@
     <div v-if="proxyTags.length > 0" class="p-query-search-tags">
         <div class="tags-container">
             <div class="left-wrapper">
-                <p-button v-if="!readOnly" class="delete-btn" :outline="true"
-                          size="sm" font-weight="normal"
-                          style-type="gray-border"
+                <p-button v-if="!readOnly" class="delete-btn"
+                          size="sm"
+                          style-type="tertiary"
                           @click="deleteAllTags"
                 >
                     {{ $t('COMPONENT.QUERY_SEARCH_TAGS.CLEAR_ALL') }}

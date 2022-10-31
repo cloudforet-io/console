@@ -20,7 +20,7 @@ export const Template = (args, {argTypes}) => {
         components: { PSidebar, PButton },
         template: `
             <div class="flex flex-col" style="height: 500px;">
-                <p-button :style-type="visible ? 'primary' : 'secondary'"
+                <p-button :style-type="visible ? 'primary' : 'highlight'"
                           @click="visible = !visible;">
                     {{visible ? 'close' : 'open' }}
                 </p-button>

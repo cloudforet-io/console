@@ -126,7 +126,7 @@ export const Template = (args, { argTypes }) => ({
             },
             template: `
     <div class="flex items-center">
-        <p-button class="mr-4" style-type="primary" @click="getData">Load Image</p-button>
+        <p-button class="mr-4" @click="getData">Load Image</p-button>
         <p-lazy-img :src="src"
             :loading="loading"
         />

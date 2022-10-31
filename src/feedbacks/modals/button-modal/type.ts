@@ -17,7 +17,6 @@ export const THEME_COLORS = [
     'safe',
     'alert',
     'gray900',
-    'gray',
 ] as const;
 
 export type ModalThemeColor = typeof THEME_COLORS[number];

@@ -129,7 +129,7 @@ export const Inner = {
     template: `
         <div class="p-4">
             <p-button style-type="primary" :outline="true" @click="visible = true">Show</p-button>
-            <p-button style-type="secondary" :outline="true" @click="visible = false">Hide</p-button>
+            <p-button style-type="highlight" :outline="true" @click="visible = false">Hide</p-button>
             <div v-if="visible" class="mt-4">
                 {{ name }}
             </div>

@@ -80,7 +80,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
     <div class="h-full w-full overflow p-8">
         <p-text-editor :loading="loading" :code="sampleCode" folded />
-        <p-button class="mt-4" style-type="primary" @click="changeCode">Load Code!</p-button>
+        <p-button class="mt-4" @click="changeCode">Load Code!</p-button>
     </div>
     `,
             setup() {
@@ -181,8 +181,8 @@ export const Template = (args, { argTypes }) => ({
             template: `
     <div class="h-full w-full overflow p-8">
         <p-text-editor :code="sampleCode" folded :disable-auto-reformat="disableAutoReformat" class="mb-4" />
-        <p-button style-type="primary" :outline="true" @click="handleChangeCode(false)">Change Code & Reformat (default)</p-button>
-        <p-button style-type="secondary" :outline="true" @click="handleChangeCode(true)">Change Code & Do not Reformat Automatically</p-button>
+        <p-button @click="handleChangeCode(false)">Change Code & Reformat (default)</p-button>
+        <p-button style-type="highlight" @click="handleChangeCode(true)">Change Code & Do not Reformat Automatically</p-button>
        <p class="text-red-600 font-bold mt-4">This feature works only when the code prop's type is string</p>
     </div>
 <!--<div>-->

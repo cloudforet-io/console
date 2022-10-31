@@ -201,10 +201,9 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
         :language="$i18n.locale"
     />
     <div class="col-span-6">
-        <p-button style-type="primary"
-            class="mb-4"
-            @click="resetSchema">Reset Schema</p-button>
-        <p-button style-type="secondary"
+        <p-button class="mb-4"
+                  @click="resetSchema">Reset Schema</p-button>
+        <p-button style-type="highlight"
                   class="mb-4"
                   @click="changeFormData">Change Form Data</p-button>
         <p-text-editor :code="JSON.stringify(schema, null, 2)"

@@ -23,7 +23,7 @@ export const modal = () => ({
     components: { PDoubleCheckModal, PButton },
     template: `
 <div>
-<p-button styleType="primary" @click="click">Open Modal</p-button>
+<p-button @click="click">Open Modal</p-button>
 <PDoubleCheckModal
     :headerTitle="headerTitle"
     :subTitle="subTitle"

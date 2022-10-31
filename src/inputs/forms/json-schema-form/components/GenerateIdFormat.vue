@@ -1,6 +1,6 @@
 <template>
     <div class="generate-id-format">
-        <p-button style-type="gray-border" :outline="true"
+        <p-button style-type="tertiary"
                   class="generate-button"
                   :disabled="disabled"
                   @click="handleClickGenerate"

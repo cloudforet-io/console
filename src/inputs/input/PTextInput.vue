@@ -48,7 +48,6 @@
             <p-button v-if="($attrs.type === 'password') && maskingMode"
                       size="sm"
                       style-type="transparent"
-                      font-weight="normal"
                       :disabled="disabled"
                       @click.stop.prevent="handleTogglePassword"
             >

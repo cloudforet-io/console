@@ -18,7 +18,7 @@ export const Template = (args, {argTypes} ) => ({
     props: Object.keys(argTypes),
     components: { PButtonModal, PButton, PSelectDropdown },
     template: `<div>
-                <p-button :styleType="themeColor" @click="launchModal">Launch a modal</p-button>
+                <p-button @click="launchModal">Launch a modal</p-button>
                 <p-button-modal :visible.sync="modalVisible"
                                 :size="size"
                                 :backdrop="backdrop"

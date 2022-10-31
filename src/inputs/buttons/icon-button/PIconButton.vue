@@ -3,7 +3,6 @@
         class="p-icon-button"
         :class="{ activated, [size]: true, loading}"
         :style-type="styleType"
-        :outline="outline"
         :disabled="disabled || loading"
         v-on="$listeners"
     >

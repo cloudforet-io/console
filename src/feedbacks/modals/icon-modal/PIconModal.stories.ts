@@ -22,7 +22,7 @@ export const iconModal = () => ({
     components: { PIconModal, PButton },
     template: `
         <div>
-            <p-button styleType="primary" @click="onClickOpen">Open Modal</p-button>
+            <p-button style-type="primary" @click="onClickOpen">Open Modal</p-button>
             <p-icon-modal
                 :visible.sync="loading"
                 :icon-name="iconName"
@@ -70,7 +70,7 @@ export const iconModalMdType = () => ({
     components: { PIconModal, PButton },
     template: `
         <div>
-            <p-button styleType="primary" @click="onClickOpen">Open Modal</p-button>
+            <p-button @click="onClickOpen">Open Modal</p-button>
             <p-icon-modal
                 :visible.sync="loading"
                 :icon-name="iconName"
