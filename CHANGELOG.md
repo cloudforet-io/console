@@ -1,3 +1,10 @@
+# [1.1.0-beta.441](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.440...v1.1.0-beta.441) (2022-10-31)
+
+
+### Features
+
+* **check-box-group:** add check-box-group component ([#118](https://github.com/cloudforet-io/mirinae/issues/118)) ([4d47d48](https://github.com/cloudforet-io/mirinae/commit/4d47d48e3a3cc770f96c36f83c39a6740aaaadfb))
+
 # [1.1.0-beta.440](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.439...v1.1.0-beta.440) (2022-10-31)
 
 
