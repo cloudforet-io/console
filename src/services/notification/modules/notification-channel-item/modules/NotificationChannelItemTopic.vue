@@ -6,16 +6,15 @@
         <div v-if="isEditMode" class="content">
             <add-notification-topic :topic="channelData.subscriptions" :topic-mode="channelData.is_subscribe" @change="onChangeTopic" />
             <div class="button-group">
-                <p-button :outline="true" size="sm" class="cancel-button"
+                <p-button style-type="secondary" size="sm" class="cancel-button"
                           @click="cancelEdit"
                 >
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
-                <p-button
-                    style-type="primary"
-                    size="sm"
-                    :disabled="!isTopicValid"
-                    @click="onClickSave"
+                <p-button style-type="primary"
+                          size="sm"
+                          :disabled="!isTopicValid"
+                          @click="onClickSave"
                 >
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
                 </p-button>

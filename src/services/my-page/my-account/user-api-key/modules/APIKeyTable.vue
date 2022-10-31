@@ -3,8 +3,8 @@
         <p-pane-layout class="main-table-wrapper">
             <article class="table-header">
                 <div class="left-section">
-                    <p-button style-type="secondary-dark"
-                              icon="ic_plus_bold"
+                    <p-button style-type="primary"
+                              icon-left="ic_plus_bold"
                               :disabled="disableCreateBtn"
                               :loading="modalState.loading"
                               @click="openAPIKeyConfirmModal"

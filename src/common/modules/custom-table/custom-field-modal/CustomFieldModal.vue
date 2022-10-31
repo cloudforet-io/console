@@ -14,7 +14,8 @@
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL') }}
                             </template>
                             <span v-else class="invalid-text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_REQUIRED') }}</span>
-                            <p-button :outline="true" size="sm" style-type="gray900"
+                            <p-button style-type="tertiary"
+                                      size="sm"
                                       @click="setColumnsDefault"
                             >
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.DEFAULT') }}
@@ -23,12 +24,14 @@
                         <p-search v-model="search" :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_ATTRIBUTE_COL')" />
                         <div class="sort-wrapper">
                             <label>{{ $t('COMMON.CUSTOM_FIELD_MODAL.SORT_BY') }}</label>
-                            <p-button size="sm" style-type="gray-border" font-weight="normal"
+                            <p-button style-type="tertiary"
+                                      size="sm"
                                       @click="sortByRecommendation"
                             >
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.RECOMMEND_SORT') }}
                             </p-button>
-                            <p-button size="sm" style-type="gray-border" font-weight="normal"
+                            <p-button style-type="tertiary"
+                                      size="sm"
                                       @click="sortByAlphabet"
                             >
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.ALPHABETICAL_SORT') }}
@@ -56,7 +59,8 @@
                     <section>
                         <h3 class="section-title">
                             {{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG_COL') }}
-                            <p-button :outline="true" size="sm" style-type="gray900"
+                            <p-button style-type="tertiary"
+                                      size="sm"
                                       @click="clearSelectedTags"
                             >
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}

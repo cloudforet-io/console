@@ -30,16 +30,15 @@
             </p-pane-layout>
         </section>
         <div class="button-group">
-            <p-button style-type="gray900" :outline="true" class="text-button"
+            <p-button style-type="tertiary" class="text-button"
                       @click="$router.go(-1)"
             >
                 {{ $t('COMMON.TAGS.CANCEL') }}
             </p-button>
-            <p-button
-                style-type="primary-dark"
-                class="text-button"
-                :disabled="!isDataValid || !isScheduleValid || !isTopicValid"
-                @click="onClickSave"
+            <p-button style-type="primary"
+                      class="text-button"
+                      :disabled="!isDataValid || !isScheduleValid || !isTopicValid"
+                      @click="onClickSave"
             >
                 {{ $t('COMMON.TAGS.SAVE') }}
             </p-button>

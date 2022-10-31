@@ -3,10 +3,9 @@
         <div v-if="!isActivated" class="activation-wrapper">
             <strong>{{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATION_DESC_1') }}</strong>
             <p>{{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATION_DESC_2') }}</p>
-            <p-button
-                style-type="safe"
-                :disabled="!hasManagePermission"
-                @click="onActivateAlert"
+            <p-button style-type="positive"
+                      :disabled="!hasManagePermission"
+                      @click="onActivateAlert"
             >
                 {{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATE') }}
             </p-button>

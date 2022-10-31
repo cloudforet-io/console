@@ -28,8 +28,8 @@
             </template>
             <template #toolbox-left>
                 <p-button class="mr-4 add-btn"
-                          style-type="primary-dark"
-                          icon="ic_plus_bold"
+                          style-type="primary"
+                          icon-left="ic_plus_bold"
                           :disabled="!hasManagePermission"
                           @click="onClickAdd"
                 >

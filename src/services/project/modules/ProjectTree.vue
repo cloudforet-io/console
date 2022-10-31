@@ -3,7 +3,7 @@
         <sidebar-title :title="$t('PROJECT.LANDING.PROJECT_GROUPS')">
             <template #extra>
                 <div class="action-btn-wrapper">
-                    <p-button v-if="treeEditMode" size="sm" style-type="secondary"
+                    <p-button v-if="treeEditMode" size="sm" style-type="highlight"
                               @click="finishTreeEdit"
                     >
                         {{ $t('PROJECT.LANDING.PROJECT_GROUP_TREE.DONE') }}

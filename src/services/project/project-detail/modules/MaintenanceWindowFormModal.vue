@@ -80,7 +80,7 @@
             </p-field-group>
         </template>
         <template v-if="editMode" #footer-extra>
-            <p-button style-type="alert" size="lg" :outline="true"
+            <p-button style-type="negative-secondary" size="lg"
                       @click="handleClickClose(maintenanceWindowId)"
             >
                 {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CLOSE_NOW') }}

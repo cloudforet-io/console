@@ -50,7 +50,7 @@
                 </div>
                 <div class="info-menu">
                     <router-link :to="{name: MY_PAGE_ROUTE._NAME }" @click.native="hideProfileMenu">
-                        <p-button style-type="primary" :outline="true" size="sm"
+                        <p-button style-type="secondary" size="sm"
                                   class="my-page-button"
                         >
                             {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}

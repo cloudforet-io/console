@@ -6,16 +6,15 @@
         <div v-if="isEditMode" class="content">
             <add-notification-schedule :schedule="channelData.schedule" :is-scheduled="channelData.is_scheduled" @change="onChangeSchedule" />
             <div class="button-group">
-                <p-button :outline="true" size="sm" class="cancel-button"
+                <p-button style-type="secondary" size="sm" class="cancel-button"
                           @click="cancelEdit"
                 >
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
-                <p-button
-                    style-type="primary"
-                    size="sm"
-                    :disabled="!isScheduleValid"
-                    @click="onClickSave"
+                <p-button style-type="primary"
+                          size="sm"
+                          :disabled="!isScheduleValid"
+                          @click="onClickSave"
                 >
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
                 </p-button>

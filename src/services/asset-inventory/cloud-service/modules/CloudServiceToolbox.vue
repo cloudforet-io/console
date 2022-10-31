@@ -10,8 +10,9 @@
             </div>
             <div class="filter-wrapper">
                 <span class="filters-count">{{ selectedFiltersCount }}</span>
-                <p-button icon="ic_setting" style-type="gray900" size="sm"
-                          :outline="true"
+                <p-button style-type="tertiary"
+                          icon-left="ic_setting"
+                          size="sm"
                           @click="handleClickSet"
                 >
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SET') }}

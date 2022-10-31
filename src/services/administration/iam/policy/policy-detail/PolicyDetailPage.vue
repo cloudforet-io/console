@@ -18,10 +18,10 @@
                     />
                 </span>
                 <div v-if="type === POLICY_TYPES.CUSTOM" class="policy-modify-buttons">
-                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="gray-border" @click="$router.back()">
+                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="tertiary" @click="$router.back()">
                         {{ $t('IAM.POLICY.FORM.CANCEL') }}
                     </p-button>
-                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="primary-dark" @click="handleSaveChanges">
+                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="primary" @click="handleSaveChanges">
                         {{ $t('IAM.POLICY.FORM.SAVE') }}
                     </p-button>
                 </div>

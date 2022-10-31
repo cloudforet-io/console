@@ -43,18 +43,16 @@
                 <span class="text">{{ $t('PROJECT.DETAIL.ALERT.ESCALATION_POLICY') }}</span>
                 <div class="text-button-group">
                     <p-button class="text-button"
-                              style-type="gray-border"
+                              style-type="tertiary"
                               size="sm"
-                              :outline="true"
                               :disabled="!hasManagePermission || escalationPolicy.scope === SCOPE.global"
                               @click="onClickUpdateEscalationPolicy"
                     >
                         {{ $t('PROJECT.DETAIL.ALERT.UPDATE') }}
                     </p-button>
                     <p-button class="text-button"
-                              style-type="gray-border"
+                              style-type="tertiary"
                               size="sm"
-                              :outline="true"
                               :disabled="!hasManagePermission"
                               @click="onClickChangeEscalationPolicy"
                     >

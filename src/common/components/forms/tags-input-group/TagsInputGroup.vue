@@ -2,9 +2,8 @@
     <div class="tags-input-group">
         <slot name="add-button" :disabled="disabled" :handle-add-pair="handleAddPair">
             <p-button class="add-button"
-                      style-type="primary-dark"
-                      :outline="true"
-                      icon="ic_plus_bold"
+                      style-type="secondary"
+                      icon-left="ic_plus_bold"
                       @click="handleAddPair"
             >
                 <span>{{ $t('COMMON.TAGS.ADD_TAG') }}</span>

@@ -16,8 +16,8 @@
                 <p-panel-top :title="$t('PROJECT.DETAIL.MEMBER_TITLE')" use-total-count :total-count="totalCount" />
             </template>
             <template #toolbox-left>
-                <p-button style-type="primary-dark" class="mr-4 add-btn"
-                          icon="ic_plus_bold"
+                <p-button style-type="primary" class="mr-4 add-btn"
+                          icon-left="ic_plus_bold"
                           :disabled="manageDisabled"
                           @click="handleClickInviteMember"
                 >

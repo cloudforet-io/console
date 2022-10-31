@@ -19,7 +19,7 @@
                 </div>
             </template>
             <template v-if="!isManagedAccount" #extra>
-                <p-button style-type="gray-border" class="link-button">
+                <p-button style-type="tertiary" class="link-button">
                     <p-anchor :href="consoleLink">
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CONNECT_TO_CONSOLE') }}
                     </p-anchor>

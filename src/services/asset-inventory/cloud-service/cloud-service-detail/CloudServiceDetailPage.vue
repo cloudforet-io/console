@@ -49,7 +49,7 @@
                                       @click-settings="handleClickSettings"
                     >
                         <template #toolbox-left>
-                            <p-button style-type="primary-dark" font-weigth="bold"
+                            <p-button style-type="primary"
                                       :disabled="!tableState.consoleLink || tableState.selectedItems.length > 1"
                                       @click="handleClickConnectToConsole"
                             >

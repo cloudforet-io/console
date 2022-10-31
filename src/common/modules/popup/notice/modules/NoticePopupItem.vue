@@ -23,7 +23,7 @@
             <text-editor-viewer :contents="item.contents" :attachments="attachments" />
         </template>
         <template #footer-extra>
-            <p-button style-type="gray-border" :outline="true" size="lg"
+            <p-button style-type="tertiary" size="lg"
                       @click="handleClose(true)"
             >
                 {{ $t('COMMON.POPUP.NOTICE.DO_NOT_SHOW') }}

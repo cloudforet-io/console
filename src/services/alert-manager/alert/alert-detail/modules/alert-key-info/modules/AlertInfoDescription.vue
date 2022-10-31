@@ -8,7 +8,7 @@
     <div v-else class="content-wrapper">
         <p-textarea v-model="dataForUpdate" class="textarea" />
         <div class="button-group">
-            <p-button :outline="true" class="text-button"
+            <p-button style-type="secondary" class="text-button"
                       size="sm" @click="cancelEdit(alertData.description)"
             >
                 {{ $t('MONITORING.ALERT.DETAIL.INFO.CANCEL') }}

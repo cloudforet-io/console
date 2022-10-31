@@ -21,7 +21,7 @@
             <div class="content-footer">
                 <p-button v-if="hideFooter"
                           class="close-button"
-                          style-type="gray-border"
+                          style-type="tertiary"
                           @click="handleClose"
                 >
                     {{ $t('APP.MAIN.CLOSE') }}

@@ -60,18 +60,16 @@
             </div>
         </p-pane-layout>
         <div class="notice-create-buttons-wrapper">
-            <p-button
-                style-type="gray-border"
-                size="lg"
-                @click="$router.go(-1)"
+            <p-button style-type="tertiary"
+                      size="lg"
+                      @click="$router.go(-1)"
             >
                 {{ $t('INFO.NOTICE.FORM.CANCEL') }}
             </p-button>
-            <p-button
-                style-type="primary-dark"
-                size="lg"
-                :disabled="!isAllValid"
-                @click="handleConfirm"
+            <p-button style-type="primary"
+                      size="lg"
+                      :disabled="!isAllValid"
+                      @click="handleConfirm"
             >
                 {{ $t('INFO.NOTICE.FORM.CONFIRM') }}
             </p-button>

@@ -2,7 +2,8 @@
     <p-pane-layout class="service-account-credentials">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')">
             <template #extra>
-                <p-button v-if="mode === 'READ' && editable && !isEmpty(credentialData)" icon="ic_edit"
+                <p-button v-if="mode === 'READ' && editable && !isEmpty(credentialData)"
+                          icon-left="ic_edit"
                           style-type="transparent"
                           @click="handleClickEditButton"
                 >
@@ -12,7 +13,7 @@
                     <p-button style-type="transparent" @click="handleClickCancelButton">
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
                     </p-button>
-                    <p-button style-type="primary-dark"
+                    <p-button style-type="primary"
                               :disabled="!isFormValid"
                               @click="handleClickSaveButton"
                     >

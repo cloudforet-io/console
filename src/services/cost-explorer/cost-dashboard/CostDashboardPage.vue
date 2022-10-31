@@ -11,7 +11,6 @@
                     <div class="left-part">
                         <p-icon-button name="ic_edit-text"
                                        class="edit-btn"
-                                       :outline="false"
                                        :disabled="!hasManagePermission && dashboardType === DASHBOARD_TYPE.PUBLIC"
                                        @click.stop="handleClickEditDashboard"
                         />
@@ -30,7 +29,7 @@
                                 <pdf-download-button icon-only @click="handleClickPdfDownload" />
                             </div>
                             <div class="left-divider">
-                                <p-button icon="ic_edit" style-type="gray-border" size="sm"
+                                <p-button icon-left="ic_edit" style-type="tertiary" size="sm"
                                           :disabled="!hasManagePermission && dashboardType === DASHBOARD_TYPE.PUBLIC"
                                           @click.stop="handleClickCustomize"
                                 >
@@ -56,7 +55,8 @@
             <div v-else class="empty-dashboard">
                 <img src="@/assets/images/illust_circle_boy.svg" class="empty-img">
                 <span class="empty-text">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.NO_SAVED_DASHBOARD_FOUND') }}</span>
-                <p-button v-if="hasManagePermission" icon="ic_plus" style-type="primary1"
+                <p-button v-if="hasManagePermission"
+                          icon-left="ic_plus" style-type="substitutive"
                           @click="handleClickCreate"
                 >
                     <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE_DASHBOARD') }}</span>

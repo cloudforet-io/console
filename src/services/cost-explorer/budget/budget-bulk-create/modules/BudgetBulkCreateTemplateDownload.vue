@@ -7,11 +7,15 @@
             </template>
         </p-panel-top>
 
-        <p-button icon="ic_download" style-type="secondary-dark" @click="handleClickTemplateDownload(true)">
+        <p-button style-type="primary"
+                  icon-left="ic_download"
+                  @click="handleClickTemplateDownload(true)"
+        >
             Template with the following values
         </p-button>
         OR
-        <p-button icon="ic_download" style-type="gray-border" :outline="true"
+        <p-button icon-left="ic_download"
+                  style-type="tertiary"
                   @click="handleClickTemplateDownload(false)"
         >
             Template with headers only

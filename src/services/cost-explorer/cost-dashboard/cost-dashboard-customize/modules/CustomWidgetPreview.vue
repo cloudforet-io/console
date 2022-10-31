@@ -23,7 +23,7 @@
             </div>
         </template>
         <template #extra>
-            <p-button style-type="primary1" class="view-query-button" @click="handleClickViewQuery">
+            <p-button style-type="substitutive" class="view-query-button" @click="handleClickViewQuery">
                 <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.VIEW_QUERY') }}</span>
             </p-button>
         </template>

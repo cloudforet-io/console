@@ -4,7 +4,7 @@
             {{ title }}
             <template #extra>
                 <router-link :to="manageLink">
-                    <p-button style-type="primary-dark" :disabled="manageDisabled">
+                    <p-button style-type="primary" :disabled="manageDisabled">
                         {{ $t('IDENTITY.USER.NOTIFICATION.MANAGE') }}
                     </p-button>
                 </router-link>

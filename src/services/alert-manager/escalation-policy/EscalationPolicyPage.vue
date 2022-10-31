@@ -18,8 +18,8 @@
             >
                 <template #left-area>
                     <p-button class="create-button"
-                              style-type="primary-dark"
-                              icon="ic_plus_bold"
+                              style-type="primary"
+                              icon-left="ic_plus_bold"
                               :disabled="!hasManagePermission"
                               @click="onSelectAction(ACTION.create)"
                     >

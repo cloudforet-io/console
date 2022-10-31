@@ -20,11 +20,11 @@
                 >
                     <div v-if="customizeMode" class="btn-group">
                         <p-icon-button name="ic_edit"
-                                       style-type="gray-border" :outline="true"
+                                       style-type="tertiary"
                                        @click.stop="handleClickUpdate(rowIdx, colIdx, widget)"
                         />
                         <p-icon-button name="ic_trashcan"
-                                       style-type="alert" :outline="true"
+                                       style-type="negative-outlined"
                                        @click.stop="handleClickDelete(rowIdx, colIdx, widget)"
                         />
                     </div>
@@ -45,7 +45,7 @@
                     <div v-for="n in getAddWidgetColumnByLayout(row[0].options.layout, row.length)"
                          :key="`${n}-${getUUID()}`" :class="`col-${row[0].options.layout} empty-widget`"
                     >
-                        <p-button style-type="primary-dark" icon="ic_plus_bold" :outline="true"
+                        <p-button style-type="secondary" icon-left="ic_plus_bold"
                                   @click="handleClickAdd(rowIdx, n, row[0].options.layout)"
                         >
                             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}

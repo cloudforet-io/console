@@ -23,8 +23,8 @@
                           highlight
                 />
             </div>
-            <p-button icon="ic_plus_bold" :outline="true"
-                      style-type="gray900"
+            <p-button style-type="tertiary"
+                      icon-left="ic_plus_bold"
                       @click="handleAddCondition"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ADD_CONDITION') }}

@@ -70,8 +70,7 @@
                     />
                 </div>
                 <p-button v-if="metricChartDataList.length !== metrics.length"
-                          :outline="true"
-                          style-type="black" class="more-btn"
+                          style-type="tertiary" class="more-btn"
                           @click="loadMoreMetricCharts"
                 >
                     {{ $t('COMMON.MONITORING.MORE') }}
@@ -477,7 +476,6 @@ section {
 
     /* custom design-system component - p-button */
     :deep(.more-btn) {
-        @apply border-gray-900;
         display: block;
         width: 40%;
         max-width: 38rem;

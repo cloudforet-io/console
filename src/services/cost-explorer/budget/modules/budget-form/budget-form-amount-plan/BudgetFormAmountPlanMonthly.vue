@@ -6,7 +6,7 @@
                     <p-label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-label> ($USD)
                 </p>
             </div>
-            <p-button style-type="gray-border" :outline="true" @click="handleAutofillButtonClick">
+            <p-button style-type="tertiary" @click="handleAutofillButtonClick">
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
             </p-button>
         </div>

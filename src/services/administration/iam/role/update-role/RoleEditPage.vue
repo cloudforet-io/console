@@ -10,12 +10,12 @@
                           @update-form-data="handleUpdateForm"
         />
         <div class="text-right mt-4">
-            <p-button style-type="primary-dark" :outline="true" class="mr-4"
+            <p-button style-type="secondary" class="mr-4"
                       @click="$router.go(-1)"
             >
                 {{ $t('IAM.ROLE.FORM.CANCEL') }}
             </p-button>
-            <p-button style-type="primary-dark" :loading="loading" :disabled="!isAllValid"
+            <p-button style-type="primary" :loading="loading" :disabled="!isAllValid"
                       @click="handleClickConfirm"
             >
                 {{ $t('IAM.ROLE.FORM.SAVE') }}

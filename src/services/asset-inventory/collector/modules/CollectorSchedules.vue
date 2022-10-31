@@ -26,8 +26,8 @@
                          @change="handleChange"
         >
             <template slot="toolbox-left">
-                <p-button style-type="primary-dark"
-                          icon="ic_plus_bold"
+                <p-button style-type="primary"
+                          icon-left="ic_plus_bold"
                           :disabled="manageDisabled"
                           @click="openEditModal(false)"
                 >

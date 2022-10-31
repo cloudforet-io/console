@@ -4,18 +4,18 @@
         <div class="title-wrapper">
             <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER') }}</span>
             <div v-if="!printMode" class="button-wrapper">
-                <p-button style-type="gray-border"
-                          font-weight="normal" size="sm"
+                <p-button style-type="tertiary"
+                          size="sm"
                           :disabled="!filtersLength"
                           @click="handleClearAllFilters"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CLEAR_ALL') }}
                 </p-button>
-                <p-icon-button
-                    name="ic_plus"
-                    style-type="gray900"
-                    size="sm"
-                    @click="handleClickAddFilterButton"
+                <p-icon-button name="ic_plus"
+                               style-type="tertiary"
+                               shape="square"
+                               size="sm"
+                               @click="handleClickAddFilterButton"
                 />
             </div>
         </div>
@@ -38,7 +38,7 @@
             />
             <span v-else class="title">Total Cost</span>
             <div v-if="!printMode" class="button-wrapper">
-                <p-button style-type="gray-border"
+                <p-button style-type="tertiary"
                           size="sm" font-weight="normal"
                           @click="handleToggleAllLegends"
                 >

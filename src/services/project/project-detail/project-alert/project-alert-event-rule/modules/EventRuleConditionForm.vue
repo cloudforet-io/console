@@ -4,8 +4,8 @@
             <p class="title">
                 <strong>{{ $t('PROJECT.EVENT_RULE.CONDITION') }}</strong>
             </p>
-            <p-button style-type="gray900" icon="ic_plus_bold"
-                      :outline="true"
+            <p-button style-type="tertiary"
+                      icon-left="ic_plus_bold"
                       class="add-button"
                       @click="onClickAdd"
             >

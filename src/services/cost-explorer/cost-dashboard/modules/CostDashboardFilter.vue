@@ -5,15 +5,14 @@
             <span class="text">{{ filterLabel }}</span>
         </p>
         <p-button v-if="!showSetting && !noFilter && !printMode"
-                  style-type="gray-border"
+                  style-type="tertiary"
                   size="sm"
                   @click.stop="handleClickViewFilter"
         >
             {{ $t('BILLING.COST_MANAGEMENT.MAIN.VIEW_FILTER') }}
         </p-button>
         <p-icon-button v-if="showSetting"
-                       name="ic_setting" style-type="gray900" size="sm"
-                       outline
+                       name="ic_setting" style-type="tertiary" size="sm"
                        @click="handleClickSelectFilter"
         />
         <view-filter-modal :visible.sync="viewFilterModalVisible"

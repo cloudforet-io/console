@@ -40,7 +40,9 @@
                                          @select="onSelectProject"
                 />
             </p-field-group>
-            <p-button v-if="projectInvalid && isProjectAlertSet === false" class="project-set-button" style-type="secondary-dark"
+            <p-button v-if="projectInvalid && isProjectAlertSet === false"
+                      style-type="primary"
+                      class="project-set-button"
                       size="sm" @click="setProjectAlert"
             >
                 {{ $t('MONITORING.ALERT.ALERT_LIST.FORM.SET_PROJECT_ALERT_NOW') }}

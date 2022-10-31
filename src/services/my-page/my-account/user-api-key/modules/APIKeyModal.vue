@@ -29,8 +29,9 @@
                     />
                 </p>
                 <p-divider class="divider" />
-                <p-button style-type="primary-dark" :outline="true"
-                          icon="ic_download" class="download-btn"
+                <p-button style-type="secondary"
+                          icon-left="ic_download"
+                          class="download-btn"
                           @click="onClickDownloadFile(FileType.JSON)"
                 >
                     {{ $t('IDENTITY.USER.API_KEY.DOWNLOAD_JSON') }}
@@ -64,8 +65,9 @@
                     />
                 </p>
                 <p-divider class="divider" />
-                <p-button style-type="primary-dark" :outline="true"
-                          icon="ic_download" class="download-btn"
+                <p-button style-type="secondary"
+                          icon-left="ic_download"
+                          class="download-btn"
                           @click="onClickDownloadFile(FileType.YAML)"
                 >
                     {{ $t('IDENTITY.USER.API_KEY.DOWNLOAD_YAML') }}

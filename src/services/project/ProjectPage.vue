@@ -50,9 +50,8 @@
                             <div class="top-button-box">
                                 <div>
                                     <p-button v-if="!storeState.groupId && hasRootProjectGroupManagePermission"
-                                              style-type="primary-dark"
-                                              :outline="true"
-                                              icon="ic_plus_bold"
+                                              style-type="secondary"
+                                              icon-left="ic_plus_bold"
                                               :disabled="!hasManagePermission"
                                               @click="openProjectGroupCreateForm"
                                     >
@@ -80,8 +79,8 @@
                                         </div>
                                     </div>
                                     <p-button v-if="storeState.groupId && hasManagePermission && !isPermissionDenied"
-                                              style-type="primary-dark"
-                                              icon="ic_plus_bold"
+                                              style-type="primary"
+                                              icon-left="ic_plus_bold"
                                               @click="openProjectForm"
                                     >
                                         <div class="truncate">

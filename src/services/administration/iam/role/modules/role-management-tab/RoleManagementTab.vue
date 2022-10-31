@@ -31,9 +31,7 @@
                     </template>
                     <template #col-edit_button-format="{ item }">
                         <p-button size="sm"
-                                  style-type="gray-border"
-                                  :outline="true"
-                                  font-weight="bold"
+                                  style-type="tertiary"
                                   @click="handleEditRole(item.role_id)"
                         >
                             <p-i class="mr-1" name="ic_edit"

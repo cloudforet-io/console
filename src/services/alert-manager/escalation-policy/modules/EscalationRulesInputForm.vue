@@ -129,9 +129,8 @@
                 </span>
             </span>
             <p-button class="add-button"
-                      icon="ic_plus_bold"
-                      :outline="true"
-                      style-type="gray900"
+                      icon-left="ic_plus_bold"
+                      style-type="tertiary"
                       :disabled="rules.length >= 5"
                       @click="onClickAddStep"
             >

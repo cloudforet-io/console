@@ -54,8 +54,8 @@
                                     </p-badge>
                                 </div>
                                 <div class="btns">
-                                    <p-button style-type="primary-dark"
-                                              icon="ic_plus_bold"
+                                    <p-button style-type="primary"
+                                              icon-left="ic_plus_bold"
                                               @click="handlePluginCreate(item)"
                                     >
                                         {{ $t('PLUGIN.COLLECTOR.PLUGINS.CREATE') }}

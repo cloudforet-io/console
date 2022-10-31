@@ -32,10 +32,10 @@
                     </div>
                     <div class="button-wrapper extra">
                         <pdf-download-button @click="handleClickPdf" />
-                        <p-button v-if="selectedQueryId" style-type="gray-border" @click="handleSaveQueryOption">
+                        <p-button v-if="selectedQueryId" style-type="tertiary" @click="handleSaveQueryOption">
                             {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
                         </p-button>
-                        <p-button style-type="gray-border" @click="handleClickSaveQuery">
+                        <p-button style-type="tertiary" @click="handleClickSaveQuery">
                             {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS') }}
                         </p-button>
                     </div>

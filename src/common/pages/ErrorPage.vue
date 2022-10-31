@@ -8,7 +8,7 @@
             <h3 class="error-message">
                 {{ $t('COMMON.ERROR.404_MSG') }}
             </h3>
-            <p-button class="go-back-button" style-type="primary-dark" size="md"
+            <p-button class="go-back-button" style-type="primary" size="md"
                       @click="$router.go(-1)"
             >
                 {{ $t('COMMON.ERROR.GO_BACK') }}

@@ -30,16 +30,17 @@
                 </div>
             </div>
             <div class="button-group">
-                <p-button :outline="true" size="sm" class="cancel-button"
+                <p-button style-type="secondary"
+                          size="sm"
+                          class="cancel-button"
                           @click="cancelEdit(channelData.data)"
                 >
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
-                <p-button
-                    style-type="primary"
-                    size="sm"
-                    :disabled="!isSpaceOneUserProtocol && !isDataValid"
-                    @click="onClickSave"
+                <p-button style-type="primary"
+                          size="sm"
+                          :disabled="!isSpaceOneUserProtocol && !isDataValid"
+                          @click="onClickSave"
                 >
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
                 </p-button>
