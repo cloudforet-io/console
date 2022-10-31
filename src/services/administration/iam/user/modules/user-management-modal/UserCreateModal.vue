@@ -50,7 +50,7 @@
                                           :invalid="invalid"
                                           class="text-input"
                             />
-                            <p-button style-type="outline primary-dark"
+                            <p-button style-type="secondary"
                                       class="user-id-check-button"
                                       @click="checkUserID"
                             >

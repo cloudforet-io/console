@@ -48,7 +48,7 @@
             <custom-widget-preview v-if="showPreview"
                                    :selected-item="selectedItem"
             />
-            <p-button v-if="Object.keys(selectedWidget).length" style-type="alert" outline="true"
+            <p-button v-if="Object.keys(selectedWidget).length" style-type="negative-outlined"
                       class="btn-remove"
                       @click="handleClickRemoveWidget"
             >

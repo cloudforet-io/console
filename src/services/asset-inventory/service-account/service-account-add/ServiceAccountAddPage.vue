@@ -58,14 +58,13 @@
         </div>
 
         <div class="button-wrapper">
-            <p-button class="text-button" style-type="primary-dark" size="lg"
+            <p-button class="text-button" style-type="primary" size="lg"
                       :disabled="!isValid"
                       @click="handleSave"
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
             </p-button>
-            <p-button class="text-button" style-type="gray900" size="lg"
-                      outline
+            <p-button class="text-button" style-type="tertiary" size="lg"
                       @click="handleGoBack"
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CANCEL') }}

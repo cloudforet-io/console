@@ -33,7 +33,8 @@
                                     <span v-else>% of budget > {{ item.threshold }}%</span>
                                 </li>
                             </ul>
-                            <p-button icon="ic_setting" style-type="gray900" :outline="true"
+                            <p-button style-type="tertiary"
+                                      icon-left="ic_setting"
                                       :disabled="manageDisabled || !budgetTargetId"
                                       @click="handleSetNotifications"
                             >
@@ -64,7 +65,8 @@
                             <p class="desc">
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_DESC') }}
                             </p>
-                            <p-button icon="ic_setting" style-type="gray900" :outline="true"
+                            <p-button style-type="tertiary"
+                                      icon-left="ic_setting"
                                       :disabled="manageDisabled || !budgetTargetId"
                                       @click="handleSetNotifications"
                             >

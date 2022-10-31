@@ -38,10 +38,9 @@
                 <span>{{ iso8601Formatter(value, timezone) }}</span>
             </template>
             <template #col-collect-format="{item}">
-                <p-button
-                    :outline="true"
-                    style-type="gray900" :disabled="!hasManagePermission"
-                    @click.stop="openCollectDataModal(item)"
+                <p-button style-type="tertiary"
+                          :disabled="!hasManagePermission"
+                          @click.stop="openCollectDataModal(item)"
                 >
                     {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_COLLECT_DATA') }}
                 </p-button>

@@ -10,7 +10,7 @@
                 <span class="text">{{ filterLabel }}</span>
             </div>
             <p-button v-if="!printMode"
-                      style-type="gray-border"
+                      style-type="tertiary"
                       size="sm"
                       @click.stop="handleClickViewFilter"
             >

@@ -4,7 +4,7 @@
         <p-check-box v-model="includesFilter" :disabled="!isDashboardTemplate">
             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.APPLIED_FILTER') }}
         </p-check-box>
-        <p-button size="sm" style-type="gray-border"
+        <p-button size="sm" style-type="tertiary"
                   :disabled="!isDashboardTemplate"
                   class="ml-2"
                   @click="handleClickFilterButton"

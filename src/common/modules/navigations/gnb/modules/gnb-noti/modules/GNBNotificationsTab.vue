@@ -8,7 +8,6 @@
                 <p-button v-if="!loading"
                           style-type="transparent"
                           size="sm"
-                          font-weight="normal"
                           class="clear-all-button"
                           @click="handleClearAll"
                 >

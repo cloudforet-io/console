@@ -82,9 +82,8 @@
                     <template #add-button="{handleAddPair}">
                         <div class="top-part">
                             <p>{{ $t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') }}</p>
-                            <p-button style-type="gray900"
-                                      :outline="true"
-                                      icon="ic_plus_bold"
+                            <p-button style-type="tertiary"
+                                      icon-left="ic_plus_bold"
                                       class="mb-2"
                                       @click="handleAddPair($event)"
                             >

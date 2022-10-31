@@ -4,7 +4,7 @@
             <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.COST_ANALYSIS_QUERY') }}</p-label>
             <template v-if="!loading && costQuerySetList.length">
                 <p-icon-button name="ic_refresh" class="refresh-button" @click="handleRefresh" />
-                <p-button style-type="primary1" icon="ic_plus_bold" @click="handleClickCreateQuery">
+                <p-button style-type="substitutive" icon-left="ic_plus_bold" @click="handleClickCreateQuery">
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}
                 </p-button>
             </template>
@@ -20,7 +20,7 @@
                         <p class="name">
                             {{ query.name }}
                         </p>
-                        <p-button style-type="gray-border" icon="ic_plus_bold" size="sm"
+                        <p-button style-type="tertiary" icon-left="ic_plus_bold" size="sm"
                                   @click="handleAddToCustomWidget(query)"
                         >
                             <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ADD_TO_CUSTOM_WIDGET') }}</span>
@@ -35,7 +35,7 @@
                     <p class="help-text">
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_SAVED_QUERY_HELP_TEXT') }}
                     </p>
-                    <p-button style-type="primary1" icon="ic_plus_bold" @click="handleClickCreateQuery">
+                    <p-button style-type="substitutive" icon-left="ic_plus_bold" @click="handleClickCreateQuery">
                         <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}</span>
                     </p-button>
                 </template>

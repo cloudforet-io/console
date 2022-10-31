@@ -44,7 +44,7 @@
                 />
             </p-field-group>
             <div class="save-button">
-                <p-button style-type="primary-dark" @click="onClickProfileConfirm">
+                <p-button style-type="primary" @click="onClickProfileConfirm">
                     {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
                 </p-button>
             </div>
@@ -85,7 +85,7 @@
                     </p-field-group>
                 </form>
                 <div class="save-button">
-                    <p-button style-type="primary-dark" @click="onClickPasswordConfirm">
+                    <p-button style-type="primary" @click="onClickPasswordConfirm">
                         {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
                     </p-button>
                 </div>

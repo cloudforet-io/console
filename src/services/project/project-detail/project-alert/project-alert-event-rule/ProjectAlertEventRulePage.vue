@@ -17,7 +17,8 @@
             <p class="help-text">
                 {{ $t('PROJECT.EVENT_RULE.NO_EVENT_RULES_HELP_TEXT') }}
             </p>
-            <p-button style-type="primary-dark" icon="ic_plus_bold"
+            <p-button style-type="primary"
+                      icon-left="ic_plus_bold"
                       @click="onClickAddEventRule"
             >
                 {{ $t('PROJECT.EVENT_RULE.ADD_EVENT_RULE') }}
@@ -90,9 +91,8 @@
         </p-card>
         <p-button v-if="cardData.length"
                   :disabled="isEditMode"
-                  style-type="primary-dark"
-                  icon="ic_plus_bold"
-                  :outline="true"
+                  style-type="secondary"
+                  icon-left="ic_plus_bold"
                   class="add-event-rule-button"
                   @click="onClickAddEventRule"
         >

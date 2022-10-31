@@ -16,7 +16,7 @@
                 </div>
                 <div class="card-button">
                     <!--song-lang-->
-                    <p-button style-type="primary-dark" :disabled="providerItem.installed">
+                    <p-button style-type="primary" :disabled="providerItem.installed">
                         Install
                     </p-button>
                 </div>

@@ -30,7 +30,7 @@
                     {{ $t('COMMON.WIDGETS.TOP_PROJECTS.NO_PROJECT_HELP_TEXT') }}
                 </p>
                 <router-link :to="{ name: PROJECT_ROUTE._NAME }">
-                    <p-button icon="ic_plus" style-type="primary1">
+                    <p-button style-type="substitutive" icon-left="ic_plus">
                         <span>{{ $t('COMMON.WIDGETS.TOP_PROJECTS.CREATE_PROJECT') }}</span>
                     </p-button>
                 </router-link>

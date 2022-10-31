@@ -2,8 +2,8 @@
     <div class="notice-page">
         <p-page-title :title="$t('INFO.NOTICE.MAIN.NOTICE_TITLE')">
             <template #extra>
-                <p-button v-if="hasDomainRoleUser || hasSystemRoleUser" :outline="true" style-type="primary-dark"
-                          icon="ic_plus_bold"
+                <p-button v-if="hasDomainRoleUser || hasSystemRoleUser" style-type="secondary"
+                          icon-left="ic_plus_bold"
                           @click="handleCreateNotice"
                 >
                     {{ $t('INFO.NOTICE.FORM.CREATE_NOTICE') }}

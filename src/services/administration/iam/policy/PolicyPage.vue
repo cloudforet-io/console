@@ -7,8 +7,8 @@
         >
             <template #extra>
                 <router-link :to="{name: ADMINISTRATION_ROUTE.IAM.POLICY.CREATE._NAME}">
-                    <p-button style-type="primary-dark"
-                              name="ic_plus_bold"
+                    <p-button style-type="primary"
+                              icon-left="ic_plus_bold"
                               :disabled="!hasManagePermission"
                     >
                         {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}

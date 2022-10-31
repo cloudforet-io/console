@@ -41,13 +41,13 @@
                         {{ $t('COMMON.GNB.FAVORITES.FAVORITES_HELP_TEXT') }}
                     </p>
                     <div class="button-wrapper">
-                        <p-button style-type="gray-border"
+                        <p-button style-type="tertiary"
                                   size="md"
                                   @click="handleClickMenuButton(FAVORITE_TYPE.PROJECT)"
                         >
                             {{ $t('COMMON.GNB.FAVORITES.GO_TO_PROJECT') }}
                         </p-button>
-                        <p-button style-type="gray-border"
+                        <p-button style-type="tertiary"
                                   size="md"
                                   @click="handleClickMenuButton(FAVORITE_TYPE.CLOUD_SERVICE)"
                         >

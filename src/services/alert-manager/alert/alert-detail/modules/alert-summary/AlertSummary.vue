@@ -40,7 +40,7 @@
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGNED_TO') }}
-                <p-button style-type="gray-border" :outline="true" size="sm"
+                <p-button style-type="tertiary" size="sm"
                           class="ml-2"
                           :disabled="manageDisabled"
                           @click="onClickReassign"

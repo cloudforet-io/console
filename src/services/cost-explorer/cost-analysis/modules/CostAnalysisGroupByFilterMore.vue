@@ -37,7 +37,7 @@
                             <p-icon-button name="ic_trashcan" size="sm" @click="handleDeleteItem(item)" />
                         </div>
                     </div>
-                    <p-button icon="ic_plus_bold" style-type="primary1" :outline="true"
+                    <p-button icon="ic_plus_bold" style-type="secondary"
                               @click="handleClickAddMoreButton"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ADD_MORE') }}

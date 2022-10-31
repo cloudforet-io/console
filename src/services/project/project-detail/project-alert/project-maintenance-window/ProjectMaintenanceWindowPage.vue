@@ -16,13 +16,13 @@
                          @refresh="onChange()"
         >
             <template #toolbox-left>
-                <p-button style-type="primary-dark" class="mr-4" :outline="true"
+                <p-button style-type="secondary" class="mr-4"
                           :disabled="!hasManagePermission || selectedItems.length !== 1 || selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED"
                           @click="visibleUpdateModal = true"
                 >
                     {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.UPDATE') }}
                 </p-button>
-                <p-button style-type="primary-dark" :outline="true"
+                <p-button style-type="secondary"
                           :disabled="!hasManagePermission || !selectedItems.length || selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED"
                           @click="visibleCloseCheckModal = true"
                 >

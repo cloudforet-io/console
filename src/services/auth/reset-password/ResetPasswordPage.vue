@@ -39,7 +39,7 @@
             >
                 {{ $t('AUTH.RESET_PASSWORD_PAGE.RESET_PASSWORD') }}
             </p-button>
-            <p-button style-type="primary" size="lg" :outline="true"
+            <p-button style-type="secondary" size="lg"
                       :block="true"
                       class="not-change-button"
                       @click="handleGoToLoginPage"

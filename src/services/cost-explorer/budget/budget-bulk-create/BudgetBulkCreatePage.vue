@@ -10,12 +10,12 @@
         <budget-bulk-create-template-download />
         <budget-bulk-create-file-upload />
 
-        <p-button style-type="primary-dark" :outline="true" class="mr-4"
+        <p-button style-type="secondary" class="mr-4"
                   @click="$router.go(-1)"
         >
             Cancel
         </p-button>
-        <p-button style-type="primary-dark"
+        <p-button style-type="primary"
                   @click="handleClickPreviewAndCreate"
         >
             Preview & Create

@@ -37,8 +37,8 @@
         <p-empty v-else>
             {{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.NO_EVENT') }}
         </p-empty>
-        <p-button v-if="itemList.length > 9" size="md"
-                  style-type="primary-dark outline"
+        <p-button v-if="itemList.length > 9"
+                  style-type="secondary"
                   class="more-button"
                   @click="onClickMore"
         >
@@ -61,9 +61,8 @@
             </template>
             <template #footer-extra>
                 <div class="footer-extra">
-                    <p-button
-                        style-type="gray-border"
-                        @click="onCopyClick"
+                    <p-button style-type="tertiary"
+                              @click="onCopyClick"
                     >
                         <p-i name="ic_copy" width="1em" height="1em"
                              color="inherit transparent" class="mr-2"

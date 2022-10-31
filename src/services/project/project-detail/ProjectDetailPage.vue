@@ -30,13 +30,12 @@
                                                :value="projectId"
                                 />
                             </p>
-                            <p-button
-                                v-if="hasAlertPermission"
-                                icon="ic_state_manual" style-type="gray900"
-                                class="ml-3"
-                                :outline="true"
-                                :disabled="!hasManagePermission"
-                                @click="maintenanceWindowFormVisible = true"
+                            <p-button v-if="hasAlertPermission"
+                                      style-type="tertiary"
+                                      icon-left="ic_state_manual"
+                                      class="ml-3"
+                                      :disabled="!hasManagePermission"
+                                      @click="maintenanceWindowFormVisible = true"
                             >
                                 {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}
                             </p-button>

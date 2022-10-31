@@ -6,7 +6,8 @@
         >
             <template #extra>
                 <div v-if="hasPermissionToEditOrDelete" class="button-group">
-                    <p-button :outline="true" style-type="gray-border" icon="ic_edit"
+                    <p-button style-type="tertiary"
+                              icon-left="ic_edit"
                               @click="handleClickEditButton"
                     >
                         {{ $t('INFO.NOTICE.FORM.EDIT') }}
@@ -15,7 +16,7 @@
                     <!--                    <p-button :outline="true" style-type="gray-border" icon="ic_send">-->
                     <!--                        {{ $t('Send Email') }}-->
                     <!--                    </p-button>-->
-                    <p-button :outline="true" style-type="alert" @click="handleDeleteModalOpen">
+                    <p-button style-type="negative-secondary" @click="handleDeleteModalOpen">
                         {{ $t('INFO.NOTICE.FORM.DELETE') }}
                     </p-button>
                 </div>
@@ -58,8 +59,8 @@
             </div>
         </p-pane-layout>
         <section class="back-to-list-button-section">
-            <p-button class="back-to-list-button" :outline="true"
-                      style-type="gray-border"
+            <p-button class="back-to-list-button"
+                      style-type="tertiary"
                       @click="handleBackToListButtonClick"
             >
                 {{ $t('INFO.NOTICE.DETAIL.BACK_TO_LIST') }}

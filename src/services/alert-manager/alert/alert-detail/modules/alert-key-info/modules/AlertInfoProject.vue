@@ -12,7 +12,7 @@
                     </p-anchor>
                 </p-copy-button>
             </span>
-            <p-button style-type="gray-border" size="sm" class="add-button ml-2"
+            <p-button style-type="tertiary" size="sm" class="add-button ml-2"
                       :disabled="manageDisabled"
                       @click="startEdit(alertData.project_id)"
             >
@@ -26,15 +26,14 @@
                                      @select="onSelectProject"
             />
             <div class="button-group ml-2">
-                <p-button :outline="true" size="sm" class="cancel-button"
+                <p-button style-type="secondary" size="sm" class="cancel-button"
                           @click="cancelEdit(alertData.project_id)"
                 >
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
-                <p-button
-                    style-type="primary"
-                    size="sm"
-                    @click="openModal"
+                <p-button style-type="primary"
+                          size="sm"
+                          @click="openModal"
                 >
                     {{ $t('MONITORING.ALERT.DETAIL.INFO.SAVE_CHANGES') }}
                 </p-button>

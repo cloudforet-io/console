@@ -7,7 +7,7 @@
         >
             <template #extra>
                 <router-link :to="{name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }">
-                    <p-button style-type="gray-border" :outline="true" font-weigth="bold">
+                    <p-button style-type="tertiary">
                         {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE') }}
                     </p-button>
                 </router-link>
@@ -32,8 +32,8 @@
                 >
                     <template #toolbox-left>
                         <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }">
-                            <p-button style-type="primary-dark"
-                                      icon="ic_plus_bold"
+                            <p-button style-type="primary"
+                                      icon-left="ic_plus_bold"
                                       :disabled="!hasManagePermission"
                             >
                                 {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}

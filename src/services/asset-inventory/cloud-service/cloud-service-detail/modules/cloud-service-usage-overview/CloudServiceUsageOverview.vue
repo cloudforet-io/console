@@ -3,8 +3,8 @@
         <div class="cloud-service-usage-overview">
             <header>
                 {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.USAGE_OVERVIEW') }}
-                <p-button size="sm" style-type="gray-border" :outline="true"
-                          font-weight="bold"
+                <p-button style-type="tertiary"
+                          size="sm"
                           :disabled="schemaLoading || !chartWidgetSchemaList.length"
                           @click="handleClickShowAll"
                 >

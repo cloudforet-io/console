@@ -10,8 +10,8 @@
                 <!--                    type="outline-button"-->
                 <!--                    @select="handleCreateBudgetSelect"-->
                 <!--                />-->
-                <p-button :outline="true" style-type="primary-dark"
-                          icon="ic_plus_bold"
+                <p-button style-type="secondary"
+                          icon-left="ic_plus_bold"
                           :disabled="!hasManagePermission"
                           @click="handleCreateBudgetSelect(createButtonItemList[0].name)"
                 >

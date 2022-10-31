@@ -6,9 +6,8 @@
             </template>
             <template #extra>
                 <div class="edit-button-container">
-                    <p-button style-type="primary1"
-                              :outline="true"
-                              icon="ic_edit"
+                    <p-button style-type="secondary"
+                              icon-left="ic_edit"
                               :disabled="disabled"
                               @click="editTag"
                     >

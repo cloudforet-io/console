@@ -2,8 +2,9 @@
     <p-pane-layout class="service-account-project">
         <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
             <template #extra>
-                <p-button v-if="mode === 'READ' && editable" icon="ic_edit"
+                <p-button v-if="mode === 'READ' && editable"
                           style-type="transparent"
+                          icon-left="ic_edit"
                           @click="handleClickEditButton"
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
@@ -12,7 +13,7 @@
                     <p-button style-type="transparent" @click="handleClickCancelButton">
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
                     </p-button>
-                    <p-button style-type="primary-dark"
+                    <p-button style-type="primary"
                               :disabled="!isFormValid"
                               @click="handleClickSaveButton"
                     >

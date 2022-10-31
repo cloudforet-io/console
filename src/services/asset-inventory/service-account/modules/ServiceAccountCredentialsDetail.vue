@@ -13,7 +13,10 @@
                 <p class="text">
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.NO_CREDENTIALS') }}
                 </p>
-                <p-button icon="ic_plus_bold" style-type="primary1" @click="handleClickAddButton">
+                <p-button style-type="substitutive"
+                          icon-left="ic_plus_bold"
+                          @click="handleClickAddButton"
+                >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ADD_CREDENTIALS') }}
                 </p-button>
             </div>

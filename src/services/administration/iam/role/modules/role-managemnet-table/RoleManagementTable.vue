@@ -21,8 +21,8 @@
                          @export="handleExport"
         >
             <template slot="toolbox-left">
-                <p-button style-type="primary-dark"
-                          icon="ic_plus_bold"
+                <p-button style-type="primary"
+                          icon-left="ic_plus_bold"
                           :disabled="manageDisabled"
                           @click="handleCreateRole"
                 >
@@ -48,9 +48,7 @@
             </template>
             <template #col-edit_button-format="{ item }">
                 <p-button size="sm"
-                          style-type="gray-border"
-                          :outline="true"
-                          font-weight="bold"
+                          style-type="tertiary"
                           :disabled="manageDisabled"
                           @click="handleEditRole(item.role_id)"
                 >

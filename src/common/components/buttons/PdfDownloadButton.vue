@@ -1,10 +1,10 @@
 <template>
     <span class="pdf-download-button">
         <p-popover v-if="!isBrowserSupported" class="popover" position="bottom-end">
-            <p-icon-button v-if="iconOnly" name="ic_download" style-type="gray-border"
+            <p-icon-button v-if="iconOnly" name="ic_download" style-type="tertiary"
                            size="sm" @click="$emit('click', $event)"
             />
-            <p-button v-else icon="ic_download" style-type="gray-border"
+            <p-button v-else icon-left="ic_download" style-type="tertiary"
                       @click="$emit('click', $event)"
             >
                 PDF
@@ -26,10 +26,10 @@
             </template>
         </p-popover>
         <template v-if="isBrowserSupported">
-            <p-icon-button v-if="iconOnly" name="ic_download" style-type="gray-border"
+            <p-icon-button v-if="iconOnly" name="ic_download" style-type="tertiary"
                            size="sm" @click="$emit('click', $event)"
             />
-            <p-button v-else icon="ic_download" style-type="gray-border"
+            <p-button v-else icon-left="ic_download" style-type="tertiary"
                       @click="$emit('click', $event)"
             >
                 PDF

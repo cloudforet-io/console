@@ -60,7 +60,7 @@
                             </span>
                             <p-button class="all-button"
                                       :class="[isAllHours ? 'all-selected' : '']"
-                                      style-type="secondary"
+                                      style-type="highlight"
                                       @click="onClickAllHours"
                             >
                                 {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_ALL') }}

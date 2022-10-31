@@ -8,7 +8,7 @@
                 <p class="sidebar-desc">
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_DESC') }}
                 </p>
-                <p-button style-type="primary-dark" icon="ic_plus_bold" :outline="true"
+                <p-button style-type="secondary" icon-left="ic_plus_bold"
                           size="lg" :block="true"
                           class="add-widget-button" @click="handleClickAddWidget"
                 >

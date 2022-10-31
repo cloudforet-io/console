@@ -40,18 +40,16 @@
             </div>
         </p-pane-layout>
         <div class="policy-modify-buttons">
-            <p-button
-                style-type="gray-border"
-                size="lg"
-                @click="$router.go(-1)"
+            <p-button style-type="tertiary"
+                      size="lg"
+                      @click="$router.go(-1)"
             >
                 {{ $t('IAM.POLICY.FORM.CANCEL') }}
             </p-button>
-            <p-button
-                style-type="primary-dark"
-                size="lg"
-                :disabled="!isAllValid"
-                @click="handleCreatePolicy"
+            <p-button style-type="primary"
+                      size="lg"
+                      :disabled="!isAllValid"
+                      @click="handleCreatePolicy"
             >
                 {{ $t('IAM.POLICY.FORM.CREATE') }}
             </p-button>

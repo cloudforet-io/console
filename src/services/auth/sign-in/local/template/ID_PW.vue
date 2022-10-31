@@ -141,7 +141,7 @@ export default defineComponent({
             }
         };
 
-        const buttonStyleType = computed(() => (props.isDomainOwner ? 'primary-dark' : 'primary1'));
+        const buttonStyleType = computed(() => (props.isDomainOwner ? 'primary' : 'substitutive'));
 
         return {
             ...toRefs(state),

@@ -7,10 +7,9 @@
                 name="agentId"
                 :value="authOptions.agent_id"
             >
-            <p-button
-                style-type="primary1 outline"
-                size="lg"
-                class="kbSSO-btn"
+            <p-button style-type="secondary"
+                      size="lg"
+                      class="kbSSO-btn"
             >
                 KB SSO
             </p-button>

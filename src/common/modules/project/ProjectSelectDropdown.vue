@@ -21,9 +21,8 @@
             </template>
             <template #menu-menu>
                 <div class="button-wrapper top">
-                    <p-button icon="ic_refresh"
-                              style-type="gray-border"
-                              :outline="true"
+                    <p-button icon-left="ic_refresh"
+                              style-type="tertiary"
                               size="sm"
                               :disabled="loading"
                               @click.stop="refreshProjectTree"
@@ -59,10 +58,9 @@
                     </template>
                 </p-tree>
                 <div class="button-wrapper">
-                    <p-button icon="ic_plus_bold"
+                    <p-button icon-left="ic_plus_bold"
                               class="create-button"
-                              style-type="primary-dark"
-                              :outline="true"
+                              style-type="secondary"
                               size="sm"
                               @click="handleClickCreateButton"
                     >

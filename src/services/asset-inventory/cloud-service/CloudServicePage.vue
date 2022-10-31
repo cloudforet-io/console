@@ -41,7 +41,8 @@
                         v-if="!Object.keys(storeState.serviceAccounts).length"
                         :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: selectedProvider}}"
                     >
-                        <p-button style-type="primary" icon="ic_plus_bold"
+                        <p-button style-type="primary"
+                                  icon-left="ic_plus_bold"
                                   class="mx-auto text-center"
                                   :disabled="!hasManagePermission"
                         >

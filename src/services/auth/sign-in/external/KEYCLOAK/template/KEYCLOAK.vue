@@ -1,10 +1,9 @@
 <template>
     <div class="keycloak-wrapper">
-        <p-button
-            style-type="primary1 outline"
-            size="lg"
-            class="keycloak-btn"
-            @click="openKeycloakSignIn"
+        <p-button style-type="secondary"
+                  size="lg"
+                  class="keycloak-btn"
+                  @click="openKeycloakSignIn"
         >
             Sign In with Keycloak
         </p-button>

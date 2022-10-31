@@ -3,13 +3,14 @@
         <div class="header-wrapper">
             <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.PDF_PREVIEW') }}</span>
             <div class="button-group">
-                <p-button style-type="gray-border" :outline="true"
+                <p-button style-type="tertiary"
                           @click="handleClickCancel"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.CANCEL') }}
                 </p-button>
-                <p-button v-if="mode === 'ELEMENT_EMBED'" icon="ic_download"
-                          style-type="secondary-dark"
+                <p-button v-if="mode === 'ELEMENT_EMBED'"
+                          icon-left="ic_download"
+                          style-type="primary"
                           :loading="loading"
                           @click="handleClickDownload"
                 >

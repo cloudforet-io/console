@@ -94,7 +94,7 @@
                         <p class="content-order">
                             <strong>2.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_2') }}
                         </p>
-                        <p-button style-type="primary-dark" class="mt-6" icon="ic_plus_bold"
+                        <p-button style-type="primary" class="mt-6" icon-left="ic_plus_bold"
                                   :disabled="manageDisabled"
                                   @click="$emit('create-project-group')"
                         >

@@ -25,7 +25,7 @@
         </article>
         <article class="add-note-wrapper">
             <p-textarea :value="noteInput" @input="handleChangeNoteInput" />
-            <p-button style-type="gray-border" size="md" class="add-btn"
+            <p-button style-type="tertiary" class="add-btn"
                       :disabled="(noteInput.trim()).length === 0 || manageDisabled"
                       @click="handleCreateNote"
             >

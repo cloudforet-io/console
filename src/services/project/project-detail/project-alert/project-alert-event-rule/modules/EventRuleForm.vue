@@ -11,11 +11,11 @@
             :options.sync="options"
         />
         <div class="button-group">
-            <p-button style-type="gray900" :outline="true" @click="onClickCancel">
+            <p-button style-type="tertiary" @click="onClickCancel">
                 {{ $t('PROJECT.EVENT_RULE.CANCEL') }}
             </p-button>
             <p-button :disabled="!isAllValid"
-                      style-type="primary-dark"
+                      style-type="primary"
                       @click="onClickConfirm"
             >
                 {{ mode === EDIT_MODE.CREATE ? $t('PROJECT.EVENT_RULE.ADD') : $t('PROJECT.EVENT_RULE.SAVE') }}

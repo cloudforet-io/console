@@ -4,7 +4,6 @@
                   :key="index"
                   class="only-desktop action-button"
                   :style-type="button.styleType"
-                  :outline="true"
                   :disabled="button.disabled"
                   @click="onSelectAction(button.name)"
         >
@@ -154,20 +153,20 @@ export default {
             buttonGroup: computed(() => ([
                 {
                     name: ALERT_ACTION.acknowledge,
-                    styleType: 'secondary-dark',
+                    styleType: 'primary',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.BUTTON_ACKNOWLEDGE'),
                     disabled: props.manageDisabled || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.ACKNOWLEDGED)) || state.isSelectedError,
                 },
                 {
                     name: ALERT_ACTION.resolve,
-                    styleType: 'secondary-dark',
+                    styleType: 'primary',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.BUTTON_RESOLVE'),
                     disabled: props.manageDisabled || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.RESOLVED)) || state.isSelectedError,
 
                 },
                 {
                     name: ALERT_ACTION.delete,
-                    styleType: 'alert',
+                    styleType: 'negative-secondary',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.BUTTON_DELETE'),
                     disabled: props.manageDisabled || state.isSelectedNone,
                 },
@@ -244,7 +243,6 @@ export default {
     width: 100%;
     justify-content: flex-end;
     .action-button {
-        @apply bg-white;
         margin-left: 0.5rem;
         line-height: 1;
     }

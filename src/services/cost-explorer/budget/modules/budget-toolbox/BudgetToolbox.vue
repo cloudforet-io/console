@@ -37,14 +37,12 @@
                         :items="sortKeyList"
                         :selected.sync="selectedSortKey"
                     />
-                    <p-button
-                        class="sort-box" style-type="gray-border"
-                        @click="handleSortType"
+                    <p-button class="sort-box"
+                              style-type="tertiary"
+                              :icon-left="sort.desc ? 'ic_arrow-down' : 'ic_arrow-up'"
+                              @click="handleSortType"
                     >
                         <span>{{ sort.desc ? $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DESC') : $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ASC') }}</span>
-                        <p-i :name="sort.desc ? 'ic_arrow-down' : 'ic_arrow-up'"
-                             color="gray900" height="1rem"
-                        />
                     </p-button>
                 </div>
             </template>
@@ -59,7 +57,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PToolbox, PSelectStatus, PButton, PI, PSelectDropdown, PDivider,
+    PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
@@ -106,7 +104,6 @@ export default {
         PSelectStatus,
         PSelectDropdown,
         PButton,
-        PI,
         PDivider,
     },
     props: {
@@ -291,11 +288,6 @@ export default {
 
     .left-area {
         @apply flex flex-wrap gap-4;
-        .sort-box {
-            &:hover {
-                @apply bg-gray-900 text-white border-gray-900;
-            }
-        }
     }
 }
 </style>

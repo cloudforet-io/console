@@ -32,10 +32,10 @@
                 />
             </p-pane-layout>
             <div class="buttons">
-                <p-button style-type="gray900" :outline="true" @click="$emit('close')">
+                <p-button style-type="tertiary" @click="$emit('close')">
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
-                <p-button style-type="primary-dark" :disabled="!isTagsValid" @click="handleSaveTags">
+                <p-button style-type="primary" :disabled="!isTagsValid" @click="handleSaveTags">
                     {{ $t('COMMON.TAGS.SAVE') }}
                 </p-button>
             </div>
