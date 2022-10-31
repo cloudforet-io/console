@@ -133,6 +133,7 @@ export default defineComponent<CheckboxProps>({
         @apply text-gray-900 cursor-pointer;
         font-weight: 400;
         font-size: 14px;
+        vertical-align: middle;
     }
     .check-icon {
         @apply text-gray-400 cursor-pointer;

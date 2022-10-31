@@ -6,7 +6,7 @@ export const getRadioGroupArgTypes = (): ArgTypes => ({
     direction: {
         name: 'direction',
         type: { name: 'string' },
-        description: 'Radios alignment direction',
+        description: 'Checkbox alignment direction',
         defaultValue: DIRECTION.horizontal,
         table: {
             type: {

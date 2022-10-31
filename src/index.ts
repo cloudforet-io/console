@@ -37,6 +37,7 @@ export { default as PCardItem } from './others/deprecated/card-item/PCardItem.vu
 export { default as PListCard } from './data-display/cards/list-card/PListCard.vue';
 export { default as PCollapsiblePanel } from './data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
 export { default as PCheckBox } from './inputs/checkbox/PCheckBox.vue';
+export { default as PCheckBoxGroup } from './inputs/checkbox-group/PCheckBoxGroup.vue';
 export { default as PFieldGroup } from './inputs/forms/field-group/PFieldGroup.vue';
 export { default as PRadio } from './inputs/radio/PRadio.vue';
 export { default as PRadioGroup } from './inputs/radio-group/PRadioGroup.vue';
