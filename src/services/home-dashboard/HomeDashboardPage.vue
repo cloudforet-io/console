@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout class="dashboard">
+    <general-page-layout class="home-dashboard">
         <div class="col-span-12 lg:col-span-9
                     widget-wrapper"
         >
@@ -43,18 +43,18 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
 import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
-import AllSummary from '@/services/dashboard/modules/all-summary/AllSummary.vue';
-import CollectorProgress from '@/services/dashboard/modules/CollectingProgress.vue';
+import AllSummary from '@/services/home-dashboard/modules/all-summary/AllSummary.vue';
+import CollectorProgress from '@/services/home-dashboard/modules/CollectingProgress.vue';
 import PersonalHealthDashboard
-    from '@/services/dashboard/modules/PersonalHealthDashboard.vue';
-import ResourceMap from '@/services/dashboard/modules/ResourceMap.vue';
-import ServiceAccounts from '@/services/dashboard/modules/ServiceAccounts.vue';
-import TopProjects from '@/services/dashboard/modules/TopProjects.vue';
-import TrustedAdvisor from '@/services/dashboard/modules/TrustedAdvisor.vue';
+    from '@/services/home-dashboard/modules/PersonalHealthDashboard.vue';
+import ResourceMap from '@/services/home-dashboard/modules/ResourceMap.vue';
+import ServiceAccounts from '@/services/home-dashboard/modules/ServiceAccounts.vue';
+import TopProjects from '@/services/home-dashboard/modules/TopProjects.vue';
+import TrustedAdvisor from '@/services/home-dashboard/modules/TrustedAdvisor.vue';
 
 
 export default {
-    name: 'Dashboard',
+    name: 'HomeDashboard',
     components: {
         PersonalHealthDashboard,
         TrustedAdvisor,
@@ -81,7 +81,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.dashboard {
+.home-dashboard {
     @apply bg-gray-100;
     height: auto;
 

@@ -50,7 +50,7 @@ import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
 import GNBToolset from '@/common/modules/navigations/gnb/modules/GNBToolset.vue';
 import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
 
-import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
 
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['notifications', 'support', 'profile'];
@@ -70,7 +70,7 @@ export default defineComponent({
             openedMenu: '',
             showSiteMap: false,
             hasPermission: computed((() => store.getters['user/hasPermission'])),
-            logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.DASHBOARD, store.getters['user/pagePermissionList']) ? { name: DASHBOARD_ROUTE._NAME } : null)),
+            logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: HOME_DASHBOARD_ROUTE._NAME } : null)),
             gnbMenuList: computed<GNBMenuType[]>(() => store.getters['display/GNBMenuList']),
             siteMapMenuList: computed<GNBMenuType[]>(() => store.getters['display/siteMapMenuList']),
             selectedMenu: computed(() => {

@@ -154,23 +154,23 @@ export default {
 
         /* Event */
         const handleSelectWidget = async (value: WidgetInfo) => {
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', value);
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', value);
+            costExplorerStore.commit('home-dashboard/setOriginSelectedWidget', value);
+            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', value);
             state.selectedQuery = {};
             state.selectedItem = value;
         };
         const handleClickRemoveWidget = async () => {
             await deleteCustomWidget();
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', {});
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
+            costExplorerStore.commit('home-dashboard/setOriginSelectedWidget', {});
+            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', {});
             state.selectedItem = {};
             state.thisPage = 1;
             await listCustomWidget();
         };
         const handleCreateCustomWidget = async (createdCustomWidget: WidgetInfo) => {
             await listCustomWidget();
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', createdCustomWidget);
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', createdCustomWidget);
+            costExplorerStore.commit('home-dashboard/setOriginSelectedWidget', createdCustomWidget);
+            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', createdCustomWidget);
             state.selectedQuery = {};
             state.selectedItem = createdCustomWidget;
             state.thisPage = 1;
@@ -184,8 +184,8 @@ export default {
         watch(() => state.selectedQuery, (selectedQuery) => {
             if (Object.keys(selectedQuery).length) {
                 state.selectedItem = selectedQuery;
-                costExplorerStore.commit('dashboard/setOriginSelectedWidget', {});
-                costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
+                costExplorerStore.commit('home-dashboard/setOriginSelectedWidget', {});
+                costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', {});
             }
         }, { immediate: false });
 

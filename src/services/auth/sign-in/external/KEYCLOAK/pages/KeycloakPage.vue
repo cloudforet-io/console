@@ -12,7 +12,7 @@ import { store } from '@/store';
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
-import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
 
 export default defineComponent({
     name: 'KeycloakPage',
@@ -40,7 +40,7 @@ export default defineComponent({
 
         const onSignIn = async () => {
             if (!props.nextPath) {
-                await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                await vm.$router.push({ name: HOME_DASHBOARD_ROUTE._NAME });
                 return;
             }
 
@@ -49,7 +49,7 @@ export default defineComponent({
             if (isAccessible) {
                 await vm.$router.push(props.nextPath);
             } else {
-                await vm.$router.push({ name: DASHBOARD_ROUTE._NAME });
+                await vm.$router.push({ name: HOME_DASHBOARD_ROUTE._NAME });
             }
         };
 

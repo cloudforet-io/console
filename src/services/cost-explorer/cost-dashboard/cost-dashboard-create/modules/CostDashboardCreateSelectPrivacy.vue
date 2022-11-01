@@ -51,7 +51,7 @@ export default {
         });
 
         const handleRadio = (value: DashboardPrivacyType) => {
-            costExplorerStore.commit('dashboard/setDashboardPrivacy', value);
+            costExplorerStore.commit('home-dashboard/setDashboardPrivacy', value);
         };
 
         return {

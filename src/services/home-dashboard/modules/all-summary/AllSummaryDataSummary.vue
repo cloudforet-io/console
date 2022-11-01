@@ -71,8 +71,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { DAY_COUNT, MONTH_COUNT } from '@/services/dashboard/modules/all-summary/AllSummary.vue';
-import { DATA_TYPE } from '@/services/dashboard/modules/type';
+import { DAY_COUNT, MONTH_COUNT } from '@/services/home-dashboard/modules/all-summary/AllSummary.vue';
+import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
 
 
 interface SummaryData {

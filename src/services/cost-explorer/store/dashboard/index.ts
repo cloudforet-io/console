@@ -13,7 +13,7 @@ import * as mutations from './mutations';
 
 
 const state: CostDashboardState = {
-    // for creating dashboard
+    // for creating home-dashboard
     selectedTemplate: {},
     defaultFilter: {},
     selectedDashboardPrivacy: DASHBOARD_PRIVACY_TYPE.USER,
@@ -23,7 +23,7 @@ const state: CostDashboardState = {
     originSelectedWidget: {} as WidgetInfo,
     editedSelectedWidget: {} as WidgetInfo,
 
-    // for customizing dashboard
+    // for customizing home-dashboard
     editedCustomLayout: [] as CustomLayout[],
     widgetPosition: undefined,
     layoutOfSpace: undefined,

@@ -11,8 +11,8 @@ import alertManagerRoute from '@/services/alert-manager/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes';
 import authRoutes from '@/services/auth/routes';
 import costExplorerRoute from '@/services/cost-explorer/routes';
-import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
-import dashboardRoute from '@/services/dashboard/routes';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
+import homeDashboardRoute from '@/services/home-dashboard/routes';
 import infoRoute from '@/services/info/routes';
 import myPageRoute from '@/services/my-page/routes';
 import projectRoute from '@/services/project/routes';
@@ -29,11 +29,11 @@ export const serviceRoutes: RouteConfig[] = [
         name: ROOT_ROUTE._NAME,
         redirect: () => {
             if (store.getters['user/isDomainOwner'] || store.getters['user/hasSystemRole']) return { name: ADMINISTRATION_ROUTE._NAME };
-            return ({ name: DASHBOARD_ROUTE._NAME });
+            return ({ name: HOME_DASHBOARD_ROUTE._NAME });
         },
         component: { template: '<router-view />' },
         children: [
-            dashboardRoute,
+            homeDashboardRoute,
             administrationRoute,
             assetInventoryRoute,
             projectRoute,

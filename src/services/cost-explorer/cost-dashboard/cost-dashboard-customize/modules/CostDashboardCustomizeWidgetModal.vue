@@ -86,15 +86,15 @@ export default {
             emit('update:visible', visible);
         };
         const handleCancel = () => {
-            costExplorerStore.commit('dashboard/setWidgetPosition', undefined);
-            costExplorerStore.commit('dashboard/setLayoutOfSpace', undefined);
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', {});
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
+            costExplorerStore.commit('home-dashboard/setWidgetPosition', undefined);
+            costExplorerStore.commit('home-dashboard/setLayoutOfSpace', undefined);
+            costExplorerStore.commit('home-dashboard/setOriginSelectedWidget', {});
+            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', {});
         };
 
         const handleChangeTab = () => {
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', {});
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
+            costExplorerStore.commit('home-dashboard/setOriginSelectedWidget', {});
+            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', {});
         };
 
         watch(() => props.visible, (visible) => {

@@ -245,7 +245,7 @@ export default {
 
 <style lang="postcss" scoped>
 .project-wise-budget-usage-summary {
-    /* custom cost-dashboard-card-widget-layout */
+    /* custom cost-home-dashboard-card-widget-layout */
 
     /* custom design-system component - p-card */
     &.p-card:deep(.body, .no-data) {

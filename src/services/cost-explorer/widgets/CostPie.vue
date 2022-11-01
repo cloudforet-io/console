@@ -306,7 +306,7 @@ export default defineComponent<WidgetProps>({
     .table-right {
         @apply border-t border-gray-200;
 
-        /* custom cost-dashboard-data-table */
+        /* custom cost-home-dashboard-data-table */
 
         /* custom design-system component - p-data-table */
         :deep(.p-data-table) th {

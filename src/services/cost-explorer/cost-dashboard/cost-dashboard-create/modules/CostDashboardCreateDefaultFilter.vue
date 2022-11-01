@@ -44,7 +44,7 @@ export default {
                     return costExplorerStore.state.dashboard.includesFilter ?? false;
                 },
                 set(value) {
-                    costExplorerStore.commit('dashboard/setIncludesFilter', value);
+                    costExplorerStore.commit('home-dashboard/setIncludesFilter', value);
                 },
             }),
             defaultFilterModalVisible: false,
