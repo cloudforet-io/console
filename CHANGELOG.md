@@ -1,3 +1,10 @@
+# [1.1.0-beta.444](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.443...v1.1.0-beta.444) (2022-11-01)
+
+
+### Features
+
+* **p-tooltip:** add position props and fix style ([#121](https://github.com/cloudforet-io/mirinae/issues/121)) ([4d50310](https://github.com/cloudforet-io/mirinae/commit/4d5031042d44e0c0dbc002c1d93912af537ccdcb))
+
 # [1.1.0-beta.443](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.442...v1.1.0-beta.443) (2022-10-31)
 
 
