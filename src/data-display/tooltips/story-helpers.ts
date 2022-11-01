@@ -6,7 +6,7 @@ export const getTooltipArgTypes = (): ArgTypes => ({
     tag: {
         name: 'tag',
         type: { name: 'string' },
-        description: 'root element tag',
+        description: 'Root element tag',
         defaultValue: 'span',
         table: {
             type: {

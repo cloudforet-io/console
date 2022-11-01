@@ -1,12 +1,15 @@
 $space: 8px;
 .p-tooltip {
+    $tooltip-color: rgba(theme('colors.gray.900'), 0.9);
     display: block !important;
     z-index: 10000;
     font-size: 0.75rem;
+    line-height: 1.5;
 
     .tooltip-inner {
-        @apply rounded-none;
-        background: black;
+        @apply rounded-md;
+        max-width: 640px;
+        background-color: $tooltip-color;
         color: white;
         padding: 5px 8px;
     }
@@ -17,7 +20,7 @@ $space: 8px;
         border-style: solid;
         position: absolute;
         margin: 5px;
-        border-color: black;
+        border-color: $tooltip-color;
         z-index: 1;
     }
 
@@ -25,12 +28,12 @@ $space: 8px;
         margin-bottom: calc($(space));
 
         .tooltip-arrow {
-            border-width: 11px 7.5px 0 7.5px;
+            border-width: 8px 6px 0 6px;
             border-left-color: transparent !important;
             border-right-color: transparent !important;
             border-bottom-color: transparent !important;
-            bottom: -9px;
-            left: calc(50% - 11px);
+            bottom: -8px;
+            left: calc(50% - 6px);
             margin-top: 0;
             margin-bottom: 0;
         }
@@ -40,12 +43,12 @@ $space: 8px;
         margin-top: calc($(space));
 
         .tooltip-arrow {
-            border-width: 0 7.5px 11px 7.5px;
+            border-width: 0 6px 8px 6px;
             border-left-color: transparent !important;
             border-right-color: transparent !important;
             border-top-color: transparent !important;
-            top: -9px;
-            left: calc(50% - 11px);
+            top: -8px;
+            left: calc(50% - 6px);
             margin-top: 0;
             margin-bottom: 0;
         }
@@ -55,12 +58,12 @@ $space: 8px;
         margin-left: calc($(space));
 
         .tooltip-arrow {
-            border-width: 7.5px 11px 7.5px 0;
+            border-width: 6px 8px 6px 0;
             border-left-color: transparent !important;
             border-top-color: transparent !important;
             border-bottom-color: transparent !important;
-            left: -9px;
-            top: calc(50% - 13px);
+            left: -8px;
+            top: calc(50% - 6px);
             margin-left: 0;
             margin-right: 0;
         }
@@ -70,12 +73,12 @@ $space: 8px;
         margin-right: calc($(space));
 
         .tooltip-arrow {
-            border-width: 7.5px 0 7.5px 11px;
+            border-width: 6px 0 6px 8px;
             border-top-color: transparent !important;
             border-right-color: transparent !important;
             border-bottom-color: transparent !important;
-            right: -9px;
-            top: calc(50% - 13px);
+            right: -8px;
+            top: calc(50% - 6px);
             margin-left: 0;
             margin-right: 0;
         }
@@ -107,5 +110,17 @@ $space: 8px;
         visibility: visible;
         opacity: 1;
         transition: opacity 0.15s;
+    }
+
+    @screen tablet {
+        .tooltip-inner {
+            max-width: 320px;
+        }
+    }
+
+    @screen mobile {
+        .tooltip-inner {
+            max-width: 240px;
+        }
     }
 }

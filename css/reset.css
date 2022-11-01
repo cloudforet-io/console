@@ -11,7 +11,7 @@ html:lang(en), body:lang(en) {
  */
 
 html, body {
-  font-family: Noto Sans, Roboto, arial, sans-serif;
+  font-family: noto sans, roboto, arial, sans-serif;
   font-size: 16px;
   font-weight: 400;
   width: 100vw;
@@ -52,7 +52,7 @@ input:focus {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: Noto Sans, Roboto, arial, sans-serif;
+  font-family: noto sans, roboto, arial, sans-serif;
   margin: 0;
   color: inherit;
   word-spacing: inherit;

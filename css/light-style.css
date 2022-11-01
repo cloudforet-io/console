@@ -13,7 +13,7 @@ html:lang(en), body:lang(en) {
  */
 
 html, body {
-  font-family: Noto Sans, Roboto, arial, sans-serif;
+  font-family: noto sans, roboto, arial, sans-serif;
   font-size: 16px;
   font-weight: 400;
   width: 100vw;
@@ -54,7 +54,7 @@ input:focus {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: Noto Sans, Roboto, arial, sans-serif;
+  font-family: noto sans, roboto, arial, sans-serif;
   margin: 0;
   color: inherit;
   word-spacing: inherit;
@@ -86,11 +86,13 @@ summary {
   display: block !important;
   z-index: 10000;
   font-size: 0.75rem;
+  line-height: 1.5;
 }
 
 .p-tooltip .tooltip-inner {
-    border-radius: 0;
-    background: black;
+    border-radius: 0.25rem;
+    max-width: 640px;
+    background-color: rgba(35,37,51, 0.9);
     color: white;
     padding: 5px 8px;
   }
@@ -101,7 +103,7 @@ summary {
     border-style: solid;
     position: absolute;
     margin: 5px;
-    border-color: black;
+    border-color: rgba(35,37,51, 0.9);
     z-index: 1;
   }
 
@@ -110,12 +112,12 @@ summary {
   }
 
 .p-tooltip[x-placement^="top"] .tooltip-arrow {
-      border-width: 11px 7.5px 0 7.5px;
+      border-width: 8px 6px 0 6px;
       border-left-color: transparent !important;
       border-right-color: transparent !important;
       border-bottom-color: transparent !important;
-      bottom: -9px;
-      left: calc(50% - 11px);
+      bottom: -8px;
+      left: calc(50% - 6px);
       margin-top: 0;
       margin-bottom: 0;
     }
@@ -125,12 +127,12 @@ summary {
   }
 
 .p-tooltip[x-placement^="bottom"] .tooltip-arrow {
-      border-width: 0 7.5px 11px 7.5px;
+      border-width: 0 6px 8px 6px;
       border-left-color: transparent !important;
       border-right-color: transparent !important;
       border-top-color: transparent !important;
-      top: -9px;
-      left: calc(50% - 11px);
+      top: -8px;
+      left: calc(50% - 6px);
       margin-top: 0;
       margin-bottom: 0;
     }
@@ -140,12 +142,12 @@ summary {
   }
 
 .p-tooltip[x-placement^="right"] .tooltip-arrow {
-      border-width: 7.5px 11px 7.5px 0;
+      border-width: 6px 8px 6px 0;
       border-left-color: transparent !important;
       border-top-color: transparent !important;
       border-bottom-color: transparent !important;
-      left: -9px;
-      top: calc(50% - 13px);
+      left: -8px;
+      top: calc(50% - 6px);
       margin-left: 0;
       margin-right: 0;
     }
@@ -155,12 +157,12 @@ summary {
   }
 
 .p-tooltip[x-placement^="left"] .tooltip-arrow {
-      border-width: 7.5px 0 7.5px 11px;
+      border-width: 6px 0 6px 8px;
       border-top-color: transparent !important;
       border-right-color: transparent !important;
       border-bottom-color: transparent !important;
-      right: -9px;
-      top: calc(50% - 13px);
+      right: -8px;
+      top: calc(50% - 6px);
       margin-left: 0;
       margin-right: 0;
     }
@@ -193,4 +195,16 @@ summary {
     opacity: 1;
     -webkit-transition: opacity 0.15s;
     transition: opacity 0.15s;
+  }
+
+@media (max-width: 1023px) {
+    .p-tooltip .tooltip-inner {
+      max-width: 320px;
+    }
+  }
+
+@media (max-width: 767px) {
+    .p-tooltip .tooltip-inner {
+      max-width: 240px;
+    }
   }

@@ -1,7 +1,4 @@
 export const POSITIONS = {
-    auto: 'auto',
-    'auto-start': 'auto-start',
-    'auto-end': 'auto-end',
     top: 'top',
     'top-start': 'top-start',
     'top-end': 'top-end',
