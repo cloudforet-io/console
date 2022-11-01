@@ -92,7 +92,7 @@ import { FILTER, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import CostExplorerSetFilterModal from '@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { CostFiltersMap } from '@/services/cost-explorer/type';
+import type { CostFiltersMap, MoreGroupByItem } from '@/services/cost-explorer/type';
 import type { Legend } from '@/services/cost-explorer/widgets/type';
 
 
@@ -134,7 +134,7 @@ export default defineComponent<Props>({
             filters: computed(() => costExplorerStore.state.costAnalysis.filters),
             groupBy: computed(() => costExplorerStore.state.costAnalysis.groupBy),
             primaryGroupBy: computed(() => costExplorerStore.state.costAnalysis.primaryGroupBy),
-            moreGroupBy: computed(() => costExplorerStore.state.costAnalysis.moreGroupBy),
+            moreGroupBy: computed<MoreGroupByItem[]>(() => costExplorerStore.getters['costAnalysis/orderedMoreGroupByItems']),
             //
             filtersLength: computed<number>(() => {
                 const selectedValues = Object.values(state.filters);

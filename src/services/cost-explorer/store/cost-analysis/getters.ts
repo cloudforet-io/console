@@ -1,10 +1,12 @@
 import type { Getter } from 'vuex';
 
-import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
+import { orderBy } from 'lodash';
+
+import { GROUP_BY_ITEM_MAP, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import type {
     CostAnalysisStoreState, GroupByItem,
 } from '@/services/cost-explorer/store/cost-analysis/type';
-import type { CostQuerySetModel } from '@/services/cost-explorer/type';
+import type { CostQuerySetModel, MoreGroupByItem } from '@/services/cost-explorer/type';
 
 
 export const groupByItems: Getter<CostAnalysisStoreState, any> = ({ groupBy }): GroupByItem[] => groupBy.map(d => GROUP_BY_ITEM_MAP[d]);
@@ -27,3 +29,13 @@ export const currentQuerySetOptions: Getter<CostAnalysisStoreState, any> = ({
     period,
     filters,
 });
+
+
+export const orderedMoreGroupByItems: Getter<CostAnalysisStoreState, any> = ({ moreGroupBy }): MoreGroupByItem[] => {
+    if (!moreGroupBy?.length) return [];
+    const tags = moreGroupBy.filter(d => d.category === MORE_GROUP_BY.TAGS);
+    const additionalInfo = moreGroupBy.filter(d => d.category === MORE_GROUP_BY.ADDITIONAL_INFO);
+    const orderedTags = orderBy(tags, [d => d.key]);
+    const orderedAdditionalInfo = orderBy(additionalInfo, [d => d.key]);
+    return [...orderedTags, ...orderedAdditionalInfo];
+};
