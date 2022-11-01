@@ -19,10 +19,6 @@
             />
             <template #content>
                 <div class="popover-content-wrapper">
-                    <div class="group-by-wrapper">
-                        <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DEFAULT') }}</b>
-                        <span class="count-text"> ({{ Object.keys(GROUP_BY).length }})</span>
-                    </div>
                     <div v-for="(popoverItem, idx) in popoverItems" :key="`popover-row-${idx}-${popoverItem.title}`"
                          class="group-by-wrapper"
                     >
@@ -64,7 +60,7 @@ import { cloneDeep } from 'lodash';
 import { i18n } from '@/translations';
 
 import CostAnalysisGroupByFilterMoreModal from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilterMoreModal.vue';
-import { GROUP_BY, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { MoreGroupByItem } from '@/services/cost-explorer/type';
 
@@ -87,7 +83,7 @@ export default defineComponent({
     },
     setup() {
         const state = reactive({
-            moreGroupByItems: computed<MoreGroupByItem[]>(() => costExplorerStore.state.costAnalysis.moreGroupBy),
+            moreGroupByItems: computed<MoreGroupByItem[]>(() => costExplorerStore.getters['costAnalysis/orderedMoreGroupByItems']),
             addMoreModalVisible: false,
             // popover
             popoverVisible: false,
@@ -146,7 +142,6 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
-            GROUP_BY,
             predicate,
             handleClickSettingButton,
             handleClose,
