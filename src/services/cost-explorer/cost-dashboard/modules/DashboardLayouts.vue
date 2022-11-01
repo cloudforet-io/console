@@ -21,10 +21,12 @@
                     <div v-if="customizeMode" class="btn-group">
                         <p-icon-button name="ic_edit"
                                        style-type="tertiary"
+                                       shape="square"
                                        @click.stop="handleClickUpdate(rowIdx, colIdx, widget)"
                         />
                         <p-icon-button name="ic_trashcan"
-                                       style-type="negative-outlined"
+                                       style-type="negative-secondary"
+                                       shape="square"
                                        @click.stop="handleClickDelete(rowIdx, colIdx, widget)"
                         />
                     </div>
