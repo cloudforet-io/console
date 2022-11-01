@@ -130,7 +130,7 @@ export default defineComponent<ButtonProps>({
 </script>
 
 <style lang="postcss">
-@define-mixin btn-color $theme, $default-color, $text-color, $hover-color, $active-color, $focus-color, $border-color {
+@define-mixin btn-color $theme, $default-color, $text-color, $hover-color, $active-color, $border-color {
     &.$(theme) {
         background-color: $default-color;
         color: $text-color;
@@ -140,10 +140,6 @@ export default defineComponent<ButtonProps>({
             &:active {
                 background-color: $active-color;
             }
-        }
-        &:focus {
-            background-color: $focus-color;
-            outline-color: theme('colors.blue.500');
         }
         &.disabled {
             @apply bg-gray-200 text-gray-400 border-transparent;
@@ -173,6 +169,10 @@ export default defineComponent<ButtonProps>({
 
     &[type="button"], &[type="reset"], &[type="submit"] {
         appearance: none;
+    }
+
+    &:focus {
+        outline-color: theme('colors.blue.500');
     }
 
     &.block {
@@ -224,16 +224,16 @@ export default defineComponent<ButtonProps>({
         }
     }
 
-    @mixin btn-color primary, theme('colors.primary-dark'), theme('colors.white'), theme('colors.violet.900'), theme('colors.violet.900'), theme('colors.primary-dark');
-    @mixin btn-color substitutive, theme('colors.primary1'), theme('colors.white'), theme('colors.violet.500'), theme('colors.primary'), theme('colors.primary1');
-    @mixin btn-color secondary, theme('colors.white'), theme('colors.primary'), theme('colors.primary3'), theme('colors.primary2'), theme('colors.white'), theme('colors.primary1');
-    @mixin btn-color tertiary, theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.300'), theme('colors.white'), theme('colors.gray.300');
-    @mixin btn-color transparent, theme('colors.transparent'), theme('colors.gray.900'), theme('colors.blue.200'), theme('colors.blue.300'), theme('colors.white');
-    @mixin btn-color highlight, theme('colors.blue.600'), theme('colors.white'), theme('colors.blue.700'), theme('colors.blue.800'), theme('colors.blue.600');
-    @mixin btn-color positive, theme('colors.green.600'), theme('colors.white'), theme('colors.green.700'), theme('colors.green.800'), theme('colors.green.600');
+    @mixin btn-color primary, theme('colors.primary-dark'), theme('colors.white'), theme('colors.violet.900'), theme('colors.violet.900');
+    @mixin btn-color substitutive, theme('colors.primary1'), theme('colors.white'), theme('colors.violet.500'), theme('colors.primary');
+    @mixin btn-color secondary, theme('colors.white'), theme('colors.primary'), theme('colors.primary3'), theme('colors.primary2'), theme('colors.primary1');
+    @mixin btn-color tertiary, theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.300'), theme('colors.gray.300');
+    @mixin btn-color transparent, theme('colors.transparent'), theme('colors.gray.900'), theme('colors.blue.200'), theme('colors.blue.300');
+    @mixin btn-color highlight, theme('colors.blue.600'), theme('colors.white'), theme('colors.blue.700'), theme('colors.blue.800');
+    @mixin btn-color positive, theme('colors.green.600'), theme('colors.white'), theme('colors.green.700'), theme('colors.green.800');
     @mixin btn-color negative-primary, theme('colors.red.500'), theme('colors.white'), theme('colors.red.600'), theme('colors.red.700');
-    @mixin btn-color negative-secondary, theme('colors.white'), theme('colors.gray.900'), theme('colors.red.100'), theme('colors.red.200'), theme('colors.white'), theme('colors.gray.300');
-    @mixin btn-color negative-transparent, theme('colors.transparent'), theme('colors.gray.900'), theme('colors.red.400'), theme('colors.red.500'), theme('colors.white');
+    @mixin btn-color negative-secondary, theme('colors.white'), theme('colors.gray.900'), theme('colors.red.100'), theme('colors.red.200'), theme('colors.gray.300');
+    @mixin btn-color negative-transparent, theme('colors.transparent'), theme('colors.gray.900'), theme('colors.red.400'), theme('colors.red.500');
 
     &.transparent {
         &:hover, &:focus {
