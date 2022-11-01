@@ -238,11 +238,11 @@ export default defineComponent<Props>({
 <style lang="postcss" scoped>
 .cloud-service-history-detail-overlay {
     @apply bg-gray-100;
-    position: absolute;
+    position: fixed;
     display: flex;
     width: 100%;
     height: 100%;
-    top: 0;
+    top: $gnb-height;
     left: 0;
     flex-direction: column;
     z-index: 99;
