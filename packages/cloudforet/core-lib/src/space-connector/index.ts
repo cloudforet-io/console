@@ -2,10 +2,12 @@ import type { AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import { camelCase } from 'lodash';
 
-import API from '@/space-connector/api';
 import type {
     SessionTimeoutCallback, APIInfo, MockInfo, AxiosPostResponse,
 } from '@/space-connector/type';
+
+import ServiceAPI from './service-api';
+import TokenAPI from './token-api';
 
 const API_REFLECTION_URL = '/api/reflection';
 
@@ -29,7 +31,9 @@ export class SpaceConnector {
 
     private apiTokenCheckInterval?: ReturnType<typeof setInterval>;
 
-    private readonly api: API;
+    private readonly serviceApi: ServiceAPI;
+
+    private readonly tokenApi: TokenAPI;
 
     private _client: any = {};
 
@@ -37,16 +41,22 @@ export class SpaceConnector {
 
     private readonly afterCallApiMap: AfterCallApiMap;
 
-    constructor(endpoint: string, sessionTimeoutCallback: SessionTimeoutCallback = () => undefined, mockInfo: MockInfo, afterCallApiMap: AfterCallApiMap) {
+    constructor(
+        endpoint: string,
+        sessionTimeoutCallback: SessionTimeoutCallback = () => undefined,
+        mockInfo: MockInfo,
+        afterCallApiMap: AfterCallApiMap,
+    ) {
         this.mockInfo = mockInfo;
-        this.api = new API(endpoint, sessionTimeoutCallback);
+        this.tokenApi = TokenAPI.getInstance(endpoint, sessionTimeoutCallback);
+        this.serviceApi = new ServiceAPI(endpoint, this.tokenApi);
         this.afterCallApiMap = afterCallApiMap;
         this.setApiTokenCheckInterval();
     }
 
     private setApiTokenCheckInterval() {
         if (this.apiTokenCheckInterval) clearInterval(this.apiTokenCheckInterval);
-        this.apiTokenCheckInterval = setInterval(() => this.api.getActivatedToken(), CHECK_TOKEN_TIME);
+        this.apiTokenCheckInterval = setInterval(() => this.tokenApi.getActivatedToken(), CHECK_TOKEN_TIME);
     }
 
     private clearApiTokenCheckInterval() {
@@ -71,21 +81,21 @@ export class SpaceConnector {
     }
 
     static setToken(accessToken: string, refreshToken: string): void {
-        SpaceConnector.instance.api.setToken(accessToken, refreshToken);
+        SpaceConnector.instance.tokenApi.setToken(accessToken, refreshToken);
         SpaceConnector.instance.setApiTokenCheckInterval();
     }
 
     static flushToken(): void {
         SpaceConnector.instance.clearApiTokenCheckInterval();
-        SpaceConnector.instance.api.flushToken();
+        SpaceConnector.instance.tokenApi.flushToken();
     }
 
     static async refreshAccessToken(executeSessionTimeoutCallback: boolean): Promise<boolean|undefined> {
-        return SpaceConnector.instance.api.refreshAccessToken(executeSessionTimeoutCallback);
+        return SpaceConnector.instance.tokenApi.refreshAccessToken(executeSessionTimeoutCallback);
     }
 
     static get isTokenAlive(): boolean {
-        return API.checkToken();
+        return TokenAPI.checkToken();
     }
 
     protected async loadAPI(): Promise<void> {
@@ -97,7 +107,7 @@ export class SpaceConnector {
                     baseURL: this.mockInfo.endpoint,
                 });
             } else {
-                reflectionApi = this.api.instance;
+                reflectionApi = this.serviceApi.instance;
             }
             const response: AxiosPostResponse = await reflectionApi.post(API_REFLECTION_URL);
             response.data.apis.forEach((apiInfo: APIInfo) => {
@@ -141,7 +151,7 @@ export class SpaceConnector {
                     }
                 }
 
-                const response: AxiosPostResponse = await this.api.instance.post(url, params, mockConfig);
+                const response: AxiosPostResponse = await this.serviceApi.instance.post(url, params, mockConfig);
 
                 if (afterCall) afterCall(response.data);
 
@@ -149,7 +159,7 @@ export class SpaceConnector {
             };
         }
         return async (params: object = {}, config?: AxiosRequestConfig): Promise<any> => {
-            const response: AxiosPostResponse = await this.api.instance.post(path, params, config);
+            const response: AxiosPostResponse = await this.serviceApi.instance.post(path, params, config);
 
             if (afterCall) afterCall(response.data);
 

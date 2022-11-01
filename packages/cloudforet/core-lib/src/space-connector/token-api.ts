@@ -1,15 +1,10 @@
 import type {
-    AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse,
+    AxiosInstance, AxiosResponse,
 } from 'axios';
 import axios from 'axios';
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 
-import {
-    APIError, AuthenticationError,
-    AuthorizationError, BadRequestError,
-    NotFoundError,
-} from '@/space-connector/error';
 import type {
     AxiosPostResponse,
     SessionTimeoutCallback,
@@ -19,8 +14,15 @@ const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/refresh';
 const IS_REFRESHING_KEY = 'spaceConnector/isRefreshing';
-class API {
-    instance: AxiosInstance;
+export default class TokenAPI {
+    private static instance: TokenAPI;
+
+    static getInstance(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback) {
+        if (!this.instance) {
+            this.instance = new TokenAPI(baseURL, sessionTimeoutCallback);
+        }
+        return this.instance;
+    }
 
     private refreshInstance: AxiosInstance;
 
@@ -30,24 +32,22 @@ class API {
 
     private readonly sessionTimeoutCallback: SessionTimeoutCallback;
 
-    private defaultAxiosConfig: AxiosRequestConfig = {
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    };
-
     constructor(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback) {
         this.sessionTimeoutCallback = sessionTimeoutCallback;
 
-        const axiosConfig = this.getAxiosConfig(baseURL);
-        this.instance = axios.create(axiosConfig);
+        const axiosConfig = {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            baseURL,
+        };
         this.refreshInstance = axios.create(axiosConfig);
 
         this.loadToken();
         this.setAxiosInterceptors();
     }
 
-    private loadToken(): void {
+    loadToken(): void {
         this.accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
         this.refreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY) || undefined;
     }
@@ -64,11 +64,15 @@ class API {
         this.refreshToken = refreshToken;
         window.localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
         window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-        API.unsetRefreshingState();
+        TokenAPI.unsetRefreshingState();
     }
 
     getRefreshToken(): string|undefined {
         return this.refreshToken;
+    }
+
+    getAccessToken(): string|undefined|null {
+        return this.accessToken;
     }
 
     static checkRefreshingState(): string|null {
@@ -87,9 +91,9 @@ class API {
         if (!this.refreshToken) {
             return false;
         }
-        if (API.checkRefreshingState() !== 'true') {
+        if (TokenAPI.checkRefreshingState() !== 'true') {
             try {
-                API.setRefreshingState();
+                TokenAPI.setRefreshingState();
                 const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
                 this.setToken(response.data.access_token, response.data.refresh_token);
                 return true;
@@ -98,7 +102,7 @@ class API {
                 if (executeSessionTimeoutCallback) this.sessionTimeoutCallback();
                 return false;
             } finally {
-                API.unsetRefreshingState();
+                TokenAPI.unsetRefreshingState();
             }
         } else {
             return true;
@@ -107,7 +111,7 @@ class API {
 
     async getActivatedToken() {
         if (this.accessToken && this.refreshToken) {
-            const isTokenValid = API.checkToken();
+            const isTokenValid = TokenAPI.checkToken();
             if (isTokenValid) this.accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
             else await this.refreshAccessToken();
         }
@@ -115,8 +119,8 @@ class API {
 
     static checkToken(): boolean {
         const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
-        const tokenExpirationTime = API.getTokenExpirationTime(storedAccessToken);
-        const currentTime = API.getCurrentTime();
+        const tokenExpirationTime = TokenAPI.getTokenExpirationTime(storedAccessToken);
+        const currentTime = TokenAPI.getCurrentTime();
         return (tokenExpirationTime - currentTime) > 10;
     }
 
@@ -138,48 +142,8 @@ class API {
         return Math.floor(Date.now() / 1000);
     }
 
-    private getAxiosConfig(baseURL: string): AxiosRequestConfig {
-        if (baseURL) {
-            this.defaultAxiosConfig.baseURL = baseURL;
-        }
-
-        return this.defaultAxiosConfig;
-    }
-
-    private handleRequestError = async (error: AxiosError): Promise<void> => {
-        switch (error.response?.status) {
-        case 400: {
-            throw new BadRequestError(error);
-        }
-        case 401: {
-            const res = await this.refreshAccessToken();
-            if (!res) throw new AuthenticationError(error);
-            else break;
-        }
-        case 403: {
-            throw new AuthorizationError(error);
-        }
-        case 404: {
-            throw new NotFoundError(error);
-        }
-        default: {
-            throw new APIError(error);
-        }
-        }
-    };
 
     private setAxiosInterceptors(): void {
-        // Axios request interceptor
-        this.instance.interceptors.request.use((request: AxiosRequestConfig) => {
-            if (!request.headers) request.headers = {};
-
-            // Set the access token
-            const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
-            request.headers.Authorization = `Bearer ${storedAccessToken}`;
-
-            return request;
-        });
-
         // Axios request interceptor to set the refresh token
         this.refreshInstance.interceptors.request.use((request) => {
             const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY);
@@ -195,13 +159,5 @@ class API {
             (response: AxiosResponse) => response,
             error => Promise.reject(error),
         );
-
-        // Axios's response interceptor with error handling
-        this.instance.interceptors.response.use(
-            (response: AxiosResponse) => response,
-            this.handleRequestError,
-        );
     }
 }
-
-export default API;
