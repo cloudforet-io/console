@@ -1,6 +1,6 @@
-import type { WatchStopHandle } from 'vue';
+import type { WatchStopHandle, Ref } from 'vue';
 import {
-    computed, onMounted, onUnmounted, reactive, watch,
+    computed, onMounted, onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -17,13 +17,13 @@ import {
 import {
     findKey, getKeyMenuForm, getRootKeyItemHandler, getValueMenuForm,
 } from '@/inputs/search/query-search/helper';
+import { OPERATOR, operators } from '@/inputs/search/query-search/type';
 import type {
-    KeyItem, OperatorType, KeyDataType, QuerySearchProps,
+    KeyItem, OperatorType, KeyDataType,
     HandlerResponse, MenuType, ValueHandler,
     KeyMenuItem, ValueMenuItem,
-    QueryItem, ValueItem,
+    QueryItem, ValueItem, KeyItemSet, ValueHandlerMap,
 } from '@/inputs/search/query-search/type';
-import { OPERATOR, operators } from '@/inputs/search/query-search/type';
 
 const ROOT_KEY_SETTER = ':';
 const NUMBER_TYPES = ['integer', 'float'];
@@ -31,13 +31,28 @@ interface QuerySearchOptions {
     strict?: boolean;
 }
 
-export const useQuerySearch = (props: QuerySearchProps, options: QuerySearchOptions = {}) => {
+export interface QuerySearchStateArgs {
+    focused: boolean;
+    value?: Ref<string>;
+    keyItemSets: Ref<KeyItemSet[]>;
+    valueHandlerMap: Ref<ValueHandlerMap>;
+    visibleMenu: Ref<boolean | undefined>;
+}
+
+export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySearchOptions = {}) => {
+    const {
+        value, focused, visibleMenu, valueHandlerMap, keyItemSets,
+    } = stateArgs;
     const { strict } = options;
     const state = reactive({
+        /* Args */
+        keyItemSets,
+        valueHandlerMap,
+
         /* Input */
+        isFocused: focused,
+        searchText: value || ref(''),
         inputRef: null as null|HTMLElement,
-        isFocused: props.focused,
-        searchText: props.value,
         currentPlaceholder: computed(() => placeholderMap[state.currentDataType] || undefined),
         inputElType: computed(() => inputTypeMap[state.currentDataType] || 'text'),
         currentDataType: computed<KeyDataType|string>(() => {
@@ -61,7 +76,7 @@ export const useQuerySearch = (props: QuerySearchProps, options: QuerySearchOpti
 
         /* Menu */
         menuRef: null as any,
-        visibleMenu: false,
+        visibleMenu,
         menuType: computed<MenuType>(() => {
             if (!state.rootKey) return 'ROOT_KEY';
             if (state.currentDataType === 'object') return 'KEY';
@@ -73,9 +88,9 @@ export const useQuerySearch = (props: QuerySearchProps, options: QuerySearchOpti
         loading: false,
         lazyLoading: false,
         handler: computed<ValueHandler|null>(() => {
-            if (state.menuType === 'ROOT_KEY') return getRootKeyItemHandler(props.keyItemSets);
+            if (state.menuType === 'ROOT_KEY') return getRootKeyItemHandler(state.keyItemSets);
             return defaultHandlerMap[state.currentDataType]
-                || props.valueHandlerMap[state.rootKey?.name as string]
+                || state.valueHandlerMap[state.rootKey?.name as string]
                 || null;
         }),
         handlerResp: { results: [] } as HandlerResponse,
@@ -146,9 +161,9 @@ export const useQuerySearch = (props: QuerySearchProps, options: QuerySearchOpti
     const updateLoader = debounce(() => {
         state.lazyLoading = state.loading;
     }, 500);
-    const updateLoading = (value, force = false) => {
-        state.loading = value;
-        if (force) state.lazyLoading = value;
+    const updateLoading = (loading, force = false) => {
+        state.loading = loading;
+        if (force) state.lazyLoading = loading;
         else if (state.lazyLoading !== state.loading) updateLoader();
     };
 
@@ -199,7 +214,7 @@ export const useQuerySearch = (props: QuerySearchProps, options: QuerySearchOpti
 
     /* Utils */
     const getKeyItemsFromKeyText = (keyStr: string): KeyItem[] => {
-        const allKeyItems = props.keyItemSets.map(d => d.items).flat();
+        const allKeyItems = state.keyItemSets.map(d => d.items).flat();
         const dotIdx = keyStr.indexOf('.');
         let keyItems: KeyItem[] = [];
 
@@ -337,10 +352,10 @@ export const useQuerySearch = (props: QuerySearchProps, options: QuerySearchOpti
             const keyStr = text.slice(0, separatorIdx);
             const keyItems = getKeyItemsFromKeyText(keyStr);
 
-            const value = text.slice(separatorIdx + 1);
+            const textValue = text.slice(separatorIdx + 1);
             if (keyItems.length > 0) {
                 state.selectedKeys = keyItems;
-                state.searchText = value;
+                state.searchText = textValue;
                 hideMenu();
             } else {
                 state.searchText = text;

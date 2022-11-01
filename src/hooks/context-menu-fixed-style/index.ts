@@ -15,7 +15,7 @@ export interface ContextMenuFixedStyleProps {
 
 interface StateArgs {
     useFixedMenuStyle?: ComputedRef<boolean|undefined> | boolean;
-    visibleMenu: Ref<boolean>;
+    visibleMenu: Ref<boolean | undefined>;
 }
 
 const isScrollable = (ele: Element) => {

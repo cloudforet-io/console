@@ -14,7 +14,7 @@
         >
             <div v-if="searchDropdownType === SEARCH_DROPDOWN_TYPE.radioButton &&
                      proxySelected.length &&
-                     !visibleMenuRef &&
+                     !proxyVisibleMenu &&
                      !proxyIsFocused"
                  class="selected-radio-label"
             >
@@ -36,8 +36,8 @@
                      @click="onDeleteAllTags"
                 />
             </template>
-            <template v-if="searchDropdownType !== SEARCH_DROPDOWN_TYPE.default || !proxySelected.length || visibleMenuRef" #right>
-                <p-i :name="visibleMenuRef ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+            <template v-if="searchDropdownType !== SEARCH_DROPDOWN_TYPE.default || !proxySelected.length || visibleMenu" #right>
+                <p-i :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                      color="inherit" class="dropdown-button" :class="disabled"
                      @click.stop="handleClickDropdownButton"
                 />
@@ -46,7 +46,7 @@
                 <slot :name="`search-${slot}`" v-bind="{...scope}" />
             </template>
         </p-search>
-        <p-context-menu v-show="visibleMenuRef"
+        <p-context-menu v-show="proxyVisibleMenu"
                         ref="menuRef"
                         :menu="bindingMenu"
                         :loading="loading"
@@ -81,10 +81,10 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch, nextTick, ref,
+    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch, nextTick, toRef,
 } from 'vue';
 import type Vue from 'vue';
-import type { DirectiveFunction, SetupContext, Ref } from 'vue';
+import type { DirectiveFunction, SetupContext } from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components';
 import { reduce } from 'lodash';
@@ -195,18 +195,8 @@ export default defineComponent<SearchDropdownProps>({
         },
     },
     setup(props, { emit, slots, listeners }: SetupContext) {
-        const visibleMenuRef: Ref<boolean> = ref<boolean>(props.visibleMenu || false);
-        const {
-            targetRef, targetElement, contextMenuStyle,
-        } = useContextMenuFixedStyle({
-            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
-            visibleMenu: visibleMenuRef,
-        });
-        const contextMenuFixedStyleState = reactive({
-            visibleMenuRef, targetRef, targetElement, contextMenuStyle,
-        });
-
         const state = reactive({
+            proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
             menuRef: null as null|Vue,
             searchDropdownType: computed<SEARCH_DROPDOWN_TYPE | undefined>(() => {
                 if (props.type) return props.type;
@@ -231,6 +221,16 @@ export default defineComponent<SearchDropdownProps>({
                 if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
                 return res;
             }, {})),
+        });
+
+        const {
+            targetRef, targetElement, contextMenuStyle,
+        } = useContextMenuFixedStyle({
+            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+            visibleMenu: toRef(state, 'proxyVisibleMenu'),
+        });
+        const contextMenuFixedStyleState = reactive({
+            targetRef, targetElement, contextMenuStyle,
         });
 
         const defaultHandler = (inputText: string, list: SearchDropdownMenuItem[]) => {
@@ -276,7 +276,7 @@ export default defineComponent<SearchDropdownProps>({
         };
 
         const hideMenu = (mode?: string) => {
-            if (!contextMenuFixedStyleState.visibleMenuRef) return;
+            if (!state.proxyVisibleMenu) return;
             // placeholder
             const isRadioItemSelected = state.searchDropdownType === SEARCH_DROPDOWN_TYPE.radioButton && (mode === 'click' || state.proxySelected.length);
             if (isRadioItemSelected) {
@@ -298,12 +298,12 @@ export default defineComponent<SearchDropdownProps>({
                 state.proxyValue = '';
             }
 
-            contextMenuFixedStyleState.visibleMenuRef = false;
+            state.proxyVisibleMenu = false;
             emit('hide-menu');
         };
 
         const showMenu = () => {
-            if (contextMenuFixedStyleState.visibleMenuRef) return;
+            if (state.proxyVisibleMenu) return;
 
             if (
                 state.proxySelected.length && (
@@ -320,7 +320,7 @@ export default defineComponent<SearchDropdownProps>({
                 filterMenu(state.proxyValue);
             }
 
-            contextMenuFixedStyleState.visibleMenuRef = true;
+            state.proxyVisibleMenu = true;
             emit('show-menu');
         };
 
@@ -371,7 +371,7 @@ export default defineComponent<SearchDropdownProps>({
         };
 
         const onInput = (val: string, e) => {
-            if (!contextMenuFixedStyleState.visibleMenuRef) showMenu();
+            if (!state.proxyVisibleMenu) showMenu();
 
             state.proxyValue = val;
             emit('input', val, e);
@@ -425,7 +425,7 @@ export default defineComponent<SearchDropdownProps>({
 
         const handleClickDropdownButton = () => {
             if (props.disabled) return;
-            if (contextMenuFixedStyleState.visibleMenuRef) hideMenu();
+            if (state.proxyVisibleMenu) hideMenu();
             else showMenu();
         };
 
@@ -456,7 +456,7 @@ export default defineComponent<SearchDropdownProps>({
         };
 
         const onWindowKeydown = (e: KeyboardEvent) => {
-            if (contextMenuFixedStyleState.visibleMenuRef && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
+            if (state.proxyVisibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
                 e.preventDefault();
             }
         };

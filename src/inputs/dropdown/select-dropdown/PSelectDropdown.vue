@@ -5,13 +5,13 @@
              invalid,
              disabled,
              'read-only': readOnly,
-             active: visibleMenuRef && !readOnly,
+             active: proxyVisibleMenu && !readOnly,
          }"
     >
         <p-icon-button v-if="styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
                        ref="targetRef"
-                       :name="buttonIcon || (visibleMenuRef ? 'ic_arrow_top' : 'ic_arrow_bottom')"
-                       :activated="visibleMenuRef"
+                       :name="buttonIcon || (proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom')"
+                       :activated="proxyVisibleMenu"
                        :disabled="disabled"
                        color="inherit"
                        class="icon-button"
@@ -34,14 +34,14 @@
                 </slot>
             </span>
             <p-i v-if="!(styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && readOnly)"
-                 :name="visibleMenuRef ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                 :activated="visibleMenuRef"
+                 :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                 :activated="proxyVisibleMenu"
                  :disabled="disabled"
                  color="inherit"
                  class="dropdown-icon"
             />
         </button>
-        <p-context-menu v-show="visibleMenuRef"
+        <p-context-menu v-show="proxyVisibleMenu"
                         ref="contextMenuRef"
                         :class="{ [menuPosition]: !useFixedMenuStyle }"
                         :menu="items"
@@ -68,9 +68,9 @@ import {
     defineComponent,
     reactive,
     toRefs,
-    nextTick, ref,
+    nextTick, toRef,
 } from 'vue';
-import type { DirectiveFunction, SetupContext, Ref } from 'vue';
+import type { DirectiveFunction, SetupContext } from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components';
 import { groupBy, reduce } from 'lodash';
@@ -163,18 +163,8 @@ export default defineComponent<SelectDropdownProps>({
         },
     },
     setup(props, { emit, slots }: SetupContext) {
-        const visibleMenuRef: Ref<boolean> = ref<boolean>(props.visibleMenu || false);
-        const {
-            targetRef, targetElement, contextMenuStyle,
-        } = useContextMenuFixedStyle({
-            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
-            visibleMenu: visibleMenuRef,
-        });
-        const contextMenuFixedStyleState = reactive({
-            visibleMenuRef, targetRef, targetElement, contextMenuStyle,
-        });
-
         const state = reactive({
+            proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
             contextMenuRef: null as null|any,
             proxySelected: useProxyValue('selected', props, emit),
             selectedItem: computed<MenuItem|null>(() => {
@@ -199,6 +189,15 @@ export default defineComponent<SelectDropdownProps>({
             }, {})),
         });
 
+        const {
+            targetRef, targetElement, contextMenuStyle,
+        } = useContextMenuFixedStyle({
+            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+            visibleMenu: toRef(state, 'proxyVisibleMenu'),
+        });
+        const contextMenuFixedStyleState = reactive({
+            targetRef, targetElement, contextMenuStyle,
+        });
 
         /* Event Handlers */
         const onSelectMenu = (item: MenuItem, index, event) => {
@@ -209,18 +208,18 @@ export default defineComponent<SelectDropdownProps>({
                 emit('select', item.name, event);
                 state.proxySelected = item.name;
             }
-            contextMenuFixedStyleState.visibleMenuRef = false;
+            state.proxyVisibleMenu = false;
         };
         const handleClick = (e: MouseEvent) => {
             if (props.readOnly || props.disabled) return;
-            contextMenuFixedStyleState.visibleMenuRef = !contextMenuFixedStyleState.visibleMenuRef;
+            state.proxyVisibleMenu = !state.proxyVisibleMenu;
             e.stopPropagation();
         };
         const handleClickOutside = (): void => {
-            contextMenuFixedStyleState.visibleMenuRef = false;
+            state.visibleMenu = false;
         };
         const handlePressDownKey = () => {
-            if (!contextMenuFixedStyleState.visibleMenuRef) contextMenuFixedStyleState.visibleMenuRef = true;
+            if (!state.proxyVisibleMenu) state.proxyVisibleMenu = true;
             nextTick(() => {
                 if (state.contextMenuRef) {
                     if (slots['menu-menu']) emit('focus-menu');

@@ -13,7 +13,7 @@
                 <slot :name="`search-${slot}`" v-bind="{...scope}" />
             </template>
         </p-search>
-        <p-context-menu v-if="visibleMenuRef"
+        <p-context-menu v-if="proxyVisibleMenu"
                         ref="menuRef"
                         :menu="bindingMenu"
                         :loading="loading"
@@ -33,14 +33,14 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, ref, toRefs, watch,
+    computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRef, toRefs, watch,
 } from 'vue';
-import type { Ref } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import Fuse from 'fuse.js';
 import { reduce } from 'lodash';
 
+import { useProxyValue } from '@/hooks';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
@@ -143,19 +143,9 @@ export default defineComponent<AutocompleteSearchProps>({
     },
     setup(props: AutocompleteSearchProps, { emit, slots, listeners }) {
         const vm = getCurrentInstance()?.proxy as Vue;
-        const visibleMenuRef: Ref<boolean> = ref<boolean>(props.visibleMenu || false);
-
-        const {
-            targetRef, targetElement, contextMenuStyle,
-        } = useContextMenuFixedStyle({
-            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
-            visibleMenu: visibleMenuRef,
-        });
-        const contextMenuFixedStyleState = reactive({
-            visibleMenuRef, targetRef, targetElement, contextMenuStyle,
-        });
 
         const state = reactive({
+            proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
             menuRef: null,
             proxyValue: makeOptionalProxy('value', vm, ''),
             isAutoMode: computed(() => props.visibleMenu === undefined),
@@ -165,7 +155,15 @@ export default defineComponent<AutocompleteSearchProps>({
             searchableItems: computed<MenuItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
             fuse: computed(() => new Fuse(state.searchableItems, fuseOptions)),
         });
-
+        const {
+            targetRef, targetElement, contextMenuStyle,
+        } = useContextMenuFixedStyle({
+            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+            visibleMenu: toRef(state, 'proxyVisibleMenu'),
+        });
+        const contextMenuFixedStyleState = reactive({
+            targetRef, targetElement, contextMenuStyle,
+        });
 
         // const defaultHandler = (inputText: string, list: MenuItem[]) => {
         //     let results: MenuItem[] = [...list];
@@ -221,12 +219,12 @@ export default defineComponent<AutocompleteSearchProps>({
         };
 
         const hideMenu = () => {
-            if (state.isAutoMode) contextMenuFixedStyleState.visibleMenuRef = false;
+            if (state.isAutoMode) state.proxyVisibleMenu = false;
             emit('hide-menu');
         };
 
         const showMenu = () => {
-            if (state.isAutoMode) contextMenuFixedStyleState.visibleMenuRef = true;
+            if (state.isAutoMode) state.proxyVisibleMenu = true;
             emit('show-menu');
         };
 
@@ -243,7 +241,7 @@ export default defineComponent<AutocompleteSearchProps>({
         };
 
         const onWindowKeydown = (e: KeyboardEvent) => {
-            if (contextMenuFixedStyleState.visibleMenuRef && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
+            if (state.proxyVisibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
                 e.preventDefault();
             }
         };
@@ -278,7 +276,7 @@ export default defineComponent<AutocompleteSearchProps>({
         }, {}));
 
         const onInput = (val: string, e) => {
-            if (!contextMenuFixedStyleState.visibleMenuRef) showMenu();
+            if (!state.proxyVisibleMenu) showMenu();
 
             state.proxyValue = val;
             emit('input', val, e);

@@ -105,6 +105,36 @@ Query Search Dropdown is <b>```key:value``` format search dropdown.</b> <br/>
 <br/>
 <br/>
 
+## Use Fixed Menu Style
+<Canvas>
+    <Story name="Use Fixed Menu Style">
+        {{
+            components: { PQuerySearchDropdown },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p-query-search-dropdown
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+        use-fixed-menu-style
+        multi-selectable
+    ></p-query-search-dropdown>
+</div>
+    `,
+            setup() {
+                const keyItemSets = getKeyItemSets(5, 1)
+                const valueHandlerMap = getValueHandlerMap(keyItemSets)
+                return {
+                    keyItemSets,
+                    valueHandlerMap
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Playground
 
 <Canvas>

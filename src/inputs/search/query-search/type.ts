@@ -80,15 +80,6 @@ export interface KeyItemSet {
     items: KeyItem[];
 }
 
-
-export interface QuerySearchProps {
-    placeholder?: string;
-    focused: boolean;
-    keyItemSets: KeyItemSet[];
-    valueHandlerMap: ValueHandlerMap;
-    value: string;
-}
-
 export interface QuerySearchEventArgs {
     search: [QueryItem];
 }

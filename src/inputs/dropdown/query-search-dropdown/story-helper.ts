@@ -1,13 +1,10 @@
 import type { ArgTypes } from '@storybook/addons';
 
 import { getKeyItemSets, getValueHandlerMap } from '@/inputs/dropdown/query-search-dropdown/mock';
-import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
 
 export const getQuerySearchDropdownArgTypes = (): ArgTypes => {
-    const searchArgTypes = getSearchArgTypes();
     const keyItemSets = getKeyItemSets(5, 1);
     return {
-        value: searchArgTypes.value,
         placeholder: {
             name: 'placeholder',
             type: { name: 'string' },
@@ -23,7 +20,6 @@ export const getQuerySearchDropdownArgTypes = (): ArgTypes => {
                 },
             },
         },
-        'v-model': searchArgTypes['v-model'],
         focused: {
             name: 'focused',
             type: { name: 'boolean' },
@@ -106,6 +102,43 @@ export const getQuerySearchDropdownArgTypes = (): ArgTypes => {
             },
             control: {
                 type: 'boolean',
+            },
+        },
+        // context menu fixed style props
+        useFixedMenuStyle: {
+            name: 'useFixedMenuStyle',
+            type: { name: 'boolean' },
+            description: 'Whether to use position fixed style on menu or not. ',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
+        visibleMenu: {
+            name: 'visibleMenu',
+            type: { name: 'boolean' },
+            description: 'Whether to show the menu or not. Automatically determined if no value is given. `sync` props.',
+            defaultValue: undefined,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'undefined',
+                },
+            },
+            control: {
+                type: null,
             },
         },
     };

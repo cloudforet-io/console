@@ -65,7 +65,7 @@
                 <slot name="right-edge" v-bind="{ value }" />
             </span>
         </div>
-        <p-context-menu v-if="visibleMenuRef && useAutoComplete"
+        <p-context-menu v-if="proxyVisibleMenu && useAutoComplete"
                         ref="menuRef"
                         :menu="bindingMenu"
                         :highlight-term="proxyValue"
@@ -78,9 +78,9 @@
 </template>
 
 <script lang="ts">
-import type { PropType, Ref } from 'vue';
+import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, ref, toRefs, watch,
+    computed, defineComponent, reactive, toRef, toRefs, watch,
 } from 'vue';
 
 import vClickOutside from 'v-click-outside';
@@ -207,18 +207,8 @@ export default defineComponent<TextInputProps>({
     },
 
     setup(props, { emit, listeners, attrs }) {
-        const visibleMenuRef: Ref<boolean> = ref<boolean>(props.visibleMenu || false);
-        const {
-            targetRef, targetElement, contextMenuStyle,
-        } = useContextMenuFixedStyle({
-            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
-            visibleMenu: visibleMenuRef,
-        });
-        const contextMenuFixedStyleState = reactive({
-            visibleMenuRef, targetRef, targetElement, contextMenuStyle,
-        });
-
         const state = reactive({
+            proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
             menuRef: null,
             targetRef: null,
             isFocused: false,
@@ -240,6 +230,15 @@ export default defineComponent<TextInputProps>({
             filteredMenu: [] as MenuItem[],
             bindingMenu: computed<SearchDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
         });
+        const {
+            targetRef, targetElement, contextMenuStyle,
+        } = useContextMenuFixedStyle({
+            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+            visibleMenu: toRef(state, 'proxyVisibleMenu'),
+        });
+        const contextMenuFixedStyleState = reactive({
+            targetRef, targetElement, contextMenuStyle,
+        });
 
         const handleDeleteTag = (val, idx) => {
             const _selectedItems: SelectedItem[] = [...state.proxySelectedValue];
@@ -256,12 +255,12 @@ export default defineComponent<TextInputProps>({
         };
 
         const hideMenu = () => {
-            contextMenuFixedStyleState.visibleMenuRef = false;
+            state.proxyVisibleMenu = false;
             emit('hide-menu');
         };
 
         const showMenu = () => {
-            contextMenuFixedStyleState.visibleMenuRef = true;
+            state.proxyVisibleMenu = true;
             emit('show-menu');
         };
 
