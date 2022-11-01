@@ -1,4 +1,5 @@
 import path from 'path';
+import process from 'process';
 
 import vuePlugin from '@vitejs/plugin-vue2';
 import { defineConfig, loadEnv } from 'vite';
@@ -37,6 +38,7 @@ export default defineConfig(({ command, mode }) => {
                 '@cloudforet/core-lib': path.resolve(__dirname, './packages/cloudforet/core-lib/dist/'),
                 '@cloudforet/language-pack': path.resolve(__dirname, './packages/cloudforet/language-pack/'),
                 vue: path.resolve(__dirname, './node_modules/vue/dist/vue.js'),
+                'env': path.resolve(__dirname, './node_modules/dotenv/')
             },
         },
         define: {
