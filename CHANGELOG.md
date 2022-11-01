@@ -1,3 +1,10 @@
+# [1.1.0-beta.445](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.444...v1.1.0-beta.445) (2022-11-01)
+
+
+### Bug Fixes
+
+* **p-button:** delete focus background-color ([#122](https://github.com/cloudforet-io/mirinae/issues/122)) ([771cbb8](https://github.com/cloudforet-io/mirinae/commit/771cbb8936e65d99f1022adf49a33139d0a40eea))
+
 # [1.1.0-beta.444](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.443...v1.1.0-beta.444) (2022-11-01)
 
 
