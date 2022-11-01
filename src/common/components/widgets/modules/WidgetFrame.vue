@@ -4,15 +4,15 @@
              [size]: true,
          }"
     >
-        <header>
+        <div class="widget-header">
             <h3 class="title">
                 {{ title }}
             </h3> <slot name="header-right" />
-        </header>
+        </div>
         <div class="body">
             <slot />
         </div>
-        <footer>
+        <div class="widget-footer">
             <div class="footer-left">
                 <p-datetime-picker style-type="text" select-mode="range" :selected-dates.sync="selectedDates" />
                 <p-divider :vertical="true" />
@@ -28,13 +28,13 @@
                     </router-link>
                 </slot>
             </div>
-        </footer>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
-import { reactive, toRefs } from 'vue';
+import type { PropType, SetupContext } from 'vue';
+import { reactive, toRefs, defineComponent } from 'vue';
 
 import { PDatetimePicker, PDivider, PI } from '@spaceone/design-system';
 import { CARD_SIZE } from '@spaceone/design-system/src/data-display/cards/card/config';
@@ -43,7 +43,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 
-export default {
+export default defineComponent({
     name: 'WidgetFrame',
     components: {
         CurrencySelectDropdown,
@@ -57,11 +57,8 @@ export default {
             default: 'Title',
         },
         size: {
-            type: String,
+            type: String as PropType<CARD_SIZE>,
             default: CARD_SIZE.md,
-            validator(size: any) {
-                return Object.values(CARD_SIZE).includes(size);
-            },
         },
         widgetLink: {
             type: [Object, String],
@@ -85,7 +82,7 @@ export default {
             ...toRefs(state),
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
@@ -97,12 +94,12 @@ export default {
 }
 
 .widget-frame {
+    @apply border rounded-lg bg-white;
     border-color: theme('colors.gray.200');
     display: inline-flex;
     flex-direction: column;
 
-    @apply border rounded-lg bg-white;
-    header {
+    .widget-header {
         @apply flex justify-between items-center;
         .title {
             font-size: 1rem;
@@ -120,7 +117,7 @@ export default {
         flex-grow: 1;
         flex-shrink: 1;
     }
-    footer {
+    .widget-footer {
         @apply border-t rounded-b-lg flex justify-between items-center;
         padding: 0 1rem;
         flex: 0 0;
@@ -134,7 +131,7 @@ export default {
         }
         .footer-right {
             .anchor-button {
-                @apply flex items-center flex-shrink-0 text-sm text-blue-700 font-normal cursor-pointer;
+                @apply flex items-center flex-shrink-0 text-blue-700 font-normal cursor-pointer;
                 font-size: 0.75rem;
                 line-height: 150%;
                 margin-top: 0.1rem;
