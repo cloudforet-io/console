@@ -104,6 +104,7 @@ import {
     getConvertedFilter, getDataTableCostFields, getTimeUnitByPeriod,
 } from '@/services/cost-explorer/lib/helper';
 import { costExplorerStore } from '@/services/cost-explorer/store';
+import type { MoreGroupByItem } from '@/services/cost-explorer/type';
 import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type';
 
 
@@ -148,7 +149,7 @@ export default {
             period: computed(() => costExplorerStore.state.costAnalysis.period),
             filters: computed(() => costExplorerStore.state.costAnalysis.filters),
             groupBy: computed(() => costExplorerStore.state.costAnalysis.groupBy),
-            moreGroupBy: computed(() => costExplorerStore.state.costAnalysis.moreGroupBy),
+            moreGroupBy: computed<MoreGroupByItem[]>(() => costExplorerStore.getters['costAnalysis/orderedMoreGroupByItems']),
             //
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
@@ -478,15 +479,15 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-analysis-data-table {
+    .field-description {
+        @apply text-gray-400;
+        white-space: pre;
+        display: flex;
+    }
     .cell-text {
         &.raised {
             @apply text-alert;
         }
-    }
-
-    .field-description {
-        @apply text-gray-400;
-        white-space: pre-wrap;
     }
 }
 </style>
