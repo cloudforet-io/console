@@ -11,6 +11,7 @@ import alertManagerRoute from '@/services/alert-manager/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes';
 import authRoutes from '@/services/auth/routes';
 import costExplorerRoute from '@/services/cost-explorer/routes';
+import dashboardRoutes from '@/services/dashboard/routes';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
 import homeDashboardRoute from '@/services/home-dashboard/routes';
 import infoRoute from '@/services/info/routes';
@@ -34,6 +35,7 @@ export const serviceRoutes: RouteConfig[] = [
         component: { template: '<router-view />' },
         children: [
             homeDashboardRoute,
+            dashboardRoutes,
             administrationRoute,
             assetInventoryRoute,
             projectRoute,
