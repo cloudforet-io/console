@@ -1,3 +1,10 @@
+# [1.1.0-beta.446](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.445...v1.1.0-beta.446) (2022-11-02)
+
+
+### Features
+
+* **p-text-button:** add PTextButton component ([#123](https://github.com/cloudforet-io/mirinae/issues/123)) ([5641696](https://github.com/cloudforet-io/mirinae/commit/56416962de820a143dc28195cdcd2be4cc3046e3))
+
 # [1.1.0-beta.445](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.444...v1.1.0-beta.445) (2022-11-01)
 
 
