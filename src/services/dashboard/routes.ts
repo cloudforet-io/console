@@ -6,7 +6,7 @@ const DashboardContainer = () => import(/* webpackChunkName: "DashboardContainer
 const DashboardPage = () => import(/* webpackChunkName: "DashboardPage" */ '@/services/dashboard/dashboard/DashboardPage.vue');
 const CreateDashboardPage = () => import(/* webpackChunkName: "CreateDashboardPage" */ '@/services/dashboard/create-dashboard/CreateDashboardPage.vue');
 
-const dashboardRoutes: RouteConfig = {
+const dashboardRoute: RouteConfig = {
     path: 'dashboard',
     component: DashboardContainer,
     redirect: () => ({ name: DASHBOARD_ROUTE._NAME }),
@@ -30,4 +30,4 @@ const dashboardRoutes: RouteConfig = {
     ],
 };
 
-export default dashboardRoutes;
+export default dashboardRoute;
