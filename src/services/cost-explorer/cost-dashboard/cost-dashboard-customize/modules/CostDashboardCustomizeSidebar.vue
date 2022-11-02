@@ -75,15 +75,15 @@ export default {
             editingCustomLayout: computed<CustomLayout[]|undefined>({
                 get() { return costExplorerStore.state.dashboard.editedCustomLayout; },
                 set(val) {
-                    costExplorerStore.commit('home-dashboard/setEditedCustomLayout', [...(val || [])]);
+                    costExplorerStore.commit('dashboard/setEditedCustomLayout', [...(val || [])]);
                 },
             }),
         });
 
         const handleClickAddWidget = () => {
             state.customizeModalVisible = true;
-            costExplorerStore.commit('home-dashboard/setWidgetPosition', undefined);
-            costExplorerStore.commit('home-dashboard/setLayoutOfSpace', undefined);
+            costExplorerStore.commit('dashboard/setWidgetPosition', undefined);
+            costExplorerStore.commit('dashboard/setLayoutOfSpace', undefined);
         };
 
         onUnmounted(() => {

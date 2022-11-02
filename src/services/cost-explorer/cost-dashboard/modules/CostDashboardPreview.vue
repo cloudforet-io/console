@@ -89,7 +89,7 @@ export default {
             currencyRates: computed(() => store.state.display.currencyRates),
             homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
             isPageMounted: false,
-            // home-dashboard layout widget
+            // dashboard layout widget
             widgetList: undefined as HTMLElement[]|undefined,
             //
             totalElementCount: DASHBOARD_LAYOUT + HEADER_ELEMENT,

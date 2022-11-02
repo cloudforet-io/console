@@ -81,7 +81,7 @@ export default {
             editingCustomLayout: computed<CustomLayout[]|undefined>({
                 get() { return costExplorerStore.state.dashboard.editedCustomLayout; },
                 set(val) {
-                    costExplorerStore.commit('home-dashboard/setEditedCustomLayout', [...(val ?? [])]);
+                    costExplorerStore.commit('dashboard/setEditedCustomLayout', [...(val ?? [])]);
                 },
             }),
             dashboardIdFromRoute: computed(() => props.dashboardId || SpaceRouter.router.currentRoute.params.dashboardId),
@@ -133,13 +133,13 @@ export default {
                     state.editingCustomLayout[state.widgetPosition.row ?? ''].splice((state.widgetPosition.col ?? 0) + 1, 0, state.selectedWidget as WidgetInfo);
                 } else {
                     state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget as WidgetInfo];
-                    costExplorerStore.commit('home-dashboard/setEditedCustomLayout', [...(state.editingCustomLayout ?? [])]);
+                    costExplorerStore.commit('dashboard/setEditedCustomLayout', [...(state.editingCustomLayout ?? [])]);
                 }
             } else if (state.editingCustomLayout.length === 0) {
                 state.editingCustomLayout = [[state.selectedWidget as WidgetInfo]];
             } else {
                 state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget as WidgetInfo];
-                costExplorerStore.commit('home-dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+                costExplorerStore.commit('dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
             }
         };
 
@@ -148,18 +148,18 @@ export default {
             if (!state.editingCustomLayout) return;
             state.editingCustomLayout[state.widgetPosition.row ?? ''].splice(state.widgetPosition.col, 1);
             state.editingCustomLayout = state.editingCustomLayout.filter(row => row.length > 0);
-            costExplorerStore.commit('home-dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
-            costExplorerStore.commit('home-dashboard/setWidgetPosition', undefined);
-            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', {});
+            costExplorerStore.commit('dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+            costExplorerStore.commit('dashboard/setWidgetPosition', undefined);
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
         };
 
         const handleUpdateWidget = () => {
             if (!state.widgetPosition) return;
             if (!state.editingCustomLayout) return;
             state.editingCustomLayout[state.widgetPosition.row ?? ''][state.widgetPosition.col ?? ''] = state.selectedWidget;
-            costExplorerStore.commit('home-dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
-            costExplorerStore.commit('home-dashboard/setWidgetPosition', undefined);
-            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', {});
+            costExplorerStore.commit('dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+            costExplorerStore.commit('dashboard/setWidgetPosition', undefined);
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
         };
 
         const getDashboardData = async () => {
