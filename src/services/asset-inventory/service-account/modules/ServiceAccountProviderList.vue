@@ -60,7 +60,7 @@ export default defineComponent({
     @apply grid w-full gap-2;
     grid-template-columns: repeat(6, minmax(10rem, auto));
     padding-bottom: 1rem;
-    overflow-x: scroll;
+    overflow-x: auto;
     .provider-button {
         @apply flex items-center border rounded-lg border-gray-200 bg-white;
         min-width: 10rem;
