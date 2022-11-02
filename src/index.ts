@@ -17,6 +17,7 @@ export { messages } from './translations';
 export { default as PBackToTopButton } from './navigation/scrolls/back-to-top-button/PBackToTopButton.vue';
 export { default as PBadge } from './data-display/badges/PBadge.vue';
 export { default as PButton } from './inputs/buttons/button/PButton.vue';
+export { default as PTextButton } from './inputs/buttons/text-button/PTextButton.vue';
 export { default as PEmpty } from './data-display/empty/PEmpty.vue';
 export { default as PDivider } from './layouts/divider/PDivider.vue';
 export { default as PI } from './foundation/icons/PI.vue';
