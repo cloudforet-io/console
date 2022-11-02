@@ -9,7 +9,3 @@ export default {
     name: 'CreateDashboardPage',
 };
 </script>
-
-<style scoped>
-.create-dashboard-page
-</style>
