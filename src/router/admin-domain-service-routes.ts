@@ -11,7 +11,7 @@ const TotalDashboardPage = () => import(/* webpackChunkName: "TotalDashboardPage
 
 const ROOT_DOMAIN_ROUTE = Object.freeze({
     _NAME: 'root',
-    DASHBOARD: { _NAME: 'dashboard' },
+    HOME_DASHBOARD: { _NAME: 'home_dashboard' },
     IDENTITY: {
         _NAME: ADMINISTRATION_ROUTE._NAME,
         USER: ADMINISTRATION_ROUTE.IAM.USER,
@@ -24,12 +24,12 @@ export const adminDomainServiceRoutes: RouteConfig[] = [
     {
         path: '/',
         name: ROOT_DOMAIN_ROUTE._NAME,
-        redirect: '/dashboard',
+        redirect: '/home-dashboard',
         component: { template: '<router-view />' },
         children: [
             {
-                path: 'dashboard',
-                name: ROOT_DOMAIN_ROUTE.DASHBOARD._NAME,
+                path: 'home-dashboard',
+                name: ROOT_DOMAIN_ROUTE.HOME_DASHBOARD._NAME,
                 component: TotalDashboardPage,
             },
             administrationRoute,

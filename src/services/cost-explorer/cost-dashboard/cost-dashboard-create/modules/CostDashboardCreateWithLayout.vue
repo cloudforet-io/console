@@ -87,8 +87,8 @@ export default {
         };
 
         const handleLayoutChange = (value: Record<string, DefaultLayout>) => {
-            costExplorerStore.commit('dashboard/setDashboardTemplate', value);
-            costExplorerStore.commit('dashboard/setDefaultFilter', {});
+            costExplorerStore.commit('home-dashboard/setDashboardTemplate', value);
+            costExplorerStore.commit('home-dashboard/setDefaultFilter', {});
         };
 
         return {

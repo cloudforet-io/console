@@ -94,7 +94,7 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import TrustedAdvisorOverall from '@/services/dashboard/modules/trusted-advisor/TrustedAdvisorOverall.vue';
+import TrustedAdvisorOverall from '@/services/home-dashboard/modules/trusted-advisor/TrustedAdvisorOverall.vue';
 
 
 enum STATUS {

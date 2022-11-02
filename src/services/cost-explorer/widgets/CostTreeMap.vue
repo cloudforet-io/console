@@ -334,7 +334,7 @@ export default defineComponent<WidgetProps>({
         }
     }
 
-    /* custom cost-dashboard-card-widget-layout */
+    /* custom cost-home-dashboard-card-widget-layout */
 
     /* custom design-system component - p-card */
     &.cost-dashboard-card-widget-layout.p-card:deep(.body) {

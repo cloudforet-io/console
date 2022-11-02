@@ -13,7 +13,7 @@ import { GTag } from '@/lib/gtag';
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
-import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
@@ -67,9 +67,9 @@ export class SpaceRouter {
                 // When a user need to reset password and tries to go to other pages, redirect to reset password page
                 if (userNeedPwdReset && to.name !== AUTH_ROUTE.RESET_PASSWORD._NAME && to.name !== AUTH_ROUTE.SIGN_OUT._NAME) {
                     nextLocation = { name: AUTH_ROUTE.RESET_PASSWORD._NAME };
-                // When a user is already signed in and tries to go to sign in page, redirect to dashboard page
+                // When a user is already signed in and tries to go to sign in page, redirect to home-dashboard page
                 } else if (to.meta?.isSignInPage) {
-                    nextLocation = { name: DASHBOARD_ROUTE._NAME };
+                    nextLocation = { name: HOME_DASHBOARD_ROUTE._NAME };
                 // When a user tries to go to inaccessible page, redirect to error page
                 } else if (userAccessLevel < routeAccessLevel) {
                     nextLocation = { name: ERROR_ROUTE._NAME };

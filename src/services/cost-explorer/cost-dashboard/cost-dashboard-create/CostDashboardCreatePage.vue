@@ -110,7 +110,7 @@ export default {
         const handleClickCreate = async () => {
             const createdDashboardId = state.selectedPrivacy === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
             if (createdDashboardId) goToCustomizePage(createdDashboardId);
-            costExplorerStore.commit('dashboard/setDashboardPrivacy', DASHBOARD_PRIVACY_TYPE.USER);
+            costExplorerStore.commit('home-dashboard/setDashboardPrivacy', DASHBOARD_PRIVACY_TYPE.USER);
         };
 
         return {

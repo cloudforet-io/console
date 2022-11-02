@@ -89,11 +89,11 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Period } from '@/services/cost-explorer/type';
-import AllSummaryDataSummary from '@/services/dashboard/modules/all-summary/AllSummaryDataSummary.vue';
-import type { DateItem, DateType, DataType } from '@/services/dashboard/modules/type';
+import AllSummaryDataSummary from '@/services/home-dashboard/modules/all-summary/AllSummaryDataSummary.vue';
+import type { DateItem, DateType, DataType } from '@/services/home-dashboard/modules/type';
 import {
     DATA_TYPE,
-} from '@/services/dashboard/modules/type';
+} from '@/services/home-dashboard/modules/type';
 
 
 export const DAY_COUNT = 14;

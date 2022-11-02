@@ -176,15 +176,15 @@ export default {
         };
 
         const handleClickUpdate = (rowIdx, colIdx, widget: WidgetInfo) => {
-            costExplorerStore.commit('dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', widget);
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', widget);
+            costExplorerStore.commit('home-dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
+            costExplorerStore.commit('home-dashboard/setOriginSelectedWidget', widget);
+            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', widget);
             state.updateModalVisible = true;
         };
 
         const handleClickDelete = (rowIdx, colIdx, widget: WidgetInfo) => {
-            costExplorerStore.commit('dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', widget);
+            costExplorerStore.commit('home-dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
+            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', widget);
             checkDeleteState.visible = true;
         };
 
@@ -198,8 +198,8 @@ export default {
         };
 
         const handleClickAdd = (rowIdx, colIdx, layout) => {
-            costExplorerStore.commit('dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
-            costExplorerStore.commit('dashboard/setLayoutOfSpace', layout);
+            costExplorerStore.commit('home-dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
+            costExplorerStore.commit('home-dashboard/setLayoutOfSpace', layout);
             state.customizeModalVisible = true;
         };
 

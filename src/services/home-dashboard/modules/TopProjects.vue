@@ -107,7 +107,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray, peacock, secondary } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { DATA_TYPE } from '@/services/dashboard/modules/type';
+import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 

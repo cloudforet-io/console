@@ -1,6 +1,6 @@
 // Menu Ids' Rule: All menu ids are dot-delimited in depth, up to two depths.
 export const MENU_ID = Object.freeze({
-    DASHBOARD: 'dashboard',
+    HOME_DASHBOARD: 'home-dashboard',
     PROJECT: 'project',
     ASSET_INVENTORY: 'asset_inventory',
     ASSET_INVENTORY_CLOUD_SERVICE: 'asset_inventory.cloud_service',
@@ -8,11 +8,11 @@ export const MENU_ID = Object.freeze({
     ASSET_INVENTORY_COLLECTOR: 'asset_inventory.collector',
     ASSET_INVENTORY_SERVICE_ACCOUNT: 'asset_inventory.service_account',
     COST_EXPLORER: 'cost_explorer',
-    COST_EXPLORER_DASHBOARD: 'cost_explorer.dashboard',
+    COST_EXPLORER_DASHBOARD: 'cost_explorer.home-dashboard',
     COST_EXPLORER_COST_ANALYSIS: 'cost_explorer.cost_analysis',
     COST_EXPLORER_BUDGET: 'cost_explorer.budget',
     ALERT_MANAGER: 'alert_manager',
-    ALERT_MANAGER_DASHBOARD: 'alert_manager.dashboard',
+    ALERT_MANAGER_DASHBOARD: 'alert_manager.home-dashboard',
     ALERT_MANAGER_ALERT: 'alert_manager.alert',
     ALERT_MANAGER_ESCALATION_POLICY: 'alert_manager.escalation_policy',
     ADMINISTRATION: 'administration',

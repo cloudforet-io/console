@@ -33,7 +33,7 @@ export const getPasswordValidationInfo = (password): ValidationInfo => {
 };
 
 export const GENERAL_USER_DEFAULT_ROUTE = Object.freeze({
-    name: MENU_ID.DASHBOARD,
+    name: MENU_ID.HOME_DASHBOARD,
 });
 
 export const NO_ROLE_USER_DEFAULT_ROUTE = Object.freeze({
