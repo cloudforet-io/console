@@ -1,8 +1,6 @@
 import Vue from 'vue';
 import Fragment from 'vue-fragment';
 
-import * as process from 'process';
-
 import SpaceDesignSystem from '@spaceone/design-system';
 import PortalVue from 'portal-vue';
 import VTooltip from 'v-tooltip';
@@ -30,13 +28,6 @@ Vue.use(SpaceDesignSystem);
 
 Vue.config.productionTip = import.meta.env.DEV;
 
-/** ********** WINDOW MODULES ************** */
-declare global {
-    interface Window {
-        VITE_APP_VER: string;
-    }
-}
-
 /** ********** INITIALIZE ************** */
 (async () => {
     await siteInit();
@@ -53,7 +44,5 @@ declare global {
     });
 })();
 
+// eslint-disable-next-line no-console
 console.log('Vite Attached');
-console.log('env: ', import.meta.env);
-console.log('ver: ', import.meta.env.VITE_APP_VER);
-console.log('main.ts process.env: ', process.env);

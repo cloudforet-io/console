@@ -58,12 +58,11 @@ export default {
     },
     setup() {
         const state = reactive({
-            version: window.VITE_APP_VER,
+            // eslint-disable-next-line no-undef
+            version: VITE_APP_VER,
             signInImage: computed(() => config.get('DOMAIN_IMAGE.SIGN_IN')),
             contactLink: computed(() => config.get('CONTACT_LINK')),
         });
-
-        console.log('state.version: ', state.version);
 
         return {
             ...toRefs(state),
