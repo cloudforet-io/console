@@ -85,8 +85,8 @@ export default {
         });
 
         const handleDashboardChange = (value: Partial<DashboardInfo>) => {
-            costExplorerStore.commit('home-dashboard/setDashboardTemplate', value);
-            costExplorerStore.commit('home-dashboard/setDefaultFilter', convertFiltersInToNewType(value.default_filter ?? {}));
+            costExplorerStore.commit('dashboard/setDashboardTemplate', value);
+            costExplorerStore.commit('dashboard/setDefaultFilter', convertFiltersInToNewType(value.default_filter ?? {}));
         };
 
         const listDashboard = async () => {

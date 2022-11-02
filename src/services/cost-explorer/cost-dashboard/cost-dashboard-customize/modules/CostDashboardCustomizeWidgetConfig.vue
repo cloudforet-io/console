@@ -151,19 +151,19 @@ export default {
         const handleName = (value) => {
             setForm('name', value);
             state.editedSelectedWidget.name = value;
-            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
         };
 
         const handleSelectGroupBy = (value) => {
             setForm('groupBy', value);
             state.editedSelectedWidget.options.group_by = value;
-            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
         };
 
         const handleSelectGranularity = (value) => {
             setForm('granularity', value);
             state.editedSelectedWidget.options.granularity = value;
-            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
         };
 
         const init = () => {

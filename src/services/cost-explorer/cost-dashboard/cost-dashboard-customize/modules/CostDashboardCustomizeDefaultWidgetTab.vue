@@ -125,8 +125,8 @@ export default {
         const getChartTypeImageFileName = (chartType: ChartType) => chartTypeItemMap[chartType].imageFileName;
 
         const selectWidget = (value: WidgetInfo) => {
-            costExplorerStore.commit('home-dashboard/setOriginSelectedWidget', value);
-            costExplorerStore.commit('home-dashboard/setEditedSelectedWidget', value);
+            costExplorerStore.commit('dashboard/setOriginSelectedWidget', value);
+            costExplorerStore.commit('dashboard/setEditedSelectedWidget', value);
         };
 
         (() => {

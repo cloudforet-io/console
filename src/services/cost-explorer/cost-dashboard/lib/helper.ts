@@ -18,10 +18,10 @@ export const fetchDefaultLayoutData = async (layoutId: string) => {
 
 export const getDashboardLayout = async (dashboard: DashboardInfo): Promise<CustomLayout[]> => {
     let layout: CustomLayout[];
-    if (dashboard?.default_layout_id && dashboard.custom_layouts.length === 0) { // default home-dashboard
+    if (dashboard?.default_layout_id && dashboard.custom_layouts.length === 0) { // default dashboard
         layout = await fetchDefaultLayoutData(dashboard.default_layout_id);
     } else layout = dashboard.custom_layouts;
-    costExplorerStore.commit('home-dashboard/setEditedCustomLayout', layout);
+    costExplorerStore.commit('dashboard/setEditedCustomLayout', layout);
     return layout;
 };
 
