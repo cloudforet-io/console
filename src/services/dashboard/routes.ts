@@ -9,7 +9,6 @@ const CreateDashboardPage = () => import(/* webpackChunkName: "CreateDashboardPa
 const dashboardRoute: RouteConfig = {
     path: 'dashboard',
     component: DashboardContainer,
-    redirect: () => ({ name: DASHBOARD_ROUTE._NAME }),
     children: [
         {
             path: '/',
