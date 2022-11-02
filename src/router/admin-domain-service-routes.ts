@@ -24,11 +24,11 @@ export const adminDomainServiceRoutes: RouteConfig[] = [
     {
         path: '/',
         name: ROOT_DOMAIN_ROUTE._NAME,
-        redirect: '/home_home-dashboard',
+        redirect: '/home-dashboard',
         component: { template: '<router-view />' },
         children: [
             {
-                path: 'home_dashboard',
+                path: 'home-dashboard',
                 name: ROOT_DOMAIN_ROUTE.HOME_DASHBOARD._NAME,
                 component: TotalDashboardPage,
             },
