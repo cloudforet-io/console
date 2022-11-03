@@ -5,6 +5,7 @@ import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
 const DashboardContainer = () => import(/* webpackChunkName: "DashboardContainer" */ '@/services/dashboard/DashboardContainer.vue');
 const DashboardPage = () => import(/* webpackChunkName: "DashboardPage" */ '@/services/dashboard/dashboard/DashboardPage.vue');
 const CreateDashboardPage = () => import(/* webpackChunkName: "CreateDashboardPage" */ '@/services/dashboard/create-dashboard/CreateDashboardPage.vue');
+const EditDashboardPage = () => import(/* webpackChunkName: "EditDashboardPage" */ '@/services/dashboard/edit-dashboard/EditDashboardPage.vue');
 
 const dashboardRoute: RouteConfig = {
     path: 'dashboard',
@@ -22,9 +23,9 @@ const dashboardRoute: RouteConfig = {
             component: CreateDashboardPage,
         },
         {
-            path: 'edit',
+            path: 'edit/:dashboardId',
             name: DASHBOARD_ROUTE.EDIT._NAME,
-            component: CreateDashboardPage,
+            component: EditDashboardPage,
         },
     ],
 };
