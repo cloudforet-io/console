@@ -55,6 +55,13 @@ export const fontInfoMap: Record<string, FontInfo[]> = {
         },
         {
             family: notoSansConfigMap.en.family,
+            source: getSources(notoSansConfigMap.en, '500'),
+            descriptors: {
+                weight: 500,
+            },
+        },
+        {
+            family: notoSansConfigMap.en.family,
             source: getSources(notoSansConfigMap.en, '700'),
             descriptors: {
                 weight: 700,
@@ -73,6 +80,21 @@ export const fontInfoMap: Record<string, FontInfo[]> = {
             descriptors: {
                 style: 'italic',
                 weight: 400,
+            },
+        },
+        {
+            family: robotoConfig.family,
+            source: getSources(robotoConfig, '500'),
+            descriptors: {
+                weight: 500,
+            },
+        },
+        {
+            family: robotoConfig.family,
+            source: getSources(robotoConfig, '500italic'),
+            descriptors: {
+                style: 'italic',
+                weight: 500,
             },
         },
         {
@@ -101,6 +123,13 @@ export const fontInfoMap: Record<string, FontInfo[]> = {
         },
         {
             family: notoSansConfigMap.en.family,
+            source: getSources(notoSansConfigMap.en, '500'),
+            descriptors: {
+                weight: 500,
+            },
+        },
+        {
+            family: notoSansConfigMap.en.family,
             source: getSources(notoSansConfigMap.en, '700'),
             descriptors: {
                 weight: 700,
@@ -117,6 +146,13 @@ export const fontInfoMap: Record<string, FontInfo[]> = {
         },
         {
             family: notoSansConfigMap.ko.family,
+            source: getSources(notoSansConfigMap.ko, '500'),
+            descriptors: {
+                weight: 500,
+            },
+        },
+        {
+            family: notoSansConfigMap.ko.family,
             source: getSources(notoSansConfigMap.ko, '700'),
             descriptors: {
                 weight: 700,
@@ -129,6 +165,13 @@ export const fontInfoMap: Record<string, FontInfo[]> = {
             source: getSources(notoSansConfigMap.jp, 'regular'),
             descriptors: {
                 weight: 400,
+            },
+        },
+        {
+            family: notoSansConfigMap.jp.family,
+            source: getSources(notoSansConfigMap.jp, '500'),
+            descriptors: {
+                weight: 500,
             },
         },
         {
