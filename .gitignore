@@ -1,7 +1,7 @@
 # Config
-!config/default.json
-!config/development.json.sample
-config/*
+!public/config/default.json
+!public/config/development.json.sample
+public/config/*
 
 
 # Logs
