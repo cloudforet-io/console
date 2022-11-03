@@ -37,18 +37,19 @@ import type { PropType, SetupContext } from 'vue';
 import { reactive, toRefs, defineComponent } from 'vue';
 
 import { PDatetimePicker, PDivider, PI } from '@spaceone/design-system';
-import { CARD_SIZE } from '@spaceone/design-system/src/data-display/cards/card/config';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 
+import type { WidgetSize } from '@/common/components/widgets/type';
+import { WIDGET_SIZE } from '@/common/components/widgets/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 
 interface Props {
     title: string;
-    size: CARD_SIZE;
+    size: WidgetSize;
     widgetLink: string;
     noData: boolean;
     printMode: boolean;
@@ -70,8 +71,8 @@ export default defineComponent<Props>({
             default: 'Title',
         },
         size: {
-            type: String as PropType<CARD_SIZE>,
-            default: CARD_SIZE.md,
+            type: String as PropType<WidgetSize>,
+            default: WIDGET_SIZE.md,
         },
         widgetLink: {
             type: [Object, String],
@@ -175,6 +176,9 @@ export default defineComponent<Props>({
     }
     &.lg {
         @mixin widget-size 44rem;
+    }
+    &.xl {
+        @mixin widget-size 54rem;
     }
 }
 </style>
