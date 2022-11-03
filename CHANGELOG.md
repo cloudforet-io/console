@@ -1,3 +1,10 @@
+# [1.1.0-beta.447](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.446...v1.1.0-beta.447) (2022-11-03)
+
+
+### Features
+
+* **font-weight:** add medium(500) font-weight ([#125](https://github.com/cloudforet-io/mirinae/issues/125)) ([15c941a](https://github.com/cloudforet-io/mirinae/commit/15c941ac6c706a542acde09c2df474846d290cbe))
+
 # [1.1.0-beta.446](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.445...v1.1.0-beta.446) (2022-11-02)
 
 
