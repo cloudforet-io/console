@@ -14,9 +14,9 @@
         </div>
         <div class="widget-footer">
             <div class="footer-left">
-                <p-datetime-picker style-type="text" select-mode="range" :selected-dates.sync="selectedDates" />
+                <p-datetime-picker style-type="text" select-mode="range" :selected-dates.sync="proxySelectedDates" />
                 <p-divider :vertical="true" />
-                <currency-select-dropdown />
+                <currency-select-dropdown :print-mode="printMode" @update="handleUpdateCurrency" />
             </div>
             <div class="footer-right">
                 <slot name="footer-right">
@@ -37,13 +37,27 @@ import type { PropType, SetupContext } from 'vue';
 import { reactive, toRefs, defineComponent } from 'vue';
 
 import { PDatetimePicker, PDivider, PI } from '@spaceone/design-system';
-import { CARD_SIZE } from '@spaceone/design-system/src/data-display/cards/card/config';
 
+import type { Currency } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/display/config';
+
+import type { WidgetSize } from '@/common/components/widgets/type';
+import { WIDGET_SIZE } from '@/common/components/widgets/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 
-export default defineComponent({
+interface Props {
+    title: string;
+    size: WidgetSize;
+    widgetLink: string;
+    noData: boolean;
+    printMode: boolean;
+    selectedDates: string[];
+    currency: Currency;
+}
+
+export default defineComponent<Props>({
     name: 'WidgetFrame',
     components: {
         CurrencySelectDropdown,
@@ -57,8 +71,8 @@ export default defineComponent({
             default: 'Title',
         },
         size: {
-            type: String as PropType<CARD_SIZE>,
-            default: CARD_SIZE.md,
+            type: String as PropType<WidgetSize>,
+            default: WIDGET_SIZE.md,
         },
         widgetLink: {
             type: [Object, String],
@@ -72,14 +86,27 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
-        // currency
+        selectedDates: {
+            type: Array as PropType<string[]>,
+            default: () => [],
+        },
+        currency: {
+            type: String as PropType<Currency>,
+            default: CURRENCY.USD,
+        },
     },
     setup(props, { emit }:SetupContext) {
         const state = reactive({
-            selectedDates: useProxyValue('selectedDates', props, emit),
+            proxySelectedDates: useProxyValue('selectedDates', props, emit),
+            proxyCurrency: useProxyValue('currency', props, emit),
         });
+
+        const handleUpdateCurrency = (currency: Currency) => {
+            state.proxyCurrency = currency;
+        };
         return {
             ...toRefs(state),
+            handleUpdateCurrency,
         };
     },
 });
@@ -149,6 +176,9 @@ export default defineComponent({
     }
     &.lg {
         @mixin widget-size 44rem;
+    }
+    &.xl {
+        @mixin widget-size 54rem;
     }
 }
 </style>
