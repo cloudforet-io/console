@@ -6,6 +6,10 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.HOME_DASHBOARD',
         icon: 'ic_dashboard',
     },
+    [MENU_ID.DASHBOARD]: {
+        translationId: 'MENU.DASHBOARD',
+        icon: 'ic_dashboard',
+    },
     [MENU_ID.PROJECT]: {
         translationId: 'MENU.PROJECT',
         icon: 'ic_project',

@@ -6,6 +6,10 @@ export const MENU_LIST: Menu[] = [
         id: MENU_ID.HOME_DASHBOARD,
         hideOnGNB: true,
     },
+    {
+        id: MENU_ID.DASHBOARD,
+        subMenuList: [],
+    },
     { id: MENU_ID.PROJECT },
     {
         id: MENU_ID.ASSET_INVENTORY,
