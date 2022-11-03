@@ -26,6 +26,9 @@ export default defineConfig(({ command, mode }) => {
         server: {
             port: 8080,
         },
+        preview: {
+            port: 8080,
+        },
         test: {
             globals: true,
             environment: 'jsdom',
@@ -33,17 +36,15 @@ export default defineConfig(({ command, mode }) => {
         resolve: {
             alias: {
                 '@': path.resolve(__dirname, './src'),
-                '@/*': path.resolve(__dirname, './src/*'),
-                '@spaceone/console-core-lib': path.resolve(__dirname, './packages/@spaceone/console-core-lib/dist/'),
                 '@cloudforet/core-lib': path.resolve(__dirname, './packages/cloudforet/core-lib/dist/'),
                 '@cloudforet/language-pack': path.resolve(__dirname, './packages/cloudforet/language-pack/'),
                 vue: path.resolve(__dirname, './node_modules/vue/dist/vue.js'),
-                'env': path.resolve(__dirname, './node_modules/dotenv/')
             },
         },
         define: {
             VITE_APP_VER: JSON.stringify(process.env.npm_package_version),
-            VITE_SOME_KEY: '123'
+            // Add env variables here
+            // Usage references => SignInLeftContainer.vue / env.d.ts
         },
     };
 });

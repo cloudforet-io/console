@@ -26,6 +26,8 @@ directive(Vue);
 
 Vue.use(SpaceDesignSystem);
 
+/** ********** SET VUE CONFIG ************** */
+
 Vue.config.productionTip = import.meta.env.DEV;
 
 /** ********** INITIALIZE ************** */
@@ -43,6 +45,3 @@ Vue.config.productionTip = import.meta.env.DEV;
         template: '<App/>',
     });
 })();
-
-// eslint-disable-next-line no-console
-console.log('Vite Attached');
