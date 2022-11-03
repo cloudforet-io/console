@@ -1,0 +1,77 @@
+import { Meta, Canvas, Story } from '@storybook/addon-docs/blocks';
+
+
+
+<Meta title='Foundation/Styles/Typography' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/DVwz3WQLLIxWXj4d4W8MQI/Foundation?node-id=100%3A48'
+    }
+}} />
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    template: `
+    <div class="flex flex-col gap-2 h-full w-full overflow p-8">
+        <p class="font-normal">regular ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</p>
+        <p class="font-medium">medium ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</p>
+        <p class="font-bold">bold ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</p>
+    </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Typography
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { },
+            template: `
+                <div class="h-full w-full overflow p-8 flex flex-col gap-2">
+                    <p>English/Number - Noto Sans</p>
+                </div>
+            `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Font Weight
+
+<Canvas>
+    <Story name="Font Weight">
+        {{
+            components: { },
+            template: `
+                <div class="h-full w-full overflow p-8 flex flex-col gap-2">
+                    <p class="font-normal">[regular|400] ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</p>
+                    <p class="font-medium">[medium|500] ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</p>
+                    <p class="font-bold">[bold|700] ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</p>
+                </div>
+            `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+

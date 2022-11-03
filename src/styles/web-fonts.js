@@ -1,7 +1,7 @@
 module.exports = {
     webFonts: [
-        'Roboto:400,700',
-        'Noto Sans:400,700',
+        'Roboto:400,500,700',
+        'Noto Sans:400,500,700',
     ],
     fontUrls: [
         'https://fonts.googleapis.com/css?family=Roboto&display=swap',
