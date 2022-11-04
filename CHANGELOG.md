@@ -1,3 +1,10 @@
+# [1.1.0-beta.448](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.447...v1.1.0-beta.448) (2022-11-04)
+
+
+### Bug Fixes
+
+* **p-search:** fix p-search issue ([#126](https://github.com/cloudforet-io/mirinae/issues/126)) ([36265fb](https://github.com/cloudforet-io/mirinae/commit/36265fbc970ccab671889a4574f8948c64e17a36))
+
 # [1.1.0-beta.447](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.446...v1.1.0-beta.447) (2022-11-03)
 
 
