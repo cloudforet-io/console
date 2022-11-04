@@ -138,7 +138,6 @@ export default defineComponent<Props>({
 
         /* Event */
         const handleConfirm = () => {
-            const preMoreGroupBy = costExplorerStore.getters['costAnalysis/orderedMoreGroupByItems'];
             const tagsGroupBy: MoreGroupByItem[] = state.selectedTags.map(d => ({
                 category: MORE_GROUP_BY.TAGS,
                 key: d.name as string,
@@ -147,17 +146,11 @@ export default defineComponent<Props>({
                 category: MORE_GROUP_BY.ADDITIONAL_INFO,
                 key: d.name as string,
             }));
-            const updatedMoreGroupBy = tagsGroupBy.concat(additionalInfoGroupBy);
-
-            // use previous data if the selected item already exists(because of `selected`, `disabled` properties)
-            const mergedMoreGroupBy: MoreGroupByItem[] = [];
-            updatedMoreGroupBy.forEach((item) => {
-                const _selected = preMoreGroupBy.find(d => d.category === item.category && d.key === item.key);
-                if (_selected) mergedMoreGroupBy.push(_selected);
-                else mergedMoreGroupBy.push(item);
-            });
             state.proxyVisible = false;
-            costExplorerStore.commit('costAnalysis/setMoreGroupBy', mergedMoreGroupBy);
+            costExplorerStore.commit('costAnalysis/setMoreGroupBy', [
+                ...tagsGroupBy,
+                ...additionalInfoGroupBy,
+            ]);
         };
 
         /* Watcher */
