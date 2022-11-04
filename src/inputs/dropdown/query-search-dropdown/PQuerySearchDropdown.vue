@@ -228,8 +228,10 @@ export default defineComponent<QuerySearchDropdownProps>({
 .p-query-search-dropdown {
     @apply w-full relative;
     .p-search {
-        @apply text-sm font-normal;
-        padding: 0.25rem 0.5rem;
+        .input-container {
+            @apply text-sm font-normal;
+            padding: 0.25rem 0.5rem;
+        }
     }
     .input-set {
         display: inline-flex;

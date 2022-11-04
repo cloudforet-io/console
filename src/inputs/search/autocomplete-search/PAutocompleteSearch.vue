@@ -375,7 +375,9 @@ export default defineComponent<AutocompleteSearchProps>({
 .p-autocomplete-search {
     @apply w-full relative;
     .p-search {
-        @apply text-sm font-normal;
+        .input-container {
+            @apply text-sm font-normal;
+        }
     }
     .p-context-menu {
         @apply font-normal;

@@ -520,16 +520,18 @@ export default defineComponent<SearchDropdownProps>({
 .p-search-dropdown {
     @apply w-full relative;
     .p-search {
-        @apply text-sm font-normal;
-        &.disabled {
-            @apply text-gray-300;
-            .dropdown-button {
-                cursor: default;
+        .input-container {
+            @apply text-sm font-normal;
+            &.disabled {
+                @apply text-gray-300;
+                .dropdown-button {
+                    cursor: default;
+                }
             }
-        }
-        &.focused:not(.disabled) {
-            .dropdown-button {
-                @apply text-secondary;
+            &.focused:not(.disabled) {
+                .dropdown-button {
+                    @apply text-secondary;
+                }
             }
         }
     }
@@ -574,21 +576,23 @@ export default defineComponent<SearchDropdownProps>({
 
     &.multi-selectable {
         .p-search {
-            @apply relative flex-wrap row-gap-1;
-            padding-right: 3rem;
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
+            .input-container {
+                @apply relative flex-wrap row-gap-1;
+                padding-right: 3rem;
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
 
-            .dropdown-button {
-                @apply absolute;
-                top: 0.1875rem;
-                right: 0.5rem;
-            }
-            > .delete-icon {
-                @apply absolute cursor-pointer;
-                right: 2rem;
-                top: 0.4375rem;
-                height: 100%;
+                .dropdown-button {
+                    @apply absolute;
+                    top: 0.1875rem;
+                    right: 0.5rem;
+                }
+                > .delete-icon {
+                    @apply absolute cursor-pointer;
+                    right: 2rem;
+                    top: 0.4375rem;
+                    height: 100%;
+                }
             }
         }
     }

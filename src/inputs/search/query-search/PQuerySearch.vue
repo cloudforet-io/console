@@ -201,7 +201,9 @@ export default defineComponent({
 .p-query-search {
     @apply w-full;
     .p-search {
-        @apply text-sm font-normal;
+        .input-container {
+            @apply text-sm font-normal;
+        }
     }
     .menu-container {
         @apply w-full relative;
