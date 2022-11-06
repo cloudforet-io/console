@@ -9,7 +9,10 @@
         >
             {{ button.label }}
         </p-button>
-        <p-select-dropdown :items="buttonGroup" class="only-mobile" @select="onSelectAction">
+        <p-select-dropdown :items="buttonGroup"
+                           class="only-mobile"
+                           @select="onSelectAction"
+        >
             {{ $t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
         </p-select-dropdown>
 
@@ -25,13 +28,17 @@
             @confirm="onDeleteConfirm"
         >
             <template #col-state-format="{ value }">
-                <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)" :outline="value === ALERT_STATE.ERROR">
+                <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
+                         :outline="value === ALERT_STATE.ERROR"
+                >
                     {{ alertStateI18n[value] }}
                 </p-badge>
             </template>
             <template #col-urgency-format="{ value }">
                 <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_state_duplicated'"
-                     width="1em" height="1em" class="mr-1"
+                     width="1em"
+                     height="1em"
+                     class="mr-1"
                      :class="{'ic_state_duplicated': !(value === ALERT_URGENCY.HIGH)}"
                 />
                 <span>{{ urgencyI18n[value] }}</span>
@@ -103,7 +110,6 @@ import type { AlertAction } from '@/services/alert-manager/lib/config';
 import { ALERT_ACTION, ALERT_STATE, ALERT_URGENCY } from '@/services/alert-manager/lib/config';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
 
-
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
 
 const TABLE_FIELDS = [
@@ -146,7 +152,7 @@ export default {
             timezone: computed(() => store.state.user.timezone),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
-            selectedItemsState: computed(() => props.selectedItems.map(selectedItem => selectedItem.state)),
+            selectedItemsState: computed(() => props.selectedItems.map((selectedItem) => selectedItem.state)),
             isSelectedNone: computed(() => props.selectedItems.length === 0),
             isSelectedOne: computed(() => props.selectedItems.length === 1),
             isSelectedError: computed(() => state.selectedItemsState.includes(ALERT_STATE.ERROR)),
@@ -179,13 +185,13 @@ export default {
             urgencyI18n: useAlertUrgencyI18n(),
         });
 
-        const alertDurationFormatter = value => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), state.timezone) || '--';
+        const alertDurationFormatter = (value) => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), state.timezone) || '--';
 
         const onDeleteConfirm = async () => {
             state.closeLoading = true;
             try {
                 await SpaceConnector.client.monitoring.alert.delete({
-                    alerts: props.selectedItems.map(d => d.alert_id),
+                    alerts: props.selectedItems.map((d) => d.alert_id),
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_DELETE'), '');
                 state.visibleDeleteModal = false;

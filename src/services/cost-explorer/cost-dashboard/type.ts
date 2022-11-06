@@ -11,7 +11,6 @@ const DASHBOARD_SCOPE = {
 
 export type DashboardScope = typeof DASHBOARD_SCOPE[keyof typeof DASHBOARD_SCOPE];
 
-
 export const CHART_TYPE = Object.freeze({
     CARD: 'CARD',
     TREEMAP: 'TREEMAP',

@@ -5,7 +5,6 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import type { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 
-
 const flattenSubMenuList = (subMenuList?: Menu[], translationIds?: string[]): PageAccessMenuItem[] => {
     if (!subMenuList) return [];
     let results: PageAccessMenuItem[] = [];

@@ -1,13 +1,25 @@
 <template>
-    <router-link :to="linkLocation" class="budget-list-card">
-        <div v-if="budgetLoading" class="skeleton-wrapper">
+    <router-link :to="linkLocation"
+                 class="budget-list-card"
+    >
+        <div v-if="budgetLoading"
+             class="skeleton-wrapper"
+        >
             <div class="top">
-                <p-skeleton width="30%" height="1rem" />
-                <p-skeleton width="23%" height="1.5rem" />
+                <p-skeleton width="30%"
+                            height="1rem"
+                />
+                <p-skeleton width="23%"
+                            height="1.5rem"
+                />
             </div>
-            <p-skeleton width="40%" height="1rem" />
+            <p-skeleton width="40%"
+                        height="1rem"
+            />
         </div>
-        <div v-else class="card-wrapper">
+        <div v-else
+             class="card-wrapper"
+        >
             <div class="card-header">
                 <div class="flex items-center mb-1">
                     <span v-for="(name, index) in projects"
@@ -18,12 +30,15 @@
                         <p-i v-if="index === projects.length - 1"
                              :name="isProject ? 'ic_tree_project' : 'ic_tree_project-group'"
                              color="inherit"
-                             width="1em" height="1em" class="mr-1"
+                             width="1em"
+                             height="1em"
+                             class="mr-1"
                         />
                         {{ name }}
                         <p-i v-if="index < projects.length - 1"
                              name="ic_breadcrumb_arrow"
-                             width="1em" height="1em"
+                             width="1em"
+                             height="1em"
                         />
                     </span>
                 </div>
@@ -39,7 +54,9 @@
                             <p class="label">
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
                             </p>
-                            <div class="amount-used-wrapper" :class="progressStatus">
+                            <div class="amount-used-wrapper"
+                                 :class="progressStatus"
+                            >
                                 <span class="cost">{{ currencyMoneyFormatter(cost, storeState.currency, storeState.currencyRates) }}</span>
                                 <span class="percent">(<template v-if="percentage < 0">0.00</template>
                                     <template v-else>{{ percentage.toFixed(2) }}</template>%)</span>
@@ -62,7 +79,10 @@
                             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.COST_TYPE') }}
                         </div>
                         <div class="cost-type">
-                            <span v-for="({resourceList, costTypeLabel}) in costTypeResourceListMap" :key="costTypeLabel" class="truncate">
+                            <span v-for="({resourceList, costTypeLabel}) in costTypeResourceListMap"
+                                  :key="costTypeLabel"
+                                  class="truncate"
+                            >
                                 {{ costTypeLabel }}: {{ resourceList.join(', ') }}
                             </span>
                         </div>
@@ -98,7 +118,6 @@ import type { BudgetUsageData } from '@/services/cost-explorer/budget/type';
 import BudgetUsageProgressBar from '@/services/cost-explorer/modules/BudgetUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
-
 interface Props {
     budgetUsage: BudgetUsageData;
     budgetLoading: boolean;
@@ -115,7 +134,6 @@ type CostTypeResourceListMap = Record<string, {
     costTypeLabel: string;
     resourceList: string[];
 }>;
-
 
 export default {
     name: 'BudgetListCard',
@@ -194,7 +212,7 @@ export default {
 
                         costTypeResourceListMap[costType] = {
                             costTypeLabel: resource?.label ?? costType,
-                            resourceList: resources.map(d => (resource?.items[d]?.name ?? d)),
+                            resourceList: resources.map((d) => (resource?.items[d]?.name ?? d)),
                         };
                     }
                 });

@@ -18,20 +18,26 @@
                     />
                 </div>
                 <div class="table-wrapper">
-                    <div v-for="rowNum of range(-1, 5)" :key="rowNum"
-                         class="table-row" :class="{ 'project-name-row': rowNum === -1 }"
+                    <div v-for="rowNum of range(-1, 5)"
+                         :key="rowNum"
+                         class="table-row"
+                         :class="{ 'project-name-row': rowNum === -1 }"
                     >
                         <div class="left-part">
-                            <div v-if="rowNum > -1" class="label-wrapper">
+                            <div v-if="rowNum > -1"
+                                 class="label-wrapper"
+                            >
                                 <p-i :name="tableData[rowNum].icon"
-                                     width="0.875rem" height="0.875rem"
+                                     width="0.875rem"
+                                     height="0.875rem"
                                      color="inherit transparent"
                                 />
                                 <span class="text hidden lg:inline-block">{{ tableData[rowNum].label }}</span>
                             </div>
                         </div>
                         <div class="right-part grid grid-cols-12 gap-1">
-                            <div v-for="colNum of range(1, 7)" :key="colNum"
+                            <div v-for="colNum of range(1, 7)"
+                                 :key="colNum"
                                  class="col-wrapper col-span-2"
                             >
                                 <template v-if="rowNum === -1">
@@ -39,9 +45,11 @@
                                           v-tooltip.top="projectSummaryData[colNum * thisPage - 1].tooltipText"
                                           class="project-name"
                                     >
-                                        <p-i v-if="projectSummaryData[colNum * thisPage - 1].isFavorite" name="ic_bookmark"
+                                        <p-i v-if="projectSummaryData[colNum * thisPage - 1].isFavorite"
+                                             name="ic_bookmark"
                                              class="favorite-icon"
-                                             width="0.625rem" height="0.625rem"
+                                             width="0.625rem"
+                                             height="0.625rem"
                                         />
                                         <span>{{ projectSummaryData[colNum * thisPage - 1].projectName }}</span>
                                     </span>
@@ -50,11 +58,15 @@
                                     <router-link v-if="getProjectBoxCount(rowNum, colNum * thisPage - 1) > 0"
                                                  :to="projectSummaryLinkFormatter(rowNum, colNum * thisPage - 1)"
                                     >
-                                        <div class="box" :class="getProjectBoxStatus(rowNum, colNum * thisPage - 1)">
+                                        <div class="box"
+                                             :class="getProjectBoxStatus(rowNum, colNum * thisPage - 1)"
+                                        >
                                             <span class="box-text">{{ getProjectBoxCount(rowNum, colNum * thisPage - 1) }}</span>
                                         </div>
                                     </router-link>
-                                    <div v-else class="box empty">
+                                    <div v-else
+                                         class="box empty"
+                                    >
                                         <span class="box-text">0</span>
                                     </div>
                                 </template>
@@ -95,7 +107,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import TrustedAdvisorOverall from '@/services/home-dashboard/modules/trusted-advisor/TrustedAdvisorOverall.vue';
-
 
 enum STATUS {
     error = 'error',

@@ -1,31 +1,45 @@
 <template>
     <div class="project-region-service">
-        <div v-if="!loading && data.length === 0" class="no-data-wrapper grid">
+        <div v-if="!loading && data.length === 0"
+             class="no-data-wrapper grid"
+        >
             <div class="m-auto">
-                <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
+                <img src="@/assets/images/illust_cloud.svg"
+                     class="empty-image hidden lg:block"
+                >
                 <p class="text">
                     {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE') }) }}
                 </p>
             </div>
         </div>
-        <div v-else class="grid grid-cols-12">
+        <div v-else
+             class="grid grid-cols-12"
+        >
             <div class="col-span-3 chart-wrapper">
                 <p-data-loader :loading="loading">
-                    <div ref="chartRef" class="chart" />
+                    <div ref="chartRef"
+                         class="chart"
+                    />
                 </p-data-loader>
             </div>
             <div class="col-span-9 summary-content-wrapper">
                 <template v-if="loading">
-                    <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
+                    <div v-for="v in skeletons"
+                         :key="v"
+                         class="flex items-center p-2 col-span-3"
+                    >
                         <p-skeleton class="flex-grow" />
                     </div>
                 </template>
                 <template v-else>
-                    <router-link v-for="(d, idx) of data" :key="idx"
+                    <router-link v-for="(d, idx) of data"
+                                 :key="idx"
                                  :to="d.to"
                                  class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
                     >
-                        <span class="circle" :style="{ 'background-color': d.color }" />
+                        <span class="circle"
+                              :style="{ 'background-color': d.color }"
+                        />
                         <div class="text-group">
                             <span :style="{ color: d.providerColor }">{{ d.provider }}</span>
                             <span class="type truncate">{{ d.region }}</span>
@@ -71,7 +85,6 @@ import {
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 interface Data {
     provider: string;

@@ -10,7 +10,9 @@
         <template #item="{item, index}">
             <div v-if="index < 15">
                 <div class="title-wrapper">
-                    <p-i name="ic_state_manual" width="1em" height="1em"
+                    <p-i name="ic_state_manual"
+                         width="1em"
+                         height="1em"
                          color="inherit transparent"
                     />
                     <span class="title">{{ item.title }}</span>
@@ -20,7 +22,9 @@
                     <span class="ml-1">{{ dateFormatter(item.start_time, item.end_time) }}</span>
                 </div>
             </div>
-            <div v-else class="view-all-text">
+            <div v-else
+                 class="view-all-text"
+            >
                 <p-anchor :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME, params: { id: projectId } }"
                           :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_MAINTENANCE_WINDOW')"
                           :icon-visible="false"
@@ -32,7 +36,6 @@
 </template>
 
 <script lang="ts">
-
 
 import {
     reactive, toRefs, watch,
@@ -49,7 +52,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-
 
 export default {
     name: 'ProjectMaintenanceWindowListItem',

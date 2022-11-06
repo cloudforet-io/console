@@ -5,7 +5,8 @@
         </div>
         <div class="content-wrapper">
             <div class="button-group">
-                <router-link v-for="(alertState, idx) in alertStates" :key="`button-${idx}`"
+                <router-link v-for="(alertState, idx) in alertStates"
+                             :key="`button-${idx}`"
                              :to="alertLinkFormatter(alertState.name)"
                              class="button"
                              :style="{ color: alertState.color }"
@@ -13,13 +14,17 @@
                     <strong>{{ commaFormatter(counts[alertState.name]) }}</strong> {{ alertState.label }}
                 </router-link>
             </div>
-            <p-list-card :items="items" :loading="loading" :hoverable="true">
+            <p-list-card :items="items"
+                         :loading="loading"
+                         :hoverable="true"
+            >
                 <template #header>
                     <p class="left-part">
                         <strong>{{ $t('PROJECT.DETAIL.SUMMARY.OPEN_ALERT') }}</strong> ({{ commaFormatter(totalCount) }})
                     </p>
                     <p class="right-part">
-                        <p-select-button v-for="(state, idx) in assignedStateList" :key="`assigned-${idx}`"
+                        <p-select-button v-for="(state, idx) in assignedStateList"
+                                         :key="`assigned-${idx}`"
                                          v-model="selectedAssignedState"
                                          class="assigned-button"
                                          :value="state.name"
@@ -61,7 +66,6 @@ import {
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { find } from 'lodash';
 
-
 import { commaFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -80,7 +84,6 @@ import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
 import type { AlertListPageUrlQuery } from '@/services/alert-manager/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-
 
 const ASSIGNED_STATE = Object.freeze({
     ALL: 'ALL',

@@ -1,9 +1,12 @@
 <template>
-    <p-card-item class="provider-list-card" @click="handleInstallModalOpen">
+    <p-card-item class="provider-list-card"
+                 @click="handleInstallModalOpen"
+    >
         <template #side>
             <p-lazy-img :src="providerItem.icon"
                         error-icon="ic_collector_tags"
-                        width="4rem" height="4rem"
+                        width="4rem"
+                        height="4rem"
             />
         </template>
         <template #body>
@@ -12,11 +15,15 @@
                     <header class="title">
                         {{ providerItem.name }}
                     </header>
-                    <span v-if="providerItem.installed" class="contents">{{ $t('Already installed') }}</span>
+                    <span v-if="providerItem.installed"
+                          class="contents"
+                    >{{ $t('Already installed') }}</span>
                 </div>
                 <div class="card-button">
                     <!--song-lang-->
-                    <p-button style-type="primary" :disabled="providerItem.installed">
+                    <p-button style-type="primary"
+                              :disabled="providerItem.installed"
+                    >
                         Install
                     </p-button>
                 </div>
@@ -30,7 +37,6 @@
 import { reactive, toRefs } from 'vue';
 
 import { PCardItem, PButton, PLazyImg } from '@spaceone/design-system';
-
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

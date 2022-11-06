@@ -15,7 +15,9 @@
                            required
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="projectGroupName" class="block w-full" :invalid="showValidation && invalid"
+                    <p-text-input v-model="projectGroupName"
+                                  class="block w-full"
+                                  :invalid="showValidation && invalid"
                                   :placeholder="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER')"
                                   @keydown.enter="confirm"
                     />
@@ -26,7 +28,6 @@
 </template>
 
 <script lang="ts">
-
 
 import {
     computed, reactive, toRefs, watch,
@@ -99,9 +100,8 @@ export default {
             const res = await SpaceConnector.client.identity.projectGroup.list({
                 query: projectGroupNameApiQuery.data,
             });
-            state.projectGroupNames = res.results.map(d => d.name);
+            state.projectGroupNames = res.results.map((d) => d.name);
         };
-
 
         const projectGroupApiQuery = new ApiQueryHelper().setOnly('project_group_id', 'name');
         const getProjectGroup = async () => {

@@ -1,5 +1,7 @@
 <template>
-    <div class="sign-in-right-container" :class="{ admin: isDomainOwner }">
+    <div class="sign-in-right-container"
+         :class="{ admin: isDomainOwner }"
+    >
         <div class="form-wrapper">
             <div class="hidden xs:block">
                 <p class="title">
@@ -11,13 +13,23 @@
             </div>
 
             <div class="flex xs:hidden">
-                <img v-if="ciLogoImage" class="logo-character" :src="ciLogoImage">
-                <img v-else class="logo-character" src="@/assets/images/brand/brand_logo.png">
+                <img v-if="ciLogoImage"
+                     class="logo-character"
+                     :src="ciLogoImage"
+                >
+                <img v-else
+                     class="logo-character"
+                     src="@/assets/images/brand/brand_logo.png"
+                >
             </div>
 
-            <div v-if="showErrorMessage" class="error-msg-box">
+            <div v-if="showErrorMessage"
+                 class="error-msg-box"
+            >
                 <span class="error-msg">{{ $t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
-                <p-i name="ic_delete" width="1.5rem" height="1.5rem"
+                <p-i name="ic_delete"
+                     width="1.5rem"
+                     height="1.5rem"
                      class="cursor-pointer"
                      color="inherit"
                      @click="hideErrorMessage"
@@ -27,8 +39,12 @@
             <slot name="input" />
 
             <template v-if="isDomainOwner">
-                <span class="sign-in-button-wrapper" @click="goToUserSignIn">
-                    <p-i name="ic_arrow_left_sm" width="0.5rem" height="0.5rem"
+                <span class="sign-in-button-wrapper"
+                      @click="goToUserSignIn"
+                >
+                    <p-i name="ic_arrow_left_sm"
+                         width="0.5rem"
+                         height="0.5rem"
                          color="inherit"
                          class="user-icon"
                     />
@@ -36,8 +52,12 @@
                 </span>
             </template>
             <template v-else>
-                <span class="sign-in-button-wrapper" @click="goToAdminSignIn">
-                    <p-i name="root-account" width="1.5rem" height="1.5rem"
+                <span class="sign-in-button-wrapper"
+                      @click="goToAdminSignIn"
+                >
+                    <p-i name="root-account"
+                         width="1.5rem"
+                         height="1.5rem"
                          class="admin-icon"
                     />
                     <span class="admin-sign-in-text">{{ $t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') }}</span>
@@ -57,13 +77,11 @@ import {
     PI,
 } from '@spaceone/design-system';
 
-
 import { store } from '@/store';
 
 import config from '@/lib/config';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
-
 
 export default {
     name: 'SignInRightContainer',

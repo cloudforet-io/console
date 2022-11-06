@@ -20,9 +20,12 @@
                         @click="() => handleSelectAccountType('TRUSTED')"
                     />
                 </div>
-                <div v-if="showTrustedAccount" class="information-wrapper">
+                <div v-if="showTrustedAccount"
+                     class="information-wrapper"
+                >
                     <p-i name="ic_outlined-info"
-                         height="0.875rem" width="0.875rem"
+                         height="0.875rem"
+                         width="0.875rem"
                          color="inherit"
                          class="external-icon"
                     />
@@ -46,7 +49,6 @@ import {
 } from '@spaceone/design-system';
 
 import type { AccountType } from '@/services/asset-inventory/service-account/type';
-
 
 export default defineComponent({
     name: 'ServiceAccountAccountType',

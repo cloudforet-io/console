@@ -2,7 +2,10 @@
     <div class="basic-dashboard">
         <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.BASIC_TEMPLATE') }}</h3>
         <div class="dashboard-list">
-            <div v-for="(layoutData, idx) in defaultLayoutData" :key="layoutData.name" class="dashboard-item">
+            <div v-for="(layoutData, idx) in defaultLayoutData"
+                 :key="layoutData.name"
+                 class="dashboard-item"
+            >
                 <!--                TODO:: apply keyboard event below this SelectCard-->
                 <p-select-card
                     :selected="selectedTemplate"
@@ -12,7 +15,9 @@
                 >
                     {{ layoutData.name }}
                 </p-select-card>
-                <div v-if="layoutData.widgetList.length" class="widget-list-wrapper">
+                <div v-if="layoutData.widgetList.length"
+                     class="widget-list-wrapper"
+                >
                     <div class="widget-title-wrapper">
                         <span class="widget-list-title">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.LIST_OF_WIDGETS') }}</span>
                         <p-collapsible-toggle :is-collapsed="!unfoldedIndices.includes(idx)"
@@ -20,9 +25,13 @@
                                               @update:isCollapsed="handleUpdateCollapsed(idx, ...arguments)"
                         />
                     </div>
-                    <ul v-if="unfoldedIndices.includes(idx)" class="widgets-list">
+                    <ul v-if="unfoldedIndices.includes(idx)"
+                        class="widgets-list"
+                    >
                         <template v-if="layoutData.widgetList.length > 10">
-                            <li v-for="({name}) in getNamesOfWidgetList(layoutData.widgetList).slice(0, 10)" :key="name">
+                            <li v-for="({name}) in getNamesOfWidgetList(layoutData.widgetList).slice(0, 10)"
+                                :key="name"
+                            >
                                 {{ name }}
                             </li>
                             <li class="text-more">
@@ -30,7 +39,9 @@
                             </li>
                         </template>
                         <template v-else>
-                            <li v-for="({name}) in getNamesOfWidgetList(layoutData.widgetList)" :key="name">
+                            <li v-for="({name}) in getNamesOfWidgetList(layoutData.widgetList)"
+                                :key="name"
+                            >
                                 {{ name }}
                             </li>
                         </template>
@@ -57,7 +68,7 @@ import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 
 const getNamesOfWidgetList = (widgetList) => {
     const flattenWidgetList: WidgetInfo[] = flattenDeep(widgetList);
-    if (flattenWidgetList) return flattenWidgetList.map(d => ({ name: startCase(defaultWidgetMap[d.widget_id].widget_file_name) }));
+    if (flattenWidgetList) return flattenWidgetList.map((d) => ({ name: startCase(defaultWidgetMap[d.widget_id].widget_file_name) }));
     return [];
 };
 
@@ -76,7 +87,7 @@ export default {
         });
 
         const handleUpdateCollapsed = (idx: number, isCollapsed: boolean) => {
-            const foundIdx = state.unfoldedIndices.findIndex(d => d === idx);
+            const foundIdx = state.unfoldedIndices.findIndex((d) => d === idx);
             if (isCollapsed) {
                 if (foundIdx !== -1) {
                     state.unfoldedIndices.splice(foundIdx, 1);

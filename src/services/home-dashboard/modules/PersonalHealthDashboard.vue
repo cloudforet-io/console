@@ -15,11 +15,15 @@
             <template #col-event-format="{ index, value }">
                 <div class="col-event">
                     <span class="event-name">
-                        <router-link :to="value.to" class="link-text">
+                        <router-link :to="value.to"
+                                     class="link-text"
+                        >
                             <span>{{ value.name }}</span>
                         </router-link>
                     </span>
-                    <span class="event-time" :class="{ 'show-all': data[index].showAll }">
+                    <span class="event-time"
+                          :class="{ 'show-all': data[index].showAll }"
+                    >
                         {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.LAST_UPDATE') }} : {{ value.lastUpdate }}
                     </span>
                 </div>
@@ -29,16 +33,26 @@
             </template>
             <template #col-affected_projects-format="{ index, value }">
                 <div class="affected-projects-wrapper grid grid-cols-12 gap-2">
-                    <div class="count col-span-1" :class="{ 'show-all': data[index].showAll }">
+                    <div class="count col-span-1"
+                         :class="{ 'show-all': data[index].showAll }"
+                    >
                         {{ value.length }}
                     </div>
-                    <div class="col-span-9 project-link-group" :class="{ 'show-all': data[index].showAll }">
-                        <div v-for="(project, pIndex) in value" :key="`project-link-${project.name}-${pIndex}`">
-                            <p-i v-if="project.isFavorite" name="ic_bookmark"
+                    <div class="col-span-9 project-link-group"
+                         :class="{ 'show-all': data[index].showAll }"
+                    >
+                        <div v-for="(project, pIndex) in value"
+                             :key="`project-link-${project.name}-${pIndex}`"
+                        >
+                            <p-i v-if="project.isFavorite"
+                                 name="ic_bookmark"
                                  class="favorite-icon"
-                                 width="0.625rem" height="0.625rem"
+                                 width="0.625rem"
+                                 height="0.625rem"
                             />
-                            <router-link :to="project.to" class="project-link">
+                            <router-link :to="project.to"
+                                         class="project-link"
+                            >
                                 {{ project.name }}
                             </router-link>
                         </div>
@@ -50,7 +64,9 @@
                         >
                             {{ data[index].showAll ? $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.HIDE') : $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ALL') }}
                             <p-i :name="data[index].showAll ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                                 height="1rem" width="1rem" color="inherit transparent"
+                                 height="1rem"
+                                 width="1rem"
+                                 color="inherit transparent"
                             />
                         </div>
                     </div>
@@ -83,7 +99,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 const EVENT_PERIOD = 7;
 
@@ -127,7 +142,7 @@ export default {
                     to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
                 },
                 region: state.regions[d.region_code]?.name || d.region_code,
-                affected_projects: d.affected_projects.map(projectId => ({
+                affected_projects: d.affected_projects.map((projectId) => ({
                     name: projects[projectId].name,
                     to: referenceRouter(projectId, { resource_type: 'identity.Project' }),
                     isFavorite: !!find(state.favoriteProjects, { id: projectId }),

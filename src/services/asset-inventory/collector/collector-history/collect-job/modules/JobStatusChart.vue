@@ -2,10 +2,13 @@
     <p-pane-layout class="job-status-chart">
         <div class="status-wrapper">
             <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.STATUS') }}</span>
-            <span v-if="status" class="value">
+            <span v-if="status"
+                  class="value"
+            >
                 <p-i
                     :name="statusIconFormatter(status)"
-                    width="1rem" height="1rem"
+                    width="1rem"
+                    height="1rem"
                     :animation="status === JOB_STATUS.progress ? 'spin' : undefined"
                 />
                 {{ statusText }}
@@ -25,8 +28,12 @@
                 <span class="total-text">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.TOTAL') }} <strong>{{ totalCount }}</strong></span>
             </div>
             <div class="progress-bar">
-                <span class="succeeded-bar" :style="{ width: `${succeededPercentage}%` }" />
-                <span class="failed-bar" :style="{ width: `${failedPercentage}%` }" />
+                <span class="succeeded-bar"
+                      :style="{ width: `${succeededPercentage}%` }"
+                />
+                <span class="failed-bar"
+                      :style="{ width: `${failedPercentage}%` }"
+                />
             </div>
         </div>
     </p-pane-layout>
@@ -48,14 +55,11 @@ import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { coral, green } from '@/styles/colors';
 
-
 import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
-
 
 const SUCCEEDED_COLOR = green[400];
 const FAILED_COLOR = coral[400];

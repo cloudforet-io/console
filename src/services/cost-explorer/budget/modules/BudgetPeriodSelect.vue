@@ -6,7 +6,8 @@
                        :invalid="!disableValidation && invalidState.startDates"
                        required
         >
-            <p-datetime-picker :selected-dates="startDates" data-type="yearToMonth"
+            <p-datetime-picker :selected-dates="startDates"
+                               data-type="yearToMonth"
                                :invalid="!disableValidation && invalidState.startDates"
                                :max-date="endDates[0] || ''"
                                @update:selectedDates="handleUpdateSelectedDates('startDates', $event)"
@@ -18,7 +19,8 @@
                        :invalid="!disableValidation && invalidState.endDates"
                        required
         >
-            <p-datetime-picker :selected-dates="endDates" data-type="yearToMonth"
+            <p-datetime-picker :selected-dates="endDates"
+                               data-type="yearToMonth"
                                :invalid="!disableValidation && invalidState.endDates"
                                :min-date="startDates[0] || ''"
                                @update:selectedDates="handleUpdateSelectedDates('endDates', $event)"
@@ -42,7 +44,6 @@ import { i18n } from '@/translations';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { Period } from '@/services/cost-explorer/type';
-
 
 interface Props {
     disableValidation?: boolean;

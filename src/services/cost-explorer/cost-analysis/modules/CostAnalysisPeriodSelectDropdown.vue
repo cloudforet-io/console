@@ -1,5 +1,7 @@
 <template>
-    <div class="cost-analysis-period-select-dropdown" :class="{responsive: !printMode}">
+    <div class="cost-analysis-period-select-dropdown"
+         :class="{responsive: !printMode}"
+    >
         <p-badge style-type="gray200">
             <p class="text">
                 {{ periodText }}
@@ -21,7 +23,6 @@
 
 <script lang="ts">
 
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -32,7 +33,6 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-
 import { i18n } from '@/translations';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
@@ -42,7 +42,6 @@ import { getInitialDates } from '@/services/cost-explorer/lib/helper';
 import CostManagementCustomRangeModal from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { Period, Granularity } from '@/services/cost-explorer/type';
-
 
 const today = dayjs.utc();
 interface PeriodItem {
@@ -124,7 +123,7 @@ export default {
                 },
             ])),
             periodMenuItems: computed<MenuItem[]>(() => {
-                const menuItems = state.periodItems.filter(d => d.enabled.includes(state.granularity));
+                const menuItems = state.periodItems.filter((d) => d.enabled.includes(state.granularity));
                 return [
                     ...menuItems,
                     {
@@ -176,7 +175,7 @@ export default {
             state.selectedPeriod = periodMenuName;
             if (periodMenuName === 'custom') state.customRangeModalVisible = true;
             else {
-                const selectedPeriodItem: PeriodItem = state.periodItems.find(d => d.name === periodMenuName);
+                const selectedPeriodItem: PeriodItem = state.periodItems.find((d) => d.name === periodMenuName);
                 setPeriod({
                     start: selectedPeriodItem.start.format(),
                     end: selectedPeriodItem.end.format(),

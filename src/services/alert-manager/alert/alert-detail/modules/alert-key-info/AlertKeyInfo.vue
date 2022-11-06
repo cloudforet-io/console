@@ -1,6 +1,7 @@
 <template>
     <p-pane-layout class="alert-detail-info border-none">
-        <p-definition-table :fields="fields" :data="data"
+        <p-definition-table :fields="fields"
+                            :data="data"
                             :skeleton-rows="10"
                             style-type="white"
                             block
@@ -19,23 +20,29 @@
                 </span>
             </template>
             <template #data-severity="{value}">
-                <p-badge outline :background-color="ALERT_SEVERITY_COLORS[value]">
+                <p-badge outline
+                         :background-color="ALERT_SEVERITY_COLORS[value]"
+                >
                     {{ ALERT_SEVERITY[value] || value }}
                 </p-badge>
             </template>
             <template #data-escalation_policy_id>
-                <p-anchor :to="{ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME }" highlight>
+                <p-anchor :to="{ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME }"
+                          highlight
+                >
                     {{ escalationPolicyName }}
                 </p-anchor>
             </template>
             <template #data-project_id>
-                <alert-info-project :id="id" :alert-data="data"
+                <alert-info-project :id="id"
+                                    :alert-data="data"
                                     :manage-disabled="manageDisabled"
                                     @update="$emit('update')"
                 />
             </template>
             <template #data-triggered_by="{ value }">
-                <alert-triggered-by :value="value" :project-id="data.project_id"
+                <alert-triggered-by :value="value"
+                                    :project-id="data.project_id"
                                     :webhook-reference="webhooks[value]"
                                     :user-reference="users[value]"
                                     disable-link
@@ -57,7 +64,10 @@
                     --
                 </span>
                 <template v-else>
-                    <p v-for="([k, v]) in Object.entries(value)" :key="k" class="additional-info">
+                    <p v-for="([k, v]) in Object.entries(value)"
+                       :key="k"
+                       class="additional-info"
+                    >
                         <b>{{ k }}</b>: {{ v }}
                     </p>
                 </template>
@@ -79,7 +89,6 @@ import {
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -98,7 +107,6 @@ import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/alert-manager/
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import { alertManagerStore } from '@/services/alert-manager/store';
 import type { AlertDataModel } from '@/services/alert-manager/type';
-
 
 export default {
     name: 'AlertKeyInfo',
@@ -174,7 +182,6 @@ export default {
             ]);
         })();
 
-
         return {
             ...toRefs(state),
             iso8601Formatter,
@@ -185,7 +192,6 @@ export default {
         };
     },
 };
-
 
 </script>
 

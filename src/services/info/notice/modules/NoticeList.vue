@@ -1,18 +1,24 @@
 <template>
     <div class="notice-list">
         <div class="notice-header">
-            <p-toolbox :pagination-visible="false" :page-size-changeable="false" :refreshable="false"
+            <p-toolbox :pagination-visible="false"
+                       :page-size-changeable="false"
+                       :refreshable="false"
                        @change="handleToolboxChange"
             >
                 <template #left-area>
-                    <p-select-dropdown v-if="domainName !== 'root'" :items="dropdownItems" :selected="selectedPostType"
+                    <p-select-dropdown v-if="domainName !== 'root'"
+                                       :items="dropdownItems"
+                                       :selected="selectedPostType"
                                        @update:selected="handleSearchPostTypeChange"
                     />
                 </template>
             </p-toolbox>
         </div>
         <p-divider />
-        <p-data-loader :data="noticeItems" :loading="loading">
+        <p-data-loader :data="noticeItems"
+                       :loading="loading"
+        >
             <ul class="list-wrapper">
                 <list-item v-for="(item, index) in noticeItems"
                            :key="`notice-${item.post_id}-${index}`"
@@ -24,14 +30,22 @@
                 />
             </ul>
             <template #no-data>
-                <div v-if="!searchText || !searchText.length" class="no-data">
-                    <img src="@/assets/images/illust_satellite.svg" class="no-data-img">
+                <div v-if="!searchText || !searchText.length"
+                     class="no-data"
+                >
+                    <img src="@/assets/images/illust_satellite.svg"
+                         class="no-data-img"
+                    >
                     <p class="no-data-text">
                         {{ $t('INFO.NOTICE.NO_NOTICES') }}
                     </p>
                 </div>
-                <div v-else class="no-data">
-                    <img src="@/assets/images/illust_ghost.svg" class="img-no-data-ghost">
+                <div v-else
+                     class="no-data"
+                >
+                    <img src="@/assets/images/illust_ghost.svg"
+                         class="img-no-data-ghost"
+                    >
                     <p class="no-data-text">
                         <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
                             <template #inputText>
@@ -54,7 +68,6 @@
 </template>
 
 <script lang="ts">
-
 
 import {
     computed, defineComponent, reactive, toRefs,
@@ -86,7 +99,6 @@ import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
 import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
 import type { NoticePostModel } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
-
 
 interface Props {
     noticeItems: any[];

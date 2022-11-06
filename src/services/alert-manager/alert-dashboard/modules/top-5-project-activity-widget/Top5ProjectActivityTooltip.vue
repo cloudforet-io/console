@@ -1,12 +1,22 @@
 <template>
-    <div class="top5-project-activity-tooltip" :class="status">
+    <div class="top5-project-activity-tooltip"
+         :class="status"
+    >
         <div class="tooltip-title-wrapper">
             <span class="title"><b>{{ $t('MONITORING.ALERT.DASHBOARD.ALERT') }}</b> ({{ totalCount }})</span>
             <span class="date">{{ dateFormatter(date) }}</span>
             <div class="alert-item-wrapper">
-                <p v-for="(alert, idx) in alerts" :key="`${projectId}-${date}-${idx}`" class="alert-item">
-                    <p-i :name="alert.urgency === 'HIGH' ? 'ic_alert' : 'ic_urgency_low'" width="0.75rem" height="0.75rem" />
-                    <span class="title" :class="{'urgency-high': alert.urgency === 'HIGH'}">{{ alert.title }}</span>
+                <p v-for="(alert, idx) in alerts"
+                   :key="`${projectId}-${date}-${idx}`"
+                   class="alert-item"
+                >
+                    <p-i :name="alert.urgency === 'HIGH' ? 'ic_alert' : 'ic_urgency_low'"
+                         width="0.75rem"
+                         height="0.75rem"
+                    />
+                    <span class="title"
+                          :class="{'urgency-high': alert.urgency === 'HIGH'}"
+                    >{{ alert.title }}</span>
                 </p>
             </div>
             <p v-if="moreCount">
@@ -17,7 +27,6 @@
 </template>
 
 <script lang="ts">
-
 
 import {
     onMounted, reactive, toRefs, computed,

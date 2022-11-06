@@ -3,7 +3,9 @@
         <template #loader>
             <p-skeleton height="100%" />
         </template>
-        <div ref="chartRef" class="chart" />
+        <div ref="chartRef"
+             class="chart"
+        />
     </p-data-loader>
 </template>
 
@@ -20,7 +22,6 @@ import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-
 
 import config from '@/lib/config';
 

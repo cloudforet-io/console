@@ -9,12 +9,15 @@
                           @update-form-data="handleUpdateForm"
         />
         <div class="text-right mt-4">
-            <p-button style-type="tertiary" class="mr-4"
+            <p-button style-type="tertiary"
+                      class="mr-4"
                       @click="$router.go(-1)"
             >
                 {{ $t('IAM.ROLE.FORM.CANCEL') }}
             </p-button>
-            <p-button style-type="primary" :loading="loading" :disabled="!isAllValid"
+            <p-button style-type="primary"
+                      :loading="loading"
+                      :disabled="!isAllValid"
                       @click="handleClickConfirm"
             >
                 {{ $t('IAM.ROLE.FORM.CREATE') }}
@@ -30,7 +33,6 @@ import { reactive, toRefs } from 'vue';
 import { PPageTitle, PButton } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';

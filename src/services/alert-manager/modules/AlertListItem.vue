@@ -51,7 +51,6 @@
 
 <script lang="ts">
 
-
 import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs,
@@ -61,7 +60,6 @@ import {
     PI, PBadge, PAnchor,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-
 
 import { store } from '@/store';
 

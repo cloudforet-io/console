@@ -1,10 +1,14 @@
 <template>
     <div>
-        <p-page-title child :title="pageTitle" class="page-title"
+        <p-page-title child
+                      :title="pageTitle"
+                      class="page-title"
                       @goBack="$router.go(-1)"
         />
-        <notification-add-form :protocol-id="protocolId" :protocol-type="protocolType"
-                               :supported-schema="supportedSchema" :user-id="userId"
+        <notification-add-form :protocol-id="protocolId"
+                               :protocol-type="protocolType"
+                               :supported-schema="supportedSchema"
+                               :user-id="userId"
         />
     </div>
 </template>
@@ -26,7 +30,6 @@ import NotificationAddForm from '@/services/notification/notification-add/module
 
 import TranslateResult = VueI18n.TranslateResult;
 
-
 export default {
     name: 'NotificationAddPage',
     components: {
@@ -44,7 +47,6 @@ export default {
             protocolType: computed(() => vm.$route.query.protocolType),
             supportedSchema: computed(() => vm.$route.query.supported_schema),
         });
-
 
         (async () => {
             const protocolLabel = decodeURIComponent(vm.$route.query?.protocolLabel as any);

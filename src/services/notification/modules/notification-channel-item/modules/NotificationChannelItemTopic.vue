@@ -1,12 +1,21 @@
 <template>
-    <li class="content-wrapper" :class="{'edit-mode': isEditMode}">
+    <li class="content-wrapper"
+        :class="{'edit-mode': isEditMode}"
+    >
         <span class="content-title">
             {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') }}
         </span>
-        <div v-if="isEditMode" class="content">
-            <add-notification-topic :topic="channelData.subscriptions" :topic-mode="channelData.is_subscribe" @change="onChangeTopic" />
+        <div v-if="isEditMode"
+             class="content"
+        >
+            <add-notification-topic :topic="channelData.subscriptions"
+                                    :topic-mode="channelData.is_subscribe"
+                                    @change="onChangeTopic"
+            />
             <div class="button-group">
-                <p-button style-type="secondary" size="sm" class="cancel-button"
+                <p-button style-type="secondary"
+                          size="sm"
+                          class="cancel-button"
                           @click="cancelEdit"
                 >
                     {{ $t('COMMON.TAGS.CANCEL') }}
@@ -20,10 +29,16 @@
                 </p-button>
             </div>
         </div>
-        <div v-else class="content">
+        <div v-else
+             class="content"
+        >
             <ul v-if="channelData.subscriptions.length > 0">
-                <li v-for="(item, index) in channelData.subscriptions" :key="`topic-${index}`">
-                    <p-badge style-type="gray200" shape="square">
+                <li v-for="(item, index) in channelData.subscriptions"
+                    :key="`topic-${index}`"
+                >
+                    <p-badge style-type="gray200"
+                             shape="square"
+                    >
                         <span v-if="item === 'monitoring.Alert'">Alert</span>
                         <span v-else-if="item === 'cost_analysis.Budget'">Budget</span>
                         <span v-else>{{ item }}</span>
@@ -31,11 +46,15 @@
                 </li>
             </ul>
             <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL') }}</span>
-            <button class="edit-button" :class="{'edit-disable':disableEdit}"
+            <button class="edit-button"
+                    :class="{'edit-disable':disableEdit}"
                     @click="startEdit(EDIT_TYPE.TOPIC)"
             >
-                <p-i name="ic_edit" width="1rem" height="1rem"
-                     color="inherit" class="edit-icon"
+                <p-i name="ic_edit"
+                     width="1rem"
+                     height="1rem"
+                     color="inherit"
+                     class="edit-icon"
                 />
                 <span class="edit-text">{{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}</span>
             </button>
@@ -58,7 +77,6 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AddNotificationTopic from '@/services/notification/modules/AddNotificationTopic.vue';
@@ -67,7 +85,6 @@ import {
     EDIT_TYPE,
     PROTOCOL_TYPE,
 } from '@/services/notification/modules/notification-channel-item/type';
-
 
 export default {
     name: 'NotificationChannelItemTopic',
@@ -109,7 +126,6 @@ export default {
             isEditMode: false,
 
         });
-
 
         const setUserChannelSubscription = async () => {
             try {

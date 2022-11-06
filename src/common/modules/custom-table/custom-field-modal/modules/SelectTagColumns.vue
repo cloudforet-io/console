@@ -1,24 +1,32 @@
 <template>
     <fragment>
-        <p-autocomplete-search v-model="search" :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_TAG')"
+        <p-autocomplete-search v-model="search"
+                               :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_TAG')"
                                :menu="allTagsMenuItems"
                                :loading="loading"
                                use-fixed-menu-style
                                @select-menu="onSelectTag"
         >
             <template #menu-item--format="{item, id}">
-                <p-check-box :id="id" v-model="selectedTagKeys" class="tag-menu-item"
+                <p-check-box :id="id"
+                             v-model="selectedTagKeys"
+                             class="tag-menu-item"
                              :value="item.name"
                 >
                     {{ item.label }}
                 </p-check-box>
             </template>
             <template #menu-no-data-format>
-                <div v-if="loading" class="fake-no-data" />
+                <div v-if="loading"
+                     class="fake-no-data"
+                />
             </template>
         </p-autocomplete-search>
         <div class="tag-box">
-            <p-tag v-for="(tag, i) in selectedTagKeys" :key="tag" @delete="onDeleteTag(i)">
+            <p-tag v-for="(tag, i) in selectedTagKeys"
+                   :key="tag"
+                   @delete="onDeleteTag(i)"
+            >
                 {{ tag ? tag.slice(TAGS_PREFIX.length) : '' }}
             </p-tag>
         </div>
@@ -74,14 +82,14 @@ export default defineComponent<Props>({
             search: '',
             proxySelectedKeys: useProxyValue('selectedKeys', props, emit),
             selectedTagKeys: computed<string[]>({
-                get: () => props.selectedKeys.filter(key => key.startsWith(TAGS_PREFIX)),
+                get: () => props.selectedKeys.filter((key) => key.startsWith(TAGS_PREFIX)),
                 set: (val: string[]) => {
                     state.proxySelectedKeys = props.selectedKeys
-                        .filter(key => !key.startsWith(TAGS_PREFIX))
+                        .filter((key) => !key.startsWith(TAGS_PREFIX))
                         .concat(val);
                 },
             }),
-            allTagsMenuItems: computed(() => props.allTags.map(d => ({
+            allTagsMenuItems: computed(() => props.allTags.map((d) => ({
                 name: `${TAGS_PREFIX}${d}`,
                 label: d,
                 type: 'item',
@@ -97,7 +105,7 @@ export default defineComponent<Props>({
 
         const onSelectTag = (item: Required<MenuItem>) => {
             state.search = '';
-            const idx = state.selectedTagKeys.findIndex(k => k === item.name);
+            const idx = state.selectedTagKeys.findIndex((k) => k === item.name);
             if (idx !== -1) {
                 onDeleteTag(idx);
             } else {

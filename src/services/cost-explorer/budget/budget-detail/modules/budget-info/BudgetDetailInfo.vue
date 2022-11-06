@@ -1,24 +1,36 @@
 <template>
     <section class="budget-detail-summary">
         <p-pane-layout class="summary-card">
-            <span v-if="!loading" class="summary-title">
+            <span v-if="!loading"
+                  class="summary-title"
+            >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.AMOUNT_PLANNING_TYPE') }} <span class="font-normal">({{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.PERIOD') }})</span>
             </span>
-            <div v-if="!loading" class="flex justify-between">
-                <p v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="summary-content">
+            <div v-if="!loading"
+                 class="flex justify-between"
+            >
+                <p v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL"
+                   class="summary-content"
+                >
                     <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
                 </p>
-                <p v-else class="summary-content">
+                <p v-else
+                   class="summary-content"
+                >
                     <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
                 </p>
-                <amount-planning-type-popover class="summary-content" :budget-data="budgetData">
+                <amount-planning-type-popover class="summary-content"
+                                              :budget-data="budgetData"
+                >
                     <span class="view-all">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DETAILS') }}</span>
                 </amount-planning-type-popover>
             </div>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
             <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TARGET') }}</span>
-            <p v-if="!loading" class="summary-content">
+            <p v-if="!loading"
+               class="summary-content"
+            >
                 <p-anchor v-if="budgetData.project_group_id || budgetData.project_id"
                           :to="referenceRouter(
                               (budgetData.project_id || budgetData.project_group_id),
@@ -30,9 +42,13 @@
         </p-pane-layout>
         <p-pane-layout class="summary-card">
             <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }}
-                <span v-if="!loading" class="text-gray-900 font-normal">{{ costTypeMap[costTypeKey] }}</span>
+                <span v-if="!loading"
+                      class="text-gray-900 font-normal"
+                >{{ costTypeMap[costTypeKey] }}</span>
             </span>
-            <p v-if="!loading" class="summary-content cost-type">
+            <p v-if="!loading"
+               class="summary-content cost-type"
+            >
                 <span class="cost-type-content">{{ processedCostTypeValue }}</span>
                 <budget-cost-type-popover
                     :cost-type-key="costTypeKey"
@@ -69,8 +85,7 @@ import {
 } from '@/services/cost-explorer/budget/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 
-
-const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
+const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
 const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
 
 const costTypeMap = {
@@ -120,7 +135,6 @@ export default {
             if (state.budgetData?.project_group_id) return state.projectGroups[state.budgetData.project_group_id]?.label ?? '';
             return 'No Item';
         };
-
 
         // LOAD REFERENCE STORE
         (async () => {

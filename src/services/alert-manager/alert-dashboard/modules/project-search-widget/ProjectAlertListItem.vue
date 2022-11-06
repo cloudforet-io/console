@@ -12,7 +12,9 @@
                              :show-status-message="true"
                              :user-reference="users[item.assignee]"
             />
-            <div v-else class="view-all-text">
+            <div v-else
+                 class="view-all-text"
+            >
                 <p-anchor :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: projectId } }"
                           :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_ALERTS')"
                           :icon-visible="false"
@@ -35,7 +37,6 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { store } from '@/store';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
@@ -45,7 +46,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-
 
 export default {
     name: 'ProjectAlertListItem',

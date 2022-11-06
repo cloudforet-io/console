@@ -1,10 +1,15 @@
 <template>
     <div class="cost-dashboard-page">
-        <div v-if="dashboardList.length" class="top-wrapper">
+        <div v-if="dashboardList.length"
+             class="top-wrapper"
+        >
             <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
                 <template #title-left-extra>
-                    <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC" name="ic_public" width="1rem"
-                         height="1rem" :color="PUBLIC_ICON_COLOR"
+                    <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC"
+                         name="ic_public"
+                         width="1rem"
+                         height="1rem"
+                         :color="PUBLIC_ICON_COLOR"
                     />
                 </template>
                 <template #title-right-extra>
@@ -14,7 +19,8 @@
                                        :disabled="!hasManagePermission && dashboardType === DASHBOARD_TYPE.PUBLIC"
                                        @click.stop="handleClickEditDashboard"
                         />
-                        <cost-dashboard-more-menu :dashboard-id="dashboardId" :dashboard="dashboard"
+                        <cost-dashboard-more-menu :dashboard-id="dashboardId"
+                                                  :dashboard="dashboard"
                                                   :manage-disabled="!hasManagePermission"
                         />
                     </div>
@@ -26,10 +32,14 @@
                                                                    :manage-disabled="!hasManagePermission"
                             />
                             <div class="left-divider download-pdf">
-                                <pdf-download-button icon-only @click="handleClickPdfDownload" />
+                                <pdf-download-button icon-only
+                                                     @click="handleClickPdfDownload"
+                                />
                             </div>
                             <div class="left-divider">
-                                <p-button icon-left="ic_edit" style-type="tertiary" size="sm"
+                                <p-button icon-left="ic_edit"
+                                          style-type="tertiary"
+                                          size="sm"
                                           :disabled="!hasManagePermission && dashboardType === DASHBOARD_TYPE.PUBLIC"
                                           @click.stop="handleClickCustomize"
                                 >
@@ -40,7 +50,10 @@
                     </div>
                 </template>
             </p-page-title>
-            <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" :manage-disabled="!hasManagePermission" />
+            <cost-dashboard-filter :dashboard-id="dashboardId"
+                                   :filters.sync="filters"
+                                   :manage-disabled="!hasManagePermission"
+            />
         </div>
         <div v-if="!loading && !dashboardListLoading">
             <dashboard-layouts
@@ -52,11 +65,16 @@
                 :currency="currency"
                 :currency-rates="currencyRates"
             />
-            <div v-else class="empty-dashboard">
-                <img src="@/assets/images/illust_circle_boy.svg" class="empty-img">
+            <div v-else
+                 class="empty-dashboard"
+            >
+                <img src="@/assets/images/illust_circle_boy.svg"
+                     class="empty-img"
+                >
                 <span class="empty-text">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.NO_SAVED_DASHBOARD_FOUND') }}</span>
                 <p-button v-if="hasManagePermission"
-                          icon-left="ic_plus" style-type="substitutive"
+                          icon-left="ic_plus"
+                          style-type="substitutive"
                           @click="handleClickCreate"
                 >
                     <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE_DASHBOARD') }}</span>
@@ -68,7 +86,10 @@
                                      :dashboard-name="dashboard.name"
                                      @confirm="handleUpdateConfirm"
         />
-        <pdf-download-overlay v-model="visiblePdfDownload" :items="previewItems" :file-name="pdfFileName">
+        <pdf-download-overlay v-model="visiblePdfDownload"
+                              :items="previewItems"
+                              :file-name="pdfFileName"
+        >
             <cost-dashboard-preview v-if="dashboardId"
                                     :dashboard-id="dashboardId"
                                     :period="period"
@@ -92,10 +113,8 @@ import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-
 
 import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
 import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
@@ -126,7 +145,7 @@ const PUBLIC_ICON_COLOR = gray[500];
 const validateDashboardId = async (dashboardId): Promise<boolean> => {
     await costExplorerStore.dispatch('setDashboardList');
     const dashboardList = costExplorerStore.getters.dashboardList;
-    const targetDashboard = dashboardList.find(item => item.dashboard_id === dashboardId);
+    const targetDashboard = dashboardList.find((item) => item.dashboard_id === dashboardId);
     return !!targetDashboard;
 };
 
@@ -203,7 +222,7 @@ export default {
         };
 
         const handlePreviewRendered = (elements: HTMLElement[]) => {
-            state.previewItems = elements.map(element => ({ element, type: 'image' }));
+            state.previewItems = elements.map((element) => ({ element, type: 'image' }));
         };
 
         const fetchDashboard = async (dashboardId: string): Promise<DashboardInfo> => {
@@ -241,7 +260,6 @@ export default {
             state.loading = false;
         };
 
-
         watch([() => props.dashboardId, () => state.homeDashboardId], async ([dashboardId, homeDashboardId], before) => {
             if (!dashboardId) {
                 if (homeDashboardId) {
@@ -268,7 +286,6 @@ export default {
                 state.dashboard.period_type = after[1];
             }
         });
-
 
         return {
             ...toRefs(state),

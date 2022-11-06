@@ -142,7 +142,6 @@ export default class TokenAPI {
         return Math.floor(Date.now() / 1000);
     }
 
-
     private setAxiosInterceptors(): void {
         // Axios request interceptor to set the refresh token
         this.refreshInstance.interceptors.request.use((request) => {
@@ -157,7 +156,7 @@ export default class TokenAPI {
         });
         this.refreshInstance.interceptors.response.use(
             (response: AxiosResponse) => response,
-            error => Promise.reject(error),
+            (error) => Promise.reject(error),
         );
     }
 }

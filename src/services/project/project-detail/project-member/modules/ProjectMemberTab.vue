@@ -13,10 +13,14 @@
                          @refresh="handleChangeTable()"
         >
             <template #toolbox-top>
-                <p-panel-top :title="$t('PROJECT.DETAIL.MEMBER_TITLE')" use-total-count :total-count="totalCount" />
+                <p-panel-top :title="$t('PROJECT.DETAIL.MEMBER_TITLE')"
+                             use-total-count
+                             :total-count="totalCount"
+                />
             </template>
             <template #toolbox-left>
-                <p-button style-type="primary" class="mr-4 add-btn"
+                <p-button style-type="primary"
+                          class="mr-4 add-btn"
                           icon-left="ic_plus_bold"
                           :disabled="manageDisabled"
                           @click="handleClickInviteMember"
@@ -40,7 +44,9 @@
             </template>
             <template #col-labels-format="{ value }">
                 <p v-if="value.length === 0" />
-                <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
+                <p-badge v-for="(label, idx) in value"
+                         :key="idx"
+                         style-type="gray200"
                          class="mr-2"
                 >
                     {{ label }}
@@ -48,13 +54,19 @@
             </template>
         </p-toolbox-table>
 
-        <project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" :is-project-group="isProjectGroup"
+        <project-member-add-modal v-if="memberAddFormVisible"
+                                  :visible.sync="memberAddFormVisible"
+                                  :is-project-group="isProjectGroup"
                                   :project-id="projectId"
-                                  :project-group-id="projectGroupId" @confirm="handleConfirm"
+                                  :project-group-id="projectGroupId"
+                                  @confirm="handleConfirm"
         />
-        <project-member-update-modal v-if="memberUpdateFormVisible" :visible.sync="memberUpdateFormVisible" :selected-member="selectedItems[0]"
+        <project-member-update-modal v-if="memberUpdateFormVisible"
+                                     :visible.sync="memberUpdateFormVisible"
+                                     :selected-member="selectedItems[0]"
                                      :project-id="projectId"
-                                     :is-project-group="isProjectGroup" :project-group-id="projectGroupId"
+                                     :is-project-group="isProjectGroup"
+                                     :project-group-id="projectGroupId"
                                      @confirm="handleConfirm"
         />
         <p-table-check-modal
@@ -111,7 +123,6 @@ import ProjectMemberUpdateModal
     from '@/services/project/project-detail/project-member/modules/ProjectMemberUpdateModal.vue';
 import type { MemberItem } from '@/services/project/project-detail/project-member/type';
 
-
 interface MemberDataTableItem extends MemberItem {
     user_id: string;
     assigned: string;
@@ -160,7 +171,7 @@ export default {
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
         });
         const state = reactive({
-            searchText: apiQueryHelper.filters.map(d => d.v).join(' ') || '',
+            searchText: apiQueryHelper.filters.map((d) => d.v).join(' ') || '',
             selectIndex: [] as number[],
             fields: [
                 { label: 'User ID', name: 'user_id' },
@@ -172,7 +183,7 @@ export default {
             items: [] as MemberDataTableItem[],
             loading: true,
             totalCount: 0,
-            selectedItems: computed(() => state.selectIndex.map(i => state.items[i])),
+            selectedItems: computed(() => state.selectIndex.map((i) => state.items[i])),
             dropdownMenu: computed(() => ([
                 {
                     type: 'item',
@@ -191,8 +202,8 @@ export default {
                     disabled: !state.selectedItems.length
                         || (
                             props.isProjectGroup
-                                ? !!state.selectedItems.find(d => props.projectGroupId !== d.project_group_info?.project_group_id)
-                                : !!state.selectedItems.find(d => !!d.project_group_info)
+                                ? !!state.selectedItems.find((d) => props.projectGroupId !== d.project_group_info?.project_group_id)
+                                : !!state.selectedItems.find((d) => !!d.project_group_info)
                         ),
                 },
             ] as MenuItem[])),
@@ -256,7 +267,7 @@ export default {
             try {
                 await SpaceConnector.client.identity.project.member.remove({
                     project_id: props.projectId,
-                    users: items.map(it => it.resource_id),
+                    users: items.map((it) => it.resource_id),
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
             } catch (e) {
@@ -267,7 +278,7 @@ export default {
             try {
                 await SpaceConnector.client.identity.projectGroup.member.remove({
                     project_group_id: props.projectGroupId,
-                    users: items.map(it => it.resource_id),
+                    users: items.map((it) => it.resource_id),
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
             } catch (e) {

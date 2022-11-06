@@ -9,7 +9,6 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
 const createFavorite = async (itemType: FavoriteType, itemId: string) => {
     try {
         await SpaceConnector.client.addOns.favorite.create({
@@ -84,7 +83,7 @@ export const load: Action<FavoriteState, any> = async ({ state, commit }, itemTy
         const { results } = await SpaceConnector.client.addOns.favorite.list({
             type: itemType,
         });
-        const favorites: FavoriteConfig[] = results.map(d => ({
+        const favorites: FavoriteConfig[] = results.map((d) => ({
             itemType: d.data.type,
             itemId: d.data.id,
         }));

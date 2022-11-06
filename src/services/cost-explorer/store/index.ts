@@ -29,5 +29,4 @@ export const costExplorerStoreModule: Module<CostExplorerState, any> = {
     mutations,
 };
 
-
 export const costExplorerStore: CostExplorerStore = {} as CostExplorerStore;

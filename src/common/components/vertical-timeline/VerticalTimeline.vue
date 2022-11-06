@@ -1,19 +1,30 @@
 <template>
-    <div class="vertical-timeline" :class="{selected: selected}" @click="handleClickTimeline">
-        <div class="timeline-item" :class="[{'last-item': isLastItem}]">
+    <div class="vertical-timeline"
+         :class="{selected: selected}"
+         @click="handleClickTimeline"
+    >
+        <div class="timeline-item"
+             :class="[{'last-item': isLastItem}]"
+        >
             <div class="date">
                 {{ getTimezoneDate(date, timezone) }}
             </div>
             <div class="vertical-line">
                 <div class="line" />
-                <div class="circle" :class="color" />
+                <div class="circle"
+                     :class="color"
+                />
             </div>
             <div class="item-detail">
                 <div class="title-wrapper">
-                    <div class="title-left" :class="{ vertical: isTitleVertical }">
+                    <div class="title-left"
+                         :class="{ vertical: isTitleVertical }"
+                    >
                         <div>
                             <span class="title">{{ title }}</span>
-                            <p-badge v-if="count" :style-type="getBadgeStyleType(color)">
+                            <p-badge v-if="count"
+                                     :style-type="getBadgeStyleType(color)"
+                            >
                                 {{ count }}
                             </p-badge>
                         </div>
@@ -38,7 +49,6 @@ import {
 import dayjs from 'dayjs';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
-
 
 interface Props {
     date: string;

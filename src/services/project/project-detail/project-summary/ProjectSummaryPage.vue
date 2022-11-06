@@ -1,11 +1,22 @@
 <template>
     <div class="grid grid-cols-12 project-dashboard-page">
-        <project-all-summary class="col-span-12" :project-id="id" />
+        <project-all-summary class="col-span-12"
+                             :project-id="id"
+        />
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
-            <project-alert-widget v-if="hasAlertConfig" class="col-span-12" :project-id="id" />
-            <project-billing class="col-span-12" :project-id="id" />
-            <project-personal-health-dashboard class="col-span-12" :project-id="id" />
-            <project-service-accounts class="col-span-12 service-accounts-table" :project-id="id" />
+            <project-alert-widget v-if="hasAlertConfig"
+                                  class="col-span-12"
+                                  :project-id="id"
+            />
+            <project-billing class="col-span-12"
+                             :project-id="id"
+            />
+            <project-personal-health-dashboard class="col-span-12"
+                                               :project-id="id"
+            />
+            <project-service-accounts class="col-span-12 service-accounts-table"
+                                      :project-id="id"
+            />
         </div>
         <div class="col-span-12 lg:col-span-3 grid grid-cols-12 right-part">
             <daily-updates class="col-span-12 daily-updates"
@@ -29,7 +40,6 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -42,7 +52,6 @@ import ProjectBilling from '@/services/project/project-detail/project-summary/mo
 import ProjectPersonalHealthDashboard from '@/services/project/project-detail/project-summary/modules/ProjectPersonalHealthDashboard.vue';
 import ProjectServiceAccounts from '@/services/project/project-detail/project-summary/modules/ProjectServiceAccounts.vue';
 import ProjectTrustedAdvisor from '@/services/project/project-detail/project-summary/modules/ProjectTrustedAdvisor.vue';
-
 
 export default {
     name: 'ProjectDashboardPage',

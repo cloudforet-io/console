@@ -1,35 +1,52 @@
 <template>
-    <li class="content-wrapper" :class="{'edit-mode': isEditMode}">
+    <li class="content-wrapper"
+        :class="{'edit-mode': isEditMode}"
+    >
         <p class="content-title">
             {{ $t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME') }}
         </p>
-        <div v-if="isEditMode" class="content">
+        <div v-if="isEditMode"
+             class="content"
+        >
             <p-field-group
                 required
                 :invalid-text="nameInvalidText"
                 :invalid="isNameInvalid"
                 class="base-info-input"
             >
-                <p-text-input v-model="dataForEdit" :invalid="isNameInvalid" />
+                <p-text-input v-model="dataForEdit"
+                              :invalid="isNameInvalid"
+                />
             </p-field-group>
             <div class="button-group">
-                <p-button style-type="secondary" size="sm" class="cancel-button"
+                <p-button style-type="secondary"
+                          size="sm"
+                          class="cancel-button"
                           @click="cancelEdit"
                 >
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
-                <p-button style-type="primary" size="sm" @click="onClickSave">
+                <p-button style-type="primary"
+                          size="sm"
+                          @click="onClickSave"
+                >
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
                 </p-button>
             </div>
         </div>
-        <div v-else class="content">
+        <div v-else
+             class="content"
+        >
             <p>{{ channelData.name }}</p>
-            <button class="edit-button" :class="{'edit-disable':disableEdit}"
+            <button class="edit-button"
+                    :class="{'edit-disable':disableEdit}"
                     @click="startEdit(EDIT_TYPE.NAME, channelData.name)"
             >
-                <p-i name="ic_edit" width="1rem" height="1rem"
-                     color="inherit" class="edit-icon"
+                <p-i name="ic_edit"
+                     width="1rem"
+                     height="1rem"
+                     color="inherit"
+                     class="edit-icon"
                 />
                 {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
             </button>
@@ -44,12 +61,10 @@ import {
     PButton, PI, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 
-
 import { i18n } from '@/translations';
 
 import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
 import { EDIT_TYPE, PARAM_KEY_TYPE } from '@/services/notification/modules/notification-channel-item/type';
-
 
 export default {
     name: 'NotificationChannelItemName',

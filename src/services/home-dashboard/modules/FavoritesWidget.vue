@@ -2,22 +2,32 @@
     <div class="favorites-widget">
         <p class="title">
             <span>{{ $t('COMMON.WIDGETS.FAVORITES_WIDGET.TITLE') }}</span>
-            <p-i class="icon" name="ic_bookmark" height="1rem"
+            <p-i class="icon"
+                 name="ic_bookmark"
+                 height="1rem"
                  width="1rem"
                  color="inherit"
             />
         </p>
         <div class="list-wrapper">
             <div class="label-wrapper">
-                <label v-for="(item, k) in Object.values(items)" :key="k">{{ item.label }}</label>
+                <label v-for="(item, k) in Object.values(items)"
+                       :key="k"
+                >{{ item.label }}</label>
             </div>
             <div class="item-wrapper">
-                <div v-for="(item, k) in Object.values(items)" :key="k" :style="{width}">
-                    <div v-if="item.favorites.length === 0" class="no-data">
+                <div v-for="(item, k) in Object.values(items)"
+                     :key="k"
+                     :style="{width}"
+                >
+                    <div v-if="item.favorites.length === 0"
+                         class="no-data"
+                    >
                         {{ $t('COMMON.WIDGETS.FAVORITES_WIDGET.NO_DATA') }}
                     </div>
                     <template v-else>
-                        <router-link v-for="d in item.favorites" :key="d.itemId"
+                        <router-link v-for="d in item.favorites"
+                                     :key="d.itemId"
                                      :to="referenceRouter(
                                          d.itemId, {
                                              resource_type: getResourceType(d.itemType),
@@ -30,10 +40,15 @@
                 </div>
             </div>
         </div>
-        <summary v-if="showToggle" class="toggle-btn" @click="handleClickToggle">
+        <summary v-if="showToggle"
+                 class="toggle-btn"
+                 @click="handleClickToggle"
+        >
             {{ isExpanded ? $t('COMMON.WIDGETS.FAVORITES_WIDGET.TOGGLE_LESS') : $t('COMMON.WIDGETS.FAVORITES_WIDGET.TOGGLE_MORE') }}
             <p-i :name="isExpanded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                 height="1rem" width="1rem" color="inherit transparent"
+                 height="1rem"
+                 width="1rem"
+                 color="inherit transparent"
             />
         </summary>
     </div>
@@ -61,7 +76,6 @@ import {
     convertProjectConfigToReferenceData, convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-
 
 type Item = Record<string, {label: TranslateResult; favorites: FavoriteItem[]}>;
 

@@ -6,14 +6,16 @@
                     {{ $t('MONITORING.ALERT.DASHBOARD.TOP_5_PROJECT_ACTIVITY') }}
                 </span>
                 <div class="legend-wrapper">
-                    <p-status v-for="(activityLabel, activity, idx) in alertActivity" :key="`status-${idx}`"
+                    <p-status v-for="(activityLabel, activity, idx) in alertActivity"
+                              :key="`status-${idx}`"
                               :icon-color="ACTIVITY_COLOR[activity]"
                               :text="activityLabel"
                     />
                 </div>
             </div>
             <div class="period-wrapper">
-                <p-select-status v-for="(period, idx) in periods" :key="`period-${idx}`"
+                <p-select-status v-for="(period, idx) in periods"
+                                 :key="`period-${idx}`"
                                  v-model="selectedPeriod"
                                  :value="period.name"
                                  :disable-check-icon="true"
@@ -23,9 +25,13 @@
             </div>
         </div>
         <div class="content-wrapper">
-            <p-skeleton v-if="loading" width="100%" height="100%" />
+            <p-skeleton v-if="loading"
+                        width="100%"
+                        height="100%"
+            />
             <template v-else>
-                <div v-for="(projectId, idx) in top5Projects" :key="`table-row-${idx}`"
+                <div v-for="(projectId, idx) in top5Projects"
+                     :key="`table-row-${idx}`"
                      class="table-row"
                 >
                     <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
@@ -33,15 +39,21 @@
                               size="sm"
                               class="col-name"
                     >
-                        <span v-tooltip.bottom="projectNameFormatter(projectId, projects)" class="tablet:hidden">{{ projectNameFormatter(projectId, projects) }}</span>
+                        <span v-tooltip.bottom="projectNameFormatter(projectId, projects)"
+                              class="tablet:hidden"
+                        >{{ projectNameFormatter(projectId, projects) }}</span>
                         <span class="tablet-text">{{ projectNameFormatter(projectId, projects) }}</span>
                     </p-anchor>
                     <div class="col-activity">
-                        <div v-for="(activity, aIdx) in activity[projectId]" :key="`activity-${aIdx}`"
+                        <div v-for="(activity, aIdx) in activity[projectId]"
+                             :key="`activity-${aIdx}`"
                              class="box-wrapper"
                              :class="activity.status ? activity.status : 'empty'"
                         >
-                            <div class="box" :class="activity.status ? activity.status : 'empty'" @click="onClickBox(projectId, activity.date)">
+                            <div class="box"
+                                 :class="activity.status ? activity.status : 'empty'"
+                                 @click="onClickBox(projectId, activity.date)"
+                            >
                                 <top5-project-activity-tooltip
                                     :project-id="projectId"
                                     :status="activity.status"
@@ -73,7 +85,6 @@ import { find } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -87,7 +98,6 @@ import { red, yellow } from '@/styles/colors';
 
 import Top5ProjectActivityTooltip from '@/services/alert-manager/alert-dashboard/modules/top-5-project-activity-widget/Top5ProjectActivityTooltip.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-
 
 const ACTIVITY = {
     HIGH: 'HIGH',
@@ -184,7 +194,7 @@ export default {
             }
             return activities;
         };
-        const periodNumberFormatter = period => parseInt(period.match(/\d+/)[0]);
+        const periodNumberFormatter = (period) => parseInt(period.match(/\d+/)[0]);
         const projectNameFormatter = (projectId: string, projects: ProjectReferenceMap) => projects[projectId]?.label || projectId;
 
         /* api */
@@ -193,7 +203,7 @@ export default {
                 const { results } = await SpaceConnector.client.monitoring.dashboard.top5ProjectActivityList({
                     period: state.selectedPeriod,
                 });
-                state.top5Projects = results.map(d => d.project_id);
+                state.top5Projects = results.map((d) => d.project_id);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.top5Projects = [];
@@ -240,7 +250,7 @@ export default {
         watch(() => state.selectedPeriod, async () => {
             state.loading = true;
             await getTop5ProjectList();
-            await Promise.all(state.top5Projects.map(d => getActivities(d)));
+            await Promise.all(state.top5Projects.map((d) => getActivities(d)));
             state.loading = false;
         }, { immediate: true });
 

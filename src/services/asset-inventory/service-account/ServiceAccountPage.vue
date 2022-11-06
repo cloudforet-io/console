@@ -5,7 +5,9 @@
                       :total-count="typeOptionState.totalCount"
                       class="page-title"
         />
-        <service-account-provider-list :provider-list="providerList" :selected-provider.sync="selectedProvider" />
+        <service-account-provider-list :provider-list="providerList"
+                                       :selected-provider.sync="selectedProvider"
+        />
         <p-dynamic-layout v-if="tableState.schema"
                           class="service-account-table"
                           type="query-search-table"
@@ -35,7 +37,8 @@
             <template #toolbox-bottom>
                 <div class="account-type-filter">
                     <span class="label">{{ $t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE') }}</span>
-                    <p-select-status v-for="(status, idx) in tableState.accountTypeList" :key="`${status.name}-${idx}`"
+                    <p-select-status v-for="(status, idx) in tableState.accountTypeList"
+                                     :key="`${status.name}-${idx}`"
                                      :selected="tableState.selectedAccountType"
                                      :value="status.name"
                                      :multi-selectable="false"
@@ -173,7 +176,7 @@ export default {
             }
             const fields = tableState.schema?.options?.fields;
             if (fields) {
-                apiQuery.setOnly(...fields.map(d => d.key).filter(d => !d.startsWith('tags.')), 'service_account_id', 'tags');
+                apiQuery.setOnly(...fields.map((d) => d.key).filter((d) => !d.startsWith('tags.')), 'service_account_id', 'tags');
             }
             return apiQuery.data;
         };

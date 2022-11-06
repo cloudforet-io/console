@@ -4,16 +4,20 @@
                        :loading="loading"
                        :class="{ loading: loading && !items.length }"
         >
-            <div ref="noticeItemsRef" class="content-wrapper">
+            <div ref="noticeItemsRef"
+                 class="content-wrapper"
+            >
                 <template v-if="!!pinnedItems.length">
                     <div class="pinned-header-wrapper">
                         <p-i name="ic_pin"
-                             width="1rem" height="1rem"
+                             width="1rem"
+                             height="1rem"
                              class="mr-1"
                         />
                         <span class="label">{{ $t('COMMON.GNB.NOTICE.PINNED_NOTICE') }}</span>
                     </div>
-                    <g-n-b-noti-item v-for="(item, idx) in pinnedItems" :key="`${item.postId}-${idx}`"
+                    <g-n-b-noti-item v-for="(item, idx) in pinnedItems"
+                                     :key="`${item.postId}-${idx}`"
                                      :title="item.title"
                                      :created-at="item.createdAt"
                                      :is-read="isReadMap[item.postId]"
@@ -22,7 +26,8 @@
                     />
                     <p-divider class="divider" />
                 </template>
-                <g-n-b-noti-item v-for="(item, idx) in items" :key="`${item.postId}-${idx}`"
+                <g-n-b-noti-item v-for="(item, idx) in items"
+                                 :key="`${item.postId}-${idx}`"
                                  :title="item.title"
                                  :created-at="item.createdAt"
                                  :is-read="isReadMap[item.postId]"
@@ -31,13 +36,17 @@
                 />
             </div>
             <div class="view-all-button-wrapper">
-                <div class="view-all-button" @click="handleClickViewAllNotice">
+                <div class="view-all-button"
+                     @click="handleClickViewAllNotice"
+                >
                     {{ $t('COMMON.GNB.NOTICE.VIEW_ALL') }}
                 </div>
             </div>
             <template #no-data>
                 <div class="no-data">
-                    <img class="img" src="@/assets/images/illust_ghost.svg">
+                    <img class="img"
+                         src="@/assets/images/illust_ghost.svg"
+                    >
                     <p class="title">
                         {{ $t('COMMON.GNB.NOTICE.NO_NOTICE') }}
                     </p>
@@ -81,7 +90,6 @@ import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
 import type { NoticePostModel } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
 
-
 interface NoticeItem {
     postId: string;
     createdAt: TimeStamp;
@@ -114,18 +122,18 @@ export default {
             noticeItemsRef: null as HTMLElement|null,
             noticeData: [] as NoticePostModel[],
             items: computed<NoticeItem[]>(() => {
-                const filteredData = state.noticeData.filter(d => !d.options.is_pinned);
+                const filteredData = state.noticeData.filter((d) => !d.options.is_pinned);
                 return convertNoticeItem(filteredData);
             }),
             pinnedItems: computed<NoticeItem[]>(() => {
-                const filteredData = state.noticeData.filter(d => d.options.is_pinned);
+                const filteredData = state.noticeData.filter((d) => d.options.is_pinned);
                 return convertNoticeItem(filteredData);
             }),
             domainName: computed(() => store.state.domain.name),
         });
 
         /* Util */
-        const convertNoticeItem = (rawData: NoticePostModel[]): NoticeItem[] => rawData.map(d => ({
+        const convertNoticeItem = (rawData: NoticePostModel[]): NoticeItem[] => rawData.map((d) => ({
             postId: d.post_id,
             createdAt: d.created_at,
             title: d.title,
@@ -174,7 +182,6 @@ export default {
             emit('close');
             SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME }).catch(() => {});
         };
-
 
         /* Init */
         const init = async () => {

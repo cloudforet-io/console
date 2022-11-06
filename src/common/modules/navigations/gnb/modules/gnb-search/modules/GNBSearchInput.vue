@@ -1,5 +1,7 @@
 <template>
-    <div class="gnb-search-input" @click.stop="$emit('click')">
+    <div class="gnb-search-input"
+         @click.stop="$emit('click')"
+    >
         <p-i v-if="!isFocused"
              name="ic_search"
              height="1.5rem"
@@ -35,7 +37,6 @@ import {
 } from 'vue';
 
 import { PI } from '@spaceone/design-system';
-
 
 import { i18n } from '@/translations';
 
@@ -74,7 +75,6 @@ export default defineComponent<Props>({
             if (isFocused) state.inputRef.focus();
             else state.inputRef.blur();
         });
-
 
         return {
             ...toRefs(state),

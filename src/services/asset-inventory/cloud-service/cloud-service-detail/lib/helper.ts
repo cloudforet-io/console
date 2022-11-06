@@ -10,7 +10,7 @@ export const makeCustomValueHandler = (distinctKey: string, cloudServiceId: stri
             search: inputText,
         });
 
-        const filteredResults = results.filter(d => d.key.includes(inputText));
+        const filteredResults = results.filter((d) => d.key.includes(inputText));
         const filteredTotalCount = filteredResults.length;
         return {
             results: filteredResults.slice(0, 10).reduce((r, d) => {

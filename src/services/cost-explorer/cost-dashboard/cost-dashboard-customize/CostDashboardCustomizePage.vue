@@ -5,12 +5,19 @@
                 name="ic_back"
                 @click="handleClickCancel"
             />
-            <p-text-input v-model="dashboardTitle" block class="dashboard-title" />
+            <p-text-input v-model="dashboardTitle"
+                          block
+                          class="dashboard-title"
+            />
             <div class="button-group">
-                <p-button style-type="transparent" @click="handleClickCancel">
+                <p-button style-type="transparent"
+                          @click="handleClickCancel"
+                >
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CANCEL') }}
                 </p-button>
-                <p-button style-type="highlight" @click="handleClickSave">
+                <p-button style-type="highlight"
+                          @click="handleClickSave"
+                >
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SAVE') }}
                 </p-button>
             </div>
@@ -57,7 +64,6 @@ import type {
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { CostFiltersMap, Period } from '@/services/cost-explorer/type';
-
 
 export default {
     name: 'CostDashboardCustomizePage',
@@ -147,7 +153,7 @@ export default {
             if (!state.widgetPosition) return;
             if (!state.editingCustomLayout) return;
             state.editingCustomLayout[state.widgetPosition.row ?? ''].splice(state.widgetPosition.col, 1);
-            state.editingCustomLayout = state.editingCustomLayout.filter(row => row.length > 0);
+            state.editingCustomLayout = state.editingCustomLayout.filter((row) => row.length > 0);
             costExplorerStore.commit('dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
             costExplorerStore.commit('dashboard/setWidgetPosition', undefined);
             costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});

@@ -39,7 +39,9 @@
                 </p-select-dropdown>
             </template>
             <template #col-state-format="{value}">
-                <p-status v-bind="userStateFormatter(value)" class="capitalize" />
+                <p-status v-bind="userStateFormatter(value)"
+                          class="capitalize"
+                />
             </template>
             <template #col-last_accessed_at-format="{ value }">
                 <span v-if="value === -1">
@@ -57,8 +59,10 @@
             </template>
             <template #col-tags-format="{value}">
                 <template v-if="!!Object.keys(value).length">
-                    <p-badge v-for="([key, val], idx) in Object.entries(value)" :key="`${key}-${val}-${idx}`"
-                             style-type="gray200" class="mr-2"
+                    <p-badge v-for="([key, val], idx) in Object.entries(value)"
+                             :key="`${key}-${val}-${idx}`"
+                             style-type="gray200"
+                             class="mr-2"
                     >
                         {{ key }}: {{ val }}
                     </p-badge>
@@ -194,7 +198,7 @@ export default {
             selectedIndex: [],
             selectedUsers: computed(() => {
                 const users = [] as User[];
-                state.selectedIndex.map(d => users.push(state.users[d]));
+                state.selectedIndex.map((d) => users.push(state.users[d]));
                 return users;
             }) || [],
             isSelected: computed(() => state.selectedIndex.length > 0),
@@ -239,7 +243,7 @@ export default {
             isUpdateModalVisible: computed(() => administrationStore.getters['user/isUpdateModalVisible']),
         });
 
-        const getArrayWithNotDuplicatedItem = array => [...new Set(array)];
+        const getArrayWithNotDuplicatedItem = (array) => [...new Set(array)];
         const getUserType = (userType: UserType) => {
             let formattedUserType;
             if (userType === USER_TYPE.API_USER) formattedUserType = 'Console, API';
@@ -256,11 +260,11 @@ export default {
                     only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at', 'api_key_count', 'tags'],
                     include_role_binding: true,
                 });
-                state.users = res.results.map(d => ({
+                state.users = res.results.map((d) => ({
                     ...d,
                     api_key_count: d.api_key_count || 0,
                     user_type: getUserType(d.user_type),
-                    role_name: (getArrayWithNotDuplicatedItem(d.role_bindings.map(data => data.role_info.name))).join(', '),
+                    role_name: (getArrayWithNotDuplicatedItem(d.role_bindings.map((data) => data.role_info.name))).join(', '),
                     last_accessed_at: calculateTime(d.last_accessed_at, state.timezone),
                 }));
                 state.totalCount = res.total_count;
@@ -276,7 +280,7 @@ export default {
 
         const saveRoleOfSelectedUser = (index) => {
             const selectedUser = state.users[index];
-            const roleBindingsData = selectedUser.role_bindings?.find(data => data.role_info?.role_type === 'DOMAIN');
+            const roleBindingsData = selectedUser.role_bindings?.find((data) => data.role_info?.role_type === 'DOMAIN');
             if (roleBindingsData) userFormState.roleOfSelectedUser = roleBindingsData.role_info?.role_id;
             else userFormState.roleOfSelectedUser = '';
         };

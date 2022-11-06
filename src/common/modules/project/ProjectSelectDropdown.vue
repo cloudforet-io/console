@@ -48,7 +48,8 @@
                         <span>
                             <component :is="selectComponent"
                                        v-if="(node.data.item_type === 'PROJECT' && projectSelectable) || (node.data.item_type === 'PROJECT_GROUP' && projectGroupSelectable)"
-                                       :selected="selectedProjects" :value="node.data"
+                                       :selected="selectedProjects"
+                                       :value="node.data"
                                        :predicate="predicate"
                                        class="mr-1"
                                        @change="handleChangeSelectState(node, path, ...arguments)"
@@ -86,7 +87,6 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
@@ -99,7 +99,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { ProjectGroup } from '@/services/asset-inventory/service-account/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import type { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/type';
-
 
 export default {
     name: 'ProjectSelectDropdown',
@@ -155,7 +154,7 @@ export default {
             root: null as ProjectTreeRoot|null,
             // selected states
             selectedProjectItems: [] as ProjectTreeItem[],
-            selectedProjects: computed<ProjectItemResp[]>(() => state.selectedProjectItems.map(d => d.node.data)),
+            selectedProjects: computed<ProjectItemResp[]>(() => state.selectedProjectItems.map((d) => d.node.data)),
             _selectedProjectIds: [...props.selectedProjectIds] as string[],
             selectedItems: computed<MenuItem[]>({
                 get() {
@@ -163,13 +162,13 @@ export default {
                         ...storeState.projects,
                         ...storeState.projectGroups,
                     };
-                    return state._selectedProjectIds.map(id => ({
+                    return state._selectedProjectIds.map((id) => ({
                         name: id,
                         label: items[id]?.label,
                     }));
                 },
                 set(val) {
-                    state._selectedProjectIds = val.map(d => d.name);
+                    state._selectedProjectIds = val.map((d) => d.name);
                 },
             }),
             selectComponent: computed(() => {
@@ -196,15 +195,15 @@ export default {
         const findNodes = async () => {
             if (!state.root) return;
 
-            const pathList: string[][] = await Promise.all(props.selectedProjectIds.map(d => getSearchPath(d, props.projectGroupSelectable ? 'PROJECT_GROUP' : 'PROJECT')));
-            const predicateList = pathList.map(paths => paths.map(d => (data => data.id === d)));
+            const pathList: string[][] = await Promise.all(props.selectedProjectIds.map((d) => getSearchPath(d, props.projectGroupSelectable ? 'PROJECT_GROUP' : 'PROJECT')));
+            const predicateList = pathList.map((paths) => paths.map((d) => ((data) => data.id === d)));
             await state.root.fetchAndFindNodes(predicateList);
         };
 
         /* Tree props */
         const predicate = (current, data) => current?.id === data.id;
         const toggleOptions = {
-            validator: node => node.data.item_type === 'PROJECT_GROUP' && (node.data.has_child || node.children.length > 0),
+            validator: (node) => node.data.item_type === 'PROJECT_GROUP' && (node.data.has_child || node.children.length > 0),
             toggleOnNodeClick: true,
         };
         const selectOptions = computed(() => ({
@@ -216,7 +215,7 @@ export default {
         const dataSetter = (text, node) => {
             node.data.name = text;
         };
-        const dataGetter = node => node.data.name;
+        const dataGetter = (node) => node.data.name;
         const dataFetcher = async (node): Promise<ProjectGroup[]> => {
             try {
                 const params: any = {
@@ -257,7 +256,7 @@ export default {
             if (!props.multiSelectable && state.selectedProjectItems === selected) return;
 
             state.selectedProjectItems = selected;
-            state._selectedProjectIds = state.selectedProjects.map(d => d.id);
+            state._selectedProjectIds = state.selectedProjects.map((d) => d.id);
 
             if (!props.multiSelectable) {
                 if (state.visibleMenu) state.visibleMenu = false;
@@ -293,7 +292,6 @@ export default {
             handleUpdateVisibleMenu(false);
         };
 
-
         /* Watchers */
         watch(() => props.selectedProjectIds, async (after, before) => {
             if (after !== state._selectedProjectIds) {
@@ -301,7 +299,7 @@ export default {
 
                 /* when findNodes() has node delete function, this will be deprecated */
                 if (after.length < before.length) {
-                    const deletedId = before.filter(d => !after.includes(d))[0];
+                    const deletedId = before.filter((d) => !after.includes(d))[0];
                     const deletedIdx = state._selectedProjectIds.indexOf(deletedId);
                     handleDeleteTag(deletedId, deletedIdx);
                 }

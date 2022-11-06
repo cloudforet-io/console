@@ -1,20 +1,30 @@
 <template>
     <div class="cost-dashboard-customize-custom-widget-tab">
         <div class="left-area">
-            <p-data-loader class="widgets-area" :data="widgetList" :loading="loading">
+            <p-data-loader class="widgets-area"
+                           :data="widgetList"
+                           :loading="loading"
+            >
                 <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ widgetList.length }})</p-label>
                 <ul class="widget-list">
-                    <li v-for="(widget, idx) in widgetList" :key="`widget-${idx}-${widget.name}`" class="widget-card"
+                    <li v-for="(widget, idx) in widgetList"
+                        :key="`widget-${idx}-${widget.name}`"
+                        class="widget-card"
                         :class="{'selected' : selectedItem.widget_id === widget.widget_id}"
                         @click="handleSelectWidget(widget)"
                     >
                         <div class="card-header">
-                            <p-radio :selected="selectedWidget.name" :value="widget.name" @click="handleSelectWidget(widget)">
+                            <p-radio :selected="selectedWidget.name"
+                                     :value="widget.name"
+                                     @click="handleSelectWidget(widget)"
+                            >
                                 <span @click="handleSelectWidget(widget)">{{ widget.name }}</span>
                             </p-radio>
                         </div>
                         <div class="card-content">
-                            <img class="card-image" :src="require(`@/assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)">
+                            <img class="card-image"
+                                 :src="require(`@/assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)"
+                            >
                         </div>
                     </li>
                 </ul>
@@ -48,7 +58,8 @@
             <custom-widget-preview v-if="showPreview"
                                    :selected-item="selectedItem"
             />
-            <p-button v-if="Object.keys(selectedWidget).length" style-type="negative-outlined"
+            <p-button v-if="Object.keys(selectedWidget).length"
+                      style-type="negative-outlined"
                       class="btn-remove"
                       @click="handleClickRemoveWidget"
             >
@@ -87,7 +98,6 @@ import type { WidgetInfo, ChartType } from '@/services/cost-explorer/cost-dashbo
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
-
 
 const PAGE_SIZE = 6;
 

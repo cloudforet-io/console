@@ -1,7 +1,12 @@
 <template>
     <div class="monitoring">
-        <section v-if="!dataSourceId && dataTools.length > 1" class="data-source-section">
-            <p-select-button-group class="data-source-wrapper" :buttons="tools" :selected.sync="selectedToolId" />
+        <section v-if="!dataSourceId && dataTools.length > 1"
+                 class="data-source-section"
+        >
+            <p-select-button-group class="data-source-wrapper"
+                                   :buttons="tools"
+                                   :selected.sync="selectedToolId"
+            />
         </section>
         <section class="resource-section">
             <span class="title">
@@ -13,7 +18,9 @@
                 }) }}
             </span>
             <div>
-                <p-anchor v-for="resource in availableResources" :key="resource.id" class="legend"
+                <p-anchor v-for="resource in availableResources"
+                          :key="resource.id"
+                          class="legend"
                           :href="resource.link"
                 >
                     <template #left-extra>
@@ -42,23 +49,36 @@
             </div>
             <div class="inline-flex items-center">
                 <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.STATISTICS') }}</span>
-                <p-select-dropdown v-model="selectedStat" :items="statItems" />
-                <p-icon-button class="ml-4 flex-shrink-0" name="ic_refresh" @click="listMetricCharts" />
+                <p-select-dropdown v-model="selectedStat"
+                                   :items="statItems"
+                />
+                <p-icon-button class="ml-4 flex-shrink-0"
+                               name="ic_refresh"
+                               @click="listMetricCharts"
+                />
             </div>
         </section>
         <section class="chart-section">
-            <i18n path="COMMON.MONITORING.DISPLAY_TIMEZONE" tag="p" class="text-sm text-gray mb-12">
+            <i18n path="COMMON.MONITORING.DISPLAY_TIMEZONE"
+                  tag="p"
+                  class="text-sm text-gray mb-12"
+            >
                 <template #timezone>
                     <strong>{{ $t('COMMON.MONITORING.LOCAL_TIME') }}</strong>
                 </template>
             </i18n>
-            <p-spinner v-if="showLoader" size="xl" />
-            <div v-else-if="metrics.length === 0" class="text-center text-gray">
+            <p-spinner v-if="showLoader"
+                       size="xl"
+            />
+            <div v-else-if="metrics.length === 0"
+                 class="text-center text-gray"
+            >
                 {{ $t('COMMON.MONITORING.NO_METRICS') }}
             </div>
             <template v-else>
                 <div class="metric-chart-wrapper grid grid-cols-12">
-                    <metric-chart v-for="(item, index) in metricChartDataList" :key="index"
+                    <metric-chart v-for="(item, index) in metricChartDataList"
+                                  :key="index"
                                   :loading="item.loading"
                                   :labels="item.labels"
                                   :dataset="item.dataset"
@@ -70,7 +90,8 @@
                     />
                 </div>
                 <p-button v-if="metricChartDataList.length !== metrics.length"
-                          style-type="tertiary" class="more-btn"
+                          style-type="tertiary"
+                          class="more-btn"
                           @click="loadMoreMetricCharts"
                 >
                     {{ $t('COMMON.MONITORING.MORE') }}
@@ -101,7 +122,6 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -115,7 +135,6 @@ import type {
     AvailableResource,
     Metric, MetricChartData, StatisticsType, StatItem,
 } from '@/common/modules/monitoring/type';
-
 
 interface DataToolType {
     id: string;
@@ -145,7 +164,7 @@ export default {
             type: Array,
             default: () => [],
             validator(resources) {
-                return resources.every(resource => resource.id);
+                return resources.every((resource) => resource.id);
             },
         },
         selectedMetrics: {
@@ -164,7 +183,7 @@ export default {
             timezone: computed(() => store.state.user.timezone),
             dataTools: [],
             selectedToolId: '',
-            tools: computed<DataToolType[]>(() => state.dataTools.map(d => ({
+            tools: computed<DataToolType[]>(() => state.dataTools.map((d) => ({
                 name: d.id,
                 label: d.name,
             }))),
@@ -173,7 +192,7 @@ export default {
                 const tool = find(state.dataTools, { id: state.selectedToolId });
                 return tool ? tool.statisticsTypes : [STATISTICS_TYPE.AVERAGE];
             }),
-            statItems: computed<StatItem[]>(() => state.statisticsTypes.map(d => ({
+            statItems: computed<StatItem[]>(() => state.statisticsTypes.map((d) => ({
                 type: 'item', label: capitalize(d), name: d,
             }))),
             selectedStat: STATISTICS_TYPE.AVERAGE,
@@ -192,7 +211,7 @@ export default {
                 color: COLORS[idx],
                 link: vm.$router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
             }));
-            state.availableResources = sortBy(resources, m => m.name);
+            state.availableResources = sortBy(resources, (m) => m.name);
         };
         const getDataSource = async () => {
             try {
@@ -215,13 +234,13 @@ export default {
         const apiQuery = new ApiQueryHelper();
         const listDataSources = async () => {
             try {
-                apiQuery.setFilters([{ k: 'provider', o: '=', v: props.resources.map(d => d.provider) }]);
+                apiQuery.setFilters([{ k: 'provider', o: '=', v: props.resources.map((d) => d.provider) }]);
                 const res = await SpaceConnector.client.monitoring.dataSource.list({
                     monitoring_type: MONITORING_TYPE.METRIC,
                     query: apiQuery.data,
                 });
                 state.dataTools = chain(res.results)
-                    .map(d => ({
+                    .map((d) => ({
                         id: d.data_source_id,
                         name: d.name,
                         statisticsTypes: get(d, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.AVERAGE]),
@@ -248,12 +267,12 @@ export default {
 
                 const res = await SpaceConnector.client.monitoring.metric.list({
                     data_source_id: state.selectedToolId,
-                    resources: props.resources.map(d => d.id),
+                    resources: props.resources.map((d) => d.id),
                 }, {
                     cancelToken: resourceToken.token,
                 });
                 resourceToken = undefined;
-                state.metrics = sortBy(res.metrics, m => m.name);
+                state.metrics = sortBy(res.metrics, (m) => m.name);
             } catch (e: any) {
                 if (!axios.isCancel(e.axiosError)) {
                     ErrorHandler.handleError(e);
@@ -304,7 +323,7 @@ export default {
             if (state.availableResources.length === 0) return;
             try {
                 await Promise.all(
-                    range(start, state.metricChartDataList.length).map(i => getMetricChartData(state.metricChartDataList[i])),
+                    range(start, state.metricChartDataList.length).map((i) => getMetricChartData(state.metricChartDataList[i])),
                 );
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -318,7 +337,7 @@ export default {
 
             state.metricsLoading = true;
             if (props.selectedMetrics && props.selectedMetrics.length > 0) {
-                state.metrics = sortBy(props.selectedMetrics, m => m.name);
+                state.metrics = sortBy(props.selectedMetrics, (m) => m.name);
             } else {
                 await listMetrics();
             }
@@ -329,7 +348,6 @@ export default {
             initMetricChartData();
             await listMetricCharts();
         }, 300);
-
 
         /* event */
         const loadMoreMetricCharts = async () => {

@@ -2,7 +2,8 @@
     <div class="local-wrapper">
         <form class="form">
             <p-field-group :label="isDomainOwner ? $t('COMMON.SIGN_IN.ADMIN_ID') : $t('COMMON.SIGN_IN.USER_ID')"
-                           :invalid="isIdValid === false" required
+                           :invalid="isIdValid === false"
+                           required
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="userId"
@@ -29,7 +30,9 @@
                 </template>
             </p-field-group>
         </form>
-        <p-button :style-type="buttonStyleType" type="submit" size="lg"
+        <p-button :style-type="buttonStyleType"
+                  type="submit"
+                  size="lg"
                   class="sign-in-btn"
                   :loading="loading"
                   @click="signIn"
@@ -111,7 +114,6 @@ export default defineComponent({
                 validationState.passwordInvalidText = '';
             }
         };
-
 
         const signIn = async () => {
             state.loading = true;

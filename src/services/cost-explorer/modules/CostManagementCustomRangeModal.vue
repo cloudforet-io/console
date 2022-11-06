@@ -15,7 +15,9 @@
                            :help-text="settingsByGranularity.helpTextFrom"
                            required
             >
-                <p-datetime-picker class="datetime-picker" :data-type="granularity ? settingsByGranularity.dateType : datetimePickerDataType" :selected-dates.sync="startDate"
+                <p-datetime-picker class="datetime-picker"
+                                   :data-type="granularity ? settingsByGranularity.dateType : datetimePickerDataType"
+                                   :selected-dates.sync="startDate"
                                    :invalid="!!startDate.length && !!endDate.length && invalid"
                                    :min-date="fromDate.minDate"
                                    :max-date="fromDate.maxDate"
@@ -26,7 +28,9 @@
                            :help-text="settingsByGranularity.helpTextTo"
                            required
             >
-                <p-datetime-picker class="datetime-picker" :data-type="granularity ? settingsByGranularity.dateType : datetimePickerDataType" :selected-dates.sync="endDate"
+                <p-datetime-picker class="datetime-picker"
+                                   :data-type="granularity ? settingsByGranularity.dateType : datetimePickerDataType"
+                                   :selected-dates.sync="endDate"
                                    :invalid="!!startDate.length && !!endDate.length && invalid"
                                    :min-date="toDate.minDate"
                                    :max-date="toDate.maxDate"
@@ -44,7 +48,6 @@ import type { TranslateResult } from 'vue-i18n';
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
-
 
 import { i18n } from '@/translations';
 

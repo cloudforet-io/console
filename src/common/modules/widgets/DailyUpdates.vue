@@ -1,5 +1,7 @@
 <template>
-    <widget-layout class="daily-updates" overflow="auto">
+    <widget-layout class="daily-updates"
+                   overflow="auto"
+    >
         <template #title>
             <div class="top">
                 <p class="title">
@@ -11,12 +13,24 @@
             </div>
         </template>
         <template #default>
-            <div v-if="loading" class="overflow-hidden">
-                <div v-for="v in skeletons" :key="v" class="flex p-4 items-center">
-                    <p-skeleton width="2rem" height="2rem" class="mr-4 flex-shrink-0" />
+            <div v-if="loading"
+                 class="overflow-hidden"
+            >
+                <div v-for="v in skeletons"
+                     :key="v"
+                     class="flex p-4 items-center"
+                >
+                    <p-skeleton width="2rem"
+                                height="2rem"
+                                class="mr-4 flex-shrink-0"
+                    />
                     <div class="grid grid-cols-1 gap-1 w-full">
-                        <p-skeleton width="80%" height="0.625rem" />
-                        <p-skeleton width="100%" height="0.625rem" />
+                        <p-skeleton width="80%"
+                                    height="0.625rem"
+                        />
+                        <p-skeleton width="100%"
+                                    height="0.625rem"
+                        />
                     </div>
                 </div>
             </div>
@@ -25,60 +39,92 @@
                  class="w-full h-full flex items-center"
             >
                 <div class="no-data-wrapper">
-                    <img class="no-data-img" src="@/assets/images/illust_spaceship_3.svg">
+                    <img class="no-data-img"
+                         src="@/assets/images/illust_spaceship_3.svg"
+                    >
                     <p class="no-data-text">
                         {{ $t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA') }}
                     </p>
                 </div>
             </div>
 
-            <div v-else class="card-wrapper">
-                <div v-if="warningData.length > 0" class="daily-update-card-alert">
-                    <div v-for="(item, index) in warningData" :key="index"
+            <div v-else
+                 class="card-wrapper"
+            >
+                <div v-if="warningData.length > 0"
+                     class="daily-update-card-alert"
+                >
+                    <div v-for="(item, index) in warningData"
+                         :key="index"
                          class="daily-update-card"
                     >
                         <div>
                             <p-lazy-img :src="assetUrlConverter(item.icon)"
-                                        width="2rem" height="2rem"
+                                        width="2rem"
+                                        height="2rem"
                                         class="rounded flex-shrink-0 service-img"
                             />
                         </div>
-                        <p v-if="item.createdCount || item.deletedCount" class="daily-service">
+                        <p v-if="item.createdCount || item.deletedCount"
+                           class="daily-service"
+                        >
                             {{ item.title }}<br> <span class="font-bold text-sm">{{ item.totalCount || 0 }}</span>
                         </p>
-                        <router-link v-if="item.createdCount" :to="item.createdHref" class="daily-created-count">
+                        <router-link v-if="item.createdCount"
+                                     :to="item.createdHref"
+                                     class="daily-created-count"
+                        >
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
                             <span class="text-blue-600 font-bold text-sm">{{ item.createdCount || 0 }}
-                                <p-i v-if="item.isCreateWarning" name="ic_state_duplicated" width="0.75rem"
+                                <p-i v-if="item.isCreateWarning"
+                                     name="ic_state_duplicated"
+                                     width="0.75rem"
                                      height="0.75rem"
                                 />
                             </span>
                         </router-link>
-                        <router-link v-if="item.deletedCount" :to="item.deletedHref" class="daily-deleted-count">
+                        <router-link v-if="item.deletedCount"
+                                     :to="item.deletedHref"
+                                     class="daily-deleted-count"
+                        >
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
                             <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}
-                                <p-i v-if="item.isDeleteWarning" name="ic_state_duplicated" width="0.75rem"
+                                <p-i v-if="item.isDeleteWarning"
+                                     name="ic_state_duplicated"
+                                     width="0.75rem"
                                      height="0.75rem"
                                 />
                             </span>
                         </router-link>
                     </div>
                 </div>
-                <div v-for="(item, index) in data" :key="index" class="daily-update-card">
+                <div v-for="(item, index) in data"
+                     :key="index"
+                     class="daily-update-card"
+                >
                     <div>
                         <p-lazy-img :src="assetUrlConverter(item.icon)"
-                                    width="2rem" height="2rem"
+                                    width="2rem"
+                                    height="2rem"
                                     class="rounded flex-shrink-0 service-img"
                         />
                     </div>
-                    <p v-if="item.createdCount || item.deletedCount" class="daily-service">
+                    <p v-if="item.createdCount || item.deletedCount"
+                       class="daily-service"
+                    >
                         {{ item.title }}<br> <span class="text-sm font-bold">{{ item.totalCount || 0 }}</span>
                     </p>
-                    <router-link v-if="item.createdCount" :to="item.createdHref" class="daily-created-count">
+                    <router-link v-if="item.createdCount"
+                                 :to="item.createdHref"
+                                 class="daily-created-count"
+                    >
                         {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
                         <span class="text-blue-600 font-bold text-sm">{{ item.createdCount || 0 }}</span>
                     </router-link>
-                    <router-link v-if="item.deletedCount" :to="item.deletedHref" class="daily-deleted-count">
+                    <router-link v-if="item.deletedCount"
+                                 :to="item.deletedHref"
+                                 class="daily-deleted-count"
+                    >
                         {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
                         <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}</span>
                     </router-link>
@@ -112,7 +158,6 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 interface CloudServiceData {
     cloud_service_group: string;
@@ -252,7 +297,7 @@ export default {
             ]);
             const data = getConvertedCloudServiceData(state.cloudServiceData);
             state.warningData = getWarningData(data);
-            state.data = data.filter(x => !state.warningData.includes(x));
+            state.data = data.filter((x) => !state.warningData.includes(x));
         };
         init();
 

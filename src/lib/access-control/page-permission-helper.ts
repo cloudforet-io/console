@@ -17,7 +17,6 @@ import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 
 import type { RoleType } from '@/services/administration/iam/role/config';
 
-
 export const getDefaultPagePermissionList = (isDomainOwner: boolean, roleType?: RoleType): PagePermissionTuple[] => {
     if (isDomainOwner) return DOMAIN_OWNER_DEFAULT_PERMISSIONS;
     if (roleType === 'SYSTEM') return SYSTEM_USER_DEFAULT_PERMISSIONS;
@@ -32,7 +31,7 @@ export const getProperPermissionType = (permissionA: PagePermissionType = PAGE_P
 };
 
 const menuIdList = Object.keys(MENU_INFO_MAP) as MenuId[];
-export const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter(id => MENU_INFO_MAP[id]?.needPermissionByRole);
+export const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter((id) => MENU_INFO_MAP[id]?.needPermissionByRole);
 
 const permissionRequiredMenuIds: MenuId[] = getPermissionRequiredMenuIds();
 export const getPagePermissionMapFromRaw = (pagePermissions: RawPagePermission[]): PagePermissionMap => {
@@ -48,7 +47,7 @@ export const getPagePermissionMapFromRaw = (pagePermissions: RawPagePermission[]
             // in case of service wildcard
         } else if (page.endsWith('*')) {
             const menuId = page.replace('.*', '');
-            const menuIds = permissionRequiredMenuIds.filter(id => id.split('.')[0] === menuId);
+            const menuIds = permissionRequiredMenuIds.filter((id) => id.split('.')[0] === menuId);
             menuIds.forEach((id) => {
                 result[id] = getProperPermissionType(permission, result[id]);
             });
@@ -66,7 +65,7 @@ const hasPermissionToLNBItem = (lnbItem: LNBItem, pagePermissionList: PagePermis
 };
 export const filterLNBMenuByPermission = (menuSet: LNBMenu[], pagePermissionList: PagePermissionTuple[]): LNBMenu[] => menuSet.reduce((results, menuData) => {
     if (Array.isArray(menuData)) {
-        const filteredMenuData = menuData.filter(lnbItem => hasPermissionToLNBItem(lnbItem, pagePermissionList));
+        const filteredMenuData = menuData.filter((lnbItem) => hasPermissionToLNBItem(lnbItem, pagePermissionList));
         if (filteredMenuData.length) {
             results.push(filteredMenuData);
         }

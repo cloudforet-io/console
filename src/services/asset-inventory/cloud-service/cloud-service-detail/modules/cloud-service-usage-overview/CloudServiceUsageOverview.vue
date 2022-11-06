@@ -30,7 +30,6 @@
 
 <script lang="ts">
 
-
 import {
     computed,
     defineComponent,
@@ -48,12 +47,10 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { debounce, isEmpty } from 'lodash';
 
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Filter } from '@cloudforet/core-lib/space-connector/type';
-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -65,7 +62,6 @@ import type {
     CloudServiceTypeInfo,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import type { Period } from '@/services/cost-explorer/type';
-
 
 interface Props {
     cloudServiceTypeInfo: CloudServiceTypeInfo;
@@ -196,7 +192,6 @@ export default defineComponent<Props>({
             });
             state.dataLoading = false;
         }, 300);
-
 
         /* Event Handlers */
         const handleClickShowAll = () => {

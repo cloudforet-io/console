@@ -11,7 +11,6 @@ import { convertFiltersInToNewType, getInitialDates } from '@/services/cost-expl
 import type { CostAnalysisStoreState } from '@/services/cost-explorer/store/cost-analysis/type';
 import type { CostQuerySetModel, CostQuerySetOption } from '@/services/cost-explorer/type';
 
-
 export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = ({ commit }): void => {
     commit('setGranularity', GRANULARITY.ACCUMULATED);
     commit('setStack', false);
@@ -21,7 +20,6 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
     commit('setPeriod', getInitialDates());
     commit('setFilters', {});
 };
-
 
 export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit }, options: Partial<CostQuerySetOption>): void => {
     if (options.granularity) commit('setGranularity', options.granularity);

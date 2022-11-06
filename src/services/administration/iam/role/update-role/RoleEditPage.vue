@@ -10,12 +10,15 @@
                           @update-form-data="handleUpdateForm"
         />
         <div class="text-right mt-4">
-            <p-button style-type="secondary" class="mr-4"
+            <p-button style-type="secondary"
+                      class="mr-4"
                       @click="$router.go(-1)"
             >
                 {{ $t('IAM.ROLE.FORM.CANCEL') }}
             </p-button>
-            <p-button style-type="primary" :loading="loading" :disabled="!isAllValid"
+            <p-button style-type="primary"
+                      :loading="loading"
+                      :disabled="!isAllValid"
                       @click="handleClickConfirm"
             >
                 {{ $t('IAM.ROLE.FORM.SAVE') }}
@@ -42,7 +45,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { FORM_TYPE } from '@/services/administration/iam/role/config';
 import type { RoleData } from '@/services/administration/iam/role/type';
 import RoleUpdateForm from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
-
 
 export default {
     name: 'RoleEditPage',

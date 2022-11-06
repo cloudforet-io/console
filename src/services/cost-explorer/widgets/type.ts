@@ -41,7 +41,6 @@ export interface CostAnalyzeModel {
     [key: string]: any;
 }
 
-
 /* component props */
 export interface WidgetProps<Options = any> {
     widgetId?: string;

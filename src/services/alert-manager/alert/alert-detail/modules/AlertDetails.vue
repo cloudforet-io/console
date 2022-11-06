@@ -1,7 +1,8 @@
 <template>
     <section>
         <p-panel-top>{{ $t('PAGE_SCHEMA.BASE_INFO') }}</p-panel-top>
-        <p-definition-table :fields="fields" :data="data"
+        <p-definition-table :fields="fields"
+                            :data="data"
                             :skeleton-rows="7"
                             block
         >
@@ -23,7 +24,8 @@
             </template>
         </p-definition-table>
         <p-panel-top>{{ $t('MONITORING.ALERT.DETAIL.DETAILS.ADDITIONAL_INFO') }}</p-panel-top>
-        <p-definition-table :fields="additionalState.fields" :data="additionalState.data"
+        <p-definition-table :fields="additionalState.fields"
+                            :data="additionalState.data"
                             :skeleton-rows="7"
                             block
         />
@@ -45,7 +47,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { alertManagerStore } from '@/services/alert-manager/store';
-
 
 export default {
     name: 'AlertDetails',
@@ -76,7 +77,7 @@ export default {
             timezone: computed(() => store.state.user.timezone),
         });
 
-        const checkEmptyValue = (data: Record<string, any>) => Object.values(data).every(el => el.length === 0);
+        const checkEmptyValue = (data: Record<string, any>) => Object.values(data).every((el) => el.length === 0);
         const additionalState = reactive({
             fields: computed(() => map(additionalState.data, (d, k) => ({ name: k, label: k }))),
             // eslint-disable-next-line camelcase

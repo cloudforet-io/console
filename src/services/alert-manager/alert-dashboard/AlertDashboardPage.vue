@@ -2,14 +2,20 @@
     <div class="alert-dashboard-page">
         <p-page-title :title="$t('MONITORING.ALERT.DASHBOARD.DASHBOARD')" />
         <div class="widget-wrapper">
-            <alert-state-widget :activated-projects="activatedProjects" class="alert-state-widget" />
-            <alert-history-widget :activated-projects="activatedProjects" class="alert-history-widget" />
+            <alert-state-widget :activated-projects="activatedProjects"
+                                class="alert-state-widget"
+            />
+            <alert-history-widget :activated-projects="activatedProjects"
+                                  class="alert-history-widget"
+            />
             <h2 class="widget-title">
                 {{ $t('MONITORING.ALERT.DASHBOARD.PROJECT_HEALTH_BOARD') }}
             </h2>
             <current-project-status-widget class="current-project-status-widget" />
             <top5-project-activity-widget class="top5-project-activity-widget" />
-            <project-search-widget :activated-projects="activatedProjects" class="col-span-12" />
+            <project-search-widget :activated-projects="activatedProjects"
+                                   class="col-span-12"
+            />
         </div>
     </div>
 </template>
@@ -32,7 +38,6 @@ import CurrentProjectStatusWidget from '@/services/alert-manager/alert-dashboard
 import ProjectSearchWidget from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectSearchWidget.vue';
 import Top5ProjectActivityWidget from '@/services/alert-manager/alert-dashboard/modules/top-5-project-activity-widget/Top5ProjectActivityWidget.vue';
 
-
 export default {
     name: 'AlertDashboardPage',
     components: {
@@ -52,7 +57,7 @@ export default {
         const listProjectAlertConfig = async () => {
             try {
                 const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list();
-                state.activatedProjects = results.map(d => d.project_id);
+                state.activatedProjects = results.map((d) => d.project_id);
             } catch (e) {
             }
         };

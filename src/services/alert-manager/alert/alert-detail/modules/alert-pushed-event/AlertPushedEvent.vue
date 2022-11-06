@@ -10,20 +10,29 @@
             @refresh="onChange()"
         />
         <template v-if="itemList.length > 0">
-            <div v-for="(item, idx) in itemList" :key="item.event_id">
+            <div v-for="(item, idx) in itemList"
+                 :key="item.event_id"
+            >
                 <alert-vertical-timeline
-                    :key="item.event_id" :item="item" :timezone="timezone"
+                    :key="item.event_id"
+                    :item="item"
+                    :timezone="timezone"
                     :event-type="item.event_type"
                     :is-last-item="idx===itemList.length-1"
                     class="timeline"
                 >
                     <template #timeline-detail>
-                        <div class="list-item" @click="onOpenModal(item)">
+                        <div class="list-item"
+                             @click="onOpenModal(item)"
+                        >
                             <div class="list-item-title">
                                 <span class="severity">[{{ item.severity }}]</span>
                                 <span>{{ item.title }}</span>
-                                <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                                     color="inherit" class="svg-icon"
+                                <p-i name="ic_arrow_right"
+                                     width="1rem"
+                                     height="1rem"
+                                     color="inherit"
+                                     class="svg-icon"
                                 />
                             </div>
                             <p class="desc">
@@ -53,7 +62,8 @@
         >
             <template #body>
                 <div class="content-wrapper">
-                    <p-text-editor :code="selectedItem" class="code-block"
+                    <p-text-editor :code="selectedItem"
+                                   class="code-block"
                                    read-only
                                    folded
                     />
@@ -64,14 +74,22 @@
                     <p-button style-type="tertiary"
                               @click="onCopyClick"
                     >
-                        <p-i name="ic_copy" width="1em" height="1em"
-                             color="inherit transparent" class="mr-2"
+                        <p-i name="ic_copy"
+                             width="1em"
+                             height="1em"
+                             color="inherit transparent"
+                             class="mr-2"
                         />
                         {{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.COPY_ALL') }}
                     </p-button>
                     <transition name="fade">
-                        <div v-if="isAlertVisible" ref="alertRef" class="copy-button-alert">
-                            <p-i name="ic_state_active" color="white" width="1rem"
+                        <div v-if="isAlertVisible"
+                             ref="alertRef"
+                             class="copy-button-alert"
+                        >
+                            <p-i name="ic_state_active"
+                                 color="white"
+                                 width="1rem"
                                  height="1rem"
                             />
                             <span>{{ $t('COMPONENT.COPY_BUTTON.COPIED') }}</span>
@@ -99,13 +117,11 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
-
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
 import AlertVerticalTimeline
     from '@/services/alert-manager/alert/alert-detail/modules/alert-pushed-event/modules/AlertVerticalTimeline.vue';
 import type { Event } from '@/services/alert-manager/type';
-
 
 const PAGE_SIZE = 10;
 

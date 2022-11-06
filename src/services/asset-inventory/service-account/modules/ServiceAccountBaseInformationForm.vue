@@ -55,7 +55,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { BaseInformationForm, PageMode } from '@/services/asset-inventory/service-account/type';
 
-
 interface Props {
     editMode: PageMode;
     schema: any;
@@ -138,7 +137,7 @@ export default defineComponent<Props>({
             const { results } = await SpaceConnector.client.identity.serviceAccount.list({
                 only: 'name',
             });
-            state.serviceAccountNames = results.map(v => v.name);
+            state.serviceAccountNames = results.map((v) => v.name);
         };
 
         /* Event */

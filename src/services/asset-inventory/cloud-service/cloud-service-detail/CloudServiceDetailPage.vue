@@ -17,13 +17,18 @@
                       :selected-count="tableState.selectedItems.length"
                       @goBack="$router.go(-1)"
         />
-        <div v-if="!checkIsEmpty(overviewState.period)" class="filter-wrapper">
+        <div v-if="!checkIsEmpty(overviewState.period)"
+             class="filter-wrapper"
+        >
             <span class="filter-title">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTER') }}</span>
             <cloud-service-period-filter :period="overviewState.period"
                                          @update:period="handlePeriodUpdate"
             />
         </div>
-        <p-horizontal-layout :min-height="TABLE_MIN_HEIGHT" :height="tableState.tableHeight" @drag-end="handleTableHeightChange">
+        <p-horizontal-layout :min-height="TABLE_MIN_HEIGHT"
+                             :height="tableState.tableHeight"
+                             @drag-end="handleTableHeightChange"
+        >
             <template #container="{ height }">
                 <template v-if="tableState.schema">
                     <p-dynamic-layout type="query-search-table"
@@ -56,7 +61,9 @@
                                 {{ $t('INVENTORY.SERVER.MAIN.CONSOLE') }}
                             </p-button>
                         </template>
-                        <template v-if="!isServerPage" #toolbox-bottom>
+                        <template v-if="!isServerPage"
+                                  #toolbox-bottom
+                        >
                             <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"
                                                           :filters="tableState.searchFilters"
                                                           :period="overviewState.period"
@@ -89,7 +96,9 @@
                 <cloud-service-admin :cloud-service-project-id="tableState.selectedItems[0].project_id" />
             </template>
             <template #history>
-                <cloud-service-history :cloud-service-item="tableState.selectedItems[0]" :provider="tableState.selectedItems[0].provider" />
+                <cloud-service-history :cloud-service-item="tableState.selectedItems[0]"
+                                       :provider="tableState.selectedItems[0].provider"
+                />
             </template>
             <template #monitoring>
                 <monitoring :resources="monitoringState.resources" />
@@ -114,7 +123,9 @@
                 <monitoring :resources="monitoringState.resources" />
             </template>
         </p-tab>
-        <p-empty v-else style="height: auto; margin-top: 4rem;">
+        <p-empty v-else
+                 style="height: auto; margin-top: 4rem;"
+        >
             {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.NO_SELECTED') }}
         </p-empty>
         <p-table-check-modal v-if="checkTableModalState.visible"
@@ -144,7 +155,6 @@
 
 <script lang="ts">
 
-
 import { debouncedWatch } from '@vueuse/core';
 import {
     reactive, computed, getCurrentInstance, watch,
@@ -164,12 +174,10 @@ import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-displa
 import dayjs from 'dayjs';
 import { isEmpty, get } from 'lodash';
 
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -271,7 +279,7 @@ export default {
             hasManagePermission: useManagePermissionState(),
             schema: null as null|DynamicLayout,
             items: [],
-            selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
+            selectedItems: computed(() => typeOptionState.selectIndex.map((d) => tableState.items[d])),
             consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
             multiSchema: computed<null|DynamicLayout>(() => {
                 if (!tableState.schema) return null;
@@ -286,7 +294,7 @@ export default {
 
                 return res;
             }),
-            selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
+            selectedCloudServiceIds: computed(() => tableState.selectedItems.map((d) => d.cloud_service_id)),
             tableHeight: tableHeight > TABLE_MIN_HEIGHT ? tableHeight : TABLE_MIN_HEIGHT,
             visibleCustomFieldModal: false,
             searchFilters: computed<QueryStoreFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
@@ -375,7 +383,7 @@ export default {
             }
             const fields = schema?.options?.fields || tableState.schema?.options?.fields;
             if (fields) {
-                apiQuery.setOnly(...fields.map(d => d.key).filter(d => !d.startsWith('tags.')), 'reference.resource_id', 'reference.external_link', 'cloud_service_id', 'tags', 'provider');
+                apiQuery.setOnly(...fields.map((d) => d.key).filter((d) => !d.startsWith('tags.')), 'reference.resource_id', 'reference.external_link', 'cloud_service_id', 'tags', 'provider');
             }
 
             return apiQuery.data;
@@ -395,7 +403,7 @@ export default {
                 });
 
                 // filtering select index
-                typeOptionState.selectIndex = typeOptionState.selectIndex.filter(d => !!res.results[d]);
+                typeOptionState.selectIndex = typeOptionState.selectIndex.filter((d) => !!res.results[d]);
 
                 return { items: res.results, totalCount: res.total_count };
             } catch (e) {
@@ -437,7 +445,6 @@ export default {
             fetchTableData(changed);
         };
 
-
         const replaceQueryHelper = new QueryHelper();
         watch(() => tableState.searchFilters, (searchFilters) => {
             replaceQueryHelper.setFilters(searchFilters);
@@ -470,7 +477,6 @@ export default {
             }
             return {};
         };
-
 
         const reloadTable = async () => {
             tableState.schema = await getTableSchema();
@@ -516,7 +522,7 @@ export default {
             try {
                 await checkTableModalState.api({
                     ...checkTableModalState.params,
-                    cloud_services: tableState.selectedItems.map(item => item.cloud_service_id),
+                    cloud_services: tableState.selectedItems.map((item) => item.cloud_service_id),
                 });
                 showSuccessMessage(i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_S_CHECK_MODAL', { action: checkTableModalState.title }), '');
             } catch (e) {
@@ -529,17 +535,15 @@ export default {
             }
         };
 
-
         /* Monitoring Tab */
         const monitoringState: MonitoringProps = reactive({
             resourceType: 'inventory.CloudService',
-            resources: computed(() => tableState.selectedItems.map(d => ({
+            resources: computed(() => tableState.selectedItems.map((d) => ({
                 id: get(d, 'cloud_service_id'),
                 name: d.name,
                 provider: d.provider,
             }))) as unknown as MonitoringResourceType[],
         });
-
 
         /* Usage Overview */
         const handlePeriodUpdate = (period?: Period) => {
@@ -547,7 +551,7 @@ export default {
             replaceUrlQuery('period', objectToQueryString(period));
         };
 
-        const checkIsEmpty = data => isEmpty(data);
+        const checkIsEmpty = (data) => isEmpty(data);
 
         /* Watchers */
         watch(() => keyItemSets.value, (after) => {
@@ -561,7 +565,6 @@ export default {
             tableState.schema = await getTableSchema();
             await fetchTableData();
         }, { immediate: true, debounce: 200 });
-
 
         return {
             /* Sidebar */

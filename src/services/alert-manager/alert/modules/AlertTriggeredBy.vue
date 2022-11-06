@@ -1,6 +1,8 @@
 <template>
     <span>
-        <p-anchor v-if="link" :to="link">
+        <p-anchor v-if="link"
+                  :to="link"
+        >
             {{ label }}
         </p-anchor>
         <template v-else>

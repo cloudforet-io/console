@@ -4,7 +4,9 @@
               :class="{'selected': selected}"
         >
             <slot name="default">{{ title }}</slot>
-            <p-i v-if="styleType === SIDEBAR_STYLE.LINK" name="ic_arrow_right" width="1rem"
+            <p-i v-if="styleType === SIDEBAR_STYLE.LINK"
+                 name="ic_arrow_right"
+                 width="1rem"
                  height="1rem"
                  color="inherit transparent"
             />

@@ -1,5 +1,7 @@
 <template>
-    <div class="cost-explorer-filter-tags" :class="{'print-mode': printMode}">
+    <div class="cost-explorer-filter-tags"
+         :class="{'print-mode': printMode}"
+    >
         <template v-if="!tagItems.length">
             <slot name="no-filter">
                 <p-empty>
@@ -8,7 +10,8 @@
             </slot>
         </template>
         <template v-else>
-            <p-tag v-for="(item, idx) in tagItems" :key="`selected-tag-${idx}-${item.value}`"
+            <p-tag v-for="(item, idx) in tagItems"
+                   :key="`selected-tag-${idx}-${item.value}`"
                    :deletable="!printMode && deletable"
                    :category-item="hideCategory ? undefined : item.categoryItem"
                    :key-item="item.keyItem"
@@ -36,7 +39,6 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import type { CostFiltersMap } from '@/services/cost-explorer/type';
-
 
 interface Props {
     printMode: boolean;

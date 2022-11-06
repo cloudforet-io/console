@@ -23,28 +23,33 @@
                 <span class="image">
                     <p-lazy-img v-if="item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE"
                                 :src="item.icon || ''"
-                                width="1rem" height="1rem"
+                                width="1rem"
+                                height="1rem"
                     />
                     <p-i v-else
                          :name="item.icon"
-                         width="1rem" height="1rem"
+                         width="1rem"
+                         height="1rem"
                     />
                 </span>
                 <span class="texts">
                     <template v-if="item.parents">
                         <template v-for="(parent, pIdx) in item.parents">
-                            <text-highlighting :key="`parent-${parent.label}-${pIdx}`" class="text-item"
+                            <text-highlighting :key="`parent-${parent.label}-${pIdx}`"
+                                               class="text-item"
                                                :term="inputText"
                                                :text="parent.label"
                             />
                             <span :key="`arrow-${pIdx}`">
                                 <p-i name="ic_breadcrumb_arrow"
-                                     width="1rem" height="1rem"
+                                     width="1rem"
+                                     height="1rem"
                                 />
                             </span>
                         </template>
                     </template>
-                    <text-highlighting :key="`leaf-${item.label}`" class="text-item"
+                    <text-highlighting :key="`leaf-${item.label}`"
+                                       class="text-item"
                                        :term="inputText"
                                        :text="item.label"
                     />
@@ -58,8 +63,12 @@
                 </span>
             </p-tooltip>
         </template>
-        <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
-            <slot :name="slot" v-bind="scope" />
+        <template v-for="(_, slot) of $scopedSlots"
+                  #[slot]="scope"
+        >
+            <slot :name="slot"
+                  v-bind="scope"
+            />
         </template>
     </p-context-menu>
 </template>
@@ -75,13 +84,11 @@ import {
     PContextMenu, PI, PLazyImg, PTooltip,
 } from '@spaceone/design-system';
 
-
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import type { SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import type { FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
-
 
 interface Props {
     items: SuggestionItem[];

@@ -18,7 +18,8 @@
         >
             <template #default>
                 <div v-if="mode === ACTION.create">
-                    <p-radio v-for="(item, idx) in scopes" :key="idx"
+                    <p-radio v-for="(item, idx) in scopes"
+                             :key="idx"
                              :selected="item.value"
                              :value="inputModel.scope"
                              @change="onChangeScope(item.value)"
@@ -28,7 +29,9 @@
                 </div>
             </template>
             <template #label-extra>
-                <span v-if="mode === ACTION.update" class="scope-text">
+                <span v-if="mode === ACTION.update"
+                      class="scope-text"
+                >
                     <span>{{ scopeLabels[inputModel.scope] || inputModel.scope }}</span>
                     <span v-if="inputModel.scope === SCOPE.project">
                         (<p-anchor :to="referenceRouter(inputModel.project_id,{ resource_type: 'identity.Project' })"
@@ -53,13 +56,17 @@
                           highlight
                 />
             </template>
-            <project-select-dropdown project-selectable :invalid="!isProjectValid" @select="onSelectProject" />
+            <project-select-dropdown project-selectable
+                                     :invalid="!isProjectValid"
+                                     @select="onSelectProject"
+            />
         </p-field-group>
         <p-field-group
             :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.FINISH_CONDITION_LABEL')"
             required
         >
-            <p-radio v-for="(item, idx) in finishConditions" :key="idx"
+            <p-radio v-for="(item, idx) in finishConditions"
+                     :key="idx"
                      :selected="item.value"
                      :value="inputModel.finish_condition"
                      @change="onChangeFinishCondition(item.value)"
@@ -97,7 +104,6 @@ import {
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -110,7 +116,6 @@ import EscalationRulesInputForm from '@/services/alert-manager/escalation-policy
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
 import type { EscalationPolicyFormModel } from '@/services/alert-manager/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-
 
 const DEFAULT_REPEAT_COUNT = 0;
 const DEFAULT_NOTIFICATION_LEVEL = 'LV1';

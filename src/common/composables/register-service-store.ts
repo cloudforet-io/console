@@ -54,11 +54,10 @@ const prepareParentModules = (path: string[], serviceStore) => {
     });
 };
 
-
 function getGetters(path: string) {
     const result = {};
     Object.keys(store.getters)
-        .filter(k => k.startsWith(path))
+        .filter((k) => k.startsWith(path))
         .forEach((k) => {
             Object.defineProperty(result, k.slice(path.length + 1), {
                 get() {

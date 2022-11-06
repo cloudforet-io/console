@@ -22,12 +22,10 @@ import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
-
 import { i18n } from '@/translations';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { useProxyValue } from '@/common/composables/proxy-state';
-
 
 const { i18nDayjs } = useI18nDayjs();
 

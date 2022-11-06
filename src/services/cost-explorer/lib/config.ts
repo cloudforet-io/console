@@ -30,7 +30,6 @@ export const GRANULARITY_ITEM_MAP = {
     [GRANULARITY.YEARLY]: { name: GRANULARITY.YEARLY, label: 'Yearly' },
 } as const;
 
-
 export const MORE_GROUP_BY_ITEM_MAP = {
     [MORE_GROUP_BY.TAGS]: { name: MORE_GROUP_BY.TAGS, label: 'Tags' },
     [MORE_GROUP_BY.ADDITIONAL_INFO]: { name: MORE_GROUP_BY.ADDITIONAL_INFO, label: 'Additional Info' },

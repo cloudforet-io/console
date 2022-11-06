@@ -37,7 +37,7 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             currency: computed(() => store.state.display.currency),
-            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map(currency => ({
+            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map((currency) => ({
                 type: 'item',
                 name: currency,
                 label: `${CURRENCY_SYMBOL[currency]}${currency}`,
@@ -48,7 +48,6 @@ export default {
             store.commit('display/setCurrency', currency);
             emit('update', currency);
         };
-
 
         return {
             ...toRefs(state),

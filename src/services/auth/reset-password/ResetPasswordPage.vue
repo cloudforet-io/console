@@ -1,6 +1,10 @@
 <template>
-    <p-data-loader class="reset-password-page" :loading="loading">
-        <div v-if="showResetPassword" class="reset-password-wrapper">
+    <p-data-loader class="reset-password-page"
+                   :loading="loading"
+    >
+        <div v-if="showResetPassword"
+             class="reset-password-wrapper"
+        >
             <p class="title">
                 {{ $t('AUTH.RESET_PASSWORD_PAGE.RESET_PASSWORD') }}
             </p>
@@ -14,7 +18,8 @@
                                :invalid-text="invalidTexts.password"
                 >
                     <template #default="{invalid}">
-                        <p-text-input :value="password" type="password"
+                        <p-text-input :value="password"
+                                      type="password"
                                       :invalid="invalid"
                                       @input="setForm('password', $event)"
                         />
@@ -26,20 +31,24 @@
                                :invalid-text="invalidTexts.confirmPassword"
                 >
                     <template #default="{invalid}">
-                        <p-text-input :value="confirmPassword" type="password"
+                        <p-text-input :value="confirmPassword"
+                                      type="password"
                                       :invalid="invalid"
                                       @input="setForm('confirmPassword', $event)"
                         />
                     </template>
                 </p-field-group>
             </div>
-            <p-button :disabled="!isAllValid" style-type="primary" size="lg"
+            <p-button :disabled="!isAllValid"
+                      style-type="primary"
+                      size="lg"
                       :block="true"
                       @click="handleResetPassword"
             >
                 {{ $t('AUTH.RESET_PASSWORD_PAGE.RESET_PASSWORD') }}
             </p-button>
-            <p-button style-type="secondary" size="lg"
+            <p-button style-type="secondary"
+                      size="lg"
                       :block="true"
                       class="not-change-button"
                       @click="handleGoToLoginPage"
@@ -47,12 +56,18 @@
                 {{ $t('AUTH.RESET_PASSWORD_PAGE.GO_TO_LOGIN_WITHOUT_CHANGE') }}
             </p-button>
         </div>
-        <div v-else class="invalid-link-wrapper">
-            <img class="logo-character" src="@/assets/images/brand-asset_no-file_opacity50.svg">
+        <div v-else
+             class="invalid-link-wrapper"
+        >
+            <img class="logo-character"
+                 src="@/assets/images/brand-asset_no-file_opacity50.svg"
+            >
             <p class="help-text">
                 {{ warningMessage }}
             </p>
-            <p-button style-type="primary" size="lg" class="mt-8"
+            <p-button style-type="primary"
+                      size="lg"
+                      class="mt-8"
                       @click="handleGoToLoginPage"
             >
                 {{ $t('AUTH.RESET_PASSWORD_PAGE.GO_TO_LOGIN_PAGE') }}
@@ -87,7 +102,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { getDefaultRouteAfterSignIn, getPasswordValidationInfo } from '@/services/auth/lib/helper';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
-
 
 const UPDATE_PASSWORD_ACTION = 'UPDATE_PASSWORD';
 

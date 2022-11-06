@@ -22,7 +22,6 @@ const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> 
     };
 };
 
-
 const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.client.identity.user.get({ user_id: userId });
     return {

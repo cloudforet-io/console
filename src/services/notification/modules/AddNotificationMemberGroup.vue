@@ -44,24 +44,24 @@ export default {
         const state = reactive({
             loading: true,
             allMember: [] as any[],
-            allMemberItems: computed(() => state.allMember.map(d => ({
+            allMemberItems: computed(() => state.allMember.map((d) => ({
                 name: d.resource_id,
                 label: state.users[d.resource_id]?.label,
                 type: 'item',
             }))),
-            selectedMemberItems: props.users.map(d => ({ name: d, label: d })),
+            selectedMemberItems: props.users.map((d) => ({ name: d, label: d })),
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
         });
 
         const emitChange = () => {
             emit('change', {
-                users: state.selectedMemberItems.map(d => d.name),
+                users: state.selectedMemberItems.map((d) => d.name),
             });
         };
 
         const removeDuplicatedElement = (duplicatedArr) => {
             const res = duplicatedArr.filter((item, i) => (
-                duplicatedArr.findIndex(item2 => item.resource_id === item2.resource_id) === i
+                duplicatedArr.findIndex((item2) => item.resource_id === item2.resource_id) === i
             ));
             return res;
         };

@@ -1,4 +1,3 @@
-
 interface JobTaskErrorAdditional {
     cloud_service_group?: string;
     cloud_service_type?: string;

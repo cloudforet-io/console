@@ -24,7 +24,9 @@
             >
                 <service-accounts class="col-span-12" />
                 <collector-progress class="col-span-12 collector-progress" />
-                <cloud-services class="col-span-12 cloud-services" :more-info="true" />
+                <cloud-services class="col-span-12 cloud-services"
+                                :more-info="true"
+                />
             </div>
         </div>
     </general-page-layout>
@@ -51,7 +53,6 @@ import ResourceMap from '@/services/home-dashboard/modules/ResourceMap.vue';
 import ServiceAccounts from '@/services/home-dashboard/modules/ServiceAccounts.vue';
 import TopProjects from '@/services/home-dashboard/modules/TopProjects.vue';
 import TrustedAdvisor from '@/services/home-dashboard/modules/TrustedAdvisor.vue';
-
 
 export default {
     name: 'HomeDashboard',

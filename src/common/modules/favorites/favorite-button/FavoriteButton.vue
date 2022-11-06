@@ -13,13 +13,12 @@
 </template>
 
 <script lang="ts">
-import type { WatchStopHandle} from 'vue';
+import type { WatchStopHandle } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs, watch
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import { PI } from '@spaceone/design-system';
-
 
 import { store } from '@/store';
 

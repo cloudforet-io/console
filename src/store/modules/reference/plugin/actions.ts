@@ -10,12 +10,9 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
 let lastLoadedTime = 0;
 
-export const load: Action<PluginReferenceState, any> = async (
-    { state, commit }, options: ReferenceLoadOptions,
-): Promise<void|Error> => {
+export const load: Action<PluginReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -41,7 +38,6 @@ export const load: Action<PluginReferenceState, any> = async (
                 },
                 repository_id: repoInfo.repository_id,
             }, { timeout: 3000 });
-
 
             pluginResponse.results.forEach((pluginInfo: any): void => {
                 plugins[pluginInfo.plugin_id] = {

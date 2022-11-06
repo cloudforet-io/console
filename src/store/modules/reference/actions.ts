@@ -2,9 +2,7 @@ import type { Action } from 'vuex';
 
 import type { ReferenceLoadOptions, ReferenceRootState } from '@/store/modules/reference/type';
 
-export const loadAll: Action<ReferenceRootState, any> = async (
-    { dispatch, commit }, options: ReferenceLoadOptions,
-): Promise<void|Error> => {
+export const loadAll: Action<ReferenceRootState, any> = async ({ dispatch, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
     commit('setIsAllLoaded', false);
     await Promise.allSettled([
         dispatch('cloudServiceType/load', options),

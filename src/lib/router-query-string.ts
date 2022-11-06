@@ -4,7 +4,6 @@ import { forEach } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
-
 export type RouteQueryString = string | (string | null)[] | null | undefined;
 export interface ConvertValueToQueryString {
     (value?: any): RouteQueryString;
@@ -40,7 +39,6 @@ export const replaceUrlQuery = async (keyOrQuery?: string|Record<string, RouteQu
         await SpaceRouter.router.replace({ query });
     } catch (e) {}
 };
-
 
 /** QueryString to Value Converter Helpers */
 
@@ -139,7 +137,6 @@ export const queryStringToString = (queryString: RouteQueryString): string|undef
     return undefined;
 };
 
-
 /** Value to QueryString Converter Helpers */
 
 /**
@@ -169,7 +166,6 @@ export const arrayToQueryString = (value?: any[]): RouteQueryString => {
     return JSON.stringify(value);
 };
 
-
 /**
  * @param locationQuery
  * @description convert location query to search filters. will be DEPRECATED.
@@ -180,7 +176,7 @@ export const locationQueryToString = (locationQuery: Location['query']): string 
     forEach(locationQuery, (v, k) => {
         if (k === 'filters') {
             let filters: string[] = locationQuery.filters as string[];
-            filters = filters.map(d => `filters=${d}`);
+            filters = filters.map((d) => `filters=${d}`);
             queryStrings.push(...filters);
         } else {
             queryStrings.push(`${k}=${v}`);

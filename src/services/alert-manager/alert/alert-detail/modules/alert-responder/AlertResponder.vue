@@ -5,27 +5,38 @@
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER') }}
                 <template #extra>
                     <div class="w-full text-right">
-                        <p-badge v-if="alertData.escalation_ttl === 0" outline style-type="indigo">
+                        <p-badge v-if="alertData.escalation_ttl === 0"
+                                 outline
+                                 style-type="indigo"
+                        >
                             {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.COMPLETED') }}
                         </p-badge>
                     </div>
                 </template>
             </p-panel-top>
-            <p-collapsible-list :items="escalationRuleItems" theme="card" multi-unfoldable
+            <p-collapsible-list :items="escalationRuleItems"
+                                theme="card"
+                                multi-unfoldable
                                 :unfolded-indices="[alertData.escalation_step - 1]"
             >
                 <template #title="{data, index}">
-                    <p class="responder-info" :class="{'current': data.notification_level === `LV${alertData.escalation_step}` }">
+                    <p class="responder-info"
+                       :class="{'current': data.notification_level === `LV${alertData.escalation_step}` }"
+                    >
                         <span class="step">[{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.STEP') }} {{ index+1 }}]</span>
                         <span class="level">{{ data.notification_level }}</span>
-                        <p-badge v-if="data.notification_level === `LV${alertData.escalation_step}`" style-type="primary3">
+                        <p-badge v-if="data.notification_level === `LV${alertData.escalation_step}`"
+                                 style-type="primary3"
+                        >
                             {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.CURRENT') }}
                         </p-badge>
                     </p>
                 </template>
                 <template #default="{ data }">
                     <p class="data-wrapper">
-                        <project-channel-list :project-channels="projectChannels" :notification-level="data.notification_level" />
+                        <project-channel-list :project-channels="projectChannels"
+                                              :notification-level="data.notification_level"
+                        />
                     </p>
                 </template>
             </p-collapsible-list>
@@ -56,7 +67,6 @@ import {
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { difference } from 'lodash';
 
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -73,7 +83,6 @@ import type {
 } from '@/services/alert-manager/type';
 
 import TranslateResult = VueI18n.TranslateResult;
-
 
 interface PropsType {
     id?: string;
@@ -130,17 +139,16 @@ export default {
                     type: 'item',
                 };
             })),
-            selectedMemberItems: props.alertData.responders.map(d => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[],
-            selectedResourceIds: computed<string[]>(() => responderState.selectedMemberItems.map(d => d.name)),
+            selectedMemberItems: props.alertData.responders.map((d) => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[],
+            selectedResourceIds: computed<string[]>(() => responderState.selectedMemberItems.map((d) => d.name)),
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
         });
 
         const responderNameFormatter = (resourceId) => {
-            const target = responderState.allMemberItems.find(d => d.name === resourceId);
+            const target = responderState.allMemberItems.find((d) => d.name === resourceId);
             if (target?.label) return target.label;
             return resourceId;
         };
-
 
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
@@ -214,7 +222,7 @@ export default {
                 // eslint-disable-next-line camelcase
                 escalation_policy_id: props.alertData.escalation_policy_id,
             });
-            state.escalationRuleItems = rules.map(d => ({
+            state.escalationRuleItems = rules.map((d) => ({
                 title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'),
                 data: d,
             }));
@@ -241,7 +249,6 @@ export default {
         };
     },
 };
-
 
 </script>
 

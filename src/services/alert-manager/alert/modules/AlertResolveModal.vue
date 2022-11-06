@@ -42,7 +42,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import type { AlertStateUpdateParams } from '@/services/alert-manager/type';
 
-
 export default {
     name: 'AlertResolveModal',
     components: {
@@ -70,7 +69,7 @@ export default {
         const updateToResolve = async () => {
             try {
                 const params: AlertStateUpdateParams = {
-                    alerts: props.alerts?.map(d => d.alert_id),
+                    alerts: props.alerts?.map((d) => d.alert_id),
                     state: ALERT_STATE.RESOLVED,
                 };
                 if (state.noteInput) params.note = state.noteInput;

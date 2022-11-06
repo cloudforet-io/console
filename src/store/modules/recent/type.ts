@@ -22,7 +22,6 @@ export interface RecentItem extends RecentConfig {
     parents?: { name?: string; label?: TranslateResult }[];
 }
 
-
 export interface RecentState {
     allItems: RecentItem[];
     menuItems: RecentItem[];

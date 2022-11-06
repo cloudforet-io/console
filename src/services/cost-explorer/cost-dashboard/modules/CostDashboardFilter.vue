@@ -1,5 +1,7 @@
 <template>
-    <div class="set-filter-part" :class="{responsive: !printMode}">
+    <div class="set-filter-part"
+         :class="{responsive: !printMode}"
+    >
         <p class="applied-filter">
             <span class="label">{{ $t('BILLING.COST_MANAGEMENT.MAIN.APPLIED_FILTER') }}: </span>
             <span class="text">{{ filterLabel }}</span>
@@ -12,7 +14,9 @@
             {{ $t('BILLING.COST_MANAGEMENT.MAIN.VIEW_FILTER') }}
         </p-button>
         <p-icon-button v-if="showSetting"
-                       name="ic_setting" style-type="tertiary" size="sm"
+                       name="ic_setting"
+                       style-type="tertiary"
+                       size="sm"
                        @click="handleClickSelectFilter"
         />
         <view-filter-modal :visible.sync="viewFilterModalVisible"
@@ -51,7 +55,6 @@ import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/Vie
 import { FILTER } from '@/services/cost-explorer/lib/config';
 import CostExplorerSetFilterModal from '@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue';
 import type { CostFiltersMap } from '@/services/cost-explorer/type';
-
 
 interface Props {
     dashboardId: string;
@@ -96,7 +99,7 @@ export default defineComponent<Props>({
                 const label = getCostDashboardFilterLabel(props.filters);
                 return label ?? i18n.t('BILLING.COST_MANAGEMENT.MAIN.FILTER_NONE');
             }),
-            noFilter: computed(() => isEmpty(props.filters) || Object.values(props.filters).every(d => !d.length)),
+            noFilter: computed(() => isEmpty(props.filters) || Object.values(props.filters).every((d) => !d.length)),
             viewFilterModalVisible: false,
             selectFilterModalVisible: false,
             isUserDashboard: computed(() => (props.dashboardId?.startsWith(DASHBOARD_TYPE.USER))),

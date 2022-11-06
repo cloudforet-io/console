@@ -1,28 +1,44 @@
 <template>
-    <li class="content-wrapper" :class="{'edit-mode': isEditMode}">
+    <li class="content-wrapper"
+        :class="{'edit-mode': isEditMode}"
+    >
         <!-- Edit Mode of Left section(Key) -->
-        <div v-if="isEditMode" class="content-title">
-            <p v-for="(item, index) in keyListForEdit" :key="`channel-data-key-${index}`">
+        <div v-if="isEditMode"
+             class="content-title"
+        >
+            <p v-for="(item, index) in keyListForEdit"
+               :key="`channel-data-key-${index}`"
+            >
                 {{ item.replace(/\_/g, ' ') }}
             </p>
         </div>
 
         <!-- Read Mode of Left section(Key) -->
-        <div v-else class="content-title">
-            <span v-for="(item, index) in keyListForRead" :key="`channel-data-key-${index}`">
+        <div v-else
+             class="content-title"
+        >
+            <span v-for="(item, index) in keyListForRead"
+                  :key="`channel-data-key-${index}`"
+            >
                 {{ item.replace(/\_/g, ' ') }}
             </span>
         </div>
 
         <!-- Edit Mode of Content -->
-        <div v-if="isEditMode" class="content">
+        <div v-if="isEditMode"
+             class="content"
+        >
             <div class="left-section">
                 <p v-if="isSpaceOneUserProtocol">
-                    <add-notification-member-group :users="channelData.data.users" :project-id="projectId" @change="onChangeUser" />
+                    <add-notification-member-group :users="channelData.data.users"
+                                                   :project-id="projectId"
+                                                   @change="onChangeUser"
+                    />
                 </p>
                 <div>
                     <p-json-schema-form
-                        :form-data.sync="dataForEdit" :schema="schema"
+                        :form-data.sync="dataForEdit"
+                        :schema="schema"
                         :language="$store.state.user.language"
                         class="schema-form"
                         @validate="handleSchemaValidate"
@@ -48,21 +64,31 @@
         </div>
 
         <!-- Read Mode of Content -->
-        <div v-else class="content">
+        <div v-else
+             class="content"
+        >
             <div class="left-section">
                 <div v-if="isSpaceOneUserProtocol">
-                    <p-badge v-for="(userId, index) in dataForEdit.users" :key="`users-${index}`"
-                             style-type="gray200" shape="square"
+                    <p-badge v-for="(userId, index) in dataForEdit.users"
+                             :key="`users-${index}`"
+                             style-type="gray200"
+                             shape="square"
                              class="mr-2 rounded"
                     >
                         {{ users[userId] ? users[userId].label : userId }}
                     </p-badge>
                 </div>
-                <div v-else-if="isSecretData" class="inline">
-                    <span v-for="(item, index) in keyListForRead" :key="`channel-secret-data-key-${index}`">*********</span>
+                <div v-else-if="isSecretData"
+                     class="inline"
+                >
+                    <span v-for="(item, index) in keyListForRead"
+                          :key="`channel-secret-data-key-${index}`"
+                    >*********</span>
                 </div>
                 <div v-else>
-                    <p v-for="(item, index) in Object.values(valueList)" :key="`channel-data-value-${index}`">
+                    <p v-for="(item, index) in Object.values(valueList)"
+                       :key="`channel-data-value-${index}`"
+                    >
                         {{ item }}
                     </p>
                 </div>
@@ -70,11 +96,16 @@
             <p v-if="isSecretData">
                 <info-message :message="$t('IDENTITY.USER.NOTIFICATION.CANNOT_EDIT_TOKEN')" />
             </p>
-            <button v-else class="edit-button" :class="{'edit-disable':disableEdit}"
+            <button v-else
+                    class="edit-button"
+                    :class="{'edit-disable':disableEdit}"
                     @click="startEdit(EDIT_TYPE.DATA, channelData.data)"
             >
-                <p-i name="ic_edit" width="1rem" height="1rem"
-                     color="inherit" class="edit-icon"
+                <p-i name="ic_edit"
+                     width="1rem"
+                     height="1rem"
+                     color="inherit"
+                     class="edit-icon"
                 />
                 {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
             </button>
@@ -103,7 +134,6 @@ import {
     PARAM_KEY_TYPE,
     PROTOCOL_TYPE,
 } from '@/services/notification/modules/notification-channel-item/type';
-
 
 export default {
     name: 'NotificationChannelItemData',

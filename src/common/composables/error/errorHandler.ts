@@ -14,7 +14,6 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import { isInstanceOfNoResourceError, isInstanceOfNoSearchResourceError } from '@/common/composables/error/error';
 
-
 interface GlobalErrorHandlers {
     authenticationErrorHandler: () => void;
     authorizationErrorHandler: () => void;

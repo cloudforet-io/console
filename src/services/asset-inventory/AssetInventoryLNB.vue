@@ -1,5 +1,7 @@
 <template>
-    <l-n-b :header="header" :back-link="backLink" :top-title="topTitle"
+    <l-n-b :header="header"
+           :back-link="backLink"
+           :top-title="topTitle"
            :menu-set="menuSet"
     />
 </template>
@@ -15,7 +17,6 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import { get } from 'lodash';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -37,7 +38,6 @@ import type {
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
-
 
 export default defineComponent({
     name: 'AssetInventoryLNB',
@@ -61,7 +61,7 @@ export default defineComponent({
             }),
             cloudServiceTypeList: computed<CloudServiceTypeInfo[]>(() => assetInventoryStore.state.cloudServiceDetail.cloudServiceTypeList),
             selectedItem: computed(() => assetInventoryStore.state.cloudServiceDetail.selectedItem),
-            cloudServiceDetailMenuSet: computed<LNBItem[]>(() => [...state.cloudServiceTypeList.map(d => (
+            cloudServiceDetailMenuSet: computed<LNBItem[]>(() => [...state.cloudServiceTypeList.map((d) => (
                 {
                     type: 'item',
                     label: d.name,

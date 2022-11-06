@@ -1,6 +1,9 @@
 <template>
     <div class="collector-creator-page">
-        <p-page-title :title="$t('PLUGIN.COLLECTOR.CREATE.TITLE')" child @goBack="$router.go(-1)" />
+        <p-page-title :title="$t('PLUGIN.COLLECTOR.CREATE.TITLE')"
+                      child
+                      @goBack="$router.go(-1)"
+        />
         <p-progress-wizard :tabs="tabState.tabs"
                            :active-idx.sync="tabState.activeIdx"
                            :invalid-state="tabState.invalidState"
@@ -14,7 +17,8 @@
                     <p-lazy-img class="flex-shrink-0 mr-8"
                                 :src="imageUrl"
                                 :loading="loading"
-                                width="5.5rem" height="5.5rem"
+                                width="5.5rem"
+                                height="5.5rem"
                     />
                     <div class="flex-grow">
                         <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.NAME_LABEL')"
@@ -23,17 +27,27 @@
                                        :required="true"
                         >
                             <template #default="{invalid}">
-                                <p-text-input v-model="inputModel.name" class="block" :invalid="invalid" />
+                                <p-text-input v-model="inputModel.name"
+                                              class="block"
+                                              :invalid="invalid"
+                                />
                             </template>
                         </p-field-group>
                         <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.VERSION_LABEL')"
                                        :invalid="!isVersionValid"
                                        :required="true"
                         >
-                            <p-select-dropdown v-model="inputModel.version" :items="versions" :disabled="isAutoUpgrade" />
+                            <p-select-dropdown v-model="inputModel.version"
+                                               :items="versions"
+                                               :disabled="isAutoUpgrade"
+                            />
                         </p-field-group>
-                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL')" :required="true">
-                            <p-toggle-button :value="isAutoUpgrade" @change="onChangeAutoUpgrade" />
+                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL')"
+                                       :required="true"
+                        >
+                            <p-toggle-button :value="isAutoUpgrade"
+                                             @change="onChangeAutoUpgrade"
+                            />
                         </p-field-group>
                     </div>
                 </div>
@@ -63,7 +77,6 @@ import { get, some } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -74,7 +87,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 export default {
     name: 'CreateCollectorPage',
@@ -145,7 +157,7 @@ export default {
                 conf: !formState.isConfValid,
                 tags: !formState.isTagsValid,
             })),
-            disabled: computed(() => some(tabState.invalidState, v => v === true)),
+            disabled: computed(() => some(tabState.invalidState, (v) => v === true)),
         });
 
         /* api */
@@ -169,7 +181,7 @@ export default {
                     only: ['name'],
                 },
             });
-            state.collectorNames = res.results.map(v => v.name);
+            state.collectorNames = res.results.map((v) => v.name);
         };
         const getVersions = async () => {
             try {

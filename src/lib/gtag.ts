@@ -7,7 +7,6 @@ import Hashids from 'hashids';
 
 import config from '@/lib/config';
 
-
 export class GTag {
     private static _gtag: VueGtagType|null;
 

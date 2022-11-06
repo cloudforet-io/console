@@ -5,11 +5,9 @@ import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -81,7 +79,6 @@ export const useNotificationItem = (obj: NotificationItemState) => {
             ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'));
         }
     };
-
 
     return {
         state,

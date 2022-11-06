@@ -10,12 +10,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { RegionMap } from '@/services/cost-explorer/widgets/lib/config';
 
-
 let lastLoadedTime = 0;
 
-export const load: Action<RegionReferenceState, any> = async (
-    { state, commit }, options: ReferenceLoadOptions,
-): Promise<void|Error> => {
+export const load: Action<RegionReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (

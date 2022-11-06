@@ -5,7 +5,8 @@
               @click="handleHandbookButton"
         >
             <p-i name="ic_help"
-                 width="0.875rem" height="0.875rem"
+                 width="0.875rem"
+                 height="0.875rem"
                  color="inherit"
             />
             <span class="text">
@@ -19,15 +20,24 @@
         </portal>
         <portal to="handbook-contents">
             <div class="handbook-contents">
-                <p-tab :tabs="tabs" :active-tab.sync="proxyActiveTab">
-                    <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
+                <p-tab :tabs="tabs"
+                       :active-tab.sync="proxyActiveTab"
+                >
+                    <template v-for="(_, slot) of $scopedSlots"
+                              #[slot]="scope"
+                    >
                         <div :key="slot">
-                            <slot :name="slot" v-bind="scope" />
+                            <slot :name="slot"
+                                  v-bind="scope"
+                            />
                         </div>
                     </template>
                 </p-tab>
                 <div class="no-more">
-                    <p-check-box v-model="noMore" :value="true" @change="onChangeNoMore">
+                    <p-check-box v-model="noMore"
+                                 :value="true"
+                                 @change="onChangeNoMore"
+                    >
                         {{ $t('COMMON.HANDBOOK_BUTTON.DONT_DISPLAY') }}
                     </p-check-box>
                 </div>
@@ -46,11 +56,9 @@ import {
     PI, PCheckBox, PTab,
 } from '@spaceone/design-system';
 
-
 import { store } from '@/store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-
 
 export default defineComponent({
     name: 'HandbookButton',

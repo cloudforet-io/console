@@ -6,7 +6,6 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { clone } from 'lodash';
 
-
 type ValidatorResult = boolean|TranslateResult;
 interface Validator { (value?: any): ValidatorResult }
 type ValidationResult = boolean;
@@ -74,7 +73,6 @@ function useValueValidator<T = any>(
         validate,
     };
 }
-
 
 type Forms<T> = {
     [K in keyof T]: ComputedRef<T[K]>
@@ -222,7 +220,6 @@ export function useFormValidator<T extends Record<string, any> = any>(
     const resetValidationMap = {} as Resets<T>;
     const validateMap = {} as Validates<T>;
 
-
     formKeys.forEach((key) => {
         const validator = validators[key];
         const immediate = typeof _immediate === 'boolean' ? _immediate : _immediate[key];
@@ -241,7 +238,7 @@ export function useFormValidator<T extends Record<string, any> = any>(
         validateMap[key] = validate;
     });
 
-    const isAllValid = computed<boolean>(() => Object.values(validationResults).every(validationResult => validationResult.value));
+    const isAllValid = computed<boolean>(() => Object.values(validationResults).every((validationResult) => validationResult.value));
 
     const setForm = (key: keyof T | T, value?: T[keyof T]) => {
         if (typeof key === 'object') {

@@ -2,7 +2,6 @@ import { computed } from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
@@ -20,11 +19,9 @@ import { initDomain } from '@/lib/site-initializer/domain';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 
-
 const initConfig = async () => {
     await config.init();
 };
-
 
 const initQueryHelper = () => {
     QueryHelper.init(computed(() => store.state.user.timezone));
@@ -70,12 +67,11 @@ const init = async () => {
     }
 };
 
-
 const MIN_LOADING_TIME = 1000;
 export const siteInit = async () => {
     store.dispatch('display/startInitializing');
 
-    store.watch(state => state.display.isInitialized, (isInitialized) => {
+    store.watch((state) => state.display.isInitialized, (isInitialized) => {
         if (isInitialized) {
             const el = document.getElementById('site-loader-wrapper');
             if (el?.parentElement) el.parentElement.removeChild(el);

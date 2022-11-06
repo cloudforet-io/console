@@ -19,14 +19,17 @@
                                @keydown.delete="onDeletePrefix"
         >
             <template #search-left>
-                <div v-if="groupId" class="prefix-tag"
+                <div v-if="groupId"
+                     class="prefix-tag"
                      :class="{active: isFocused || visibleMenu}"
                 >
                     <span class="text">{{ groupName }}</span>
                 </div>
             </template>
             <template #menu-item--format="{item}">
-                <p-i :name="item.icon" height="1rem" width="1rem"
+                <p-i :name="item.icon"
+                     height="1rem"
+                     width="1rem"
                      class="mr-1"
                 />
                 <p-text-highlighting :text="item.label"
@@ -35,8 +38,12 @@
                 />
             </template>
             <template #menu-header-more="{item}">
-                <div class="show-more" @click.stop="onShowMore(item)">
-                    <p-i name="ic_search" color="inherit" height="1rem"
+                <div class="show-more"
+                     @click.stop="onShowMore(item)"
+                >
+                    <p-i name="ic_search"
+                         color="inherit"
+                         height="1rem"
                          width="1rem"
                     />
                     <span class="text">{{ $t('PROJECT.LANDING.PLACE_HOLDER_SHOW_MORE') }}</span>
@@ -59,10 +66,8 @@ import {
 import type { MenuItem as ContextMenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { debounce } from 'lodash';
 
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
 
 import { store } from '@/store';
 
@@ -118,7 +123,6 @@ const makeMenuItems = (...args: MenuOption[]): MenuItem[] => {
     return items;
 };
 
-
 export default {
     name: 'ProjectSearch',
     components: {
@@ -173,7 +177,6 @@ export default {
             isFocused: true,
         });
 
-
         const getMatchText = (text: string): string => {
             const res = state.regex.exec(text);
             if (res) return res[0];
@@ -182,7 +185,6 @@ export default {
 
         const projectGroupQuery = new ApiQueryHelper().setOnly('project_group_id', 'name').setPageLimit(LIMIT);
         const projectQuery = new ApiQueryHelper().setOnly('project_id', 'name').setPageLimit(LIMIT);
-
 
         const listProjectGroups = async () => {
             if (state.searchText) {
@@ -252,7 +254,6 @@ export default {
             if (state.visibleMenu) await listItems();
         });
 
-
         const commitSearchContext = (groupId?: string, searchText?: string, hide = true) => {
             let val = searchText;
             if (typeof searchText === 'string') val = searchText.trim();
@@ -310,7 +311,6 @@ export default {
             state.searchText = vm.$route.query.search as string;
             store.commit('service/project/setSearchText', vm.$route.query.search as string);
         }
-
 
         return {
             ...toRefs(state),

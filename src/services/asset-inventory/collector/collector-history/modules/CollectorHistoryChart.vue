@@ -2,20 +2,27 @@
     <div class="collector-history-chart">
         <div class="top-part">
             <div class="legend-wrapper">
-                <div v-for="legend in legends" :key="legend.color"
+                <div v-for="legend in legends"
+                     :key="legend.color"
                      class="legend"
                 >
-                    <span class="circle" :style="{ 'background-color': legend.color }" />
+                    <span class="circle"
+                          :style="{ 'background-color': legend.color }"
+                    />
                     <span class="text">{{ legend.label }}</span>
                 </div>
             </div>
-            <p-date-pagination :date.sync="currentDate" :timezone="timezone" />
+            <p-date-pagination :date.sync="currentDate"
+                               :timezone="timezone"
+            />
         </div>
         <p-data-loader :loading="loading">
             <template #loader>
                 <p-skeleton width="100%" />
             </template>
-            <div ref="chartRef" class="chart" />
+            <div ref="chartRef"
+                 class="chart"
+            />
         </p-data-loader>
     </div>
 </template>
@@ -38,7 +45,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
-
 import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -46,7 +52,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
     gray, green, coral,
 } from '@/styles/colors';
-
 
 interface ChartData {
     date: string;
@@ -107,7 +112,7 @@ export default {
 
         /* util */
         const initChartData = (data) => {
-            const dataWithTimezone = data.map(d => ({
+            const dataWithTimezone = data.map((d) => ({
                 date: dayjs.utc(d.date).tz(state.timezone).format('YYYY-MM-DD'),
                 completed: d.success,
                 failed: d.failure,
@@ -117,7 +122,7 @@ export default {
 
             while (now.isSameOrBefore(state.currentMonthEnd, 'day')) {
                 // eslint-disable-next-line no-loop-func
-                const existData = dataWithTimezone.find(d => now.isSame(d.date, 'day'));
+                const existData = dataWithTimezone.find((d) => now.isSame(d.date, 'day'));
 
                 if (existData) {
                     chartData.push({

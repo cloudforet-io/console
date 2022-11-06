@@ -10,39 +10,67 @@
                 <div class="help">
                     <p-i v-if="projectId"
                          v-tooltip.top="$t('COMMON.WIDGETS.CLOUD_SERVICE.HELP')"
-                         name="ic_tooltip" width="1rem"
+                         name="ic_tooltip"
+                         width="1rem"
                          height="1rem"
                          class="icon"
                          color="inherit transparent"
                     />
                 </div>
-                <router-link v-if="moreInfo" :to="cloudServiceTypeLink" class="more">
+                <router-link v-if="moreInfo"
+                             :to="cloudServiceTypeLink"
+                             class="more"
+                >
                     <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE.SEE_MORE') }}</span>
-                    <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                    <p-i name="ic_arrow_right"
+                         width="1rem"
+                         height="1rem"
                          color="inherit transparent"
                     />
                 </router-link>
             </div>
         </template>
         <template #default>
-            <div v-if="loading" class="card-wrapper">
-                <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
-                    <p-skeleton width="2rem" height="2rem" class="mr-4" />
+            <div v-if="loading"
+                 class="card-wrapper"
+            >
+                <div v-for="v in skeletons"
+                     :key="v"
+                     class="flex items-center p-4"
+                >
+                    <p-skeleton width="2rem"
+                                height="2rem"
+                                class="mr-4"
+                    />
                     <div class="grid grid-cols-1 gap-1 w-full">
-                        <p-skeleton width="80%" height="0.625rem" />
-                        <p-skeleton width="100%" height="0.625rem" />
+                        <p-skeleton width="80%"
+                                    height="0.625rem"
+                        />
+                        <p-skeleton width="100%"
+                                    height="0.625rem"
+                        />
                     </div>
                 </div>
             </div>
-            <div v-else-if="data.length === 0" class="no-data-wrapper">
+            <div v-else-if="data.length === 0"
+                 class="no-data-wrapper"
+            >
                 <img src="@/assets/images/illust_circle_boy.svg">
                 <div class="text">
                     {{ $t('COMMON.WIDGETS.CLOUD_SERVICE.NO_DATA') }}
                 </div>
             </div>
-            <div v-else class="card-wrapper">
-                <router-link v-for="(item, index) in data" :key="index" :to="item.href">
-                    <p-selectable-item :icon-url="iconUrl(item)" theme="card" class="card">
+            <div v-else
+                 class="card-wrapper"
+            >
+                <router-link v-for="(item, index) in data"
+                             :key="index"
+                             :to="item.href"
+                >
+                    <p-selectable-item :icon-url="iconUrl(item)"
+                                       theme="card"
+                                       class="card"
+                    >
                         <template #contents>
                             <div class="group-name">
                                 {{ item.group }}
@@ -64,7 +92,6 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 
-
 import { computed, reactive, toRefs } from 'vue';
 
 import { PSelectableItem, PSkeleton, PI } from '@spaceone/design-system';
@@ -81,7 +108,6 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 interface Value {
     provider: string;
@@ -180,7 +206,7 @@ export default {
             });
 
             state.data = [
-                ...res.results.map(d => ({
+                ...res.results.map((d) => ({
                     count: d.count,
                     group: d.cloud_service_group,
                     icon: d.icon,
@@ -206,7 +232,7 @@ export default {
                         is_primary: true,
                     });
                     state.data = [
-                        ...res.results.splice(0, DATA_LENGTH).map(d => ({
+                        ...res.results.splice(0, DATA_LENGTH).map((d) => ({
                             count: d.count,
                             group: d.cloud_service_group,
                             icon: d.icon,

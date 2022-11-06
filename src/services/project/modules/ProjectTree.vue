@@ -3,19 +3,25 @@
         <sidebar-title :title="$t('PROJECT.LANDING.PROJECT_GROUPS')">
             <template #extra>
                 <div class="action-btn-wrapper">
-                    <p-button v-if="treeEditMode" size="sm" style-type="highlight"
+                    <p-button v-if="treeEditMode"
+                              size="sm"
+                              style-type="highlight"
                               @click="finishTreeEdit"
                     >
                         {{ $t('PROJECT.LANDING.PROJECT_GROUP_TREE.DONE') }}
                     </p-button>
                     <template v-else>
                         <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.EDIT')"
-                                       name="ic_edit-text" style-type="transparent" size="sm"
+                                       name="ic_edit-text"
+                                       style-type="transparent"
+                                       size="sm"
                                        :disabled="manageDisabled"
                                        @click="startTreeEdit"
                         />
                         <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.CREATE')"
-                                       name="ic_plus_thin" style-type="transparent" size="sm"
+                                       name="ic_plus_thin"
+                                       style-type="transparent"
+                                       size="sm"
                                        color="inherit"
                                        class="ml-1"
                                        :disabled="!(hasRootProjectGroupManagePermission || hasCurrentProjectGroupManagePermission)"
@@ -37,8 +43,11 @@
                         @change-select="onAllProjectChangeSelect"
                 >
                     <template #left-extra>
-                        <p-i name="ic_tree_all-projects" width="1rem" height="1rem"
-                             class="all-project-button" color="inherit"
+                        <p-i name="ic_tree_all-projects"
+                             width="1rem"
+                             height="1rem"
+                             class="all-project-button"
+                             color="inherit"
                         />
                     </template>
                 </p-tree>
@@ -71,18 +80,22 @@
                         <p-i :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' : 'ic_tree_project-group'"
                              class="project-group-icon"
                              color="inherit"
-                             width="1rem" height="1rem"
+                             width="1rem"
+                             height="1rem"
                         />
                     </template>
                     <template #right-extra="{node, path}">
                         <p-icon-button v-if="treeEditMode && node.data.item_type !== 'PROJECT' && permissionInfo[node.data.id]"
-                                       name="ic_delete" class="group-delete-btn"
+                                       name="ic_delete"
+                                       class="group-delete-btn"
                                        size="sm"
                                        color="inherit"
                                        :disabled="manageDisabled"
                                        @click.stop="openProjectGroupDeleteCheckModal({node, path})"
                         />
-                        <p-icon-button v-if="!treeEditMode && node.data.item_type !== 'PROJECT'" name="ic_plus" class="group-add-btn"
+                        <p-icon-button v-if="!treeEditMode && node.data.item_type !== 'PROJECT'"
+                                       name="ic_plus"
+                                       class="group-add-btn"
                                        size="sm"
                                        :disabled="manageDisabled || !permissionInfo[node.data.id]"
                                        @click.stop="openProjectGroupCreateForm({node, path})"
@@ -104,7 +117,6 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -152,8 +164,8 @@ export default {
             treeEditMode: computed(() => store.state.service.project.treeEditMode),
             editOptions: computed(() => ({
                 disabled: !state.treeEditMode,
-                editStartValidator: item => (state.permissionInfo[item.data.id] || item.data.has_permission) && (item.data.item_type !== 'PROJECT'),
-                validator: text => (text && text.length > 2 && text.length < 40),
+                editStartValidator: (item) => (state.permissionInfo[item.data.id] || item.data.has_permission) && (item.data.item_type !== 'PROJECT'),
+                validator: (text) => (text && text.length > 2 && text.length < 40),
                 setDataAfterEdit: false,
             })),
             dragOptions: computed(() => ({
@@ -170,7 +182,7 @@ export default {
                         return !props.manageDisabled;
                     }
                     if (parent.data.item_type === 'PROJECT') return false;
-                    if (parent.children?.some(child => child.data.name === node.data.name)) return false;
+                    if (parent.children?.some((child) => child.data.name === node.data.name)) return false;
                     return !!(state.permissionInfo[parent.data.id] || parent.data.has_permission);
                 },
             })),
@@ -179,7 +191,7 @@ export default {
         });
 
         const toggleOptions = {
-            validator: node => node.data.has_child || node.children.length > 0,
+            validator: (node) => node.data.has_child || node.children.length > 0,
             removeChildrenOnFold: true,
         };
 
@@ -192,7 +204,7 @@ export default {
         const dataSetter = (text, node) => {
             node.data.name = text;
         };
-        const dataGetter = node => node.data.name;
+        const dataGetter = (node) => node.data.name;
 
         const getClassNames = ({ data }) => ({
             'no-permission': state.treeEditMode ? !state.permissionInfo[data.id] && !data.has_permission : false,
@@ -218,7 +230,6 @@ export default {
             if (!state.rootNode) return [];
             return state.rootNode.getAllItems();
         };
-
 
         const dataFetcher = async (node: any = {}, projectOnly = false): Promise<ProjectItemResp[]> => {
             try {
@@ -248,8 +259,8 @@ export default {
 
                 store.dispatch(
                     'service/project/addPermissionInfo',
-                    items.filter(d => d.item_type === 'PROJECT_GROUP')
-                        .map(d => d.id),
+                    items.filter((d) => d.item_type === 'PROJECT_GROUP')
+                        .map((d) => d.id),
                 );
                 return items;
             } catch (e) {
@@ -277,7 +288,7 @@ export default {
             const projectItems = items.filter(({ node }) => node.data.item_type === 'PROJECT');
 
             projectItems.forEach(({ node }) => {
-                state.rootNode.deleteNode(d => d.id === node.data.id);
+                state.rootNode.deleteNode((d) => d.id === node.data.id);
             });
 
             const projectGroupItems = items.filter(({ node }) => node.data.item_type === 'PROJECT_GROUP' && node.data.has_child);
@@ -362,7 +373,7 @@ export default {
             if (!state.rootNode) return;
             if (oldParent?.data.id === parent?.data.id) return;
             if (oldParent?.data.has_child && oldParent?.children.length === 1) {
-                state.rootNode.updateNode(d => d.id === oldParent.data.id, {
+                state.rootNode.updateNode((d) => d.id === oldParent.data.id, {
                     ...oldParent.data,
                     has_child: false,
                 });
@@ -397,7 +408,6 @@ export default {
                 state.allProjectRoot.changeSelectState(state.allProjectNode, [0]);
             }
         });
-
 
         /* Init */
         const onTreeInit = (root) => {

@@ -6,39 +6,48 @@
                                  :disabled="manageDisabled"
                                  @change="onToggleChange"
                 />
-                <span class="card-title" :class="{ inactivated: !isActivated }">{{ channelData.protocol_name }}</span>
+                <span class="card-title"
+                      :class="{ inactivated: !isActivated }"
+                >{{ channelData.protocol_name }}</span>
             </div>
-            <p-icon-button name="ic_trashcan" width="1.5rem" height="1.5rem"
+            <p-icon-button name="ic_trashcan"
+                           width="1.5rem"
+                           height="1.5rem"
                            :disabled="manageDisabled"
                            @click="onClickDelete"
             />
         </div>
         <ul class="card-body">
-            <notification-channel-item-name :channel-data="channelData" :project-id="projectId"
+            <notification-channel-item-name :channel-data="channelData"
+                                            :project-id="projectId"
                                             :disable-edit="(editTarget && editTarget !== EDIT_TYPE.NAME) || manageDisabled"
                                             @change="onChange"
                                             @edit="onEdit"
             />
             <p-divider />
-            <notification-channel-item-data :channel-data="channelData" :project-id="projectId"
+            <notification-channel-item-data :channel-data="channelData"
+                                            :project-id="projectId"
                                             :disable-edit="(editTarget && editTarget !== EDIT_TYPE.DATA) || manageDisabled"
                                             @change="onChange"
                                             @edit="onEdit"
             />
             <p-divider v-if="projectId" />
-            <notification-channel-item-level :channel-data="channelData" :project-id="projectId"
+            <notification-channel-item-level :channel-data="channelData"
+                                             :project-id="projectId"
                                              :disable-edit="(editTarget && editTarget !== EDIT_TYPE.LEVEL) || manageDisabled"
                                              @change="onChange"
                                              @edit="onEdit"
             />
             <p-divider />
-            <notification-channel-item-schedule :channel-data="channelData" :project-id="projectId"
+            <notification-channel-item-schedule :channel-data="channelData"
+                                                :project-id="projectId"
                                                 :disable-edit="(editTarget && editTarget !== EDIT_TYPE.SCHEDULE) || manageDisabled"
                                                 @change="onChange"
                                                 @edit="onEdit"
             />
             <p-divider />
-            <notification-channel-item-topic :channel-data="channelData" :project-id="projectId"
+            <notification-channel-item-topic :channel-data="channelData"
+                                             :project-id="projectId"
                                              :disable-edit="(editTarget && editTarget !== EDIT_TYPE.TOPIC) || manageDisabled"
                                              @change="onChange"
                                              @edit="onEdit"
@@ -84,7 +93,6 @@ import NotificationChannelItemSchedule
 import NotificationChannelItemTopic
     from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemTopic.vue';
 import { EDIT_TYPE, PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
-
 
 // interface ParamType {
 //     user_channel_id?: string;
@@ -202,7 +210,6 @@ export default {
             if (!value.value) await disableChannel();
             else await enableChannel();
         };
-
 
         const onChange = async () => {
             emit('change');

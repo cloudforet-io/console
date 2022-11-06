@@ -22,9 +22,13 @@
                 <div class="chart-wrapper">
                     <p-data-loader :loading="chartState.loading">
                         <template #loader>
-                            <p-skeleton width="100%" height="100%" />
+                            <p-skeleton width="100%"
+                                        height="100%"
+                            />
                         </template>
-                        <div ref="chartRef" class="chart" />
+                        <div ref="chartRef"
+                             class="chart"
+                        />
                     </p-data-loader>
                 </div>
             </div>
@@ -34,7 +38,9 @@
                     <span class="date">({{ summaryState.pastDate }})</span>
                     <span class="cost">
                         <span v-if="summaryState.pastCost !== 0">${{ summaryState.pastCost }}</span>
-                        <span v-else class="empty" />
+                        <span v-else
+                              class="empty"
+                        />
                     </span>
                 </div>
                 <div class="summary-wrapper col-span-6 md:col-span-12">
@@ -46,7 +52,8 @@
                             <span class="in-process-text">({{ $t('COMMON.WIDGETS.BILLING.IN_PROCESS') }})</span>
                             <div class="help">
                                 <p-i v-tooltip.top="$t('COMMON.WIDGETS.BILLING.TOOLTIP_TEXT')"
-                                     name="ic_tooltip" width="1rem"
+                                     name="ic_tooltip"
+                                     width="1rem"
                                      height="1rem"
                                      color="inherit transparent"
                                 />
@@ -81,20 +88,33 @@
                     <template #th-service-format>
                         <span />
                     </template>
-                    <template v-for="field in tableState.fields" #[`col-${field.name}-format`]="{value}">
+                    <template v-for="field in tableState.fields"
+                              #[`col-${field.name}-format`]="{value}"
+                    >
                         <template v-if="field.name !== 'service'">
-                            <span v-if="value" :key="field.name" :style="{ 'color': value.color }">{{ value.cost }}</span>
-                            <span v-else :key="field.name">-</span>
+                            <span v-if="value"
+                                  :key="field.name"
+                                  :style="{ 'color': value.color }"
+                            >{{ value.cost }}</span>
+                            <span v-else
+                                  :key="field.name"
+                            >-</span>
                         </template>
-                        <span v-else :key="field.name" class="col-service"
+                        <span v-else
+                              :key="field.name"
+                              class="col-service"
                               :class="{'link-text': !!value.to.name }"
                         >
-                            <router-link v-if="!!value.to.name" :to="value.to">{{ value.name }}</router-link>
+                            <router-link v-if="!!value.to.name"
+                                         :to="value.to"
+                            >{{ value.name }}</router-link>
                             <span v-else>{{ value.name }}</span>
                         </span>
                     </template>
                 </p-data-table>
-                <div v-if="tableState.data.length > 5" class="toggle-button-wrapper">
+                <div v-if="tableState.data.length > 5"
+                     class="toggle-button-wrapper"
+                >
                     <p-collapsible-toggle :is-collapsed.sync="tableState.isCollapsed">
                         {{ tableState.isCollapsed ? $t('COMMON.WIDGETS.BILLING.SHOW_ALL') : $t('COMMON.WIDGETS.BILLING.HIDE') }}
                     </p-collapsible-toggle>
@@ -105,7 +125,6 @@
 </template>
 
 <script lang="ts">
-
 
 import {
     computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
@@ -131,9 +150,7 @@ import { orderBy, range } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { CURRENCY } from '@/store/modules/display/config';
-
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -146,7 +163,6 @@ import {
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 interface ChartData {
     date: string;
@@ -339,7 +355,7 @@ export default {
 
             state.chart = chart;
         };
-        const getLink = data => ({
+        const getLink = (data) => ({
             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
             query: {
                 provider: primitiveToQueryString(data.provider),
@@ -371,8 +387,8 @@ export default {
                 });
                 if (res.results.length > 0) {
                     const billingData = res.results[0].billing_data;
-                    summaryState.pastCost = commaFormatter(numberFormatter(billingData.find(d => d.date === start)?.cost || 0));
-                    summaryState.currentCost = commaFormatter(numberFormatter(billingData.find(d => d.date === end)?.cost || 0));
+                    summaryState.pastCost = commaFormatter(numberFormatter(billingData.find((d) => d.date === start)?.cost || 0));
+                    summaryState.currentCost = commaFormatter(numberFormatter(billingData.find((d) => d.date === end)?.cost || 0));
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -403,7 +419,7 @@ export default {
                 });
 
                 if (res.results.length > 0) {
-                    data = res.results[0].billing_data.map(d => ({
+                    data = res.results[0].billing_data.map((d) => ({
                         date: dayjs(d.date),
                         value: d.cost,
                     }));
@@ -499,7 +515,7 @@ export default {
                         const dateUnit = state.selectedDateType === DATE_TYPE.monthly ? 'month' : 'day';
                         const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'YYYY-MM' : 'YYYY-MM-DD';
                         const pastDate = dayjs.utc(d.date).subtract(1, dateUnit).format(dateFormat);
-                        const pastCost = result.billing_data.find(bd => bd.date === pastDate)?.cost || 0;
+                        const pastCost = result.billing_data.find((bd) => bd.date === pastDate)?.cost || 0;
                         billingData[d.date] = {
                             cost: currencyMoneyFormatter(d.cost, CURRENCY.USD),
                         };

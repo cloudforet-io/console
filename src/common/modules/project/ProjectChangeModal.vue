@@ -53,7 +53,6 @@ import { PButtonModal, PRadio } from '@spaceone/design-system';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-
 export default {
     name: 'ProjectTreeModal',
     components: {

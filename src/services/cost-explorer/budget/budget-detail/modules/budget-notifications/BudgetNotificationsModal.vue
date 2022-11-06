@@ -30,13 +30,17 @@
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ADD_CONDITION') }}
             </p-button>
             <section class="condition-wrapper">
-                <p v-if="conditions.length > 0" class="condition-header">
+                <p v-if="conditions.length > 0"
+                   class="condition-header"
+                >
                     <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.UNIT') }}</span>
                     <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.THRESHOLD') }}</span>
                     <span>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.TYPE') }}</span>
                 </p>
                 <template v-for="(condition, idx) of conditions">
-                    <div :key="`condition-${idx}`" class="condition-input-wrapper">
+                    <div :key="`condition-${idx}`"
+                         class="condition-input-wrapper"
+                    >
                         <p-select-dropdown v-model="condition.unit"
                                            class="condition"
                                            :items="units"
@@ -54,7 +58,9 @@
                                       @input="handleThresholdInput(idx, $event)"
                         >
                             <template #right-extra>
-                                <span v-if="condition.unit === NOTIFICATION_UNIT.PERCENT" class="text-gray-400">%</span>
+                                <span v-if="condition.unit === NOTIFICATION_UNIT.PERCENT"
+                                      class="text-gray-400"
+                                >%</span>
                             </template>
                         </p-text-input>
                         <p-select-dropdown v-model="condition.notification_type"
@@ -95,7 +101,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-
 
 const NOTIFICATION_UNIT = Object.freeze({
     PERCENT: 'PERCENT',
@@ -161,8 +166,8 @@ export default {
                 },
             ])),
             budgetId: computed(() => costExplorerStore.state.budget.budgetData?.budget_id),
-            thresholdValidations: costExplorerStore.state.budget.budgetData?.notifications?.map(d => !!d) ?? [] as Array<boolean|undefined>,
-            isAllValid: computed(() => state.thresholdValidations.every(d => !!d)),
+            thresholdValidations: costExplorerStore.state.budget.budgetData?.notifications?.map((d) => !!d) ?? [] as Array<boolean|undefined>,
+            isAllValid: computed(() => state.thresholdValidations.every((d) => !!d)),
         });
 
         const handleAddCondition = () => {

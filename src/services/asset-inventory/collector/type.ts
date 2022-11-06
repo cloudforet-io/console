@@ -73,7 +73,6 @@ export interface CollectorCreateParameter extends Tags {
     name: string;
 }
 
-
 export interface Schedule {
     hours?: string[];
     interval?: number;
@@ -87,7 +86,6 @@ export interface ScheduleAddParameter {
     filter?: any;
     collect_mode?: COLLECT_MODE;
 }
-
 
 export interface CollectorScheduleModel {
     schedule_id: string;

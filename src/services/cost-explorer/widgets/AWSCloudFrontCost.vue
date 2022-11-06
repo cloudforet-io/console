@@ -5,11 +5,15 @@
                                        :data-range="DATA_LIMIT"
                                        :print-mode="printMode"
     >
-        <p-data-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading"
+                       class="chart-wrapper"
+        >
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
-            <div ref="chartRef" class="chart" />
+            <div ref="chartRef"
+                 class="chart"
+            />
         </p-data-loader>
         <div class="table-wrapper">
             <cost-dashboard-data-table :fields="tableState.fields"
@@ -42,10 +46,8 @@ import bytes from 'bytes';
 import dayjs from 'dayjs';
 import { sortBy } from 'lodash';
 
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { i18n } from '@/translations';
 
@@ -73,7 +75,6 @@ import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/Cos
 import type {
     CostAnalyzeModel, Legend, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
-
 
 interface TableData {
     trafficOut?: TableItem;
@@ -271,7 +272,7 @@ export default {
             });
 
             const valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
-            if (state.items.every(d => d.totalCost === 0)) valueAxis.min = 0;
+            if (state.items.every((d) => d.totalCost === 0)) valueAxis.min = 0;
             valueAxis.tooltip.disabled = true;
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.adapter.add('stroke', (stroke, target) => {
@@ -309,7 +310,7 @@ export default {
                     usageQuantity = bytes.parse(`${item.usage_quantity}GB`);
                 }
                 const resourceId = item[state.groupBy];
-                const existData = results.find(d => d.resourceId === resourceId);
+                const existData = results.find((d) => d.resourceId === resourceId);
                 if (existData) {
                     existData[item.usage_type] = item.usd_cost;
                     existData[usageType[item.usage_type]] = {

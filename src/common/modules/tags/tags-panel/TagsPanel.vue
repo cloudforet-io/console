@@ -1,6 +1,8 @@
 <template>
     <div>
-        <p-panel-top :use-total-count="true" :total-count="isCustomMode ? customItems.length : items.length">
+        <p-panel-top :use-total-count="true"
+                     :total-count="isCustomMode ? customItems.length : items.length"
+        >
             <template #default>
                 {{ $t('COMMON.TAGS.TITLE') }}
             </template>
@@ -23,8 +25,12 @@
                       :col-copy="true"
                       beautify-text
         >
-            <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
-                <slot :name="slot" v-bind="scope" />
+            <template v-for="(_, slot) of $scopedSlots"
+                      #[slot]="scope"
+            >
+                <slot :name="slot"
+                      v-bind="scope"
+                />
             </template>
         </p-data-table>
         <transition name="slide-up">
@@ -32,7 +38,8 @@
                           :title="overlayTitle"
                           :tags="isCustomMode ? customTags : tags"
                           :resource-id="resourceId"
-                          :resource-key="resourceKey" :resource-type="resourceType"
+                          :resource-key="resourceKey"
+                          :resource-type="resourceType"
                           :loading="loading"
                           @close="closeTag"
                           @update="handleTagUpdate"
@@ -42,7 +49,6 @@
 </template>
 
 <script lang="ts">
-
 
 import type { PropType, SetupContext } from 'vue';
 import {
@@ -115,7 +121,7 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
-        const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
+        const apiKeys = computed(() => props.resourceType.split('.').map((d) => camelCase(d)));
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
         const state = reactive({
@@ -126,7 +132,7 @@ export default {
                 { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
                 { name: 'value', label: i18n.t('COMMON.TAGS.VALUE'), type: 'item' },
             ]),
-            items: computed(() => Object.keys(state.tags).map(k => ({ key: k, value: state.tags[k] }))),
+            items: computed(() => Object.keys(state.tags).map((k) => ({ key: k, value: state.tags[k] }))),
         });
         const tagState = reactive({
             tagEditPageVisible: false,
@@ -162,7 +168,7 @@ export default {
             tagState.tagEditPageVisible = false;
         };
         const handleTagUpdate = async (newTags) => {
-            if (!api) {
+            if (!api.value) {
                 ErrorHandler.handleRequestError(new Error(), i18n.t('COMMON.TAGS.ALT_E_UPDATE'));
                 return;
             }
@@ -184,14 +190,17 @@ export default {
             tagState.tagEditPageVisible = false;
         };
 
-        watch([() => props.resourceKey, () => props.resourceId, () => props.resourceType],
+        watch(
+            [() => props.resourceKey, () => props.resourceId, () => props.resourceType],
             async ([resourceKey, resourceId, resourceType]) => {
                 if (resourceKey && resourceId && resourceType && !state.isCustomMode) {
                     await getTags();
                 } else {
                     state.loading = false;
                 }
-            }, { immediate: true });
+            },
+            { immediate: true },
+        );
 
         return {
             ...toRefs(state),

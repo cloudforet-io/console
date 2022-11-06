@@ -47,7 +47,9 @@
                 <div class="col-type">
                     <p-lazy-img :src="plugins[value] ? plugins[value].icon : 'ic_webhook'"
                                 error-icon="ic_webhook"
-                                width="1.5rem" height="1.5rem" class="mr-2"
+                                width="1.5rem"
+                                height="1.5rem"
+                                class="mr-2"
                     />
                     {{ plugins[value] ? plugins[value].label : value }}
                 </div>
@@ -82,7 +84,9 @@
             <template #col-plugin_info.plugin_id-format="{value}">
                 <p-lazy-img :src="plugins[value] ? plugins[value].icon : 'ic_webhook'"
                             error-icon="ic_webhook"
-                            width="1.5rem" height="1.5rem" class="mr-2"
+                            width="1.5rem"
+                            height="1.5rem"
+                            class="mr-2"
                 />
                 {{ plugins[value] ? plugins[value].label : value }}
             </template>
@@ -173,7 +177,6 @@ import { WEBHOOK_STATE } from '@/services/alert-manager/lib/config';
 import WebhookAddFormModal from '@/services/project/project-detail/project-alert/project-webhook/modules/WebhookAddFormModal.vue';
 import WebhookUpdateFormModal from '@/services/project/project-detail/project-alert/project-webhook/modules/WebhookUpdateFormModal.vue';
 
-
 export default {
     name: 'ProjectWebhookPage',
     components: {
@@ -262,7 +265,7 @@ export default {
             ],
             items: [],
             selectIndex: [],
-            selectedItem: computed(() => state.selectIndex.map(i => state.items[i])),
+            selectedItem: computed(() => state.selectIndex.map((i) => state.items[i])),
             isSelectedItem: computed(() => state.selectedItem.length),
             totalCount: 0,
             tags: webhookListApiQueryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,

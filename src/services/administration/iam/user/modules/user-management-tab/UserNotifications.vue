@@ -4,13 +4,14 @@
             {{ title }}
             <template #extra>
                 <router-link :to="manageLink">
-                    <p-button style-type="primary" :disabled="manageDisabled">
+                    <p-button style-type="primary"
+                              :disabled="manageDisabled"
+                    >
                         {{ $t('IDENTITY.USER.NOTIFICATION.MANAGE') }}
                     </p-button>
                 </router-link>
             </template>
         </p-panel-top>
-
 
         <p-data-table
             :items="items"
@@ -20,7 +21,9 @@
         >
             <template #col-data-format="{ item }">
                 <div v-if="item.data.length > 1">
-                    <p v-for="(value, index) in item.data" :key="`item-${index}`">
+                    <p v-for="(value, index) in item.data"
+                       :key="`item-${index}`"
+                    >
                         {{ Object.keys(value)[0] }} : {{ Object.values(value)[0] }}
                     </p>
                 </div>
@@ -34,7 +37,9 @@
             </template>
             <template #col-schedule-format="{value}">
                 <p v-if="value">
-                    <span v-for="day in value.day_of_week" :key="day"> {{ day }}</span><br>
+                    <span v-for="day in value.day_of_week"
+                          :key="day"
+                    > {{ day }}</span><br>
                     {{ utcToTimezoneFormatter(value.start_hour, timezone) }}:00 ~
                     {{ utcToTimezoneFormatter(value.end_hour, timezone) }}:00
                 </p>
@@ -42,8 +47,13 @@
             </template>
             <template #col-subscriptions-format="{value}">
                 <ul v-if="value.length > 0">
-                    <li v-for="(item, index) in value" :key="`topic-${index}`">
-                        <p-badge style-type="gray200" shape="square" class="rounded">
+                    <li v-for="(item, index) in value"
+                        :key="`topic-${index}`"
+                    >
+                        <p-badge style-type="gray200"
+                                 shape="square"
+                                 class="rounded"
+                        >
                             {{ item }}
                         </p-badge>
                     </li>
@@ -67,7 +77,6 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -131,7 +140,7 @@ export default {
             }
         };
 
-        const injectProtocolName = (channel: ChannelItem) => (state.protocolList as any).find(i => i.protocol_id === channel.protocol_id).name;
+        const injectProtocolName = (channel: ChannelItem) => (state.protocolList as any).find((i) => i.protocol_id === channel.protocol_id).name;
 
         const channelApiQuery = new ApiQueryHelper();
         const listUserChannel = async () => {
@@ -141,7 +150,7 @@ export default {
                 const res = await SpaceConnector.client.notification.userChannel.list({
                     query: channelApiQuery.data,
                 });
-                state.items = res.results.map(d => ({
+                state.items = res.results.map((d) => ({
                     ...d,
                     // eslint-disable-next-line camelcase
                     protocol_type: injectProtocolName(d),
@@ -158,7 +167,6 @@ export default {
             await listProtocol();
             await listUserChannel();
         }, { immediate: true });
-
 
         return {
             ...toRefs(state),

@@ -1,10 +1,13 @@
 <template>
     <fragment>
-        <component :is="tag" v-bind="childProps" class="info-button"
+        <component :is="tag"
+                   v-bind="childProps"
+                   class="info-button"
                    @click.stop="href ? undefined : $store.dispatch('display/showInfo')"
         >
             <p-i name="ic_outlined-info"
-                 width="0.875rem" height="0.875rem"
+                 width="0.875rem"
+                 height="0.875rem"
                  color="inherit"
             />
             <span class="text">
@@ -15,7 +18,9 @@
             <slot name="title" />
         </portal>
         <portal to="info-contents">
-            <div class="info-contents" :class="{'no-title': !$scopedSlots.title }">
+            <div class="info-contents"
+                 :class="{'no-title': !$scopedSlots.title }"
+            >
                 <slot name="contents" />
             </div>
         </portal>
@@ -33,7 +38,6 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import { PI, PAnchor } from '@spaceone/design-system';
-
 
 export default {
     name: 'InfoButton',

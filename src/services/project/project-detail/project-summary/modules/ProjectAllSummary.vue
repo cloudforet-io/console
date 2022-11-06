@@ -3,17 +3,27 @@
         <div class="title">
             <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TITLE') }}</span>
         </div>
-        <p-balloon-tab v-model="activeTab" size="sm" style-type="primary"
+        <p-balloon-tab v-model="activeTab"
+                       size="sm"
+                       style-type="primary"
                        :tabs="tabs"
                        tail
                        @change="handleChangeTab"
         >
             <template #tab="{name}">
-                <div class="box" :class="{selected: name === activeTab}">
+                <div class="box"
+                     :class="{selected: name === activeTab}"
+                >
                     <span>{{ labelMap[name] }}</span>
-                    <span v-if="name === SERVICE_CATEGORY.STORAGE" class="suffix">({{ storageSuffix }})</span>
-                    <p-spinner v-if="summaryLoading" size="sm" />
-                    <span v-else class="count"> {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(countMap[name]).split(' ')[0] : commaFormatter(countMap[name]) }}</span>
+                    <span v-if="name === SERVICE_CATEGORY.STORAGE"
+                          class="suffix"
+                    >({{ storageSuffix }})</span>
+                    <p-spinner v-if="summaryLoading"
+                               size="sm"
+                    />
+                    <span v-else
+                          class="count"
+                    > {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(countMap[name]).split(' ')[0] : commaFormatter(countMap[name]) }}</span>
                 </div>
             </template>
         </p-balloon-tab>
@@ -22,7 +32,9 @@
                 <div class="chart-wrapper">
                     <div class="sub-title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
-                        <span v-if="activeTab === SERVICE_CATEGORY.STORAGE" class="suffix">({{ storageTrendSuffix }})</span>
+                        <span v-if="activeTab === SERVICE_CATEGORY.STORAGE"
+                              class="suffix"
+                        >({{ storageTrendSuffix }})</span>
                     </div>
                     <div class="toggle-button-group">
                         <p-select-button v-for="(d, idx) in dateTypes"
@@ -37,9 +49,13 @@
                     </div>
                     <p-data-loader :loading="chartState.loading">
                         <template #loader>
-                            <p-skeleton width="100%" height="100%" />
+                            <p-skeleton width="100%"
+                                        height="100%"
+                            />
                         </template>
-                        <div ref="chartRef" class="chart" />
+                        <div ref="chartRef"
+                             class="chart"
+                        />
                     </p-data-loader>
                 </div>
                 <div class="summary-wrapper">
@@ -56,12 +72,15 @@
                                 </div>
                                 <span class="count">{{ activeTab === SERVICE_CATEGORY.STORAGE ? byteFormatter(countMap[activeTab]) : commaFormatter(countMap[activeTab]) }}</span>
                             </router-link>
-                            <router-link v-for="(data, idx) of summaryData" :key="idx"
+                            <router-link v-for="(data, idx) of summaryData"
+                                         :key="idx"
                                          :to="data.to"
                                          class="summary-row"
                             >
                                 <div class="text-group">
-                                    <span class="provider" :style="{ color: getColor(data) }">{{ data.label }}</span>
+                                    <span class="provider"
+                                          :style="{ color: getColor(data) }"
+                                    >{{ data.label }}</span>
                                     <span class="type">{{ data.type }}</span>
                                 </div>
                                 <span class="count">{{ data.count }}</span>
@@ -71,7 +90,9 @@
                     <template v-else-if="!loading">
                         <div class="summary-content-wrapper no-data-wrapper">
                             <div class="m-auto">
-                                <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
+                                <img src="@/assets/images/illust_cloud.svg"
+                                     class="empty-image hidden lg:block"
+                                >
                                 <p class="text">
                                     {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: labelMap[activeTab] }) }}
                                 </p>
@@ -79,7 +100,10 @@
                         </div>
                     </template>
                     <template v-else>
-                        <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
+                        <div v-for="v in skeletons"
+                             :key="v"
+                             class="flex items-center p-2 col-span-3"
+                        >
                             <p-skeleton class="flex-grow" />
                         </div>
                     </template>
@@ -88,7 +112,10 @@
                     <div class="sub-title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE_TITLE') }}</span>
                     </div>
-                    <project-region-service :project-id="projectId" :label="activeTab" :count="countMap[activeTab]" />
+                    <project-region-service :project-id="projectId"
+                                            :label="activeTab"
+                                            :count="countMap[activeTab]"
+                    />
                 </div>
             </div>
         </div>
@@ -133,7 +160,6 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import type { DateType, ServiceCategory } from '@/services/project/project-detail/project-summary/modules/config';
 import { DATE_TYPE, SERVICE_CATEGORY } from '@/services/project/project-detail/project-summary/modules/config';
 import ProjectRegionService from '@/services/project/project-detail/project-summary/modules/ProjectRegionService.vue';
-
 
 interface ChartData {
     date: string;
@@ -313,7 +339,7 @@ export default {
 
                 state.countMap = {};
                 Object.values(SERVICE_CATEGORY).forEach((serviceName) => {
-                    const result = results.find(d => d.label === serviceName);
+                    const result = results.find((d) => d.label === serviceName);
                     const count = result?.total || 0;
                     state.countMap[serviceName] = count;
                     if (serviceName === SERVICE_CATEGORY.STORAGE) {
@@ -343,7 +369,7 @@ export default {
                 const data = res.results;
 
                 if (type === SERVICE_CATEGORY.STORAGE) {
-                    const smallestCount = Math.min(...data.map(d => d.total));
+                    const smallestCount = Math.min(...data.map((d) => d.total));
                     const formattedSize = byteFormatter(smallestCount);
                     if (formattedSize) state.storageTrendSuffix = formattedSize.split(' ')[1] as Unit;
                 }
@@ -360,7 +386,7 @@ export default {
                 });
                 forEach(range(0, dateRange), (i) => {
                     const date = utcToday.subtract(i, dateUnit);
-                    if (!(chartData.find(d => d.date.isSame(date, 'day')))) {
+                    if (!(chartData.find((d) => d.date.isSame(date, 'day')))) {
                         chartData.push({ date, count: null });
                     }
                 });

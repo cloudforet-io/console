@@ -8,7 +8,6 @@ import * as styles from '@/styles/colors';
 
 import { USER_STATE, USER_TYPE_LABEL } from '@/services/administration/iam/user/type';
 
-
 export const userSearchHandlers = {
     keyItemSets: [{
         title: 'Properties',

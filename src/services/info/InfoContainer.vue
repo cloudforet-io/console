@@ -34,7 +34,6 @@ import InfoLNB from '@/services/info/InfoLNB.vue';
 import { infoStore, infoStoreModule } from '@/services/info/store';
 import type { InfoState } from '@/services/info/store/type';
 
-
 export default defineComponent({
     name: 'InfoContainer',
     components: {

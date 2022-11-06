@@ -96,7 +96,7 @@ const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d)
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
-    const menuList = rootState.domain.billingEnabled ? MENU_LIST : MENU_LIST.filter(d => d.id !== MENU_ID.COST_EXPLORER);
+    const menuList = rootState.domain.billingEnabled ? MENU_LIST : MENU_LIST.filter((d) => d.id !== MENU_ID.COST_EXPLORER);
 
     let _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(menuList);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
@@ -104,6 +104,6 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
     return _allGnbMenuList;
 };
 
-export const GNBMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter(d => !d.hideOnGNB);
+export const GNBMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter((d) => !d.hideOnGNB);
 
-export const siteMapMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter(d => !d.hideOnSiteMap);
+export const siteMapMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter((d) => !d.hideOnSiteMap);

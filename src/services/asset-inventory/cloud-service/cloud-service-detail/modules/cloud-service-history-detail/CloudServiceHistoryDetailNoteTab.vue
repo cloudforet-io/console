@@ -1,17 +1,24 @@
 <template>
     <p-pane-layout class="cloud-service-history-detail-note">
-        <p-panel-top use-total-count :total-count="totalCount">
+        <p-panel-top use-total-count
+                     :total-count="totalCount"
+        >
             {{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}
         </p-panel-top>
         <article class="note-wrapper">
-            <p-collapsible-list :items="noteList" toggle-position="contents" :line-clamp="2">
+            <p-collapsible-list :items="noteList"
+                                toggle-position="contents"
+                                :line-clamp="2"
+            >
                 <template #title="{data, title, index}">
                     <div class="title-wrapper">
                         <p>
                             <span class="author">{{ title }}</span>
                             <span class="date">{{ iso8601Formatter(noteList[index].created_at, timezone) }}</span>
                         </p>
-                        <p-select-dropdown style-type="icon-button" button-icon="ic_more" :items="menuItems"
+                        <p-select-dropdown style-type="icon-button"
+                                           button-icon="ic_more"
+                                           :items="menuItems"
                                            menu-position="right"
                                            :disabled="manageDisabled"
                                            @select="handleSelect(data.note_id)"
@@ -24,8 +31,11 @@
             </p-collapsible-list>
         </article>
         <article class="add-note-wrapper">
-            <p-textarea :value="noteInput" @input="handleChangeNoteInput" />
-            <p-button style-type="tertiary" class="add-btn"
+            <p-textarea :value="noteInput"
+                        @input="handleChangeNoteInput"
+            />
+            <p-button style-type="tertiary"
+                      class="add-btn"
                       :disabled="(noteInput.trim()).length === 0 || manageDisabled"
                       @click="handleCreateNote"
             >
@@ -100,7 +110,6 @@ export default {
             totalCount: 0,
         });
 
-
         const handleChangeNoteInput = (e) => {
             state.noteInput = e.target?.value;
         };
@@ -112,7 +121,7 @@ export default {
                 const res = await SpaceConnector.client.inventory.note.list({
                     query: apiQuery.data,
                 });
-                state.noteList = res.results.map(d => ({
+                state.noteList = res.results.map((d) => ({
                     title: d.created_by,
                     data: {
                         note: d.note,
@@ -188,7 +197,6 @@ export default {
             await listNote();
         })();
 
-
         return {
             ...toRefs(state),
             checkDeleteState,
@@ -201,7 +209,6 @@ export default {
         };
     },
 };
-
 
 </script>
 

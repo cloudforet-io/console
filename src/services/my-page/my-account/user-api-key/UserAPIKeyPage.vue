@@ -1,7 +1,8 @@
 <template>
     <section class="api-key-wrapper">
         <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
-                      :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')" class="page-title"
+                      :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')"
+                      class="page-title"
         />
         <user-a-p-i-key-table :user-id="userId" />
         <p-pane-layout class="sub-table-wrapper">
@@ -29,7 +30,6 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { store } from '@/store';
 
@@ -69,7 +69,7 @@ export default {
             state.loading = true;
             try {
                 const { results } = await SpaceConnector.client.identity.endpoint.list();
-                state.items = results.filter(d => d.service === 'inventory' || d.service === 'statistics' || d.service === 'monitoring'
+                state.items = results.filter((d) => d.service === 'inventory' || d.service === 'statistics' || d.service === 'monitoring'
                     || d.service === 'cost-analysis' || d.service === 'notification');
             } catch (e) {
                 ErrorHandler.handleError(e);

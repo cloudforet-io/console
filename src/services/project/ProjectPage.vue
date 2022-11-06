@@ -9,10 +9,15 @@
                                 <span class="count">({{ favoriteItems.length }})</span>
                             </template>
                         </sidebar-title>
-                        <favorite-list :items="favoriteItems" :before-route="beforeFavoriteRoute" @delete="onFavoriteDelete">
+                        <favorite-list :items="favoriteItems"
+                                       :before-route="beforeFavoriteRoute"
+                                       @delete="onFavoriteDelete"
+                        >
                             <template #icon="{item}">
                                 <p-i :name="item.itemType === FAVORITE_TYPE.PROJECT ? 'ic_tree_project' : 'ic_tree_project-group'"
-                                     width="1rem" height="1rem" color="inherit inherit"
+                                     width="1rem"
+                                     height="1rem"
+                                     color="inherit inherit"
                                 />
                             </template>
                         </favorite-list>
@@ -24,7 +29,9 @@
                     </div>
 
                     <div class="sidebar-item-wrapper">
-                        <project-tree :init-group-id="initGroupId" :manage-disabled="!hasManagePermission" />
+                        <project-tree :init-group-id="initGroupId"
+                                      :manage-disabled="!hasManagePermission"
+                        />
                     </div>
                 </div>
             </template>
@@ -32,7 +39,9 @@
                 <div class="page-wrapper">
                     <div class="parents-info">
                         <span class="group-name">
-                            <p-breadcrumbs :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
+                            <p-breadcrumbs :routes="projectGroupNavigation"
+                                           @click="onProjectGroupNavClick"
+                            />
                         </span>
                     </div>
                     <p-page-title :title="storeState.groupName ? storeState.groupName : $t('PROJECT.LANDING.ALL_PROJECT')"
@@ -72,7 +81,8 @@
                                     >
                                         <div>
                                             <p-i name="ic_member"
-                                                 width="1rem" height="1rem"
+                                                 width="1rem"
+                                                 height="1rem"
                                                  color="inherit transparent"
                                             />
                                             <span class="text">{{ groupMemberCount || 0 }}</span>
@@ -148,7 +158,6 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
 import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
-
 import ProjectCardList from '@/services/project/modules/ProjectCardList.vue';
 import ProjectGroupDeleteCheckModal from '@/services/project/modules/ProjectGroupDeleteCheckModal.vue';
 import ProjectGroupFormModal from '@/services/project/modules/ProjectGroupFormModal.vue';
@@ -160,7 +169,6 @@ import type { ProjectPageState } from '@/services/project/store/type';
 import type {
     ProjectGroup,
 } from '@/services/project/type';
-
 
 export default {
     name: 'ProjectGroupPage',
@@ -228,7 +236,7 @@ export default {
                 { name: 'delete', label: i18n.t('PROJECT.LANDING.ACTION_DELETE_THIS_GROUP'), type: 'item' },
             ] as MenuItem[]),
             projectGroupNavigation: computed(() => {
-                const result = storeState.parentGroups.map(d => ({ name: d.name, data: d }));
+                const result = storeState.parentGroups.map((d) => ({ name: d.name, data: d }));
                 if (storeState.selectedNodeData) {
                     result.push({ name: storeState.groupName, data: storeState.selectedNodeData });
                 }
@@ -238,7 +246,6 @@ export default {
             groupMemberPageVisible: false,
             isPermissionDenied: computed(() => state.groupMemberCount === undefined),
         });
-
 
         /* Favorite */
         const onFavoriteDelete = (item: FavoriteItem) => {
@@ -254,12 +261,10 @@ export default {
             }
         };
 
-
         /* Navigation */
         const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroup}) => {
             if (item.data) await store.dispatch('service/project/selectNode', item.data.id);
         };
-
 
         /* Handling Forms */
         const openProjectGroupDeleteCheckModal = () => {
@@ -309,7 +314,6 @@ export default {
             }
         };
 
-
         watch(() => storeState.groupId, async (groupId) => {
             await getMemberCount(groupId);
         });
@@ -347,7 +351,6 @@ export default {
                 store.dispatch('reference/projectGroup/load'),
             ]);
         })();
-
 
         return {
             storeState,

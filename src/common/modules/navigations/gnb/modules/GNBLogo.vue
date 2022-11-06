@@ -1,14 +1,29 @@
 <template>
-    <span class="gnb-logo" data-gtm="gtm-gnb-logo">
+    <span class="gnb-logo"
+          data-gtm="gtm-gnb-logo"
+    >
         <component :is="to ? 'router-link' : 'div'"
-                   class="inline-block" :to="to"
+                   class="inline-block"
+                   :to="to"
         >
             <div class="logo-wrapper">
-                <img v-if="ciLogoImage" class="logo-character" :src="ciLogoImage">
-                <img v-else class="logo-character" src="@/assets/images/brand/brand_logo.png">
+                <img v-if="ciLogoImage"
+                     class="logo-character"
+                     :src="ciLogoImage"
+                >
+                <img v-else
+                     class="logo-character"
+                     src="@/assets/images/brand/brand_logo.png"
+                >
 
-                <img v-if="ciTextImage" class="logo-text" :src="ciTextImage">
-                <img v-else class="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA v1.9.svg">
+                <img v-if="ciTextImage"
+                     class="logo-text"
+                     :src="ciTextImage"
+                >
+                <img v-else
+                     class="logo-text"
+                     src="@/assets/images/brand/SpaceONE_logoTypeA v1.9.svg"
+                >
             </div>
         </component>
     </span>
@@ -21,7 +36,6 @@ import {
 } from 'vue';
 
 import config from '@/lib/config';
-
 
 export default defineComponent({
     name: 'GNBLogo',

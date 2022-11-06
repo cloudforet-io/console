@@ -11,9 +11,13 @@
         </div>
 
         <!-- KB Domain Tab -->
-        <div v-if="domainList.length > 0" class="domain-tab">
+        <div v-if="domainList.length > 0"
+             class="domain-tab"
+        >
             <ul>
-                <li v-for="(domain) in domainList" :key="domain.domain_id">
+                <li v-for="(domain) in domainList"
+                    :key="domain.domain_id"
+                >
                     <p-button :class="{ 'active': domain.domain_id === selectedDomainId }"
                               class="btn"
                               @click="switchDomain(domain)"
@@ -25,17 +29,31 @@
         </div>
 
         <!-- If you want to reload when the state is changed, bind key with reactive state. -->
-        <p-data-loader :loading="loading" disable-empty-case>
-            <div :key="selectedDomainId" class="contents-wrapper">
+        <p-data-loader :loading="loading"
+                       disable-empty-case
+        >
+            <div :key="selectedDomainId"
+                 class="contents-wrapper"
+            >
                 <!-- Give extra parameter objects for api requests in widgets. -->
                 <div class="col-span-12 lg:col-span-9
                         widget-wrapper"
                 >
-                    <all-summary class="col-span-12" :extra-params="extraParams" />
-                    <resource-map class="col-span-12" :extra-params="extraParams" />
-                    <personal-health-dashboard class="col-span-12" :extra-params="extraParams" />
-                    <trusted-advisor class="col-span-12" :extra-params="extraParams" />
-                    <top-projects class="col-span-12" :extra-params="extraParams" />
+                    <all-summary class="col-span-12"
+                                 :extra-params="extraParams"
+                    />
+                    <resource-map class="col-span-12"
+                                  :extra-params="extraParams"
+                    />
+                    <personal-health-dashboard class="col-span-12"
+                                               :extra-params="extraParams"
+                    />
+                    <trusted-advisor class="col-span-12"
+                                     :extra-params="extraParams"
+                    />
+                    <top-projects class="col-span-12"
+                                  :extra-params="extraParams"
+                    />
                 </div>
                 <div class="col-span-12 lg:col-span-3
                     widget-wrapper"
@@ -43,17 +61,27 @@
                     <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
                     >
-                        <favorites-widget class="hidden lg:block col-span-12" :extra-params="extraParams" />
+                        <favorites-widget class="hidden lg:block col-span-12"
+                                          :extra-params="extraParams"
+                        />
                         <daily-updates class="col-span-12 daily-updates"
-                                       :providers="providers" :extra-params="extraParams"
+                                       :providers="providers"
+                                       :extra-params="extraParams"
                         />
                     </div>
                     <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
                     >
-                        <service-accounts class="col-span-12" :extra-params="extraParams" />
-                        <collector-progress class="col-span-12 collector-progress" :extra-params="extraParams" />
-                        <cloud-services class="col-span-12 cloud-services" :more-info="true" :extra-params="extraParams" />
+                        <service-accounts class="col-span-12"
+                                          :extra-params="extraParams"
+                        />
+                        <collector-progress class="col-span-12 collector-progress"
+                                            :extra-params="extraParams"
+                        />
+                        <cloud-services class="col-span-12 cloud-services"
+                                        :more-info="true"
+                                        :extra-params="extraParams"
+                        />
                     </div>
                 </div>
             </div>
@@ -70,7 +98,6 @@ import type { Vue } from 'vue/types/vue';
 import { PButton, PDataLoader } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { store } from '@/store';
 

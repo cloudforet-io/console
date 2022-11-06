@@ -1,7 +1,12 @@
 <template>
     <div>
-        <p-page-title :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.UPDATE_BUDGET')" child @goBack="$router.go(-1)" />
-        <budget-form :budget-id="budgetId" @confirm="handleFormConfirm" />
+        <p-page-title :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.UPDATE_BUDGET')"
+                      child
+                      @goBack="$router.go(-1)"
+        />
+        <budget-form :budget-id="budgetId"
+                     @confirm="handleFormConfirm"
+        />
     </div>
 </template>
 

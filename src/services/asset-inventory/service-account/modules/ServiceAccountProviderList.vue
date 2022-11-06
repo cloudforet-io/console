@@ -1,10 +1,15 @@
 <template>
-    <div class="service-account-provider-list" :class="{'low-count-provider-list': providerList.length < 6}">
-        <button v-for="item in providerList" :key="item.key" :class="{'provider-button': true, 'selected-button' : item.key === selectedProvider}"
+    <div class="service-account-provider-list"
+         :class="{'low-count-provider-list': providerList.length < 6}"
+    >
+        <button v-for="item in providerList"
+                :key="item.key"
+                :class="{'provider-button': true, 'selected-button' : item.key === selectedProvider}"
                 @click="() => handleSelectProvider(item.key)"
         >
             <p-lazy-img :src="item.icon"
-                        width="1rem" height="1rem"
+                        width="1rem"
+                        height="1rem"
             />
             <p :class="{'provider-name': true, 'selected': item.key === selectedProvider }">
                 {{ item.name }}
@@ -19,7 +24,6 @@ import type { SetupContext } from 'vue';
 import { defineComponent, reactive, toRefs } from 'vue';
 
 import { PLazyImg } from '@spaceone/design-system';
-
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -51,7 +55,6 @@ export default defineComponent({
         };
     },
 });
-
 
 </script>
 

@@ -4,7 +4,10 @@
         <section class="items-container">
             <div class="item">
                 <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
-                <p-anchor :to="collector.linkLocation" class="contents" size="sm">
+                <p-anchor :to="collector.linkLocation"
+                          class="contents"
+                          size="sm"
+                >
                     {{ collector.label }}
                 </p-anchor>
             </div>
@@ -17,9 +20,12 @@
             <div class="item">
                 <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PLUGIN') }}</label>
                 <span class="contents align-middle">
-                    <p-lazy-img :src="plugin.icon" error-icon="ic_provider_other"
+                    <p-lazy-img :src="plugin.icon"
+                                error-icon="ic_provider_other"
                                 :loading="!plugin.id"
-                                :alt="plugin.label" width="1rem" height="1rem"
+                                :alt="plugin.label"
+                                width="1rem"
+                                height="1rem"
                                 class="mr-1"
                     />
                     {{ plugin.label }}
@@ -52,7 +58,6 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { store } from '@/store';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
@@ -62,7 +67,6 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 interface Props {
     jobId: string;

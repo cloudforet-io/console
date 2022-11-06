@@ -7,12 +7,15 @@
     >
         <template #default>
             <div class="widget-wrapper">
-                <p-data-loader :loading="loading" loader-type="skeleton"
+                <p-data-loader :loading="loading"
+                               loader-type="skeleton"
                                disable-empty-case
                                :disable-transition="printMode"
                                class="chart-wrapper"
                 >
-                    <div ref="chartRef" class="chart" />
+                    <div ref="chartRef"
+                         class="chart"
+                    />
                 </p-data-loader>
                 <cost-dashboard-data-table
                     :fields="tableState.fields"
@@ -77,7 +80,6 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardCardWidgetLayout from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 import type { TrafficWidgetTableData } from '@/services/cost-explorer/widgets/type';
-
 
 const valueName = 'value';
 
@@ -151,7 +153,7 @@ export default {
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             data: [] as Data[],
-            chartData: computed<BubbleChartData[]>(() => state.data.map(d => ({
+            chartData: computed<BubbleChartData[]>(() => state.data.map((d) => ({
                 value: d.usd_cost > 1 ? d.usd_cost : undefined,
                 longitude: parseFloat(state.regions[d.region_code]?.longitude ?? 0),
                 latitude: parseFloat(state.regions[d.region_code]?.latitude ?? 0),
@@ -296,14 +298,11 @@ export default {
             });
         };
 
-
         const costQueryHelper = new QueryHelper();
         const fetchData = async () => {
             costQueryHelper
                 .setFilters(getConvertedFilter(props.filters))
-                .addFilter(
-                    { k: 'provider', v: 'aws', o: '=' }, { k: 'product', v: 'AWSDataTransfer', o: '=' },
-                );
+                .addFilter({ k: 'provider', v: 'aws', o: '=' }, { k: 'product', v: 'AWSDataTransfer', o: '=' });
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: true,
@@ -338,7 +337,6 @@ export default {
             }
         };
 
-
         watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
             if (!loading && chartContext) {
                 drawChart(chartContext);
@@ -357,7 +355,6 @@ export default {
             ]);
             await getChartData();
         })();
-
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();

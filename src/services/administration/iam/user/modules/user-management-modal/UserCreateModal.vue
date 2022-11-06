@@ -10,7 +10,9 @@
                     @close="handleClose"
     >
         <template #body>
-            <p-box-tab v-model="formState.activeTab" :tabs="formState.tabs" style-type="gray"
+            <p-box-tab v-model="formState.activeTab"
+                       :tabs="formState.tabs"
+                       style-type="gray"
                        class="auth-type-tab"
             >
                 <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
@@ -43,7 +45,9 @@
                                 </template>
                             </p-search-dropdown>
                         </div>
-                        <div v-else class="id-input-form">
+                        <div v-else
+                             class="id-input-form"
+                        >
                             <p-text-input v-model="formState.user_id"
                                           v-focus
                                           :placeholder="$t('IDENTITY.USER.FORM.NAME_PLACEHOLDER')"
@@ -59,8 +63,13 @@
                         </div>
                     </template>
                 </p-field-group>
-                <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')" class="input-form">
-                    <p-text-input v-model="formState.name" class="text-input" autocomplete="username" />
+                <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')"
+                               class="input-form"
+                >
+                    <p-text-input v-model="formState.name"
+                                  class="text-input"
+                                  autocomplete="username"
+                    />
                 </p-field-group>
                 <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')"
                                :invalid="validationState.isEmailValid === false"
@@ -68,10 +77,15 @@
                                class="input-form"
                 >
                     <template #default="{invalid}">
-                        <p-text-input v-model="formState.email" :invalid="invalid" class="text-input" />
+                        <p-text-input v-model="formState.email"
+                                      :invalid="invalid"
+                                      class="text-input"
+                        />
                     </template>
                 </p-field-group>
-                <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')" class="input-form">
+                <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')"
+                               class="input-form"
+                >
                     <p-select-dropdown v-model="formState.domainRole"
                                        :items="formState.domainRoleItem"
                                        :disabled="formState.domainRoleItem.length < 2 || isSameId"
@@ -90,7 +104,8 @@
                         class="input-form"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="formState.password" type="password"
+                            <p-text-input v-model="formState.password"
+                                          type="password"
                                           autocomplete="current-password"
                                           class="text-input"
                                           :invalid="invalid"
@@ -105,7 +120,8 @@
                         class="input-form"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="formState.passwordCheck" type="password"
+                            <p-text-input v-model="formState.passwordCheck"
+                                          type="password"
                                           class="text-input"
                                           autocomplete="new-password"
                                           :invalid="invalid"
@@ -114,7 +130,9 @@
                     </p-field-group>
                 </form>
                 <p-divider class="divider" />
-                <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')" class="tags-title">
+                <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')"
+                               class="tags-title"
+                >
                     <div class="tag-help-msg">
                         {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT1') }} <br>
                         {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
@@ -169,7 +187,6 @@ import {
     checkRequiredField, checkSamePassword,
 } from '@/services/administration/iam/user/lib/user-form-validations';
 import { administrationStore } from '@/services/administration/store';
-
 
 interface AuthType {
     user_type: string;
@@ -305,7 +322,7 @@ export default {
                 checkDuplicateID(formState.user_id),
                 checkEmptyValue(formState.user_id),
                 executeSpecificIDValidation()]);
-            const invalidObj = validation.find(item => item.invalidText.length > 0);
+            const invalidObj = validation.find((item) => item.invalidText.length > 0);
             if (!invalidObj) {
                 validationState.isUserIdValid = true;
                 validationState.userIdInvalidText = '';
@@ -320,7 +337,7 @@ export default {
                 checkRequiredField(formState.passwordCheck),
                 checkSamePassword(formState.passwordCheck, password),
             ]);
-            const passwordCheckInvalidObj = passwordCheckValidation.find(item => item.invalidText.length > 0);
+            const passwordCheckInvalidObj = passwordCheckValidation.find((item) => item.invalidText.length > 0);
             if (!passwordCheckInvalidObj) {
                 validationState.isPasswordCheckValid = true;
                 validationState.passwordCheckInvalidText = '';
@@ -337,7 +354,7 @@ export default {
                 checkOneUpperCase(password),
                 checkOneNumber(password),
             ]);
-            const passwordInvalidObj = passwordValidation.find(item => item.invalidText.length > 0);
+            const passwordInvalidObj = passwordValidation.find((item) => item.invalidText.length > 0);
             if (!passwordInvalidObj) {
                 validationState.isPasswordValid = true;
                 validationState.passwordInvalidText = '';
@@ -372,7 +389,7 @@ export default {
                 const { results } = await SpaceConnector.client.identity.role.list({
                     role_type: 'DOMAIN',
                 });
-                formState.domainRoleList = results.map(d => ({
+                formState.domainRoleList = results.map((d) => ({
                     type: 'item',
                     label: d.name,
                     name: d.role_id,

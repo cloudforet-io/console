@@ -7,7 +7,9 @@
         @confirm="handleConfirm"
     >
         <template #body>
-            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_TAG')" required>
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_TAG')"
+                           required
+            >
                 <template #label-extra>
                     <span class="font-normal">({{ selectedTags.length }})</span>
                 </template>
@@ -18,7 +20,9 @@
                     multi-selectable
                 />
             </p-field-group>
-            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ADDITIONAL_INFO')" required>
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ADDITIONAL_INFO')"
+                           required
+            >
                 <template #label-extra>
                     <span class="font-normal">({{ selectedAdditionalInfo.length }})</span>
                 </template>
@@ -55,7 +59,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { FILTER, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { MoreGroupByItem } from '@/services/cost-explorer/type';
-
 
 interface Props {
     visible: boolean;
@@ -129,21 +132,21 @@ export default defineComponent<Props>({
         };
         const tagsMenuHandler: AutocompleteHandler = async (value: string) => {
             const results = await getResources(value, FILTER.TAGS);
-            return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };
+            return { results: results ? results.map((d) => ({ name: d.key, label: d.name })) : [] };
         };
         const additionalInfoMenuHandler: AutocompleteHandler = async (value: string) => {
             const results = await getResources(value, FILTER.ADDITIONAL_INFO);
-            return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };
+            return { results: results ? results.map((d) => ({ name: d.key, label: d.name })) : [] };
         };
 
         /* Event */
         const handleConfirm = () => {
             const preMoreGroupBy = costExplorerStore.getters['costAnalysis/orderedMoreGroupByItems'];
-            const tagsGroupBy: MoreGroupByItem[] = state.selectedTags.map(d => ({
+            const tagsGroupBy: MoreGroupByItem[] = state.selectedTags.map((d) => ({
                 category: MORE_GROUP_BY.TAGS,
                 key: d.name as string,
             }));
-            const additionalInfoGroupBy: MoreGroupByItem[] = state.selectedAdditionalInfo.map(d => ({
+            const additionalInfoGroupBy: MoreGroupByItem[] = state.selectedAdditionalInfo.map((d) => ({
                 category: MORE_GROUP_BY.ADDITIONAL_INFO,
                 key: d.name as string,
             }));
@@ -152,7 +155,7 @@ export default defineComponent<Props>({
             // use previous data if the selected item already exists(because of `selected`, `disabled` properties)
             const mergedMoreGroupBy: MoreGroupByItem[] = [];
             updatedMoreGroupBy.forEach((item) => {
-                const _selected = preMoreGroupBy.find(d => d.category === item.category && d.key === item.key);
+                const _selected = preMoreGroupBy.find((d) => d.category === item.category && d.key === item.key);
                 if (_selected) mergedMoreGroupBy.push(_selected);
                 else mergedMoreGroupBy.push(item);
             });
@@ -163,10 +166,10 @@ export default defineComponent<Props>({
         /* Watcher */
         watch(() => props.visible, (visible) => {
             if (visible) {
-                state.selectedTags = props.prevMoreGroupByItems?.filter(d => d.category === MORE_GROUP_BY.TAGS).map(d => ({
+                state.selectedTags = props.prevMoreGroupByItems?.filter((d) => d.category === MORE_GROUP_BY.TAGS).map((d) => ({
                     name: d.key, label: d.key,
                 }));
-                state.selectedAdditionalInfo = props.prevMoreGroupByItems?.filter(d => d.category === MORE_GROUP_BY.ADDITIONAL_INFO).map(d => ({
+                state.selectedAdditionalInfo = props.prevMoreGroupByItems?.filter((d) => d.category === MORE_GROUP_BY.ADDITIONAL_INFO).map((d) => ({
                     name: d.key, label: d.key,
                 }));
             }

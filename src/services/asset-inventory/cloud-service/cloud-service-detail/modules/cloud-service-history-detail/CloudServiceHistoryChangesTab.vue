@@ -1,15 +1,25 @@
 <template>
     <div class="cloud-service-history-changes-tab">
-        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES')" use-total-count :total-count="changesCount" />
+        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES')"
+                     use-total-count
+                     :total-count="changesCount"
+        />
         <div class="cloud-service-history-changes-wrapper">
             <nav class="cloud-service-history-changes-key-nav">
                 <p-card :header="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.CHANGED_KEYS')">
-                    <p-context-menu :menu="keyMenus" :selected="[{name: selectedKeyMenu}]" @select="handleSelect">
+                    <p-context-menu :menu="keyMenus"
+                                    :selected="[{name: selectedKeyMenu}]"
+                                    @select="handleSelect"
+                    >
                         <template #item--format="{ item }">
                             <div class="flex justify-between items-center">
                                 <span>{{ item.label }}</span>
-                                <p-i v-if="item.updateType === 'ADDED'" name="ic_plus" color="#60B731"
-                                     width="1rem" height="1rem" class="p-i-ic_plus"
+                                <p-i v-if="item.updateType === 'ADDED'"
+                                     name="ic_plus"
+                                     color="#60B731"
+                                     width="1rem"
+                                     height="1rem"
+                                     class="p-i-ic_plus"
                                 />
                             </div>
                         </template>
@@ -21,19 +31,25 @@
                     <template #header>
                         <div class="cloud-service-history-changes-code-header-wrapper">
                             <div>
-                                <span v-for="(path, index) in selectedKeyPath.split('.')" :key="index"
+                                <span v-for="(path, index) in selectedKeyPath.split('.')"
+                                      :key="index"
                                       class="inline-flex items-center"
                                 >
                                     <span class="text-gray-500">
-                                        <p-i v-if="selectedKeyMenu && index !== 0" name="ic_arrow_right" color="inherit"
+                                        <p-i v-if="selectedKeyMenu && index !== 0"
+                                             name="ic_arrow_right"
+                                             color="inherit"
                                              scale="0.7"
                                         />
                                     </span>
                                     <span :class="index === selectedKeyPath.split('.').length - 1 ? 'text-gray-900' : 'text-gray-700'">{{ path }}</span>
                                 </span>
                             </div>
-                            <p-i width="1rem" height="1rem" :name="folding ? 'ic_code-expand' : 'ic_code-collapse'"
-                                 class="cursor-pointer" @click="handleCodeDisplayType"
+                            <p-i width="1rem"
+                                 height="1rem"
+                                 :name="folding ? 'ic_code-expand' : 'ic_code-collapse'"
+                                 class="cursor-pointer"
+                                 @click="handleCodeDisplayType"
                             />
                         </div>
                     </template>
@@ -42,7 +58,10 @@
                         <div>{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES_TAB.CHANGED') }}</div>
                     </div>
                     <div class="cloud-service-history-changes-code-area">
-                        <vue-diff :prev="previousValue" :current="changedValue" :folding="folding" />
+                        <vue-diff :prev="previousValue"
+                                  :current="changedValue"
+                                  :folding="folding"
+                        />
                     </div>
                 </p-card>
             </nav>
@@ -59,7 +78,6 @@ import {
 import {
     PPanelTop, PCard, PContextMenu, PI,
 } from '@spaceone/design-system';
-
 
 import vueDiff from '@/common/components/forms/vue-diff/Diff.vue';
 
@@ -88,12 +106,12 @@ export default defineComponent({
     },
     setup(props) {
         const state = reactive({
-            keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map(data => ({
+            keyMenus: computed(() => props.selectedHistoryItem?.diffItems?.map((data) => ({
                 label: data.key, name: data.key, updateType: data.type, path: data.path,
             })) ?? []),
             selectedKeyMenu: props.selectedKeyName || props.selectedHistoryItem?.diffItems?.at(0)?.key || '',
             selectedKeyPath: props.selectedHistoryItem?.diffItems?.at(0)?.path || '',
-            filteredDiffItem: computed(() => props.selectedHistoryItem?.diffItems?.filter(d => d.key === state.selectedKeyMenu) ?? []),
+            filteredDiffItem: computed(() => props.selectedHistoryItem?.diffItems?.filter((d) => d.key === state.selectedKeyMenu) ?? []),
             previousValue: computed(() => valueConverter(state.filteredDiffItem[0]?.previousValue)),
             changedValue: computed(() => valueConverter(state.filteredDiffItem[0]?.changedValue)),
             changesCount: computed(() => props.selectedHistoryItem?.diffCount ?? 0),

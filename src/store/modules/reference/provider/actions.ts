@@ -12,12 +12,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { colorSet } from '@/styles/colors';
 
-
 let lastLoadedTime = 0;
 
-export const load: Action<ProviderReferenceState, any> = async (
-    { commit, state }, options: ReferenceLoadOptions,
-): Promise<void|Error> => {
+export const load: Action<ProviderReferenceState, any> = async ({ commit, state }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (

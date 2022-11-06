@@ -24,7 +24,9 @@
             </template>
             <template #toolbox-table-bottom>
                 <div class="help-text-wrapper">
-                    <p v-if="invalidState.selectedPolicyList" class="policy-list-invalid-text">
+                    <p v-if="invalidState.selectedPolicyList"
+                       class="policy-list-invalid-text"
+                    >
                         {{ invalidTexts.selectedPolicyList }}
                     </p>
                 </div>
@@ -41,13 +43,11 @@ import {
 
 import { PPanelTop } from '@spaceone/design-system';
 
-
 import { i18n } from '@/translations';
 
 import type { RawPagePermission } from '@/lib/access-control/config';
 
 import { useFormValidator } from '@/common/composables/form-validator';
-
 
 import type { RoleType } from '@/services/administration/iam/role/config';
 import { FORM_TYPE } from '@/services/administration/iam/role/config';

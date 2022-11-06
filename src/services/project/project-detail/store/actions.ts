@@ -28,7 +28,7 @@ export const loadMaintenanceHappenings: Action<ProjectDetailState, any> = async 
             project_id: state.projectId,
             query: queryHelper.data,
         });
-        const convertedResults: MaintenanceHappening[] = results.map(d => ({
+        const convertedResults: MaintenanceHappening[] = results.map((d) => ({
             title: d.title,
             startTime: d.start_time,
             endTime: d.end_time,

@@ -36,7 +36,7 @@ export const notoSansConfigMap: Record<string, FontConfig> = {
     },
 };
 
-const getSources = ({ urlPrefix, formats }: FontConfig, name = '') => formats.map(format => `url(${urlPrefix}${name}.${format})`).join(', ');
+const getSources = ({ urlPrefix, formats }: FontConfig, name = '') => formats.map((format) => `url(${urlPrefix}${name}.${format})`).join(', ');
 
 interface FontInfo {
     family: string;
@@ -209,7 +209,7 @@ export const loadFont = async (fontsInfo: FontInfo[]) => {
         return font;
     });
 
-    const results = await Promise.allSettled(fonts.map(d => d.load()));
+    const results = await Promise.allSettled(fonts.map((d) => d.load()));
     results.forEach((result, idx) => {
         if (result.status === 'fulfilled') {
             (document as any).fonts.add(result.value);

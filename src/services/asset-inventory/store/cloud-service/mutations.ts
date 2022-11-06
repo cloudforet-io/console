@@ -5,7 +5,6 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import type { CloudServiceFilterMap, Period } from '@/services/asset-inventory/cloud-service/type';
 import type { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
 
-
 export const setSelectedProvider: Mutation<CloudServiceStoreState> = (state, provider: string) => {
     state.selectedProvider = provider;
 };

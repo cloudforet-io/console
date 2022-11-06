@@ -1,6 +1,8 @@
 <template>
     <general-page-layout class="add-service-account-container">
-        <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
+        <p-breadcrumbs class="flex-grow"
+                       :routes="routeState.routes"
+        />
         <p-page-title child
                       class="page-title"
                       @goBack="$router.go(-1)"
@@ -10,7 +12,9 @@
                 <info-message :message="$t('PROJECT.EVENT_RULE.TITLE_INFO_MESSAGE')" />
             </template>
         </p-page-title>
-        <div v-if="!loading && !isEditMode && !cardData.length" class="no-data-wrapper">
+        <div v-if="!loading && !isEditMode && !cardData.length"
+             class="no-data-wrapper"
+        >
             <p class="title">
                 {{ $t('PROJECT.EVENT_RULE.NO_EVENT_RULES_TITLE') }}
             </p>
@@ -24,7 +28,10 @@
                 {{ $t('PROJECT.EVENT_RULE.ADD_EVENT_RULE') }}
             </p-button>
         </div>
-        <div v-for="data in orderedCardData" :key="data.order" class="card-list-wrapper">
+        <div v-for="data in orderedCardData"
+             :key="data.order"
+             class="card-list-wrapper"
+        >
             <p-card :style-type="isEditMode && selectedOrder === data.order ? 'indigo400' : 'gray100'"
                     :header="isEditMode && selectedOrder === data.order ? $t('PROJECT.EVENT_RULE.EDIT_EVENT_RULE') : ''"
             >
@@ -36,7 +43,9 @@
                                   class="arrow-button"
                                   @click="onClickUpButton(data)"
                             >
-                                <p-i name="ic_up" width="1.5rem" height="1.5rem"
+                                <p-i name="ic_up"
+                                     width="1.5rem"
+                                     height="1.5rem"
                                      color="inherit transparent"
                                 />
                             </span>
@@ -44,7 +53,9 @@
                                   class="arrow-button"
                                   @click="onClickDownButton(data)"
                             >
-                                <p-i name="ic_down" width="1.5rem" height="1.5rem"
+                                <p-i name="ic_down"
+                                     width="1.5rem"
+                                     height="1.5rem"
                                      color="inherit transparent"
                                 />
                             </span>
@@ -61,7 +72,9 @@
                                   :class="{'disabled': isEditMode}"
                                   @click="onClickEditButton(data.order)"
                             >
-                                <p-i name="ic_edit" width="1rem" height="1rem"
+                                <p-i name="ic_edit"
+                                     width="1rem"
+                                     height="1rem"
                                      color="inherit"
                                 />
                                 {{ $t('PROJECT.EVENT_RULE.EDIT') }}
@@ -76,7 +89,9 @@
                                  @confirm="onClickFormConfirm"
                                  @cancel="onClickFormCancel"
                 />
-                <event-rule-content v-else :data="data" />
+                <event-rule-content v-else
+                                    :data="data"
+                />
             </p-card>
         </div>
         <p-card v-if="isEditMode && mode === EDIT_MODE.CREATE"
@@ -106,7 +121,6 @@
     </general-page-layout>
 </template>
 
-
 <script lang="ts">
 
 import {
@@ -121,7 +135,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
-
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
@@ -131,7 +144,6 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 
 import EventRuleContent from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleContent.vue';
 import EventRuleForm from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleForm.vue';
-
 
 const EDIT_MODE = Object.freeze({
     CREATE: 'CREATE',

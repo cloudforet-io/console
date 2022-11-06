@@ -23,7 +23,10 @@
             </div>
         </template>
         <template #extra>
-            <p-button style-type="substitutive" class="view-query-button" @click="handleClickViewQuery">
+            <p-button style-type="substitutive"
+                      class="view-query-button"
+                      @click="handleClickViewQuery"
+            >
                 <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.VIEW_QUERY') }}</span>
             </p-button>
         </template>
@@ -52,7 +55,6 @@ import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
-
 
 const LAYOUT = 100;
 
@@ -100,7 +102,7 @@ export default {
         });
 
         /* Util */
-        const getGranularityText = granularity => capitalize(granularity);
+        const getGranularityText = (granularity) => capitalize(granularity);
         const _getViewQueryLink = (): Location => {
             const queryId = props.selectedItem?.cost_query_set_id;
             if (queryId) {

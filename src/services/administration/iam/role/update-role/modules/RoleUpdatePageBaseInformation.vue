@@ -29,8 +29,11 @@
                 </template>
             </p-field-group>
             <p-label :label="$t('IAM.ROLE.DETAIL.ROLE_TYPE')" />
-            <div v-if="!roleTypeInputDisabled" class="select-card-wrapper">
-                <p-select-card v-for="(roleType, index) in roleTypes" :key="roleType.key"
+            <div v-if="!roleTypeInputDisabled"
+                 class="select-card-wrapper"
+            >
+                <p-select-card v-for="(roleType, index) in roleTypes"
+                               :key="roleType.key"
                                v-model="selectedRoleType"
                                :tab-index="index"
                                class="card"
@@ -45,7 +48,9 @@
                     </p>
                 </p-select-card>
             </div>
-            <span v-else-if="savedRoleType" class="role-type-saved-text">{{ `${savedRoleType.label} (${savedRoleType.description})` }}</span>
+            <span v-else-if="savedRoleType"
+                  class="role-type-saved-text"
+            >{{ `${savedRoleType.label} (${savedRoleType.description})` }}</span>
         </div>
     </p-pane-layout>
 </template>
@@ -61,11 +66,9 @@ import {
     PPaneLayout, PPanelTop, PFieldGroup, PLabel, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
 
-
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
-
 
 import type { RoleType } from '@/services/administration/iam/role/config';
 import { ROLE_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
@@ -117,7 +120,7 @@ export default {
             selectedRoleType: ROLE_TYPE.PROJECT as RoleType,
             savedRoleType: computed<RoleTypeForm|undefined>(() => {
                 const roleType = props.initialFormData?.roleType;
-                return state.roleTypes.find(type => type.key === roleType);
+                return state.roleTypes.find((type) => type.key === roleType);
             }),
         });
         watch(() => isAllValid.value, (after) => {

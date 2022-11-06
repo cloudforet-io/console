@@ -12,7 +12,6 @@ import { computed, reactive, toRefs } from 'vue';
 
 import { PProgressBar } from '@spaceone/design-system';
 
-
 import { indigo, red, yellow } from '@/styles/colors';
 
 const getColor = (rate) => {

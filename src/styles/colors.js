@@ -148,7 +148,6 @@ export const colorSet = {
     },
 };
 
-
 const semanticColors = {
     primary: palette.violet[600],
     primaryDark: palette.violet[800],
@@ -166,8 +165,6 @@ const semanticColors = {
 const kebabColors = {};
 forEach(semanticColors, (d, k) => { kebabColors[kebabCase(k)] = d; });
 forEach(colorSet, (d, k) => { kebabColors[kebabCase(k)] = d; });
-
-
 
 // TEMPORARY CONSTANTS FOR colorSets
 
@@ -212,7 +209,6 @@ export const indigo = {
     ...palette.indigo,
     default: palette.indigo[500],
 };
-
 
 // TEMPORARY CONSTANTS FOR semanticColors
 

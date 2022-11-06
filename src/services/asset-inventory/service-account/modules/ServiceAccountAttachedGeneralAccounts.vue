@@ -2,7 +2,8 @@
     <p-pane-layout class="service-account-attached-general-accounts">
         <p-panel-top :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ATTACHED_GENERAL_ACCOUNTS_TITLE')" />
         <div class="content-wrapper">
-            <p-data-table :fields="fields" :items="items"
+            <p-data-table :fields="fields"
+                          :items="items"
                           sortable
                           :loading="loading"
                           :sort-by="sortBy"

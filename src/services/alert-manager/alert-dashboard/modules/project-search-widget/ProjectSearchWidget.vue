@@ -16,7 +16,9 @@
             :loader-backdrop-color="BACKGROUND_COLOR"
         >
             <div class="box-group">
-                <div v-for="(item, idx) in items" :key="`box-${idx}`" class="box"
+                <div v-for="(item, idx) in items"
+                     :key="`box-${idx}`"
+                     class="box"
                      @click="onClickProjectBox(item)"
                 >
                     <p class="sub-title">
@@ -25,14 +27,22 @@
                     <p class="title">
                         {{ projectNameFormatter(item.project_id, projects) }}
                     </p>
-                    <div class="content-wrapper" :class="{'multiple-items': item.alert_count > 0 && item.maintenance_window_count > 0}">
-                        <project-maintenance-window-list-item v-if="item.maintenance_window_count > 0" :project-id="item.project_id" />
-                        <project-alert-list-item v-if="item.alert_count > 0" :project-id="item.project_id" />
+                    <div class="content-wrapper"
+                         :class="{'multiple-items': item.alert_count > 0 && item.maintenance_window_count > 0}"
+                    >
+                        <project-maintenance-window-list-item v-if="item.maintenance_window_count > 0"
+                                                              :project-id="item.project_id"
+                        />
+                        <project-alert-list-item v-if="item.alert_count > 0"
+                                                 :project-id="item.project_id"
+                        />
                     </div>
                 </div>
             </div>
         </p-data-loader>
-        <p-pane-layout v-if="isHealthy" class="project-healthy">
+        <p-pane-layout v-if="isHealthy"
+                       class="project-healthy"
+        >
             <p-i name="smile-face"
                  width="3rem"
                  height="3rem"
@@ -71,7 +81,6 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 import ProjectAlertListItem from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectAlertListItem.vue';
 import ProjectMaintenanceWindowListItem from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectMaintenanceWindowListItem.vue';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-
 
 export default {
     name: 'ProjectSearchWidget',

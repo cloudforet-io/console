@@ -12,7 +12,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { ProjectPageState } from '@/services/project/store/type';
 import type { ProjectGroupTreeItem, ProjectItemResp } from '@/services/project/type';
 
-
 export const initRoot: Action<ProjectPageState, any> = ({ commit }, root) => {
     commit('setRootNode', root);
 };
@@ -33,7 +32,7 @@ export const selectNode: Action<ProjectPageState, any> = async ({ state }, group
         const paths = res.open_path || [];
 
         if (state.rootNode) {
-            const { node } = await state.rootNode.fetchAndFindNode(paths.map(d => (data => data.id === d)));
+            const { node } = await state.rootNode.fetchAndFindNode(paths.map((d) => ((data) => data.id === d)));
             return node;
         }
     } catch (e) {
@@ -62,8 +61,10 @@ export const openProjectGroupDeleteCheckModal: Action<ProjectPageState, any> = (
 
 interface ProjectGroupInfo {parent_project_group_id?: string; name: string}
 
-export const createProjectGroup: Action<ProjectPageState, any> = async ({ state, commit, getters },
-    projectGroupInfo: ProjectGroupInfo) => {
+export const createProjectGroup: Action<ProjectPageState, any> = async (
+    { state, commit, getters },
+    projectGroupInfo: ProjectGroupInfo,
+) => {
     try {
         const params: ProjectGroupInfo = { ...projectGroupInfo };
         if (getters.actionTargetNodeData) {
@@ -103,8 +104,10 @@ export const createProjectGroup: Action<ProjectPageState, any> = async ({ state,
     }
 };
 
-export const updateProjectGroup: Action<ProjectPageState, any> = async ({ state, commit, getters },
-    projectGroupInfo: Partial<ProjectGroupInfo>) => {
+export const updateProjectGroup: Action<ProjectPageState, any> = async (
+    { state, commit, getters },
+    projectGroupInfo: Partial<ProjectGroupInfo>,
+) => {
     if (!state.rootNode || !getters.actionTargetNodeData) return;
 
     try {
@@ -115,9 +118,10 @@ export const updateProjectGroup: Action<ProjectPageState, any> = async ({ state,
 
         await SpaceConnector.client.identity.projectGroup.update(params);
 
-
-        state.rootNode.updateNodeByPath(getters.actionTargetNodePath,
-            { ...getters.actionTargetNodeData, ...projectGroupInfo });
+        state.rootNode.updateNodeByPath(
+            getters.actionTargetNodePath,
+            { ...getters.actionTargetNodeData, ...projectGroupInfo },
+        );
     } catch (e: any) {
         ErrorHandler.handleError(e);
         throw e;
@@ -170,8 +174,10 @@ interface ProjectInfo {
     project_group_id: string;
     name: string;
 }
-export const createProject: Action<ProjectPageState, any> = async ({ state, commit, getters },
-    projectInfo: ProjectInfo) => {
+export const createProject: Action<ProjectPageState, any> = async (
+    { state, commit, getters },
+    projectInfo: ProjectInfo,
+) => {
     try {
         const res = await SpaceConnector.client.identity.project.create({
             ...projectInfo,
@@ -225,7 +231,7 @@ let addPermissionInfoLoading;
 export const addPermissionInfo: Action<ProjectPageState, any> = async ({ commit, state }, ids: string[]): Promise<void> => {
     if (addPermissionInfoLoading) return;
 
-    const projectGroupIds = ids.filter(id => state.permissionInfo[id] === undefined);
+    const projectGroupIds = ids.filter((id) => state.permissionInfo[id] === undefined);
     if (!projectGroupIds.length) return;
 
     addPermissionInfoLoading = true;

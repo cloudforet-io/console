@@ -1,7 +1,6 @@
 import type { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { forEach } from 'lodash';
 
-
 import type { ConsoleDynamicField, Reference } from '@/lib/component-util/dynamic-layout/type';
 
 interface ExcelDataField {
@@ -11,7 +10,6 @@ interface ExcelDataField {
     enum_items?: any;
     reference?: Reference;
 }
-
 
 /**
  * @name getApiActionByLayoutType

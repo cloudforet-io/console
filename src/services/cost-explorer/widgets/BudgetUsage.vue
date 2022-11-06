@@ -8,16 +8,25 @@
         :widget-link="widgetLink"
         :class="{ 'print-mode': printMode }"
     >
-        <template v-if="!loading" #title-extra>
-            <p-i name="ic_budget" width="1em" height="1em"
+        <template v-if="!loading"
+                  #title-extra
+        >
+            <p-i name="ic_budget"
+                 width="1em"
+                 height="1em"
                  class="mr-1"
             />
             {{ budgetCount }} Budgets
         </template>
         <template #default>
-            <budget-usage-progress-bar :usage-rate="usageRate" :disable-animation="printMode" class="budget-progress-bar" />
+            <budget-usage-progress-bar :usage-rate="usageRate"
+                                       :disable-animation="printMode"
+                                       class="budget-progress-bar"
+            />
             <p class="progress-bar-label">
-                <span class="usage-cost" :style="{ color: getUsageCostColor(usageCost, limitCost) }">
+                <span class="usage-cost"
+                      :style="{ color: getUsageCostColor(usageCost, limitCost) }"
+                >
                     {{ currencyMoneyFormatter(usageCost, currency, currencyRates, false, 10000000) }} <span class="spent">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.SPENT') }}</span>
                 </span>
                 <span class="limit-cost">
@@ -44,13 +53,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 
-
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo, red } from '@/styles/colors';
-
 
 import {
     getConvertedBudgetFilter,

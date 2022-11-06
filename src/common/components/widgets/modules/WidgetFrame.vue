@@ -14,15 +14,25 @@
         </div>
         <div class="widget-footer">
             <div class="footer-left">
-                <p-datetime-picker style-type="text" select-mode="range" :selected-dates.sync="proxySelectedDates" />
+                <p-datetime-picker style-type="text"
+                                   select-mode="range"
+                                   :selected-dates.sync="proxySelectedDates"
+                />
                 <p-divider :vertical="true" />
-                <currency-select-dropdown :print-mode="printMode" @update="handleUpdateCurrency" />
+                <currency-select-dropdown :print-mode="printMode"
+                                          @update="handleUpdateCurrency"
+                />
             </div>
             <div class="footer-right">
                 <slot name="footer-right">
-                    <router-link v-if="widgetLink && !printMode" :to="widgetLink" class="anchor-button">
+                    <router-link v-if="widgetLink && !printMode"
+                                 :to="widgetLink"
+                                 class="anchor-button"
+                    >
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
-                        <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                        <p-i name="ic_arrow_right"
+                             width="1rem"
+                             height="1rem"
                              color="inherit transparent"
                         />
                     </router-link>

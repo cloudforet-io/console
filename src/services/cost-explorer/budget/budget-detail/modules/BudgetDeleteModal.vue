@@ -22,7 +22,6 @@ import { i18n } from '@/translations';
 import DoubleCheckModal from '@/common/components/modals/DoubleCheckModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
 import TranslateResult = VueI18n.TranslateResult;
 
 export default {

@@ -5,8 +5,10 @@
                 <h3 class="content-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.BASE_INFO') }}
                 </h3>
-                <add-notification-data :project-id="projectId" :supported-schema="supportedSchema"
-                                       :protocol-type="protocolType" :protocol-id="protocolId"
+                <add-notification-data :project-id="projectId"
+                                       :supported-schema="supportedSchema"
+                                       :protocol-type="protocolType"
+                                       :protocol-id="protocolId"
                                        @change="onChangeData"
                 />
             </p-pane-layout>
@@ -30,7 +32,8 @@
             </p-pane-layout>
         </section>
         <div class="button-group">
-            <p-button style-type="tertiary" class="text-button"
+            <p-button style-type="tertiary"
+                      class="text-button"
                       @click="$router.go(-1)"
             >
                 {{ $t('COMMON.TAGS.CANCEL') }}
@@ -57,7 +60,6 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { i18n } from '@/translations';
 
@@ -126,7 +128,6 @@ export default {
             isScheduled: false,
             isScheduleValid: true,
         });
-
 
         const createUserChannel = async () => {
             try {

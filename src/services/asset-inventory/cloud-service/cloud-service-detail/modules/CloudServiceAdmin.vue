@@ -1,6 +1,8 @@
 <template>
     <div>
-        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.ADMIN.MEMBER')" :total-count="totalCount" />
+        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.ADMIN.MEMBER')"
+                     :total-count="totalCount"
+        />
         <p-search-table :fields="fields"
                         :items="items"
                         :loading="loading"
@@ -14,7 +16,9 @@
             </template>
             <template #col-labels-format="{value}">
                 <p v-if="value.length === 0" />
-                <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
+                <p-badge v-for="(label, idx) in value"
+                         :key="idx"
+                         style-type="gray200"
                          class="mr-2"
                 >
                     {{ label }}
@@ -36,7 +40,6 @@ import type { SearchTableListeners } from '@spaceone/design-system/dist/src/data
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
 
 import { store } from '@/store';
 
@@ -99,7 +102,7 @@ export default {
                     project_id: props.cloudServiceProjectId,
                     query: getQuery(),
                 });
-                state.items = res.results.map(d => ({
+                state.items = res.results.map((d) => ({
                     ...d,
                     user_id: d.resource_id,
                 }));

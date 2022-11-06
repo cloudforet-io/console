@@ -15,24 +15,35 @@
                 data: *******
             </p>
             <p v-if="item.data && Object.keys(item.data)[0] === 'users'">
-                <span v-for="user in item.data.users" :key="`${user}-${index}`">
-                    <p-badge style-type="gray200" shape="square" class="rounded mr-1">{{ user }}</p-badge>
+                <span v-for="user in item.data.users"
+                      :key="`${user}-${index}`"
+                >
+                    <p-badge style-type="gray200"
+                             shape="square"
+                             class="rounded mr-1"
+                    >{{ user }}</p-badge>
                 </span>
             </p>
             <div v-else-if="item.data">
-                <p v-for="(value, dIdx) in item.data" :key="`item-${dIdx}`">
+                <p v-for="(value, dIdx) in item.data"
+                   :key="`item-${dIdx}`"
+                >
                     {{ value }}
                 </p>
             </div>
         </template>
         <template #col-notification_level-format="{value}">
-            <p-badge :style-type="getBadgeColor(value)" outline>
+            <p-badge :style-type="getBadgeColor(value)"
+                     outline
+            >
                 {{ value }}
             </p-badge>
         </template>
         <template #col-schedule-format="{value}">
             <p v-if="value">
-                <span v-for="day in value.day_of_week" :key="day"> {{ day }}</span><br>
+                <span v-for="day in value.day_of_week"
+                      :key="day"
+                > {{ day }}</span><br>
                 {{ utcToTimezoneFormatter(value.start_hour, timezone) }}:00 ~
                 {{ utcToTimezoneFormatter(value.end_hour, timezone) }}:00
             </p>
@@ -59,7 +70,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { utcToTimezoneFormatter } from '@/services/administration/iam/user/lib/helper';
 import type { ChannelItem } from '@/services/administration/iam/user/type';
-
 
 const getBadgeColor = (level: string) => {
     switch (level) {
@@ -125,7 +135,7 @@ export default {
             }
         };
 
-        const protocolFormatter = val => state.protocols[val]?.name || val;
+        const protocolFormatter = (val) => state.protocols[val]?.name || val;
 
         (async () => {
             await Promise.allSettled([

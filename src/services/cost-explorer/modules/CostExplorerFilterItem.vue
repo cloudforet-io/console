@@ -75,7 +75,6 @@ import type { QueryItemResource } from '@/services/cost-explorer/cost-analysis/t
 import { FILTER } from '@/services/cost-explorer/lib/config';
 import type { FilterItem } from '@/services/cost-explorer/type';
 
-
 interface Props {
     category: string;
     selectedFilterItems: FilterItem[];
@@ -105,21 +104,21 @@ export default {
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
         });
         const state = reactive({
-            selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selectedFilterItems?.map(filterItem => ({
+            selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selectedFilterItems?.map((filterItem) => ({
                 name: filterItem.v,
-                label: state.menuItems.find(d => d.name === filterItem.v)?.label || filterItem.v,
+                label: state.menuItems.find((d) => d.name === filterItem.v)?.label || filterItem.v,
             }))),
             menuItems: computed(() => {
                 if (props.category === FILTER.SERVICE_ACCOUNT) {
-                    return Object.keys(storeState.serviceAccounts).map(k => ({
+                    return Object.keys(storeState.serviceAccounts).map((k) => ({
                         name: k, label: storeState.serviceAccounts[k].label,
                     }));
                 } if (props.category === FILTER.PROVIDER) {
-                    return Object.keys(storeState.providers).map(k => ({
+                    return Object.keys(storeState.providers).map((k) => ({
                         name: k, label: storeState.providers[k].name,
                     }));
                 } if (props.category === FILTER.REGION) {
-                    return Object.keys(storeState.regions).map(k => ({
+                    return Object.keys(storeState.regions).map((k) => ({
                         name: k, label: storeState.regions[k].name,
                     }));
                 }
@@ -129,7 +128,7 @@ export default {
         });
         const querySearchHandlerState = reactive({
             querySearchResource: undefined as QueryItemResource[] | undefined,
-            selectedQueryItems: computed<QueryItem[]>(() => props.selectedFilterItems?.map(filterItem => ({
+            selectedQueryItems: computed<QueryItem[]>(() => props.selectedFilterItems?.map((filterItem) => ({
                 key: {
                     label: filterItem.k.replaceAll(`${props.category}.`, ''),
                     name: filterItem.k.replaceAll(`${props.category}.`, ''),
@@ -195,11 +194,11 @@ export default {
             const results = await getResources(value, props.category);
             state.menuLoading = false;
 
-            return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };
+            return { results: results ? results.map((d) => ({ name: d.key, label: d.name })) : [] };
         };
 
         const queryItemFormatter = (data: QueryItemResource[], distinct: string) => {
-            const result: {name: string; label: string}[] = data.map(item => ({
+            const result: {name: string; label: string}[] = data.map((item) => ({
                 name: item.name || item.key,
                 label: item.name || item.key,
             }));
@@ -214,7 +213,7 @@ export default {
 
         /* event */
         const handleSelectedProjectIds = (selectedProjectIds) => {
-            const updatedFilterItems = selectedProjectIds.map(d => ({
+            const updatedFilterItems = selectedProjectIds.map((d) => ({
                 k: props.category,
                 v: d,
                 o: '=',
@@ -222,7 +221,7 @@ export default {
             emit('update-filter-items', updatedFilterItems);
         };
         const handleUpdateSelected = (selectedItems: SearchDropdownMenuItem[]) => {
-            const updatedFilterItems = selectedItems.map(d => ({
+            const updatedFilterItems = selectedItems.map((d) => ({
                 k: props.category,
                 v: d.name,
                 o: '=',
@@ -230,7 +229,7 @@ export default {
             emit('update-filter-items', updatedFilterItems);
         };
         const handleUpdateSelectedQueryItems = (selectedQueryItems: QueryItem[]) => {
-            const updatedFilterItems = selectedQueryItems.map(d => ({
+            const updatedFilterItems = selectedQueryItems.map((d) => ({
                 k: `${props.category}.${d.key?.label}`,
                 v: d.value.label,
                 o: '=',

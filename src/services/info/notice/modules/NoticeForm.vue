@@ -1,23 +1,34 @@
 <template>
     <div class="notice-form">
         <p-pane-layout class="notice-form-wrapper">
-            <p-field-group class="notice-label-wrapper writer-name-input" :label="$t('INFO.NOTICE.FORM.LABEL_WRITER_NAME')" required>
+            <p-field-group class="notice-label-wrapper writer-name-input"
+                           :label="$t('INFO.NOTICE.FORM.LABEL_WRITER_NAME')"
+                           required
+            >
                 <template #default="{invalid}">
-                    <p-text-input :value="writerName" :invalid="invalid"
+                    <p-text-input :value="writerName"
+                                  :invalid="invalid"
                                   :placeholder="$store.state.user.name || $t('INFO.NOTICE.FORM.PLACEHOLDER_REQUIRED')"
                                   @input="setForm('writerName', $event)"
                     />
                 </template>
             </p-field-group>
-            <p-field-group v-if="hasSystemRole" class="notice-label-wrapper" :label="$t('INFO.NOTICE.FORM.LABEL_VIEWER')"
+            <p-field-group v-if="hasSystemRole"
+                           class="notice-label-wrapper"
+                           :label="$t('INFO.NOTICE.FORM.LABEL_VIEWER')"
                            required
             >
-                <p-radio :disabled="type === 'EDIT'" :selected="isAllDomainSelected" class="mr-4"
+                <p-radio :disabled="type === 'EDIT'"
+                         :selected="isAllDomainSelected"
+                         class="mr-4"
                          @click="handleClickAllDomainRadio"
                 >
                     <span>{{ $t('INFO.NOTICE.FORM.ALL_DOMAINS') }}</span>
                 </p-radio>
-                <p-radio :disabled="type === 'EDIT'" :selected="!isAllDomainSelected" @click="handleClickSelectDomainRadio">
+                <p-radio :disabled="type === 'EDIT'"
+                         :selected="!isAllDomainSelected"
+                         @click="handleClickSelectDomainRadio"
+                >
                     <span>{{ $t('INFO.NOTICE.FORM.SELECTED_DOMAIN') }}</span>
                 </p-radio>
                 <br>
@@ -29,28 +40,38 @@
                                    @update:selected="handleSelectDomain"
                 />
             </p-field-group>
-            <p-field-group class="notice-label-wrapper" :label="$t('INFO.NOTICE.FORM.LABEL_TITLE')" required
+            <p-field-group class="notice-label-wrapper"
+                           :label="$t('INFO.NOTICE.FORM.LABEL_TITLE')"
+                           required
                            :invalid="invalidState.noticeTitle"
                            :invalid-text="invalidTexts.noticeTitle"
             >
                 <template #default="{invalid}">
-                    <p-text-input :value="noticeTitle" :invalid="invalid"
+                    <p-text-input :value="noticeTitle"
+                                  :invalid="invalid"
                                   class="!w-full"
                                   @input="setForm('noticeTitle', $event)"
                     />
                 </template>
             </p-field-group>
-            <p-field-group class="notice-label-wrapper" :label="$t('INFO.NOTICE.FORM.LABEL_CONTENT')" required
+            <p-field-group class="notice-label-wrapper"
+                           :label="$t('INFO.NOTICE.FORM.LABEL_CONTENT')"
+                           required
                            :invalid="invalidState.contents"
                            :invalid-text="invalidTexts.contents"
             >
                 <template #default="{invalid}">
-                    <text-editor :value="contents" :attachments.sync="attachments" :image-uploader="fileUploader"
-                                 :invalid="invalid" @update:value="(d) => setForm('contents', d)"
+                    <text-editor :value="contents"
+                                 :attachments.sync="attachments"
+                                 :image-uploader="fileUploader"
+                                 :invalid="invalid"
+                                 @update:value="(d) => setForm('contents', d)"
                     />
                 </template>
             </p-field-group>
-            <div v-if="hasSystemRole" class="notice-create-options-wrapper">
+            <div v-if="hasSystemRole"
+                 class="notice-create-options-wrapper"
+            >
                 <p-check-box v-model="isPinned">
                     <span>{{ $t('INFO.NOTICE.FORM.PIN_NOTICE') }}</span>
                 </p-check-box>
@@ -90,7 +111,6 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -106,7 +126,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { NoticePostModel } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
-
 
 interface DomainItem {
     name: string;
@@ -244,7 +263,7 @@ export default {
         const getDomainList = async () => {
             try {
                 const { results } = await SpaceConnector.client.identity.domain.list();
-                state.domainList = results.map(d => ({
+                state.domainList = results.map((d) => ({
                     name: d.domain_id,
                     label: d.name,
                 }));
@@ -257,10 +276,10 @@ export default {
         const getBoardList = async () => {
             try {
                 const { results } = await SpaceConnector.client.board.board.list({
-                    domain_id: state.domainList.length ? state.domainList.map(d => d.name)
+                    domain_id: state.domainList.length ? state.domainList.map((d) => d.name)
                         : store.state.domain.domainId,
                 });
-                state.boardIdState = results.filter(d => d.name === 'Notice')[0]?.board_id ?? '';
+                state.boardIdState = results.filter((d) => d.name === 'Notice')[0]?.board_id ?? '';
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.boardIdState = '';
@@ -281,7 +300,7 @@ export default {
             // INIT STATES
             state.isPinned = d.options?.is_pinned ?? false;
             state.isPopup = d.options?.is_popup ?? false;
-            state.attachments = d.files?.map(file => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
+            state.attachments = d.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
             state.isAllDomainSelected = !d?.domain_id;
             state.boardIdState = d?.board_id ?? '';
             state.selectedDomain = d?.domain_id

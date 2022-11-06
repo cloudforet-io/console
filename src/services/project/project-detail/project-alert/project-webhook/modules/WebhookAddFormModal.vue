@@ -69,7 +69,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-
 interface WebhookType {
     plugin_id: string;
     label: string;

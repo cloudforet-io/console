@@ -32,16 +32,21 @@
                         <div class="title">
                             {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SELECTED_FILTER') }} ({{ selectedItemsLength }})
                         </div>
-                        <div v-if="selectedItemsLength" class="selected-tags-wrapper">
+                        <div v-if="selectedItemsLength"
+                             class="selected-tags-wrapper"
+                        >
                             <template v-for="([filterName, items], idx) in Object.entries(selectedItemsMap)">
-                                <p-tag v-for="(item, itemIdx) in items" :key="`selected-tag-${idx}-${item.name}`"
+                                <p-tag v-for="(item, itemIdx) in items"
+                                       :key="`selected-tag-${idx}-${item.name}`"
                                        @delete="handleDeleteTag(filterName, itemIdx)"
                                 >
                                     <b>{{ filterLabels[filterName] }}: </b>{{ item.label }}
                                 </p-tag>
                             </template>
                         </div>
-                        <div v-else class="no-item-wrapper">
+                        <div v-else
+                             class="no-item-wrapper"
+                        >
                             <p>{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.NO_FILTER_HELP_TEXT1') }}</p>
                             <p>{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.NO_FILTER_HELP_TEXT2') }}</p>
                         </div>
@@ -128,8 +133,8 @@ export default defineComponent<Props>({
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             // asset inventory store data
             provider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
-            categoryFilters: computed<CategoryMenuItem[]>(() => state.filters[CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]?.map(d => ({ name: d, label: d }))),
-            regionFilters: computed<RegionMenuItem[]>(() => state.filters[CLOUD_SERVICE_FILTER_KEY.REGION]?.map(d => getRegionFilterMenuItem(d, state.regions, state.providers))),
+            categoryFilters: computed<CategoryMenuItem[]>(() => state.filters[CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]?.map((d) => ({ name: d, label: d }))),
+            regionFilters: computed<RegionMenuItem[]>(() => state.filters[CLOUD_SERVICE_FILTER_KEY.REGION]?.map((d) => getRegionFilterMenuItem(d, state.regions, state.providers))),
             filters: assetInventoryStore.state.cloudService.additionalFilters as CloudServiceFilterMap,
             selectedItemsMap: computed<CloudServiceFilterItemsMap>(() => ({
                 [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: state.categoryFilters,
@@ -137,7 +142,7 @@ export default defineComponent<Props>({
             })),
             selectedItemsLength: computed<number>(() => {
                 const selectedValues = Object.values(state.selectedItemsMap as CloudServiceFilterItemsMap);
-                return sum(selectedValues.map(v => v?.length || 0));
+                return sum(selectedValues.map((v) => v?.length || 0));
             }),
             unfoldedIndices: [] as number[],
             menuLoading: false,
@@ -185,7 +190,7 @@ export default defineComponent<Props>({
         watch(() => state.unfoldedIndices, (after, before) => {
             if (after.length < before.length) {
                 const filters = { ...state.filters };
-                const deletedIndex: number = before.filter(idx => !after.includes(idx))[0];
+                const deletedIndex: number = before.filter((idx) => !after.includes(idx))[0];
                 const deletedFilterName = state.filterItems[deletedIndex].name;
                 filters[deletedFilterName] = undefined;
                 state.filters = filters;

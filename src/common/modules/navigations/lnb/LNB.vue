@@ -5,37 +5,55 @@
         </div>
         <p-divider class="divider" />
         <div class="menu-wrapper">
-            <router-link v-if="backLink.label" class="back-link"
+            <router-link v-if="backLink.label"
+                         class="back-link"
                          :to="backLink.to"
             >
-                <p-i name="ic_arrow_left" width="1rem" height="1rem"
+                <p-i name="ic_arrow_left"
+                     width="1rem"
+                     height="1rem"
                      color="inherit transparent"
                 />
                 {{ backLink.label }}
             </router-link>
             <slot />
-            <div v-if="topTitle.label" class="top-title">
+            <div v-if="topTitle.label"
+                 class="top-title"
+            >
                 <div class="icon-label-wrapper">
                     <p-lazy-img
                         v-if="topTitle.icon"
                         :src="assetUrlConverter(topTitle.icon)"
-                        width="1.5rem" height="1.5rem"
+                        width="1.5rem"
+                        height="1.5rem"
                         class="icon"
                     />
-                    <span :class="{'icon-label': topTitle.icon}" class="label">{{ topTitle.label }}</span>
+                    <span :class="{'icon-label': topTitle.icon}"
+                          class="label"
+                    >{{ topTitle.label }}</span>
                 </div>
-                <router-link v-if="topTitle.visibleAddButton" :to="topTitle.addButtonLink">
-                    <p-i name="ic_plus" width="1rem"
-                         height="1rem" class="add-button"
+                <router-link v-if="topTitle.visibleAddButton"
+                             :to="topTitle.addButtonLink"
+                >
+                    <p-i name="ic_plus"
+                         width="1rem"
+                         height="1rem"
+                         class="add-button"
                     />
                 </router-link>
             </div>
-            <l-n-b-menu-item v-for="(menuData, idx) in menuSet" :key="`${idx}-${getUUID()}`" :menu-data="menuData"
+            <l-n-b-menu-item v-for="(menuData, idx) in menuSet"
+                             :key="`${idx}-${getUUID()}`"
+                             :menu-data="menuData"
                              :current-path="currentPath"
                              :depth="Array.isArray(menuData) ? 2 : 1"
             >
-                <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
-                    <slot :name="slot" v-bind="scope" />
+                <template v-for="(_, slot) of $scopedSlots"
+                          #[slot]="scope"
+                >
+                    <slot :name="slot"
+                          v-bind="scope"
+                    />
                 </template>
             </l-n-b-menu-item>
         </div>
@@ -52,7 +70,6 @@ import {
     PDivider, PI, PLazyImg,
 } from '@spaceone/design-system';
 
-
 import { getUUID } from '@/lib/component-util/getUUID';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -60,7 +77,6 @@ import LNBMenuItem from '@/common/modules/navigations/lnb/modules/LNBMenuItem.vu
 import type {
     BackLink, LNBMenu, TopTitle,
 } from '@/common/modules/navigations/lnb/type';
-
 
 export default {
     name: 'LNB',

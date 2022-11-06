@@ -3,14 +3,17 @@
         <div class="error">
             <div class="error-contents">
                 <p-lottie class="flex items-center justify-center"
-                          name="lottie_floating-astronaut" auto
+                          name="lottie_floating-astronaut"
+                          auto
                           :size="20"
                 />
                 <p class="error-message">
                     {{ $t('COMMON.ERROR.NO_RESOURCE_MSG') }}
                 </p>
                 <router-link :to="serviceRoute.path">
-                    <p-button style-type="primary" class="redirect-button">
+                    <p-button style-type="primary"
+                              class="redirect-button"
+                    >
                         {{ $t('COMMON.ERROR.NO_RESOURCE_GO_MAIN', {service: mainLabel}) }}
                     </p-button>
                 </router-link>

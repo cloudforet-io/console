@@ -37,7 +37,10 @@
                 </p-select-dropdown>
             </template>
             <template #col-role_type-format="{ value }">
-                <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
+                <p-badge v-if="value"
+                         :outline="true"
+                         :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType"
+                >
                     {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
                 </p-badge>
             </template>
@@ -52,8 +55,10 @@
                           :disabled="manageDisabled"
                           @click="handleEditRole(item.role_id)"
                 >
-                    <p-i class="mr-1" name="ic_edit"
-                         width="1rem" height="1rem"
+                    <p-i class="mr-1"
+                         name="ic_edit"
+                         width="1rem"
+                         height="1rem"
                          color="inherit"
                     />{{ $t('IAM.ROLE.EDIT') }}
                 </p-button>
@@ -67,7 +72,6 @@
 </template>
 
 <script lang="ts">
-
 
 import {
     computed, defineComponent, reactive, toRefs, watch,
@@ -101,7 +105,6 @@ import RoleDeleteModal
 import type { RoleData } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { administrationStore } from '@/services/administration/store';
-
 
 const DEFAULT_PAGE_LIMIT = 15;
 
@@ -180,7 +183,7 @@ export default defineComponent({
             deleteModalVisible: false,
             // selected
             selectedIndices: [] as number[],
-            selectedRoles: computed<RoleData[]>(() => state.selectedIndices.map(d => state.roles[d]) || []),
+            selectedRoles: computed<RoleData[]>(() => state.selectedIndices.map((d) => state.roles[d]) || []),
             isSelected: computed(() => state.selectedIndices.length > 0),
             tags: roleListApiQueryHelper.setKeyItemSets(roleSearchHandler.keyItemSets).queryTags,
             sortBy: 'name',

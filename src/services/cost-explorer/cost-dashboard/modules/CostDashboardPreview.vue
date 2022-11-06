@@ -1,6 +1,8 @@
 <template>
     <div class="cost-dashboard-preview">
-        <div ref="headerRef" class="top-wrapper">
+        <div ref="headerRef"
+             class="top-wrapper"
+        >
             <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
                 <template #title-right-extra>
                     <div class="right-part">
@@ -14,7 +16,9 @@
                 </template>
             </p-page-title>
 
-            <cost-dashboard-filter :dashboard-id="dashboardId" :filters="filters" print-mode
+            <cost-dashboard-filter :dashboard-id="dashboardId"
+                                   :filters="filters"
+                                   print-mode
                                    manage-disabled
             />
         </div>

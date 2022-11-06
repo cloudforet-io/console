@@ -1,13 +1,21 @@
 <template>
     <div class="gnb-noti-item">
-        <p v-if="dateHeader" class="date-header">
+        <p v-if="dateHeader"
+           class="date-header"
+        >
             {{ dateHeader }}
         </p>
-        <div class="item-wrapper" @click="handleClickItem">
-            <span class="new-icon" :class="{ invisible: isRead }" />
+        <div class="item-wrapper"
+             @click="handleClickItem"
+        >
+            <span class="new-icon"
+                  :class="{ invisible: isRead }"
+            />
             <div class="contents-wrapper">
                 <p class="title">
-                    <p-i v-if="icon" :name="icon" width="1rem"
+                    <p-i v-if="icon"
+                         :name="icon"
+                         width="1rem"
                          height="1rem"
                          class="mr-1"
                     />
@@ -42,7 +50,6 @@ import {
 import dayjs from 'dayjs';
 
 import { store } from '@/store';
-
 
 interface Props {
     isRead: boolean;

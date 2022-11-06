@@ -8,16 +8,23 @@
         <!-- split view -->
         <template v-if="mode === 'split'">
             <template v-for="(line, index) in render">
-                <div :key="`line-${index}`" class="vue-diff-line" style="display: inline-flex;">
+                <div :key="`line-${index}`"
+                     class="vue-diff-line"
+                     style="display: inline-flex;"
+                >
                     <template v-if="isFoldLine">
                         <div class="lineNum vue-diff-cell-fold" />
                         <div class="code vue-diff-cell-fold" />
                     </template>
                     <template v-else>
-                        <div class="lineNum" :class="`vue-diff-cell-${line.type}`">
+                        <div class="lineNum"
+                             :class="`vue-diff-cell-${line.type}`"
+                        >
                             {{ line.lineNum }}
                         </div>
-                        <div class="code" :class="`vue-diff-cell-${line.type}`">
+                        <div class="code"
+                             :class="`vue-diff-cell-${line.type}`"
+                        >
                             <vueDiffCode
                                 :language="language"
                                 :code="setCode(line, render, index)"
@@ -37,10 +44,14 @@
                 <div class="code vue-diff-cell-fold" />
             </template>
             <template v-else>
-                <div class="lineNum" :class="`vue-diff-cell-${render[0].type}`">
+                <div class="lineNum"
+                     :class="`vue-diff-cell-${render[0].type}`"
+                >
                     {{ render[0].lineNum }}
                 </div>
-                <div class="code" :class="`vue-diff-cell-${render[0].type}`">
+                <div class="code"
+                     :class="`vue-diff-cell-${render[0].type}`"
+                >
                     <vueDiffCode
                         :language="language"
                         :code="setCode(render[0])"
@@ -61,13 +72,11 @@ import {
     computed, defineComponent, ref,
 } from 'vue';
 
-
 import vueDiffCode from './Code.vue';
 import type {
     Meta, Mode, Lines, Line, VirtualScroll,
 } from './types';
 import { renderWords } from './utils';
-
 
 export default defineComponent({
     name: 'VueDiffLine',

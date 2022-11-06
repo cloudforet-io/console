@@ -9,11 +9,14 @@
                         @export="handleExport"
                         @update-sort="handleUpdateSort"
         />
-        <budget-stat :query-store-filters="queryStoreFilters" :period="period" :usage-range="range"
+        <budget-stat :query-store-filters="queryStoreFilters"
+                     :period="period"
+                     :usage-range="range"
                      class="budget-stat"
         />
         <div class="budget-list-card-box">
-            <budget-list-card v-for="(budgetUsage, i) in budgetUsages" :key="`${budgetUsage.budget_id}-${i}`"
+            <budget-list-card v-for="(budgetUsage, i) in budgetUsages"
+                              :key="`${budgetUsage.budget_id}-${i}`"
                               :budget-usage="budgetUsage"
                               :budget-loading="loading"
             />
@@ -33,7 +36,6 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { store } from '@/store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
@@ -50,7 +52,6 @@ import type {
     BudgetUsageRange,
 } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
-
 
 interface Props {
     filters: QueryStoreFilter[];
@@ -125,7 +126,6 @@ export default defineComponent<Props>({
 
             state.loading = false;
         };
-
 
         /* Handlers */
         const handleUpdateRange = (range: BudgetUsageRange) => {

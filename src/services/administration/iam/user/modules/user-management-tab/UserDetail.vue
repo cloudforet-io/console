@@ -1,11 +1,16 @@
 <template>
     <div>
         <p-panel-top>{{ title }}</p-panel-top>
-        <p-definition-table :fields="fields" :data="data" :loading="loading"
-                            :skeleton-rows="7" v-on="$listeners"
+        <p-definition-table :fields="fields"
+                            :data="data"
+                            :loading="loading"
+                            :skeleton-rows="7"
+                            v-on="$listeners"
         >
             <template #data-state="{data}">
-                <p-status v-bind="userStateFormatter(data)" class="capitalize" />
+                <p-status v-bind="userStateFormatter(data)"
+                          class="capitalize"
+                />
             </template>
             <template #data-user_type="{data}">
                 <span v-if="data === 'API_USER'">API Only</span>
@@ -44,10 +49,8 @@ import { PPanelTop, PDefinitionTable, PStatus } from '@spaceone/design-system';
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import type { Tags } from '@/models';
 import { i18n } from '@/translations';
-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

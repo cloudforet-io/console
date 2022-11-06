@@ -1,10 +1,12 @@
 <template>
     <fragment>
-        <p-field-group :label="$t('IDENTITY.USER.NOTIFICATION.FORM.NOTIFICATION_LEVEL')" required
+        <p-field-group :label="$t('IDENTITY.USER.NOTIFICATION.FORM.NOTIFICATION_LEVEL')"
+                       required
                        class="level-dropdown"
         >
             <template #default>
-                <p-select-dropdown v-model="proxyNotificationLevel" :items="LEVEL_LIST"
+                <p-select-dropdown v-model="proxyNotificationLevel"
+                                   :items="LEVEL_LIST"
                                    @select="onChangeLevel"
                 />
             </template>
@@ -17,7 +19,6 @@
 import { reactive, toRefs } from 'vue';
 
 import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
-
 
 const LEVEL_LIST = Object.freeze([
     { label: 'Level 1', name: 'LV1', type: 'item' },

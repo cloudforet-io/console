@@ -5,10 +5,16 @@
                        required
         >
             <div class="flex">
-                <p-radio v-model="formState.hasCredentialKey" :value="true" class="radio-text">
+                <p-radio v-model="formState.hasCredentialKey"
+                         :value="true"
+                         class="radio-text"
+                >
                     {{ $t('APP.MAIN.YES') }}
                 </p-radio>
-                <p-radio :selected="formState.hasCredentialKey" :value="false" @change="handleSelectNoCredentials">
+                <p-radio :selected="formState.hasCredentialKey"
+                         :value="false"
+                         @change="handleSelectNoCredentials"
+                >
                     {{ $t('APP.MAIN.NO') }}
                 </p-radio>
             </div>
@@ -26,25 +32,38 @@
                     />
                 </template>
                 <div class="radio-wrapper">
-                    <p-radio :selected="formState.attachTrustedAccount" :value="false"
+                    <p-radio :selected="formState.attachTrustedAccount"
+                             :value="false"
                              @change="handleChangeAttachTrustedAccount"
                     >
                         {{ $t('APP.MAIN.NO') }}
                     </p-radio>
                     <br>
-                    <p-radio :selected="formState.attachTrustedAccount" :value="true" @change="handleChangeAttachTrustedAccount">
+                    <p-radio :selected="formState.attachTrustedAccount"
+                             :value="true"
+                             @change="handleChangeAttachTrustedAccount"
+                    >
                         {{ $t('APP.MAIN.YES') }}<br>
                     </p-radio>
-                    <div v-if="formState.attachTrustedAccount" class="yes-dropdown">
+                    <div v-if="formState.attachTrustedAccount"
+                         class="yes-dropdown"
+                    >
                         <p-select-dropdown :selected="formState.attachedTrustedAccountId"
                                            :items="trustedAccountMenuItems"
                                            :disabled="!formState.attachTrustedAccount"
                                            @select="handleChangeAttachedTrustedAccountId"
                         />
-                        <div v-if="formState.attachTrustedAccount && formState.attachedTrustedAccountId" class="copy-text-wrapper">
-                            <p-i name="ic_outlined-info" width="0.875rem" height="0.875rem" />
+                        <div v-if="formState.attachTrustedAccount && formState.attachedTrustedAccountId"
+                             class="copy-text-wrapper"
+                        >
+                            <p-i name="ic_outlined-info"
+                                 width="0.875rem"
+                                 height="0.875rem"
+                            />
                             <div class="right-part">
-                                <div v-for="(data, idx) in selectedTrustedAccountDataList" :key="`text-${data.key}-${idx}`">
+                                <div v-for="(data, idx) in selectedTrustedAccountDataList"
+                                     :key="`text-${data.key}-${idx}`"
+                                >
                                     <b>{{ data.key }} </b>
                                     <p-copy-button size="sm">
                                         {{ data.value }}
@@ -55,9 +74,13 @@
                     </div>
                 </div>
             </p-field-group>
-            <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SECRET_TYPE_LABEL')" required class="mb-8">
+            <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SECRET_TYPE_LABEL')"
+                           required
+                           class="mb-8"
+            >
                 <div class="flex">
-                    <p-radio v-for="(type, idx) in secretTypes" :key="idx"
+                    <p-radio v-for="(type, idx) in secretTypes"
+                             :key="idx"
                              :selected="formState.selectedSecretType"
                              :value="type"
                              class="radio-text"
@@ -67,7 +90,10 @@
                     </p-radio>
                 </div>
             </p-field-group>
-            <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" stretch>
+            <p-tab :tabs="tabState.tabs"
+                   :active-tab.sync="tabState.activeTab"
+                   stretch
+            >
                 <template #input>
                     <p-json-schema-form :form-data.sync="formState.customSchemaForm"
                                         :schema="credentialSchema"
@@ -82,7 +108,9 @@
                                    :invalid="!checkJsonStringAvailable(formState.credentialJson)"
                                    :invalid-text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.JSON_INVALID')"
                     >
-                        <p-text-editor :code.sync="formState.credentialJson" :disable-auto-reformat="true" />
+                        <p-text-editor :code.sync="formState.credentialJson"
+                                       :disable-auto-reformat="true"
+                        />
                     </p-field-group>
                 </template>
             </p-tab>
@@ -117,7 +145,6 @@ import type {
     ActiveDataType, CredentialForm, ProviderModel, PageMode, AccountType,
     ServiceAccountModel,
 } from '@/services/asset-inventory/service-account/type';
-
 
 interface Props {
     editMode: PageMode;
@@ -170,12 +197,12 @@ export default defineComponent<Props>({
             providerData: {} as ProviderModel,
             showTrustedAccount: computed<boolean>(() => state.providerData?.capability?.support_trusted_service_account ?? false),
             trustedAccounts: [] as ServiceAccountModel[],
-            trustedAccountMenuItems: computed<SelectDropdownMenu[]>(() => state.trustedAccounts.map(d => ({
+            trustedAccountMenuItems: computed<SelectDropdownMenu[]>(() => state.trustedAccounts.map((d) => ({
                 name: d.service_account_id,
                 label: d.name,
             }))),
             selectedTrustedAccountDataList: computed(() => {
-                const selectedTrustedAccount = state.trustedAccounts.find(d => d.service_account_id === formState.attachedTrustedAccountId);
+                const selectedTrustedAccount = state.trustedAccounts.find((d) => d.service_account_id === formState.attachedTrustedAccountId);
                 if (!selectedTrustedAccount) return [];
                 const baseInfoProperties: Record<string, JsonSchema> = state.baseInformationSchema?.properties;
                 let entries: Array<[string, JsonSchema]> = [];

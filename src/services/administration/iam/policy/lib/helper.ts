@@ -7,7 +7,6 @@ import type { PolicyTypes } from '@/services/administration/iam/policy/lib/confi
 import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
 import type { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 
-
 export const policyTypeBadgeColorFormatter = (policyType: PolicyTypes) => {
     switch (policyType) {
     case POLICY_TYPES.MANAGED: return 'gray';
@@ -34,7 +33,7 @@ export const makeCustomValueHandler = (policyList: PolicyDataModel[], distinct: 
     policyList.forEach((d) => {
         allItemSet.add(d[distinct]);
     });
-    const allItems: ValueItem[] = Array.from(allItemSet).map(d => ({ name: d, label: d }));
+    const allItems: ValueItem[] = Array.from(allItemSet).map((d) => ({ name: d, label: d }));
 
     return async (inputText: string) => {
         let res: ValueItem[] = [...allItems];

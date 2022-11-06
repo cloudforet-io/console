@@ -1,6 +1,9 @@
 <template>
-    <p-data-table :items="items" :fields="fields" :loading="loading"
-                  selectable sortable
+    <p-data-table :items="items"
+                  :fields="fields"
+                  :loading="loading"
+                  selectable
+                  sortable
                   search-type="query"
                   :multi-select="false"
                   :select-index.sync="proxySelectIndex"
@@ -11,7 +14,10 @@
     >
         <template #col-name-format="{ value }">
             <span>{{ value.label }}</span>
-            <p-badge v-if="value.isDefault" outline class="ml-2">
+            <p-badge v-if="value.isDefault"
+                     outline
+                     class="ml-2"
+            >
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.DEFAULT') }}
             </p-badge>
         </template>
@@ -51,7 +57,6 @@ import {
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { capitalize } from 'lodash';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -60,7 +65,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
-
 
 export default {
     name: 'EscalationPolicyDataTable',

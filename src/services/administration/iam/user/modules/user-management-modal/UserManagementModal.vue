@@ -14,7 +14,9 @@
         @close="handleClose"
     >
         <template #col-state-format="{value}">
-            <p-status v-bind="userStateFormatter(value)" class="capitalize" />
+            <p-status v-bind="userStateFormatter(value)"
+                      class="capitalize"
+            />
         </template>
         <template #col-last_accessed_at-format="{ value }">
             <span v-if="value === -1">
@@ -104,7 +106,7 @@ export default {
             selectedUsers: computed<User[]>(() => administrationStore.state.user.selectedUsers),
         });
 
-        const getUsersParam = items => ({ users: map(items, 'user_id') });
+        const getUsersParam = (items) => ({ users: map(items, 'user_id') });
 
         const deleteUser = async (items) => {
             try {

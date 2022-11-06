@@ -8,7 +8,6 @@ import type {
     Granularity, MoreGroupByItem, CostFiltersMap,
 } from '@/services/cost-explorer/type';
 
-
 export const setGranularity: Mutation<CostAnalysisStoreState> = (state, granularity: Granularity) => {
     state.granularity = granularity;
 };

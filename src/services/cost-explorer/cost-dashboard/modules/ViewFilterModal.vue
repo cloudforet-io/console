@@ -8,7 +8,10 @@
         :visible.sync="proxyVisible"
     >
         <template #body>
-            <div v-for="category in categories" :key="`filter-wrapper-${category}`" class="filter-wrapper">
+            <div v-for="category in categories"
+                 :key="`filter-wrapper-${category}`"
+                 class="filter-wrapper"
+            >
                 <p class="title">
                     {{ FILTER_ITEM_MAP[category].label }} ({{ selectedFilters[category] ? selectedFilters[category].length : 0 }})
                 </p>
@@ -40,7 +43,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import type { CostFiltersMap } from '@/services/cost-explorer/type';
-
 
 const DASHBOARD_FILTERS = [FILTER.PROJECT_GROUP, FILTER.PROJECT, FILTER.SERVICE_ACCOUNT, FILTER.PROVIDER];
 const CUSTOM_DASHBOARD_FILTERS = Object.values(FILTER);

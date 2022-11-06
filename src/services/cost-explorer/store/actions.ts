@@ -8,7 +8,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { CostExplorerState } from '@/services/cost-explorer/store/type';
 
-
 export const setDashboardList: Action<CostExplorerState, any> = async ({ commit }): Promise<void> => {
     const userId = store.state.user.userId;
     try {

@@ -6,22 +6,38 @@
             @goBack="$router.go(-1)"
         >
             <template #title-right-extra>
-                <span v-if="type === POLICY_TYPES.MANAGED" class="policy-managed-badge">
+                <span v-if="type === POLICY_TYPES.MANAGED"
+                      class="policy-managed-badge"
+                >
                     <p-badge style-type="gray200">{{ $t('IAM.POLICY.FORM.VIEW_ONLY') }}</p-badge>
                 </span>
-                <span v-if="type === POLICY_TYPES.CUSTOM" class="policy-edit-buttons">
-                    <p-icon-button name="ic_trashcan" :disabled="!hasManagePermission" class="w-full delete-btn"
+                <span v-if="type === POLICY_TYPES.CUSTOM"
+                      class="policy-edit-buttons"
+                >
+                    <p-icon-button name="ic_trashcan"
+                                   :disabled="!hasManagePermission"
+                                   class="w-full delete-btn"
                                    @click="handleVisibleDeleteModal"
                     />
-                    <p-icon-button name="ic_edit-text" :disabled="!hasManagePermission" class="edit-btn"
+                    <p-icon-button name="ic_edit-text"
+                                   :disabled="!hasManagePermission"
+                                   class="edit-btn"
                                    @click="handleVisibleTitleEditModal"
                     />
                 </span>
-                <div v-if="type === POLICY_TYPES.CUSTOM" class="policy-modify-buttons">
-                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="tertiary" @click="$router.back()">
+                <div v-if="type === POLICY_TYPES.CUSTOM"
+                     class="policy-modify-buttons"
+                >
+                    <p-button :disabled="!isCodeModified && !isDescriptionModified"
+                              style-type="tertiary"
+                              @click="$router.back()"
+                    >
                         {{ $t('IAM.POLICY.FORM.CANCEL') }}
                     </p-button>
-                    <p-button :disabled="!isCodeModified && !isDescriptionModified" style-type="primary" @click="handleSaveChanges">
+                    <p-button :disabled="!isCodeModified && !isDescriptionModified"
+                              style-type="primary"
+                              @click="handleSaveChanges"
+                    >
                         {{ $t('IAM.POLICY.FORM.SAVE') }}
                     </p-button>
                 </div>
@@ -32,10 +48,16 @@
                 <p-label>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-label>
                 <br>
                 <div class="policy-detail-type-badge">
-                    <p-badge v-if="type === POLICY_TYPES.MANAGED" outline style-type="gray">
+                    <p-badge v-if="type === POLICY_TYPES.MANAGED"
+                             outline
+                             style-type="gray"
+                    >
                         {{ $t('IAM.POLICY.FORM.MANAGED_POLICY') }}
                     </p-badge>
-                    <p-badge v-else outline style-type="primary1">
+                    <p-badge v-else
+                             outline
+                             style-type="primary1"
+                    >
                         {{ $t('IAM.POLICY.FORM.CUSTOM_POLICY') }}
                     </p-badge>
                 </div>
@@ -71,8 +93,13 @@
                 />
             </div>
         </p-pane-layout>
-        <policy-delete-modal :visible.sync="visibleDeleteModal" :policy-id="id" />
-        <policy-name-edit-modal :visible.sync="visibleTitleEditModal" :policy-id="id" :policy-name="policyName" />
+        <policy-delete-modal :visible.sync="visibleDeleteModal"
+                             :policy-id="id"
+        />
+        <policy-name-edit-modal :visible.sync="visibleTitleEditModal"
+                                :policy-id="id"
+                                :policy-name="policyName"
+        />
     </section>
 </template>
 
@@ -88,7 +115,6 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -102,7 +128,6 @@ import type { PolicyDetailPageProps } from '@/services/administration/iam/policy
 import PolicyDeleteModal from '@/services/administration/iam/policy/modules/PolicyDeleteModal.vue';
 import PolicyNameEditModal from '@/services/administration/iam/policy/modules/PolicyNameEditModal.vue';
 import { administrationStore } from '@/services/administration/store';
-
 
 export default defineComponent<PolicyDetailPageProps>({
     name: 'PolicyDetailPage',

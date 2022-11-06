@@ -4,7 +4,9 @@
             <h3 class="sub-title">
                 {{ $t('IDENTITY.USER.NOTIFICATION.NOTIFICATION_CHANNEL') }}
             </h3>
-            <p-data-loader :data="protocolList" :loading="loading">
+            <p-data-loader :data="protocolList"
+                           :loading="loading"
+            >
                 <ul class="channel-list-wrapper">
                     <div v-for="item in protocolList"
                          :key="item.protocol_id"
@@ -19,14 +21,18 @@
                                             height="2.25rem"
                                             class="service-img"
                                 />
-                                <p-lazy-img v-else :src="assetUrlConverter(item.icon)"
+                                <p-lazy-img v-else
+                                            :src="assetUrlConverter(item.icon)"
                                             width="2.25rem"
                                             height="2.25rem"
                                             class="service-img"
                                 />
-                                <span class="text" :class="{disabled: manageDisabled}">
+                                <span class="text"
+                                      :class="{disabled: manageDisabled}"
+                                >
                                     <p-i name="ic_plus_bold"
-                                         width="1rem" height="1rem"
+                                         width="1rem"
+                                         height="1rem"
                                          color="inherit transparent"
                                     />
                                     {{ item.label }}
@@ -35,8 +41,13 @@
                         </router-link>
                     </div>
                 </ul>
-                <p v-if="projectId" class="spaceone-desc">
-                    <p-i name="ic_notifications_member" width="1.125rem" class="mr-2" />
+                <p v-if="projectId"
+                   class="spaceone-desc"
+                >
+                    <p-i name="ic_notifications_member"
+                         width="1.125rem"
+                         class="mr-2"
+                    />
                     <b>SpaceOne User:</b> {{ $t('IDENTITY.USER.NOTIFICATION.SPACEONE_USER_DESC') }}
                 </p>
                 <template #no-data>
@@ -46,11 +57,17 @@
                 </template>
             </p-data-loader>
             <p-divider class="divider" />
-            <p-data-loader class="flex-grow" :data="channelList" :loading="channelLoading">
+            <p-data-loader class="flex-grow"
+                           :data="channelList"
+                           :loading="channelLoading"
+            >
                 <div style="min-height: 6.5rem;">
-                    <ul v-for="item in channelList" :key="`${item.name}-${item.created_at}`">
+                    <ul v-for="item in channelList"
+                        :key="`${item.name}-${item.created_at}`"
+                    >
                         <li class="mb-4">
-                            <notification-channel-item :channel-data="item" :project-id="projectId"
+                            <notification-channel-item :channel-data="item"
+                                                       :project-id="projectId"
                                                        :manage-disabled="manageDisabled"
                                                        @change="onChangeChannelItem"
                                                        @confirm="listChannel"
@@ -96,7 +113,6 @@ import NotificationChannelItem from '@/services/notification/modules/notificatio
 import { PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-
 export default {
     name: 'NotificationChannelList',
     components: {
@@ -138,7 +154,7 @@ export default {
         });
 
         const enrichProtocol = async (protocolResp) => {
-            const enrichedProtocolList: EnrichedProtocolItem[] = await Promise.all(protocolResp.map(async d => ({
+            const enrichedProtocolList: EnrichedProtocolItem[] = await Promise.all(protocolResp.map(async (d) => ({
                 label: computed(() => i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
                 link: {
                     name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
@@ -192,12 +208,12 @@ export default {
         };
 
         const injectProtocolName = (channel: ChannelItem) => {
-            const protocolInfoOfChannel = (state.protocolResp as ProtocolItem[])?.find(i => i.protocol_id === channel.protocol_id);
+            const protocolInfoOfChannel = (state.protocolResp as ProtocolItem[])?.find((i) => i.protocol_id === channel.protocol_id);
             if (protocolInfoOfChannel) return protocolInfoOfChannel.name;
             return channel.name;
         };
         const injectProtocolSchema = (channel: ChannelItem) => {
-            const protocolInfoOfChannel = (state.protocolResp as ProtocolItem[]).find(i => i.protocol_id === channel.protocol_id);
+            const protocolInfoOfChannel = (state.protocolResp as ProtocolItem[]).find((i) => i.protocol_id === channel.protocol_id);
             if (protocolInfoOfChannel?.plugin_info.metadata.data === undefined) return {};
             return protocolInfoOfChannel.plugin_info.metadata.data.schema;
         };
@@ -210,7 +226,7 @@ export default {
                 const res = await SpaceConnector.client.notification.userChannel.list({
                     query: channelApiQuery.data,
                 });
-                state.channelList = res.results.map(d => ({
+                state.channelList = res.results.map((d) => ({
                     ...d,
                     protocol_name: injectProtocolName(d),
                     schema: injectProtocolSchema(d),
@@ -230,7 +246,7 @@ export default {
                 const res = await SpaceConnector.client.notification.projectChannel.list({
                     query: channelApiQuery.data,
                 });
-                state.channelList = res.results.map(d => ({
+                state.channelList = res.results.map((d) => ({
                     ...d,
                     protocol_name: injectProtocolName(d),
                     schema: injectProtocolSchema(d),

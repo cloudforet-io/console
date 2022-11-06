@@ -2,7 +2,10 @@
     <div class="gnb">
         <div class="left-part">
             <div class="site-map-wrapper">
-                <site-map :menu-list="siteMapMenuList" :visible.sync="showSiteMap" :disabled="!hasPermission" />
+                <site-map :menu-list="siteMapMenuList"
+                          :visible.sync="showSiteMap"
+                          :disabled="!hasPermission"
+                />
             </div>
 
             <g-n-b-logo :to="logoLink" />
@@ -37,7 +40,6 @@ import type { Vue } from 'vue/types/vue';
 
 import { includes } from 'lodash';
 
-
 import { store } from '@/store';
 
 import type { DisplayMenu as GNBMenuType } from '@/store/modules/display/type';
@@ -51,7 +53,6 @@ import GNBToolset from '@/common/modules/navigations/gnb/modules/GNBToolset.vue'
 import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
 
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
-
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['notifications', 'support', 'profile'];
 

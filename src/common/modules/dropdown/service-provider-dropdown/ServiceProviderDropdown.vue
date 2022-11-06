@@ -4,21 +4,28 @@
                        :items="contextMenuItems"
                        @select="handleSelect"
     >
-        <span v-if="providers[proxySelected]" class="text">
-            <p-lazy-img width="1rem" height="1rem"
+        <span v-if="providers[proxySelected]"
+              class="text"
+        >
+            <p-lazy-img width="1rem"
+                        height="1rem"
                         :src="providers[proxySelected].icon"
                         class="mr-1"
             /><span>{{ providers[proxySelected].name }}</span>
         </span>
-        <span v-else-if="hasAll" class="text">
+        <span v-else-if="hasAll"
+              class="text"
+        >
             <p-lazy-img error-icon="ic_provider_other"
-                        width="1rem" height="1rem"
+                        width="1rem"
+                        height="1rem"
                         class="mr-1"
             /><span>All</span>
         </span>
         <template #menu-item--format="{ item }">
             <div class="content-menu-item">
-                <p-lazy-img width="1rem" height="1rem"
+                <p-lazy-img width="1rem"
+                            height="1rem"
                             error-icon="ic_provider_other"
                             :src="item.icon"
                             class="mr-1"
@@ -40,7 +47,6 @@ import { i18n } from '@/translations';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-
 
 export default {
     name: 'ServiceProviderDropdown',
@@ -69,7 +75,7 @@ export default {
             contextMenuItems: computed(() => [
                 { type: 'header', name: 'serviceProvider', label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') },
                 ...(props.hasAll ? [{ name: 'all', label: 'All', icon: undefined }] : []),
-                ...Object.keys(state.providers).map(k => ({
+                ...Object.keys(state.providers).map((k) => ({
                     label: state.providers[k].name,
                     name: k,
                     icon: state.providers[k]?.icon,

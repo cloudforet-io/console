@@ -130,7 +130,6 @@ export default {
             }
         };
 
-
         const handleSelectMoreMenu = (item) => {
             if (item === MENU.SET_HOME && props.dashboardId) {
                 costExplorerStore.dispatch('setHomeDashboard', props.dashboardId);

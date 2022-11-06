@@ -27,7 +27,6 @@ import {
     PHorizontalLayout, PPageTitle,
 } from '@spaceone/design-system';
 
-
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';

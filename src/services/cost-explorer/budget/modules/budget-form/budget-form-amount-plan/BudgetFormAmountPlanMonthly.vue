@@ -6,14 +6,17 @@
                     <p-label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-label> ($USD)
                 </p>
             </div>
-            <p-button style-type="tertiary" @click="handleAutofillButtonClick">
+            <p-button style-type="tertiary"
+                      @click="handleAutofillButtonClick"
+            >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
             </p-button>
         </div>
         <slot name="last-3-months" />
         <p-divider class="mt-2" />
         <div class="input-wrapper">
-            <budget-form-amount-plan-month-input v-for="(_, month, index) in monthAmountInputMap" :key="month"
+            <budget-form-amount-plan-month-input v-for="(_, month, index) in monthAmountInputMap"
+                                                 :key="month"
                                                  class="input"
                                                  :amount="monthAmountInputMap[month].amount"
                                                  :month="month"
@@ -45,7 +48,6 @@ import type { MonthAmountInput } from '@/services/cost-explorer/budget/modules/b
 import BudgetFormAmountPlanMonthInput
     from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
 import type { Period } from '@/services/cost-explorer/type';
-
 
 interface Props {
     period: Period;
@@ -155,7 +157,6 @@ export default {
         watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
             emit('update', monthAmountInputMap, state.isAllValid);
         }, { deep: true });
-
 
         return {
             ...toRefs(state),

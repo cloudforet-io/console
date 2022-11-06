@@ -1,5 +1,7 @@
 <template>
-    <p-tag v-if="periodText" class="period" :deletable="!readOnly"
+    <p-tag v-if="periodText"
+           class="period"
+           :deletable="!readOnly"
            @delete="handleDeletePeriod"
     >
         <span class="text">UTC</span>

@@ -1,7 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { MockInfo } from '@cloudforet/core-lib/space-connector/type';
 
-const getAfterCallApiMap = store => ({
+const getAfterCallApiMap = (store) => ({
     '/inventory/cloud-service-type/create': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
     '/inventory/cloud-service-type/update': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
     '/inventory/collector/create': (data) => { store.dispatch('reference/collector/sync', data); },
@@ -28,12 +28,12 @@ const getAfterCallApiMap = store => ({
     '/monitoring/webhook/update': (data) => { store.dispatch('reference/webhook/sync', data); },
 });
 
-const getSessionTimeoutCallback = store => () => {
+const getSessionTimeoutCallback = (store) => () => {
     // Add session expiration process
     store.dispatch('user/setIsSessionExpired', true);
     store.dispatch('error/showSessionExpiredError');
 };
-const getApiEndpoint = config => config.get('CONSOLE_API.ENDPOINT');
+const getApiEndpoint = (config) => config.get('CONSOLE_API.ENDPOINT');
 const getMockInfo = (config): MockInfo => ({
     endpoint: config.get('MOCK.ENDPOINT'),
     all: config.get('MOCK.ALL'),

@@ -1,6 +1,8 @@
 <template>
     <transition name="slide-up">
-        <general-page-layout v-if="visible" class="overlay-page-layout">
+        <general-page-layout v-if="visible"
+                             class="overlay-page-layout"
+        >
             <slot />
         </general-page-layout>
     </transition>

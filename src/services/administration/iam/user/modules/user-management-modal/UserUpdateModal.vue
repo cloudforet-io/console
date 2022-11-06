@@ -10,7 +10,9 @@
                     @close="handleClose"
     >
         <template #body>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')" required>
+            <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
+                           required
+            >
                 <template #default>
                     <div class="id-input-form">
                         <p-text-input v-model="user_id"
@@ -20,8 +22,14 @@
                     </div>
                 </template>
             </p-field-group>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')" class="input-form" required>
-                <p-text-input v-model="name" class="text-input" autocomplete="username" />
+            <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')"
+                           class="input-form"
+                           required
+            >
+                <p-text-input v-model="name"
+                              class="text-input"
+                              autocomplete="username"
+                />
             </p-field-group>
             <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')"
                            :invalid="validationState.isEmailValid === false"
@@ -29,10 +37,16 @@
                            class="input-form"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="email" :invalid="invalid" class="text-input" />
+                    <p-text-input v-model="email"
+                                  :invalid="invalid"
+                                  class="text-input"
+                    />
                 </template>
             </p-field-group>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')" class="input-form" required>
+            <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')"
+                           class="input-form"
+                           required
+            >
                 <p-select-dropdown v-model="domainRole"
                                    :items="domainRoleItem"
                                    :disabled="domainRoleItem.length < 2 || isSameId"
@@ -51,7 +65,8 @@
                     class="input-form"
                 >
                     <template #default="{invalid}">
-                        <p-text-input v-model="password" type="password"
+                        <p-text-input v-model="password"
+                                      type="password"
                                       autocomplete="current-password"
                                       class="text-input"
                                       :invalid="invalid"
@@ -66,7 +81,8 @@
                     class="input-form"
                 >
                     <template #default="{invalid}">
-                        <p-text-input v-model="passwordCheck" type="password"
+                        <p-text-input v-model="passwordCheck"
+                                      type="password"
                                       class="text-input"
                                       autocomplete="new-password"
                                       :invalid="invalid"
@@ -75,7 +91,9 @@
                 </p-field-group>
             </form>
             <p-divider class="divider" />
-            <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')" class="tags-title">
+            <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')"
+                           class="tags-title"
+            >
                 <div class="tag-help-msg">
                     {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT1') }} <br>
                     {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
@@ -102,7 +120,6 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { store } from '@/store';
 
@@ -223,7 +240,7 @@ export default {
                 checkOneUpperCase(password),
                 checkOneNumber(password),
             ]);
-            const passwordInvalidObj = passwordValidation.find(item => item.invalidText.length > 0);
+            const passwordInvalidObj = passwordValidation.find((item) => item.invalidText.length > 0);
             if (!passwordInvalidObj) {
                 validationState.isPasswordValid = true;
                 validationState.passwordInvalidText = '';
@@ -280,7 +297,7 @@ export default {
                 const res = await SpaceConnector.client.identity.role.list({
                     role_type: 'DOMAIN',
                 });
-                state.domainRoleList = res.results.map(d => ({
+                state.domainRoleList = res.results.map((d) => ({
                     type: 'item',
                     label: d.name,
                     name: d.role_id,
@@ -293,7 +310,7 @@ export default {
 
         const setCurrentDomainId = async () => {
             if (state.domainRoleList[0] && state.selectedUsers[0]) {
-                const roleName = state.selectedUsers[0].role_bindings?.find(data => data.role_info.role_type === 'DOMAIN')?.role_info.role_id;
+                const roleName = state.selectedUsers[0].role_bindings?.find((data) => data.role_info.role_type === 'DOMAIN')?.role_info.role_id;
                 state.domainRole = roleName;
             } else state.domainRole = '';
         };

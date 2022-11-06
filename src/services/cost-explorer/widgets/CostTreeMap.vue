@@ -7,14 +7,22 @@
         :print-mode="printMode"
         class="cost-tree-map"
     >
-        <p-data-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading"
+                       class="chart-wrapper"
+        >
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
-            <div ref="chartRef" class="chart" />
+            <div ref="chartRef"
+                 class="chart"
+            />
         </p-data-loader>
-        <div v-if="printMode" class="table-wrapper">
-            <p-data-table v-for="(itemSet, itemSetIdx) in itemSetList" :key="itemSetIdx" class="table"
+        <div v-if="printMode"
+             class="table-wrapper"
+        >
+            <p-data-table v-for="(itemSet, itemSetIdx) in itemSetList"
+                          :key="itemSetIdx"
+                          class="table"
                           :fields="fields"
                           :items="itemSet"
                           :loading="loading"
@@ -44,7 +52,6 @@
 
 <script lang="ts">
 
-
 import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -59,13 +66,11 @@ import type { DataTableField } from '@spaceone/design-system/dist/src/data-displ
 import dayjs from 'dayjs';
 import { sum } from 'lodash';
 
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
-
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -85,7 +90,6 @@ import { getPieChartData } from '@/services/cost-explorer/widgets/lib/widget-dat
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import type { CostAnalyzeModel, PieChartData, WidgetProps } from '@/services/cost-explorer/widgets/type';
-
 
 const CATEGORY_KEY = 'category';
 const VALUE_KEY = 'value';
@@ -196,7 +200,7 @@ export default defineComponent<WidgetProps>({
             chart.zoomOutButton.disabled = true;
             chart.dataFields.color = 'backgroundColor';
 
-            const totalCost = sum(state.data.map(d => d.value));
+            const totalCost = sum(state.data.map((d) => d.value));
             const series = chart.seriesTemplates.create('0');
             if (props.printMode) series.showOnInit = false;
             if (series.tooltip) series.tooltip.fontSize = 14;

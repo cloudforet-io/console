@@ -27,7 +27,6 @@ import {
 
 import { PPageTitle, PButton } from '@spaceone/design-system';
 
-
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import PolicyListDataTable from '@/services/administration/modules/PolicyListDataTable.vue';

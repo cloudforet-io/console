@@ -10,7 +10,6 @@ import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
-
 interface ConfigData extends FavoriteConfig, RecentConfig {
     [key: string]: any;
 }
@@ -97,7 +96,7 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
     if (config) {
         config.forEach((d) => {
             const resource = Object.values(cloudServiceReference)
-                .find(c => c.data.cloudServiceTypeKey === d.itemId);
+                .find((c) => c.data.cloudServiceTypeKey === d.itemId);
             if (resource) {
                 results.push({
                     ...d,

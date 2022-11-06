@@ -1,7 +1,10 @@
 <template>
     <div class="collector-plugins-page">
-        <p-page-title :title="$t('PLUGIN.COLLECTOR.PLUGINS.TITLE')" use-total-count :total-count="totalCount"
-                      child @goBack="$router.go(-1)"
+        <p-page-title :title="$t('PLUGIN.COLLECTOR.PLUGINS.TITLE')"
+                      use-total-count
+                      :total-count="totalCount"
+                      child
+                      @goBack="$router.go(-1)"
         />
         <p-divider class="divider" />
         <collector-plugins-toolbox class="collector-plugin-toolbox"
@@ -16,26 +19,38 @@
                 />
             </template>
         </collector-plugins-toolbox>
-        <p v-if="resourceTypeSearchTags.length > 0" class="mb-4">
-            <p-badge v-for="(tag, idx) in resourceTypeSearchTags" :key="idx"
+        <p v-if="resourceTypeSearchTags.length > 0"
+           class="mb-4"
+        >
+            <p-badge v-for="(tag, idx) in resourceTypeSearchTags"
+                     :key="idx"
                      style-type="primary"
                      :outline="true"
                      class="filter-tag"
             >
                 <span>{{ tag }}</span>
-                <p-i name="ic_delete" width="1rem"
-                     height="1rem" color="inherit"
+                <p-i name="ic_delete"
+                     width="1rem"
+                     height="1rem"
+                     color="inherit"
                      class="cursor-pointer"
                      @click="handleDeleteResourceSearchTag(idx)"
                 />
             </p-badge>
         </p>
-        <p v-if="keyword" class="mb-2 text-sm">
+        <p v-if="keyword"
+           class="mb-2 text-sm"
+        >
             {{ totalCount }} plugins for <strong>[{{ keyword }}]</strong>
         </p>
-        <p-data-loader :data="plugins" :loading="loading" :loader-backdrop-color="BACKGROUND_COLOR">
+        <p-data-loader :data="plugins"
+                       :loading="loading"
+                       :loader-backdrop-color="BACKGROUND_COLOR"
+        >
             <ul class="plugin-card-list">
-                <li v-for="item in plugins" :key="item.name">
+                <li v-for="item in plugins"
+                    :key="item.name"
+                >
                     <p-card-item :icon="item.icon"
                                  :title="item.name"
                                  :contents="item.tags.description"
@@ -46,7 +61,9 @@
                         <template #extra>
                             <div class="card-bottom">
                                 <div v-if="item.labels">
-                                    <p-badge v-for="(label, idx) in item.labels" :key="`${label}-${idx}`" style-type="gray"
+                                    <p-badge v-for="(label, idx) in item.labels"
+                                             :key="`${label}-${idx}`"
+                                             style-type="gray"
                                              :outline="true"
                                              class="mr-2 mb-2"
                                     >
@@ -84,11 +101,9 @@ import {
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import { get, range } from 'lodash';
 
-
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
 
 import type { TimeStamp } from '@/models';
 
@@ -102,12 +117,10 @@ import CollectorPluginsToolbox from '@/services/asset-inventory/collector/collec
 import PluginFilter from '@/services/asset-inventory/collector/collector-plugins/modules/PluginFilter.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
-
 enum PLUGIN_STATE {
     enabled = 'ENABLED',
     disabled = 'DISABLED'
 }
-
 
 interface PluginTemplateModel {
     [key: string]: {
@@ -186,7 +199,6 @@ export default {
                     .setSort(state.sortBy, state.sortBy !== 'name')
                     .setFilters([{ v: state.keyword }]);
 
-
                 if (state.resourceTypeSearchTags.length) {
                     pluginApiQuery.setFilters([{
                         k: 'labels',
@@ -201,7 +213,7 @@ export default {
                 };
                 const res = await SpaceConnector.client.repository.plugin.list(params);
                 state.plugins = [
-                    ...res.results.map(d => ({
+                    ...res.results.map((d) => ({
                         icon: assetUrlConverter(d.tags?.icon),
                         ...d,
                     })),
@@ -215,7 +227,6 @@ export default {
                 state.loading = false;
             }
         };
-
 
         const repoApiQuery = new ApiQueryHelper();
         const getRepositories = async () => {
@@ -271,7 +282,7 @@ export default {
             handlePluginCreate,
             handleToolbox,
             handleDeleteResourceSearchTag,
-            isBeta: item => get(item, 'tags.beta', ''),
+            isBeta: (item) => get(item, 'tags.beta', ''),
             BACKGROUND_COLOR,
         };
     },

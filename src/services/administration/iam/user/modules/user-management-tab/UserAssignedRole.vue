@@ -8,7 +8,9 @@
             :striped="false"
         >
             <template #col-project_group_info.project_group_id-format="{value}">
-                <p-anchor v-if="value" :href="getProjectLink(value, false)">
+                <p-anchor v-if="value"
+                          :href="getProjectLink(value, false)"
+                >
                     {{ projectGroups[value] ? projectGroups[value].label : value }}
                 </p-anchor>
                 <p v-if="!value">
@@ -16,7 +18,9 @@
                 </p>
             </template>
             <template #col-project_info.project_id-format="{value}">
-                <p-anchor v-if="value" :href="getProjectLink(value, true)">
+                <p-anchor v-if="value"
+                          :href="getProjectLink(value, true)"
+                >
                     {{ projects[value] ? projects[value].label : value }}
                 </p-anchor>
                 <p v-if="!value">
@@ -25,7 +29,9 @@
             </template>
             <template #col-labels-format="{value}">
                 <p v-if="value.length === 0" />
-                <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
+                <p-badge v-for="(label, idx) in value"
+                         :key="idx"
+                         style-type="gray200"
                          class="mr-2"
                 >
                     {{ label }}
@@ -46,7 +52,6 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import type { Tags } from '@/models';
 import { store } from '@/store';
@@ -105,18 +110,14 @@ export default {
 
         const getProjectLink = (value, isProject: true) => {
             if (isProject) {
-                const link = vm.$router.resolve(referenceRouter(
-                    value, {
-                        resource_type: 'identity.Project',
-                    },
-                ));
+                const link = vm.$router.resolve(referenceRouter(value, {
+                    resource_type: 'identity.Project',
+                }));
                 return link.href;
             }
-            const link = vm.$router.resolve(referenceRouter(
-                value, {
-                    resource_type: 'identity.ProjectGroup',
-                },
-            ));
+            const link = vm.$router.resolve(referenceRouter(value, {
+                resource_type: 'identity.ProjectGroup',
+            }));
             return link.href;
         };
 
@@ -129,7 +130,7 @@ export default {
                     include_role_binding: true,
                 });
 
-                baseState.items = res.role_bindings.map(d => ({
+                baseState.items = res.role_bindings.map((d) => ({
                     ...d,
                 }));
                 baseState.loading = false;

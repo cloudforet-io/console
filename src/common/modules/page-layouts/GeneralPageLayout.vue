@@ -1,11 +1,20 @@
 <template>
-    <div class="general-page-layout" :class="overflow">
-        <div class="header" :class="{'without-breadcrumbs': !breadcrumbs.length}">
-            <p-breadcrumbs v-if="breadcrumbs.length" :routes="breadcrumbs" :copiable="copiable" />
+    <div class="general-page-layout"
+         :class="overflow"
+    >
+        <div class="header"
+             :class="{'without-breadcrumbs': !breadcrumbs.length}"
+        >
+            <p-breadcrumbs v-if="breadcrumbs.length"
+                           :routes="breadcrumbs"
+                           :copiable="copiable"
+            />
             <slot name="handbook" />
         </div>
 
-        <div class="page-contents" :class="{'without-breadcrumbs': !breadcrumbs.length}">
+        <div class="page-contents"
+             :class="{'without-breadcrumbs': !breadcrumbs.length}"
+        >
             <slot />
         </div>
         <div class="fnb">
@@ -20,10 +29,8 @@ import { computed } from 'vue';
 
 import { PBreadcrumbs } from '@spaceone/design-system';
 
-
 import FNB from '@/common/modules/navigations/FNB.vue';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
-
 
 export default {
     name: 'GeneralPageLayout',

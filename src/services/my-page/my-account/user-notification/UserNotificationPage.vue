@@ -16,7 +16,6 @@ import {
     PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
 
-
 import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
 
 export default {

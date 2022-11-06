@@ -9,7 +9,9 @@
         <template #body>
             <article class="alert-wrapper">
                 <span class="alert-message">
-                    <p-i name="ic_state_duplicated" width="0.75rem" height="0.75rem"
+                    <p-i name="ic_state_duplicated"
+                         width="0.75rem"
+                         height="0.75rem"
                          class="alert-icon"
                     />
                     {{ $t('IDENTITY.USER.API_KEY.ALERT_MSG') }}
@@ -21,11 +23,16 @@
                 </span>
                 <p class="box-contents">
                     {{ apiKeyItem.api_key_id }}
-                    <p-collapsible-toggle :is-collapsed.sync="isAPICollapsed" class="collapsible-toggle">
+                    <p-collapsible-toggle :is-collapsed.sync="isAPICollapsed"
+                                          class="collapsible-toggle"
+                    >
                         {{ isAPICollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
-                    <p-text-editor v-if="!isAPICollapsed" class="m-4" :code="apiItem"
-                                   folded read-only
+                    <p-text-editor v-if="!isAPICollapsed"
+                                   class="m-4"
+                                   :code="apiItem"
+                                   folded
+                                   read-only
                     />
                 </p>
                 <p-divider class="divider" />
@@ -42,7 +49,8 @@
                     {{ $t('IDENTITY.USER.API_KEY.SPACECTL') }}
                     <div class="box-header-desc">
                         <p-i name="ic_outlined-info"
-                             width="1rem" height="1rem"
+                             width="1rem"
+                             height="1rem"
                              color="inherit"
                              class="info-icon"
                         />
@@ -57,11 +65,16 @@
                 </span>
                 <p class="box-contents">
                     {{ $t('IDENTITY.USER.API_KEY.SPACECTL_CONFIG') }}
-                    <p-collapsible-toggle :is-collapsed.sync="isSpacectlCollapsed" class="collapsible-toggle">
+                    <p-collapsible-toggle :is-collapsed.sync="isSpacectlCollapsed"
+                                          class="collapsible-toggle"
+                    >
                         {{ isSpacectlCollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
-                    <p-text-editor v-if="!isSpacectlCollapsed" class="m-4" :code="yamlItem"
-                                   folded read-only
+                    <p-text-editor v-if="!isSpacectlCollapsed"
+                                   class="m-4"
+                                   :code="yamlItem"
+                                   folded
+                                   read-only
                     />
                 </p>
                 <p-divider class="divider" />
@@ -87,7 +100,6 @@ import {
 import yaml from 'js-yaml';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-
 
 enum FileType {
     JSON = 'json',

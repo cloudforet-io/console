@@ -1,7 +1,8 @@
 <template>
     <div class="collector-page">
         <p-page-title :title="$t('PLUGIN.COLLECTOR.MAIN.TITLE')"
-                      use-total-count use-selected-count
+                      use-total-count
+                      use-selected-count
                       :selected-count="selectedItems.length"
                       :total-count="totalCount"
         >
@@ -50,18 +51,25 @@
                     <template #col-plugin_info.plugin_id-format="{item}">
                         <div class="plugin-info-col">
                             <p-lazy-img :src="item.plugin_icon"
-                                        width="1rem" height="1rem" class="mr-2"
+                                        width="1rem"
+                                        height="1rem"
+                                        class="mr-2"
                             />
                             {{ item.plugin_name }}
                         </div>
                     </template>
                     <template #col-state-format="data">
-                        <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
+                        <p-status :text="data.value"
+                                  :theme="data.value === 'DISABLED' ? 'red' : 'green'"
+                        />
                     </template>
                     <template #col-collector_history-format="{item}">
                         <router-link :to="item.detailLink">
                             <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
-                                <p-i name="ic_arrow_right" width="1rem" color="inherit transparent" />
+                                <p-i name="ic_arrow_right"
+                                     width="1rem"
+                                     color="inherit transparent"
+                                />
                             </span>
                         </router-link>
                     </template>
@@ -93,14 +101,17 @@
                 />
             </template>
             <template #schedules>
-                <collector-schedules :collector="selectedItems[0]" :manage-disabled="!hasManagePermission" />
+                <collector-schedules :collector="selectedItems[0]"
+                                     :manage-disabled="!hasManagePermission"
+                />
             </template>
             <!--            <template #collectionRule>-->
             <!--                <collection-rule />-->
             <!--            </template>-->
         </p-tab>
         <p-tab v-else-if="selectedItems.length > 1"
-               :tabs="multiTabState.tabs" :active-tab.sync="multiTabState.activeTab"
+               :tabs="multiTabState.tabs"
+               :active-tab.sync="multiTabState.activeTab"
         >
             <template #data>
                 <p-data-table :fields="selectedDataFields"
@@ -112,18 +123,25 @@
                     <template #col-plugin_info.plugin_id-format="{item}">
                         <div class="plugin-info-col">
                             <p-lazy-img :src="item.plugin_icon"
-                                        width="1.5rem" height="1.5rem" class="mr-2"
+                                        width="1.5rem"
+                                        height="1.5rem"
+                                        class="mr-2"
                             />
                             {{ item.plugin_name }}
                         </div>
                     </template>
                     <template #col-state-format="data">
-                        <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
+                        <p-status :text="data.value"
+                                  :theme="data.value === 'DISABLED' ? 'red' : 'green'"
+                        />
                     </template>
                     <template #col-collector_history-format="{item}">
                         <router-link :to="item.detailLink">
                             <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
-                                <p-i name="ic_arrow_right" width="1rem" color="inherit transparent" />
+                                <p-i name="ic_arrow_right"
+                                     width="1rem"
+                                     color="inherit transparent"
+                                />
                             </span>
                         </router-link>
                     </template>
@@ -133,7 +151,9 @@
                 </p-data-table>
             </template>
         </p-tab>
-        <div v-else class="empty-space">
+        <div v-else
+             class="empty-space"
+        >
             <p-empty>{{ $t('PLUGIN.COLLECTOR.MAIN.NO_SELECTED_COLLECTOR') }}</p-empty>
         </div>
 
@@ -161,18 +181,25 @@
             <template #col-plugin_info.plugin_id-format="{item}">
                 <div class="plugin-info-col">
                     <p-lazy-img :src="item.plugin_icon"
-                                width="1.5rem" height="1.5rem" class="mr-2"
+                                width="1.5rem"
+                                height="1.5rem"
+                                class="mr-2"
                     />
                     {{ item.plugin_name }}
                 </div>
             </template>
             <template #col-state-format="data">
-                <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
+                <p-status :text="data.value"
+                          :theme="data.value === 'DISABLED' ? 'red' : 'green'"
+                />
             </template>
             <template #col-collector_history-format="{item}">
                 <router-link :to="item.detailLink">
                     <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
-                        <p-i name="ic_arrow_right" width="1rem" color="inherit transparent" />
+                        <p-i name="ic_arrow_right"
+                             width="1rem"
+                             color="inherit transparent"
+                        />
                     </span>
                 </router-link>
             </template>
@@ -312,7 +339,7 @@ export default {
             selectedIndexes: [],
             selectedItems: computed(() => {
                 const items = [] as CollectorModel[];
-                state.selectedIndexes.map(d => items.push(state.items[d]));
+                state.selectedIndexes.map((d) => items.push(state.items[d]));
                 return items;
             }),
             selectedDataFields: computed(() => [{ name: 'collector_id', label: 'Collector Id' }, ...state.fields]),
@@ -374,7 +401,6 @@ export default {
             activeTab: 'data',
         });
 
-
         // Url query
         const setSearchTags = async () => {
             queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters)
@@ -384,8 +410,13 @@ export default {
 
         // Table
         const apiQuery = new ApiQueryHelper().setOnly(
-            'collector_id', 'name', 'last_collected_at',
-            'provider', 'tags', 'plugin_info', 'state',
+            'collector_id',
+            'name',
+            'last_collected_at',
+            'provider',
+            'tags',
+            'plugin_info',
+            'state',
         );
         const getQuery = () => {
             apiQuery.setSort(state.sortBy, state.sortDesc)
@@ -398,7 +429,7 @@ export default {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.inventory.collector.list({ query: getQuery() });
-                state.items = res.results.map(d => ({
+                state.items = res.results.map((d) => ({
                     plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
                     plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
                     detailLink: {
@@ -444,17 +475,17 @@ export default {
             try {
                 if (checkModalState.mode === 'enable') {
                     await SpaceConnector.client.inventory.collector.enable({
-                        collectors: state.selectedItems.map(d => d.collector_id),
+                        collectors: state.selectedItems.map((d) => d.collector_id),
                     });
                     showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_ENABLE_TITLE', state.selectedItems.length), '');
                 } else if (checkModalState.mode === 'disable') {
                     await SpaceConnector.client.inventory.collector.disable({
-                        collectors: state.selectedItems.map(d => d.collector_id),
+                        collectors: state.selectedItems.map((d) => d.collector_id),
                     });
                     showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DISABLE_TITLE', state.selectedItems.length), '');
                 } else if (checkModalState.mode === 'delete') {
                     await SpaceConnector.client.inventory.collector.delete({
-                        collectors: state.selectedItems.map(d => d.collector_id),
+                        collectors: state.selectedItems.map((d) => d.collector_id),
                     });
                     showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_TITLE', state.selectedItems.length), '');
                 }
@@ -507,7 +538,6 @@ export default {
             default: break;
             }
         };
-
 
         const exportCollectorDataToExcel = async () => {
             await store.dispatch('file/downloadExcel', {

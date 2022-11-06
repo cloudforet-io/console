@@ -6,17 +6,27 @@
         :print-mode="printMode"
     >
         <template #default>
-            <div class="widget-wrapper" :class="{responsive: !printMode}">
+            <div class="widget-wrapper"
+                 :class="{responsive: !printMode}"
+            >
                 <p-data-loader :loading="loading"
                                loader-type="skeleton"
                                disable-empty-case
                                :disable-transition="printMode"
                                class="chart-wrapper"
                 >
-                    <div ref="chartRef" class="chart" />
+                    <div ref="chartRef"
+                         class="chart"
+                    />
                     <div class="legend-wrapper">
-                        <span v-for="(item) in chartLegends" :key="item" class="circle-wrapper">
-                            <span v-if="providers" class="circle" :style="{background: providers[item].color}" /><span class="label">{{ providers[item].label || '' }}</span>
+                        <span v-for="(item) in chartLegends"
+                              :key="item"
+                              class="circle-wrapper"
+                        >
+                            <span v-if="providers"
+                                  class="circle"
+                                  :style="{background: providers[item].color}"
+                            /><span class="label">{{ providers[item].label || '' }}</span>
                         </span>
                     </div>
                 </p-data-loader>
@@ -87,7 +97,6 @@ import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
-
 
 const CATEGORY_KEY = 'category';
 const VALUE_KEY = 'value';
@@ -273,7 +282,7 @@ export default defineComponent<WidgetProps>({
 
         // return value: {asia_pacific: { aws: 3304.85581588513 }}
         const getCostByProviderData = (originData: OriginData[]): Record<string, Record<string, number>> => {
-            const data = originData.map(d => ({
+            const data = originData.map((d) => ({
                 ...d,
                 continent_code: state.regions[d.region_code]?.continent?.continent_code,
             }));
@@ -282,7 +291,7 @@ export default defineComponent<WidgetProps>({
             Object.entries(continentGroupBy).forEach(([continent, cItem]) => {
                 const providerGroupBy = groupBy(cItem, 'provider');
                 Object.entries(providerGroupBy).forEach(([provider, pItem]) => {
-                    const providerCost = sum(pItem.map(d => d.usd_cost));
+                    const providerCost = sum(pItem.map((d) => d.usd_cost));
                     if (continent && continent !== 'undefined') {
                         if (result[continent]) result[continent][provider] = providerCost;
                         else result[continent] = { [provider]: providerCost };
@@ -292,10 +301,9 @@ export default defineComponent<WidgetProps>({
             return result;
         };
 
-
         const setPieChartData = (originData: OriginData[]): ChartData[] => {
             const costByProviderData = getCostByProviderData(originData);
-            return Object.keys(costByProviderData).map(continent => ({
+            return Object.keys(costByProviderData).map((continent) => ({
                 continent_code: RegionMap[continent]?.continent_code,
                 longitude: RegionMap[continent]?.longitude,
                 latitude: RegionMap[continent]?.latitude,
@@ -337,7 +345,7 @@ export default defineComponent<WidgetProps>({
                 tableState.loading = true;
                 const results: OriginData[] = await fetchData();
                 state.chartData = setPieChartData(results); // pie chart data (continent, latitude, etc.)
-                tableState.items = results.map(d => ({ // table data (usd_cost, region, provider)
+                tableState.items = results.map((d) => ({ // table data (usd_cost, region, provider)
                     usd_cost: d.usd_cost,
                     provider: d.provider || '',
                     region: state.regions[d.region_code]?.name || d.region_code,
@@ -370,7 +378,6 @@ export default defineComponent<WidgetProps>({
             ]);
             await getChartData();
         })();
-
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();

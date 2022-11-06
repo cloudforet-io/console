@@ -10,7 +10,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { CloudServiceDetailPageParams, CloudServiceTypeInfo } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import type { CloudServiceDetailStoreState } from '@/services/asset-inventory/store/cloud-service-detail/type';
 
-
 export const setProviderGroupName: Action<CloudServiceDetailStoreState, any> = ({ commit }, { provider, group, name }: CloudServiceDetailPageParams) => {
     commit('setProvider', provider);
     commit('setGroup', group);
@@ -31,7 +30,6 @@ export const setSelectedItem: Action<CloudServiceDetailStoreState, any> = ({ sta
 const cloudServiceTypeQuery = new ApiQueryHelper()
     .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary', 'resource_type', 'cloud_service_type_key')
     .setMultiSort([{ key: 'is_primary', desc: true }, { key: 'name', desc: false }]);
-
 
 const getCloudServiceTypeQuery = (provider: string, group: string) => {
     cloudServiceTypeQuery.setFilters([

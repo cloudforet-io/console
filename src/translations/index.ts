@@ -10,11 +10,9 @@ import en from '@cloudforet/language-pack/en.json';
 import ja from '@cloudforet/language-pack/ja.json';
 import ko from '@cloudforet/language-pack/ko.json';
 
-
 import { loadDayjsLocale } from '@/translations/vendors/dayjs';
 
 import { loadFonts } from '@/styles/fonts';
-
 
 Vue.use(VueI18n);
 
@@ -30,7 +28,6 @@ const removeEmpty = (obj: any): LocaleMessageObject => Object.keys(obj)
 
 const supportLanguages = ['en', 'ko', 'jp'] as const;
 type SupportLanguage = typeof supportLanguages[number];
-
 
 const loadLocaleFiles = async (lang: string) => {
     // load necessary files

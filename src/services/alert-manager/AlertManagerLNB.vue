@@ -1,5 +1,7 @@
 <template>
-    <l-n-b :header="header" :menu-set="menuSet" />
+    <l-n-b :header="header"
+           :menu-set="menuSet"
+    />
 </template>
 
 <script lang="ts">

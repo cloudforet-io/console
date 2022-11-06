@@ -1,7 +1,10 @@
 <template>
     <div class="cloud-service-history-detail-overlay">
         <p-pane-layout class="page-wrapper">
-            <p-page-title :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')" child @goBack="$router.go(-1)">
+            <p-page-title :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')"
+                          child
+                          @goBack="$router.go(-1)"
+            >
                 <template #title-right-extra>
                     <div class="title-right-extra">
                         <template v-if="cloudServiceItem.name">
@@ -22,7 +25,9 @@
                         <span class="title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY') }}</span>
                         <span class="total-count">({{ totalCount }})</span>
                     </div>
-                    <div ref="timelineWrapperRef" class="timeline-wrapper">
+                    <div ref="timelineWrapperRef"
+                         class="timeline-wrapper"
+                    >
                         <vertical-timeline v-for="(item, idx) in historyItems"
                                            :ref="`timelineRef_${item.recordId}`"
                                            :key="`timeline-${item.recordId}-${idx}`"
@@ -44,12 +49,16 @@
                                 </div>
                             </template>
                         </vertical-timeline>
-                        <p-spinner v-if="loading" size="xl" />
+                        <p-spinner v-if="loading"
+                                   size="xl"
+                        />
                     </div>
                 </div>
                 <div class="right-part">
                     <div class="info-wrapper">
-                        <div class="circle" :class="getTimelineColor(proxySelectedHistoryItem.action)" />
+                        <div class="circle"
+                             :class="getTimelineColor(proxySelectedHistoryItem.action)"
+                        />
                         <span class="action-text">{{ HISTORY_ACTION_MAP[proxySelectedHistoryItem.action].label }}</span>
                         <span class="date-text">({{ iso8601Formatter(selectedHistoryRecordDate, 'UTC') }})</span>
                     </div>

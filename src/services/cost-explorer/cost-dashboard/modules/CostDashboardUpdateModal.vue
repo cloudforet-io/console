@@ -1,5 +1,6 @@
 <template>
-    <p-button-modal :visible="proxyVisible" :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.UPDATE_DASHBOARD')"
+    <p-button-modal :visible="proxyVisible"
+                    :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.UPDATE_DASHBOARD')"
                     :disabled="!isAllValid"
                     size="sm"
                     class="cost-dashboard-update-modal"
@@ -12,7 +13,8 @@
                            :invalid-text="invalidTexts.name"
                            required
             >
-                <p-text-input :value="name" :invalid="invalidState.name"
+                <p-text-input :value="name"
+                              :invalid="invalidState.name"
                               @input="setForm('name', $event)"
                 />
             </p-field-group>

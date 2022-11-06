@@ -20,7 +20,6 @@ import {
 
 import { PButtonModal } from '@spaceone/design-system';
 
-
 interface Props {
     visible: boolean;
 }

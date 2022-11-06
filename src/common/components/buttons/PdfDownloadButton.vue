@@ -1,10 +1,18 @@
 <template>
     <span class="pdf-download-button">
-        <p-popover v-if="!isBrowserSupported" class="popover" position="bottom-end">
-            <p-icon-button v-if="iconOnly" name="ic_download" style-type="tertiary"
-                           size="sm" @click="$emit('click', $event)"
+        <p-popover v-if="!isBrowserSupported"
+                   class="popover"
+                   position="bottom-end"
+        >
+            <p-icon-button v-if="iconOnly"
+                           name="ic_download"
+                           style-type="tertiary"
+                           size="sm"
+                           @click="$emit('click', $event)"
             />
-            <p-button v-else icon-left="ic_download" style-type="tertiary"
+            <p-button v-else
+                      icon-left="ic_download"
+                      style-type="tertiary"
                       @click="$emit('click', $event)"
             >
                 PDF
@@ -26,10 +34,15 @@
             </template>
         </p-popover>
         <template v-if="isBrowserSupported">
-            <p-icon-button v-if="iconOnly" name="ic_download" style-type="tertiary"
-                           size="sm" @click="$emit('click', $event)"
+            <p-icon-button v-if="iconOnly"
+                           name="ic_download"
+                           style-type="tertiary"
+                           size="sm"
+                           @click="$emit('click', $event)"
             />
-            <p-button v-else icon-left="ic_download" style-type="tertiary"
+            <p-button v-else
+                      icon-left="ic_download"
+                      style-type="tertiary"
                       @click="$emit('click', $event)"
             >
                 PDF
@@ -42,7 +55,6 @@
 import { defineComponent } from 'vue';
 
 import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
-
 
 import { i18n } from '@/translations';
 

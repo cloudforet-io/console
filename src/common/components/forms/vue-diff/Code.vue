@@ -1,7 +1,9 @@
 <template>
     <div>
         <!--        eslint-disable-next-line vue/no-v-html-->
-        <pre><code class="hljs" v-html="highlightCode" /></pre>
+        <pre><code class="hljs"
+                   v-html="highlightCode"
+        /></pre>
     </div>
 </template>
 

@@ -1,10 +1,15 @@
 <template>
     <div class="budget-stat">
-        <div v-for="({title, data, unit, description}) in cards" :key="title" class="card-box">
+        <div v-for="({title, data, unit, description}) in cards"
+             :key="title"
+             class="card-box"
+        >
             <div class="title">
                 <span>{{ title }}</span>
             </div>
-            <div v-if="loading" class="loader" />
+            <div v-if="loading"
+                 class="loader"
+            />
             <template v-else>
                 <div class="stat">
                     <template v-if="unit === UNIT.currency">
@@ -42,7 +47,6 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -57,7 +61,6 @@ import type {
     BudgetUsageRange,
 } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
-
 
 interface Props {
     queryStoreFilters: QueryStoreFilter[];
@@ -190,7 +193,6 @@ export default defineComponent<Props>({
             await vm.$nextTick();
             emit('rendered');
         }, { immediate: true });
-
 
         return {
             ...toRefs(state),

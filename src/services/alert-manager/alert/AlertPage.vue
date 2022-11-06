@@ -26,7 +26,6 @@ import { PPageTitle } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-
 import { i18n } from '@/translations';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';

@@ -2,10 +2,14 @@
     <div class="plugin-filter-container">
         <div class="cols">
             <span class="header">{{ $t('PLUGIN.COLLECTOR.PLUGINS.REPOSITORY_LABEL') }}</span>
-            <span v-for="repo in repositories" :key="repo.repository_id"
-                  class="filter" :class="{selected: proxySelectedRepoId === repo.repository_id}"
+            <span v-for="repo in repositories"
+                  :key="repo.repository_id"
+                  class="filter"
+                  :class="{selected: proxySelectedRepoId === repo.repository_id}"
                   @click.stop="handleClickRepoText(repo.repository_id)"
-            ><p-radio v-model="proxySelectedRepoId" :value="repo.repository_id" />{{ repo.name }}</span>
+            ><p-radio v-model="proxySelectedRepoId"
+                      :value="repo.repository_id"
+            />{{ repo.name }}</span>
         </div>
         <!--        <p-divider class="divider" :vertical="true" />-->
         <!--        <div class="cols">-->
@@ -31,7 +35,6 @@ import {
     PRadio,
     // PCheckBox, PDivider
 } from '@spaceone/design-system';
-
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 

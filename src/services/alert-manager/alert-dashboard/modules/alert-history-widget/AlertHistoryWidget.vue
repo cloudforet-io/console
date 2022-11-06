@@ -8,7 +8,9 @@
         </div>
         <div class="content-wrapper">
             <div class="summary-wrapper">
-                <p-card v-for="(item, idx) in [createdSummaryData, resolvedSummaryData]" :key="`p-card-${idx}`">
+                <p-card v-for="(item, idx) in [createdSummaryData, resolvedSummaryData]"
+                        :key="`p-card-${idx}`"
+                >
                     <template #header>
                         <span class="text">{{ item.name === ALERT_STATE.CREATED ? $t('MONITORING.ALERT.DASHBOARD.CREATED') : $t('MONITORING.ALERT.DASHBOARD.RESOLVED') }}</span>
                         <span v-if="item.increase"
@@ -18,7 +20,8 @@
                             <span>{{ commaFormatter(Math.abs(item.increase)) }}</span>
                             <p-i v-if="item.increase !== 0"
                                  :name="item.increase > 0 ? 'ic_increase' : 'ic_decrease'"
-                                 height="0.75rem" width="0.75rem"
+                                 height="0.75rem"
+                                 width="0.75rem"
                                  color="inherit"
                             />
                         </span>
@@ -34,14 +37,15 @@
                 </p-card>
             </div>
             <div class="chart-wrapper col-span-9">
-                <alert-history-chart :current-date="currentDate" :activated-projects="activatedProjects" />
+                <alert-history-chart :current-date="currentDate"
+                                     :activated-projects="activatedProjects"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-
 
 import {
     reactive, toRefs, watch, watchEffect,
@@ -59,7 +63,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertHistoryChart from '@/services/alert-manager/alert-dashboard/modules/alert-history-widget/AlertHistoryChart.vue';
-
 
 const ALERT_STATE = {
     CREATED: 'created',
@@ -156,7 +159,6 @@ export default {
                 ErrorHandler.handleError(e);
             }
         };
-
 
         watchEffect(async () => {
             if (props.activatedProjects.length) {

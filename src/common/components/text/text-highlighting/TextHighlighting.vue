@@ -1,5 +1,7 @@
 <template>
-    <span class="text-highlighting" :class="styleType">
+    <span class="text-highlighting"
+          :class="styleType"
+    >
         <span v-for="({text: eachText, matched}, i) in getTextList(text)"
               :key="`label-${eachText}-${i}`"
         >

@@ -69,13 +69,17 @@
                     </template>
                 </template>
                 <template #col-state-format="{ value }">
-                    <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)" :outline="value === ALERT_STATE.ERROR">
+                    <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
+                             :outline="value === ALERT_STATE.ERROR"
+                    >
                         {{ alertStateLabels[value] }}
                     </p-badge>
                 </template>
                 <template #col-urgency-format="{ value }">
                     <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_urgency_low'"
-                         width="1em" height="1em" class="mr-1"
+                         width="1em"
+                         height="1em"
+                         class="mr-1"
                          :class="{'ic_urgency_low': !(value === ALERT_URGENCY.HIGH)}"
                     />
                     <span>{{ urgencyLabels[value] }}</span>
@@ -102,7 +106,8 @@
                     {{ value ? (storeState.webhooks[value] ? storeState.webhooks[value].label : value) : ' ' }}
                 </template>
                 <template #col-triggered_by-format="{ value, item }">
-                    <alert-triggered-by :value="value" :project-id="item.project_id"
+                    <alert-triggered-by :value="value"
+                                        :project-id="item.project_id"
                                         :webhook-reference="storeState.webhooks[value]"
                                         :user-reference="storeState.users[value]"
                                         disable-link
@@ -110,7 +115,10 @@
                 </template>
             </p-toolbox-table>
         </div>
-        <alert-form-modal :visible.sync="visibleAlertFormModal" :project-id.sync="projectId" @confirm="onAlertFormConfirm" />
+        <alert-form-modal :visible.sync="visibleAlertFormModal"
+                          :project-id.sync="projectId"
+                          @confirm="onAlertFormConfirm"
+        />
     </fragment>
 </template>
 <script lang="ts">
@@ -156,9 +164,7 @@ import type {
     AlertBottomFilters, AlertListTableFilters,
 } from '@/services/alert-manager/type';
 
-
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
-
 
 export default {
     name: 'AlertDataTable',
@@ -266,7 +272,7 @@ export default {
         const state = reactive({
             loading: true,
             selectIndex: [] as number[],
-            selectedItems: computed(() => state.selectIndex.map(d => state.items[d])),
+            selectedItems: computed(() => state.selectIndex.map((d) => state.items[d])),
             fields: computed(() => {
                 const fields = [
                     { name: 'alert_number', label: 'No' },
@@ -311,14 +317,12 @@ export default {
         });
 
         /* formatters & autocomplete handlers */
-        const alertDurationFormatter = value => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), storeState.timezone) || '--';
-
+        const alertDurationFormatter = (value) => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), storeState.timezone) || '--';
 
         /* event emitter */
         const emitUpdate = (filters: Partial<AlertListTableFilters>) => {
             emit('update', filters);
         };
-
 
         /* api */
         const bottomFilterQueryHelper = new QueryHelper();
@@ -341,7 +345,7 @@ export default {
         };
 
         const alertApiQueryHelper = new ApiQueryHelper()
-            .setOnly(...state.fields.map(d => d.name), 'alert_id')
+            .setOnly(...state.fields.map((d) => d.name), 'alert_id')
             .setPageStart(1).setPageLimit(15)
             .setSort('created_at', true);
         let alertApiQuery = alertApiQueryHelper.data;
@@ -369,7 +373,6 @@ export default {
                 state.loading = false;
             }
         };
-
 
         /* event */
         const onChange = async (options: any = {}) => {
@@ -424,7 +427,6 @@ export default {
         onActivated(() => {
             initPage();
         });
-
 
         if (!props.keepAlive) {
             initPage();

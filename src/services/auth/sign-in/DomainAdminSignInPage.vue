@@ -1,11 +1,23 @@
 <template>
     <div class="wrapper">
         <div class="ci-wrapper">
-            <img v-if="ciLogoImage" class="logo-character" :src="ciLogoImage">
-            <img v-else class="logo-character" src="@/assets/images/brand/brand_logo.png">
+            <img v-if="ciLogoImage"
+                 class="logo-character"
+                 :src="ciLogoImage"
+            >
+            <img v-else
+                 class="logo-character"
+                 src="@/assets/images/brand/brand_logo.png"
+            >
 
-            <img v-if="ciTextWithTypeImage" class="logo-text" :src="ciTextWithTypeImage">
-            <img v-else class="logo-text" src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg">
+            <img v-if="ciTextWithTypeImage"
+                 class="logo-text"
+                 :src="ciTextWithTypeImage"
+            >
+            <img v-else
+                 class="logo-text"
+                 src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg"
+            >
         </div>
         <sign-in-left-container
             is-domain-owner
@@ -44,7 +56,6 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 import IDPWSignIn from '@/services/auth/sign-in/local/template/ID_PW.vue';
 import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
 import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
-
 
 export default {
     name: 'DomainAdminSignInPage',

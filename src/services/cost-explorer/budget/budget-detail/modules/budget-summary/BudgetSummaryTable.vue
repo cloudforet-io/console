@@ -3,10 +3,12 @@
         <p class="toggle">
             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.ORIGINAL_DATA') }}
             <p-collapsible-toggle :toggle-type="'switch'"
-                                  :is-collapsed.sync="showFormattedBudgetData" class="collapsible-toggle"
+                                  :is-collapsed.sync="showFormattedBudgetData"
+                                  class="collapsible-toggle"
             />
         </p>
-        <p-data-table :fields="fields" :items="data"
+        <p-data-table :fields="fields"
+                      :items="data"
                       :skeleton-rows="3"
                       :stripe="false"
                       :selectable="false"
@@ -21,8 +23,12 @@
                         : currencyMoneyFormatter(value[value.path], currency, currencyRates, false, 1000000000)
                     }}
                 </span>
-                <span v-else-if="field.name && value.path === 'usd_cost'" class="text-blue-700">
-                    <router-link :to="value.link" class="link-text">
+                <span v-else-if="field.name && value.path === 'usd_cost'"
+                      class="text-blue-700"
+                >
+                    <router-link :to="value.link"
+                                 class="link-text"
+                    >
                         {{
                             showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], currency, currencyRates)
                             : currencyMoneyFormatter(value[value.path], currency, currencyRates, false, 1000000000)
@@ -66,7 +72,6 @@ import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { Period } from '@/services/cost-explorer/type';
 import { getStackedChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 
-
 const defaultTableKey = [{ name: 'Actual Cost', path: 'usd_cost' }, { name: 'Current vs Budget.', path: 'ratio' }];
 const monthlyPlanningTableKey = { name: 'Budgeted', path: 'limit' };
 
@@ -77,9 +82,8 @@ const firstColumnData = {
     ratio: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_SPENT'),
 };
 
-const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
+const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
 const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
-
 
 interface EnrichedBudgetUsageData {
     date: string;
@@ -154,12 +158,23 @@ export default {
             });
         };
 
-        const getEnrichedBudgetUsageData = (budgetUsageData: BudgetUsageData[], period: Period, budgetTimeUnit: BudgetTimeUnit,
-            totalBudgetLimit: number, costType: BudgetCostType, budgetTarget: BudgetTarget): EnrichedBudgetUsageData[] => {
+        const getEnrichedBudgetUsageData = (
+            budgetUsageData: BudgetUsageData[],
+            period: Period,
+            budgetTimeUnit: BudgetTimeUnit,
+            totalBudgetLimit: number,
+            costType: BudgetCostType,
+            budgetTarget: BudgetTarget,
+        ): EnrichedBudgetUsageData[] => {
             const _budgetUsageData = cloneDeep(budgetUsageData);
             const accumulatedBudgetData = getAccumulatedBudgetUsageData(_budgetUsageData, period);
-            const budgetUsageDataWithRatioAndLink = getBudgetUsageDataWithRatioAndLink(accumulatedBudgetData, budgetTimeUnit,
-                totalBudgetLimit, costType, budgetTarget);
+            const budgetUsageDataWithRatioAndLink = getBudgetUsageDataWithRatioAndLink(
+                accumulatedBudgetData,
+                budgetTimeUnit,
+                totalBudgetLimit,
+                costType,
+                budgetTarget,
+            );
             return [firstColumnData, ...budgetUsageDataWithRatioAndLink] as unknown as EnrichedBudgetUsageData[];
         };
 
@@ -181,12 +196,17 @@ export default {
             })),
             totalBudgetLimit: computed<number>(() => state.budgetData?.limit ?? 0),
             enrichedBudgetUsageData: computed<EnrichedBudgetUsageData[]>(
-                () => getEnrichedBudgetUsageData(state.budgetUsageData, state.budgetPeriod,
-                    state.budgetTimeUnit, state.totalBudgetLimit,
-                    state.budgetCostType, state.budgetTarget),
+                () => getEnrichedBudgetUsageData(
+                    state.budgetUsageData,
+                    state.budgetPeriod,
+                    state.budgetTimeUnit,
+                    state.totalBudgetLimit,
+                    state.budgetCostType,
+                    state.budgetTarget,
+                ),
             ),
             data: [],
-            fields: computed(() => state.enrichedBudgetUsageData.map(d => ({
+            fields: computed(() => state.enrichedBudgetUsageData.map((d) => ({
                 name: d.date,
                 label: d.date ? dayjs.utc(d.date).format('MMM YYYY') : ' ',
                 // textAlign: 'right',

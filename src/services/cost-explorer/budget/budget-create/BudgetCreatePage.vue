@@ -1,6 +1,9 @@
 <template>
     <div>
-        <p-page-title :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE_BUDGET')" child @goBack="$router.go(-1)" />
+        <p-page-title :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE_BUDGET')"
+                      child
+                      @goBack="$router.go(-1)"
+        />
         <budget-form @confirm="handleFormConfirm" />
     </div>
 </template>
@@ -11,7 +14,6 @@ import {
 } from 'vue';
 
 import { PPageTitle } from '@spaceone/design-system';
-
 
 import BudgetForm from '@/services/cost-explorer/budget/modules/budget-form/BudgetForm.vue';
 
@@ -24,7 +26,6 @@ export default {
     setup() {
         const state = reactive({
         });
-
 
         const handleFormConfirm = () => {
 

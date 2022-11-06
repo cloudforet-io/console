@@ -64,7 +64,6 @@ import {
 } from '@spaceone/design-system';
 import { sum } from 'lodash';
 
-
 import { store } from '@/store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -73,7 +72,6 @@ import { FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import CostExplorerFilterItem from '@/services/cost-explorer/modules/CostExplorerFilterItem.vue';
 import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import type { CostFiltersMap, Filter, FilterItem } from '@/services/cost-explorer/type';
-
 
 interface Props {
     visible: boolean;
@@ -107,12 +105,12 @@ export default {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             selectedFilters: {} as CostFiltersMap,
-            categoryItems: computed(() => props.categories.map(category => ({
+            categoryItems: computed(() => props.categories.map((category) => ({
                 name: FILTER_ITEM_MAP[category].name, title: FILTER_ITEM_MAP[category].label,
             }))),
             selectedItemsLength: computed<number>(() => {
                 const selectedValues = Object.values(state.selectedFilters);
-                return sum(selectedValues.map(v => v?.length || 0));
+                return sum(selectedValues.map((v) => v?.length || 0));
             }),
             unfoldedIndices: [] as number[],
         });
@@ -149,7 +147,7 @@ export default {
         watch(() => state.unfoldedIndices, (after, before) => {
             if (after.length < before.length) {
                 const _filters = { ...state.selectedFilters };
-                const deletedIndex: number = before.filter(idx => !after.includes(idx))[0];
+                const deletedIndex: number = before.filter((idx) => !after.includes(idx))[0];
                 const deletedFilterName = props.categories[deletedIndex];
                 delete _filters[deletedFilterName];
                 state.selectedFilters = _filters;

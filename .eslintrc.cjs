@@ -15,13 +15,29 @@ module.exports = {
     ],
 
     rules: {
+        // vue
         'vue/component-name-in-template-casing': ['error', 'kebab-case'],
         'vue/valid-v-slot': ['error', { allowModifiers: true }],
+        'vue/html-indent': ['error', 4],
+        'vue/first-attribute-linebreak': ['off'],
+        'vue/max-attributes-per-line': 1,
+        'vue/no-v-html': 0,
+        'vue/no-mutating-props': 1,
+        'vue/multi-word-component-names': 0,
+
+        // js
         'max-len': ['error', { code: 200 }],
         'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-        'vue/html-indent': ['error', 4],
-        'vue/first-attribute-linebreak': ['off'],
+        'no-unsafe-optional-chaining': 1,
+        'no-undef': 1,
+        'no-useless-catch': 1,
+        'no-unused-vars': 1,
+        'no-mixed-operators': 0,
+        'no-promise-executor-return': 1,
+        'prefer-regex-literals': 1,
+        'prefer-const': 1,
+
         indent: ['error', 4],
         'prefer-destructuring': ['error', { object: false, array: false }],
         radix: ['error', 'as-needed'],
@@ -38,7 +54,6 @@ module.exports = {
             },
         ],
         camelcase: 'off',
-        'vue/max-attributes-per-line': 1,
         'no-this-before-super': ['off'],
         'no-useless-constructor': ['off'],
         'no-empty-function': ['error', { allow: ['constructors', 'arrowFunctions'] }],
@@ -115,6 +130,11 @@ module.exports = {
 
         semi: 'off',
         '@typescript-eslint/semi': ['error'],
+
+        // core-lib as a package
+        'default-param-last': ['off'],
+        'no-redeclare': ['off'],
+        'max-classes-per-file': ['off'],
 
         // eslint-plugin-import rules
         'import/order': [

@@ -26,11 +26,9 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { PLabel, PSelectCard } from '@spaceone/design-system';
 
-
 import { i18n } from '@/translations';
 
 import type { BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
-
 
 interface Plan {
     title: TranslateResult;

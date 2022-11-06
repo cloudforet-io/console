@@ -1,9 +1,15 @@
 <template>
-    <p-data-loader :loading="loading" class="alert-history-chart">
+    <p-data-loader :loading="loading"
+                   class="alert-history-chart"
+    >
         <template #loader>
-            <p-skeleton width="100%" height="100%" />
+            <p-skeleton width="100%"
+                        height="100%"
+            />
         </template>
-        <div ref="chartRef" class="chart" />
+        <div ref="chartRef"
+             class="chart"
+        />
     </p-data-loader>
 </template>
 
@@ -24,11 +30,9 @@ import { i18n } from '@/translations';
 
 import config from '@/lib/config';
 
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray, red } from '@/styles/colors';
-
 
 interface ChartData {
     date: string;
@@ -83,7 +87,7 @@ export default {
 
             while (now.isSameOrBefore(state.currentMonthEnd, 'day')) {
                 // eslint-disable-next-line no-loop-func
-                const existData = data.find(d => d.date === now.format('YYYY-MM-DD'));
+                const existData = data.find((d) => d.date === now.format('YYYY-MM-DD'));
 
                 if (existData) {
                     const openPercentage = Math.round((existData.open_count / existData.total_count) * 100);

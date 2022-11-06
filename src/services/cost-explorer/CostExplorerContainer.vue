@@ -30,7 +30,6 @@ import CostExplorerLNB from '@/services/cost-explorer/CostExplorerLNB.vue';
 import { costExplorerStore, costExplorerStoreModule } from '@/services/cost-explorer/store';
 import type { CostExplorerState } from '@/services/cost-explorer/store/type';
 
-
 export default {
     name: 'CostExplorerContainer',
     components: {

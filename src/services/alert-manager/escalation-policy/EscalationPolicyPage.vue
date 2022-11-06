@@ -60,7 +60,6 @@
 
 <script lang="ts">
 
-
 import {
     reactive, toRefs, computed,
 } from 'vue';
@@ -92,7 +91,6 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import EscalationPolicyDataTable from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyDataTable.vue';
 import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
-
 
 export default {
     name: 'EscalationPolicyPage',
@@ -180,7 +178,7 @@ export default {
                     query: escalationPolicyApiQuery,
                 });
                 state.escalationPolicies = res.results;
-                state.items = res.results.map(d => ({
+                state.items = res.results.map((d) => ({
                     ...d,
                     name: {
                         label: d.name,

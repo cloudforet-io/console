@@ -1,7 +1,12 @@
 <template>
-    <div v-show="showList" class="budget-form-amount-plan-last-months-cost">
+    <div v-show="showList"
+         class="budget-form-amount-plan-last-months-cost"
+    >
         <label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_LAST_MONTH') }}</label>
-        <span v-for="({month, cost}, index) in items" :key="index" class="data">
+        <span v-for="({month, cost}, index) in items"
+              :key="index"
+              class="data"
+        >
             {{ month }}: {{ currencyMoneyFormatter(cost, currency) }}
         </span>
     </div>
@@ -30,7 +35,6 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import type { BudgetData, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/type';
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
 import type { Granularity } from '@/services/cost-explorer/type';
-
 
 interface Props {
     projectId?: string;
@@ -70,7 +74,6 @@ export default {
 
         const { i18nDayjs } = useI18nDayjs();
 
-
         const state = reactive({
             last3MonthsBudgets: [] as BudgetData[],
             months: computed(() => {
@@ -105,7 +108,6 @@ export default {
                     granularity: 'MONTHLY',
                     ...recentBudgetApiQueryHelper.data,
                 };
-
 
                 return params;
             }),

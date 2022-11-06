@@ -2,7 +2,9 @@
     <div>
         <div class="toolbox-top-wrapper">
             <span class="title">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTER') }}</span>
-            <div v-if="period" class="period-wrapper">
+            <div v-if="period"
+                 class="period-wrapper"
+            >
                 <cloud-service-period-filter :period="period"
                                              @update:period="handleUpdatePeriod"
                 />
@@ -74,7 +76,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import CloudServiceFilterModal from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterModal.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
-
 
 interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerMap }
 
@@ -206,7 +207,7 @@ export default defineComponent<Props>({
                 .addFilter({ k: 'cloud_service_type', o: '=', v: data.cloud_service_type });
             const fields = field;
             if (fields) {
-                excelApiQueryHelper.setOnly(...fields.map(d => d.key));
+                excelApiQueryHelper.setOnly(...fields.map((d) => d.key));
             }
             return excelApiQueryHelper.data;
         };
@@ -229,7 +230,7 @@ export default defineComponent<Props>({
         const getExcelPayloadList = async (): Promise<ExcelPayload[]> => {
             const excelPayloadList: ExcelPayload[] = [];
             const excelItems = await getCloudServiceResources();
-            const excelFieldList: Array<ExcelDataField[]> = await Promise.all(excelItems.map(d => getExcelFields(d)));
+            const excelFieldList: Array<ExcelDataField[]> = await Promise.all(excelItems.map((d) => getExcelFields(d)));
 
             excelFieldList.forEach((excelField, idx) => {
                 const provider = excelItems[idx].provider;

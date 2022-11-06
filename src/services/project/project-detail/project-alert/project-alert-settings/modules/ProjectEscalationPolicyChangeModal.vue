@@ -9,7 +9,9 @@
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <p-box-tab v-model="activeTab" :tabs="tabs">
+                <p-box-tab v-model="activeTab"
+                           :tabs="tabs"
+                >
                     <template #select>
                         <escalation-policy-data-table
                             v-if="activeTab === FORM_MODE.select"
@@ -64,7 +66,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import EscalationPolicyDataTable from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyDataTable.vue';
 import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
 import type { EscalationPolicyFormModel } from '@/services/alert-manager/type';
-
 
 enum FORM_MODE {
     select = 'select',
@@ -149,7 +150,7 @@ export default {
                 const { results } = await SpaceConnector.client.monitoring.escalationPolicy.list({
                     query: escalationPolicyApiQuery,
                 });
-                tableState.items = results.map(d => ({
+                tableState.items = results.map((d) => ({
                     ...d,
                     name: {
                         label: d.name,

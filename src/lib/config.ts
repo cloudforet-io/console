@@ -2,7 +2,6 @@ import type { AxiosInstance } from 'axios';
 import axios from 'axios';
 import { get } from 'lodash';
 
-
 class Config {
     config: any;
 

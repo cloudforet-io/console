@@ -1,18 +1,29 @@
 <template>
     <div class="all-summary">
-        <p-balloon-tab v-model="activeTab" :tabs="tabs"
-                       tail stretch @change="handleChangeTab"
+        <p-balloon-tab v-model="activeTab"
+                       :tabs="tabs"
+                       tail
+                       stretch
+                       @change="handleChangeTab"
         >
             <template #tab="{name, label}">
-                <div class="tab-box-wrapper" :class="{selected: name === activeTab}">
+                <div class="tab-box-wrapper"
+                     :class="{selected: name === activeTab}"
+                >
                     <div class="count">
-                        <router-link :to="getAllSummaryTabLocation(name)" class="anchor">
+                        <router-link :to="getAllSummaryTabLocation(name)"
+                                     class="anchor"
+                        >
                             <span class="number">
-                                <span v-if="name === DATA_TYPE.BILLING" class="dollar-sign">$</span>
+                                <span v-if="name === DATA_TYPE.BILLING"
+                                      class="dollar-sign"
+                                >$</span>
                                 <span>{{ count[name] }}</span>
                             </span>
                         </router-link>
-                        <span v-if="name === DATA_TYPE.STORAGE" class="suffix">{{ storageBoxSuffix }}</span>
+                        <span v-if="name === DATA_TYPE.STORAGE"
+                              class="suffix"
+                        >{{ storageBoxSuffix }}</span>
                     </div>
                     <div class="title">
                         {{ label }}
@@ -23,8 +34,12 @@
                 <div class="chart-wrapper col-span-12 lg:col-span-9">
                     <div class="title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
-                        <span v-if="activeTab === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
-                        <span v-if="activeTab === 'billing'" class="suffix">(USD)</span>
+                        <span v-if="activeTab === 'storage'"
+                              class="suffix"
+                        >({{ storageTrendSuffix }})</span>
+                        <span v-if="activeTab === 'billing'"
+                              class="suffix"
+                        >(USD)</span>
                     </div>
                     <div class="toggle-button-group">
                         <p-select-button v-for="(d, idx) in dateTypes"
@@ -39,9 +54,13 @@
                     </div>
                     <p-data-loader :loading="chartState.loading">
                         <template #loader>
-                            <p-skeleton width="100%" height="100%" />
+                            <p-skeleton width="100%"
+                                        height="100%"
+                            />
                         </template>
-                        <div ref="chartRef" class="chart" />
+                        <div ref="chartRef"
+                             class="chart"
+                        />
                     </p-data-loader>
                 </div>
                 <all-summary-data-summary :extra-params="extraParams"
@@ -72,7 +91,6 @@ import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/t
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
 
-
 import { byteFormatter, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -94,7 +112,6 @@ import type { DateItem, DateType, DataType } from '@/services/home-dashboard/mod
 import {
     DATA_TYPE,
 } from '@/services/home-dashboard/modules/type';
-
 
 export const DAY_COUNT = 14;
 export const MONTH_COUNT = 12;
@@ -274,7 +291,7 @@ export default {
         const setTabInterval = () => {
             tabInterval = setInterval(() => {
                 disposeChart(state.chartRef);
-                let activeTabIndex = state.tabs.findIndex(d => d.name === state.activeTab);
+                let activeTabIndex = state.tabs.findIndex((d) => d.name === state.activeTab);
                 if (activeTabIndex < 3) {
                     activeTabIndex += 1;
                 } else {
@@ -291,7 +308,7 @@ export default {
             const dateFormat = dateType === 'MONTHLY' ? 'YYYY-MM' : 'YYYY-MM-DD';
 
             if (state.activeTab === DATA_TYPE.STORAGE) {
-                const smallestCount = Math.min(...data.map(d => d.total));
+                const smallestCount = Math.min(...data.map((d) => d.total));
                 const formattedSize = byteFormatter(smallestCount);
                 if (formattedSize) state.storageTrendSuffix = formattedSize.split(' ')[1] as Unit;
             }
@@ -313,8 +330,8 @@ export default {
                 if (state.activeTab === DATA_TYPE.BILLING && state.selectedDateType === 'DAILY') {
                     date = date.subtract(1, 'day');
                 }
-                if (formattedData.find(d => date.format(dateFormat) === d.date)) {
-                    chartData.push(formattedData.find(d => date.format(dateFormat) === d.date));
+                if (formattedData.find((d) => date.format(dateFormat) === d.date)) {
+                    chartData.push(formattedData.find((d) => date.format(dateFormat) === d.date));
                 } else {
                     chartData.push({ date: date.format(dateFormat), count: null });
                 }
@@ -427,7 +444,7 @@ export default {
                         end: state.period.end,
                     });
                     if (res.results.length > 0) {
-                        data = res.results[0].billing_data.map(d => ({
+                        data = res.results[0].billing_data.map((d) => ({
                             date: d.date,
                             total: d.cost,
                         }));

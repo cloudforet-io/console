@@ -15,11 +15,15 @@
                 <div class="right" />
             </div>
             <p-pane-layout class="tag-panel">
-                <div v-if="noItem" class="comment">
+                <div v-if="noItem"
+                     class="comment"
+                >
                     <span class="highlight">{{ $t('COMMON.TAGS.NO_TAGS') }}</span><br>
                     {{ $t('COMMON.TAGS.CLICK_TO_ADD_TAG') }}
                 </div>
-                <div v-else class="comment">
+                <div v-else
+                     class="comment"
+                >
                     <span class="highlight">{{ $t('COMMON.TAGS.ADD_TAG_DESC') }}</span><br>
                     {{ $t('COMMON.TAGS.KEY_VALUE_DESC') }}
                 </div>
@@ -32,10 +36,15 @@
                 />
             </p-pane-layout>
             <div class="buttons">
-                <p-button style-type="tertiary" @click="$emit('close')">
+                <p-button style-type="tertiary"
+                          @click="$emit('close')"
+                >
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
-                <p-button style-type="primary" :disabled="!isTagsValid" @click="handleSaveTags">
+                <p-button style-type="primary"
+                          :disabled="!isTagsValid"
+                          @click="handleSaveTags"
+                >
                     {{ $t('COMMON.TAGS.SAVE') }}
                 </p-button>
             </div>
@@ -44,7 +53,6 @@
 </template>
 
 <script lang="ts">
-
 
 import type { SetupContext, PropType } from 'vue';
 import {
@@ -57,10 +65,8 @@ import {
 } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
-
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
-
 
 export default {
     name: 'TagsOverlay',

@@ -13,7 +13,9 @@
                                    @close="$emit('close')"
                                    @select="handleSelect"
             />
-            <div v-if="inputText && menuTotalCount > searchLimit" class="too-many-results-wrapper">
+            <div v-if="inputText && menuTotalCount > searchLimit"
+                 class="too-many-results-wrapper"
+            >
                 <div class="dim-wrapper" />
                 <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
             </div>
@@ -26,19 +28,29 @@
                                    @close="$emit('close')"
                                    @select="handleSelect"
             />
-            <div v-if="inputText && cloudServiceTotalCount > searchLimit" class="too-many-results-wrapper">
+            <div v-if="inputText && cloudServiceTotalCount > searchLimit"
+                 class="too-many-results-wrapper"
+            >
                 <div class="dim-wrapper" />
                 <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
             </div>
             <template #no-data>
-                <div v-if="isRecent" class="no-data">
-                    <img src="@/assets/images/illust_microscope.svg" class="img-help">
+                <div v-if="isRecent"
+                     class="no-data"
+                >
+                    <img src="@/assets/images/illust_microscope.svg"
+                         class="img-help"
+                    >
                     <p class="no-data-text">
                         {{ $t('COMMON.GNB.SEARCH.HELP_TEXT') }}
                     </p>
                 </div>
-                <div v-if="inputText" class="no-data">
-                    <img src="@/assets/images/illust_ghost.svg" class="img-no-data">
+                <div v-if="inputText"
+                     class="no-data"
+                >
+                    <img src="@/assets/images/illust_ghost.svg"
+                         class="img-no-data"
+                    >
                     <p class="no-data-text">
                         <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
                             <template #inputText>
@@ -62,7 +74,6 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-
 
 import { i18n } from '@/translations';
 
@@ -122,10 +133,10 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            menuTotalCount: computed<undefined|number>(() => props.items?.find(d => d.itemType === SUGGESTION_TYPE.MENU)?.totalCount),
-            cloudServiceTotalCount: computed<undefined|number>(() => props.items?.find(d => d.itemType === SUGGESTION_TYPE.CLOUD_SERVICE)?.totalCount),
+            menuTotalCount: computed<undefined|number>(() => props.items?.find((d) => d.itemType === SUGGESTION_TYPE.MENU)?.totalCount),
+            cloudServiceTotalCount: computed<undefined|number>(() => props.items?.find((d) => d.itemType === SUGGESTION_TYPE.CLOUD_SERVICE)?.totalCount),
             menuSuggestionItems: computed<SuggestionItem[]|null>(() => {
-                const menuItems = props.items?.find(d => d.itemType === SUGGESTION_TYPE.MENU);
+                const menuItems = props.items?.find((d) => d.itemType === SUGGESTION_TYPE.MENU);
                 if (!menuItems?.suggestionItems) return null;
 
                 let results: SuggestionItem[] = [];
@@ -136,7 +147,7 @@ export default defineComponent<Props>({
                 return results;
             }),
             cloudServiceSuggestionItems: computed<SuggestionItem[]|null>(() => {
-                const cloudServiceItems = props.items?.find(d => d.itemType === SUGGESTION_TYPE.CLOUD_SERVICE);
+                const cloudServiceItems = props.items?.find((d) => d.itemType === SUGGESTION_TYPE.CLOUD_SERVICE);
                 if (!cloudServiceItems?.suggestionItems) return null;
 
                 let results: SuggestionItem[] = [];

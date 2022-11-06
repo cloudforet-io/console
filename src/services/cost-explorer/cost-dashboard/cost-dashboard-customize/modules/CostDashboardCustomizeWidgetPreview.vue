@@ -5,7 +5,9 @@
         <div class="layout-preview-area">
             <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LAYOUT') }}</p-label>
             <div class="layout-preview">
-                <span v-for="i in Math.round(100 / layout)" :key="i" />
+                <span v-for="i in Math.round(100 / layout)"
+                      :key="i"
+                />
             </div>
             <p class="text">
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.IN_RATIO', { ratio: layout }) }}

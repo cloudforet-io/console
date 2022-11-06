@@ -6,12 +6,17 @@
                                        :print-mode="printMode"
                                        :class="{ 'print-mode': printMode }"
     >
-        <p-data-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading"
+                       class="chart-wrapper"
+        >
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
             <div class="waffle-chart">
-                <div v-for="colIdx in colRange" :key="`status-col-${colIdx}`" class="status-col-wrapper">
+                <div v-for="colIdx in colRange"
+                     :key="`status-col-${colIdx}`"
+                     class="status-col-wrapper"
+                >
                     <template v-for="rowIdx in rowRange">
                         <router-link v-if="!!chartData[colIdx * 10 + rowIdx]"
                                      :key="`status-box-${colIdx}-${rowIdx}`"
@@ -20,14 +25,22 @@
                                      class="box status-box"
                                      :style="{ 'background-color': chartData[colIdx * 10 + rowIdx].color }"
                         />
-                        <div v-else :key="`status-box-${colIdx}-${rowIdx}`" class="box" />
+                        <div v-else
+                             :key="`status-box-${colIdx}-${rowIdx}`"
+                             class="box"
+                        />
                     </template>
                 </div>
             </div>
         </p-data-loader>
         <div class="legend-wrapper">
-            <div v-for="legend in legends" :key="`legend-${legend.label}`" class="legend">
-                <span class="legend-icon" :style="{ 'background-color': legend.color }" />
+            <div v-for="legend in legends"
+                 :key="`legend-${legend.label}`"
+                 class="legend"
+            >
+                <span class="legend-icon"
+                      :style="{ 'background-color': legend.color }"
+                />
                 {{ legend.label }}
             </div>
         </div>
@@ -35,7 +48,6 @@
 </template>
 
 <script lang="ts">
-
 
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs, watch,

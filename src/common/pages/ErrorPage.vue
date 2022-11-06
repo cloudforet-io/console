@@ -1,14 +1,18 @@
 <template>
     <section class="page-wrapper">
         <article class="error-contents">
-            <img class="error-img" src="@/assets/images/error/error-octos.gif">
+            <img class="error-img"
+                 src="@/assets/images/error/error-octos.gif"
+            >
             <h2 class="error-code">
                 404
             </h2>
             <h3 class="error-message">
                 {{ $t('COMMON.ERROR.404_MSG') }}
             </h3>
-            <p-button class="go-back-button" style-type="primary" size="md"
+            <p-button class="go-back-button"
+                      style-type="primary"
+                      size="md"
                       @click="$router.go(-1)"
             >
                 {{ $t('COMMON.ERROR.GO_BACK') }}
@@ -25,7 +29,6 @@ export default {
     components: { PButton },
 };
 </script>
-
 
 <style lang="postcss" scoped>
 .page-wrapper {

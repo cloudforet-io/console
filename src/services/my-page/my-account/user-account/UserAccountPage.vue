@@ -5,16 +5,34 @@
             <p class="form-title">
                 {{ $t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION') }}
             </p>
-            <p-field-group required :label="$t('COMMON.PROFILE.ID')" class="input-form">
-                <p-text-input v-model="userId" disabled class="text-input" />
+            <p-field-group required
+                           :label="$t('COMMON.PROFILE.ID')"
+                           class="input-form"
+            >
+                <p-text-input v-model="userId"
+                              disabled
+                              class="text-input"
+                />
             </p-field-group>
-            <p-field-group required :label="$t('COMMON.PROFILE.NAME')" class="input-form">
-                <p-text-input v-model="formState.userName" class="text-input" />
+            <p-field-group required
+                           :label="$t('COMMON.PROFILE.NAME')"
+                           class="input-form"
+            >
+                <p-text-input v-model="formState.userName"
+                              class="text-input"
+                />
             </p-field-group>
-            <p-field-group required :label="$t('COMMON.PROFILE.ROLE')" class="input-form">
-                <p-text-input v-model="userRole" disabled class="text-input" />
+            <p-field-group required
+                           :label="$t('COMMON.PROFILE.ROLE')"
+                           class="input-form"
+            >
+                <p-text-input v-model="userRole"
+                              disabled
+                              class="text-input"
+                />
             </p-field-group>
-            <p-field-group required :label="$t('COMMON.PROFILE.EMAIL')"
+            <p-field-group required
+                           :label="$t('COMMON.PROFILE.EMAIL')"
                            :invalid="validationState.isEmailValid === false"
                            :invalid-text="validationState.emailInvalidText"
                            class="input-form"
@@ -26,7 +44,9 @@
                     />
                 </template>
             </p-field-group>
-            <p-field-group required :label="$t('COMMON.PROFILE.TIMEZONE')" class="input-form"
+            <p-field-group required
+                           :label="$t('COMMON.PROFILE.TIMEZONE')"
+                           class="input-form"
                            :invalid="validationState.showValidation && !!validationState.timezoneInvalidText"
                            :invalid-text="validationState.timezoneInvalidText"
             >
@@ -38,13 +58,18 @@
                     />
                 </template>
             </p-field-group>
-            <p-field-group required :label="$t('COMMON.PROFILE.LANGUAGE')" class="input-form">
+            <p-field-group required
+                           :label="$t('COMMON.PROFILE.LANGUAGE')"
+                           class="input-form"
+            >
                 <p-select-dropdown v-model="formState.language"
                                    :items="languages"
                 />
             </p-field-group>
             <div class="save-button">
-                <p-button style-type="primary" @click="onClickProfileConfirm">
+                <p-button style-type="primary"
+                          @click="onClickProfileConfirm"
+                >
                     {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
                 </p-button>
             </div>
@@ -63,7 +88,8 @@
                         class="input-form"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="formState.password" type="password"
+                            <p-text-input v-model="formState.password"
+                                          type="password"
                                           class="text-input"
                                           :invalid="invalid"
                             />
@@ -77,7 +103,8 @@
                         class="input-form"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="formState.passwordCheck" type="password"
+                            <p-text-input v-model="formState.passwordCheck"
+                                          type="password"
                                           class="text-input"
                                           :invalid="invalid"
                             />
@@ -85,7 +112,9 @@
                     </p-field-group>
                 </form>
                 <div class="save-button">
-                    <p-button style-type="primary" @click="onClickPasswordConfirm">
+                    <p-button style-type="primary"
+                              @click="onClickPasswordConfirm"
+                    >
                         {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
                     </p-button>
                 </div>
@@ -120,7 +149,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getPasswordValidationInfo } from '@/services/auth/lib/helper';
 
-
 export default {
     name: 'UserAccountPage',
     components: {
@@ -149,7 +177,7 @@ export default {
             languages: map(languages, (d, k) => ({
                 type: 'item', label: k === 'en' ? `${d} (default)` : d, name: k,
             })) as MenuItem[],
-            timezones: map(timezoneList, d => ({
+            timezones: map(timezoneList, (d) => ({
                 type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
             })) as SearchDropdownMenuItem[],
         });
@@ -207,7 +235,6 @@ export default {
             }
         };
 
-
         const updateUser = async (userParam) => {
             try {
                 await store.dispatch('user/setUser', userParam);
@@ -254,7 +281,7 @@ export default {
                 formState.userName = store.state.user.name;
                 formState.email = store.state.user.email;
                 formState.language = store.state.user.language;
-                formState.timezone = state.timezones.filter(d => d.name === store.state.user.timezone);
+                formState.timezone = state.timezones.filter((d) => d.name === store.state.user.timezone);
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

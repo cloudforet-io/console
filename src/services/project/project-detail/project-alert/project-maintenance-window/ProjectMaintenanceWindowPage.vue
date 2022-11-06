@@ -1,9 +1,16 @@
 <template>
     <div>
-        <p-panel-top :title="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.TITLE')" use-total-count :total-count="totalCount" />
+        <p-panel-top :title="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.TITLE')"
+                     use-total-count
+                     :total-count="totalCount"
+        />
 
-        <p-toolbox-table :loading="loading" :fields="fields" :items="items"
-                         searchable selectable sortable
+        <p-toolbox-table :loading="loading"
+                         :fields="fields"
+                         :items="items"
+                         searchable
+                         selectable
+                         sortable
                          search-type="query"
                          :select-index.sync="selectIndex"
                          :query-tags="queryTags"
@@ -16,7 +23,8 @@
                          @refresh="onChange()"
         >
             <template #toolbox-left>
-                <p-button style-type="secondary" class="mr-4"
+                <p-button style-type="secondary"
+                          class="mr-4"
                           :disabled="!hasManagePermission || selectedItems.length !== 1 || selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED"
                           @click="visibleUpdateModal = true"
                 >
@@ -45,7 +53,8 @@
             </template>
         </p-toolbox-table>
 
-        <maintenance-window-form-modal :visible.sync="visibleUpdateModal" edit-mode
+        <maintenance-window-form-modal :visible.sync="visibleUpdateModal"
+                                       edit-mode
                                        :maintenance-window-id="selectedItems[0] && selectedItems[0].maintenance_window_id"
                                        @confirm="getMaintenanceWindows"
                                        @close="closeMaintenanceWindow"
@@ -66,7 +75,6 @@
 </template>
 
 <script lang="ts">
-
 
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
@@ -98,7 +106,6 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import MaintenanceWindowFormModal from '@/services/project/project-detail/modules/MaintenanceWindowFormModal.vue';
 import { MAINTENANCE_WINDOW_STATE } from '@/services/project/project-detail/project-alert/project-maintenance-window/lib/config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-
 
 const keyItemSets: KeyItemSet[] = [
     {
@@ -148,7 +155,7 @@ export default {
             .setFiltersAsRawQueryString(vm.$route.query.filters);
 
         const maintenanceWindowApiQueryHelper = new ApiQueryHelper()
-            .setOnly(...fields.map(d => d.name), 'maintenance_window_id')
+            .setOnly(...fields.map((d) => d.name), 'maintenance_window_id')
             .setPageStart(1).setPageLimit(15)
             .setSort('state', true);
 
@@ -159,14 +166,13 @@ export default {
             items: [] as any[],
             timezone: computed(() => store.state.user.timezone),
             selectIndex: [] as number[],
-            selectedItems: computed<any[]>(() => state.selectIndex.map(d => state.items[d])),
+            selectedItems: computed<any[]>(() => state.selectIndex.map((d) => state.items[d])),
             selectedItemState: computed(() => MAINTENANCE_WINDOW_STATE[state.selectedItems[0]?.state]),
             queryTags: tagQueryHandler.queryTags,
             visibleUpdateModal: false,
             visibleCloseCheckModal: false,
             closeLoading: false,
         });
-
 
         const getMaintenanceWindows = async () => {
             if (state.loading) return;
@@ -214,7 +220,7 @@ export default {
             state.closeLoading = true;
             try {
                 await SpaceConnector.client.monitoring.maintenanceWindow.close({
-                    maintenance_windows: state.selectedItems.map(d => d.maintenance_window_id),
+                    maintenance_windows: state.selectedItems.map((d) => d.maintenance_window_id),
                 });
                 state.visibleCloseCheckModal = false;
 
@@ -226,7 +232,6 @@ export default {
                 state.closeLoading = false;
             }
         };
-
 
         /* Init */
         (async () => {

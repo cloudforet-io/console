@@ -22,7 +22,6 @@ export const defaultLayoutList: Record<string, DefaultLayout> = {
 };
 export const defaultLayoutData = Object.values(defaultLayoutList);
 
-
 export const chartTypeItemMap = Object.freeze({
     [CHART_TYPE.CARD]: {
         name: CHART_TYPE.CARD, label: 'Card', imageFileName: 'widget_card',

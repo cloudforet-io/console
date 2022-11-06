@@ -6,7 +6,10 @@
         <p>
             {{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT') }}
         </p>
-        <i18n path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC" tag="p" class="desc">
+        <i18n path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC"
+              tag="p"
+              class="desc"
+        >
             <template #deleteAllSubProjects>
                 <strong>{{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DELETE_ALL_SUB_PROJECT') }}</strong>
             </template>

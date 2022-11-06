@@ -11,7 +11,9 @@
                 >
                     <div class="more">
                         <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE.SEE_MORE') }}</span>
-                        <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                        <p-i name="ic_arrow_right"
+                             width="1rem"
+                             height="1rem"
                              color="inherit transparent"
                         />
                     </div>
@@ -19,13 +21,21 @@
             </div>
         </template>
         <template v-if="loading">
-            <div v-for="skeleton in skeletons" :key="skeleton" class="grid grid-cols-1 gap-1 my-4 w-full">
-                <p-skeleton width="80%" height="0.625rem" />
-                <p-skeleton width="100%" height="0.625rem" />
+            <div v-for="skeleton in skeletons"
+                 :key="skeleton"
+                 class="grid grid-cols-1 gap-1 my-4 w-full"
+            >
+                <p-skeleton width="80%"
+                            height="0.625rem"
+                />
+                <p-skeleton width="100%"
+                            height="0.625rem"
+                />
             </div>
         </template>
         <div v-else-if="!loading && items.length > 0">
-            <div v-for="(item, index) in items" :key="index"
+            <div v-for="(item, index) in items"
+                 :key="index"
                  class="card grid grid-cols-12 cursor-pointer"
                  @click="goToCollectorHistory(item)"
             >
@@ -37,14 +47,19 @@
                     <br><span class="time">{{ timeFormatter(item.created_at) }}</span>
                 </div>
                 <div class="right-part col-span-2">
-                    <p-lottie name="lottie_working" auto
+                    <p-lottie name="lottie_working"
+                              auto
                               :size="1.5"
                     />
                 </div>
             </div>
         </div>
-        <div v-else class="no-data-wrapper">
-            <img src="@/assets/images/illust_star.svg" class="no-data-img">
+        <div v-else
+             class="no-data-wrapper"
+        >
+            <img src="@/assets/images/illust_star.svg"
+                 class="no-data-img"
+            >
             <p class="no-data-text">
                 {{ $t('COMMON.WIDGETS.COLLECTING_JOBS_NO_RUNNING') }}
             </p>

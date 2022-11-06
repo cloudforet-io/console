@@ -43,7 +43,7 @@ export const createImageExtension = (uploadFn: ImageUploader) => Node.create({
     renderHTML: ({ HTMLAttributes }) => ['img', HTMLAttributes],
 
     addCommands(this: any) {
-        return attrs => (state, dispatch) => {
+        return (attrs) => (state, dispatch) => {
             const { selection } = state;
             const position = selection.$cursor
                 ? selection.$cursor.pos

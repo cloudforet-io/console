@@ -16,5 +16,4 @@ export const infoStoreModule: Module<InfoState, any> = {
     mutations,
 };
 
-
 export const infoStore: InfoStore = {} as InfoStore;

@@ -16,13 +16,18 @@
         </template>
         <template #toggle="{node, selected, path}">
             <p-radio v-if="node.data.item_type === 'PROJECT'"
-                     :selected="selected" :value="true"
+                     :selected="selected"
+                     :value="true"
                      @click.stop="changeSelectState(node, path)"
             />
         </template>
         <template #toggle-right="{node}">
-            <p-i v-if="node.data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
-                 width="1rem" height="1rem" color="inherit transparent"
+            <p-i v-if="node.data.item_type === 'PROJECT_GROUP'"
+                 name="ic_tree_project-group"
+                 class="project-group-icon"
+                 width="1rem"
+                 height="1rem"
+                 color="inherit transparent"
             />
         </template>
     </p-tree>
@@ -64,7 +69,7 @@ export default {
         });
 
         const toggleOptions = {
-            validator: node => node.data.has_child || node.children.length > 0,
+            validator: (node) => node.data.has_child || node.children.length > 0,
             removeChildrenOnFold: true,
         };
         const selectOptions = {
@@ -75,7 +80,7 @@ export default {
         const dataSetter = (text, node) => {
             node.data.name = text;
         };
-        const dataGetter = node => node.data.name;
+        const dataGetter = (node) => node.data.name;
         const dataFetcher = async (node): Promise<ProjectGroup[]> => {
             try {
                 const params: any = {

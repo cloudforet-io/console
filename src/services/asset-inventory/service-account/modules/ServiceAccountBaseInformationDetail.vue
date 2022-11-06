@@ -52,7 +52,7 @@ export default {
             convertedDetailSchema: computed(() => {
                 const result = cloneDeep(state.detailSchema);
                 if (!isEmpty(result)) {
-                    result.options.fields = state.detailSchema?.options?.fields.filter(d => !EXCLUDED_FIELD_KEYS.includes(d.key));
+                    result.options.fields = state.detailSchema?.options?.fields.filter((d) => !EXCLUDED_FIELD_KEYS.includes(d.key));
                 }
                 return result;
             }),

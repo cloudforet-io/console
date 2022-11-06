@@ -7,29 +7,41 @@
                     @confirm="onConfirm"
     >
         <template #body>
-            <p-field-group :label="$t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_ALERT_TITLE')" required
+            <p-field-group :label="$t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_ALERT_TITLE')"
+                           required
                            :invalid="titleInvalid"
                            :invalid-text="titleInvalidText"
             >
-                <p-text-input v-model="title" block :placeholder="$t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_ALERT_TITLE')"
+                <p-text-input v-model="title"
+                              block
+                              :placeholder="$t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_ALERT_TITLE')"
                               :invalid="titleInvalid"
                 />
             </p-field-group>
-            <p-field-group :label="$t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_URGENCY')" required>
-                <p-radio v-model="urgency" :value="ALERT_URGENCY.HIGH">
+            <p-field-group :label="$t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_URGENCY')"
+                           required
+            >
+                <p-radio v-model="urgency"
+                         :value="ALERT_URGENCY.HIGH"
+                >
                     {{ $t('MONITORING.ALERT.ALERT_LIST.FORM.HIGH') }}
                 </p-radio>
-                <p-radio v-model="urgency" :value="ALERT_URGENCY.LOW">
+                <p-radio v-model="urgency"
+                         :value="ALERT_URGENCY.LOW"
+                >
                     {{ $t('MONITORING.ALERT.ALERT_LIST.FORM.LOW') }}
                 </p-radio>
             </p-field-group>
-            <p-field-group v-if="!projectId" class="project-field-group" :label="$t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_PROJECT')"
+            <p-field-group v-if="!projectId"
+                           class="project-field-group"
+                           :label="$t('MONITORING.ALERT.ALERT_LIST.FORM.LABEL_PROJECT')"
                            required
                            :invalid="projectInvalid"
                            :invalid-text="projectInvalidText"
             >
                 <template #label-extra>
-                    <p-anchor class="go-project" highlight
+                    <p-anchor class="go-project"
+                              highlight
                               :to="{name: PROJECT_ROUTE._NAME }"
                     >
                         {{ $t('MONITORING.ALERT.ALERT_LIST.FORM.CREATE_PROJECT') }}
@@ -43,7 +55,8 @@
             <p-button v-if="projectInvalid && isProjectAlertSet === false"
                       style-type="primary"
                       class="project-set-button"
-                      size="sm" @click="setProjectAlert"
+                      size="sm"
+                      @click="setProjectAlert"
             >
                 {{ $t('MONITORING.ALERT.ALERT_LIST.FORM.SET_PROJECT_ALERT_NOW') }}
             </p-button>
@@ -168,7 +181,6 @@ export default {
             }
         };
 
-
         const onConfirm = async () => {
             if (!state.isAllValid) return;
 
@@ -201,7 +213,6 @@ export default {
         watch(() => state.proxyVisible, (visible) => {
             if (!visible) reset();
         });
-
 
         return {
             ...toRefs(state),

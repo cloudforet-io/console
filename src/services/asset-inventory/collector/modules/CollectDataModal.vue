@@ -13,7 +13,8 @@
                 <div class="flex w-full">
                     <p-lazy-img :src="imageUrl"
                                 :loading="collector === null"
-                                width="5.5rem" height="5.5rem"
+                                width="5.5rem"
+                                height="5.5rem"
                                 class="mr-10 flex-grow-0"
                     />
                     <div>
@@ -72,7 +73,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-
 
 interface SecretModel {
     secret_id: string;

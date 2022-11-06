@@ -1,10 +1,17 @@
 <template>
     <div class="list-title">
-        <p-i v-if="isPinned" class="pin" name="ic_pin"
+        <p-i v-if="isPinned"
+             class="pin"
+             name="ic_pin"
              width="1.125rem"
         />
-        <text-highlighting class="title" :term="searchInputText" :text="title" />
-        <new-mark v-if="isNew" class="new-mark" />
+        <text-highlighting class="title"
+                           :term="searchInputText"
+                           :text="title"
+        />
+        <new-mark v-if="isNew"
+                  class="new-mark"
+        />
     </div>
 </template>
 

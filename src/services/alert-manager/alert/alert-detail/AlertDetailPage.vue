@@ -1,6 +1,10 @@
 <template>
-    <div v-if="!loading" class="alert-detail-page">
-        <p-page-title :title="alertInfo.title" child class="page-title"
+    <div v-if="!loading"
+         class="alert-detail-page"
+    >
+        <p-page-title :title="alertInfo.title"
+                      child
+                      class="page-title"
                       @goBack="$router.go(-1)"
         >
             <template #title-right-extra>
@@ -21,12 +25,14 @@
         </p-page-title>
         <section class="detail-contents-wrapper">
             <div class="left-wrapper">
-                <alert-summary :id="id" class="header"
+                <alert-summary :id="id"
+                               class="header"
                                :alert-data="alertInfo"
                                :manage-disabled="!hasManagePermission"
                 />
 
-                <alert-key-info :id="id" class="info"
+                <alert-key-info :id="id"
+                                class="info"
                                 :alert-data="alertInfo"
                                 :manage-disabled="!hasManagePermission"
                 />
@@ -35,17 +41,23 @@
                                      :manage-disabled="!hasManagePermission"
                                      class="status-update"
                 />
-                <alert-timeline-and-event :id="id" :alert-data="alertInfo"
+                <alert-timeline-and-event :id="id"
+                                          :alert-data="alertInfo"
                                           class="timeline-and-event"
                 />
             </div>
             <div class="right-wrapper">
-                <alert-responder :id="id" class="responder"
+                <alert-responder :id="id"
+                                 class="responder"
                                  :alert-data="alertInfo"
                                  :manage-disabled="!hasManagePermission"
                 />
-                <alert-note :id="id" :manage-disabled="!hasManagePermission" class="note" />
-                <alert-project-dependency :id="id" :alert-data="alertInfo"
+                <alert-note :id="id"
+                            :manage-disabled="!hasManagePermission"
+                            class="note"
+                />
+                <alert-project-dependency :id="id"
+                                          :alert-data="alertInfo"
                                           class="project-dependency"
                 />
             </div>
@@ -78,7 +90,6 @@ import type { Vue } from 'vue/types/vue';
 import { PIconButton, PPageTitle } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { i18n } from '@/translations';
 

@@ -49,7 +49,6 @@ export const useBreadcrumbs = () => {
                     }
                 }
 
-
                 return results;
             }, [] as Breadcrumb[]);
         }),

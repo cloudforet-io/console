@@ -1,6 +1,7 @@
 <template>
     <div class="dashboard-layouts">
-        <p-data-loader :loading="loading" :data="layout"
+        <p-data-loader :loading="loading"
+                       :data="layout"
                        :min-loading-time="printMode ? 0 : 1000"
                        :lazy-loading-time="printMode ? 0 : 1000"
                        :loader-backdrop-color="BACKGROUND_COLOR"
@@ -12,13 +13,19 @@
             <template #loader>
                 <div />
             </template>
-            <div v-for="(row, rowIdx) in layout" :key="`row-${row[0].name}-${contextId}-${rowIdx}`" ref="dynamicWidgetRows"
-                 class="row" :class="{'customize':customizeMode}"
+            <div v-for="(row, rowIdx) in layout"
+                 :key="`row-${row[0].name}-${contextId}-${rowIdx}`"
+                 ref="dynamicWidgetRows"
+                 class="row"
+                 :class="{'customize':customizeMode}"
             >
-                <div v-for="(widget, colIdx) in row" :key="`widget-${widget.widget_id}-${contextId}-${colIdx}`"
+                <div v-for="(widget, colIdx) in row"
+                     :key="`widget-${widget.widget_id}-${contextId}-${colIdx}`"
                      :class="`col-${widget.options.layout}`"
                 >
-                    <div v-if="customizeMode" class="btn-group">
+                    <div v-if="customizeMode"
+                         class="btn-group"
+                    >
                         <p-icon-button name="ic_edit"
                                        style-type="tertiary"
                                        shape="square"
@@ -45,9 +52,11 @@
                 </div>
                 <template v-if="customizeMode && getAddWidgetColumnByLayout(row[0].options.layout, row.length) > 0">
                     <div v-for="n in getAddWidgetColumnByLayout(row[0].options.layout, row.length)"
-                         :key="`${n}-${getUUID()}`" :class="`col-${row[0].options.layout} empty-widget`"
+                         :key="`${n}-${getUUID()}`"
+                         :class="`col-${row[0].options.layout} empty-widget`"
                     >
-                        <p-button style-type="secondary" icon-left="ic_plus_bold"
+                        <p-button style-type="secondary"
+                                  icon-left="ic_plus_bold"
                                   @click="handleClickAdd(rowIdx, n, row[0].options.layout)"
                         >
                             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}
@@ -56,14 +65,19 @@
                 </template>
             </div>
         </p-data-loader>
-        <cost-dashboard-customize-widget-modal v-model="customizeModalVisible" @confirm="$emit('add-widget', $event)" />
+        <cost-dashboard-customize-widget-modal v-model="customizeModalVisible"
+                                               @confirm="$emit('add-widget', $event)"
+        />
         <delete-modal
             :header-title="checkDeleteState.headerTitle"
             :visible.sync="checkDeleteState.visible"
             :contents="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.DELETE_CONTENTS')"
             @confirm="handleDeleteConfirm"
         />
-        <cost-dashboard-update-widget-modal v-if="updateModalVisible && customizeMode" v-model="updateModalVisible" @confirm="handleUpdateConfirm" />
+        <cost-dashboard-update-widget-modal v-if="updateModalVisible && customizeMode"
+                                            v-model="updateModalVisible"
+                                            @confirm="handleUpdateConfirm"
+        />
     </div>
 </template>
 
@@ -74,7 +88,6 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import { PDataLoader, PIconButton, PButton } from '@spaceone/design-system';
-
 
 import { i18n } from '@/translations';
 
@@ -94,7 +107,6 @@ import DynamicWidget from '@/services/cost-explorer/cost-dashboard/modules/Dynam
 import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
-
 
 export default {
     name: 'DashboardLayouts',
@@ -169,7 +181,7 @@ export default {
         };
 
         const CUSTOM_WIDGET_FILE_NAME = 'CustomWidget';
-        const getWidgetFileName = widget => defaultWidgetMap[widget.widget_id]?.widget_file_name ?? CUSTOM_WIDGET_FILE_NAME;
+        const getWidgetFileName = (widget) => defaultWidgetMap[widget.widget_id]?.widget_file_name ?? CUSTOM_WIDGET_FILE_NAME;
 
         const handleDynamicWidgetInit = () => {
             state.renderedCount++;

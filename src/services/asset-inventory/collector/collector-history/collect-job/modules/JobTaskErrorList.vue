@@ -1,6 +1,8 @@
 <template>
     <div class="job-task-error-list">
-        <p-panel-top :use-total-count="true" :total-count="errorItems.length">
+        <p-panel-top :use-total-count="true"
+                     :total-count="errorItems.length"
+        >
             {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST') }}
         </p-panel-top>
         <p-data-table :fields="errorFields"
@@ -13,8 +15,12 @@
         >
             <template #col-format="{field: { name }, item, value}">
                 <template v-if="name === 'message' && value">
-                    <div v-if="value.length >= 80" class="error-message">
-                        <pre class="content" :class="{ 'text-overflow': errorItemsToggleList[item.sequence - 1] }">{{ value }}</pre>
+                    <div v-if="value.length >= 80"
+                         class="error-message"
+                    >
+                        <pre class="content"
+                             :class="{ 'text-overflow': errorItemsToggleList[item.sequence - 1] }"
+                        >{{ value }}</pre>
                         <div class="toggle-box">
                             <p-collapsible-toggle v-if="value.length >= 80"
                                                   :is-collapsed="errorItemsToggleList[item.sequence - 1]"
@@ -24,7 +30,9 @@
                             </p-collapsible-toggle>
                         </div>
                     </div>
-                    <pre v-else class="short-error-message">{{ value ? value : '--' }}</pre>
+                    <pre v-else
+                         class="short-error-message"
+                    >{{ value ? value : '--' }}</pre>
                 </template>
                 <template v-else-if="name === 'additional'">
                     <div class="error-location">
@@ -58,11 +66,9 @@ import {
 
 import { PDataTable, PPanelTop, PCollapsibleToggle } from '@spaceone/design-system';
 
-
 import { resourceTypeLabels } from '@/lib/reference/type';
 
 import type { JobTaskData, JobTaskError } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
-
 
 interface Props {
     selectedItem: JobTaskData;

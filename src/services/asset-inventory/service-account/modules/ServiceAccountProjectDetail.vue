@@ -1,13 +1,21 @@
 <template>
     <div class="service-account-project-detail">
-        <p-anchor v-if="!!projectName" :href="projectLink">
+        <p-anchor v-if="!!projectName"
+                  :href="projectLink"
+        >
             {{ projectName }}
         </p-anchor>
         <span v-if="!projectName && serviceAccountType === ACCOUNT_TYPE.TRUSTED">N/A</span>
         <div v-if="!projectName && serviceAccountType === ACCOUNT_TYPE.GENERAL">
             <span>-- <span class="required-span">{{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.REQUIRED') }}</span></span>
-            <p-tooltip position="bottom" class="project-required-tooltip" :contents="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.PROJECT_REQUIRED_HELP_TEXT')">
-                <p-i name="ic_tooltip" width="1rem" height="1rem" />
+            <p-tooltip position="bottom"
+                       class="project-required-tooltip"
+                       :contents="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.PROJECT_REQUIRED_HELP_TEXT')"
+            >
+                <p-i name="ic_tooltip"
+                     width="1rem"
+                     height="1rem"
+                />
             </p-tooltip>
         </div>
     </div>
@@ -28,7 +36,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
 import type { AccountType } from '@/services/asset-inventory/service-account/type';
-
 
 export default {
     name: 'ServiceAccountProjectDetail',

@@ -1,19 +1,28 @@
 <template>
-    <div v-if="channelFormatter(notificationLevel).length > 0" class="project-channel-list">
-        <div v-for="(channel, cIdx) in channelFormatter(notificationLevel)" :key="`channel-${cIdx}`"
+    <div v-if="channelFormatter(notificationLevel).length > 0"
+         class="project-channel-list"
+    >
+        <div v-for="(channel, cIdx) in channelFormatter(notificationLevel)"
+             :key="`channel-${cIdx}`"
              :class="{ disabled: channel.state === CHANNEL_STATE.DISABLED }"
              class="channel-wrapper"
         >
             <p class="title">
                 [{{ protocolNameFormatter(channel.protocol_id) }}] {{ channel.name }}
                 <span class="on-off">
-                    <p-i name="ic_bell" color="inherit" class="ml-1"
-                         width="1rem" height="1rem"
+                    <p-i name="ic_bell"
+                         color="inherit"
+                         class="ml-1"
+                         width="1rem"
+                         height="1rem"
                     />
                     {{ channel.state === CHANNEL_STATE.ENABLED ? 'ON' : 'OFF' }}
                 </span>
             </p>
-            <p v-for="(user, uIdx) in channel.data.users" :key="`user-${uIdx}`" class="info">
+            <p v-for="(user, uIdx) in channel.data.users"
+               :key="`user-${uIdx}`"
+               class="info"
+            >
                 {{ user }}
             </p>
         </div>
@@ -29,7 +38,6 @@ import { get, filter } from 'lodash';
 import { store } from '@/store';
 
 import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
-
 
 const CHANNEL_STATE = Object.freeze({
     ENABLED: 'ENABLED',

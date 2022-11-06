@@ -17,11 +17,14 @@
                                @update-pagination="handlePaginationUpdate"
         />
 
-        <p-data-loader class="flex-grow" :data="items" :loading="loading"
+        <p-data-loader class="flex-grow"
+                       :data="items"
+                       :loading="loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
         >
             <div class="cloud-service-type-wrapper">
-                <cloud-service-list-card v-for="(item, idx) in items" :key="`${item.provider}-${item.cloud_service_group}-${idx}`"
+                <cloud-service-list-card v-for="(item, idx) in items"
+                                         :key="`${item.provider}-${item.cloud_service_group}-${idx}`"
                                          :item="item"
                                          :search-filters="searchFilters"
                                          :selected-regions="selectedRegions"
@@ -30,8 +33,14 @@
             </div>
             <template #no-data>
                 <div class="text-center empty-cloud-service">
-                    <img v-if="!Object.keys(storeState.serviceAccounts).length" class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
-                    <img v-else class="empty-cloud-service-img" src="@/assets/images/illust_microscope.svg">
+                    <img v-if="!Object.keys(storeState.serviceAccounts).length"
+                         class="empty-cloud-service-img"
+                         src="@/assets/images/illust_satellite.svg"
+                    >
+                    <img v-else
+                         class="empty-cloud-service-img"
+                         src="@/assets/images/illust_microscope.svg"
+                    >
                     <p class="text-primary2 mb-12">
                         {{ Object.keys(storeState.serviceAccounts).length ? $t('COMMON.WIDGETS.CLOUD_SERVICE.NO_DATA')
                             : $t('INVENTORY.CLOUD_SERVICE.MAIN.EMPTY_CLOUD_SERVICE')
@@ -112,7 +121,6 @@ import type {
 } from '@/services/asset-inventory/cloud-service/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
-
 
 export default {
     name: 'CloudServicePage',
@@ -236,7 +244,6 @@ export default {
         const init = async () => {
             /* load references */
             await Promise.allSettled([store.dispatch('reference/provider/load'), store.dispatch('reference/serviceAccount/load')]);
-
 
             /* init states from url query */
             const currentQuery = SpaceRouter.router.currentRoute.query;

@@ -1,14 +1,22 @@
 <template>
     <div class="cost-dashboard-create-page">
         <nav>
-            <p-page-title :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.CREATE_DASHBOARD')" child @goBack="$router.go(-1)" />
+            <p-page-title :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.CREATE_DASHBOARD')"
+                          child
+                          @goBack="$router.go(-1)"
+            />
         </nav>
         <cost-dashboard-create-form :manage-disabled="!hasManagePermission" />
         <div class="button-group">
-            <p-button style-type="tertiary" @click="$router.go(-1)">
+            <p-button style-type="tertiary"
+                      @click="$router.go(-1)"
+            >
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CANCEL') }}
             </p-button>
-            <p-button style-type="primary" :disabled="!Object.keys(selectedTemplate).length" @click="handleClickCreate">
+            <p-button style-type="primary"
+                      :disabled="!Object.keys(selectedTemplate).length"
+                      @click="handleClickCreate"
+            >
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.CREATE') }}
             </p-button>
         </div>

@@ -17,9 +17,14 @@
                       highlight
             />
         </div>
-        <div v-for="(rule, idx) in rules" :key="`rule-${idx}`" class="content-row">
+        <div v-for="(rule, idx) in rules"
+             :key="`rule-${idx}`"
+             class="content-row"
+        >
             <span class="col-step">
-                <p-badge outline style-type="gray">{{ idx + 1 }}</p-badge>
+                <p-badge outline
+                         style-type="gray"
+                >{{ idx + 1 }}</p-badge>
             </span>
             <span class="col-notification">
                 <p-select-dropdown v-model="rule.notification_level"
@@ -31,12 +36,13 @@
                                  :value="item.name"
                         >
                             <p>{{ item.label }}</p>
-                            <project-channel-list :project-channels="projectChannels" :notification-level="item.name" />
+                            <project-channel-list :project-channels="projectChannels"
+                                                  :notification-level="item.name"
+                            />
                         </p-radio>
                     </template>
                 </p-select-dropdown>
             </span>
-
 
             <i18n v-if="showEscalatesAfterForm(idx)"
                   :path="idx === rules.length - 1 ? 'MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_AFTER' : 'MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER'"
@@ -72,7 +78,9 @@
                             >
                                 <div class="item">
                                     <p>{{ item.label }}</p>
-                                    <project-channel-list :project-channels="projectChannels" :notification-level="item.name" />
+                                    <project-channel-list :project-channels="projectChannels"
+                                                          :notification-level="item.name"
+                                    />
                                 </div>
                             </p-radio>
                         </template>
@@ -157,7 +165,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
 import { SCOPE } from '@/services/alert-manager/lib/config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-
 
 const NOTIFICATION_LEVELS = Object.freeze([
     { name: 'ALL', label: 'All' },

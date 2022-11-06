@@ -97,7 +97,7 @@ const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') 
             }
         } else if (f.v !== null && f.v !== undefined) {
             /* keyword case */
-            if (Array.isArray(f.v)) keyword.push(...f.v.map(v => (v !== null ? v.toString().trim() : '')));
+            if (Array.isArray(f.v)) keyword.push(...f.v.map((v) => (v !== null ? v.toString().trim() : '')));
             else keyword.push(f.v.toString().trim());
         }
     });
@@ -136,7 +136,7 @@ export class QueryHelper {
 
     setKeyItemSets(keyItemSets: KeyItemSet[]): this {
         this._keyMap = {};
-        flatten(keyItemSets.map(d => d.items)).forEach((d) => {
+        flatten(keyItemSets.map((d) => d.items)).forEach((d) => {
             this._keyMap[d.name] = d;
         });
         return this;
@@ -271,7 +271,7 @@ export class QueryHelper {
     }
 
     get rawQueryStrings(): string[] {
-        return this.rawQueries.map(q => JSON.stringify(q));
+        return this.rawQueries.map((q) => JSON.stringify(q));
     }
 
     get rawQueryString(): string {

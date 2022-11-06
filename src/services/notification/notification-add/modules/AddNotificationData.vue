@@ -8,22 +8,33 @@
             class="base-info-input"
         >
             <template #default>
-                <p-text-input v-model="channelName" class="block w-full" :invalid="isNameInvalid"
-                              :placeholder="$t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')" @input="onChangeChannelName"
+                <p-text-input v-model="channelName"
+                              class="block w-full"
+                              :invalid="isNameInvalid"
+                              :placeholder="$t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')"
+                              @input="onChangeChannelName"
                 />
             </template>
         </p-field-group>
-        <add-notification-level v-if="projectId" @change="onChangeLevel" />
-        <p-json-schema-form v-if="isJsonSchema" :key="protocolId"
-                            :form-data="schemaForm" :schema="schema"
+        <add-notification-level v-if="projectId"
+                                @change="onChangeLevel"
+        />
+        <p-json-schema-form v-if="isJsonSchema"
+                            :key="protocolId"
+                            :form-data="schemaForm"
+                            :schema="schema"
                             :language="$store.state.user.language"
                             class="schema-form"
                             @change="handleSchemaFormChange"
         />
         <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER">
-            <p-field-group :label="$t('MENU.ADMINISTRATION_USER')" required>
+            <p-field-group :label="$t('MENU.ADMINISTRATION_USER')"
+                           required
+            >
                 <template #default>
-                    <add-notification-member-group :project-id="projectId" @change="onChangeMember" />
+                    <add-notification-member-group :project-id="projectId"
+                                                   @change="onChangeMember"
+                    />
                 </template>
             </p-field-group>
         </div>
@@ -31,7 +42,6 @@
 </template>
 
 <script lang="ts">
-
 
 import type { SetupContext } from 'vue';
 import {
@@ -163,7 +173,6 @@ export default {
             emitChange();
         };
 
-
         const initStates = () => {
             state.channelName = undefined;
             state.notificationLevel = 'LV1';
@@ -172,7 +181,6 @@ export default {
             state.selectedMember = [];
             state.schema = null;
         };
-
 
         watch([() => props.protocolId, () => props.supportedSchema, () => props.protocolType], async ([protocolId, supportedSchema, protocolType]) => {
             if (!protocolId) return;

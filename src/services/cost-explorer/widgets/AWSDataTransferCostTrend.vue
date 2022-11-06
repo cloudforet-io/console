@@ -5,11 +5,15 @@
                                        :data-range="6"
                                        :print-mode="printMode"
     >
-        <p-data-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading"
+                       class="chart-wrapper"
+        >
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
-            <div ref="chartRef" class="chart" />
+            <div ref="chartRef"
+                 class="chart"
+            />
         </p-data-loader>
         <div class="table-wrapper">
             <cost-dashboard-data-table :fields="fields"
@@ -42,11 +46,9 @@ import bytes from 'bytes';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
-
 import { byteFormatter, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { i18n } from '@/translations';
 
@@ -75,7 +77,6 @@ import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/Cos
 import type {
     ChartData, CostAnalyzeModel, Legend, TrafficWidgetTableData, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
-
 
 const GROUP_BY = 'usage_type';
 const CATEGORY_KEY = 'date';
@@ -204,14 +205,13 @@ export default {
                     ],
                 },
 
-
             ]),
             tableItems: computed<TableData[]>(() => {
-                const months = range(6).map(i => i18nDayjs.value.utc(props.period.end)
+                const months = range(6).map((i) => i18nDayjs.value.utc(props.period.end)
                     .subtract(i, 'month'));
-                const transferIn = state.items.find(item => item.usage_type === 'data-transfer.in');
-                const transferOut = state.items.find(item => item.usage_type === 'data-transfer.out');
-                const transferEtc = state.items.find(item => item.usage_type === 'data-transfer.etc');
+                const transferIn = state.items.find((item) => item.usage_type === 'data-transfer.in');
+                const transferOut = state.items.find((item) => item.usage_type === 'data-transfer.out');
+                const transferEtc = state.items.find((item) => item.usage_type === 'data-transfer.etc');
                 const tableItems = months.map((m, idx) => {
                     const month = m.format('YYYY-MM');
                     return ({

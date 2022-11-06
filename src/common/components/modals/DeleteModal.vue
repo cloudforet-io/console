@@ -1,5 +1,6 @@
 <template>
-    <p-button-modal class="delete-modal" :header-title="headerTitle"
+    <p-button-modal class="delete-modal"
+                    :header-title="headerTitle"
                     :size="size"
                     :fade="true"
                     :backdrop="true"
@@ -28,7 +29,9 @@
                 </p-button>
             </div>
         </template>
-        <template v-if="confirmText" #confirm-button>
+        <template v-if="confirmText"
+                  #confirm-button
+        >
             {{ confirmText }}
         </template>
     </p-button-modal>

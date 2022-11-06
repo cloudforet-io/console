@@ -2,7 +2,6 @@ import { Plugin } from 'prosemirror-state';
 
 import type { ImageUploader } from '@/common/components/editor/extensions/image/type';
 
-
 export const dropImagePlugin = (upload: ImageUploader) => new Plugin({
     props: {
         handleDOMEvents: {
@@ -52,8 +51,8 @@ export const dropImagePlugin = (upload: ImageUploader) => new Plugin({
                 if (!hasFiles) return false;
 
                 const images = Array.from(
-                        event.dataTransfer?.files ?? [],
-                ).filter(file => /image/i.test(file.type));
+                    event.dataTransfer?.files ?? [],
+                ).filter((file) => /image/i.test(file.type));
 
                 if (images.length === 0) return false;
 
