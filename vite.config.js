@@ -7,11 +7,8 @@ import StylelintPlugin from 'vite-plugin-stylelint';
 
 export default defineConfig(({ command, mode }) => {
     process.env = {...process.env, ...loadEnv(mode, process.cwd())};
-    if (command === 'serve') {
-        console.log('serve mode');
-    } else {
-        console.log('build mode');
-    }
+    if (command === 'serve') { console.log('serve mode') }
+    else { console.log('build mode') }
 
     return {
         plugins: [
@@ -23,15 +20,12 @@ export default defineConfig(({ command, mode }) => {
                 emitErrorAsWarning: true,
             }),
         ],
-        server: {
-            port: 8080,
-        },
-        preview: {
-            port: 8080,
-        },
+        server: { port: 8080 },
+        preview: { port: 8080 },
         test: {
             globals: true,
             environment: 'jsdom',
+            include: ['./src/**/__tests__/**/*.+(ts|js)'],
         },
         resolve: {
             alias: {
