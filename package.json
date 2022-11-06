@@ -18,9 +18,7 @@
     "stylelint": "stylelint \"src/**/*.{css,vue,pcss,scss}\"",
     "lint": "npm run eslint && npm run stylelint",
     "prepare": "node -e \"if(require('fs').existsSync('.git')){process.exit(1)}\" || is-ci || husky install",
-    "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build",
-    "postcss": "node build/reset-css.js",
-    "serve:docker": "docker build --tag spaceone/console . && docker run -p 80:80 spaceone/console"
+    "postcss": "node build/reset-css.js"
   },
   "main": "dist/cloudforet-component.common.js",
   "dependencies": {
