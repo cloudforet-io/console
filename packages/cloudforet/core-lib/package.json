@@ -11,7 +11,7 @@
     "tsc:watch": "tsc-watch --project . --outDir ./dist --onSuccess \"tsc-alias -w\"",
     "eslint": "eslint --ext .js,.ts src",
     "eslint:fix": "eslint --fix --ext .js,.ts src",
-    "test:unit": "jest"
+    "test:unit": "vitest run"
   },
   "repository": {
     "type": "git",
