@@ -1,8 +1,11 @@
 <template>
     <fragment>
         <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.VISIBILITY.SAVE_AS') }}</h3>
-        <p-radio v-for="privacy in filteredPrivacyList" :key="privacy.name" v-model="selectedPrivacy"
-                 :value="privacy.name" class="mr-4"
+        <p-radio v-for="privacy in filteredPrivacyList"
+                 :key="privacy.name"
+                 v-model="selectedPrivacy"
+                 :value="privacy.name"
+                 class="mr-4"
                  @change="handleRadio"
         >
             <span class="capitalize ml-1">{{ privacy.label.toLowerCase() }}</span>
@@ -14,7 +17,6 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import { PRadio } from '@spaceone/design-system';
-
 
 import { i18n } from '@/translations';
 
@@ -47,7 +49,7 @@ export default {
     setup(props) {
         const state = reactive({
             selectedPrivacy: DASHBOARD_PRIVACY_TYPE.USER as DashboardPrivacyType,
-            filteredPrivacyList: computed(() => (props.manageDisabled ? privacyList.filter(item => item.name !== DASHBOARD_PRIVACY_TYPE.PUBLIC) : privacyList)),
+            filteredPrivacyList: computed(() => (props.manageDisabled ? privacyList.filter((item) => item.name !== DASHBOARD_PRIVACY_TYPE.PUBLIC) : privacyList)),
         });
 
         const handleRadio = (value: DashboardPrivacyType) => {

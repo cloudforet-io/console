@@ -8,12 +8,12 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { INFO_ROUTE } from '@/services/info/route-config';
 
-const InfoContainer = () => import(/* webpackChunkName: "InfoContainer" */ '@/services/info/InfoContainer.vue');
+const InfoContainer = () => import('@/services/info/InfoContainer.vue');
 
-const NoticePage = () => import(/* webpackChunkName: "NoticePage" */ '@/services/info/notice/NoticePage.vue');
-const NoticeDetailPage = () => import(/* webpackChunkName: "NoticeDetailPage" */ '@/services/info/notice/notice-detail/NoticeDetailPage.vue');
-const NoticeCreatePage = () => import(/* webpackChunkName: "NoticeCreatePage" */ '@/services/info/notice/notice-create/NoticeCreatePage.vue');
-const NoticeUpdatePage = () => import(/* webpackChunkName: "NoticeUpdatePage" */ '@/services/info/notice/notice-update/NoticeUpdatePage.vue');
+const NoticePage = () => import('@/services/info/notice/NoticePage.vue');
+const NoticeDetailPage = () => import('@/services/info/notice/notice-detail/NoticeDetailPage.vue');
+const NoticeCreatePage = () => import('@/services/info/notice/notice-create/NoticeCreatePage.vue');
+const NoticeUpdatePage = () => import('@/services/info/notice/notice-update/NoticeUpdatePage.vue');
 
 const infoRoute: RouteConfig = {
     path: 'info',

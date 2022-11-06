@@ -21,10 +21,15 @@
             Template with headers only
         </p-button>
 
-        <budget-period-select disable-validation @update="handleUpdatePeriodSelect" />
+        <budget-period-select disable-validation
+                              @update="handleUpdatePeriodSelect"
+        />
 
-        <p-field-group label="How to budget" required>
-            <p-radio v-for="({type, name, description}) in budgetPlans" :key="type"
+        <p-field-group label="How to budget"
+                       required
+        >
+            <p-radio v-for="({type, name, description}) in budgetPlans"
+                     :key="type"
                      v-model="selectedPlan"
                      :value="type"
                      class="plan"
@@ -34,9 +39,14 @@
             </p-radio>
         </p-field-group>
 
-        <budget-target-select disable-validation multi-selectable @update="handleUpdateTarget" />
+        <budget-target-select disable-validation
+                              multi-selectable
+                              @update="handleUpdateTarget"
+        />
 
-        <budget-cost-type-select disable-validation @update="handleUpdateCostTypes" />
+        <budget-cost-type-select disable-validation
+                                 @update="handleUpdateCostTypes"
+        />
     </p-pane-layout>
 </template>
 
@@ -52,7 +62,6 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -63,7 +72,6 @@ import BudgetPeriodSelect from '@/services/cost-explorer/budget/modules/BudgetPe
 import BudgetTargetSelect from '@/services/cost-explorer/budget/modules/BudgetTargetSelect.vue';
 import type { BudgetData, BudgetTimeUnit } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
-
 
 type CostTypes = BudgetData['cost_types'];
 interface BudgetBulkCreateTemplateSource {

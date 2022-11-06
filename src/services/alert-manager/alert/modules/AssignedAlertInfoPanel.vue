@@ -1,12 +1,19 @@
 <template>
     <p-pane-layout class="assign-alert-info">
-        <p-panel-top :title="$t('MONITORING.ALERT.ALERT_LIST.OPEN_ALERT')" :total-count="totalCount" use-total-count />
+        <p-panel-top :title="$t('MONITORING.ALERT.ALERT_LIST.OPEN_ALERT')"
+                     :total-count="totalCount"
+                     use-total-count
+        />
         <div class="filter-wrapper">
-            <span class="filter text-alert mr-4" @click="onClickAssignedAlerts(ALERT_STATE_FILTER.TRIGGERED)">
+            <span class="filter text-alert mr-4"
+                  @click="onClickAssignedAlerts(ALERT_STATE_FILTER.TRIGGERED)"
+            >
                 <em>{{ counts[ALERT_STATE_FILTER.TRIGGERED] }}</em>
                 {{ $t('MONITORING.ALERT.ALERT_LIST.TRIGGERED') }}
             </span>
-            <span class="filter text-secondary" @click="onClickAssignedAlerts(ALERT_STATE_FILTER.ACKNOWLEDGED)">
+            <span class="filter text-secondary"
+                  @click="onClickAssignedAlerts(ALERT_STATE_FILTER.ACKNOWLEDGED)"
+            >
                 <em>{{ counts[ALERT_STATE_FILTER.ACKNOWLEDGED] }}</em>
                 {{ $t('MONITORING.ALERT.ALERT_LIST.ACKNOWLEDGED') }}
             </span>
@@ -16,7 +23,6 @@
 
 <script lang="ts">
 
-
 import { computed, reactive, toRefs } from 'vue';
 
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
@@ -24,13 +30,11 @@ import { find } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ALERT_STATE_FILTER } from '@/services/alert-manager/lib/config';
-
 
 export default {
     name: 'AssignedAlertInfoPanel',

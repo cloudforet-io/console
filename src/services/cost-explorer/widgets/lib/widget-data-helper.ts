@@ -22,7 +22,6 @@ import type {
     XYChartData,
 } from '@/services/cost-explorer/widgets/type';
 
-
 /**
  * This function only merges numeric values, not string.
  * ({ date: '2021-11', aws: 100, azure: 100 }, { date: '2021-12', azure: 200 }) => { aws: 100, azure: 300 }
@@ -40,7 +39,6 @@ const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: Cha
     });
     return mergedData;
 };
-
 
 /**
  * @name getLegends
@@ -106,7 +104,6 @@ export const getLegends = (rawData: CostAnalyzeModel[], granularity: Granularity
     return [];
 };
 
-
 /**
  * @name getReferenceLabel
  * @description Extract label from raw string.
@@ -127,7 +124,6 @@ export const getReferenceLabel = (data: string, groupBy: GroupBy | string): stri
     if (groupBy === GROUP_BY.PROVIDER) return _providers[data]?.name || data;
     return 'Unknown';
 };
-
 
 /**
  * @name getPieChartData
@@ -185,16 +181,13 @@ export const getPieChartData = (rawData: CostAnalyzeModel[], groupBy?: GroupBy |
     return chartData;
 };
 
-
 /**
  * @name getXYChartData
  * @description Convert raw data to XYChart data.
  * @example [{ date: '2021-11-01', aws: 100, azure: 300 }, { date: '2021-11-02', aws: 300, azure: 100 }]
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary, LastMonthTotalSpend, BudgetSummaryChart
  */
-export const getXYChartData = (
-    rawData: CostAnalyzeModel[], granularity: Granularity, period: Period, groupBy?: GroupBy | string, valueKey = 'usd_cost',
-): XYChartData[] => {
+export const getXYChartData = (rawData: CostAnalyzeModel[], granularity: Granularity, period: Period, groupBy?: GroupBy | string, valueKey = 'usd_cost'): XYChartData[] => {
     const chartData: XYChartData[] = [];
     const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(period.start), dayjs.utc(period.end));
     const dateFormat = DATE_FORMAT[timeUnit];
@@ -227,7 +220,6 @@ export const getXYChartData = (
     return chartData;
 };
 
-
 /**
  * @name getStackedChartData
  * @description Get accumulated array of chart data. Chart data must have 'date' property.
@@ -242,7 +234,7 @@ export const getStackedChartData = (chartData: XYChartData[], period: Period, ti
     while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
         let eachChartData: XYChartData = { date: now.format('YYYY-MM-DD') };
         // eslint-disable-next-line no-loop-func
-        const existData = chartData.find(d => now.isSame(dayjs.utc(d.date), timeUnit));
+        const existData = chartData.find((d) => now.isSame(dayjs.utc(d.date), timeUnit));
         accumulatedData = _mergePrevChartDataAndCurrChartData(accumulatedData, existData);
         eachChartData = {
             ...eachChartData,
@@ -253,7 +245,6 @@ export const getStackedChartData = (chartData: XYChartData[], period: Period, ti
     }
     return accumulatedChartData;
 };
-
 
 /**
  * @name getCurrencyAppliedChartData
@@ -279,7 +270,6 @@ export const getCurrencyAppliedChartData = (
     return results;
 });
 
-
 export const getTooltipText = (categoryKey, valueKey, money, disablePercentage = true) => {
     if (disablePercentage) {
         return `{${categoryKey}}: [bold]${money}[/]`;
@@ -287,11 +277,10 @@ export const getTooltipText = (categoryKey, valueKey, money, disablePercentage =
     return `{${categoryKey}}: [bold]${money}[/] ({${valueKey}.percent.formatNumber('#.00')}%)`;
 };
 
-
 const getWidgetDefaultOptions = async (widgetId?: string): Promise<WidgetOptions|undefined> => {
     try {
         const defaultWidgetList = await import('./defaultWidgetList.json');
-        return defaultWidgetList.default.find(widget => widget.widget_id === widgetId)?.options as WidgetOptions;
+        return defaultWidgetList.default.find((widget) => widget.widget_id === widgetId)?.options as WidgetOptions;
     } catch (e) {
         throw new Error('Failed to fetch default widget list');
     }

@@ -1,6 +1,10 @@
 <template>
-    <div v-click-outside="hideSearchMenu" class="gnb-search" @click.stop>
-        <g-n-b-search-input v-if="isOverLaptopSize" v-model="inputText"
+    <div v-click-outside="hideSearchMenu"
+         class="gnb-search"
+         @click.stop
+    >
+        <g-n-b-search-input v-if="isOverLaptopSize"
+                            v-model="inputText"
                             :is-focused.sync="isFocusOnInput"
                             @click="showSearchMenu"
                             @esc="hideSearchMenu"
@@ -9,14 +13,17 @@
                             @input="handleUpdateInput"
         />
 
-        <span v-else class="menu-button" tabindex="0"
+        <span v-else
+              class="menu-button"
+              tabindex="0"
               role="button"
               @click.stop="handleSearchButtonClick"
               @keydown.esc="hideSearchMenu"
               @keydown.enter="showSearchMenu"
         >
             <p-i name="ic_search--bold"
-                 height="1.5rem" width="1.5rem"
+                 height="1.5rem"
+                 width="1.5rem"
                  color="inherit"
             />
         </span>
@@ -49,7 +56,6 @@
 
 <script lang="ts">
 
-
 import { vOnClickOutside } from '@vueuse/components';
 import {
     computed, defineComponent, onMounted, onUnmounted,
@@ -63,9 +69,7 @@ import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce, throttle } from 'lodash';
 
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -95,7 +99,6 @@ import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/
 import type { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 interface CloudServiceData {
     id: string;
@@ -155,11 +158,11 @@ export default defineComponent<Props>({
                 if (state.showRecent) {
                     return convertMenuConfigToReferenceData(dataState.recentMenuList, store.getters['display/allMenuList']);
                 }
-                return dataState.filteredMenuList.map(d => ({
+                return dataState.filteredMenuList.map((d) => ({
                     itemType: SUGGESTION_TYPE.MENU,
                     name: d.id,
                     label: d.label,
-                    parents: d.parents ? d.parents.map(p => ({ name: p.id, label: p.label })) : undefined,
+                    parents: d.parents ? d.parents.map((p) => ({ name: p.id, label: p.label })) : undefined,
                     icon: d.icon,
                 }));
             }),
@@ -172,7 +175,7 @@ export default defineComponent<Props>({
                 if (state.showRecent) {
                     return convertCloudServiceConfigToReferenceData(dataState.recentCloudServices, dataState.cloudServiceTypes);
                 }
-                return dataState.filteredCloudServices.map(d => ({
+                return dataState.filteredCloudServices.map((d) => ({
                     itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
                     name: d.id,
                     label: d.name,
@@ -209,21 +212,20 @@ export default defineComponent<Props>({
 
         const filterMenuItemsBySearchTerm = (menu: SuggestionMenu[], searchTerm?: string): SuggestionMenu[] => {
             const regex = getTextHighlightRegex(searchTerm);
-            const results = menu.map(d => ({
+            const results = menu.map((d) => ({
                 id: d.id,
                 label: d.label,
                 parents: d.parents ? d.parents : undefined,
                 icon: d.parents?.[0]?.icon ?? d.icon,
             })).filter((d) => {
                 if (regex.test(d.label as string)) return true;
-                if (d.parents && d.parents.some(p => regex.test(p.label as string))) return true;
+                if (d.parents && d.parents.some((p) => regex.test(p.label as string))) return true;
                 return false;
             });
 
             dataState._menuTotalCount = results.length;
             return results.slice(0, SEARCH_LIMIT);
         };
-
 
         /* API */
         let resourceToken: CancelTokenSource | undefined;
@@ -266,7 +268,7 @@ export default defineComponent<Props>({
                     type,
                     limit: RECENT_LIMIT,
                 });
-                const recentConfig: RecentConfig[] = results.map(d => ({
+                const recentConfig: RecentConfig[] = results.map((d) => ({
                     itemType: d.data.type,
                     itemId: d.data.id,
                     updatedAt: d.updated_at,
@@ -337,7 +339,7 @@ export default defineComponent<Props>({
             state.loading = true;
             if (state.trimmedInputText) {
                 const results = await getCloudServiceResources(state.trimmedInputText);
-                dataState.filteredCloudServices = results.map(d => d.data);
+                dataState.filteredCloudServices = results.map((d) => d.data);
                 dataState.filteredMenuList = filterMenuItemsBySearchTerm(dataState.allMenuList, state.trimmedInputText);
             }
         }, 300, {

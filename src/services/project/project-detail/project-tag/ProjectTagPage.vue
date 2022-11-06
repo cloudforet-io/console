@@ -11,7 +11,6 @@
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
-
 export default {
     name: 'ProjectTagPage',
     components: {

@@ -13,8 +13,12 @@
     >
         <template #body>
             <div>
-                <slot v-if="subTitle" name="subTitle" />
-                <i18n v-else class="double-check-modal-sub-title" tag="p"
+                <slot v-if="subTitle"
+                      name="subTitle"
+                />
+                <i18n v-else
+                      class="double-check-modal-sub-title"
+                      tag="p"
                       path="IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_DESC"
                 >
                     <template #account>
@@ -29,7 +33,9 @@
                     :invalid="invalid"
                 >
                     <template #label>
-                        <i18n class="label-text" path="COMPONENT.DOUBLE_CHECK_MODAL.INPUT_DESC">
+                        <i18n class="label-text"
+                              path="COMPONENT.DOUBLE_CHECK_MODAL.INPUT_DESC"
+                        >
                             <template #text>
                                 <strong>{{ verificationText }}</strong>
                             </template>
@@ -145,7 +151,6 @@ export default defineComponent({
             handleConfirm,
         };
     },
-
 
 });
 </script>

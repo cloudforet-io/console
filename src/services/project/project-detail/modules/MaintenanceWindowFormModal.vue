@@ -11,29 +11,41 @@
             <p class="form-desc">
                 {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.DESC') }}
             </p>
-            <p-field-group :label="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_TITLE')" required
+            <p-field-group :label="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_TITLE')"
+                           required
                            :invalid="showValidation && !!titleInvalidText"
                            :invalid-text="titleInvalidText"
             >
-                <p-text-input v-model="title" class="w-full" :invalid="showValidation && !!titleInvalidText"
-                              block @input.once="handleFirstInputTitle"
+                <p-text-input v-model="title"
+                              class="w-full"
+                              :invalid="showValidation && !!titleInvalidText"
+                              block
+                              @input.once="handleFirstInputTitle"
                 />
             </p-field-group>
-            <p-field-group class="schedule-field" :label="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_SCHEDULE')"
+            <p-field-group class="schedule-field"
+                           :label="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_SCHEDULE')"
                            required
                            :invalid="showValidation && isTimePeriodInvalid"
                            :invalid-text="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.INVALID_TEXT')"
             >
-                <p-radio v-for="{name, label} in scheduleRadioItems" :key="name" v-model="selectedScheduleType"
+                <p-radio v-for="{name, label} in scheduleRadioItems"
+                         :key="name"
+                         v-model="selectedScheduleType"
                          :value="name"
                          class="schedule-type-radio"
                 >
                     {{ label }}
                 </p-radio>
-                <div class="time-selection-wrapper" :class="{'invalid':showValidation && isTimePeriodInvalid}">
+                <div class="time-selection-wrapper"
+                     :class="{'invalid':showValidation && isTimePeriodInvalid}"
+                >
                     <template v-if="selectedScheduleType === SCHEDULE_TYPE.startNow">
-                        <p-select-button v-for="{name, label} in durationItems" :key="name" v-model="selectedDuration"
-                                         :value="name" class="mr-2"
+                        <p-select-button v-for="{name, label} in durationItems"
+                                         :key="name"
+                                         v-model="selectedDuration"
+                                         :value="name"
+                                         class="mr-2"
                         >
                             {{ label }}
                         </p-select-button>
@@ -51,7 +63,9 @@
                                     <label for="start-time">{{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_START_TIME') }}</label>
                                 </td>
                                 <td class="time-selection-group">
-                                    <input id="start-time" v-model="startTimeInput" type="datetime-local"
+                                    <input id="start-time"
+                                           v-model="startTimeInput"
+                                           type="datetime-local"
                                            @change="handleChangeStartTime"
                                     >
                                 </td>
@@ -61,7 +75,9 @@
                                     <label for="end-time">{{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_END_TIME') }}</label>
                                 </td>
                                 <td class="time-selection-group">
-                                    <input id="end-time" v-model="endTimeInput" type="datetime-local"
+                                    <input id="end-time"
+                                           v-model="endTimeInput"
+                                           type="datetime-local"
                                            :min="startTimeInput"
                                     >
                                 </td>
@@ -70,7 +86,10 @@
                     </table>
                 </div>
             </p-field-group>
-            <p-field-group class="period-field" :label="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_TIME_PERIOD')" required>
+            <p-field-group class="period-field"
+                           :label="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_TIME_PERIOD')"
+                           required
+            >
                 <span v-if="selectedScheduleType === SCHEDULE_TYPE.startNow">
                     {{ timePeriod }}
                 </span>
@@ -79,8 +98,11 @@
                 </span>
             </p-field-group>
         </template>
-        <template v-if="editMode" #footer-extra>
-            <p-button style-type="negative-secondary" size="lg"
+        <template v-if="editMode"
+                  #footer-extra
+        >
+            <p-button style-type="negative-secondary"
+                      size="lg"
                       @click="handleClickClose(maintenanceWindowId)"
             >
                 {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CLOSE_NOW') }}
@@ -108,7 +130,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -205,13 +226,11 @@ export default {
             startTimeInput: dayjs().format(DATE_TIME_FORMAT),
             endTimeInput: dayjs().add(1, 'hour').format(DATE_TIME_FORMAT),
             showValidation: false,
-            timePeriod: computed(() => state.durationItems.find(d => d.name === state.selectedDuration)?.label),
+            timePeriod: computed(() => state.durationItems.find((d) => d.name === state.selectedDuration)?.label),
         });
-
 
         /* Local Variables */
         let originMaintenanceWindow: Partial<MaintenanceWindow> = {};
-
 
         /* Helpers */
         const checkTimes = () => {
@@ -291,7 +310,6 @@ export default {
             }
         };
 
-
         /* Handlers */
         const handleFirstInputTitle = (e) => {
             state.showValidation = true;
@@ -364,7 +382,6 @@ export default {
         watch(() => props.visible, async (visible) => {
             if (visible) await reset();
         });
-
 
         return {
             ...toRefs(state),

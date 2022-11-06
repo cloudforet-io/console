@@ -10,7 +10,6 @@ const hyphenRegExp = /^\d{4}\.(0?[1-9]|1[012])\.(0?[1-9]|[12][0-9]|3[01])$/;
 
 const dateUnionRegExp = new RegExp(`${slashRegExp.source}|${dotRegExp.source}|${hyphenRegExp.source}`);
 
-
 export const convertDatetimeQueryStoreFilterToFilters = (filter: QueryStoreFilter, timezone = 'UTC'): Filter[]|undefined => {
     const f = filter as Required<QueryStoreFilter>;
     if (typeof f.v === 'string') {

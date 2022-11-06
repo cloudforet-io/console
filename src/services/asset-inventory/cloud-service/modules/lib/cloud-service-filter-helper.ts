@@ -3,7 +3,6 @@ import type { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/in
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
-
 export interface RegionMenuItem extends SearchDropdownMenuItem {
     name: string;
     label: string;

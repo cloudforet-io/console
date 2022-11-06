@@ -28,7 +28,6 @@ import {
     PHorizontalLayout, PPageTitle,
 } from '@spaceone/design-system';
 
-
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import RoleManagementTab from '@/services/administration/iam/role/modules/role-management-tab/RoleManagementTab.vue';

@@ -6,9 +6,12 @@
             <template #sidebar>
                 <my-page-l-n-b />
             </template>
-            <template v-if="handbookState.isVisible" #handbook>
+            <template v-if="handbookState.isVisible"
+                      #handbook
+            >
                 <div class="flex">
-                    <handbook-button :tabs="handbookState.tabs" :active-tab.sync="handbookState.activeTab"
+                    <handbook-button :tabs="handbookState.tabs"
+                                     :active-tab.sync="handbookState.activeTab"
                                      type="identity/user/api-key"
                                      class="flex-shrink-0"
                     >
@@ -38,7 +41,6 @@ import type { Vue } from 'vue/types/vue';
 
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
-
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -48,7 +50,6 @@ import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 import UserAPIKeyHandbook from '@/services/my-page/my-account/user-api-key/modules/APIKeyHandbook.vue';
 import MyPageLNB from '@/services/my-page/MyPageLNB.vue';
 import myPageStore from '@/services/my-page/store';
-
 
 export default defineComponent({
     name: 'MyPageContainer',

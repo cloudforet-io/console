@@ -6,8 +6,10 @@
                    class="budget-cost-type-select-field"
     >
         <div class="cost-type-wrapper">
-            <p-radio v-for="(costTypeLabel, costTypeKey) in costTypeItems" :key="costTypeKey"
-                     :selected="selectedCostType" :value="costTypeKey"
+            <p-radio v-for="(costTypeLabel, costTypeKey) in costTypeItems"
+                     :key="costTypeKey"
+                     :selected="selectedCostType"
+                     :value="costTypeKey"
                      @change="setForm('selectedCostType', $event)"
             >
                 {{ costTypeLabel }}
@@ -60,7 +62,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { BudgetCostType, BudgetData, CostType } from '@/services/cost-explorer/budget/type';
 
-
 type CostTypes = BudgetData['cost_types'];
 
 interface Props {
@@ -74,7 +75,7 @@ interface DistinctResult {
     total_count?: number;
 }
 
-const getSearchDropdownItems = (resourceItems: ReferenceMap): SearchDropdownMenuItem[] => Object.keys(resourceItems).map(k => ({
+const getSearchDropdownItems = (resourceItems: ReferenceMap): SearchDropdownMenuItem[] => Object.keys(resourceItems).map((k) => ({
     name: k, label: resourceItems[k].label,
 }));
 
@@ -114,7 +115,6 @@ export default defineComponent<Props>({
             },
         }, { selectedCostType: true, selectedResources: true });
 
-
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
@@ -137,7 +137,7 @@ export default defineComponent<Props>({
             costTypeInfo: computed<CostTypes|undefined>(() => {
                 if (selectedCostType.value === 'all') return undefined;
 
-                const resources = selectedResources.value.map(d => d.name as string);
+                const resources = selectedResources.value.map((d) => d.name as string);
                 if (resources.length === 0) return undefined;
 
                 return { [selectedCostType.value as CostType]: resources };
@@ -184,7 +184,7 @@ export default defineComponent<Props>({
             state.resourceMenuLoading = false;
 
             return {
-                results: results ? results.map(d => ({ name: d.key, label: d.name })) : [],
+                results: results ? results.map((d) => ({ name: d.key, label: d.name })) : [],
                 totalCount: total_count,
             };
         };

@@ -6,15 +6,23 @@
             </div>
             <div class="sm:flex-col-reverse ">
                 <span class="email">
-                    <p-i name="ic_footer_email" width="1rem" height="1rem"
+                    <p-i name="ic_footer_email"
+                         width="1rem"
+                         height="1rem"
                          color="gray-200"
                     />
-                    <a target="_blank" href="mailto:support@cloudforet.io">support@cloudforet.io</a>
+                    <a target="_blank"
+                       href="mailto:support@cloudforet.io"
+                    >support@cloudforet.io</a>
                 </span>
                 <span class="divider" />
-                <span class="policy" @click="showTemp">{{ $t('COMMON.FNB.PRIVACY') }}</span>
+                <span class="policy"
+                      @click="showTemp"
+                >{{ $t('COMMON.FNB.PRIVACY') }}</span>
                 <transition name="fade">
-                    <span v-if="temp" class="footerMsg" transition="expand"
+                    <span v-if="temp"
+                          class="footerMsg"
+                          transition="expand"
                           @click="showTemp"
                     >{{ $t('COMMON.FNB.PRIVACY_MSG') }}</span>
                 </transition>
@@ -54,7 +62,6 @@ export default {
     },
 };
 </script>
-
 
 <style lang="postcss" scoped>
 .fnb {

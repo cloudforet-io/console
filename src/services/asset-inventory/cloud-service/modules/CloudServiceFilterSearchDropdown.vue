@@ -10,10 +10,13 @@
                            @update:selected="handleUpdateSelected"
                            @search="handleSearch"
         >
-            <template v-if="type === CLOUD_SERVICE_FILTER_KEY.REGION" #menu-item--format="{item}">
+            <template v-if="type === CLOUD_SERVICE_FILTER_KEY.REGION"
+                      #menu-item--format="{item}"
+            >
                 <div class="region-list-text">
                     <div class="region-type">
-                        <text-highlighting class="region-provider" :style="{color: item.color}"
+                        <text-highlighting class="region-provider"
+                                           :style="{color: item.color}"
                                            :text="providers[item.provider] ? providers[item.provider].label : item.provider"
                                            :term="searchTerm"
                                            style-type="secondary"
@@ -59,7 +62,6 @@ import type { RegionMenuItem } from '@/services/asset-inventory/cloud-service/mo
 import { getRegionFilterMenuItem } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 
-
 const categoryItems = [
     { name: CLOUD_SERVICE_CATEGORY.SERVER, label: CLOUD_SERVICE_CATEGORY.SERVER },
     { name: CLOUD_SERVICE_CATEGORY.COMPUTE, label: CLOUD_SERVICE_CATEGORY.COMPUTE },
@@ -97,19 +99,19 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const state = reactive({
             searchTerm: '',
-            selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selected.map(selectedName => ({
+            selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selected.map((selectedName) => ({
                 name: selectedName,
-                label: state.menuItems.find(d => d.name === selectedName)?.label || selectedName,
+                label: state.menuItems.find((d) => d.name === selectedName)?.label || selectedName,
             }))),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
             sortedRegions: computed<SortedRegionReferenceItem[]>(() => {
                 const regions: SortedRegionReferenceItem[] = store.getters['reference/region/regionsSortedByProvider'];
                 if (state.selectedProvider === 'all') return regions;
-                return regions.filter(r => r.data.provider === state.selectedProvider);
+                return regions.filter((r) => r.data.provider === state.selectedProvider);
             }),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-            regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map(d => getRegionFilterMenuItem(d.key, state.regions, state.providers))),
+            regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => getRegionFilterMenuItem(d.key, state.regions, state.providers))),
             menuItems: computed<SearchDropdownMenuItem[]|RegionMenuItem[]>(() => {
                 if (props.type === CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY) {
                     return categoryItems;
@@ -125,7 +127,7 @@ export default defineComponent<Props>({
             let results: RegionMenuItem[] = [...list];
             if (trimmed) {
                 const regex = getTextHighlightRegex(inputText);
-                results = results.filter(d => regex.test(d.label));
+                results = results.filter((d) => regex.test(d.label));
             }
 
             return {
@@ -136,11 +138,11 @@ export default defineComponent<Props>({
 
         /* event */
         const handleSearch = (val: string) => {
-            emit('update:selected', state.selectedItems.map(d => d.name).concat([val]));
+            emit('update:selected', state.selectedItems.map((d) => d.name).concat([val]));
         };
 
         const handleUpdateSelected = (selected: SearchDropdownMenuItem[]) => {
-            emit('update:selected', selected.map(d => d.name));
+            emit('update:selected', selected.map((d) => d.name));
         };
 
         // LOAD REFERENCE STORE

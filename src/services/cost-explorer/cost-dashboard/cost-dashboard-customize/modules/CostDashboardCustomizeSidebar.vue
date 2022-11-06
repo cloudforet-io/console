@@ -8,16 +8,21 @@
                 <p class="sidebar-desc">
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.SIDEBAR_DESC') }}
                 </p>
-                <p-button style-type="secondary" icon-left="ic_plus_bold"
-                          size="lg" :block="true"
-                          class="add-widget-button" @click="handleClickAddWidget"
+                <p-button style-type="secondary"
+                          icon-left="ic_plus_bold"
+                          size="lg"
+                          :block="true"
+                          class="add-widget-button"
+                          @click="handleClickAddWidget"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET') }}
                 </p-button>
                 <p class="widget-count">
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.CURRENT_WIDGETS') }}
                 </p>
-                <draggable v-model="editingCustomLayout" tag="ul" class="widget-list"
+                <draggable v-model="editingCustomLayout"
+                           tag="ul"
+                           class="widget-list"
                            ghost-class="ghost"
                 >
                     <li
@@ -25,11 +30,16 @@
                         :key="idx"
                         class="widget-item"
                     >
-                        <p-i name="ic_drag-handle" width="1rem" height="1rem"
+                        <p-i name="ic_drag-handle"
+                             width="1rem"
+                             height="1rem"
                              class="drag-icon"
                         />
                         <div class="widget-row">
-                            <span v-for="{ name, widget_id } in widget" :key="`${widget_id}-${getUUID()}`" class="widget-col">
+                            <span v-for="{ name, widget_id } in widget"
+                                  :key="`${widget_id}-${getUUID()}`"
+                                  class="widget-col"
+                            >
                                 {{ name }}
                             </span>
                         </div>
@@ -37,7 +47,9 @@
                 </draggable>
             </div>
         </portal>
-        <cost-dashboard-customize-widget-modal v-model="customizeModalVisible" @confirm="$emit('add-widget',$event)" />
+        <cost-dashboard-customize-widget-modal v-model="customizeModalVisible"
+                                               @confirm="$emit('add-widget',$event)"
+        />
     </div>
 </template>
 
@@ -49,7 +61,6 @@ import {
 import draggable from 'vuedraggable';
 
 import { PButton, PI } from '@spaceone/design-system';
-
 
 import { store } from '@/store';
 

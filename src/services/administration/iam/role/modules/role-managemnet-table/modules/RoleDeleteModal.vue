@@ -8,7 +8,9 @@
                   @confirm="handleDelete"
     >
         <template #delete-modal-body>
-            <div v-if="!isDeletable" class="mb-4">
+            <div v-if="!isDeletable"
+                 class="mb-4"
+            >
                 {{ $t('IAM.ROLE.MODAL.DELETE_HELP_TEXT') }}
             </div>
             <p-data-table v-if="isDeletable"
@@ -19,7 +21,10 @@
                           :table-custom-style="{ maxHeight: 'calc(100vh - 17.5rem)' }"
             >
                 <template #col-role_type-format="{ value }">
-                    <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
+                    <p-badge v-if="value"
+                             :outline="true"
+                             :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType"
+                    >
                         {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
                     </p-badge>
                 </template>
@@ -37,7 +42,10 @@
                     {{ value ? value : '--' }}
                 </template>
                 <template #col-roleType-format="{ value }">
-                    <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
+                    <p-badge v-if="value"
+                             :outline="true"
+                             :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType"
+                    >
                         {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
                     </p-badge>
                 </template>
@@ -45,7 +53,10 @@
                     {{ users[value.resource_id] ? users[value.resource_id].label : '--' }}
                 </template>
                 <template #col-project-format="{ value }">
-                    <p-anchor v-if="value" :highlight="true" :href="getProjectLink(value)">
+                    <p-anchor v-if="value"
+                              :highlight="true"
+                              :href="getProjectLink(value)"
+                    >
                         {{ projectFieldHandler(value, projects) }}
                     </p-anchor>
                 </template>
@@ -83,7 +94,6 @@ import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/confi
 import type { RoleBindingType } from '@/services/administration/iam/role/modules/role-managemnet-table/modules/type';
 import type { RoleData } from '@/services/administration/iam/role/type';
 import type { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
-
 
 interface UnDeletableRole {
     roleName: string;
@@ -174,18 +184,14 @@ export default {
             const projectId = value?.project_info?.project_id;
             let link;
             if (projectId) {
-                link = SpaceRouter.router.resolve(referenceRouter(
-                    projectId, {
-                        resource_type: 'identity.Project',
-                    },
-                ));
+                link = SpaceRouter.router.resolve(referenceRouter(projectId, {
+                    resource_type: 'identity.Project',
+                }));
             } else {
                 const projectGroupId = value?.project_group_info?.project_group_id;
-                link = SpaceRouter.router.resolve(referenceRouter(
-                    projectGroupId, {
-                        resource_type: 'identity.ProjectGroup',
-                    },
-                ));
+                link = SpaceRouter.router.resolve(referenceRouter(projectGroupId, {
+                    resource_type: 'identity.ProjectGroup',
+                }));
             }
             return link.href;
         };

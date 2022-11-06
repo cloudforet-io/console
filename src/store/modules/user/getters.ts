@@ -47,7 +47,7 @@ export const isNoRoleUser = (state: UserState): boolean => !state.roles?.length;
 
 export const hasDomainRole = (state: UserState): boolean => {
     if (state.roles) {
-        return state.roles.some(role => role.roleType === 'DOMAIN');
+        return state.roles.some((role) => role.roleType === 'DOMAIN');
     }
 
     return false;
@@ -55,7 +55,7 @@ export const hasDomainRole = (state: UserState): boolean => {
 
 export const hasSystemRole = (state: UserState): boolean => {
     if (state.roles) {
-        return state.roles.some(role => role.roleType === 'SYSTEM');
+        return state.roles.some((role) => role.roleType === 'SYSTEM');
     }
 
     return false;
@@ -67,7 +67,7 @@ export const pagePermissionList: Getter<UserState, any> = (state, getters): Page
     if (getters.isDomainOwner) {
         return getDefaultPagePermissionList(true);
     }
-    const roleBasePagePermissions = state.roles?.flatMap(role => role.pagePermissions) ?? [];
+    const roleBasePagePermissions = state.roles?.flatMap((role) => role.pagePermissions) ?? [];
     const pagePermissionMap = getPagePermissionMapFromRaw(roleBasePagePermissions);
     // merge role based page permissions and default page permissions
     let roleType: RoleType|undefined;

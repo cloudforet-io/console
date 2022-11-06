@@ -8,19 +8,36 @@ module.exports = {
     extends: [
         'plugin:@typescript-eslint/recommended',
         'plugin:vue/recommended',
-        '@vue/airbnb',
-        '@vue/typescript',
+        'plugin:vue/base',
         'plugin:import/recommended',
         'plugin:import/typescript',
+        'airbnb',
     ],
 
     rules: {
+        // vue
         'vue/component-name-in-template-casing': ['error', 'kebab-case'],
         'vue/valid-v-slot': ['error', { allowModifiers: true }],
+        'vue/html-indent': ['error', 4],
+        'vue/first-attribute-linebreak': ['off'],
+        'vue/max-attributes-per-line': 1,
+        'vue/no-v-html': 0,
+        'vue/no-mutating-props': 1,
+        'vue/multi-word-component-names': 0,
+
+        // js
         'max-len': ['error', { code: 200 }],
         'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-        'vue/html-indent': ['error', 4],
+        'no-unsafe-optional-chaining': 1,
+        'no-undef': 1,
+        'no-useless-catch': 1,
+        'no-unused-vars': 1,
+        'no-mixed-operators': 0,
+        'no-promise-executor-return': 1,
+        'prefer-regex-literals': 1,
+        'prefer-const': 1,
+
         indent: ['error', 4],
         'prefer-destructuring': ['error', { object: false, array: false }],
         radix: ['error', 'as-needed'],
@@ -37,16 +54,6 @@ module.exports = {
             },
         ],
         camelcase: 'off',
-        'vue/max-attributes-per-line': [
-            'error',
-            {
-                singleline: 3,
-                multiline: {
-                    max: 3,
-                    allowFirstLine: true,
-                },
-            },
-        ],
         'no-this-before-super': ['off'],
         'no-useless-constructor': ['off'],
         'no-empty-function': ['error', { allow: ['constructors', 'arrowFunctions'] }],
@@ -86,7 +93,6 @@ module.exports = {
         ],
         '@typescript-eslint/camelcase': ['off'],
         '@typescript-eslint/naming-convention': [
-            // FIXME:: turn on naming-convention
             'off',
             {
                 selector: 'variable',
@@ -124,6 +130,11 @@ module.exports = {
 
         semi: 'off',
         '@typescript-eslint/semi': ['error'],
+
+        // core-lib as a package
+        'default-param-last': ['off'],
+        'no-redeclare': ['off'],
+        'max-classes-per-file': ['off'],
 
         // eslint-plugin-import rules
         'import/order': [
@@ -198,10 +209,11 @@ module.exports = {
         'import/namespace': [0, { allowComputed: true }],
     },
     ignorePatterns: ['src/assets/**', '**/node_modules/**', 'packages/cloudforet/language-pack/**', 'public/lottie.js'],
+    parser: 'vue-eslint-parser',
     parserOptions: {
         parser: '@typescript-eslint/parser',
         sourceType: 'module',
-        ecmaVersion: 2018,
+        ecmaVersion: 'latest',
     },
 
     settings: {

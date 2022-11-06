@@ -5,7 +5,8 @@
             <p-divider :vertical="true" />
             <div class="period-box">
                 <span class="label">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
-                <p-select-status v-for="(status, idx) in periodList" :key="idx"
+                <p-select-status v-for="(status, idx) in periodList"
+                                 :key="idx"
                                  :selected="selectedPeriod"
                                  :value="status.name"
                                  :multi-selectable="false"
@@ -83,7 +84,6 @@ import BudgetToolboxUsageRange
 import type { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/cost-explorer/budget/type';
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 import type { Period } from '@/services/cost-explorer/type';
-
 
 export interface Pagination {
     pageStart: number;

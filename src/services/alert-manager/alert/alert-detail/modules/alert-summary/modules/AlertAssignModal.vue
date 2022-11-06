@@ -55,7 +55,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { alertManagerStore } from '@/services/alert-manager/store';
 import type { ProjectMember } from '@/services/alert-manager/type';
 
-
 export default {
     name: 'AlertAssignModal',
     components: {
@@ -128,7 +127,7 @@ export default {
                     include_parent_member: true,
                 });
                 const filteredResult = uniqBy(results, 'resource_id') as unknown as ProjectMember[];
-                state.items = filteredResult.map<ProjectMember>(d => ({
+                state.items = filteredResult.map<ProjectMember>((d) => ({
                     ...d,
                     user_id: d.resource_id,
                 }));

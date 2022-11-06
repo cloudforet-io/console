@@ -49,21 +49,21 @@ const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, 
             /* when first item is array */
             if (Array.isArray(d[0])) {
                 const next = uniq(flatten(d));
-                return getHandlerResp(next, next.map(t => ({ label: t, name: t })), d.length, 'object');
+                return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), d.length, 'object');
             }
             /* when first item is object */
-            const next = uniq(flatMap(d, (t => Object.keys(t))));
-            return getHandlerResp(next, next.map(t => ({ label: t, name: t })), d.length, 'object');
+            const next = uniq(flatMap(d, ((t) => Object.keys(t))));
+            return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), d.length, 'object');
         }
 
         /* when first item is primitive type */
-        return getHandlerResp(d, d.map(t => ({ label: t, name: t })), d.length, 'object');
+        return getHandlerResp(d, d.map((t) => ({ label: t, name: t })), d.length, 'object');
     }
 
     /* object case */
     const keys = Object.keys(d);
     return {
-        results: keys.map(k => ({ label: k, name: k })),
+        results: keys.map((k) => ({ label: k, name: k })),
         totalCount: keys.length,
         dataType: dataType || 'object',
     };
@@ -102,7 +102,7 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
         try {
             const res = await SpaceConnector.client.addOns.autocomplete.distinct(param);
 
-            if (keyItem.dataType === 'object') return getHandlerResp(res.results[0]?.key, res.results.map(d => ({ label: d.name, name: d.key })), res.total_count);
+            if (keyItem.dataType === 'object') return getHandlerResp(res.results[0]?.key, res.results.map((d) => ({ label: d.name, name: d.key })), res.total_count);
 
             return {
                 results: res.results.reduce((results, d) => {

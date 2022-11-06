@@ -2,7 +2,8 @@
     <div class="alert-table-bottom-filters">
         <div class="filter filter-state">
             <span class="filter-label">{{ $t('MONITORING.ALERT.ALERT_LIST.STATE') }}</span>
-            <p-select-status v-for="(status, idx) in statusList" :key="idx"
+            <p-select-status v-for="(status, idx) in statusList"
+                             :key="idx"
                              v-model="selectedAlertState"
                              :value="status.name"
             >
@@ -11,7 +12,8 @@
         </div>
         <div class="filter filter-urgency">
             <span class="filter-label">{{ $t('MONITORING.ALERT.ALERT_LIST.URGENCY') }}</span>
-            <p-select-status v-for="(urgencyItem, idx) in urgencyList" :key="idx"
+            <p-select-status v-for="(urgencyItem, idx) in urgencyList"
+                             :key="idx"
                              v-model="selectedUrgency"
                              :value="urgencyItem.name"
                              class="mr-2"
@@ -47,7 +49,6 @@ import {
 } from 'vue';
 
 import { PCheckBox, PSelectButton, PSelectStatus } from '@spaceone/design-system';
-
 
 import { i18n } from '@/translations';
 
@@ -102,11 +103,9 @@ export default {
             ]),
         });
 
-
         const onSelectAssignedCheckbox = (value) => {
             state.selectedAssigned = value || ASSIGNED_STATE.ALL;
         };
-
 
         watch([() => props.alertState, () => props.urgency, () => props.assigned], () => {
             state.selectedAlertState = props.alertState;
@@ -121,7 +120,6 @@ export default {
                 assigned: state.selectedAssigned,
             } as AlertBottomFilters);
         });
-
 
         return {
             ...toRefs(state),

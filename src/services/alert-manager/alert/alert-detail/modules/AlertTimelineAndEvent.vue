@@ -1,5 +1,6 @@
 <template>
-    <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"
+    <p-tab :tabs="tabState.tabs"
+           :active-tab.sync="tabState.activeTab"
            class="alert-detail-timeline"
     >
         <template #pushed-event>
@@ -7,7 +8,9 @@
             <alert-pushed-event :id="id" />
         </template>
         <template #details>
-            <alert-details :id="id" :alert-data="alertData" />
+            <alert-details :id="id"
+                           :alert-data="alertData"
+            />
         </template>
     </p-tab>
 </template>
@@ -57,6 +60,5 @@ export default {
         };
     },
 };
-
 
 </script>

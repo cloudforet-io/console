@@ -11,22 +11,21 @@ import type {
     Period, Granularity, CostFiltersMap,
 } from '@/services/cost-explorer/type';
 
-
 export const getConvertedFilter = (filters: CostFiltersMap): QueryStoreFilter[] => {
     const results: QueryStoreFilter[] = [];
     Object.entries(filters).forEach(([category, filterItems]) => {
-        const keys = [...new Set(filterItems.map(d => d.k))];
+        const keys = [...new Set(filterItems.map((d) => d.k))];
         if (keys[0] === category) { // ex. provider
             results.push({
                 k: category,
-                v: filterItems.map(d => d.v),
+                v: filterItems.map((d) => d.v),
                 o: '=',
             });
         } else { // ex. tags.Name
             keys.forEach((key) => {
                 results.push({
                     k: key,
-                    v: filterItems.filter(d => d.k === key).map(d => d.v),
+                    v: filterItems.filter((d) => d.k === key).map((d) => d.v),
                     o: '=',
                 });
             });
@@ -42,7 +41,7 @@ export const getConvertedBudgetFilter = (filters: CostFiltersMap): QueryStoreFil
         if ((category === FILTER.PROJECT || category === FILTER.PROJECT_GROUP)) {
             results.push({
                 k: category,
-                v: filterItems.map(d => d.v),
+                v: filterItems.map((d) => d.v),
                 o: '=',
             });
         } else {
@@ -133,7 +132,6 @@ export const getDataTableCostFields = (granularity: Granularity, period: Period,
     return costFields.concat(dateFields);
 };
 
-
 // TODO: will be deprecated someday
 interface OldType {
     [key: string]: string[];
@@ -142,7 +140,7 @@ export const convertFiltersInToNewType = (filters: OldType | CostFiltersMap): Co
     const _filters: OldType | CostFiltersMap = cloneDeep(filters);
     Object.entries(_filters).forEach(([category, values]) => {
         if (values?.length && typeof values[0] === 'string') {
-            _filters[category] = values.map(d => ({
+            _filters[category] = values.map((d) => ({
                 k: category, v: d as string, o: '=',
             }));
         }

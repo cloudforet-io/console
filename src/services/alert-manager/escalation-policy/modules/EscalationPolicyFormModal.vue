@@ -45,7 +45,6 @@ import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/mod
 import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
 import type { EscalationPolicyFormModel } from '@/services/alert-manager/type';
 
-
 export default {
     name: 'EscalationPolicyFormModal',
     components: {

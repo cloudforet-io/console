@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel='shortcut icon' type='image/x-icon' href="<%= BASE_URL %>favicon.ico">
-<link rel='manifest' type='image/x-icon' href="<%= BASE_URL %>manifest.json">
-<link rel="apple-touch-icon" href="<%= BASE_URL %>images/icons/icon-192x192.png">
+<link rel='shortcut icon' type='image/x-icon' href="/favicon.ico">
+<link rel='manifest' type='image/x-icon' href="/manifest.json">
+<link rel="apple-touch-icon" href="/images/icons/icon-192x192.png">
 <link rel="stylesheet" type="text/css"  href="/reset.css">
-<script src="check-ie.js"></script>
+<script src="/check-ie.js"></script>
 <link rel="stylesheet" type="text/css"  href="/site-loader.css">
-<script src="lottie.js"></script>
-<link rel="preload" href="<%= BASE_URL %>fonts/roboto/roboto-v27-latin-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<script src="/lottie.js"></script>
+<link rel="preload" href="/fonts/roboto/roboto-v27-latin-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 <title></title>
 </head>
 
@@ -20,13 +20,14 @@
 <noscript>
   <strong>We're sorry but this app doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
 </noscript>
-<script src="page-initializer.js"></script>
+<script src="/page-initializer.js"></script>
 
 <div id="site-loader-wrapper">
     <div id="site-loader"></div>
 </div>
-<script src="site-loader.js"></script>
+<script src="/site-loader.js"></script>
 
-<div id="app" />
+<div id="app"></div>
+<script type="module" src="/src/main.ts"></script>
 </body>
 </html>

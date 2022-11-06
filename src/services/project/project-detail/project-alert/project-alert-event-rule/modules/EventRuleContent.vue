@@ -2,7 +2,10 @@
     <div class="event-rule-content">
         <section class="left-section">
             <h4><b>{{ conditions[data.conditions_policy] }}</b> {{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</h4>
-            <ul v-for="(condition, idx) in data.conditions" :key="`${condition}-${idx}`" class="condition-list">
+            <ul v-for="(condition, idx) in data.conditions"
+                :key="`${condition}-${idx}`"
+                class="condition-list"
+            >
                 <li>
                     <span class="text-blue-900 capitalize">{{ condition.key }}</span>
                     {{ condition.operator }}
@@ -40,7 +43,8 @@
                                 </p-anchor>
                             </td>
                             <td v-else-if="item.name === 'add_project_dependency'">
-                                <p v-for="(projectId, idx) in items[item.name]" :key="`${projectId}-${idx}`"
+                                <p v-for="(projectId, idx) in items[item.name]"
+                                   :key="`${projectId}-${idx}`"
                                    class="project-name"
                                 >
                                     <p-anchor :to="referenceRouter(
@@ -52,16 +56,23 @@
                                 </p>
                             </td>
                             <td v-else-if="item.name === 'add_responder'">
-                                <p v-for="(user, idx) in items[item.name]" :key="`${user}-${idx}`" class="user-name">
+                                <p v-for="(user, idx) in items[item.name]"
+                                   :key="`${user}-${idx}`"
+                                   class="user-name"
+                                >
                                     {{ user.resource_id }}
                                 </p>
                             </td>
                             <td v-else-if="item.name === 'add_additional_info'">
-                                <p v-for="(info, infoIdx) in Object.entries(items[item.name])" :key="`${info}-${infoIdx}`">
+                                <p v-for="(info, infoIdx) in Object.entries(items[item.name])"
+                                   :key="`${info}-${infoIdx}`"
+                                >
                                     <span class="font-bold">{{ info[0] }}</span>: {{ info[1] }}
                                 </p>
                             </td>
-                            <td v-else-if="item.name === 'stop_processing'" class="stop-processing">
+                            <td v-else-if="item.name === 'stop_processing'"
+                                class="stop-processing"
+                            >
                                 <span v-if="items[item.name]" />
                             </td>
                             <td v-else>
@@ -81,7 +92,6 @@ import {
 } from 'vue';
 
 import { PAnchor } from '@spaceone/design-system';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

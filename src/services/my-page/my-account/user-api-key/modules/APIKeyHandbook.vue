@@ -7,7 +7,9 @@
             <p class="desc">
                 <i18n path="IDENTITY.USER.HANDBOOK.DESC_1">
                     <template #document>
-                        <p-anchor :href="githubLink" class="link">
+                        <p-anchor :href="githubLink"
+                                  class="link"
+                        >
                             {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
                         </p-anchor>
                     </template>
@@ -33,7 +35,9 @@
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-2') }}
             </p>
-            <pre lang="commandline" class="code-block">
+            <pre lang="commandline"
+                 class="code-block"
+            >
                 <code>
                     {{ codeBlock.installCode }}
                 </code>
@@ -44,7 +48,9 @@
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-3') }}
             </p>
-            <pre lang="commandline" class="code-block">
+            <pre lang="commandline"
+                 class="code-block"
+            >
                 <code>
                     {{ codeBlock.configCode }}
                 </code>
@@ -57,7 +63,9 @@
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_3-1') }}
             </p>
-            <pre lang="commandline" class="code-block">
+            <pre lang="commandline"
+                 class="code-block"
+            >
                 <code>
                     {{ codeBlock.startCode }}
                 </code>
@@ -65,7 +73,9 @@
             <p class="desc">
                 {{ $t('IDENTITY.USER.HANDBOOK.DESC_3-2') }}
             </p>
-            <pre lang="commandline" class="code-block">
+            <pre lang="commandline"
+                 class="code-block"
+            >
                 <code>
                     {{ codeBlock.helpCode }}
                 </code>
@@ -73,7 +83,9 @@
             <p class="desc last">
                 <i18n path="IDENTITY.USER.HANDBOOK.DESC_3-3">
                     <template #document>
-                        <p-anchor :href="githubLink" class="link">
+                        <p-anchor :href="githubLink"
+                                  class="link"
+                        >
                             {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
                         </p-anchor>
                     </template>
@@ -95,7 +107,6 @@ const codeBlock = {
     startCode: 'spacectl api-resources',
     helpCode: 'spacectl --help',
 };
-
 
 export default {
     name: 'UserAPIKeyHandbook',

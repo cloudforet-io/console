@@ -7,15 +7,28 @@
         </template>
         <div class="contents-wrapper">
             <div class="col-span-12 lg:col-span-9 chart-wrapper">
-                <p-data-loader :loading="loading" loader-type="skeleton" disable-empty-case
+                <p-data-loader :loading="loading"
+                               loader-type="skeleton"
+                               disable-empty-case
                                class="col-span-12 lg:col-span-9 chart-wrapper"
                 >
-                    <div id="chartRef" ref="chartRef" class="chart w-full h-full" />
+                    <div id="chartRef"
+                         ref="chartRef"
+                         class="chart w-full h-full"
+                    />
                 </p-data-loader>
-                <div v-if="!chartState.legendsLoading" class="circle-wrapper">
-                    <div v-for="(item) in chartState.providerLegends" :key="item.name">
-                        <div class="cursor-pointer" @click="handleClickLegends(item.provider)">
-                            <p class="circle" :style="{background: chartState.providerFilter.includes(item.provider) ? item.color : 'gray'}" />
+                <div v-if="!chartState.legendsLoading"
+                     class="circle-wrapper"
+                >
+                    <div v-for="(item) in chartState.providerLegends"
+                         :key="item.name"
+                    >
+                        <div class="cursor-pointer"
+                             @click="handleClickLegends(item.provider)"
+                        >
+                            <p class="circle"
+                               :style="{background: chartState.providerFilter.includes(item.provider) ? item.color : 'gray'}"
+                            />
                             <span>{{ item.name }}</span>
                         </div>
                     </div>
@@ -36,7 +49,9 @@
                     <div class="grid-cols-1 sm:grid-cols-2 lg:grid-cols-1
                                         progress-bar-wrapper"
                     >
-                        <router-link v-for="(item, index) in resourceDataByRegion" :key="index" class="progress-bar-link"
+                        <router-link v-for="(item, index) in resourceDataByRegion"
+                                     :key="index"
+                                     class="progress-bar-link"
                                      :to="goToCloudService(item)"
                         >
                             <div class="progress-bar-label">
@@ -51,8 +66,12 @@
                         </router-link>
                     </div>
                 </template>
-                <div v-if="resourceDataByRegion.length === 0 || data.length === 0" class="no-data-wrapper">
-                    <img src="@/assets/images/illust_microscope.svg" class="no-data-img">
+                <div v-if="resourceDataByRegion.length === 0 || data.length === 0"
+                     class="no-data-wrapper"
+                >
+                    <img src="@/assets/images/illust_microscope.svg"
+                         class="no-data-img"
+                    >
                     <p class="no-data-text">
                         {{ $t('COMMON.WIDGETS.RESOURCE_MAP.NO_REGION') }}
                     </p>
@@ -91,7 +110,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { coral, gray } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 interface CloudService {
     cloud_service_group: string;
@@ -159,10 +177,12 @@ export default {
             legendsLoading: true,
         });
 
-
         const animateBullet = (circle) => {
-            const animation = circle.animate([{ property: 'scale', from: 1, to: 5 }, { property: 'opacity', from: 1, to: 0 }],
-                1000, am4core.ease.circleOut);
+            const animation = circle.animate(
+                [{ property: 'scale', from: 1, to: 5 }, { property: 'opacity', from: 1, to: 0 }],
+                1000,
+                am4core.ease.circleOut,
+            );
             animation.events.on('animationended', (event) => {
                 animateBullet(event.target.object);
             });
@@ -174,7 +194,7 @@ export default {
                 const { results } = await SpaceConnector.client.statistics.topic.resourceByRegion({
                     providers: chartState.providerFilter,
                 });
-                state.data = results.map(d => ({
+                state.data = results.map((d) => ({
                     ...d,
                     title: state.regions[d.region_code]?.name || d.region_code,
                     longitude: parseFloat(state.regions[d.region_code]?.longitude ?? 0),
@@ -302,7 +322,7 @@ export default {
             } else if (!chartState.providerFilter.includes(provider)) {
                 chartState.providerFilter.push(provider);
             } else {
-                chartState.providerFilter = chartState.providerFilter.filter(item => item !== provider);
+                chartState.providerFilter = chartState.providerFilter.filter((item) => item !== provider);
             }
             await getResourceByRegionData();
         };
@@ -310,13 +330,13 @@ export default {
         const initLegends = () => {
             chartState.legendsLoading = true;
             chartState.providerLegends = state.data
-                .map(d => ({
+                .map((d) => ({
                     name: state.providers[d.provider]?.label,
                     color: state.providers[d.provider]?.color as string,
                     provider: d.provider,
                 }))
-                .filter((data, index, arr) => arr.findIndex(item => item.name === data.name) === index);
-            chartState.providerFilter = chartState.providerLegends.map(d => d.provider);
+                .filter((data, index, arr) => arr.findIndex((item) => item.name === data.name) === index);
+            chartState.providerFilter = chartState.providerLegends.map((d) => d.provider);
             chartState.legendsLoading = false;
         };
 

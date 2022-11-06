@@ -36,7 +36,9 @@
                 </div>
             </template>
             <template #col-policy_type-format="{ value }">
-                <p-badge outline :style-type="policyTypeBadgeColorFormatter(value)">
+                <p-badge outline
+                         :style-type="policyTypeBadgeColorFormatter(value)"
+                >
                     {{ capitalize(value ? value : POLICY_TYPES.MANAGED) }}
                 </p-badge>
             </template>
@@ -100,7 +102,6 @@ import type { Policy } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { administrationStore } from '@/services/administration/store';
 
-
 const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], selectedType: PolicyTypes): PolicyDataModel[] => {
     // 1. filter by type
     const _typeFilteredItems = filter(policyList, selectedType === POLICY_TYPES.ALL ? {} : { policy_type: selectedType });
@@ -109,7 +110,7 @@ const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], 
     let results = [..._typeFilteredItems];
     queryTags.forEach((queryTag: any) => {
         const regex = RegExp(queryTag.value.name, 'i');
-        results = filter(results, item => regex.test(item[queryTag.key?.name]));
+        results = filter(results, (item) => regex.test(item[queryTag.key?.name]));
     });
     return results;
 };

@@ -22,7 +22,6 @@ import {
 
 import dayjs from 'dayjs';
 
-
 import { CURRENCY } from '@/store/modules/display/config';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -35,7 +34,6 @@ import CostDashboardCardWidgetLayout
 import CostDashboardStackedColumnWidget
     from '@/services/cost-explorer/widgets/modules/CostDashboardStackedColumnWidget.vue';
 import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
-
 
 export default defineComponent<WidgetProps>({
     name: 'CostTrendStackedColumnA',

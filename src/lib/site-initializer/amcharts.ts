@@ -3,7 +3,6 @@ import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 
 import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
-
 const addAmchartsLicense = (licenses?: any[]) => {
     if (Array.isArray(licenses)) {
         licenses.forEach((license) => {
@@ -14,7 +13,7 @@ const addAmchartsLicense = (licenses?: any[]) => {
 
 const customColorTheme = (target) => {
     if (target instanceof am4core.ColorSet) {
-        target.list = Array(5).fill(DEFAULT_CHART_COLORS.map(d => am4core.color(d))).flat();
+        target.list = Array(5).fill(DEFAULT_CHART_COLORS.map((d) => am4core.color(d))).flat();
     }
 };
 

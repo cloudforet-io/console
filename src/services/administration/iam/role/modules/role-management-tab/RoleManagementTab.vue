@@ -1,13 +1,15 @@
 <template>
     <section>
-        <p-tab v-if="selectedIndex.length === 1" :tabs="singleItemTabState.tabs"
+        <p-tab v-if="selectedIndex.length === 1"
+               :tabs="singleItemTabState.tabs"
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
                 <role-detail :role-id="selectedRoleId" />
             </template>
         </p-tab>
-        <p-tab v-else-if="selectedIndex.length > 1" :tabs="multiItemTabState.tabs"
+        <p-tab v-else-if="selectedIndex.length > 1"
+               :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
@@ -22,7 +24,10 @@
                         <span />
                     </template>
                     <template #col-role_type-format="{ value }">
-                        <p-badge v-if="value" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType">
+                        <p-badge v-if="value"
+                                 :outline="true"
+                                 :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType"
+                        >
                             {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
                         </p-badge>
                     </template>
@@ -34,15 +39,19 @@
                                   style-type="tertiary"
                                   @click="handleEditRole(item.role_id)"
                         >
-                            <p-i class="mr-1" name="ic_edit"
-                                 width="1rem" height="1rem"
+                            <p-i class="mr-1"
+                                 name="ic_edit"
+                                 width="1rem"
+                                 height="1rem"
                             />Edit
                         </p-button>
                     </template>
                 </p-data-table>
             </template>
         </p-tab>
-        <div v-else id="empty-space">
+        <div v-else
+             id="empty-space"
+        >
             <p-empty>{{ $t('IDENTITY.USER.MAIN.NO_SELECTED') }}</p-empty>
         </div>
     </section>

@@ -12,13 +12,11 @@ import {
 } from '@/store/modules/display/config';
 import type { CurrencyRates, DisplayState } from '@/store/modules/display/type';
 
-
 import {
     hideLoadingMessage, showLoadingMessage, showSuccessMessage,
 } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 export const showHandbook = ({ commit }): void => {
     commit('setVisibleSidebar', true);
@@ -73,7 +71,6 @@ export const showSignInErrorMessage = ({ commit }): void => {
 export const hideSignInErrorMessage = ({ commit }): void => {
     commit('setIsSignInFailed', false);
 };
-
 
 const fixedCheckNotificationFilter: QueryStoreFilter = { k: 'is_read', v: false, o: '=' };
 const checkNotificationQueryHelper = new ApiQueryHelper().setCountOnly();

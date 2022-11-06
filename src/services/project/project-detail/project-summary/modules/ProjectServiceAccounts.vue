@@ -1,5 +1,7 @@
 <template>
-    <widget-layout :title="$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.TITLE')" class="service-accounts-table">
+    <widget-layout :title="$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.TITLE')"
+                   class="service-accounts-table"
+    >
         <p-data-table :fields="fields"
                       :sortable="false"
                       :selectable="false"
@@ -8,27 +10,38 @@
                       :items="items"
         >
             <template #col-provider-format="{ value }">
-                <router-link :to="value.to" class="link-text" :style="{color: value.color}">
+                <router-link :to="value.to"
+                             class="link-text"
+                             :style="{color: value.color}"
+                >
                     {{ value.label }}
                 </router-link>
             </template>
             <template #col-service_account-format="{ value }">
-                <router-link :to="value.to" class="link-text">
+                <router-link :to="value.to"
+                             class="link-text"
+                >
                     {{ value.label }}
                 </router-link>
             </template>
             <template #col-server-format="{ value }">
-                <router-link :to="value.to" class="link-text">
+                <router-link :to="value.to"
+                             class="link-text"
+                >
                     {{ value.count }}
                 </router-link>
             </template>
             <template #col-database-format="{ value }">
-                <router-link :to="value.to" class="link-text">
+                <router-link :to="value.to"
+                             class="link-text"
+                >
                     {{ value.count }}
                 </router-link>
             </template>
             <template #col-storage-format="{ value }">
-                <router-link :to="value.to" class="link-text">
+                <router-link :to="value.to"
+                             class="link-text"
+                >
                     {{ value.count }}
                 </router-link>
             </template>
@@ -60,7 +73,6 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 export const DATA_TYPE = {
     SERVER: 'SERVER',
@@ -128,7 +140,7 @@ export default {
             };
             return location;
         };
-        const getConvertedData = (rawData): Item[] => rawData.map(item => ({
+        const getConvertedData = (rawData): Item[] => rawData.map((item) => ({
             provider: {
                 label: state.providers[item.provider]?.label,
                 color: state.providers[item.provider]?.color,
@@ -189,7 +201,6 @@ export default {
                 getData();
             }
         }, { immediate: true });
-
 
         return {
             ...toRefs(state),

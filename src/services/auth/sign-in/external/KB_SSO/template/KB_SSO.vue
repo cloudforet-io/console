@@ -1,6 +1,8 @@
 <template>
     <div class="kbSSO-wrapper">
-        <form :action="authOptions.authorization_endpoint" method="post">
+        <form :action="authOptions.authorization_endpoint"
+              method="post"
+        >
             <input
                 id="agentId"
                 type="hidden"
@@ -24,7 +26,6 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import { PButton } from '@spaceone/design-system';
-
 
 export default defineComponent({
     name: 'KBSignIn',

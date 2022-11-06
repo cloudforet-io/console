@@ -2,7 +2,6 @@ import type { AxiosInstance } from 'axios';
 import axios from 'axios';
 import { get } from 'lodash';
 
-
 class Config {
     config: any;
 
@@ -35,7 +34,7 @@ class Config {
             this.createAxiosInstance();
             this.config = {};
             await this.load('/default.json');
-            await this.load(`/${process.env.NODE_ENV}.json`);
+            await this.load(`/${import.meta.env.MODE}.json`);
         }
     }
 

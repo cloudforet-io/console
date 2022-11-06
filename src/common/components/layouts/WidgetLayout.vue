@@ -5,7 +5,9 @@
                 {{ title }}
             </p>
         </slot>
-        <div class="widget-contents" :style="{overflow}">
+        <div class="widget-contents"
+             :style="{overflow}"
+        >
             <slot />
         </div>
     </p-pane-layout>

@@ -38,14 +38,19 @@
             <span v-else-if="field.name === 'totalCost'">
                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
             </span>
-            <span v-else-if="typeof value !== 'string'" class="text-center">
+            <span v-else-if="typeof value !== 'string'"
+                  class="text-center"
+            >
                 <p-anchor :to="value ? getLink(item, field.name) : undefined"
                           :icon-visible="false"
                           class="!align-middle"
                 >
                     <template v-if="getIsRaised(item, field.name)">
                         <span class="cell-text raised">{{ currencyMoneyFormatter(value, currency, currencyRates, true) }}</span>
-                        <p-i name="ic_bold-arrow-up" width="0.75rem" height="0.75rem" />
+                        <p-i name="ic_bold-arrow-up"
+                             width="0.75rem"
+                             height="0.75rem"
+                        />
                     </template>
                     <template v-else>
                         {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
@@ -106,7 +111,6 @@ import {
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { MoreGroupByItem } from '@/services/cost-explorer/type';
 import type { CostAnalyzeModel, UsdCost } from '@/services/cost-explorer/widgets/type';
-
 
 interface PrintModeFieldSet {
     widths?: Table['widths'];
@@ -180,11 +184,11 @@ export default {
                 return field;
             })),
             groupByFields: computed<DataTableFieldType[]>(() => {
-                const groupByItems = state.groupBy.map(d => ({
+                const groupByItems = state.groupBy.map((d) => ({
                     ...GROUP_BY_ITEM_MAP[d],
                     sortable: false,
                 }));
-                const moreGroupByItems = state.moreGroupBy.filter(d => d.selected).map(d => ({
+                const moreGroupByItems = state.moreGroupBy.filter((d) => d.selected).map((d) => ({
                     name: `${d.category}_${d.key}`,
                     label: d.key,
                     sortable: false,
@@ -329,7 +333,7 @@ export default {
                 const query = costApiQueryHelper.data;
                 if (props.printMode) query.page = undefined;
 
-                const moreGroupByKeyList = moreGroupBy.filter(d => d.selected).map(d => `${d.category}.${d.key}`);
+                const moreGroupByKeyList = moreGroupBy.filter((d) => d.selected).map((d) => `${d.category}.${d.key}`);
 
                 const dateFormat = state.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
@@ -418,8 +422,8 @@ export default {
             const items = tableState.items;
             const fieldSets = getPrintModeFieldSets();
             return fieldSets.map(({ widths, fields }) => {
-                const headRows: string[][] = [fields.map(f => f.label as string)];
-                const bodyRows: string[][] = items.map(d => fields.map((f) => {
+                const headRows: string[][] = [fields.map((f) => f.label as string)];
+                const bodyRows: string[][] = items.map((d) => fields.map((f) => {
                     let value = get(d, f.name, '-');
                     if (f.name === 'totalCost') value = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST');
                     else if (state.groupByStoreMap[f.name]) {
@@ -441,13 +445,16 @@ export default {
             });
         };
 
-        watch([
-            () => state.granularity, () => state.groupBy, () => state.moreGroupBy, () => state.period, () => state.filters, () => state.stack],
-        async ([granularity, groupBy, moreGroupBy, period, filters, stack]) => {
-            await listCostAnalysisTableData(granularity, groupBy, moreGroupBy, period, filters, stack);
-            tableState.costFields = getDataTableCostFields(granularity, period, !!tableState.groupByFields.length);
-            if (props.printMode) emit('rendered', getPdfItems());
-        }, { immediate: true, deep: true });
+        watch(
+            [
+                () => state.granularity, () => state.groupBy, () => state.moreGroupBy, () => state.period, () => state.filters, () => state.stack],
+            async ([granularity, groupBy, moreGroupBy, period, filters, stack]) => {
+                await listCostAnalysisTableData(granularity, groupBy, moreGroupBy, period, filters, stack);
+                tableState.costFields = getDataTableCostFields(granularity, period, !!tableState.groupByFields.length);
+                if (props.printMode) emit('rendered', getPdfItems());
+            },
+            { immediate: true, deep: true },
+        );
 
         // LOAD REFERENCE STORE
         (async () => {

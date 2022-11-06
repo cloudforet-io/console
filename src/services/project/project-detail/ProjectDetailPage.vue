@@ -1,9 +1,17 @@
 <template>
     <general-page-layout overflow="scroll">
-        <p-data-loader class="page-inner" :loading="loading" :loader-backdrop-color="BACKGROUND_COLOR">
+        <p-data-loader class="page-inner"
+                       :loading="loading"
+                       :loader-backdrop-color="BACKGROUND_COLOR"
+        >
             <p-breadcrumbs :routes="pageNavigation" />
-            <div v-if="item" class="top-wrapper">
-                <p-page-title :title="item.name" child @goBack="$router.go(-1)">
+            <div v-if="item"
+                 class="top-wrapper"
+            >
+                <p-page-title :title="item.name"
+                              child
+                              @goBack="$router.go(-1)"
+                >
                     <template #title-right-extra>
                         <div class="button-wrapper">
                             <span class="favorite-button-wrapper">
@@ -44,17 +52,22 @@
                 </p-page-title>
             </div>
 
-            <maintenance-happening-list class="maintenance-happening-list" :project-id="projectId" />
+            <maintenance-happening-list class="maintenance-happening-list"
+                                        :project-id="projectId"
+            />
 
             <p-tab v-if="item"
-                   :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
+                   :tabs="singleItemTabState.tabs"
+                   :active-tab.sync="singleItemTabState.activeTab"
                    @change="onChangeTab"
             >
                 <keep-alive>
                     <router-view />
                 </keep-alive>
                 <template #extra="tab">
-                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">
+                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0"
+                             style-type="primary3"
+                    >
                         {{ commaFormatter(counts[ALERT_STATE.TRIGGERED]) }}
                     </p-badge>
                     <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications' || tab.name === 'projectMaintenanceWindow'" />
@@ -85,7 +98,8 @@
                             :project="item"
                             @complete="onProjectFormComplete"
         />
-        <maintenance-window-form-modal :visible.sync="maintenanceWindowFormVisible" :project-id="projectId"
+        <maintenance-window-form-modal :visible.sync="maintenanceWindowFormVisible"
+                                       :project-id="projectId"
                                        @confirm="onCreateMaintenanceWindow"
         />
     </general-page-layout>
@@ -105,11 +119,9 @@ import {
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
-
 import { commaFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -139,7 +151,6 @@ import ProjectDetailStoreModule from '@/services/project/project-detail/store';
 import type { ProjectDetailState } from '@/services/project/project-detail/store/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import type { ProjectModel } from '@/services/project/type';
-
 
 export default {
     name: 'ProjectDetailPage',
@@ -309,7 +320,7 @@ export default {
         }, { immediate: true });
 
         watch(() => vm.$route.name, () => {
-            const exactRoute = vm.$route.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
+            const exactRoute = vm.$route.matched.find((d) => singleItemTabState.tabs.find((tab) => tab.name === d.name));
             singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
         }, { immediate: true });
 
@@ -318,7 +329,6 @@ export default {
                 store.commit('service/projectDetail/setProjectId', after);
             }
         }, { immediate: true });
-
 
         return {
             ...toRefs(state),

@@ -1,11 +1,19 @@
 <template>
     <general-page-layout>
-        <p-breadcrumbs v-if="routeState.routes.length" class="flex-grow" :routes="routeState.routes" />
-        <p-page-title child :title="pageTitle" class="page-title"
+        <p-breadcrumbs v-if="routeState.routes.length"
+                       class="flex-grow"
+                       :routes="routeState.routes"
+        />
+        <p-page-title child
+                      :title="pageTitle"
+                      class="page-title"
                       @goBack="$router.go(-1)"
         />
-        <notification-add-form :project-id="projectId" :protocol-id="protocolId" :protocol-type="protocolType"
-                               :supported-schema="supportedSchema" :user-id="userId"
+        <notification-add-form :project-id="projectId"
+                               :protocol-id="protocolId"
+                               :protocol-type="protocolType"
+                               :supported-schema="supportedSchema"
+                               :user-id="userId"
         />
     </general-page-layout>
 </template>
@@ -47,7 +55,6 @@ export default {
             protocolType: computed(() => vm.$route.query.protocolType),
             supportedSchema: computed(() => vm.$route.query.supported_schema),
         });
-
 
         const routeState = reactive({
             projectRoutes: computed(() => [

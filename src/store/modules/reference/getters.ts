@@ -13,7 +13,6 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 
-
 export const projectItems: Getter<any, any> = (state): ProjectReferenceMap => state.project?.items ?? {};
 
 export const projectGroupItems: Getter<any, any> = (state): ProjectGroupReferenceMap => state.projectGroup?.items ?? {};

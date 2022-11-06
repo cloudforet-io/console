@@ -26,7 +26,6 @@ const uploadFile = async (uploadUrl: string, options: object, file: File) => {
     await axios.post(uploadUrl, formData);
 };
 
-
 export const getDownloadUrl = async (fileId: string): Promise<string> => {
     const result: FileInfo = await SpaceConnector.client.fileManager.file.getDownloadUrl({
         file_id: fileId,
@@ -34,7 +33,6 @@ export const getDownloadUrl = async (fileId: string): Promise<string> => {
     if (!result.download_url) throw new Error('[File Manager] No download url in response of update file state api');
     return result.download_url;
 };
-
 
 export const uploadFileAndGetFileInfo = async (file: File, domainId: string|null): Promise<Attachment> => {
     try {

@@ -40,7 +40,7 @@ const formatterMap: FormatterMap = {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
-    'inventory.Region': data => ({
+    'inventory.Region': (data) => ({
         data: store.getters['reference/regionItems'][data]?.label || data,
     }),
     'inventory.CloudService': (data, reference) => ({
@@ -48,14 +48,12 @@ const formatterMap: FormatterMap = {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
-    'secret.Secret': data => ({
+    'secret.Secret': (data) => ({
         data: store.getters['reference/secretItems'][data]?.label || data,
     }),
 };
 
-export const referenceFieldFormatter = (
-    reference: Reference, data: string,
-): ReturnType<FieldFormatter> => {
+export const referenceFieldFormatter = (reference: Reference, data: string): ReturnType<FieldFormatter> => {
     if (formatterMap[reference.resource_type]) {
         return formatterMap[reference.resource_type](data, reference);
     }

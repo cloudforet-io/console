@@ -27,7 +27,6 @@ const state: DisplayState = {
     visibleMobileGuideModal: false,
 };
 
-
 export default {
     namespaced: true,
     state,

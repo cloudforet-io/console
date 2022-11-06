@@ -5,7 +5,6 @@ import type {
     Period, Granularity, GroupBy, CostFiltersMap, MoreGroupByItem,
 } from '@/services/cost-explorer/type';
 
-
 export type CostAnalysisPageUrlQuery = Partial<Record<CostAnalysisPageUrlQueryKey, RouteQueryString>>;
 
 export interface CostAnalysisPageQueryValue {

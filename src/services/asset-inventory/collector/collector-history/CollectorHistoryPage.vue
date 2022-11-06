@@ -1,6 +1,9 @@
 <template>
     <div class="collector-history-page">
-        <p-page-title :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')" child @goBack="$router.go(-1)" />
+        <p-page-title :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')"
+                      child
+                      @goBack="$router.go(-1)"
+        />
         <p-collector-history-chart @click-date="handleClickDate" />
         <div class="collector-history-table">
             <div class="status-wrapper">
@@ -38,7 +41,9 @@
                 <template #[`col-collector_info.plugin_info-format`]="{ value }">
                     <template v-if="value">
                         <p-lazy-img :src="storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].icon : ''"
-                                    width="1rem" height="1rem" class="mr-2"
+                                    width="1rem"
+                                    height="1rem"
+                                    class="mr-2"
                         />
                         {{ storeState.plugins[value.plugin_id] ? storeState.plugins[value.plugin_id].label : value.plugin_id }}
                     </template>
@@ -62,7 +67,9 @@
                     </div>
                 </template>
             </p-toolbox-table>
-            <div v-if="items.length > 0" class="pagination">
+            <div v-if="items.length > 0"
+                 class="pagination"
+            >
                 <p-pagination :total-count="totalCount"
                               :this-page.sync="thisPage"
                               :page-size.sync="pageSize"
@@ -111,7 +118,6 @@ import {
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 import { capitalize } from 'lodash';
 
-
 import { iso8601Formatter, durationFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import {
@@ -140,7 +146,6 @@ import { peacock, green, red } from '@/styles/colors';
 import { JOB_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
 import PCollectorHistoryChart from '@/services/asset-inventory/collector/collector-history/modules/CollectorHistoryChart.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 const PROGRESS_BAR_COLOR = peacock[500];
 const COMPLETED_ICON_COLOR = green[500];
@@ -273,7 +278,7 @@ export default {
             try {
                 const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
                 state.totalCount = res.total_count;
-                state.items = res.results.map(job => ({
+                state.items = res.results.map((job) => ({
                     ...job,
                     remained_tasks: job.total_tasks > 0 ? numberFormatter(((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100) : 100,
                     created_at: iso8601Formatter(job.created_at, storeState.timezone),

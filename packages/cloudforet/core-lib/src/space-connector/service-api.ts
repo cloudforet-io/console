@@ -15,7 +15,6 @@ export default class ServiceAPI {
 
     tokenApi: TokenAPI;
 
-
     constructor(baseURL: string, tokenApi: TokenAPI) {
         this.instance = axios.create({
             headers: {
@@ -27,7 +26,6 @@ export default class ServiceAPI {
         tokenApi.loadToken();
         this.setAxiosInterceptors();
     }
-
 
     private handleRequestError = async (error: AxiosError): Promise<void> => {
         switch (error.response?.status) {

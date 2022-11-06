@@ -1,38 +1,63 @@
 <template>
     <div class="lnb-menu-list">
-        <div v-for="(item, idx) in processedMenuData" :key="item.id" class="lnb-menu-item">
-            <p v-if="item.type === MENU_ITEM_TYPE.TITLE" class="title-wrapper">
-                <span v-if="item.foldable" class="title foldable" @click="handleToggle">{{ item.label }}</span>
-                <span v-else class="title">{{ item.label }}</span>
-                <slot name="title-right" v-bind="$props" />
+        <div v-for="(item, idx) in processedMenuData"
+             :key="item.id"
+             class="lnb-menu-item"
+        >
+            <p v-if="item.type === MENU_ITEM_TYPE.TITLE"
+               class="title-wrapper"
+            >
+                <span v-if="item.foldable"
+                      class="title foldable"
+                      @click="handleToggle"
+                >{{ item.label }}</span>
+                <span v-else
+                      class="title"
+                >{{ item.label }}</span>
+                <slot name="title-right"
+                      v-bind="$props"
+                />
                 <new-mark v-if="item.isNew" />
                 <beta-mark v-if="item.isBeta" />
-                <span v-if="item.foldable" class="toggle-button" @click="handleToggle">
-                    <p-i width="1rem" height="1rem"
+                <span v-if="item.foldable"
+                      class="toggle-button"
+                      @click="handleToggle"
+                >
+                    <p-i width="1rem"
+                         height="1rem"
                          :name="isFolded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                          color="inherit transparent"
                     />
                 </span>
             </p>
-            <div v-if="item.type === MENU_ITEM_TYPE.DIVIDER && showMenu" class="divider">
+            <div v-if="item.type === MENU_ITEM_TYPE.DIVIDER && showMenu"
+                 class="divider"
+            >
                 <p-divider />
             </div>
             <router-link
-                v-if="item.type === MENU_ITEM_TYPE.ITEM && showMenu" class="menu-item"
+                v-if="item.type === MENU_ITEM_TYPE.ITEM && showMenu"
+                class="menu-item"
                 :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
                 :to="item.to"
                 @click.native="$event.stopImmediatePropagation()"
                 @mouseenter.native="hoveredItem = item.id"
                 @mouseleave.native="hoveredItem = ''"
             >
-                <slot name="before-text" v-bind="{...$props, item, index: idx}" />
+                <slot name="before-text"
+                      v-bind="{...$props, item, index: idx}"
+                />
                 <div class="text-wrapper">
                     <span class="text">{{ item.label }}</span>
-                    <slot name="after-text" v-bind="{...$props, item, index: idx}" />
+                    <slot name="after-text"
+                          v-bind="{...$props, item, index: idx}"
+                    />
                     <new-mark v-if="item.isNew" />
                     <beta-mark v-if="item.isBeta" />
                 </div>
-                <slot name="right-extra" v-bind="{...$props, item, index: idx}" />
+                <slot name="right-extra"
+                      v-bind="{...$props, item, index: idx}"
+                />
                 <favorite-button
                     v-if="!item.hideFavorite && !isDomainOwner"
                     :item-id="item.id"
@@ -100,7 +125,7 @@ export default defineComponent<Props>({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             processedMenuData: computed(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
             isFolded: false,
-            isFoldableMenu: computed(() => state.processedMenuData?.some(item => item.foldable)),
+            isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
             showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
             hoveredItem: '',
         });

@@ -2,7 +2,6 @@ import type { Ref } from 'vue';
 
 import { diff_match_patch as DiffMatchPatch } from 'diff-match-patch';
 
-
 import hljs from './highlight';
 import type { Diffs, Lines, Mode } from './types';
 
@@ -213,8 +212,8 @@ const renderWords = (prev: string, current: string) => {
     const diff = dmp.diff_main(prev, current);
     dmp.diff_cleanupSemantic(diff);
     return diff
-        .filter(result => getDiffType(result[0]) !== 'removed')
-        .map(result => (getDiffType(result[0]) === 'added'
+        .filter((result) => getDiffType(result[0]) !== 'removed')
+        .map((result) => (getDiffType(result[0]) === 'added'
             ? `${MODIFIED_START_TAG}${result[1]}${MODIFIED_CLOSE_TAG}`
             : result[1]))
         .join('');

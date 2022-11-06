@@ -9,7 +9,6 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-
 export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     /* ClOUD SERVICE */
     if (to.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME) {

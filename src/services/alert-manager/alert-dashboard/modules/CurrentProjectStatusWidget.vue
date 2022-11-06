@@ -8,7 +8,9 @@
                 <template #loader>
                     <div ref="loaderRef" />
                 </template>
-                <div ref="chartRef" class="chart" />
+                <div ref="chartRef"
+                     class="chart"
+                />
             </p-data-loader>
             <div class="legend-wrapper">
                 <p class="legend">
@@ -47,7 +49,6 @@ import { PDataLoader } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -55,7 +56,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
     violet, green, red, yellow, white, gray,
 } from '@/styles/colors';
-
 
 enum PROJECT_STATUS {
     issue = 'issue',
@@ -166,7 +166,7 @@ export default {
                 state.loading = true;
                 const { results, total_count } = await SpaceConnector.client.monitoring.dashboard.currentProjectStatus();
                 state.count.total = total_count;
-                state.count.issue = results.filter(d => d.is_issued).length;
+                state.count.issue = results.filter((d) => d.is_issued).length;
                 state.count.healthy = total_count - state.count.issue;
                 // todo: maintenance 향후 추가 예정
             } catch (e) {

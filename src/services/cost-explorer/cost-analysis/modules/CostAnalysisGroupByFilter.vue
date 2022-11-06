@@ -1,5 +1,7 @@
 <template>
-    <div class="cost-analysis-group-by-filter" :class="{ 'print-mode': printMode }">
+    <div class="cost-analysis-group-by-filter"
+         :class="{ 'print-mode': printMode }"
+    >
         <b class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
         <p-select-button v-for="groupByItem in (printMode ? selectedGroupByItems : allGroupByItems)"
                          :key="groupByItem.name"
@@ -29,7 +31,6 @@ import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
 
-
 export default {
     name: 'CostAnalysisGroupByFilter',
     components: {
@@ -50,11 +51,11 @@ export default {
         });
 
         /* util */
-        const predicate = (current, data) => Object.keys(current).every(key => data && current[key] === data[key]);
+        const predicate = (current, data) => Object.keys(current).every((key) => data && current[key] === data[key]);
 
         /* event */
         const handleSelectGroupByItems = async (items: GroupByItem[]) => {
-            const groupBy = items.map(d => d.name);
+            const groupBy = items.map((d) => d.name);
             costExplorerStore.commit('costAnalysis/setGroupBy', groupBy);
         };
 

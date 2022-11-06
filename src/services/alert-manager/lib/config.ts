@@ -39,7 +39,6 @@ export const WEBHOOK_STATE = {
 } as const;
 export type WebhookState = typeof WEBHOOK_STATE[keyof typeof WEBHOOK_STATE];
 
-
 export const ALERT_STATE = {
     TRIGGERED: 'TRIGGERED',
     ACKNOWLEDGED: 'ACKNOWLEDGED',

@@ -1,9 +1,13 @@
 <template>
-    <p-data-loader :loading="loading" class="cost-analysis-stacked-column-chart">
+    <p-data-loader :loading="loading"
+                   class="cost-analysis-stacked-column-chart"
+    >
         <template #loader>
             <p-skeleton height="100%" />
         </template>
-        <div ref="chartRef" class="chart" />
+        <div ref="chartRef"
+             class="chart"
+        />
     </p-data-loader>
 </template>
 
@@ -26,9 +30,7 @@ import { cloneDeep } from 'lodash';
 
 import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 
-
 import { CURRENCY } from '@/store/modules/display/config';
-
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -46,7 +48,6 @@ import {
 import type {
     Legend, XYChartData, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
-
 
 const CATEGORY_KEY = 'date';
 

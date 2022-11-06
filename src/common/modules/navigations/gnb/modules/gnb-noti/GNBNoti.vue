@@ -1,8 +1,11 @@
 <template>
-    <div v-click-outside="hideNotiMenu" class="gnb-notifications-notice" @click.stop
+    <div v-click-outside="hideNotiMenu"
+         class="gnb-notifications-notice"
+         @click.stop
          @keydown.esc="hideNotiMenu"
     >
-        <span class="menu-button" tabindex="0"
+        <span class="menu-button"
+              tabindex="0"
               role="button"
               @click.stop="handleNotiButtonClick"
               @keydown.enter="showNotiMenu"
@@ -18,7 +21,9 @@
                :active-tab.sync="activeTab"
         >
             <template #extra="tab">
-                <p-badge v-if="count[tab.name] !== 0" :style-type="tab.name === activeTab ? 'primary3' : 'gray200'">
+                <p-badge v-if="count[tab.name] !== 0"
+                         :style-type="tab.name === activeTab ? 'primary3' : 'gray200'"
+                >
                     {{ commaFormatter(count[tab.name]) }}
                 </p-badge>
             </template>
@@ -50,7 +55,6 @@ import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/t
 import { commaFormatter } from '@cloudforet/core-lib';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -60,7 +64,6 @@ import GNBNoticeTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modu
 import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationsTab.vue';
 
 import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
-
 
 interface Props {
     visible: boolean

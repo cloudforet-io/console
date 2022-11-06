@@ -1,5 +1,7 @@
 <template>
-    <div v-if="show" v-click-outside="hideMenu" class="gnb-menu"
+    <div v-if="show"
+         v-click-outside="hideMenu"
+         class="gnb-menu"
          :class="{disabled: !hasPermission}"
          @click.stop="handleMenu"
          @keydown.enter="handleMenu"
@@ -15,7 +17,8 @@
                 <p-i v-if="subMenuList.length > 0"
                      class="arrow-button"
                      :name="isOpened ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
-                     width="0.5rem" height="0.5rem"
+                     width="0.5rem"
+                     height="0.5rem"
                      color="inherit transparent"
                 />
             </span>
@@ -50,7 +53,6 @@ import { SpaceRouter } from '@/router';
 import type { DisplayMenu } from '@/store/modules/display/type';
 
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
-
 
 export default defineComponent({
     name: 'GNBMenu',

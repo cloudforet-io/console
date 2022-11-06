@@ -9,7 +9,9 @@
             <div class="policy-create-contents">
                 <p-label>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-label>
                 <br>
-                <p-badge outline style-type="primary1">
+                <p-badge outline
+                         style-type="primary1"
+                >
                     {{ $t('IAM.POLICY.FORM.CUSTOM_POLICY') }}
                 </p-badge>
             </div>
@@ -35,8 +37,12 @@
                 </p-field-group>
             </div>
             <div class="policy-create-contents">
-                <p-field-group :label="$t('IAM.POLICY.FORM.PERMISSION')" required />
-                <p-text-editor :code="policyCode" @update:code="setForm('policyCode', $event)" />
+                <p-field-group :label="$t('IAM.POLICY.FORM.PERMISSION')"
+                               required
+                />
+                <p-text-editor :code="policyCode"
+                               @update:code="setForm('policyCode', $event)"
+                />
             </div>
         </p-pane-layout>
         <div class="policy-modify-buttons">
@@ -59,7 +65,6 @@
 
 <script lang="ts">
 
-
 import {
     reactive, toRefs,
 } from 'vue';
@@ -80,7 +85,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-
 
 export default {
     name: 'PolicyCreatePage',
@@ -116,7 +120,7 @@ export default {
             description: '',
         });
 
-        const permissionsParser = (code: string) => code.split('\n').filter(d => d !== '');
+        const permissionsParser = (code: string) => code.split('\n').filter((d) => d !== '');
 
         const handleCreatePolicy = async () => {
             try {

@@ -14,7 +14,6 @@ export const PAGE_PERMISSION_TYPE = {
     MANAGE: 'MANAGE',
 } as const;
 
-
 export type PagePermissionType = typeof PAGE_PERMISSION_TYPE[keyof typeof PAGE_PERMISSION_TYPE];
 
 // backend data format of page permissions. page includes wildcard('*').

@@ -1,10 +1,14 @@
 <template>
     <div>
-        <p-button-tab v-if="tabs.length > 0" :tabs="tabs" :active-tab="activeTab"
+        <p-button-tab v-if="tabs.length > 0"
+                      :tabs="tabs"
+                      :active-tab="activeTab"
                       keep-alive-all
                       @change="onChangeTab"
         >
-            <template v-for="(layout, i) in layouts" :slot="layout.name">
+            <template v-for="(layout, i) in layouts"
+                      :slot="layout.name"
+            >
                 <div :key="`${layout.name}-${i}`">
                     <p-dynamic-layout :type="layout.type"
                                       :options="layoutOptions"
@@ -55,7 +59,6 @@ import {
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
-
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -111,7 +114,7 @@ export default {
             // button tab
             tabs: computed<TabItem[]>(() => {
                 const local = vm.$i18n.locale;
-                return state.layouts.map(d => ({
+                return state.layouts.map((d) => ({
                     label: vm.$t(d.options?.translation_id, local) || d.name,
                     name: d.name,
                 }));
@@ -195,7 +198,6 @@ export default {
             return params;
         };
 
-
         const getData = async () => {
             state.data = dataMap[state.fetchOptionKey];
             try {
@@ -212,7 +214,6 @@ export default {
             }
             dataMap[state.fetchOptionKey] = state.data;
         };
-
 
         const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
             fetch(options) {

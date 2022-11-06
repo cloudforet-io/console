@@ -5,7 +5,9 @@
                       @goBack="$router.go(-1)"
         >
             <template #extra>
-                <div v-if="hasPermissionToEditOrDelete" class="button-group">
+                <div v-if="hasPermissionToEditOrDelete"
+                     class="button-group"
+                >
                     <p-button style-type="tertiary"
                               icon-left="ic_edit"
                               @click="handleClickEditButton"
@@ -16,30 +18,49 @@
                     <!--                    <p-button :outline="true" style-type="gray-border" icon="ic_send">-->
                     <!--                        {{ $t('Send Email') }}-->
                     <!--                    </p-button>-->
-                    <p-button style-type="negative-secondary" @click="handleDeleteModalOpen">
+                    <p-button style-type="negative-secondary"
+                              @click="handleDeleteModalOpen"
+                    >
                         {{ $t('INFO.NOTICE.FORM.DELETE') }}
                     </p-button>
                 </div>
             </template>
         </p-page-title>
         <p-pane-layout class="notice-detail-page-layout">
-            <p-data-loader :loading="loading" :data="noticePostData">
+            <p-data-loader :loading="loading"
+                           :data="noticePostData"
+            >
                 <div class="post-title">
-                    <p-badge outline :style-type="noticeTypeBadgeInfo.style">
+                    <p-badge outline
+                             :style-type="noticeTypeBadgeInfo.style"
+                    >
                         {{ noticeTypeBadgeInfo.label }}
                     </p-badge>
                     <span>{{ iso8601Formatter(noticePostData.created_at, timezone) }}
-                    </span><p-i width="0.125rem" name="ic_divider-dot" />
+                    </span><p-i width="0.125rem"
+                                name="ic_divider-dot"
+                    />
                     <span> {{ noticePostData.writer }}</span>
-                    <p-i v-if="hasDomainRoleUser || hasSystemRoleUser" width="0.125rem" name="ic_divider-dot" />
-                    <span v-if="hasDomainRoleUser || hasSystemRoleUser" class="view-count">
-                        <p-i name="ic_view" width="1.125rem" /> {{ noticePostData.view_count }}
+                    <p-i v-if="hasDomainRoleUser || hasSystemRoleUser"
+                         width="0.125rem"
+                         name="ic_divider-dot"
+                    />
+                    <span v-if="hasDomainRoleUser || hasSystemRoleUser"
+                          class="view-count"
+                    >
+                        <p-i name="ic_view"
+                             width="1.125rem"
+                        /> {{ noticePostData.view_count }}
                     </span>
-                    <span v-if="hasSystemRoleUser" class="view-count">| {{ postDomainName }}</span>
+                    <span v-if="hasSystemRoleUser"
+                          class="view-count"
+                    >| {{ postDomainName }}</span>
                 </div>
                 <p-divider />
                 <div class="text-editor-wrapper">
-                    <text-editor-viewer :contents="noticePostData.contents" :attachments="attachments" />
+                    <text-editor-viewer :contents="noticePostData.contents"
+                                        :attachments="attachments"
+                    />
                 </div>
             </p-data-loader>
         </p-pane-layout>
@@ -177,7 +198,6 @@ export default {
             // TODO: send email open state
         });
 
-
         const { attachments } = useFileAttachments(computed(() => state.noticePostData.files));
 
         /* Api */
@@ -260,7 +280,6 @@ export default {
         } = useNoticeStore({
             userId: computed(() => store.state.user.userId),
         });
-
 
         /* Event */
         const handleBackToListButtonClick = () => {

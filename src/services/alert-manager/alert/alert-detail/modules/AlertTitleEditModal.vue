@@ -16,7 +16,9 @@
                            required
             >
                 <template #default>
-                    <p-text-input v-model="alertTitleInput" class="block w-full" :invalid="isNameInvalid"
+                    <p-text-input v-model="alertTitleInput"
+                                  class="block w-full"
+                                  :invalid="isNameInvalid"
                                   :placeholder="alertTitle"
                     />
                 </template>
@@ -37,12 +39,10 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { alertManagerStore } from '@/services/alert-manager/store';
-
 
 export default {
     name: 'AlertTitleEditModal',

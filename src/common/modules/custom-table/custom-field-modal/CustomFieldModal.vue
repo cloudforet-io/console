@@ -6,14 +6,18 @@
                     @confirm="updatePageSchema"
     >
         <template #body>
-            <p-data-loader :loading="loading" :min-loading-time="500">
+            <p-data-loader :loading="loading"
+                           :min-loading-time="500"
+            >
                 <div class="contents-wrapper">
                     <section class="attribute-column-section">
                         <h3 class="section-title">
                             <template v-if="isValid">
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL') }}
                             </template>
-                            <span v-else class="invalid-text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_REQUIRED') }}</span>
+                            <span v-else
+                                  class="invalid-text"
+                            >{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_REQUIRED') }}</span>
                             <p-button style-type="tertiary"
                                       size="sm"
                                       @click="setColumnsDefault"
@@ -21,7 +25,9 @@
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.DEFAULT') }}
                             </p-button>
                         </h3>
-                        <p-search v-model="search" :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_ATTRIBUTE_COL')" />
+                        <p-search v-model="search"
+                                  :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_ATTRIBUTE_COL')"
+                        />
                         <div class="sort-wrapper">
                             <label>{{ $t('COMMON.CUSTOM_FIELD_MODAL.SORT_BY') }}</label>
                             <p-button style-type="tertiary"
@@ -39,15 +45,20 @@
                         </div>
 
                         <header>
-                            <p-check-box :selected="isAllSelected" :value="true"
+                            <p-check-box :selected="isAllSelected"
+                                         :value="true"
                                          @change="onChangeAllSelect"
                             />
                             <span class="text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_NAME') }}</span>
                         </header>
 
                         <div class="column-items-wrapper">
-                            <draggable v-model="allColumns" draggable=".draggable-item" ghost-class="ghost">
-                                <column-item v-for="(column, idx) in allColumns" :key="`${column.key}-${idx}`"
+                            <draggable v-model="allColumns"
+                                       draggable=".draggable-item"
+                                       ghost-class="ghost"
+                            >
+                                <column-item v-for="(column, idx) in allColumns"
+                                             :key="`${column.key}-${idx}`"
                                              v-model="selectedAllColumnKeys"
                                              :item="column"
                                              :search-text="search"
@@ -80,7 +91,6 @@
 </template>
 
 <script lang="ts">
-
 
 import type { SetupContext } from 'vue';
 import {
@@ -127,7 +137,7 @@ type SelectedColumnMap = Record<string, DynamicField>;
 const mergeFields = (fieldsA: DynamicField[], fieldsB: DynamicField[]): DynamicField[] => {
     const allColumns: any[] = [...fieldsA];
     fieldsB.forEach((d) => {
-        const isExist = fieldsA.some(c => c.key === d.key);
+        const isExist = fieldsA.some((c) => c.key === d.key);
         if (!isExist) allColumns.push(d);
     });
     return allColumns;
@@ -181,7 +191,7 @@ export default defineComponent<Props>({
             allColumns: [] as DynamicField[], // fields merged with availableColumns and currentColumns
             selectedColumnMap: {} as SelectedColumnMap,
             selectedColumns: computed<DynamicField[]>({
-                get: () => state.allColumns.filter(d => !!state.selectedColumnMap[d.key]),
+                get: () => state.allColumns.filter((d) => !!state.selectedColumnMap[d.key]),
                 set: (val: DynamicField[]) => {
                     const selectedMap: SelectedColumnMap = {};
                     const tagColumns: DynamicField[] = [];
@@ -191,16 +201,16 @@ export default defineComponent<Props>({
                     });
 
                     state.allColumns = mergeFields(state.allColumns, tagColumns)
-                        .filter(d => (d.key.startsWith(TAGS_PREFIX) ? !!selectedMap[d.key] : true));
+                        .filter((d) => (d.key.startsWith(TAGS_PREFIX) ? !!selectedMap[d.key] : true));
                     state.selectedColumnMap = selectedMap;
                 },
             }),
             selectedAllColumnKeys: computed<string[]>({
-                get: () => state.selectedColumns.map(d => d.key),
+                get: () => state.selectedColumns.map((d) => d.key),
                 set: (val: string[]) => {
                     state.selectedColumns = val.map((key) => {
                         if (key.startsWith(TAGS_PREFIX)) return { key, name: key, options: TAGS_OPTIONS } as DynamicField;
-                        return state.availableColumns.find(col => col.key === key) ?? { key, name: key } as DynamicField;
+                        return state.availableColumns.find((col) => col.key === key) ?? { key, name: key } as DynamicField;
                     });
                 },
             }),
@@ -272,7 +282,7 @@ export default defineComponent<Props>({
 
         const setColumnsDefault = async () => {
             state.allColumns = state.availableColumns;
-            state.selectedColumns = state.availableColumns.filter(d => !d.options?.is_optional);
+            state.selectedColumns = state.availableColumns.filter((d) => !d.options?.is_optional);
             sortByRecommendation();
         };
 
@@ -319,7 +329,7 @@ export default defineComponent<Props>({
 
         /* Tags */
         const clearSelectedTags = () => {
-            state.selectedAllColumnKeys = state.selectedAllColumnKeys.filter(d => !d.startsWith(TAGS_PREFIX));
+            state.selectedAllColumnKeys = state.selectedAllColumnKeys.filter((d) => !d.startsWith(TAGS_PREFIX));
         };
 
         const tagState = reactive({
@@ -347,7 +357,7 @@ export default defineComponent<Props>({
                     },
                 });
 
-                tagState.allTags = results.map(d => d.name);
+                tagState.allTags = results.map((d) => d.name);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 tagState.allTags = [];

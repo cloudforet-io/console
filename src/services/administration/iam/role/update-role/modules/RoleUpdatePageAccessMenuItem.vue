@@ -14,17 +14,24 @@
                 <p-i v-if="lIdx < menu.translationIds.length - 1"
                      :key="`label-${menu.translationIds.join('.')}-${lIdx}`"
                      name="ic_breadcrumb_arrow"
-                     width="1rem" height="1rem"
+                     width="1rem"
+                     height="1rem"
                 />
             </template>
         </div>
-        <div class="right-part" :class="isSubMenu ? 'sub-menu' : 'menu'">
-            <p-check-box :selected="menu.isViewed" :disabled="menu.isManaged" class="pr-6"
+        <div class="right-part"
+             :class="isSubMenu ? 'sub-menu' : 'menu'"
+        >
+            <p-check-box :selected="menu.isViewed"
+                         :disabled="menu.isManaged"
+                         class="pr-6"
                          @change="handleChangeView"
             >
                 <span>{{ $t('IAM.ROLE.FORM.VIEW') }}</span>
             </p-check-box>
-            <p-check-box :selected="menu.isManaged" @change="handleChangeManage">
+            <p-check-box :selected="menu.isManaged"
+                         @change="handleChangeManage"
+            >
                 <span>Manage</span>
             </p-check-box>
             <p-tooltip v-if="tooltipText"
@@ -33,7 +40,8 @@
                        :position="'bottom'"
             >
                 <p-i name="ic_help"
-                     width="0.875rem" height="0.875rem"
+                     width="0.875rem"
+                     height="0.875rem"
                      color="inherit"
                 />
             </p-tooltip>
@@ -51,12 +59,10 @@ import {
     PCheckBox, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
 
-
 import { i18n } from '@/translations';
 
 import { MANAGE_FEATURE_MAP } from '@/services/administration/iam/role/config';
 import type { PageAccessMenuItem } from '@/services/administration/iam/role/type';
-
 
 export default {
     name: 'RoleUpdatePageAccessMenuItem',
@@ -81,7 +87,7 @@ export default {
             tooltipText: computed(() => {
                 const { title, features } = MANAGE_FEATURE_MAP[props.menu?.id] ?? {};
                 if (!title) return null;
-                return `<b>${i18n.t(title)}</b></br><ul>${features.map(d => `<li>&#8729; ${i18n.t(d)}</li>`).join('')}</ul>`;
+                return `<b>${i18n.t(title)}</b></br><ul>${features.map((d) => `<li>&#8729; ${i18n.t(d)}</li>`).join('')}</ul>`;
             }),
             isDisabled: computed(() => ((props.menu?.id === 'all') ? false : !props.menu?.subMenuList?.length)),
         });

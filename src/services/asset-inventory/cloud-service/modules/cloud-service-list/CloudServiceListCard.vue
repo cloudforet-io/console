@@ -8,7 +8,8 @@
                     <span class="provider">{{ providers[item.provider] ? providers[item.provider].label : item.provider }}</span>
                 </div>
                 <div class="service-group-wrapper">
-                    <p-lazy-img width="1.25rem" height="1.25rem"
+                    <p-lazy-img width="1.25rem"
+                                height="1.25rem"
                                 :src="assetUrlConverter(item.icon) || (providers[item.provider] ? providers[item.provider].icon : '')"
                                 error-icon="ic_provider_other"
                                 :alt="item.name"
@@ -52,7 +53,6 @@ import { PLazyImg, PDivider } from '@spaceone/design-system';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
-
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -62,7 +62,6 @@ import { objectToQueryString } from '@/lib/router-query-string';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import type { Period } from '@/services/cost-explorer/type';
-
 
 interface Props {
     item: any;

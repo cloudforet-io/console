@@ -1,17 +1,29 @@
 <template>
     <p-data-loader class="cloud-service-usage-overview-summary"
-                   :loading="schemaLoading" :data="widgetSchemaList"
+                   :loading="schemaLoading"
+                   :data="widgetSchemaList"
                    :min-loading-time="1000"
                    :loader-backdrop-opacity="1"
                    :loader-backdrop-color="loaderBackdropColor"
     >
         <template #loader>
-            <div v-for="(_, idx) in skeletons" :key="idx" class="skeleton-wrapper">
-                <p-skeleton width="66%" height="1rem" class="mb-1" />
-                <p-skeleton width="40px" height="1.5rem" />
+            <div v-for="(_, idx) in skeletons"
+                 :key="idx"
+                 class="skeleton-wrapper"
+            >
+                <p-skeleton width="66%"
+                            height="1rem"
+                            class="mb-1"
+                />
+                <p-skeleton width="40px"
+                            height="1.5rem"
+                />
             </div>
         </template>
-        <div v-for="(schema, idx) in widgetSchemaList" :key="`${contextId}-${idx}`" class="summary-wrapper">
+        <div v-for="(schema, idx) in widgetSchemaList"
+             :key="`${contextId}-${idx}`"
+             class="summary-wrapper"
+        >
             <p-dynamic-widget type="summary"
                               :name="schema.name"
                               :data="dataList[idx]"
@@ -34,13 +46,11 @@ import type { DynamicWidgetFieldHandler } from '@spaceone/design-system/dist/src
 
 import { store } from '@/store';
 
-
 import { getUUID } from '@/lib/component-util/getUUID';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 
 import { gray } from '@/styles/colors';
-
 
 export default {
     name: 'CloudServiceUsageOverviewSummary',

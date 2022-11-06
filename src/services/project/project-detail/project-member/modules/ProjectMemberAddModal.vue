@@ -9,7 +9,10 @@
         @confirm="handleConfirm"
     >
         <template #body>
-            <p-box-tab v-if="authType && authType !== 'GOOGLE_OAUTH2'" v-model="activeTab" :tabs="tabs" />
+            <p-box-tab v-if="authType && authType !== 'GOOGLE_OAUTH2'"
+                       v-model="activeTab"
+                       :tabs="tabs"
+            />
             <div class="form-wrapper">
                 <p class="title">
                     {{ $t('PROJECT.DETAIL.MEMBER.MEMBER') }} ({{
@@ -56,7 +59,8 @@
                         />
                     </template>
                 </p-field-group>
-                <p-field-group :label="$t('PROJECT.DETAIL.MEMBER.ROLE')" required
+                <p-field-group :label="$t('PROJECT.DETAIL.MEMBER.ROLE')"
+                               required
                                :help-text="$t('PROJECT.DETAIL.MEMBER.ROLE_HELP_TEXT')"
                                :invalid="invalidState.selectedRoleItems"
                                :invalid-text="invalidTexts.selectedRoleItems"
@@ -67,11 +71,14 @@
                                    position="bottom"
                         >
                             <p-i name="ic_help"
-                                 width="0.875rem" height="0.875rem"
+                                 width="0.875rem"
+                                 height="0.875rem"
                                  color="inherit"
                             />
                         </p-tooltip>
-                        <span v-if="showRoleWarning" class="role-warning-text">{{ $t('PROJECT.DETAIL.MEMBER.ROLE_WARNING') }}</span>
+                        <span v-if="showRoleWarning"
+                              class="role-warning-text"
+                        >{{ $t('PROJECT.DETAIL.MEMBER.ROLE_WARNING') }}</span>
                     </template>
                     <template #default="{invalid}">
                         <p-search-dropdown
@@ -136,7 +143,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { checkEmailFormat } from '@/services/administration/iam/user/lib/user-form-validations';
 import type { MemberItem } from '@/services/project/project-detail/project-member/type';
 import { AUTH_TYPE } from '@/services/project/project-detail/project-member/type';
-
 
 export default {
     name: 'ProjectMemberAddModal',
@@ -226,7 +232,7 @@ export default {
                 return true;
             },
             selectedExternalUserItems: (val: InputItem[]) => {
-                const invalidItems = val.filter(d => d.invalid);
+                const invalidItems = val.filter((d) => d.invalid);
                 if (invalidItems.length) return invalidItems[invalidItems.length - 1]?.invalidText || '';
                 return true;
             },
@@ -235,7 +241,7 @@ export default {
                 return true;
             },
             labels: (val: InputItem[]) => {
-                const invalidItems = val.filter(d => d.invalid);
+                const invalidItems = val.filter((d) => d.invalid);
                 if (invalidItems.length) return invalidItems[invalidItems.length - 1]?.invalidText || '';
                 if (val.length > 5) return i18n.t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT');
                 return true;
@@ -245,7 +251,7 @@ export default {
         /* Util */
         const _setInternalMenuItems = () => {
             state.internalUserItems = [];
-            const memberIdList: string[] = state.members.map(d => d.resource_id);
+            const memberIdList: string[] = state.members.map((d) => d.resource_id);
             Object.keys(state.users).forEach((userId) => {
                 const userName = state.users[userId]?.name;
                 const singleItem = {
@@ -261,7 +267,7 @@ export default {
         };
         const _getExternalMenuItems = (users): MenuItem[] => {
             const externalUserItems: MenuItem[] = [];
-            const memberIdList = state.members.map(d => d.resource_id);
+            const memberIdList = state.members.map((d) => d.resource_id);
             users.forEach((user) => {
                 const singleItem = {
                     name: user.user_id,
@@ -296,7 +302,7 @@ export default {
             }
 
             /* 3. check member list */
-            const memberIdList: string[] = state.members.map(d => d.resource_id);
+            const memberIdList: string[] = state.members.map((d) => d.resource_id);
             if (memberIdList.includes(userItem.value)) {
                 return i18n.t('PROJECT.DETAIL.MEMBER.ALREADY_EXISTING');
             }
@@ -313,7 +319,7 @@ export default {
             const { results } = await SpaceConnector.client.identity.role.list({
                 role_type: 'PROJECT',
             });
-            state.roleItems = results.map(d => ({
+            state.roleItems = results.map((d) => ({
                 type: 'item',
                 label: d.name,
                 name: d.role_id,
@@ -324,8 +330,8 @@ export default {
             try {
                 const params: any = {
                     role_id: selectedRoleItems.value[0].name,
-                    users: state.activeTab === AUTH_TYPE.INTERNAL_USER ? selectedInternalUserItems.value.map(d => d.name) : selectedExternalUserItems.value.map(d => d.value),
-                    labels: labels.value.map(d => d.value),
+                    users: state.activeTab === AUTH_TYPE.INTERNAL_USER ? selectedInternalUserItems.value.map((d) => d.name) : selectedExternalUserItems.value.map((d) => d.value),
+                    labels: labels.value.map((d) => d.value),
                     is_external_user: state.activeTab !== AUTH_TYPE.INTERNAL_USER,
                 };
                 if (props.isProjectGroup) {
@@ -423,7 +429,7 @@ export default {
         };
         const handleSelectRoleItems = (roleItems) => {
             if (!roleItems.length) return;
-            const roleItem: any = state.roleItems.find(d => d?.name === roleItems[0]?.name);
+            const roleItem: any = state.roleItems.find((d) => d?.name === roleItems[0]?.name);
             const pagePermissionMap = getPagePermissionMapFromRaw(roleItem.pagePermissions);
             setForm('selectedRoleItems', [roleItem]);
             state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
@@ -445,7 +451,6 @@ export default {
             initForm();
             state.externalUserItems = [];
         });
-
 
         return {
             ...toRefs(state),

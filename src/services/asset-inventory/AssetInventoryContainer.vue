@@ -32,7 +32,6 @@ import AssetInventoryLNB from '@/services/asset-inventory/AssetInventoryLNB.vue'
 import { assetInventoryStoreModule, assetInventoryStore } from '@/services/asset-inventory/store';
 import type { AssetInventoryState } from '@/services/asset-inventory/store/type';
 
-
 export default defineComponent({
     name: 'AssetInventoryContainer',
     components: {

@@ -10,12 +10,9 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
 const lastLoadedTime = 0;
 
-export const load: Action<CloudServiceTypeReferenceState, any> = async (
-    { state, commit }, options: ReferenceLoadOptions,
-): Promise<void|Error> => {
+export const load: Action<CloudServiceTypeReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (

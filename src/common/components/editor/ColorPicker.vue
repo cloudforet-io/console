@@ -1,26 +1,38 @@
 <template>
-    <p-select-dropdown class="color-picker" style-type="transparent"
+    <p-select-dropdown class="color-picker"
+                       style-type="transparent"
                        :items="textColorItems"
                        index-mode
     >
         <template #menu-menu>
             <div class="color-picker-menu">
-                <div v-for="(colorSet, idx) in COLOR_PICKER_COLOR_SETS" :key="idx" class="color-picker-set">
-                    <span v-for="(color) in colorSet" :key="color" class="color-picker-chip"
-                          :style="{color}" @click.stop="handleColorClick(color)"
+                <div v-for="(colorSet, idx) in COLOR_PICKER_COLOR_SETS"
+                     :key="idx"
+                     class="color-picker-set"
+                >
+                    <span v-for="(color) in colorSet"
+                          :key="color"
+                          class="color-picker-chip"
+                          :style="{color}"
+                          @click.stop="handleColorClick(color)"
                     >
                         <span class="chip-fill" />
                         <span class="chip-border" />
-                        <p-i v-if="editor.isActive('textStyle', {color})" name="ic_check" class="chip-check-mark"
+                        <p-i v-if="editor.isActive('textStyle', {color})"
+                             name="ic_check"
+                             class="chip-check-mark"
                              height="16px"
-                             width="16px" color="inherit"
+                             width="16px"
+                             color="inherit"
                         />
 
                     </span>
                 </div>
             </div>
         </template>
-        <p-i name="ic_text-color" color="inherit" />
+        <p-i name="ic_text-color"
+             color="inherit"
+        />
     </p-select-dropdown>
 </template>
 
@@ -33,11 +45,9 @@ import {
 import { PI, PSelectDropdown } from '@spaceone/design-system';
 import type { Editor } from '@tiptap/core';
 
-
 import {
     blue, coral, gray, green, peacock, red, violet, yellow,
 } from '@/styles/colors';
-
 
 const COLOR_PICKER_COLOR_SETS = [
     [gray[900], violet[500], blue[500], peacock[500], green[500], yellow[500], coral[500], red[500]],
@@ -61,7 +71,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            textColorItems: COLOR_PICKER_COLOR_SETS.flatMap(color => ({ name: color })),
+            textColorItems: COLOR_PICKER_COLOR_SETS.flatMap((color) => ({ name: color })),
         });
 
         const handleColorClick = async (color: string) => {

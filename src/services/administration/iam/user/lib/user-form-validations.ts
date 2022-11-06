@@ -127,7 +127,6 @@ export const checkOneNumber = async (valueForCheck: string) => {
     return validation;
 };
 
-
 export const checkSamePassword = async (originPasswordForCheck: string, newPasswordForCheck: string) => {
     const validation = {
         isValid: true,

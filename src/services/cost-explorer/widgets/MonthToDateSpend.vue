@@ -12,20 +12,30 @@
     >
         <template #default>
             <div class="cost-trend-wrapper flex">
-                <span class="increase increase-rate" :class="[{safe: increaseRate < 0}, {alert: increaseRate > 0}]">
-                    <p-i v-if="increaseRate < 0" name="ic_arrow-down" width="1rem"
+                <span class="increase increase-rate"
+                      :class="[{safe: increaseRate < 0}, {alert: increaseRate > 0}]"
+                >
+                    <p-i v-if="increaseRate < 0"
+                         name="ic_arrow-down"
+                         width="1rem"
                          height="1rem"
                     />
-                    <p-i v-else name="ic_arrow-up" width="1rem"
+                    <p-i v-else
+                         name="ic_arrow-up"
+                         width="1rem"
                          height="1rem"
                     />
                     {{ increaseRate }}%
                 </span>
                 <span class="increase increase-amount">
-                    <p-i v-if="increaseCost < 0" name="ic_arrow-down" width="1rem"
+                    <p-i v-if="increaseCost < 0"
+                         name="ic_arrow-down"
+                         width="1rem"
                          height="1rem"
                     />
-                    <p-i v-else name="ic_arrow-up" width="1rem"
+                    <p-i v-else
+                         name="ic_arrow-up"
+                         width="1rem"
                          height="1rem"
                     />
                     <span class="unit">{{ currencySymbol }} </span>
@@ -58,10 +68,8 @@ import dayjs from 'dayjs';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
-
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';

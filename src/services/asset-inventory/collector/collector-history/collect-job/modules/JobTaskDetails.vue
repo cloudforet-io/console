@@ -17,10 +17,8 @@ import type { Vue } from 'vue/types/vue';
 
 import { PTab } from '@spaceone/design-system';
 
-
 import JobTaskErrorList from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskErrorList.vue';
 import type { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
-
 
 export default {
     name: 'JobTaskDetails',

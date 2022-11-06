@@ -34,7 +34,8 @@
                 <!--filter-->
                 <div class="filter-wrapper">
                     <div class="left-part">
-                        <p-select-status v-for="(status, idx) in urgencyList" :key="idx"
+                        <p-select-status v-for="(status, idx) in urgencyList"
+                                         :key="idx"
                                          v-model="selectedUrgency"
                                          :value="status.name"
                                          :icon="status.icon"
@@ -45,7 +46,8 @@
                         </p-select-status>
                     </div>
                     <div class="right-part">
-                        <p-select-button v-for="(state, idx) in assignedStateList" :key="`assigned-${idx}`"
+                        <p-select-button v-for="(state, idx) in assignedStateList"
+                                         :key="`assigned-${idx}`"
                                          v-model="selectedAssignedState"
                                          :value="state.name"
                                          size="sm"
@@ -58,7 +60,9 @@
                                            :all-page="allPage"
                                            @pageChange="onPageChange"
                         />
-                        <p-icon-button name="ic_refresh" @click="onClickRefresh" />
+                        <p-icon-button name="ic_refresh"
+                                       @click="onClickRefresh"
+                        />
                     </div>
                 </div>
                 <!--list-->
@@ -88,7 +92,9 @@
                     </template>
                     <template #no-data>
                         <div>
-                            <p-i name="ic_alert" color="inherit transparent" />
+                            <p-i name="ic_alert"
+                                 color="inherit transparent"
+                            />
                             <p class="text">
                                 {{ $t('MONITORING.ALERT.DASHBOARD.NO_ALERT') }}
                             </p>
@@ -111,7 +117,6 @@ import {
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { find, sum } from 'lodash';
 
-
 import { commaFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
@@ -127,7 +132,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
-
 
 const TAB_STATE = Object.freeze({
     OPEN: 'OPEN',

@@ -7,9 +7,14 @@
             @goBack="$router.go(-1)"
         />
         <p-divider />
-        <p-data-loader class="flex-grow" :data="providerList" :loading="loading">
+        <p-data-loader class="flex-grow"
+                       :data="providerList"
+                       :loading="loading"
+        >
             <div class="provider-item-wrapper">
-                <provider-list-card v-for="item in providerList" :key="item.name" :provider-item="item"
+                <provider-list-card v-for="item in providerList"
+                                    :key="item.name"
+                                    :provider-item="item"
                                     :visible.sync="visibleInstallModal"
                                     :selected-provider.sync="selectedProvider"
                                     @select="handleSelectProvider"
@@ -62,7 +67,7 @@ export default {
     setup() {
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            providerList: computed(() => Object.keys(state.providers).map(k => ({
+            providerList: computed(() => Object.keys(state.providers).map((k) => ({
                 name: k,
                 icon: state.providers[k].icon,
                 label: k,

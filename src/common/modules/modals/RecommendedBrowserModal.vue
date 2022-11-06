@@ -9,11 +9,15 @@
     >
         <template #body>
             <div class="browser-icon-wrapper">
-                <a v-for="(browser, idx) in browserList" :key="idx"
-                   class="browser-icon-container" :href="browser.link"
+                <a v-for="(browser, idx) in browserList"
+                   :key="idx"
+                   class="browser-icon-container"
+                   :href="browser.link"
                    target="_blank"
                 >
-                    <img class="browser-img" :src="require(`@/assets/images/${browser.img}`)">
+                    <img class="browser-img"
+                         :src="require(`@/assets/images/${browser.img}`)"
+                    >
                     <span class="browser-name">{{ browser.label }}</span>
                 </a>
             </div>
@@ -37,7 +41,6 @@
 import { reactive, toRefs } from 'vue';
 
 import { PButtonModal, PCheckBox } from '@spaceone/design-system';
-
 
 import { i18n } from '@/translations';
 

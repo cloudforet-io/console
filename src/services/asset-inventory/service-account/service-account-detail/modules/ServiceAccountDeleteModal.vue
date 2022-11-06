@@ -49,7 +49,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import type { ServiceAccountModel } from '@/services/asset-inventory/service-account/type';
 
-
 export default {
     name: 'ServiceAccountDeleteModal',
     components: {

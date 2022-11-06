@@ -6,7 +6,6 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -86,7 +85,6 @@ export const useNoticeStore = ({ userId }: {
         }
     };
 
-
     const totalNoticeIdList = ref<string[]>([]);
     const totalNoticeCount = ref(0);
     const noticeApiHelper = new ApiQueryHelper().setOnly('post_id');
@@ -98,13 +96,12 @@ export const useNoticeStore = ({ userId }: {
                 query: noticeApiHelper.data,
                 domain_id: null,
             });
-            totalNoticeIdList.value = results.map(post => post.post_id);
+            totalNoticeIdList.value = results.map((post) => post.post_id);
             totalNoticeCount.value = total_count;
         } catch (e) {
             ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
         }
     };
-
 
     const unreadNoticeCount = computed(() => {
         let unreadCount = 0;

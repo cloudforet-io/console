@@ -1,13 +1,22 @@
 <template>
     <div class="cost-dashboard-period-select-dropdown">
-        <div v-if="!printMode" class="fix-date-box">
-            <p-check-box :selected="isFixedTypeSelected" :disabled="disableFixDate" @change="handleSelectedFixDate">
+        <div v-if="!printMode"
+             class="fix-date-box"
+        >
+            <p-check-box :selected="isFixedTypeSelected"
+                         :disabled="disableFixDate"
+                         @change="handleSelectedFixDate"
+            >
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FIX_DATE') }}
             </p-check-box>
-            <p-tooltip class="fix-date-tooltip" :contents="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FIXED_DATE_TOOLTIP')"
+            <p-tooltip class="fix-date-tooltip"
+                       :contents="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FIXED_DATE_TOOLTIP')"
                        :position="'bottom'"
             >
-                <p-i name="ic_tooltip" width="1rem" height="1rem" />
+                <p-i name="ic_tooltip"
+                     width="1rem"
+                     height="1rem"
+                />
             </p-tooltip>
         </div>
         <p-badge style-type="gray200">
@@ -33,7 +42,9 @@
                                             :granularity="GRANULARITY.MONTHLY"
                                             @confirm="handleCustomRangeModalConfirm"
         />
-        <currency-select-dropdown :class="{ 'left-divider': printMode }" :print-mode="printMode" />
+        <currency-select-dropdown :class="{ 'left-divider': printMode }"
+                                  :print-mode="printMode"
+        />
     </div>
 </template>
 
@@ -51,7 +62,6 @@ import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/ty
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
@@ -65,7 +75,6 @@ import CostManagementCustomRangeModal
     from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 import type { Period } from '@/services/cost-explorer/type';
-
 
 const initialPeriodStart = dayjs.utc().startOf('month').format('YYYY-MM-DD');
 const initialPeriodEnd = dayjs.utc().endOf('month').format('YYYY-MM-DD');

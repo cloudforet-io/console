@@ -3,8 +3,12 @@
         <template #title>
             <div class="top grid grid-cols-12">
                 <span class="title col-span-8 md:col-span-10">{{ $t('COMMON.WIDGETS.TOP_PROJECT_TITLE') }}</span>
-                <router-link :to="{ name: PROJECT_ROUTE._NAME }" class="create-project-button">
-                    <p-i name="ic_plus" width="1rem" height="1rem"
+                <router-link :to="{ name: PROJECT_ROUTE._NAME }"
+                             class="create-project-button"
+                >
+                    <p-i name="ic_plus"
+                         width="1rem"
+                         height="1rem"
                          color="inherit"
                          class="add-icon"
                     />
@@ -14,11 +18,17 @@
             </div>
         </template>
         <div class="contents-container">
-            <p-data-loader :loading="loading" class="chart">
+            <p-data-loader :loading="loading"
+                           class="chart"
+            >
                 <template #loader>
-                    <p-skeleton width="100%" height="100%" />
+                    <p-skeleton width="100%"
+                                height="100%"
+                    />
                 </template>
-                <div ref="chartRef" class="chart" />
+                <div ref="chartRef"
+                     class="chart"
+                />
             </p-data-loader>
             <div v-if="!loading && items.length === 0"
                  class="no-data-wrapper"
@@ -30,7 +40,9 @@
                     {{ $t('COMMON.WIDGETS.TOP_PROJECTS.NO_PROJECT_HELP_TEXT') }}
                 </p>
                 <router-link :to="{ name: PROJECT_ROUTE._NAME }">
-                    <p-button style-type="substitutive" icon-left="ic_plus">
+                    <p-button style-type="substitutive"
+                              icon-left="ic_plus"
+                    >
                         <span>{{ $t('COMMON.WIDGETS.TOP_PROJECTS.CREATE_PROJECT') }}</span>
                     </p-button>
                 </router-link>
@@ -46,27 +58,37 @@
                         <span class="col-rank">{{ `# ${index + 1}` }}</span>
                     </template>
                     <template #col-project_group-format="{ value }">
-                        <router-link class="link-text" :to="value.to">
+                        <router-link class="link-text"
+                                     :to="value.to"
+                        >
                             <span>{{ value.label }}</span>
                         </router-link>
                     </template>
                     <template #col-project-format="{ value }">
-                        <router-link class="link-text" :to="value.to">
+                        <router-link class="link-text"
+                                     :to="value.to"
+                        >
                             <span>{{ value.label }}</span>
                         </router-link>
                     </template>
                     <template #col-server-format="{ value }">
-                        <router-link class="link-text" :to="value.to">
+                        <router-link class="link-text"
+                                     :to="value.to"
+                        >
                             <span>{{ value.count }}</span>
                         </router-link>
                     </template>
                     <template #col-database-format="{ value }">
-                        <router-link class="link-text" :to="value.to">
+                        <router-link class="link-text"
+                                     :to="value.to"
+                        >
                             <span>{{ value.count }}</span>
                         </router-link>
                     </template>
                     <template #col-storage-format="{ value }">
-                        <router-link class="link-text" :to="value.to">
+                        <router-link class="link-text"
+                                     :to="value.to"
+                        >
                             <span>{{ value.label }}</span>
                         </router-link>
                     </template>
@@ -94,7 +116,6 @@ import { range } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
@@ -109,7 +130,6 @@ import { gray, peacock, secondary } from '@/styles/colors';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-
 
 interface ChartData {
     rank: string;
@@ -128,7 +148,6 @@ interface TableItem {
 const DATA_COUNT = 5;
 const SERVER_COLOR = secondary;
 const DATABASE_COLOR = peacock[200];
-
 
 export default {
     name: 'TopProjects',
@@ -263,7 +282,7 @@ export default {
             return location;
         };
         //
-        const getConvertedData = (rawData): TableItem[] => rawData.map(d => ({
+        const getConvertedData = (rawData): TableItem[] => rawData.map((d) => ({
             project_group: {
                 label: d.project_group,
                 to: referenceRouter(d.project_group_id, { resource_type: 'identity.ProjectGroup' }),

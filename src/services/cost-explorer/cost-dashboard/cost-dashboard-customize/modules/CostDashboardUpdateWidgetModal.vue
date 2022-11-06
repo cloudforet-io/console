@@ -1,5 +1,6 @@
 <template>
-    <p-button-modal :visible="proxyVisible" :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.UPDATE_TITLE')"
+    <p-button-modal :visible="proxyVisible"
+                    :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.FORM.UPDATE_TITLE')"
                     :disabled="false"
                     size="sm"
                     @confirm="handleConfirm"
@@ -23,7 +24,6 @@ import {
 } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
-
 
 import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';

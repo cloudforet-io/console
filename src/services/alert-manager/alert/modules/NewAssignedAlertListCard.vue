@@ -9,12 +9,16 @@
         @click="onClickListItem"
     >
         <template #header>
-            <p-i name="ic_notification" width="1.25rem" height="1.25rem"
+            <p-i name="ic_notification"
+                 width="1.25rem"
+                 height="1.25rem"
                  class="ic_notification"
                  color="white"
             />
             {{ $t('MONITORING.ALERT.ALERT_LIST.ASSIGNED_TO_ME_TITLE') }}
-            <p-i name="ic_delete" width="1.25rem" height="1.25rem"
+            <p-i name="ic_delete"
+                 width="1.25rem"
+                 height="1.25rem"
                  class="ic_delete cursor-pointer"
                  color="inherit"
                  @click="onHideAlerts"

@@ -1,15 +1,25 @@
 <template>
-    <p-data-loader :loading="loading" :class="{ 'data-loader': loading }" class="cloud-service-history-log-tab">
+    <p-data-loader :loading="loading"
+                   :class="{ 'data-loader': loading }"
+                   class="cloud-service-history-log-tab"
+    >
         <div v-if="tabs.length">
-            <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG')" use-total-count :total-count="totalCount" />
+            <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG')"
+                         use-total-count
+                         :total-count="totalCount"
+            />
             <p-button-tab v-if="tabs.length > 0"
                           :tabs="tabs"
                           :active-tab="activeTab"
                           keep-alive-all
                           @change="handleChangeTab"
             >
-                <template v-for="(layout, i) in layouts" #[layout.name]>
-                    <div :key="`${layout.name}-${i}`" class="log-dynamic-layout">
+                <template v-for="(layout, i) in layouts"
+                          #[layout.name]
+                >
+                    <div :key="`${layout.name}-${i}`"
+                         class="log-dynamic-layout"
+                    >
                         <p-dynamic-layout :type="layout.type"
                                           :options="layout.options"
                                           :data="data"
@@ -41,9 +51,13 @@
                 </template>
             </p-button-tab>
         </div>
-        <div v-else class="empty-tab">
+        <div v-else
+             class="empty-tab"
+        >
             <div class="container">
-                <img class="image" src="@/assets/images/illust_microscope.svg">
+                <img class="image"
+                     src="@/assets/images/illust_microscope.svg"
+                >
                 <p class="desc">
                     {{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.NO_LOG_HELP_TEXT') }}
                 </p>
@@ -163,7 +177,7 @@ export default defineComponent<Props>({
             }),
             selectedTimeWithin: 'auto',
             layouts: [] as DynamicLayout[],
-            currentLayout: computed(() => state.layouts.find(layout => layout.name === state.activeTab)),
+            currentLayout: computed(() => state.layouts.find((layout) => layout.name === state.activeTab)),
             dataSourceIds: {} as { [key: string]: string },
             totalLayoutCount: 0,
             data: [],
@@ -174,7 +188,7 @@ export default defineComponent<Props>({
         const getLogData = async () => {
             try {
                 state.loading = true;
-                const selectedTimeWithin = state.timeWithinList.find(timeWith => timeWith.name === state.selectedTimeWithin);
+                const selectedTimeWithin = state.timeWithinList.find((timeWith) => timeWith.name === state.selectedTimeWithin);
                 const { results } = await SpaceConnector.client.monitoring.log.list({
                     data_source_id: state.dataSourceIds[state.activeTab],
                     resource_id: props.cloudServiceId,
@@ -233,7 +247,7 @@ export default defineComponent<Props>({
             async export() {
                 const fields = state.currentLayout?.options?.fields;
                 if (!fields) return;
-                const selectedTimeWithin = state.timeWithinList.find(timeWith => timeWith.name === state.selectedTimeWithin);
+                const selectedTimeWithin = state.timeWithinList.find((timeWith) => timeWith.name === state.selectedTimeWithin);
                 await store.dispatch('file/downloadExcel', {
                     url: '/monitoring/log/list',
                     param: {

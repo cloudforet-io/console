@@ -1,18 +1,29 @@
 <template>
     <div>
         <p-panel-top>{{ name }}</p-panel-top>
-        <p-definition-table :fields="fields" :data="data" :loading="loading"
-                            :skeleton-rows="7" v-on="$listeners"
+        <p-definition-table :fields="fields"
+                            :data="data"
+                            :loading="loading"
+                            :skeleton-rows="7"
+                            v-on="$listeners"
         >
             <template #data-state="{data}">
-                <p-status :text="data" :theme="data === 'DISABLED' ? 'red' : 'green'" />
+                <p-status :text="data"
+                          :theme="data === 'DISABLED' ? 'red' : 'green'"
+                />
             </template>
             <template #data-plugin_name="{data}">
-                <p-lazy-img :src="data.plugin_icon" width="1rem" height="1rem" />
+                <p-lazy-img :src="data.plugin_icon"
+                            width="1rem"
+                            height="1rem"
+                />
                 <span class="ml-2 leading-none">{{ data }}</span>
             </template>
             <template #data-plugin_info.metadata.metadata.supported_resource_type="{data}">
-                <p-text-list :items="data || []" delimiter="<br>" class="text-list" />
+                <p-text-list :items="data || []"
+                             delimiter="<br>"
+                             class="text-list"
+                />
             </template>
             <template #data-created_at="{ data }">
                 {{ data ? iso8601Formatter(data, timezone) : '' }}
@@ -40,7 +51,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-
 
 export default {
     name: 'CollectorDetails',
@@ -75,7 +85,6 @@ export default {
             ]),
             data: {},
         });
-
 
         /* api */
         const getCollectorDetailData = async () => {

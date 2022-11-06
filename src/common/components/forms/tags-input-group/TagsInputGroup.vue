@@ -1,6 +1,9 @@
 <template>
     <div class="tags-input-group">
-        <slot name="add-button" :disabled="disabled" :handle-add-pair="handleAddPair">
+        <slot name="add-button"
+              :disabled="disabled"
+              :handle-add-pair="handleAddPair"
+        >
             <p-button class="add-button"
                       style-type="secondary"
                       icon-left="ic_plus_bold"
@@ -9,7 +12,9 @@
                 <span>{{ $t('COMMON.TAGS.ADD_TAG') }}</span>
             </p-button>
         </slot>
-        <div v-if="showHeader" class="tag-header">
+        <div v-if="showHeader"
+             class="tag-header"
+        >
             <div class="key">
                 <span>{{ $t('COMMON.COMPONENTS.TAGS.KEY') }}</span>
             </div>
@@ -18,7 +23,10 @@
             </div>
         </div>
         <div>
-            <div v-for="(item, idx) in items" :key="idx" class="tags-group">
+            <div v-for="(item, idx) in items"
+                 :key="idx"
+                 class="tags-group"
+            >
                 <p-field-group :invalid-text="keyValidations[idx].message"
                                :invalid="showValidation && !keyValidations[idx].isValid"
                                class="input-box key"
@@ -46,14 +54,16 @@
                         />
                     </template>
                 </p-field-group>
-                <p-icon-button name="ic_delete" :disabled="disabled" @click="handleDeletePair(idx)" />
+                <p-icon-button name="ic_delete"
+                               :disabled="disabled"
+                               @click="handleDeletePair(idx)"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-
 
 import type { SetupContext } from 'vue';
 import {
@@ -71,8 +81,7 @@ import type {
     Tag, TagItem, ValidationData,
 } from '@/common/components/forms/tags-input-group/type';
 
-
-const dictToArray = (dict): TagItem[] => Object.keys(dict).map(k => ({ key: k, value: dict[k] }));
+const dictToArray = (dict): TagItem[] => Object.keys(dict).map((k) => ({ key: k, value: dict[k] }));
 
 const arrayToDict = (arr: TagItem[]): Tag => {
     const dict = {};
@@ -122,14 +131,14 @@ export default defineComponent({
         const state = reactive({
             items: dictToArray(props.tags) as TagItem[],
             keyValidations: computed<ValidationData[]>(() => {
-                const keys = state.items.map(item => item.key);
+                const keys = state.items.map((item) => item.key);
                 return state.items.map((item) => {
                     const validation: ValidationData = { isValid: true, message: '' };
                     if (!item.key || !item.key.toString().length) {
                         validation.isValid = false;
                         validation.message = i18n.t('COMMON.COMPONENTS.TAGS.INVALID_NO_KEY');
                     } else {
-                        const isDuplicated = keys.filter(k => k === item.key).length > 1;
+                        const isDuplicated = keys.filter((k) => k === item.key).length > 1;
                         if (isDuplicated) {
                             validation.isValid = false;
                             validation.message = i18n.t('COMMON.COMPONENTS.TAGS.INVALID_DUPLICATED_KEY');
@@ -147,8 +156,8 @@ export default defineComponent({
                 return validation;
             })),
             isAllValid: computed(() => {
-                const isKeyValid = state.keyValidations.every(d => d.isValid);
-                const isValueValid = state.valueValidations.every(d => d.isValid);
+                const isKeyValid = state.keyValidations.every((d) => d.isValid);
+                const isValueValid = state.valueValidations.every((d) => d.isValid);
                 return isKeyValid && isValueValid;
             }),
         });

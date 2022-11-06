@@ -1,12 +1,21 @@
 <template>
-    <li class="content-wrapper" :class="{'edit-mode': isEditMode}">
+    <li class="content-wrapper"
+        :class="{'edit-mode': isEditMode}"
+    >
         <span class="content-title">
             {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') }}
         </span>
-        <div v-if="isEditMode" class="content">
-            <add-notification-schedule :schedule="channelData.schedule" :is-scheduled="channelData.is_scheduled" @change="onChangeSchedule" />
+        <div v-if="isEditMode"
+             class="content"
+        >
+            <add-notification-schedule :schedule="channelData.schedule"
+                                       :is-scheduled="channelData.is_scheduled"
+                                       @change="onChangeSchedule"
+            />
             <div class="button-group">
-                <p-button style-type="secondary" size="sm" class="cancel-button"
+                <p-button style-type="secondary"
+                          size="sm"
+                          class="cancel-button"
                           @click="cancelEdit"
                 >
                     {{ $t('COMMON.TAGS.CANCEL') }}
@@ -20,17 +29,25 @@
                 </p-button>
             </div>
         </div>
-        <div v-else class="content">
+        <div v-else
+             class="content"
+        >
             <p v-if="channelData.schedule">
-                <span v-for="day in channelData.schedule.day_of_week" :key="day"> {{ day }}</span><br>
+                <span v-for="day in channelData.schedule.day_of_week"
+                      :key="day"
+                > {{ day }}</span><br>
                 {{ displayStartHour }}:00 ~ {{ displayEndHour }}:00
             </p>
             <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME') }}</span>
-            <button class="edit-button" :class="{'edit-disable':disableEdit}"
+            <button class="edit-button"
+                    :class="{'edit-disable':disableEdit}"
                     @click="startEdit(EDIT_TYPE.SCHEDULE)"
             >
-                <p-i name="ic_edit" width="1rem" height="1rem"
-                     color="inherit" class="edit-icon"
+                <p-i name="ic_edit"
+                     width="1rem"
+                     height="1rem"
+                     color="inherit"
+                     class="edit-icon"
                 />
                 {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
             </button>
@@ -56,7 +73,6 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { utcToTimezoneFormatter } from '@/services/administration/iam/user/lib/helper';
@@ -66,7 +82,6 @@ import {
     EDIT_TYPE,
     PROTOCOL_TYPE,
 } from '@/services/notification/modules/notification-channel-item/type';
-
 
 export default {
     name: 'NotificationChannelItemSchedule',

@@ -9,7 +9,9 @@
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" class="tab"
+            <p-tab :tabs="tabState.tabs"
+                   :active-tab.sync="tabState.activeTab"
+                   class="tab"
                    @change="handleChangeTab"
             >
                 <template #default-widget>

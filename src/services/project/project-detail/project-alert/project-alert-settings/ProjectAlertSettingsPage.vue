@@ -6,31 +6,38 @@
         <section class="section notification-policy-wrapper">
             <div class="section-wrapper">
                 <span class="text">{{ $t('PROJECT.DETAIL.ALERT.NOTIFICATION_POLICY') }}</span>
-                <p-icon-button name="ic_edit" :disabled="!hasManagePermission"
+                <p-icon-button name="ic_edit"
+                               :disabled="!hasManagePermission"
                                @click="onClickUpdateNotificationPolicy"
                 />
             </div>
             <div class="content-wrapper">
-                <p-i v-if="notificationUrgency" :name="notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_bell' : 'ic_alert'" />
+                <p-i v-if="notificationUrgency"
+                     :name="notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_bell' : 'ic_alert'"
+                />
                 <span class="text">{{ notificationOptionFormatter(notificationUrgency) }}</span>
             </div>
         </section>
         <section class="section auto-recovery-wrapper">
             <div class="section-wrapper">
                 <span class="text">{{ $t('PROJECT.DETAIL.ALERT.AUTO_RECOVERY') }}</span>
-                <p-icon-button name="ic_edit" :disabled="!hasManagePermission"
+                <p-icon-button name="ic_edit"
+                               :disabled="!hasManagePermission"
                                @click="onClickUpdateAutoRecovery"
                 />
             </div>
             <div class="content-wrapper">
-                <p-i v-if="recoveryMode === RECOVERY_MODE.AUTO" name="ic_automation" />
+                <p-i v-if="recoveryMode === RECOVERY_MODE.AUTO"
+                     name="ic_automation"
+                />
                 <span class="text">{{ recoveryMode === RECOVERY_MODE.AUTO ? $t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : $t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
             </div>
         </section>
         <section class="section event-rule-wrapper">
             <div class="section-wrapper">
                 <span class="text">{{ $t('PROJECT.DETAIL.ALERT.EVENT_RULE') }}</span>
-                <p-icon-button name="ic_edit" :disabled="!hasManagePermission"
+                <p-icon-button name="ic_edit"
+                               :disabled="!hasManagePermission"
                                @click="onClickEditEventRule"
                 />
             </div>
@@ -127,7 +134,6 @@ import ProjectNotificationPolicyUpdateModal
     from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectNotificationPolicyUpdateModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-
 const NOTIFICATION_URGENCY = Object.freeze({
     ALL: 'ALL',
     HIGH_ONLY: 'HIGH_ONLY',
@@ -185,7 +191,7 @@ export default {
         });
 
         /* util */
-        const notificationOptionFormatter = option => state.notificationUrgencyList.find(d => d.name === option)?.label;
+        const notificationOptionFormatter = (option) => state.notificationUrgencyList.find((d) => d.name === option)?.label;
 
         /* api */
         const getProjectAlertConfig = async () => {

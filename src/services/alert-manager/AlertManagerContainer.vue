@@ -27,7 +27,6 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 import AlertManagerLNB from '@/services/alert-manager/AlertManagerLNB.vue';
 import { alertManagerStoreModule, alertManagerStore } from '@/services/alert-manager/store';
 
-
 export default {
     name: 'AlertManagerContainer',
     components: {

@@ -10,7 +10,9 @@
                 height: scrollOptions ? scrollOptions.height + 'px' : undefined,
             }"
         >
-            <div class="vue-diff-viewer-inner" :style="{ minHeight }">
+            <div class="vue-diff-viewer-inner"
+                 :style="{ minHeight }"
+            >
                 <vueDiffLine
                     v-for="(data, index) in list"
                     :key="index"

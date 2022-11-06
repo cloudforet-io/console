@@ -6,11 +6,16 @@
                    @change="onChange"
                    @refresh="getData()"
         />
-        <p-data-loader class="flex-grow" :data="items" :loading="loading"
+        <p-data-loader class="flex-grow"
+                       :data="items"
+                       :loading="loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
         >
             <div class="project-cards">
-                <div v-for="(item, i) in items" :key="i" class="project-card-container">
+                <div v-for="(item, i) in items"
+                     :key="i"
+                     class="project-card-container"
+                >
                     <router-link class="card"
                                  :to="{ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: item.project_id }}"
                     >
@@ -45,13 +50,24 @@
                                                      }"
                                         />
                                     </div>
-                                    <router-link v-if="getDistinctProviders(item.providers).length !== 0" class="icon-wrapper" :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
-                                        <p-i name="ic_plus_thin" scale="0.8" color="inherit" />
+                                    <router-link v-if="getDistinctProviders(item.providers).length !== 0"
+                                                 class="icon-wrapper"
+                                                 :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                                    >
+                                        <p-i name="ic_plus_thin"
+                                             scale="0.8"
+                                             color="inherit"
+                                        />
                                     </router-link>
                                 </div>
-                                <div v-if="getDistinctProviders(item.providers).length === 0" class="account-add">
+                                <div v-if="getDistinctProviders(item.providers).length === 0"
+                                     class="account-add"
+                                >
                                     <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
-                                        <p-i name="ic_plus_thin" scale="0.8" color="inherit" />
+                                        <p-i name="ic_plus_thin"
+                                             scale="0.8"
+                                             color="inherit"
+                                        />
                                     </router-link>
                                     <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
                                         <span class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
@@ -61,7 +77,10 @@
                         </div>
                         <div class="card-bottom-wrapper">
                             <div class="project-summary">
-                                <div v-for="{ title, summaryType } in projectSummaryList" :key="`summary-${title}-${item.project_id}`" class="project-summary-item">
+                                <div v-for="{ title, summaryType } in projectSummaryList"
+                                     :key="`summary-${title}-${item.project_id}`"
+                                     class="project-summary-item"
+                                >
                                     <div class="summary-item-text">
                                         {{ title }}
                                     </div>
@@ -72,7 +91,9 @@
                                     >
                                         {{ getItemSummaryCount(summaryType, item.project_id) }}
                                     </router-link>
-                                    <span v-else class="summary-item-num none">N/A</span>
+                                    <span v-else
+                                          class="summary-item-num none"
+                                    >N/A</span>
                                 </div>
                             </div>
                         </div>
@@ -80,7 +101,9 @@
                 </div>
             </div>
             <template #no-data>
-                <div v-if="(noProjectGroup || noProject)" class="empty-container">
+                <div v-if="(noProjectGroup || noProject)"
+                     class="empty-container"
+                >
                     <div v-if="noProjectGroup">
                         <p class="title">
                             {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_TITLE') }}<br>
@@ -94,15 +117,21 @@
                         <p class="content-order">
                             <strong>2.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_2') }}
                         </p>
-                        <p-button style-type="primary" class="mt-6" icon-left="ic_plus_bold"
+                        <p-button style-type="primary"
+                                  class="mt-6"
+                                  icon-left="ic_plus_bold"
                                   :disabled="manageDisabled"
                                   @click="$emit('create-project-group')"
                         >
                             {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_CREATE_BTN') }}
                         </p-button>
                     </div>
-                    <div v-else-if="noProject" class="empty-project">
-                        <img class="img" src="@/assets/images/illust_star.svg">
+                    <div v-else-if="noProject"
+                         class="empty-project"
+                    >
+                        <img class="img"
+                             src="@/assets/images/illust_star.svg"
+                        >
                         <p class="text-primary2">
                             {{ $t('PROJECT.LANDING.EMPTY_PROJECT_MSG') }}
                         </p>
@@ -118,7 +147,6 @@
         />
     </div>
 </template>
-
 
 <script lang="ts">
 
@@ -136,11 +164,9 @@ import axios from 'axios';
 import bytes from 'bytes';
 import { range, uniq } from 'lodash';
 
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -153,7 +179,6 @@ import { arrayToQueryString } from '@/lib/router-query-string';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
-
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
@@ -161,7 +186,6 @@ import ProjectFormModal from '@/services/project/project-detail/modules/ProjectF
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 import type { SummaryType } from '@/services/project/type';
 import { SUMMARY_TYPE } from '@/services/project/type';
-
 
 interface CardSummary {
     [projectId: string]: {
@@ -233,7 +257,7 @@ export default {
             }
             return {};
         };
-        const getProvider = name => state.providers[name] || {};
+        const getProvider = (name) => state.providers[name] || {};
         const goToServiceAccount = (provider) => {
             vm.$router.push({
                 name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
@@ -271,7 +295,6 @@ export default {
             return params;
         };
 
-
         let getCardToken: CancelTokenSource | undefined;
         const getCardSummary = async (items) => {
             if (items.length === 0) return;
@@ -285,7 +308,7 @@ export default {
             const cardSummary: CardSummary = {};
             state.cardSummaryLoading = true;
             try {
-                const ids = items?.map(item => item.project_id);
+                const ids = items?.map((item) => item.project_id);
                 const res = await SpaceConnector.client.statistics.topic.projectPage({
                     projects: ids,
                 }, { cancelToken: getCardToken.token });

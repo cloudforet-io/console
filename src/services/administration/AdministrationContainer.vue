@@ -11,7 +11,9 @@
         <general-page-layout v-else
                              :breadcrumbs="breadcrumbs"
         >
-            <template v-if="handbookState.isVisible" #handbook>
+            <template v-if="handbookState.isVisible"
+                      #handbook
+            >
                 <div class="flex">
                     <handbook-button type="administration/iam/role/create-edit"
                                      class="flex-shrink-0"
@@ -43,7 +45,6 @@ import AdministrationLNB from '@/services/administration/AdministrationLNB.vue';
 import RoleCreateEditHandbook from '@/services/administration/modules/RoleCreateEditHandbook.vue';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { administrationStore, administrationStoreModule } from '@/services/administration/store';
-
 
 export default defineComponent({
     name: 'AdministrationContainer',

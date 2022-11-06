@@ -1,11 +1,14 @@
 <template>
     <div class="budget-toolbox-usage-range">
-        <div v-for="({name, label, color}) in items" :key="name"
+        <div v-for="({name, label, color}) in items"
+             :key="name"
              class="range"
              :class="{disabled: !selectedMap[name]}"
              @click="handleClick(name)"
         >
-            <span class="mark" :style="{color}" />
+            <span class="mark"
+                  :style="{color}"
+            />
             <span class="label">{{ label }}</span>
         </div>
     </div>
@@ -85,7 +88,7 @@ export default {
         });
 
         const handleClick = (name: UsageRange) => {
-            const index = state.selected.findIndex(d => d === name);
+            const index = state.selected.findIndex((d) => d === name);
             if (index !== -1) state.selected.splice(index, 1);
             else state.selected.push(name);
             emit('update', state.range);

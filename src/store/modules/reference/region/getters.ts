@@ -2,7 +2,6 @@ import type { Getter } from 'vuex';
 
 import type { RegionReferenceState, SortedRegionReferenceItem } from '@/store/modules/reference/region/type';
 
-
 export const regionsSortedByProvider: Getter<RegionReferenceState, any> = (state): SortedRegionReferenceItem[] => {
     if (!state.items) return [];
     const regionItems = Object.values(state.items) as SortedRegionReferenceItem[];

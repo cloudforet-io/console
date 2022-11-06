@@ -18,7 +18,6 @@ import type { Vue } from 'vue/types/vue';
 
 import { PButton } from '@spaceone/design-system';
 
-
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 export default defineComponent({

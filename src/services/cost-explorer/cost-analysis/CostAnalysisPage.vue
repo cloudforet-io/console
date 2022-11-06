@@ -39,7 +39,6 @@ import type {
     CostQuerySetModel, CostQuerySetOption, Granularity,
 } from '@/services/cost-explorer/type';
 
-
 export interface SaveQueryEmitParam {
     updatedQuery: CostQuerySetModel;
     requestType: RequestType;
@@ -86,8 +85,7 @@ export default {
             filters: queryStringToObject(urlQuery.filters),
         });
 
-        const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (state.costQueryList.find(item => item.cost_query_set_id === queryItemKey)) || {};
-
+        const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (state.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
 
         /* Watchers */
         watch(() => state.selectedQueryId, (selectedQueryId) => {

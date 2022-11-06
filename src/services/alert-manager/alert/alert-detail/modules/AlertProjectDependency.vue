@@ -8,7 +8,9 @@
                 {{ $t('MONITORING.ALERT.DETAIL.PROJECT_DEPENDENCY.NO_DATA') }}
             </p-empty>
         </p>
-        <p v-for="(item, index) in projectList" v-else :key="`${item}-${index}`"
+        <p v-for="(item, index) in projectList"
+           v-else
+           :key="`${item}-${index}`"
            class="project-name"
         >
             <p-anchor :to="referenceRouter(
@@ -32,13 +34,11 @@ import {
     PAnchor, PEmpty, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
 
-
 import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import type { AlertDataModel } from '@/services/alert-manager/type';
-
 
 export default {
     name: 'AlertProjectDependency',

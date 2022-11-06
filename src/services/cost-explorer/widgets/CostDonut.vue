@@ -4,11 +4,15 @@
                                        :widget-link="widgetLink"
                                        :print-mode="printMode"
     >
-        <p-data-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading"
+                       class="chart-wrapper"
+        >
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
-            <div ref="chartRef" class="chart" />
+            <div ref="chartRef"
+                 class="chart"
+            />
         </p-data-loader>
         <div class="table-wrapper">
             <cost-dashboard-data-table
@@ -34,7 +38,6 @@
 
 <script lang="ts">
 
-
 import {
     computed, reactive, toRefs, watch, onUnmounted, defineComponent,
 } from 'vue';
@@ -48,12 +51,10 @@ import {
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { CURRENCY } from '@/store/modules/display/config';
-
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -74,7 +75,6 @@ import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/Cos
 import type {
     PieChartData, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
-
 
 const CATEGORY_KEY = 'category';
 const VALUE_KEY = 'value';

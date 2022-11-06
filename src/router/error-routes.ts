@@ -8,7 +8,6 @@ export const ERROR_ROUTE = Object.freeze({
     _NAME: 'error',
 });
 
-
 export const errorRoutes: RouteConfig[] = [
     {
         path: '/error-page',

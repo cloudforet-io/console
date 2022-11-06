@@ -1,5 +1,6 @@
 <template>
-    <p-button-modal :visible="proxyVisible" :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.DUPLICATE_DASHBOARD')"
+    <p-button-modal :visible="proxyVisible"
+                    :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.DUPLICATE_DASHBOARD')"
                     size="sm"
                     :disabled="!isAllValid"
                     class="cost-dashboard-duplicate-modal"
@@ -12,7 +13,8 @@
                            :invalid-text="invalidTexts.name"
                            required
             >
-                <p-text-input :value="name" :invalid="invalidState.name"
+                <p-text-input :value="name"
+                              :invalid="invalidState.name"
                               @input="setForm('name', $event)"
                 />
             </p-field-group>
@@ -25,7 +27,9 @@
                            required
                            class="mt-6"
             >
-                <p-radio v-for="{ name: visibilityName, label } in filteredVisibilityList" :key="visibilityName" :value="visibilityName"
+                <p-radio v-for="{ name: visibilityName, label } in filteredVisibilityList"
+                         :key="visibilityName"
+                         :value="visibilityName"
                          :selected="visibility"
                          class="radio-group"
                          @change="setForm('visibility', $event)"
@@ -133,7 +137,7 @@ export default defineComponent<Props>({
         });
         const state = reactive({
             proxyVisible: props.visible,
-            filteredVisibilityList: computed(() => (props.manageDisabled ? visibilityList.filter(item => item.name === DASHBOARD_PRIVACY_TYPE.USER) : visibilityList)),
+            filteredVisibilityList: computed(() => (props.manageDisabled ? visibilityList.filter((item) => item.name === DASHBOARD_PRIVACY_TYPE.USER) : visibilityList)),
             includesFilter: false,
         });
 

@@ -25,8 +25,12 @@
                 <span>{{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
             </div>
             <template v-for="(condition, idx) of proxyConditions">
-                <p-divider v-if="idx > 0" :key="`divider-${idx}`" />
-                <div :key="`condition-${idx}`" class="input-wrapper">
+                <p-divider v-if="idx > 0"
+                           :key="`divider-${idx}`"
+                />
+                <div :key="`condition-${idx}`"
+                     class="input-wrapper"
+                >
                     <div class="left-part">
                         <p-select-dropdown v-model="condition.key"
                                            class="input"
@@ -38,7 +42,9 @@
                                            :items="operators"
                                            use-fixed-menu-style
                         />
-                        <p-text-input v-model="condition.value" class="input" />
+                        <p-text-input v-model="condition.value"
+                                      class="input"
+                        />
                     </div>
                     <p-icon-button name="ic_trashcan"
                                    class="delete-button"
@@ -59,11 +65,9 @@ import {
     PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
 } from '@spaceone/design-system';
 
-
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-
 
 const CONDITIONS_POLICY = Object.freeze({
     ALL: 'ALL',

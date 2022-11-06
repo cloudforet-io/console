@@ -6,13 +6,19 @@
                 <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>
             </div>
 
-            <div class="summary-wrapper" :style="{ color: awsProvider ? awsProvider.color : '' }">
-                <div v-for="(data, index) in summaryData" :key="index"
-                     class="summary" :class="{active: tabState.activeTab === data.name}"
+            <div class="summary-wrapper"
+                 :style="{ color: awsProvider ? awsProvider.color : '' }"
+            >
+                <div v-for="(data, index) in summaryData"
+                     :key="index"
+                     class="summary"
+                     :class="{active: tabState.activeTab === data.name}"
                      @click="tabState.activeTab = data.name"
                 >
                     <p-anchor :href="summaryLinkFormatter(data.name).href"
-                              :icon-visible="false" class="count" highlight
+                              :icon-visible="false"
+                              class="count"
+                              highlight
                     >
                         {{ data.count | summaryCount }}
                     </p-anchor>
@@ -36,7 +42,9 @@
                                 @change="onChange"
                 >
                     <template #col-event-format="{ value }">
-                        <p-anchor :to="value.to" highlight>
+                        <p-anchor :to="value.to"
+                                  highlight
+                        >
                             {{ value.name }}
                         </p-anchor>
                     </template>
@@ -48,13 +56,18 @@
                     </template>
                     <template #col-affected_resources-format="{ value }">
                         <div v-if="value.length > 0">
-                            <div v-for="(resource, index) in value" :key="index" class="affected-resources-wrapper">
+                            <div v-for="(resource, index) in value"
+                                 :key="index"
+                                 class="affected-resources-wrapper"
+                            >
                                 <template v-if="resource.entity_type === 'account'">
                                     <span class="label">{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ACCOUNT_ID') }} : </span>
                                     <span class="value">{{ resource.aws_account_id }}</span>
                                 </template>
                                 <template v-else>
-                                    <p-anchor :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })" highlight>
+                                    <p-anchor :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
+                                              highlight
+                                    >
                                         {{ resource.entity_value }}
                                     </p-anchor>
                                 </template>
@@ -100,7 +113,6 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 enum EVENT_CATEGORY {
     accountNotification = 'accountNotification',
@@ -197,7 +209,7 @@ export default {
         });
 
         /* util */
-        const regionFormatter = val => state.regions[val]?.name || val;
+        const regionFormatter = (val) => state.regions[val]?.name || val;
         const summaryLinkFormatter = (category) => {
             const filters: QueryStoreFilter[] = [];
             const status = ['open'];

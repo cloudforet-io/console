@@ -2,11 +2,16 @@
     <p-pane-layout class="alert-detail-status-update">
         <span class="content-title">{{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.STATUS_UPDATE') }}</span>
         <p class="content-wrapper">
-            <span v-if="status" class="description">{{ status }}</span>
+            <span v-if="status"
+                  class="description"
+            >{{ status }}</span>
             <p-empty v-else>
                 {{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NO_UPDATE') }}
             </p-empty>
-            <button class="new-button" :class="{'disabled': manageDisabled}" @click="openStatusUpdateModal">
+            <button class="new-button"
+                    :class="{'disabled': manageDisabled}"
+                    @click="openStatusUpdateModal"
+            >
                 {{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NEW_UPDATE') }}
             </button>
         </p>
@@ -21,7 +26,9 @@
                                required
                 >
                     <template #default>
-                        <p-textarea v-model="statusInput" class="block w-full" />
+                        <p-textarea v-model="statusInput"
+                                    class="block w-full"
+                        />
                     </template>
                 </p-field-group>
             </template>

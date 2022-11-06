@@ -1,9 +1,13 @@
 <template>
-    <p-data-loader :loading="loading" class="cost-analysis-pie-chart">
+    <p-data-loader :loading="loading"
+                   class="cost-analysis-pie-chart"
+    >
         <template #loader>
             <p-skeleton height="100%" />
         </template>
-        <div ref="chartRef" class="chart" />
+        <div ref="chartRef"
+             class="chart"
+        />
     </p-data-loader>
 </template>
 
@@ -24,7 +28,6 @@ import {
 
 import { CURRENCY } from '@/store/modules/display/config';
 
-
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -33,7 +36,6 @@ import { gray } from '@/styles/colors';
 import type {
     Legend, PieChartData, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
-
 
 interface Props extends WidgetProps {
     loading: boolean;

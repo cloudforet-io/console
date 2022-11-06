@@ -17,8 +17,12 @@
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.ESCALATION_RULES_LABEL') }}</span>
             <div class="escalation-rules-wrapper">
                 <div class="rule-wrapper">
-                    <div v-for="(rule, idx) in escalationRules" :key="`rule-${idx}`">
-                        <p-badge outline style-type="gray">
+                    <div v-for="(rule, idx) in escalationRules"
+                         :key="`rule-${idx}`"
+                    >
+                        <p-badge outline
+                                 style-type="gray"
+                        >
                             {{ $t('PROJECT.DETAIL.ALERT.STEP') }} {{ idx + 1 }}
                         </p-badge>
                         <span class="text">
@@ -35,13 +39,17 @@
                                 </i18n>
                             </span>
                         </template>
-                        <project-channel-list :project-channels="projectChannels" :notification-level="rule.notification_level" />
+                        <project-channel-list :project-channels="projectChannels"
+                                              :notification-level="rule.notification_level"
+                        />
                         <p-divider class="divider" />
                     </div>
                 </div>
                 <div class="repeat-wrapper">
                     <p-i name="ic_repeat" />
-                    <i18n path="PROJECT.DETAIL.ALERT.REPEAT_ALL" class="ml-2">
+                    <i18n path="PROJECT.DETAIL.ALERT.REPEAT_ALL"
+                          class="ml-2"
+                    >
                         <template #count>
                             <strong>{{ repeatCount }}</strong>
                         </template>
@@ -54,7 +62,6 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-
 
 import {
     computed, onActivated, reactive, toRefs, watch,
@@ -70,7 +77,6 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -78,7 +84,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
 import { FINISH_CONDITION } from '@/services/alert-manager/lib/config';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-
 
 export default {
     name: 'ProjectEscalationPolicy',
@@ -115,7 +120,7 @@ export default {
             escalationPolicyName: computed(() => get(props.escalationPolicy, 'name')),
             finishCondition: computed(() => {
                 const finishCondition = get(props.escalationPolicy, 'finish_condition');
-                if (finishCondition) return state.finishConditions.find(d => d.name === finishCondition).label;
+                if (finishCondition) return state.finishConditions.find((d) => d.name === finishCondition).label;
                 return '';
             }),
             escalationRules: computed(() => get(props.escalationPolicy, 'rules')),
@@ -134,8 +139,8 @@ export default {
         });
 
         /* util */
-        const notificationLevelFormatter = str => str.replace('LV', '');
-        const channelFormatter = level => filter(state.projectChannels, { notification_level: level });
+        const notificationLevelFormatter = (str) => str.replace('LV', '');
+        const channelFormatter = (level) => filter(state.projectChannels, { notification_level: level });
 
         /* api */
         const apiQuery = new ApiQueryHelper();

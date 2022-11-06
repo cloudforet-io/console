@@ -1,5 +1,7 @@
 <template>
-    <portal to="top-notification" class="top-notification">
+    <portal to="top-notification"
+            class="top-notification"
+    >
         <p slot-scope="{hasDefaultMessage}">
             <p-notification-bar v-model="visible"
                                 :style-type="styleType"
@@ -18,7 +20,6 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import { PNotificationBar } from '@spaceone/design-system';
-
 
 import { store } from '@/store';
 

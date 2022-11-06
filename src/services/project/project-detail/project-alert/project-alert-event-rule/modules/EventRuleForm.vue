@@ -11,7 +11,9 @@
             :options.sync="options"
         />
         <div class="button-group">
-            <p-button style-type="tertiary" @click="onClickCancel">
+            <p-button style-type="tertiary"
+                      @click="onClickCancel"
+            >
                 {{ $t('PROJECT.EVENT_RULE.CANCEL') }}
             </p-button>
             <p-button :disabled="!isAllValid"
@@ -46,7 +48,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import EventRuleActionForm from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleActionForm.vue';
 import EventRuleConditionForm from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleConditionForm.vue';
-
 
 const CONDITIONS_POLICY = Object.freeze({
     ALL: 'ALL',
@@ -194,7 +195,7 @@ export default {
         }, { immediate: true });
 
         watch(() => state.conditions, (conditions) => {
-            state.isAllValid = conditions.every(d => d.key && d.value);
+            state.isAllValid = conditions.every((d) => d.key && d.value);
         }, { immediate: true, deep: true });
 
         return {

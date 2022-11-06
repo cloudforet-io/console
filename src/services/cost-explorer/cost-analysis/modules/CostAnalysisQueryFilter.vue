@@ -1,5 +1,7 @@
 <template>
-    <div class="cost-analysis-query-filter" :class="{ 'print-mode': printMode }">
+    <div class="cost-analysis-query-filter"
+         :class="{ 'print-mode': printMode }"
+    >
         <div class="filter-wrapper tablet-off">
             <div class="left-part">
                 <div class="filter-item">
@@ -12,7 +14,9 @@
                                        @select="handleSelectGranularity"
                     />
                 </div>
-                <div v-if="granularity !== GRANULARITY.ACCUMULATED" class="filter-item">
+                <div v-if="granularity !== GRANULARITY.ACCUMULATED"
+                     class="filter-item"
+                >
                     <template v-if="!printMode">
                         <span class="v-divider" />
                         <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}</b>
@@ -29,16 +33,25 @@
             </div>
             <div class="right-part">
                 <span class="timezone-text">UTC</span>
-                <cost-analysis-period-select-dropdown :fixed-period="period" :print-mode="printMode" @update="handleSelectedDates" />
+                <cost-analysis-period-select-dropdown :fixed-period="period"
+                                                      :print-mode="printMode"
+                                                      @update="handleSelectedDates"
+                />
                 <span class="v-divider" />
                 <currency-select-dropdown :print-mode="printMode" />
             </div>
         </div>
         <div class="filter-wrapper tablet-on">
             <div class="right-part">
-                <cost-analysis-period-select-dropdown :fixed-period="period" :print-mode="printMode" @update="handleSelectedDates" />
+                <cost-analysis-period-select-dropdown :fixed-period="period"
+                                                      :print-mode="printMode"
+                                                      @update="handleSelectedDates"
+                />
                 <span class="v-divider" />
-                <p-icon-button class="filter-item" name="ic_setting" @click="handleClickSetFilter" />
+                <p-icon-button class="filter-item"
+                               name="ic_setting"
+                               @click="handleClickSetFilter"
+                />
             </div>
         </div>
         <cost-analysis-set-query-modal :visible.sync="setQueryModalVisible" />
@@ -47,7 +60,6 @@
 
 <script lang="ts">
 
-
 import { computed, reactive, toRefs } from 'vue';
 
 import {
@@ -55,7 +67,6 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
-
 
 import { i18n } from '@/translations';
 
@@ -128,7 +139,7 @@ export default {
             state.setQueryModalVisible = true;
         };
 
-        const dateFormatter = date => dayjs.utc(date).format('YYYY/MM/DD');
+        const dateFormatter = (date) => dayjs.utc(date).format('YYYY/MM/DD');
 
         return {
             ...toRefs(state),

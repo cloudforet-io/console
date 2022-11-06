@@ -1,6 +1,10 @@
 <template>
-    <div class="cost-analysis-chart" :class="{'print-mode': printMode}">
-        <section ref="chartRef" class="chart-section">
+    <div class="cost-analysis-chart"
+         :class="{'print-mode': printMode}"
+    >
+        <section ref="chartRef"
+                 class="chart-section"
+        >
             <cost-analysis-pie-chart v-if="granularity === GRANULARITY.ACCUMULATED"
                                      :loading="loading"
                                      :chart.sync="chart"
@@ -81,7 +85,6 @@ import {
 import type {
     Legend, PieChartData, XYChartData,
 } from '@/services/cost-explorer/widgets/type';
-
 
 export default {
     name: 'CostAnalysisChart',

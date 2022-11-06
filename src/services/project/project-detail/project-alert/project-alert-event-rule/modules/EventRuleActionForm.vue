@@ -13,7 +13,9 @@
                     {{ $t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') }}
                 </p>
                 <div>
-                    <span v-if="proxyActions.no_notification" class="toggle-text">ON</span>
+                    <span v-if="proxyActions.no_notification"
+                          class="toggle-text"
+                    >ON</span>
                     <p-toggle-button
                         sync
                         :value="proxyActions.no_notification"
@@ -25,7 +27,9 @@
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.PROJECT_ROUTING') }}
                 </p>
-                <project-select-dropdown project-selectable :selected-project-ids.sync="routingProjects" />
+                <project-select-dropdown project-selectable
+                                         :selected-project-ids.sync="routingProjects"
+                />
             </div>
             <div class="form-box mobile-block">
                 <p class="label">
@@ -49,7 +53,9 @@
                     >
                         {{ urgency.label }}
                     </p-radio>
-                    <p-select-dropdown v-model="selectedUrgency" :items="urgencyList" />
+                    <p-select-dropdown v-model="selectedUrgency"
+                                       :items="urgencyList"
+                    />
                 </div>
             </div>
             <div class="form-box mobile-block">
@@ -123,7 +129,6 @@ import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-
 const URGENCY = Object.freeze({
     NO_SET: 'NO_SET',
     HIGH: 'HIGH',
@@ -155,7 +160,7 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-            userItems: computed(() => Object.keys(state.users).map(k => ({
+            userItems: computed(() => Object.keys(state.users).map((k) => ({
                 name: k,
                 label: state.users[k]?.label || k,
             }))),
@@ -221,7 +226,7 @@ export default {
             }),
             selectedResponder: computed<MenuItem[]>({
                 get() {
-                    return props.actions.add_responder.map(d => ({
+                    return props.actions.add_responder.map((d) => ({
                         name: d.resource_id,
                         label: d.resource_id,
                     }));
@@ -229,7 +234,7 @@ export default {
                 set(items) {
                     state.proxyActions = {
                         ...state.proxyActions,
-                        add_responder: items.map(item => ({
+                        add_responder: items.map((item) => ({
                             resource_type: 'identity.User',
                             resource_id: item.name,
                         })),
@@ -247,7 +252,6 @@ export default {
             }),
         });
 
-
         /* event */
         const onToggleChange = ({ value }) => {
             state.proxyActions = {
@@ -258,7 +262,6 @@ export default {
         const handleUpdateAdditionalInformation = (tags: Tag) => {
             state.additionalInfoTags = tags;
         };
-
 
         return {
             ...toRefs(state),

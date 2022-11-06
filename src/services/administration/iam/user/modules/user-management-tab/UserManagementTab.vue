@@ -1,6 +1,7 @@
 <template>
     <section>
-        <p-tab v-if="selectedIndex.length === 1" :tabs="singleItemTabState.tabs"
+        <p-tab v-if="selectedIndex.length === 1"
+               :tabs="singleItemTabState.tabs"
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
@@ -36,7 +37,8 @@
             <!--                <user-notifications :user-id="selectedUsers[0].user_id" />-->
             <!--            </template>-->
         </p-tab>
-        <p-tab v-else-if="selectedIndex.length > 1" :tabs="multiItemTabState.tabs"
+        <p-tab v-else-if="selectedIndex.length > 1"
+               :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
@@ -48,7 +50,9 @@
                               class="selected-data-tab"
                 >
                     <template #col-state-format="{value}">
-                        <p-status v-bind="userStateFormatter(value)" class="capitalize" />
+                        <p-status v-bind="userStateFormatter(value)"
+                                  class="capitalize"
+                        />
                     </template>
                     <template #col-last_accessed_at-format="{ value }">
                         <span v-if="value === -1">
@@ -67,7 +71,9 @@
                 </p-data-table>
             </template>
         </p-tab>
-        <div v-else id="empty-space">
+        <div v-else
+             id="empty-space"
+        >
             <p-empty>{{ $t('IDENTITY.USER.MAIN.NO_SELECTED') }}</p-empty>
         </div>
     </section>
@@ -83,7 +89,6 @@ import {
     PEmpty, PStatus, PTab, PDataTable, PPanelTop,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -157,7 +162,6 @@ export default {
             ] as TabItem[])),
             activeTab: 'data',
         });
-
 
         return {
             ...toRefs(state),

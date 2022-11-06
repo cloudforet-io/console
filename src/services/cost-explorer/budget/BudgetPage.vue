@@ -20,7 +20,9 @@
             </template>
         </p-page-title>
         <p-divider />
-        <budget-list :filters="filters" @update:filters="handleUpdateFilters" />
+        <budget-list :filters="filters"
+                     @update:filters="handleUpdateFilters"
+        />
     </div>
 </template>
 
@@ -45,7 +47,6 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import BudgetList from '@/services/cost-explorer/budget/modules/budget-list/BudgetList.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-
 
 export default {
     name: 'BudgetPage',

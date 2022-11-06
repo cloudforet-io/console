@@ -70,10 +70,8 @@ import type {
 import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { i18n } from '@/translations';
 
@@ -107,7 +105,6 @@ import type {
     CostAnalyzeModel,
     Legend, PieChartData, WidgetProps, XYChartData,
 } from '@/services/cost-explorer/widgets/type';
-
 
 const CostAnalysisStackedColumnChart = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue');
 const CostAnalysisPieChart = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue');

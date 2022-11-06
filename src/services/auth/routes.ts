@@ -4,13 +4,13 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
-const SignOutPage = () => import(/* webpackChunkName: "SignOutPage" */ '@/services/auth/sign-out/SignOutPage.vue');
-const ResetPasswordPage = () => import(/* webpackChunkName: "ResetPasswordPage" */ '@/services/auth/reset-password/ResetPasswordPage.vue');
+const SignOutPage = () => import('@/services/auth/sign-out/SignOutPage.vue');
+const ResetPasswordPage = () => import('@/services/auth/reset-password/ResetPasswordPage.vue');
 
-const SignInPage = () => import(/* webpackChunkName: "SignInPage" */ '@/services/auth/sign-in/SignInPage.vue');
-const DomainAdminSignInPage = () => import(/* webpackChunkName: "DomainAdminSignInPage" */ '@/services/auth/sign-in/DomainAdminSignInPage.vue');
-const KeycloakPage = () => import(/* webpackChunkName: "KeycloakPage" */ '@/services/auth/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue');
-const KB_SSO = () => import(/* webpackChunkName: "KB_SSO" */ '@/services/auth/sign-in/external/KB_SSO/pages/KB_SSOPage.vue');
+const SignInPage = () => import('@/services/auth/sign-in/SignInPage.vue');
+const DomainAdminSignInPage = () => import('@/services/auth/sign-in/DomainAdminSignInPage.vue');
+const KeycloakPage = () => import('@/services/auth/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue');
+const KB_SSO = () => import('@/services/auth/sign-in/external/KB_SSO/pages/KB_SSOPage.vue');
 
 export default [
     {
@@ -36,7 +36,7 @@ export default [
                     isSignInPage: true,
 
                 },
-                props: route => ({
+                props: (route) => ({
                     nextPath: route.query.nextPath,
                 }),
                 component: SignInPage,
@@ -48,7 +48,7 @@ export default [
                     isSignInPage: true,
                 },
                 component: DomainAdminSignInPage,
-                props: route => ({
+                props: (route) => ({
                     isDomainOwner: true,
                     nextPath: route.query.nextPath,
                 }),
@@ -59,7 +59,7 @@ export default [
                 meta: {
                     isSignInPage: true,
                 },
-                props: route => ({
+                props: (route) => ({
                     nextPath: route.query.nextPath,
                 }),
                 component: KeycloakPage,

@@ -42,12 +42,17 @@
                                   class="right-table"
                     >
                         <template #col-name-format="{value}">
-                            <p-badge v-if="value" outline style-type="gray">
+                            <p-badge v-if="value"
+                                     outline
+                                     style-type="gray"
+                            >
                                 {{ value }}
                             </p-badge>
                         </template>
                     </p-data-table>
-                    <div v-if="!hasFilterFormat" class="all-resource-msg">
+                    <div v-if="!hasFilterFormat"
+                         class="all-resource-msg"
+                    >
                         {{ $t('COMMON.COLLECT_MODAL.HINT_TEXT') }}
                     </div>
                 </div>
@@ -78,7 +83,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-
 export default {
     name: 'CollectModal',
     components: {
@@ -92,7 +96,7 @@ export default {
             type: Array,
             default: () => [],
             validator(resources) {
-                return resources.every(resource => resource && resource.collection_info && resource.collection_info.collectors);
+                return resources.every((resource) => resource && resource.collection_info && resource.collection_info.collectors);
             },
         },
         visible: Boolean, // sync
@@ -130,7 +134,7 @@ export default {
                 state.selectedCollector,
                 'plugin_info.metadata.filter_format',
                 [],
-            ).some(f => f.key === props.idKey)),
+            ).some((f) => f.key === props.idKey)),
             selectedResources: computed(() => (state.selectedCollector
                 ? state.collectorResourceMap[state.selectedCollector.collector_id] : [])),
         });
@@ -172,7 +176,7 @@ export default {
             try {
                 await SpaceConnector.client.inventory.collector.collect({
                     collector_id: id,
-                    filter: { [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map(r => r[props.idKey]) },
+                    filter: { [props.idKey]: state.collectorResourceMap[state.selectedCollector.collector_id].map((r) => r[props.idKey]) },
                 });
                 showSuccessMessage(i18n.t('COMMON.COLLECT_MODAL.ALT_S_COLLECT_DATA'), '');
             } catch (e) {
@@ -190,7 +194,6 @@ export default {
             state.loading = false;
         };
 
-
         const initiate = async (): Promise<void> => {
             state.selectedIndexes = [0];
             setCollectorResourceMap();
@@ -200,7 +203,6 @@ export default {
         watch(() => props.visible, async (val) => {
             if (val) await initiate();
         }, { immediate: true });
-
 
         return {
             ...toRefs(state),

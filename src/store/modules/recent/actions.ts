@@ -9,7 +9,6 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
 const createRecent = async (itemType: RecentType, itemId: string) => {
     try {
         await SpaceConnector.client.addOns.recent.visit.create({
@@ -50,7 +49,7 @@ export const load: Action<RecentState, any> = async ({ commit }, payload: Recent
         type: itemType,
         limit: payload?.limit,
     });
-    const recents: RecentConfig[] = results.map(d => ({
+    const recents: RecentConfig[] = results.map((d) => ({
         itemType: d.data.type,
         itemId: d.data.id,
         updatedAt: d.updated_at,

@@ -5,19 +5,31 @@
                           :title="loading ? '' : budgetData.name"
                           @goBack="$router.go(-1)"
             >
-                <template v-if="!loading" #title-right-extra>
+                <template v-if="!loading"
+                          #title-right-extra
+                >
                     <div class="title-button-group">
-                        <p-icon-button name="ic_trashcan" :disabled="!hasManagePermission" @click="handleClickDelete" />
+                        <p-icon-button name="ic_trashcan"
+                                       :disabled="!hasManagePermission"
+                                       @click="handleClickDelete"
+                        />
                     </div>
                 </template>
             </p-page-title>
         </section>
         <section class="content">
-            <budget-detail-info class="summary" :currency="currency" :currency-rates="currencyRates" />
-            <budget-summary :budget-loading="loading" :currency="currency" :currency-rates="currencyRates"
+            <budget-detail-info class="summary"
+                                :currency="currency"
+                                :currency-rates="currencyRates"
+            />
+            <budget-summary :budget-loading="loading"
+                            :currency="currency"
+                            :currency-rates="currencyRates"
                             class="summary"
             />
-            <budget-notifications class="alert" :manage-disabled="!hasManagePermission" />
+            <budget-notifications class="alert"
+                                  :manage-disabled="!hasManagePermission"
+            />
             <!--            <budget-billing-admin class="budget" />-->
         </section>
         <budget-delete-modal v-if="!loading"
@@ -34,7 +46,6 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import { PPageTitle, PIconButton } from '@spaceone/design-system';
-
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

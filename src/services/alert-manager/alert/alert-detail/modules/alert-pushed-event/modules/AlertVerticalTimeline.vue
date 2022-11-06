@@ -1,7 +1,9 @@
 <template>
     <div class="timeline-wrapper">
         <ul class="timeline-list">
-            <li class="timeline-item" :class="[eventType, {'no-border': isLastItem}]">
+            <li class="timeline-item"
+                :class="[eventType, {'no-border': isLastItem}]"
+            >
                 <div class="timestamp">
                     {{ item.created_at ? iso8601Formatter(item.created_at, timezone) : '' }}
                 </div>

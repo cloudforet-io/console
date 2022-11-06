@@ -1,25 +1,37 @@
 <template>
     <div>
         <p-panel-top>{{ title }}</p-panel-top>
-        <p-definition-table :fields="fields" :data="data" :loading="loading"
-                            :skeleton-rows="4" v-on="$listeners"
+        <p-definition-table :fields="fields"
+                            :data="data"
+                            :loading="loading"
+                            :skeleton-rows="4"
+                            v-on="$listeners"
         >
             <template #data-created_at="{ data }">
                 {{ iso8601Formatter(data, timezone) }}
             </template>
             <template #data-role_type="{ data }">
-                <p-badge v-if="data" :outline="true" :style-type="ROLE_TYPE_BADGE_OPTION[data].styleType">
+                <p-badge v-if="data"
+                         :outline="true"
+                         :style-type="ROLE_TYPE_BADGE_OPTION[data].styleType"
+                >
                     {{ ROLE_TYPE_BADGE_OPTION[data] ? ROLE_TYPE_BADGE_OPTION[data].label : '' }}
                 </p-badge>
             </template>
         </p-definition-table>
         <p-panel-top>{{ pageAccessState.title }}</p-panel-top>
-        <div v-for="pageAccessData in pageAccessState.pageAccessDataList" :key="pageAccessData.label">
+        <div v-for="pageAccessData in pageAccessState.pageAccessDataList"
+             :key="pageAccessData.label"
+        >
             <h4 class="definition-table-header">
                 {{ pageAccessData.label }}
             </h4>
-            <p-definition-table :fields="pageAccessData.fields" :data="pageAccessData.data" :loading="pageAccessState.loading"
-                                :skeleton-rows="3" disable-copy class="page-access-table"
+            <p-definition-table :fields="pageAccessData.fields"
+                                :data="pageAccessData.data"
+                                :loading="pageAccessState.loading"
+                                :skeleton-rows="3"
+                                disable-copy
+                                class="page-access-table"
                                 v-on="$listeners"
             >
                 <template #data="{ data }">
@@ -36,7 +48,9 @@
                       :sort-desc="true"
         >
             <template #col-policy_type-format="{ value }">
-                <p-badge outline :style-type="policyTypeBadgeColorFormatter(value)">
+                <p-badge outline
+                         :style-type="policyTypeBadgeColorFormatter(value)"
+                >
                     {{ value }}
                 </p-badge>
             </template>
@@ -56,7 +70,6 @@
 </template>
 
 <script lang="ts">
-
 
 import {
     computed, reactive, toRefs, watch,
@@ -89,11 +102,9 @@ import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/confi
 import type { RoleData } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
-
 type DataTableTranslationField = DataTableField | {
     label?: TranslateResult | string;
 };
-
 
 export default {
     name: 'RoleDetail',

@@ -1,35 +1,51 @@
 <template>
     <div class="menu-bar">
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_undo"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_undo"
                        :disabled="!editor.can().undo()"
                        @click="editor.chain().focus().undo().run()"
         />
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_redo"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_redo"
                        :disabled="!editor.can().redo()"
                        @click="editor.chain().focus().redo().run()"
         />
 
-        <p-divider class="menu-divider" vertical />
+        <p-divider class="menu-divider"
+                   vertical
+        />
 
-        <p-select-dropdown :selected="selectedTextStyle" class="menu-dropdown text-style" style-type="transparent"
+        <p-select-dropdown :selected="selectedTextStyle"
+                           class="menu-dropdown text-style"
+                           style-type="transparent"
                            :items="textStyleItems"
                            @select="handleTextStyleSelect"
         >
             <template #menu-item--format="{item}">
-                <component :is="TEXT_STYLE_TAGS[item.name]" class="text-style-node">
+                <component :is="TEXT_STYLE_TAGS[item.name]"
+                           class="text-style-node"
+                >
                     {{ item.label }}
                 </component>
             </template>
         </p-select-dropdown>
 
-        <p-divider class="menu-divider" vertical />
+        <p-divider class="menu-divider"
+                   vertical
+        />
 
-        <p-select-dropdown :selected="selectedTextAlign" class="menu-dropdown" style-type="transparent"
+        <p-select-dropdown :selected="selectedTextAlign"
+                           class="menu-dropdown"
+                           style-type="transparent"
                            :items="textAlignItems"
                            @select="handleTextAlignSelect"
         >
             <template #default>
-                <p-i :name="TEXT_ALIGN_ICONS[selectedTextAlign]" color="inherit" />
+                <p-i :name="TEXT_ALIGN_ICONS[selectedTextAlign]"
+                     color="inherit"
+                />
             </template>
             <template #menu-item--format="{item}">
                 <p-i :name="TEXT_ALIGN_ICONS[item.name]" />
@@ -37,56 +53,85 @@
             </template>
         </p-select-dropdown>
 
-        <p-divider class="menu-divider" vertical />
+        <p-divider class="menu-divider"
+                   vertical
+        />
 
-        <color-picker class="menu-dropdown" :editor="editor"
+        <color-picker class="menu-dropdown"
+                      :editor="editor"
                       @select="editor.chain().focus().setColor($event).run()"
         />
 
-        <p-divider class="menu-divider" vertical />
+        <p-divider class="menu-divider"
+                   vertical
+        />
 
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_text-bold"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_text-bold"
                        :class="{ 'selected': editor.isActive('bold') }"
                        @click="editor.chain().focus().toggleBold().run()"
         />
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_text-italic"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_text-italic"
                        :class="{ 'selected': editor.isActive('italic') }"
                        @click="editor.chain().focus().toggleItalic().run()"
         />
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_text-underline"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_text-underline"
                        :class="{ 'selected': editor.isActive('underline') }"
                        @click="editor.chain().focus().toggleUnderline().run()"
         />
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_text-strikethrough"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_text-strikethrough"
                        :class="{ 'selected': editor.isActive('strike') }"
                        @click="editor.chain().focus().toggleStrike().run()"
         />
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_inline-code"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_inline-code"
                        :class="{ 'selected': editor.isActive('code') }"
                        :disabled="!editor.can().setCode()"
                        @click="editor.chain().focus().toggleCode().run()"
         />
 
-        <p-divider class="menu-divider" vertical />
+        <p-divider class="menu-divider"
+                   vertical
+        />
 
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_list-bulleted"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_list-bulleted"
                        :class="{ 'selected': editor.isActive('bulletList') }"
                        @click="editor.chain().focus().toggleBulletList().run()"
         />
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_list-numbered"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_list-numbered"
                        :class="{ 'selected': editor.isActive('orderedList') }"
                        @click="editor.chain().focus().toggleOrderedList().run()"
         />
 
-        <p-divider class="menu-divider" vertical />
+        <p-divider class="menu-divider"
+                   vertical
+        />
 
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_link"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_link"
                        :class="{ 'selected': editor.isActive('link') }"
                        @click="handleLinkClick"
         />
-        <p-popover v-model="imagePopoverVisible" position="bottom">
-            <p-icon-button class="menu-button" style-type="transparent"
-                           name="ic_image" :class="{selected: imagePopoverVisible}"
+        <p-popover v-model="imagePopoverVisible"
+                   position="bottom"
+        >
+            <p-icon-button class="menu-button"
+                           style-type="transparent"
+                           name="ic_image"
+                           :class="{selected: imagePopoverVisible}"
             />
             <template #content>
                 <div class="image-popover">
@@ -98,17 +143,23 @@
             </template>
         </p-popover>
 
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_editor-code"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_editor-code"
                        :class="{ 'selected': editor.isActive('codeBlock') }"
                        :disabled="!editor.can().setCodeBlock()"
                        @click="editor.chain().focus().toggleCodeBlock().run()"
         />
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_quotes"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_quotes"
                        :class="{ 'selected': editor.isActive('blockquote') }"
                        :disabled="!editor.can().setBlockquote()"
                        @click="editor.chain().focus().toggleBlockquote().run()"
         />
-        <p-icon-button class="menu-button" style-type="transparent" name="ic_horizontal-rule"
+        <p-icon-button class="menu-button"
+                       style-type="transparent"
+                       name="ic_horizontal-rule"
                        :disabled="!editor.can().setHorizontalRule()"
                        @click="editor.chain().focus().setHorizontalRule().run()"
         />
@@ -127,11 +178,9 @@ import {
 } from '@spaceone/design-system';
 import type { Editor } from '@tiptap/vue-2';
 
-
 import { i18n } from '@/translations';
 
 import ColorPicker from '@/common/components/editor/ColorPicker.vue';
-
 
 interface Props {
     editor: Editor

@@ -12,10 +12,16 @@
     >
         <template #body>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_LABEL')">
-                <p-text-input v-model="formState.name" class="name" :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_PLACEHOLDER')" />
+                <p-text-input v-model="formState.name"
+                              class="name"
+                              :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_PLACEHOLDER')"
+                />
             </p-field-group>
-            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL')" required>
-                <p-search-dropdown :selected.sync="formState.timezone" :menu="timezones"
+            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL')"
+                           required
+            >
+                <p-search-dropdown :selected.sync="formState.timezone"
+                                   :menu="timezones"
                                    class="timezone"
                                    use-fixed-menu-style
                                    @update:selected="changeTimezone"
@@ -29,7 +35,8 @@
                 <template #label-extra>
                     <span class="label-help-text">{{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_DESC',{ timezone: formState.timezone[0].label}) }}</span>
                 </template>
-                <div v-for="(type, idx) in Object.keys(scheduleTypes)" :key="idx"
+                <div v-for="(type, idx) in Object.keys(scheduleTypes)"
+                     :key="idx"
                      class="time-schedule-wrapper block lg:flex h-48 lg:h-40"
                      :class="formState.scheduleType === type ? 'selected' : ''"
                      @click="formState.scheduleType = type"
@@ -40,7 +47,9 @@
                             :value="type"
                         >
                             <template #icon>
-                                <p-i class="radio-icon" width="1.25rem" height="1.25rem"
+                                <p-i class="radio-icon"
+                                     width="1.25rem"
+                                     height="1.25rem"
                                      :name="formState.scheduleType === type ? 'ic_checkbox_circle--checked' : 'ic_radio'"
                                 />
                             </template>
@@ -50,8 +59,11 @@
                         </span>
                     </div>
                     <div class="w-full lg:w-2/3 m-auto">
-                        <div v-if="type === 'hourly'" class="hourly-schedule-wrapper">
-                            <span v-for="(hour) in hoursMatrix" :key="hour"
+                        <div v-if="type === 'hourly'"
+                             class="hourly-schedule-wrapper"
+                        >
+                            <span v-for="(hour) in hoursMatrix"
+                                  :key="hour"
                                   class="time-block"
                                   :class="{active: formState.selectedHours[hour] }"
                                   @click="onClickHour(hour)"
@@ -66,11 +78,21 @@
                                 {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_ALL') }}
                             </p-button>
                         </div>
-                        <div v-else class="interval-wrapper">
-                            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_EVERY_LABEL')" required class="w-full flex">
+                        <div v-else
+                             class="interval-wrapper"
+                        >
+                            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_EVERY_LABEL')"
+                                           required
+                                           class="w-full flex"
+                            >
                                 <div class="ml-4 flex-grow inline-flex">
-                                    <p-text-input v-model="formState.intervalTime" class="w-1/2" type="number" />
-                                    <p-select-dropdown v-model="formState.intervalTimeType" class="w-1/2" :items="intervalTimeTypes"
+                                    <p-text-input v-model="formState.intervalTime"
+                                                  class="w-1/2"
+                                                  type="number"
+                                    />
+                                    <p-select-dropdown v-model="formState.intervalTimeType"
+                                                       class="w-1/2"
+                                                       :items="intervalTimeTypes"
                                                        use-fixed-menu-style
                                     />
                                 </div>
@@ -84,7 +106,6 @@
 </template>
 
 <script lang="ts">
-
 
 import {
     reactive, toRefs, computed, watch,
@@ -101,7 +122,6 @@ import {
     range, get, forEach, size, map,
 } from 'lodash';
 
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
@@ -115,7 +135,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type { ScheduleAddParameter, ScheduleUpdateParameter } from '@/services/asset-inventory/collector/type';
-
 
 interface ScheduleHours {
     [time: string]: Dayjs;
@@ -194,7 +213,7 @@ export default {
             proxyVisible: useProxyValue('visible', props, emit),
             //
             hoursMatrix: range(24),
-            timezones: map(timezoneList, d => ({
+            timezones: map(timezoneList, (d) => ({
                 type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
             })) as SearchDropdownMenuItem[],
             scheduleTypes: computed(() => {
@@ -369,10 +388,13 @@ export default {
             }
         };
 
-        watch([() => props.collectorId, () => props.scheduleId],
+        watch(
+            [() => props.collectorId, () => props.scheduleId],
             async ([collectorId, scheduleId]) => {
                 if (props.editMode && collectorId && scheduleId) await getSchedule();
-            }, { immediate: true });
+            },
+            { immediate: true },
+        );
 
         return {
             ...toRefs(state),

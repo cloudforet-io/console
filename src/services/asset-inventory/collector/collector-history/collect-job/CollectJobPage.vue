@@ -1,11 +1,16 @@
 <template>
     <div>
-        <p-page-title :title="jobId" child @goBack="$router.go(-1)" />
+        <p-page-title :title="jobId"
+                      child
+                      @goBack="$router.go(-1)"
+        />
         <div class="top-wrapper">
             <job-status-chart :job-id="jobId" />
             <job-basic-information :job-id="jobId" />
         </div>
-        <p-horizontal-layout class="job-tasks-wrapper" :min-height="350">
+        <p-horizontal-layout class="job-tasks-wrapper"
+                             :min-height="350"
+        >
             <template #container="{ height }">
                 <job-table :style="{height: `${height}px`}"
                            :job-id="jobId"
@@ -13,7 +18,9 @@
                 />
             </template>
         </p-horizontal-layout>
-        <job-task-details v-if="selectedItem" :selected-item="selectedItem" />
+        <job-task-details v-if="selectedItem"
+                          :selected-item="selectedItem"
+        />
     </div>
 </template>
 
@@ -26,13 +33,11 @@ import {
     PHorizontalLayout, PPageTitle,
 } from '@spaceone/design-system';
 
-
 import JobBasicInformation from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobBasicInformation.vue';
 import JobStatusChart from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobStatusChart.vue';
 import JobTaskDetails from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskDetails.vue';
 import JobTable from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobTaskTable.vue';
 import type { JobTaskData } from '@/services/asset-inventory/collector/collector-history/collect-job/type';
-
 
 export default {
     name: 'CollectorJobPage',

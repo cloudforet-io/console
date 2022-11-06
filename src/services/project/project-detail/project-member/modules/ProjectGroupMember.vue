@@ -1,5 +1,7 @@
 <template>
-    <overlay-page-layout :visible="visible" class="project-group-member">
+    <overlay-page-layout :visible="visible"
+                         class="project-group-member"
+    >
         <p-pane-layout class="page-wrapper">
             <div class="page-navigation">
                 <div class="title-wrapper">

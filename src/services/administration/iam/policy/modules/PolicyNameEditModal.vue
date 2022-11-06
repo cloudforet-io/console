@@ -7,8 +7,12 @@
             @confirm="handleConfirm"
         >
             <template #body>
-                <p-field-group :label="$t('IAM.POLICY.MODAL.NAME')" required>
-                    <p-text-input :value="policyNameInput" @input="handleNameEditInput" />
+                <p-field-group :label="$t('IAM.POLICY.MODAL.NAME')"
+                               required
+                >
+                    <p-text-input :value="policyNameInput"
+                                  @input="handleNameEditInput"
+                    />
                 </p-field-group>
             </template>
         </p-button-modal>
@@ -20,7 +24,6 @@ import { reactive, toRefs, watch } from 'vue';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -29,7 +32,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { administrationStore } from '@/services/administration/store';
-
 
 export default {
     name: 'PolicyNameEditModal',

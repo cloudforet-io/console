@@ -1,14 +1,22 @@
 <template>
-    <div class="cost-dashboard-stacked-column-widget" :class="{responsive: !printMode}">
-        <p-data-loader :loading="loading" class="chart-wrapper" :class="widgetType"
+    <div class="cost-dashboard-stacked-column-widget"
+         :class="{responsive: !printMode}"
+    >
+        <p-data-loader :loading="loading"
+                       class="chart-wrapper"
+                       :class="widgetType"
                        :disable-transition="printMode"
         >
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
-            <div ref="chartRef" class="chart" />
+            <div ref="chartRef"
+                 class="chart"
+            />
         </p-data-loader>
-        <div class="table-wrapper" :class="widgetType">
+        <div class="table-wrapper"
+             :class="widgetType"
+        >
             <cost-dashboard-data-table :fields="fields"
                                        :items="items"
                                        :loading="loading"
@@ -40,11 +48,9 @@ import {
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 
-
 import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 
 import { store } from '@/store';
 
@@ -70,7 +76,6 @@ import CostDashboardDataTable
 import type {
     ChartData, CostAnalyzeModel, Legend, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
-
 
 const widgetTypes = ['SHORT', 'LONG'] as const;
 type WidgetType = typeof widgetTypes[number];

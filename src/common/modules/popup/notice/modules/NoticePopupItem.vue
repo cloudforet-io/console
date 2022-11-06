@@ -14,16 +14,21 @@
                 {{ item.title }}
             </h1>
             <div class="notice-popup-info">
-                <p-badge outline :style-type="noticeTypeBadgeInfo.style">
+                <p-badge outline
+                         :style-type="noticeTypeBadgeInfo.style"
+                >
                     {{ noticeTypeBadgeInfo.label }}
                 </p-badge>
                 <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, $store.state.user.timezone) }} · {{ item.writer }}</span>
             </div>
             <p-divider class="!my-4" />
-            <text-editor-viewer :contents="item.contents" :attachments="attachments" />
+            <text-editor-viewer :contents="item.contents"
+                                :attachments="attachments"
+            />
         </template>
         <template #footer-extra>
-            <p-button style-type="tertiary" size="lg"
+            <p-button style-type="tertiary"
+                      size="lg"
                       @click="handleClose(true)"
             >
                 {{ $t('COMMON.POPUP.NOTICE.DO_NOT_SHOW') }}
@@ -48,7 +53,6 @@ import {
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { store } from '@/store';
 
 import type { FileInfo } from '@/lib/file-manager/type';
@@ -60,7 +64,6 @@ import { useFileAttachments } from '@/common/composables/file-attachments';
 
 import { getPostBadgeInfo } from '@/services/info/notice/helper';
 import type { NoticePostBadgeInfo, NoticePostModel } from '@/services/info/notice/type';
-
 
 export default {
     name: 'NoticePopupItem',

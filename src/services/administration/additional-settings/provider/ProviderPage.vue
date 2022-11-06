@@ -20,7 +20,6 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 
-
 export default {
     name: 'ProviderPage',
     components: {

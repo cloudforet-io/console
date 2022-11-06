@@ -2,12 +2,20 @@
     <div class="wrapper">
         <div class="ci-wrapper">
             <template v-if="images">
-                <img class="logo-character" :src="images.ciLogo">
-                <img class="logo-text" :src="images.ciTextWithType">
+                <img class="logo-character"
+                     :src="images.ciLogo"
+                >
+                <img class="logo-text"
+                     :src="images.ciTextWithType"
+                >
             </template>
             <template v-else>
-                <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
-                <img class="logo-text" src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg">
+                <img class="logo-character"
+                     src="@/assets/images/brand/brand_logo.png"
+                >
+                <img class="logo-text"
+                     src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg"
+                >
             </template>
         </div>
         <sign-in-left-container
@@ -23,10 +31,13 @@
                 <i-d-p-w-sign-in class="id-pw-wrapper"
                                  @sign-in="onSignIn"
                 />
-                <div v-if="component" class="btn-divider">
+                <div v-if="component"
+                     class="btn-divider"
+                >
                     <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
                 </div>
-                <component :is="component" class="sign-in-template"
+                <component :is="component"
+                           class="sign-in-template"
                            @sign-in="onSignIn"
                 />
             </template>
@@ -41,7 +52,6 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import { isEmpty } from 'lodash';
-
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -141,7 +151,6 @@ export default {
         watch(() => vm.$route.query.error, () => {
             state.showErrorMessage = !!vm.$route.query.error;
         });
-
 
         return {
             ...toRefs(state),

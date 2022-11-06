@@ -1,7 +1,12 @@
 <template>
-    <div v-if="editor" class="text-editor" :class="{invalid: invalid}">
+    <div v-if="editor"
+         class="text-editor"
+         :class="{invalid: invalid}"
+    >
         <menu-bar :editor="editor" />
-        <editor-content class="editor-content" :editor="editor" />
+        <editor-content class="editor-content"
+                        :editor="editor"
+        />
     </div>
 </template>
 

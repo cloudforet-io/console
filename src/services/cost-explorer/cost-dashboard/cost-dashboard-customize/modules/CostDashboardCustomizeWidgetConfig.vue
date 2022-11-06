@@ -5,11 +5,14 @@
                        :invalid-text="invalidTexts.name"
                        required
         >
-            <p-text-input :value="name" :invalid="invalidState.name"
+            <p-text-input :value="name"
+                          :invalid="invalidState.name"
                           @input="handleName"
             />
         </p-field-group>
-        <p v-if="selectedWidgetDesc" class="widget-desc">
+        <p v-if="selectedWidgetDesc"
+           class="widget-desc"
+        >
             {{ selectedWidgetDesc }}
         </p>
         <p-field-group
@@ -59,7 +62,6 @@ import { PFieldGroup, PSelectDropdown, PTextInput } from '@spaceone/design-syste
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
 
-
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -71,7 +73,6 @@ import { costExplorerStore } from '@/services/cost-explorer/store';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 
 import TranslateResult = VueI18n.TranslateResult;
-
 
 export default {
     name: 'CostDashboardCustomizeWidgetConfig',
@@ -180,13 +181,11 @@ export default {
             else state.selectedGranularityItem = '';
         };
 
-
         watch(() => state._selectedWidget, (after) => {
             if (after && Object.keys(after).length) {
                 init();
             }
         }, { immediate: true });
-
 
         return {
             name,

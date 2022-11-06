@@ -7,12 +7,18 @@
     >
         <span class="name">
             <template v-for="(text, i) in item.name.split(regex)">
-                <strong v-if="i !== 0" :key="`${i}-match`">{{ getMatchText(item.name) }}</strong>
+                <strong v-if="i !== 0"
+                        :key="`${i}-match`"
+                >{{ getMatchText(item.name) }}</strong>
                 <span :key="i">{{ text }}</span>
             </template>
-            <span v-if="item.options && item.options.field_description" class="ml-1 text-gray-400">{{ item.options.field_description }}</span>
+            <span v-if="item.options && item.options.field_description"
+                  class="ml-1 text-gray-400"
+            >{{ item.options.field_description }}</span>
         </span>
-        <p-i name="ic_drag-handle" width="1rem" height="1rem"
+        <p-i name="ic_drag-handle"
+             width="1rem"
+             height="1rem"
              class="drag-icon"
         />
     </p-check-box>
@@ -26,7 +32,6 @@ import {
 
 import { PCheckBox, PI } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';

@@ -7,23 +7,31 @@
             <template #header>
                 <section class="header">
                     <span class="title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS') }}</span>
-                    <p-icon-button v-if="hasBudgetAlert" name="ic_trashcan" :disabled="manageDisabled"
+                    <p-icon-button v-if="hasBudgetAlert"
+                                   name="ic_trashcan"
+                                   :disabled="manageDisabled"
                                    @click="handleDelete"
                     />
                 </section>
             </template>
             <template #default>
                 <section class="card-body">
-                    <p-spinner v-if="isBudgetLoading" size="xl" />
+                    <p-spinner v-if="isBudgetLoading"
+                               size="xl"
+                    />
                     <template v-else-if="hasBudgetAlert">
                         <article class="noti-condition">
                             <span class="sub-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.CONDITION') }}</span>
                             <span class="desc">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTI_HELP_TEXT_1') }}</span>
                             <ul class="condition-list">
-                                <li v-for="item in notifications" :key="item.id">
+                                <li v-for="item in notifications"
+                                    :key="item.id"
+                                >
                                     <span class="bullet">•</span>
                                     <p-badge :style-type="item.notification_type === BUDGET_NOTIFICATIONS_TYPE.WARNING ? 'gray'
-                                        : 'alert'" outline class="icon"
+                                                 : 'alert'"
+                                             outline
+                                             class="icon"
                                     >
                                         {{ item.notification_type === 'WARNING' ? 'Warning' : 'Critical' }}
                                     </p-badge>
@@ -115,7 +123,6 @@ import { BUDGET_NOTIFICATIONS_TYPE, BUDGET_NOTIFICATIONS_UNIT } from '@/services
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-
 export default {
     name: 'BudgetNotifications',
     components: {
@@ -143,7 +150,7 @@ export default {
             }),
             notifications: computed(() => {
                 const notifications = costExplorerStore.state.budget.budgetData?.notifications;
-                return notifications ? notifications.map(d => ({ ...d, id: getUUID() })) : [];
+                return notifications ? notifications.map((d) => ({ ...d, id: getUUID() })) : [];
             }),
             budgetNotificationsModalVisible: false,
             budgetId: computed(() => costExplorerStore.state.budget.budgetData?.budget_id),

@@ -20,8 +20,12 @@
                 />
             </template>
         </p-toolbox>
-        <p-data-loader :data="items" :loading="!items.length && loading">
-            <div ref="timelineWrapperRef" class="timeline-wrapper">
+        <p-data-loader :data="items"
+                       :loading="!items.length && loading"
+        >
+            <div ref="timelineWrapperRef"
+                 class="timeline-wrapper"
+            >
                 <vertical-timeline v-for="(item, idx) in items"
                                    :key="`timeline-${item.date}-${idx}`"
                                    :date="item.date"
@@ -31,7 +35,9 @@
                                    :is-last-item="idx === items.length - 1"
                                    @click-timeline="handleClickTimeline(item)"
                 >
-                    <template v-if="item.diffItems && item.diffItems.length" #timeline-detail>
+                    <template v-if="item.diffItems && item.diffItems.length"
+                              #timeline-detail
+                    >
                         <div class="timeline-content-wrapper">
                             <div v-for="(diffItem, kIdx) in item.diffItems.slice(0, DIFF_ITEM_LIMIT)"
                                  :key="`key-value-item-${diffItem.key}-${kIdx}`"
@@ -41,11 +47,15 @@
                                 <div class="key-wrapper">
                                     {{ diffItem.key }}
                                 </div>
-                                <div v-if="item.action === 'UPDATE' && diffItem.changedValue" class="value-wrapper">
+                                <div v-if="item.action === 'UPDATE' && diffItem.changedValue"
+                                     class="value-wrapper"
+                                >
                                     {{ getConvertedChangedValue(diffItem.changedValue) }}
                                 </div>
                             </div>
-                            <span v-if="item.diffCount > DIFF_ITEM_LIMIT" class="text-gray-500">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.AND_MORE') }}</span>
+                            <span v-if="item.diffCount > DIFF_ITEM_LIMIT"
+                                  class="text-gray-500"
+                            >{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.AND_MORE') }}</span>
                         </div>
                     </template>
                     <template #additional-title>
@@ -57,7 +67,9 @@
                         </div>
                     </template>
                 </vertical-timeline>
-                <p-spinner v-if="loading && !!items.length" size="xl" />
+                <p-spinner v-if="loading && !!items.length"
+                           size="xl"
+                />
             </div>
         </p-data-loader>
         <transition name="slide-up">
@@ -98,7 +110,6 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
@@ -116,12 +127,10 @@ import type {
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
-
 const HISTORY_OVERLAY_HASH_NAME = 'history-detail';
 const DIFF_ITEM_LIMIT = 10;
 const TIMELINE_ITEM_LIMIT = 10;
 dayjs.extend(localeData);
-
 
 export default {
     name: 'CloudServiceHistory',
@@ -191,14 +200,14 @@ export default {
             return noteMap;
         };
 
-        const getConvertedHistoryData = (rawData: any[]): CloudServiceHistoryItem[] => rawData.map(data => ({
+        const getConvertedHistoryData = (rawData: any[]): CloudServiceHistoryItem[] => rawData.map((data) => ({
             recordId: data.record_id,
             date: data.created_at,
             title: HISTORY_ACTION_MAP[data.action].label,
             action: data.action,
             diffItems: data.diff.map((d, i, array) => ({
                 // If the key is duplicated, shows full path
-                key: array.filter(d2 => getDiffItemsKey(d2.key) === getDiffItemsKey(d.key)).length >= 2
+                key: array.filter((d2) => getDiffItemsKey(d2.key) === getDiffItemsKey(d.key)).length >= 2
                     ? d.key : getDiffItemsKey(d.key),
                 path: d.key,
                 previousValue: d.before,
@@ -214,7 +223,7 @@ export default {
             if (value?.startsWith('{')) return '{ ... }';
             return value;
         };
-        const delay = time => new Promise(resolve => setTimeout(resolve, time));
+        const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
         const loadMoreHistoryData = async () => {
             const newPageStart = state.pageStart + TIMELINE_ITEM_LIMIT;
             if (state.totalCount < newPageStart) return;
@@ -268,7 +277,7 @@ export default {
                         ...apiQueryHelper.data,
                     },
                 });
-                const noteList = await getNoteData(results.map(history => history.record_id));
+                const noteList = await getNoteData(results.map((history) => history.record_id));
                 state.noteItemMap = groupNoteByHistoryRecordId(noteList);
                 const convertedData = getConvertedHistoryData(results);
                 state.items = state.items.concat(convertedData);

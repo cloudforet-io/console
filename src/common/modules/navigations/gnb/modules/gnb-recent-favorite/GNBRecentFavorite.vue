@@ -1,14 +1,19 @@
 <template>
-    <div v-click-outside="hideRecentFavoriteMenu" class="gnb-recent-favorite" @click.stop
+    <div v-click-outside="hideRecentFavoriteMenu"
+         class="gnb-recent-favorite"
+         @click.stop
          @keydown.esc="hideRecentFavoriteMenu"
     >
-        <span class="menu-button" tabindex="0" role="button"
+        <span class="menu-button"
+              tabindex="0"
+              role="button"
               @keydown.enter="showRecentFavoriteMenu"
               @click.stop="handleRecentFavoriteButtonClick"
         >
             <p-i class="menu-icon"
                  name="ic_recent_and_favorite"
-                 height="1.5rem" width="1.5rem"
+                 height="1.5rem"
+                 width="1.5rem"
                  color="inherit"
             />
         </span>

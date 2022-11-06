@@ -1,16 +1,27 @@
 <template>
-    <div class="sign-in-left-container" :class="{ admin: isDomainOwner }">
+    <div
+        class="sign-in-left-container"
+        :class="{ admin: isDomainOwner }"
+    >
         <div class="lottie-wrapper">
-            <img v-if="signInImage" :src="signInImage">
-            <p-lottie v-else
-                      :name="isDomainOwner ? 'lottie_planet_signin' : 'lottie_floating-astronaut_signin'"
-                      auto
-                      width="100%"
-                      height="80%"
+            <img
+                v-if="signInImage"
+                :src="signInImage"
+            >
+            <p-lottie
+                v-else
+                :name="isDomainOwner ? 'lottie_planet_signin' : 'lottie_floating-astronaut_signin'"
+                auto
+                width="100%"
+                height="80%"
             />
         </div>
         <div class="version">
-            <p-badge style-type="primary" outline shape="square">
+            <p-badge
+                style-type="primary"
+                outline
+                shape="square"
+            >
                 {{ $t('COMMON.SIGN_IN.VERSION') }} {{ version }}
             </p-badge>
             <span class="help-msg">{{ $t('COMMON.SIGN_IN.NEED_HELP') }}
@@ -31,7 +42,6 @@ import {
     PLottie, PBadge,
 } from '@spaceone/design-system';
 
-
 import config from '@/lib/config';
 
 export default {
@@ -48,7 +58,8 @@ export default {
     },
     setup() {
         const state = reactive({
-            version: process.env.VUE_APP_VERSION,
+            // eslint-disable-next-line no-undef
+            version: VITE_APP_VER,
             signInImage: computed(() => config.get('DOMAIN_IMAGE.SIGN_IN')),
             contactLink: computed(() => config.get('CONTACT_LINK')),
         });

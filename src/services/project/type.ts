@@ -35,19 +35,16 @@ export interface ProjectItemResp {
     has_permission?: boolean|null;
 }
 
-
 export interface ProjectGroup {
     id: string;
     name: string;
 }
-
 
 export type ProjectTreeItem = TreeItem<ProjectItemResp>;
 
 export type ProjectTreeRoot = Tree<ProjectItemResp>;
 
 export type ProjectGroupTreeItem = Partial<ProjectTreeItem>;
-
 
 export const SUMMARY_TYPE = {
     SERVER: 'Server',

@@ -1,26 +1,55 @@
 <template>
-    <component :is="postDirection ? 'div' : 'li'" class="list-item" :class="{ 'pointer': !!post }">
-        <div v-if="postDirection" class="post-direction">
-            <span>{{ postDirectionLabel }}</span><p-i :name="postDirectionIcon" width="1rem" />
+    <component :is="postDirection ? 'div' : 'li'"
+               class="list-item"
+               :class="{ 'pointer': !!post }"
+    >
+        <div v-if="postDirection"
+             class="post-direction"
+        >
+            <span>{{ postDirectionLabel }}</span><p-i :name="postDirectionIcon"
+                                                      width="1rem"
+            />
         </div>
         <div v-if="isPostExist">
             <div class="title">
-                <p-i v-if="isPinned" class="pin" name="ic_pin"
+                <p-i v-if="isPinned"
+                     class="pin"
+                     name="ic_pin"
                      width="1.125rem"
                 />
-                <text-highlighting class="title" :term="inputText" :text="post.title" />
-                <new-mark v-if="isNew" class="new-mark" />
+                <text-highlighting class="title"
+                                   :term="inputText"
+                                   :text="post.title"
+                />
+                <new-mark v-if="isNew"
+                          class="new-mark"
+                />
             </div>
             <div class="info">
-                <p-badge outline :style-type="noticeTypeBadge.style">
+                <p-badge outline
+                         :style-type="noticeTypeBadge.style"
+                >
                     {{ noticeTypeBadge.label }}
-                </p-badge><span>{{ date }}</span><p-i width="0.125rem" name="ic_divider-dot" />
-                <span>{{ post.writer }}</span><p-i v-if="hasDomainRoleUser || hasSystemRoleUser" width="0.125rem" name="ic_divider-dot" />
-                <span v-if="hasDomainRoleUser || hasSystemRoleUser" class="view-count"><p-i name="ic_view" width="1.125rem" /> {{ post.view_count }}</span>
-                <span v-if="hasSystemRoleUser" class="view-count">| {{ domainName }}</span>
+                </p-badge><span>{{ date }}</span><p-i width="0.125rem"
+                                                      name="ic_divider-dot"
+                />
+                <span>{{ post.writer }}</span><p-i v-if="hasDomainRoleUser || hasSystemRoleUser"
+                                                   width="0.125rem"
+                                                   name="ic_divider-dot"
+                />
+                <span v-if="hasDomainRoleUser || hasSystemRoleUser"
+                      class="view-count"
+                ><p-i name="ic_view"
+                      width="1.125rem"
+                /> {{ post.view_count }}</span>
+                <span v-if="hasSystemRoleUser"
+                      class="view-count"
+                >| {{ domainName }}</span>
             </div>
         </div>
-        <div v-else class="not-exist-item">
+        <div v-else
+             class="not-exist-item"
+        >
             {{ $t('INFO.NOTICE.MAIN.NO_NEXT_LIST') }}
         </div>
     </component>
@@ -47,7 +76,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getPostBadgeInfo } from '@/services/info/notice/helper';
 import type { NoticePostBadgeInfo, NoticePostModel } from '@/services/info/notice/type';
-
 
 interface Props {
     inputText: string;
@@ -96,7 +124,7 @@ export default defineComponent<Props>({
             domainName: '',
         });
 
-        const dateFormatter = date => dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');
+        const dateFormatter = (date) => dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');
 
         const getDomainName = async () => {
             if (!Object.keys(props.post ?? {}).length || !state.hasSystemRoleUser) return;

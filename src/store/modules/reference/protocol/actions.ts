@@ -10,9 +10,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 let lastLoadedTime = 0;
 
-export const load: Action<ProtocolReferenceState, any> = async (
-    { state, commit }, options: ReferenceLoadOptions,
-): Promise<void|Error> => {
+export const load: Action<ProtocolReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (

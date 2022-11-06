@@ -2,7 +2,6 @@ import type { RawQueryOperator } from '@/query/type';
 
 import type { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 
-
 export interface Period {
     start?: string;
     end?: string;

@@ -1,12 +1,17 @@
 <template>
-    <p-field-group required :label="formattedMonth" class="budget-form-amount-plan-month-input"
+    <p-field-group required
+                   :label="formattedMonth"
+                   class="budget-form-amount-plan-month-input"
                    :invalid-texts="invalidTexts._amount"
                    :invalid="invalidState._amount"
     >
-        <template v-if="isMonthToDate" #label-extra>
+        <template v-if="isMonthToDate"
+                  #label-extra
+        >
             <span>(MTD)</span>
         </template>
-        <p-text-input v-model="formattedAmount" placeholder="1,000"
+        <p-text-input v-model="formattedAmount"
+                      placeholder="1,000"
                       :invalid="invalidState._amount"
         >
             <template #right-extra>
@@ -30,7 +35,6 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-
 
 interface Props {
     amount: number|undefined;
@@ -76,7 +80,7 @@ export default {
         } = useFormValidator({
             _amount: props.amount,
         }, {
-            _amount: val => (val !== undefined ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
+            _amount: (val) => (val !== undefined ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.REQUIRED_AMOUNT')),
         });
 
         const setAmount = (amount?: number) => {

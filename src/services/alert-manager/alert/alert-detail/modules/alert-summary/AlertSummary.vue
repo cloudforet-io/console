@@ -16,7 +16,9 @@
                 </p-select-dropdown>
             </template>
             <template v-else>
-                <p-badge style-type="alert" shape="square">
+                <p-badge style-type="alert"
+                         shape="square"
+                >
                     {{ ALERT_STATE.ERROR }}
                 </p-badge>
             </template>
@@ -29,18 +31,25 @@
                                class="state-dropdown"
                                @select="changeAlertUrgency"
             >
-                <p-i v-if="alertUrgency === ALERT_URGENCY.HIGH" name="ic_alert" width="1em"
-                     height="1em" class="mr-2"
+                <p-i v-if="alertUrgency === ALERT_URGENCY.HIGH"
+                     name="ic_alert"
+                     width="1em"
+                     height="1em"
+                     class="mr-2"
                 />
-                <p-i v-if="alertUrgency === ALERT_URGENCY.LOW" name="ic_urgency_low" width="1em"
-                     height="1em" class="mr-2"
+                <p-i v-if="alertUrgency === ALERT_URGENCY.LOW"
+                     name="ic_urgency_low"
+                     width="1em"
+                     height="1em"
+                     class="mr-2"
                 />
                 <span>{{ alertUrgencyList.find(d => d.name === alertUrgency).label }}</span>
             </p-select-dropdown>
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGNED_TO') }}
-                <p-button style-type="tertiary" size="sm"
+                <p-button style-type="tertiary"
+                          size="sm"
                           class="ml-2"
                           :disabled="manageDisabled"
                           @click="onClickReassign"
@@ -48,7 +57,9 @@
                     {{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGN') }}
                 </p-button>
             </span>
-            <span v-if="alertData.assignee" class="email">{{ alertData.assignee }}</span>
+            <span v-if="alertData.assignee"
+                  class="email"
+            >{{ alertData.assignee }}</span>
             <span v-else>--</span>
         </p>
         <p class="content-wrapper">
@@ -56,7 +67,8 @@
             <span class="time">{{ duration }}</span>
         </p>
         <alert-assign-modal
-            :visible.sync="reassignModalVisible" :project-id="alertData.project_id"
+            :visible.sync="reassignModalVisible"
+            :project-id="alertData.project_id"
             :alert-id="id"
         />
     </p-pane-layout>
@@ -87,7 +99,6 @@ import {
     ALERT_STATE, ALERT_URGENCY,
 } from '@/services/alert-manager/lib/config';
 import { alertManagerStore } from '@/services/alert-manager/store';
-
 
 // interface HeaderState {
 //     alertState: ALERT_STATE;
@@ -193,7 +204,6 @@ export default {
         };
     },
 };
-
 
 </script>
 

@@ -1,6 +1,8 @@
 <template>
     <fragment>
-        <p v-if="!isEditMode" class="content-wrapper">
+        <p v-if="!isEditMode"
+           class="content-wrapper"
+        >
             <span class="project">
                 <p-copy-button :value="alertData.project_id">
                     <p-anchor :to="referenceRouter(
@@ -12,21 +14,27 @@
                     </p-anchor>
                 </p-copy-button>
             </span>
-            <p-button style-type="tertiary" size="sm" class="add-button ml-2"
+            <p-button style-type="tertiary"
+                      size="sm"
+                      class="add-button ml-2"
                       :disabled="manageDisabled"
                       @click="startEdit(alertData.project_id)"
             >
                 {{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE') }}
             </p-button>
         </p>
-        <div v-else class="content-wrapper">
+        <div v-else
+             class="content-wrapper"
+        >
             <project-select-dropdown :selected-project-ids="dataForUpdate ? [dataForUpdate] : []"
                                      project-selectable
                                      class="dropdown"
                                      @select="onSelectProject"
             />
             <div class="button-group ml-2">
-                <p-button style-type="secondary" size="sm" class="cancel-button"
+                <p-button style-type="secondary"
+                          size="sm"
+                          class="cancel-button"
                           @click="cancelEdit(alertData.project_id)"
                 >
                     {{ $t('COMMON.TAGS.CANCEL') }}
@@ -65,7 +73,6 @@ import {
     PButton, PAnchor, PButtonModal, PCopyButton,
 } from '@spaceone/design-system';
 
-
 import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -74,7 +81,6 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import { useAlertInfoItem } from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/composables';
 import { EDIT_MODE } from '@/services/alert-manager/lib/config';
-
 
 export default {
     name: 'AlertInfoProject',

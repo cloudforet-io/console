@@ -1,6 +1,8 @@
 <template>
     <section>
-        <notification-channel-list :project-id="projectId" :manage-disabled="!hasManagePermission" />
+        <notification-channel-list :project-id="projectId"
+                                   :manage-disabled="!hasManagePermission"
+        />
     </section>
 </template>
 
@@ -11,7 +13,6 @@ import type { Vue } from 'vue/types/vue';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
-
 
 export default {
     name: 'ProjectNotificationsPage',

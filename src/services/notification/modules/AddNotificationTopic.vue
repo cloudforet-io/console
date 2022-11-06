@@ -1,17 +1,27 @@
 <template>
     <div>
-        <p-radio v-for="(item, i) in topicModeList" :key="i"
-                 :selected="item.value" :value="isTopicModeSelected" class="mr-4"
+        <p-radio v-for="(item, i) in topicModeList"
+                 :key="i"
+                 :selected="item.value"
+                 :value="isTopicModeSelected"
+                 class="mr-4"
                  @click="onChangeTopicMode(item.value)"
         >
-            <span class="radio-label" @click="onChangeTopicMode(item.value)">{{ item.label }}</span>
+            <span class="radio-label"
+                  @click="onChangeTopicMode(item.value)"
+            >{{ item.label }}</span>
         </p-radio>
-        <article v-if="isTopicModeSelected" class="topic-wrapper">
-            <div class="topic-content-wrapper" :class="{'invalid': !isTopicValid}">
+        <article v-if="isTopicModeSelected"
+                 class="topic-wrapper"
+        >
+            <div class="topic-content-wrapper"
+                 :class="{'invalid': !isTopicValid}"
+            >
                 <h5 class="setting">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
                 </h5>
-                <p-check-box v-for="item in TOPIC_LIST" :key="item.value"
+                <p-check-box v-for="item in TOPIC_LIST"
+                             :key="item.value"
                              v-model="selectedTopic"
                              :value="item.value"
                              :invalid="!isTopicValid"
@@ -21,7 +31,9 @@
                 </p-check-box>
             </div>
         </article>
-        <p v-if="!isTopicValid" class="invalid-text">
+        <p v-if="!isTopicValid"
+           class="invalid-text"
+        >
             {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC_REQUIRED') }}
         </p>
     </div>
@@ -36,7 +48,6 @@ import {
 import { PRadio, PCheckBox } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
-
 
 const TOPIC_LIST = [
     { label: 'Alert', value: 'monitoring.Alert' },

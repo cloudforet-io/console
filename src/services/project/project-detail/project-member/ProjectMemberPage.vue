@@ -1,6 +1,8 @@
 <template>
     <div>
-        <project-member-tab :project-id="id" :filters="filters" :manage-disabled="!hasManagePermission"
+        <project-member-tab :project-id="id"
+                            :filters="filters"
+                            :manage-disabled="!hasManagePermission"
                             @update-filters="onUpdateFilters"
         />
     </div>
@@ -13,7 +15,6 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 

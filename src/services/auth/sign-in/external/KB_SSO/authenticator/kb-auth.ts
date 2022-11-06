@@ -8,7 +8,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { Authenticator } from '@/services/auth/authenticator';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
-
 class KbAuth extends Authenticator {
     static async signIn(onSignInCallback, query) {
         try {

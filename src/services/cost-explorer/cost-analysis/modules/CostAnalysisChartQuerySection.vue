@@ -1,9 +1,13 @@
 <template>
-    <div class="cost-analysis-chart-query-section" :class="{'print-mode': printMode}">
+    <div class="cost-analysis-chart-query-section"
+         :class="{'print-mode': printMode}"
+    >
         <!--filter-->
         <div class="title-wrapper">
             <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER') }}</span>
-            <div v-if="!printMode" class="button-wrapper">
+            <div v-if="!printMode"
+                 class="button-wrapper"
+            >
                 <p-button style-type="tertiary"
                           size="sm"
                           :disabled="!filtersLength"
@@ -36,21 +40,32 @@
                                :read-only="printMode"
                                @select="handlePrimaryGroupByItem"
             />
-            <span v-else class="title">Total Cost</span>
-            <div v-if="!printMode" class="button-wrapper">
+            <span v-else
+                  class="title"
+            >Total Cost</span>
+            <div v-if="!printMode"
+                 class="button-wrapper"
+            >
                 <p-button style-type="tertiary"
-                          size="sm" font-weight="normal"
+                          size="sm"
+                          font-weight="normal"
                           @click="handleToggleAllLegends"
                 >
                     {{ showHideAll ? $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') : $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SHOW_ALL') }}
                 </p-button>
             </div>
         </div>
-        <p-data-loader :loading="loading" :data="legends" class="legend-wrapper">
-            <p v-if="legends.length > 15" class="too-many-text">
+        <p-data-loader :loading="loading"
+                       :data="legends"
+                       class="legend-wrapper"
+        >
+            <p v-if="legends.length > 15"
+               class="too-many-text"
+            >
                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOO_MANY_ITEMS') }}
             </p>
-            <div v-for="(legend, idx) in legends" :key="`legend-${legend.name}`"
+            <div v-for="(legend, idx) in legends"
+                 :key="`legend-${legend.name}`"
                  class="legend"
                  @click="handleToggleSeries(idx)"
             >
@@ -95,7 +110,6 @@ import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { CostFiltersMap, MoreGroupByItem } from '@/services/cost-explorer/type';
 import type { Legend } from '@/services/cost-explorer/widgets/type';
 
-
 interface Props {
     printMode: boolean;
     loading: boolean;
@@ -138,20 +152,20 @@ export default defineComponent<Props>({
             //
             filtersLength: computed<number>(() => {
                 const selectedValues = Object.values(state.filters);
-                return sum(selectedValues.map(v => v?.length || 0));
+                return sum(selectedValues.map((v) => v?.length || 0));
             }),
             filterModalVisible: false,
             //
             proxyLegends: useProxyValue('legends', props, emit),
             groupByMenuItems: computed<SelectDropdownMenu[]>(() => {
-                const groupByItems = state.groupBy.map(d => GROUP_BY_ITEM_MAP[d]);
-                const moreGroupByItems = state.moreGroupBy.filter(d => d.selected).map(d => ({
+                const groupByItems = state.groupBy.map((d) => GROUP_BY_ITEM_MAP[d]);
+                const moreGroupByItems = state.moreGroupBy.filter((d) => d.selected).map((d) => ({
                     name: `${d.category}.${d.key}`,
                     label: d.key,
                 }));
                 return [...groupByItems, ...moreGroupByItems];
             }),
-            showHideAll: computed(() => props.legends.some(legend => !legend.disabled)),
+            showHideAll: computed(() => props.legends.some((legend) => !legend.disabled)),
         });
 
         /* Util */
@@ -209,7 +223,7 @@ export default defineComponent<Props>({
         watch(() => state.groupByMenuItems, (after) => {
             if (!after.length) {
                 costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', undefined);
-            } else if (!after.filter(d => d.name === state.primaryGroupBy).length) {
+            } else if (!after.filter((d) => d.name === state.primaryGroupBy).length) {
                 costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', after[0].name);
             }
         });

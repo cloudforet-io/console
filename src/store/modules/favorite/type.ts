@@ -13,7 +13,6 @@ export interface FavoriteConfig {
     itemId: string;
 }
 
-
 export interface FavoriteItem extends FavoriteConfig {
     name?: string;
     label?: TranslateResult;

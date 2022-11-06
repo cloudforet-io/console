@@ -5,30 +5,47 @@
                 <p class="title">
                     {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS') }}
                 </p>
-                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }" class="add-btn">
-                    <p-i name="ic_plus" width="1rem" height="1rem"
+                <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
+                             class="add-btn"
+                >
+                    <p-i name="ic_plus"
+                         width="1rem"
+                         height="1rem"
                          color="inherit"
                     /> {{ $t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ADD') }}
                 </router-link>
             </div>
         </template>
         <div class="chart-container">
-            <p-data-loader :loading="loading" :data="data" class="chart">
+            <p-data-loader :loading="loading"
+                           :data="data"
+                           class="chart"
+            >
                 <template #loader>
-                    <div ref="loaderRef" class="w-full h-full" />
+                    <div ref="loaderRef"
+                         class="w-full h-full"
+                    />
                 </template>
                 <template #no-data>
                     <div class="no-data-wrapper">
                         <img src="@/assets/images/illust_ghost.svg">
                     </div>
                 </template>
-                <div ref="chartRef" class="w-full h-full" />
+                <div ref="chartRef"
+                     class="w-full h-full"
+                />
             </p-data-loader>
         </div>
         <div class="legends">
             <template v-if="loading">
-                <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
-                    <p-skeleton width="1.5rem" height="1.5rem" class="mr-4 flex-shrink-0" />
+                <div v-for="v in skeletons"
+                     :key="v"
+                     class="flex items-center p-4"
+                >
+                    <p-skeleton width="1.5rem"
+                                height="1.5rem"
+                                class="mr-4 flex-shrink-0"
+                    />
                     <p-skeleton class="flex-grow" />
                 </div>
             </template>
@@ -40,7 +57,9 @@
             >
                 <template #col-provider-format="{ item }">
                     <router-link :to="getLink(item)">
-                        <span :style="{color: item.color}" class="provider-label">{{ providers[item.provider].label }}</span>
+                        <span :style="{color: item.color}"
+                              class="provider-label"
+                        >{{ providers[item.provider].label }}</span>
                     </router-link>
                 </template>
             </p-data-table>
@@ -78,7 +97,6 @@ import {
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 const DEFAULT_COLOR = violet[200];
 
@@ -187,7 +205,6 @@ export default {
             },
         });
 
-
         /* Api */
         const getData = async () => {
             state.loading = true;
@@ -212,12 +229,10 @@ export default {
             }
         };
 
-
         /* Init */
         (async () => {
             await store.dispatch('reference/provider/load', true);
         })();
-
 
         /* Watcher */
         watch(() => state.providers, (providers) => {

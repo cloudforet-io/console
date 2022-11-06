@@ -9,8 +9,12 @@
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
-                <div v-if="mode === 'UPDATE'" class="button-wrapper">
-                    <p-button style-type="transparent" @click="handleClickCancelButton">
+                <div v-if="mode === 'UPDATE'"
+                     class="button-wrapper"
+                >
+                    <p-button style-type="transparent"
+                              @click="handleClickCancelButton"
+                    >
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
@@ -67,7 +71,6 @@ import type {
     BaseInformationForm, PageMode, ProviderModel, ServiceAccountModel,
     ServiceAccountModelForBinding,
 } from '@/services/asset-inventory/service-account/type';
-
 
 export default {
     name: 'ServiceAccountBaseInformation',

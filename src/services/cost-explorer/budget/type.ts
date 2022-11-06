@@ -19,7 +19,6 @@ export type CostType = 'provider' | 'region_code' | 'service_account_id' | 'prod
 
 export type BudgetCostType = 'all'| CostType;
 
-
 export const BUDGET_TIME_UNIT = Object.freeze({
     MONTHLY: 'MONTHLY',
     YEARLY: 'YEARLY',

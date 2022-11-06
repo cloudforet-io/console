@@ -19,7 +19,8 @@
                         {{ userId }}
                     </span>
                 </p>
-                <p-field-group :label="$t('PROJECT.DETAIL.MEMBER.ROLE')" required
+                <p-field-group :label="$t('PROJECT.DETAIL.MEMBER.ROLE')"
+                               required
                                :invalid="invalidState.selectedRoleItems"
                                :invalid-text="invalidTexts.selectedRoleItems"
                 >
@@ -34,7 +35,9 @@
                         />
                     </template>
                     <template #label-extra>
-                        <span v-if="showRoleWarning" class="role-warning-text">{{ $t('PROJECT.DETAIL.MEMBER.ROLE_WARNING') }}</span>
+                        <span v-if="showRoleWarning"
+                              class="role-warning-text"
+                        >{{ $t('PROJECT.DETAIL.MEMBER.ROLE_WARNING') }}</span>
                     </template>
                 </p-field-group>
                 <p-field-group
@@ -81,7 +84,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type { MemberItem } from '@/services/project/project-detail/project-member/type';
-
 
 export default {
     name: 'ProjectMemberUpdateModal',
@@ -143,7 +145,7 @@ export default {
                 return true;
             },
             labels: (val: InputItem[]) => {
-                const invalidItems = val.filter(d => d.invalid);
+                const invalidItems = val.filter((d) => d.invalid);
                 if (invalidItems.length) return invalidItems[invalidItems.length - 1]?.invalidText || '';
                 if (val.length > 5) return i18n.t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT');
                 return true;
@@ -156,7 +158,7 @@ export default {
                 const { results } = await SpaceConnector.client.identity.role.list({
                     role_type: 'PROJECT',
                 });
-                state.roleItems = results.map(d => ({
+                state.roleItems = results.map((d) => ({
                     type: 'item',
                     label: d.name,
                     name: d.role_id,
@@ -188,7 +190,7 @@ export default {
                 const params: any = {
                     role_id: selectedRoleItems.value[0].name,
                     users: [state.userId],
-                    labels: labels.value.map(d => d.value),
+                    labels: labels.value.map((d) => d.value),
                 };
                 if (props.isProjectGroup) {
                     params.project_group_id = props.projectGroupId;
@@ -206,7 +208,7 @@ export default {
         const updateMember = async () => {
             const params: any = {
                 user_id: state.userId,
-                labels: labels.value.map(d => d.value),
+                labels: labels.value.map((d) => d.value),
             };
             try {
                 if (props.isProjectGroup) {
@@ -248,7 +250,7 @@ export default {
         };
         const handleSelectRoleItems = (roleItems) => {
             if (!roleItems.length) return;
-            const roleItem: any = state.roleItems.find(d => d?.name === roleItems[0]?.name);
+            const roleItem: any = state.roleItems.find((d) => d?.name === roleItems[0]?.name);
             const pagePermissionMap = getPagePermissionMapFromRaw(roleItem.pagePermissions);
             setForm('selectedRoleItems', [roleItem]);
             state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
@@ -258,8 +260,8 @@ export default {
         const initForm = () => {
             state.userId = props.selectedMember.resource_id;
             const roleId = props.selectedMember.role_info?.role_id;
-            setForm('selectedRoleItems', state.roleItems.filter(d => d.name === roleId));
-            setForm('labels', props.selectedMember?.labels?.map(label => ({ value: label, label })) || []);
+            setForm('selectedRoleItems', state.roleItems.filter((d) => d.name === roleId));
+            setForm('labels', props.selectedMember?.labels?.map((label) => ({ value: label, label })) || []);
         };
 
         (async () => {

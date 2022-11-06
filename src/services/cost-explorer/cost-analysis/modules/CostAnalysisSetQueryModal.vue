@@ -19,7 +19,9 @@
                         @select="handleSelectGranularity"
                     />
                 </div>
-                <div v-if="granularity !== GRANULARITY.ACCUMULATED" class="input-wrapper">
+                <div v-if="granularity !== GRANULARITY.ACCUMULATED"
+                     class="input-wrapper"
+                >
                     <p class="input-title">
                         {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}
                     </p>
@@ -75,7 +77,6 @@ import { getInitialDates } from '@/services/cost-explorer/lib/helper';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { Granularity } from '@/services/cost-explorer/type';
 
-
 export default {
     name: 'CostAnalysisSetQueryModal',
     components: {
@@ -117,7 +118,7 @@ export default {
                     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
                 },
             ])),
-            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map(currency => ({
+            currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map((currency) => ({
                 type: 'item',
                 name: currency,
                 label: `${CURRENCY_SYMBOL[currency]}${currency}`,
@@ -164,7 +165,6 @@ export default {
 };
 
 </script>
-
 
 <style scoped lang="postcss">
 .set-query-modal-body {

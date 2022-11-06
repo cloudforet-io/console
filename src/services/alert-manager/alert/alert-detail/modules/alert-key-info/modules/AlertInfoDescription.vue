@@ -1,15 +1,26 @@
 <template>
-    <p v-if="!isEditMode" class="content-wrapper">
+    <p v-if="!isEditMode"
+       class="content-wrapper"
+    >
         <span class="description">{{ alertData.description }}&zwnj;</span>
-        <button class="edit-btn" :class="{'disabled': manageDisabled}" @click="startEdit(alertData.description)">
+        <button class="edit-btn"
+                :class="{'disabled': manageDisabled}"
+                @click="startEdit(alertData.description)"
+        >
             {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
         </button>
     </p>
-    <div v-else class="content-wrapper">
-        <p-textarea v-model="dataForUpdate" class="textarea" />
+    <div v-else
+         class="content-wrapper"
+    >
+        <p-textarea v-model="dataForUpdate"
+                    class="textarea"
+        />
         <div class="button-group">
-            <p-button style-type="secondary" class="text-button"
-                      size="sm" @click="cancelEdit(alertData.description)"
+            <p-button style-type="secondary"
+                      class="text-button"
+                      size="sm"
+                      @click="cancelEdit(alertData.description)"
             >
                 {{ $t('MONITORING.ALERT.DETAIL.INFO.CANCEL') }}
             </p-button>
@@ -29,7 +40,6 @@
 import { toRefs } from 'vue';
 
 import { PTextarea, PButton } from '@spaceone/design-system';
-
 
 import { useAlertInfoItem } from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/composables';
 import { EDIT_MODE } from '@/services/alert-manager/lib/config';

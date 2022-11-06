@@ -9,7 +9,6 @@ import type {
     AlertState, AlertUrgency, AlertSeverity, AlertStateFilter, AssignedState,
 } from '@/services/alert-manager/lib/config';
 
-
 export interface Rule {
     notification_level: string;
     escalate_minutes?: number;

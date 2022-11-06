@@ -1,6 +1,9 @@
 <template>
     <div class="notice-update-page">
-        <p-page-title :title="$t('INFO.NOTICE.FORM.EDIT_TITLE')" child @goBack="$router.go(-1)" />
+        <p-page-title :title="$t('INFO.NOTICE.FORM.EDIT_TITLE')"
+                      child
+                      @goBack="$router.go(-1)"
+        />
         <notice-form :board-id="boardId"
                      type="EDIT"
                      :notice-post-data="noticePostData"
@@ -23,7 +26,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import NoticeForm from '@/services/info/notice/modules/NoticeForm.vue';
 import type { NoticePostModel } from '@/services/info/notice/type';
-
 
 export default {
     name: 'NoticeUpdatePage',

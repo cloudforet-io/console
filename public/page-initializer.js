@@ -1,4 +1,3 @@
-
 const httpRequest = new XMLHttpRequest();
 const getTitle = () => {
     if (httpRequest.readyState === XMLHttpRequest.DONE) {

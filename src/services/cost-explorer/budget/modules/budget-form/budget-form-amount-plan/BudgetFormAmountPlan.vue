@@ -4,22 +4,32 @@
             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AMOUNT_PLANNING') }}
         </p-panel-top>
         <div class="p-4">
-            <budget-period-select class="mb-2" @update="handleUpdatePeriod" />
-            <budget-form-amount-plan-unit-select class="mb-6" :selected-unit.sync="timeUnit" />
-            <budget-form-amount-plan-monthly v-if="timeUnit === 'MONTHLY'" class="mb-6"
+            <budget-period-select class="mb-2"
+                                  @update="handleUpdatePeriod"
+            />
+            <budget-form-amount-plan-unit-select class="mb-6"
+                                                 :selected-unit.sync="timeUnit"
+            />
+            <budget-form-amount-plan-monthly v-if="timeUnit === 'MONTHLY'"
+                                             class="mb-6"
                                              :period="period"
                                              @update="handleMonthlyInputUpdate"
             >
                 <template #last-3-months>
-                    <budget-form-amount-plan-last-months-cost :project-id="projectId" :project-group-id="projectGroupId"
+                    <budget-form-amount-plan-last-months-cost :project-id="projectId"
+                                                              :project-group-id="projectGroupId"
                                                               :cost-types="costTypes"
                                                               :time-unit="timeUnit"
                     />
                 </template>
             </budget-form-amount-plan-monthly>
-            <budget-form-amount-plan-total v-else class="mb-6" @update="handleTotalAmountUpdate">
+            <budget-form-amount-plan-total v-else
+                                           class="mb-6"
+                                           @update="handleTotalAmountUpdate"
+            >
                 <template #last-3-months>
-                    <budget-form-amount-plan-last-months-cost :project-id="projectId" :project-group-id="projectGroupId"
+                    <budget-form-amount-plan-last-months-cost :project-id="projectId"
+                                                              :project-group-id="projectGroupId"
                                                               :cost-types="costTypes"
                                                               :time-unit="timeUnit"
                     />
@@ -37,7 +47,6 @@ import {
 
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 
-
 import BudgetFormAmountPlanLastMonthsCost
     from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
 import type { MonthAmountInputMap } from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
@@ -51,7 +60,6 @@ import BudgetPeriodSelect
     from '@/services/cost-explorer/budget/modules/BudgetPeriodSelect.vue';
 import type { BudgetData, BudgetTimeUnit, CostTypes } from '@/services/cost-explorer/budget/type';
 import type { Period } from '@/services/cost-explorer/type';
-
 
 export interface BudgetAmountPlanInfo {
     limit?: BudgetData['limit'];
@@ -125,7 +133,7 @@ export default {
                     result.limit = state.totalAmount;
                 } else if (state.monthlyInputs) {
                     result.planned_limits = Object.keys(state.monthlyInputs)
-                        .map(key => ({
+                        .map((key) => ({
                             date: key,
                             limit: state.monthlyInputs[key].amount,
                         }));

@@ -4,17 +4,24 @@
             <span class="text">{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.SUB_TITLE_OVERALL') }}</span>
         </div>
         <div class="chart-wrapper">
-            <div ref="chartRef" class="chart" />
+            <div ref="chartRef"
+                 class="chart"
+            />
         </div>
         <div class="legend-wrapper">
             <template v-for="([k, v]) of Object.entries(legendData)">
                 <router-link :key="k"
                              :to="overallLinkFormatter(v.name)"
-                             class="legend-row" :class="v.name"
+                             class="legend-row"
+                             :class="v.name"
                 >
                     <div class="left-part">
-                        <span class="legend-circle" :style="{ 'background-color': v.color }" />
-                        <span class="legend-text" :class="v.name">{{ v.label }}</span>
+                        <span class="legend-circle"
+                              :style="{ 'background-color': v.color }"
+                        />
+                        <span class="legend-text"
+                              :class="v.name"
+                        >{{ v.label }}</span>
                     </div>
                     <div class="right-part relative lg:absolute">
                         <span :style="{ 'color': v.color }">{{ v.count }}</span>
@@ -47,9 +54,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { green, red, yellow } from '@/styles/colors';
 
-
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 const CLOUD_SERVICE_GROUP = 'TrustedAdvisor';
 const CLOUD_SERVICE_NAME = 'Check';
@@ -68,7 +73,6 @@ interface OverallData {
     status: Status;
     count: number;
 }
-
 
 export default {
     name: 'TrustedAdvisorOverall',
@@ -90,19 +94,19 @@ export default {
                     name: STATUS.ERROR,
                     label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_ERROR'),
                     color: STATUS_COLORS[STATUS.ERROR],
-                    count: state.chartData.find(d => d.status === STATUS.ERROR)?.count,
+                    count: state.chartData.find((d) => d.status === STATUS.ERROR)?.count,
                 },
                 [STATUS.WARNING]: {
                     name: STATUS.WARNING,
                     label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_WARNING'),
                     color: STATUS_COLORS[STATUS.WARNING],
-                    count: state.chartData.find(d => d.status === STATUS.WARNING)?.count,
+                    count: state.chartData.find((d) => d.status === STATUS.WARNING)?.count,
                 },
                 [STATUS.OK]: {
                     name: STATUS.OK,
                     label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_OK'),
                     color: STATUS_COLORS[STATUS.OK],
-                    count: state.chartData.find(d => d.status === STATUS.OK)?.count,
+                    count: state.chartData.find((d) => d.status === STATUS.OK)?.count,
                 },
             })),
         });

@@ -18,7 +18,6 @@ import infoRoute from '@/services/info/routes';
 import myPageRoute from '@/services/my-page/routes';
 import projectRoute from '@/services/project/routes';
 
-
 export const ROOT_ROUTE = Object.freeze({
     _NAME: 'root',
 });

@@ -1,5 +1,7 @@
 <template>
-    <l-n-b :header="header" :menu-set="menuSet" />
+    <l-n-b :header="header"
+           :menu-set="menuSet"
+    />
 </template>
 
 <script lang="ts">
@@ -20,7 +22,6 @@ import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
 
 import { INFO_ROUTE } from '@/services/info/route-config';
 
-
 export default defineComponent({
     name: 'InfoLNB',
     components: { LNB },
@@ -40,7 +41,6 @@ export default defineComponent({
                 return filterLNBMenuByPermission(allLnbMenu, store.getters['user/pagePermissionList']);
             }),
         });
-
 
         return {
             ...toRefs(state),

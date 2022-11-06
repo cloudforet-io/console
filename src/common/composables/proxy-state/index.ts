@@ -21,7 +21,7 @@ export function useProxyValue<T = any, Prop = any>(
         emit(`update:${name}`, value);
         if (!additionalEvents) return;
         if (typeof additionalEvents === 'string') emit(additionalEvents, value);
-        else if (Array.isArray(additionalEvents)) additionalEvents.forEach(eventName => emit(eventName, value));
+        else if (Array.isArray(additionalEvents)) additionalEvents.forEach((eventName) => emit(eventName, value));
     };
 
     const proxyValue = ref<T>(props[name]);

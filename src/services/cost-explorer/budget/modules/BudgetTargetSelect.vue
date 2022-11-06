@@ -29,7 +29,6 @@ import { i18n } from '@/translations';
 import { useFormValidator } from '@/common/composables/form-validator';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-
 interface Props {
     targets: string[];
     multiSelectable?: boolean;

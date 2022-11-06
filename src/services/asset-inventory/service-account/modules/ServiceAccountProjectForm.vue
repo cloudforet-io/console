@@ -24,7 +24,6 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 import type { ProjectForm } from '@/services/asset-inventory/service-account/type';
 import type { ProjectItemResp } from '@/services/project/type';
 
-
 export default {
     name: 'ServiceAccountProjectForm',
     components: {

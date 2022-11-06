@@ -2,7 +2,8 @@
     <div class="notice-page">
         <p-page-title :title="$t('INFO.NOTICE.MAIN.NOTICE_TITLE')">
             <template #extra>
-                <p-button v-if="hasDomainRoleUser || hasSystemRoleUser" style-type="secondary"
+                <p-button v-if="hasDomainRoleUser || hasSystemRoleUser"
+                          style-type="secondary"
                           icon-left="ic_plus_bold"
                           @click="handleCreateNotice"
                 >
@@ -20,7 +21,6 @@ import { computed, reactive, toRefs } from 'vue';
 import {
     PButton, PPageTitle,
 } from '@spaceone/design-system';
-
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

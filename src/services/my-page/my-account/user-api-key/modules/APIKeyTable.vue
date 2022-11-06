@@ -34,7 +34,9 @@
                 :multi-select="false"
             >
                 <template #col-state-format="{value}">
-                    <p-status v-bind="userStateFormatter(value)" class="capitalize" />
+                    <p-status v-bind="userStateFormatter(value)"
+                              class="capitalize"
+                    />
                 </template>
                 <template #col-created_at-format="{value}">
                     {{ iso8601Formatter(value, timezone) }}
@@ -60,7 +62,9 @@
             @confirm="checkModalConfirm"
         >
             <template #col-state-format="{value}">
-                <p-status v-bind="userStateFormatter(value)" class="capitalize" />
+                <p-status v-bind="userStateFormatter(value)"
+                          class="capitalize"
+                />
             </template>
             <template #col-created_at-format="{value}">
                 {{ iso8601Formatter(value, timezone) }}
@@ -86,7 +90,6 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
 
 import type { TimeStamp } from '@/models';
 import { store } from '@/store';
@@ -157,7 +160,7 @@ export default {
             ],
             items: [] as APIKeyItem[],
             selectedIndex: [],
-            selectedItems: computed(() => state.selectedIndex.map(i => state.items[i])),
+            selectedItems: computed(() => state.selectedIndex.map((i) => state.items[i])),
             dropdownMenu: computed(() => ([
                 {
                     type: 'item',
@@ -337,7 +340,7 @@ export default {
             state.loading = true;
             try {
                 const { results } = await SpaceConnector.client.identity.endpoint.list();
-                const filteredEndpointItem: EndpointItem[] = results.filter(d => d.service === 'inventory' || d.service === 'statistics' || d.service === 'monitoring'
+                const filteredEndpointItem: EndpointItem[] = results.filter((d) => d.service === 'inventory' || d.service === 'statistics' || d.service === 'monitoring'
                     || d.service === 'cost-analysis' || d.service === 'notification') || [];
 
                 const endpoints = {};

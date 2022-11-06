@@ -1,15 +1,22 @@
 <template>
-    <p-popover class="amount-planning-type-popover" position="bottom-end">
+    <p-popover class="amount-planning-type-popover"
+               position="bottom-end"
+    >
         <slot />
         <template #content>
-            <div v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL" class="total-wrapper">
+            <div v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL"
+                 class="total-wrapper"
+            >
                 <p class="total-data">
                     {{ currencyMoneyFormatter(budgetData.limit, currency, currencyRates, false, 1000000000) }}
                 </p>
             </div>
             <template v-else>
                 <div class="monthly-wrapper">
-                    <p v-for="{ date, limit } in budgetData.planned_limits" :key="date" class="monthly-data">
+                    <p v-for="{ date, limit } in budgetData.planned_limits"
+                       :key="date"
+                       class="monthly-data"
+                    >
                         <span>
                             <span class="date">
                                 {{ dateFormatter(date) }}

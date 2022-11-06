@@ -5,11 +5,16 @@
                                        :data-range="20"
                                        :print-mode="printMode"
     >
-        <p-data-loader :loading="loading" :disalbe-transition="printMode" class="chart-wrapper">
+        <p-data-loader :loading="loading"
+                       :disalbe-transition="printMode"
+                       class="chart-wrapper"
+        >
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
-            <div ref="chartRef" class="chart" />
+            <div ref="chartRef"
+                 class="chart"
+            />
         </p-data-loader>
         <div class="table-wrapper">
             <cost-dashboard-data-table :fields="tableState.fields"
@@ -82,7 +87,6 @@ import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/CostDashboardDataTable.vue';
 import type { Legend, PieChartData, WidgetProps } from '@/services/cost-explorer/widgets/type';
-
 
 const CATEGORY_KEY = 'category';
 const VALUE_KEY = 'value';
@@ -178,7 +182,6 @@ export default defineComponent<WidgetProps>({
             chart.events.on('ready', () => {
                 emit('rendered');
             });
-
 
             chart.paddingTop = 5;
             chart.paddingBottom = 5;

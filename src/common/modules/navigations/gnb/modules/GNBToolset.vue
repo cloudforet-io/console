@@ -1,5 +1,7 @@
 <template>
-    <div class="gnb-toolset" @click.stop>
+    <div class="gnb-toolset"
+         @click.stop
+    >
         <g-n-b-search v-if="!isDomainOwner"
                       :visible="openedMenu === 'search'"
                       @update:visible="updateOpenedMenu('search', $event)"
@@ -32,7 +34,6 @@ import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-rece
 import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
 
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
-
 
 export default defineComponent({
     name: 'GNBToolset',

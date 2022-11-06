@@ -74,7 +74,7 @@ export default {
         // noinspection TypeScriptCheckImport
         const state = reactive({
             component: null as any,
-            loader: computed<() => Promise<any>>(() => () => import(`@/services/cost-explorer/widgets/${props.widgetFileName}.vue`)) as unknown as () => Promise<any>,
+            loader: computed<() => Promise<any>>(() => () => import(`./../../widgets/${props.widgetFileName}.vue`)) as unknown as () => Promise<any>,
         });
 
         const getComponent = async () => {

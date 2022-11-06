@@ -13,7 +13,8 @@
         <template #table-top>
             <div class="tag-type-filter">
                 <span class="label">{{ $t('INVENTORY.CLOUD_SERVICE.PAGE.TYPE') }}</span>
-                <p-select-status v-for="(status, idx) in tagTypeList" :key="`${status.name}-${idx}`"
+                <p-select-status v-for="(status, idx) in tagTypeList"
+                                 :key="`${status.name}-${idx}`"
                                  :selected="selectedTagType"
                                  :value="status.name"
                                  :multi-selectable="false"
@@ -31,7 +32,9 @@
             </p-badge>
         </template>
         <template #col-provider-format="{ value }">
-            <p-badge v-if="value" :background-color="getProviderBadgeOption(value).color">
+            <p-badge v-if="value"
+                     :background-color="getProviderBadgeOption(value).color"
+            >
                 {{ getProviderBadgeOption(value)?.label }}
             </p-badge>
         </template>
@@ -44,7 +47,6 @@ import {
 } from 'vue';
 
 import { PBadge, PSelectStatus } from '@spaceone/design-system';
-
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -99,7 +101,7 @@ export default {
                     name: 'provider', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.PROVIDER'), type: 'item', disableCopy: true,
                 },
             ]),
-            items: computed(() => state.cloudServiceTagList?.map(k => ({
+            items: computed(() => state.cloudServiceTagList?.map((k) => ({
                 key: k.key,
                 value: k.value,
                 type: k.type,
@@ -134,7 +136,7 @@ export default {
         };
 
         const getTagTypeBadgeOption = (tagType: keyof typeof CLOUD_SERVICE_TAG_TYPE) => CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION[tagType];
-        const getProviderBadgeOption = provider => ({
+        const getProviderBadgeOption = (provider) => ({
             color: state.providers[provider]?.options.background_color,
             label: state.providers[provider]?.name,
         });

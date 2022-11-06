@@ -1,6 +1,8 @@
 <template>
     <div class="collector-schedules">
-        <p-panel-top use-total-count :total-count="totalCount">
+        <p-panel-top use-total-count
+                     :total-count="totalCount"
+        >
             {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_TITLE') }}
         </p-panel-top>
         <p-toolbox-table :items="items"
@@ -50,8 +52,11 @@
                     {{ getTimezoneHours(value.hours) }}
                 </span>
                 <span v-else>
-                    <p-lottie class="inline-block mr-1" style="display: inline-block;" name="lottie_interval"
-                              auto :size="1"
+                    <p-lottie class="inline-block mr-1"
+                              style="display: inline-block;"
+                              name="lottie_interval"
+                              auto
+                              :size="1"
                     />
                     <span>{{ intervalFormatter(value.interval) }}</span>
                 </span>
@@ -89,7 +94,6 @@
 
 <script lang="ts">
 
-
 import {
     reactive, toRefs, computed, watch,
 } from 'vue';
@@ -101,7 +105,6 @@ import type { DataTableField } from '@spaceone/design-system/dist/src/data-displ
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { debounce, get } from 'lodash';
-
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -156,7 +159,7 @@ export default {
                     name: 'delete', label: i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_DELETE'), disabled: state.selectIndex.length === 0,
                 },
             ]),
-            multiItems: computed(() => state.selectIndex.map(idx => state.items[idx])),
+            multiItems: computed(() => state.selectIndex.map((idx) => state.items[idx])),
             multiFields: [
                 { name: 'schedule_id', label: 'ID' },
                 { name: 'name', label: 'Name' },
@@ -261,7 +264,6 @@ export default {
         watch(() => props.collector, () => {
             listSchedules();
         }, { immediate: true });
-
 
         return {
             ...toRefs(state),

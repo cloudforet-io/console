@@ -26,7 +26,6 @@ import NoticePopupItem from '@/common/modules/popup/notice/modules/NoticePopupIt
 
 import type { NoticePostModel } from '@/services/info/notice/type';
 
-
 export default {
     name: 'NoticePopup',
     components: {
@@ -38,7 +37,6 @@ export default {
             isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
             popupList: [] as Array<NoticePostModel>,
         });
-
 
         // helper
         const apiQueryForPostIdList = new ApiQueryHelper().setFilters([{
@@ -56,7 +54,6 @@ export default {
             o: '=',
         }]).setSort('created_at', false).data;
 
-
         // API
         const getUserConfigBoardPostIdList = async (): Promise<Array<string>> => {
             try {
@@ -65,7 +62,7 @@ export default {
                     query: apiQueryForPostIdList,
                 });
                 // console:board:{boardId}:{postId}
-                return results.map(d => d.name.split(':')[3]);
+                return results.map((d) => d.name.split(':')[3]);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
@@ -75,7 +72,7 @@ export default {
         const getNoticeBoard = async (): Promise<string|undefined> => {
             try {
                 const { results } = await SpaceConnector.client.board.board.list();
-                return results.filter(d => d.name === 'Notice')[0]?.board_id;
+                return results.filter((d) => d.name === 'Notice')[0]?.board_id;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return undefined;
@@ -92,13 +89,12 @@ export default {
                     query: apiQueryForPostList,
                 });
                 const postIdList = await getUserConfigBoardPostIdList();
-                state.popupList = results.filter(d => !postIdList.includes(d.post_id));
+                state.popupList = results.filter((d) => !postIdList.includes(d.post_id));
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.popupList = [];
             }
         };
-
 
         watch(() => state.isSessionExpired, async (isSessionExpired) => {
             if (!isSessionExpired && !state.isNoRoleUser) await getPostList();

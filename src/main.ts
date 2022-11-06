@@ -10,14 +10,12 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-
 import { siteInit } from '@/lib/site-initializer';
 
 import App from './App.vue';
 
 import '@/styles/style.pcss';
 import '@spaceone/design-system/css/light-style.css';
-
 
 /** ********** SET VUE PLUGINS ************** */
 Vue.use(Fragment.Plugin);
@@ -28,7 +26,11 @@ directive(Vue);
 
 Vue.use(SpaceDesignSystem);
 
+/** ********** SET VUE CONFIG ************** */
 
+Vue.config.productionTip = import.meta.env.DEV;
+
+/** ********** INITIALIZE ************** */
 (async () => {
     await siteInit();
 

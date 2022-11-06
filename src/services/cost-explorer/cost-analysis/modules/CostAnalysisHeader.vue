@@ -1,41 +1,64 @@
 <template>
-    <div class="cost-analysis-header" :class="{'interactive-mode': !printMode}">
+    <div class="cost-analysis-header"
+         :class="{'interactive-mode': !printMode}"
+    >
         <section class="title-section">
             <p-page-title :title="selectedQueryId ? title : defaultTitle">
                 <template #title-left-extra>
                     <p-select-dropdown v-if="!printMode"
-                                       :items="queryItemList" style-type="icon-button" button-icon="ic_list"
+                                       :items="queryItemList"
+                                       style-type="icon-button"
+                                       button-icon="ic_list"
                                        class="list-button"
                                        @select="handleClickQueryItem"
                     >
                         <template #menu-item--format="{item}">
                             <div class="query-item-wrapper">
                                 <div class="dropdown-item-wrapper">
-                                    <span>{{ item.label }}</span><span v-if="!item.name" class="default-item-suffix">(default)</span>
+                                    <span>{{ item.label }}</span><span v-if="!item.name"
+                                                                       class="default-item-suffix"
+                                    >(default)</span>
                                 </div>
-                                <div v-if="item.name" class="button-wrapper">
-                                    <p-icon-button name="ic_trashcan" size="sm"
+                                <div v-if="item.name"
+                                     class="button-wrapper"
+                                >
+                                    <p-icon-button name="ic_trashcan"
+                                                   size="sm"
                                                    @click.stop="handleClickDeleteQuery(item.name)"
                                     />
-                                    <p-icon-button name="ic_edit-text" size="sm" @click.stop="handleClickEditQuery(item.name)" />
+                                    <p-icon-button name="ic_edit-text"
+                                                   size="sm"
+                                                   @click.stop="handleClickEditQuery(item.name)"
+                                    />
                                 </div>
                             </div>
                         </template>
                     </p-select-dropdown>
                 </template>
-                <template v-if="!printMode" #title-right-extra>
-                    <div v-if="!printMode && selectedQueryId" class="button-wrapper">
+                <template v-if="!printMode"
+                          #title-right-extra
+                >
+                    <div v-if="!printMode && selectedQueryId"
+                         class="button-wrapper"
+                    >
                         <p-icon-button name="ic_trashcan"
                                        @click.stop="handleClickDeleteQuery(selectedQueryId)"
                         />
-                        <p-icon-button name="ic_edit-text" @click.stop="handleClickEditQuery(selectedQueryId)" />
+                        <p-icon-button name="ic_edit-text"
+                                       @click.stop="handleClickEditQuery(selectedQueryId)"
+                        />
                     </div>
                     <div class="button-wrapper extra">
                         <pdf-download-button @click="handleClickPdf" />
-                        <p-button v-if="selectedQueryId" style-type="tertiary" @click="handleSaveQueryOption">
+                        <p-button v-if="selectedQueryId"
+                                  style-type="tertiary"
+                                  @click="handleSaveQueryOption"
+                        >
                             {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
                         </p-button>
-                        <p-button style-type="tertiary" @click="handleClickSaveQuery">
+                        <p-button style-type="tertiary"
+                                  @click="handleClickSaveQuery"
+                        >
                             {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS') }}
                         </p-button>
                     </div>
@@ -43,8 +66,10 @@
             </p-page-title>
         </section>
         <save-query-form-modal v-if="!printMode"
-                               :header-title="saveQueryFormState.title" :visible.sync="saveQueryFormState.visible"
-                               :selected-query="saveQueryFormState.selectedQuery" :request-type="saveQueryFormState.requestType"
+                               :header-title="saveQueryFormState.title"
+                               :visible.sync="saveQueryFormState.visible"
+                               :selected-query="saveQueryFormState.selectedQuery"
+                               :request-type="saveQueryFormState.requestType"
                                @confirm="handleSaveQueryConfirm"
         />
         <delete-modal v-if="!printMode"
@@ -76,7 +101,6 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
-
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -173,7 +197,7 @@ export default {
             else costExplorerStore.dispatch('costAnalysis/initCostAnalysisStoreState');
         };
 
-        const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (state.costQueryList.find(item => item.cost_query_set_id === queryItemKey)) || {};
+        const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (state.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
 
         /* Event Handlers */
         const handleClickQueryItem = async (queryId: string) => {

@@ -5,13 +5,13 @@ import type { AxiosError } from 'axios';
 import { RESPONSE } from '@/space-connector/type';
 
 export class APIError extends Error {
-	status?: number;
+    status?: number;
 
-	code?: string;
+    code?: string;
 
-	axiosError?: AxiosError;
+    axiosError?: AxiosError;
 
-	constructor(axiosError: AxiosError) {
+    constructor(axiosError: AxiosError) {
 	    super();
 	    this.name = RESPONSE.API_ERROR;
 	    this.status = 500;
@@ -30,37 +30,37 @@ export class APIError extends Error {
 	    } else {
 	        this.message = axiosError.message;
 	    }
-	}
+    }
 }
 
 export class NotFoundError extends APIError {
-	axiosError: AxiosError;
+    axiosError: AxiosError;
 
-	constructor(axiosError: AxiosError) {
+    constructor(axiosError: AxiosError) {
 	    super(axiosError);
 	    this.name = RESPONSE.NOT_FOUND_ERROR;
 	    this.axiosError = axiosError;
-	}
+    }
 }
 
 export class BadRequestError extends APIError {
-	axiosError: AxiosError;
+    axiosError: AxiosError;
 
-	constructor(axiosError: AxiosError) {
+    constructor(axiosError: AxiosError) {
 	    super(axiosError);
 	    this.name = RESPONSE.BAD_REQUEST_ERROR;
 	    this.axiosError = axiosError;
-	}
+    }
 }
 
 export class AuthenticationError extends APIError {
-	axiosError: AxiosError;
+    axiosError: AxiosError;
 
-	constructor(axiosError: AxiosError) {
+    constructor(axiosError: AxiosError) {
 	    super(axiosError);
 	    this.name = RESPONSE.AUTHENTICATION_ERROR;
 	    this.axiosError = axiosError;
-	}
+    }
 }
 
 export class AuthorizationError extends APIError {

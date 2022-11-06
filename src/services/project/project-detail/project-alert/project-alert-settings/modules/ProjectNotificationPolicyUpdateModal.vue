@@ -10,7 +10,8 @@
             <div class="content-wrapper">
                 <p>{{ $t('PROJECT.DETAIL.ALERT.SET_NOTIFICATION_MODAL_HELP_TEXT') }}</p>
                 <div class="select-card-wrapper">
-                    <p-select-card v-for="(option, index) in selectOptions" :key="option.name"
+                    <p-select-card v-for="(option, index) in selectOptions"
+                                   :key="option.name"
                                    v-model="notificationUrgency"
                                    :tab-index="index"
                                    :value="option.name"
@@ -26,7 +27,6 @@
 </template>
 
 <script lang="ts">
-
 
 import type { SetupContext } from 'vue';
 import {

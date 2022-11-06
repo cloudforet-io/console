@@ -36,16 +36,14 @@ jobs:
       - name: Transpile Core-Lib
         run: |
           npm run tsc --workspace=@cloudforet/core-lib
-          
+
       - name: ESLint
         run: |
           npm run eslint
 
-
       - name: StyleLint
         run: |
           npm run stylelint --workspaces --if-present
-
 
       - name: Unit Test
         run: |

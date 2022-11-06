@@ -5,7 +5,6 @@ import { reverse } from 'lodash';
 import type { ProjectPageState } from '@/services/project/store/type';
 import type { ProjectGroup, ProjectItemResp } from '@/services/project/type';
 
-
 export const selectedNodeData: Getter<ProjectPageState, any> = (state): ProjectItemResp|undefined => (state.selectedItem.node ? state.selectedItem.node.data : undefined);
 
 export const selectedNodePath: Getter<ProjectPageState, any> = (state): number[]|undefined => (state.selectedItem.path ? state.selectedItem.path : undefined);
@@ -17,7 +16,6 @@ export const groupName: Getter<ProjectPageState, any> = (state, getters): string
 export const actionTargetNodeData: Getter<ProjectPageState, any> = (state): ProjectItemResp|undefined => (state.actionTargetItem.node ? state.actionTargetItem.node.data : undefined);
 
 export const actionTargetNodePath: Getter<ProjectPageState, any> = (state): number[]|undefined => (state.actionTargetItem.path ? state.actionTargetItem.path : undefined);
-
 
 export const parentGroups: Getter<ProjectPageState, any> = (state: ProjectPageState, getters): ProjectGroup[] => {
     const tree = state.rootNode;

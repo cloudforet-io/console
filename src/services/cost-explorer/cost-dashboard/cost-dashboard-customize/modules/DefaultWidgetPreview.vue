@@ -11,7 +11,10 @@
                     </p-anchor>
                 </div>
                 <div class="image-wrapper">
-                    <p-lazy-img :src="assetUrlConverter(chartThumbnail)" width="232px" height="10rem" />
+                    <p-lazy-img :src="assetUrlConverter(chartThumbnail)"
+                                width="232px"
+                                height="10rem"
+                    />
                 </div>
             </div>
         </template>
@@ -23,13 +26,11 @@ import { computed, reactive, toRefs } from 'vue';
 
 import { PAnchor, PLabel, PLazyImg } from '@spaceone/design-system';
 
-
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import CostDashboardCustomizeWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetPreview.vue';
 import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
-
 
 export default {
     name: 'DefaultWidgetPreview',

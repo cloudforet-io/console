@@ -1,5 +1,7 @@
 <template>
-    <div ref="profileMenuRef" v-click-outside="hideProfileMenu" class="gnb-profile"
+    <div ref="profileMenuRef"
+         v-click-outside="hideProfileMenu"
+         class="gnb-profile"
          @keydown.esc="hideProfileMenu"
     >
         <span class="menu-button"
@@ -8,7 +10,9 @@
               @click.stop="handleProfileButtonClick"
               @keydown.enter="openProfileMenu"
         >
-            <p-i :name="userIcon" class="menu-icon" />
+            <p-i :name="userIcon"
+                 class="menu-icon"
+            />
         </span>
         <div v-if="visible"
              class="profile-menu-wrapper"
@@ -29,9 +33,13 @@
                     <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
                     <div class="value">
                         <span>{{ language }}</span>
-                        <div v-if="languageMenuVisible" class="language-menu-wrapper">
+                        <div v-if="languageMenuVisible"
+                             class="language-menu-wrapper"
+                        >
                             <div class="sub-menu-wrapper">
-                                <div v-for="(item, index) in languageMenu" :key="index" class="sub-menu"
+                                <div v-for="(item, index) in languageMenu"
+                                     :key="index"
+                                     class="sub-menu"
                                      @click.stop="handleLanguageClick(item.name)"
                                 >
                                     <span>{{ item.label }}</span>
@@ -41,7 +49,8 @@
                     </div>
                     <p-i :name="languageMenuVisible ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                          class="arrow-icon"
-                         width="1rem" height="1rem"
+                         width="1rem"
+                         height="1rem"
                     />
                 </div>
                 <div class="info-menu">
@@ -49,8 +58,11 @@
                     <span class="value">{{ timezone }}</span>
                 </div>
                 <div class="info-menu">
-                    <router-link :to="{name: MY_PAGE_ROUTE._NAME }" @click.native="hideProfileMenu">
-                        <p-button style-type="secondary" size="sm"
+                    <router-link :to="{name: MY_PAGE_ROUTE._NAME }"
+                                 @click.native="hideProfileMenu"
+                    >
+                        <p-button style-type="secondary"
+                                  size="sm"
                                   class="my-page-button"
                         >
                             {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
@@ -61,7 +73,10 @@
             <template v-if="hasPermission">
                 <p-divider />
                 <div class="sub-menu-wrapper">
-                    <router-link class="sub-menu" :to="{name: INFO_ROUTE.NOTICE._NAME}" @click.native="hideProfileMenu">
+                    <router-link class="sub-menu"
+                                 :to="{name: INFO_ROUTE.NOTICE._NAME}"
+                                 @click.native="hideProfileMenu"
+                    >
                         {{ $t('MENU.INFO_NOTICE') }}
                     </router-link>
                 </div>
@@ -69,19 +84,27 @@
             <template v-if="hasPermission && !isDomainOwner">
                 <p-divider />
                 <div class="sub-menu-wrapper">
-                    <router-link class="sub-menu" :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}" @click.native="hideProfileMenu">
+                    <router-link class="sub-menu"
+                                 :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}"
+                                 @click.native="hideProfileMenu"
+                    >
                         {{ $t('MENU.MY_PAGE_API_KEY') }}
                     </router-link>
                 </div>
             </template>
             <p-divider />
             <div class="sub-menu-wrapper">
-                <a v-for="{ link, label } in supportedMenu" :key="label" class="sub-menu support-menu"
-                   :href="link" target="_blank" @click="hideProfileMenu"
+                <a v-for="{ link, label } in supportedMenu"
+                   :key="label"
+                   class="sub-menu support-menu"
+                   :href="link"
+                   target="_blank"
+                   @click="hideProfileMenu"
                 >
                     <span>{{ label }}</span>
                     <p-i name="ic_external-link"
-                         height="1em" width="1em"
+                         height="1em"
+                         width="1em"
                          color="inherit"
                          class="external-icon"
                     />
@@ -89,7 +112,9 @@
             </div>
             <p-divider />
             <div class="sub-menu-wrapper">
-                <div class="sub-menu" @click="handleClickSignOut">
+                <div class="sub-menu"
+                     @click="handleClickSignOut"
+                >
                     {{ $t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}
                 </div>
             </div>
@@ -171,7 +196,7 @@ export default defineComponent<Props>({
             supportedMenu: computed(() => {
                 const docsList = config.get('DOCS') ?? [];
                 const data = { lang: store.state.user.language };
-                return docsList.map(d => ({
+                return docsList.map((d) => ({
                     label: ejs.render(d?.label ?? '', data),
                     link: ejs.render(d?.link ?? '', data),
                 }));

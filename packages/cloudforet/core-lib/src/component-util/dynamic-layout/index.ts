@@ -36,7 +36,7 @@ interface QuerySearchProps {
 export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema[], resourceType: string, filters?: Filter[]): Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> => {
     const querySearchProps: Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> = { keyItemSets: [], valueHandlerMap: {} };
 
-    querySearchProps.keyItemSets = schema.map(s => ({
+    querySearchProps.keyItemSets = schema.map((s) => ({
         title: s.title,
         items: s.items.map((d) => {
             let operators;

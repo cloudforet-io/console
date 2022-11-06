@@ -16,7 +16,9 @@
                            required
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="projectName" class="block w-full" :invalid="showValidation && invalid"
+                    <p-text-input v-model="projectName"
+                                  class="block w-full"
+                                  :invalid="showValidation && invalid"
                                   :placeholder="$t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_PLACEHOLDER')"
                     />
                 </template>
@@ -26,7 +28,6 @@
 </template>
 
 <script lang="ts">
-
 
 import {
     computed, getCurrentInstance, reactive, toRefs,
@@ -109,7 +110,6 @@ export default {
             loading: false,
         });
 
-
         const apiQuery = new ApiQueryHelper();
         const getProjectNames = async () => {
             apiQuery.setOnly('name');
@@ -118,7 +118,7 @@ export default {
                 project_group_id: props.projectGroupId,
                 query: apiQuery.data,
             });
-            state.projectNames = res.results.map(d => d.name);
+            state.projectNames = res.results.map((d) => d.name);
         };
 
         const createProject = async (params) => {

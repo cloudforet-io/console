@@ -7,7 +7,9 @@
             :menu-set="menuSet"
         >
             <template #after-text="{item}">
-                <p-i v-if="item.id === homeDashboardId" name="ic_home" width="1rem"
+                <p-i v-if="item.id === homeDashboardId"
+                     name="ic_home"
+                     width="1rem"
                      height="1rem"
                      class="ml-1"
                 />
@@ -22,7 +24,6 @@ import {
 } from 'vue';
 
 import { PI } from '@spaceone/design-system';
-
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -69,31 +70,33 @@ export default {
             dashboardMenuSet: computed<LNBMenu[]>(() => {
                 const results: LNBMenu[] = [];
                 if (state.topTitle) {
-                    results.push([
-                        {
-                            type: 'title', label: 'Public', id: 'public', foldable: false,
-                        },
-                        ...state.publicDashboardList.map((list: PublicDashboardInfo) => ({
-                            type: 'item',
-                            label: list.name,
-                            id: list.public_dashboard_id,
-                            to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.public_dashboard_id } },
-                            hideFavorite: true,
-                        })),
-                    ],
-                    [
-                        {
-                            type: 'title', label: 'My Dashboard', id: 'my', foldable: true,
-                        },
-                        ...state.userDashboardList.map((list: UserDashboardInfo) => ({
-                            type: 'item',
-                            label: list.name,
-                            id: list.user_dashboard_id,
-                            to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.user_dashboard_id } },
-                            hideFavorite: true,
-                        })),
-                    ],
-                    { type: 'divider' });
+                    results.push(
+                        [
+                            {
+                                type: 'title', label: 'Public', id: 'public', foldable: false,
+                            },
+                            ...state.publicDashboardList.map((list: PublicDashboardInfo) => ({
+                                type: 'item',
+                                label: list.name,
+                                id: list.public_dashboard_id,
+                                to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.public_dashboard_id } },
+                                hideFavorite: true,
+                            })),
+                        ],
+                        [
+                            {
+                                type: 'title', label: 'My Dashboard', id: 'my', foldable: true,
+                            },
+                            ...state.userDashboardList.map((list: UserDashboardInfo) => ({
+                                type: 'item',
+                                label: list.name,
+                                id: list.user_dashboard_id,
+                                to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.user_dashboard_id } },
+                                hideFavorite: true,
+                            })),
+                        ],
+                        { type: 'divider' },
+                    );
                 }
                 return results;
             }),
@@ -144,7 +147,6 @@ export default {
             await listDashboard();
             if (!state.homeDashboardId) setInitialHomeDashboard();
         })();
-
 
         return {
             ...toRefs(state),

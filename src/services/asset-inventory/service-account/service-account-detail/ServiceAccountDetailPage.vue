@@ -1,6 +1,8 @@
 <template>
     <div class="service-account-detail-page">
-        <p-page-title :title="item.name" child class="page-title"
+        <p-page-title :title="item.name"
+                      child
+                      class="page-title"
                       @goBack="$router.go(-1)"
         >
             <template #title-left-extra>
@@ -9,7 +11,9 @@
                             error-icon="ic_provider_other"
                 />
             </template>
-            <template v-if="!isManagedAccount" #title-right-extra>
+            <template v-if="!isManagedAccount"
+                      #title-right-extra
+            >
                 <div class="title-right-wrapper">
                     <p-icon-button name="ic_trashcan"
                                    class="w-full delete-button"
@@ -18,8 +22,12 @@
                     />
                 </div>
             </template>
-            <template v-if="!isManagedAccount" #extra>
-                <p-button style-type="tertiary" class="link-button">
+            <template v-if="!isManagedAccount"
+                      #extra
+            >
+                <p-button style-type="tertiary"
+                          class="link-button"
+                >
                     <p-anchor :href="consoleLink">
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CONNECT_TO_CONSOLE') }}
                     </p-anchor>
@@ -30,7 +38,9 @@
             <p-pane-layout class="service-account-account-type">
                 <p-panel-top :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE')" />
                 <div class="badge-wrapper">
-                    <service-account-badge :account-type="item.service_account_type" :is-managed="isManagedAccount" />
+                    <service-account-badge :account-type="item.service_account_type"
+                                           :is-managed="isManagedAccount"
+                    />
                 </div>
             </p-pane-layout>
             <service-account-project :project-id="projectId"

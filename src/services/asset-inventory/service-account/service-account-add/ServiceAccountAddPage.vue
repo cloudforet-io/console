@@ -6,13 +6,16 @@
                       @goBack="handleGoBack"
         >
             <template #title-left-extra>
-                <p-lazy-img class="icon" :src="providerIcon" :alt="provider"
+                <p-lazy-img class="icon"
+                            :src="providerIcon"
+                            :alt="provider"
                             :loading="providerLoading"
                             error-icon="ic_provider_other"
                 />
             </template>
             <template #extra>
-                <info-button v-if="description" :visible="!!description"
+                <info-button v-if="description"
+                             :visible="!!description"
                              class="info-button"
                 >
                     <template #contents>
@@ -39,14 +42,18 @@
                                                        @change="handleChangeBaseInformationForm"
                 />
             </p-pane-layout>
-            <p-pane-layout v-if="accountType === ACCOUNT_TYPE.GENERAL" class="form-wrapper">
+            <p-pane-layout v-if="accountType === ACCOUNT_TYPE.GENERAL"
+                           class="form-wrapper"
+            >
                 <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')" />
                 <service-account-project-form
                     :is-valid.sync="isProjectFormValid"
                     @change="handleChangeProjectForm"
                 />
             </p-pane-layout>
-            <p-pane-layout v-if="enableCredentialInput" class="form-wrapper">
+            <p-pane-layout v-if="enableCredentialInput"
+                           class="form-wrapper"
+            >
                 <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')" />
                 <service-account-credentials-form
                     :service-account-type="accountType"
@@ -58,13 +65,17 @@
         </div>
 
         <div class="button-wrapper">
-            <p-button class="text-button" style-type="primary" size="lg"
+            <p-button class="text-button"
+                      style-type="primary"
+                      size="lg"
                       :disabled="!isValid"
                       @click="handleSave"
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
             </p-button>
-            <p-button class="text-button" style-type="tertiary" size="lg"
+            <p-button class="text-button"
+                      style-type="tertiary"
+                      size="lg"
                       @click="handleGoBack"
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.CANCEL') }}
@@ -109,7 +120,6 @@ import type {
     AccountType,
     BaseInformationForm, CredentialForm, ProjectForm, ProviderModel,
 } from '@/services/asset-inventory/service-account/type';
-
 
 export default {
     name: 'AddServiceAccountPage',
@@ -296,7 +306,6 @@ export default {
     },
 };
 </script>
-
 
 <style lang="postcss" scoped>
 .service-account-add-page {

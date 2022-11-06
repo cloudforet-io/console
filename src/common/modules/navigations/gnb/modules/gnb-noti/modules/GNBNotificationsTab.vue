@@ -4,7 +4,10 @@
                        :loading="loading"
                        :disable-empty-case="loading"
         >
-            <div ref="notificationItemsRef" class="content-wrapper" :class="{ loading }">
+            <div ref="notificationItemsRef"
+                 class="content-wrapper"
+                 :class="{ loading }"
+            >
                 <p-button v-if="!loading"
                           style-type="transparent"
                           size="sm"
@@ -13,7 +16,8 @@
                 >
                     {{ $t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}
                 </p-button>
-                <g-n-b-noti-item v-for="(item, idx) in items" :key="`${item.notificationId}-${idx}`"
+                <g-n-b-noti-item v-for="(item, idx) in items"
+                                 :key="`${item.notificationId}-${idx}`"
                                  :is-read="item.isRead"
                                  :title="item.title"
                                  :icon="item.icon"
@@ -26,7 +30,9 @@
             </div>
             <template #no-data>
                 <div class="no-data">
-                    <img class="img" src="@/assets/images/illust_astronaut_radio.svg">
+                    <img class="img"
+                         src="@/assets/images/illust_astronaut_radio.svg"
+                    >
                     <p class="title">
                         {{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION') }}
                     </p>
@@ -45,7 +51,8 @@
         >
             <template #header>
                 <div class="header-wrapper">
-                    <p-i v-if="selectedItem.icon" :name="selectedItem.icon"
+                    <p-i v-if="selectedItem.icon"
+                         :name="selectedItem.icon"
                          width="1.5rem"
                          class="icon"
                     />
@@ -65,11 +72,14 @@
                         </p-anchor>
                     </div>
                 </div>
-                <div v-if="selectedItem.message.description" class="description-wrapper">
+                <div v-if="selectedItem.message.description"
+                     class="description-wrapper"
+                >
                     {{ selectedItem.message.description }}
                 </div>
                 <div v-if="definitionData">
-                    <p-definition-table :fields="definitionFields" :data="definitionData"
+                    <p-definition-table :fields="definitionFields"
+                                        :data="definitionData"
                                         :skeleton-rows="4"
                                         block
                                         disable-copy
@@ -103,7 +113,6 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -113,7 +122,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-
 
 interface NotificationItem {
     notificationId: string;
@@ -166,7 +174,7 @@ export default {
             //
             modalVisible: false,
             selectedItem: {} as NotificationItem,
-            definitionFields: computed(() => state.selectedItem?.message?.tags.map(d => ({
+            definitionFields: computed(() => state.selectedItem?.message?.tags.map((d) => ({
                 name: d.key, label: d.key,
             }))),
             definitionData: computed(() => {
@@ -250,7 +258,7 @@ export default {
             }
         };
         const setReadNotifications = async (notifications: any[]) => {
-            const ids = notifications.filter(d => !d.is_read).map(d => d.notification_id);
+            const ids = notifications.filter((d) => !d.is_read).map((d) => d.notification_id);
             if (ids.length === 0) return;
 
             try {
@@ -266,7 +274,7 @@ export default {
                 await SpaceConnector.client.notification.notification.delete({
                     notifications: notificationIds,
                 });
-                state.items = state.items.filter(d => !notificationIds.includes(d.notificationId));
+                state.items = state.items.filter((d) => !notificationIds.includes(d.notificationId));
                 state.proxyCount -= notificationIds.length;
                 return true;
             } catch (e) {
@@ -289,7 +297,7 @@ export default {
             state.modalVisible = true;
         };
         const handleDeleteNotification = async (notificationId: string) => {
-            const deletedIndex = state.items.findIndex(d => d.notificationId === notificationId);
+            const deletedIndex = state.items.findIndex((d) => d.notificationId === notificationId);
             const deleted = await deleteNotification([notificationId]);
             if (deleted) {
                 const item = state.items[deletedIndex];
@@ -302,7 +310,7 @@ export default {
             state.modalVisible = false;
         };
         const handleClearAll = async () => {
-            const notificationIds = state.items.map(d => d.notificationId);
+            const notificationIds = state.items.map((d) => d.notificationId);
             const deleted = await deleteNotification(notificationIds);
             if (deleted) await init();
         };

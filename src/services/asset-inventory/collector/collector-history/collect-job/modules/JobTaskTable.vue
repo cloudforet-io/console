@@ -23,7 +23,9 @@
         <template #toolbox-top>
             <div class="status-wrapper">
                 <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
-                <p-select-button-group class="select-button-group" :buttons="statusList" :selected.sync="selectedStatus"
+                <p-select-button-group class="select-button-group"
+                                       :buttons="statusList"
+                                       :selected.sync="selectedStatus"
                                        theme="text"
                 />
             </div>
@@ -90,7 +92,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { green, primaryDark, red } from '@/styles/colors';
 
 import { JOB_TASK_STATUS } from '@/services/asset-inventory/collector/collector-history/lib/config';
-
 
 const COMPLETED_ICON_COLOR = green[500];
 const FAILED_ICON_COLOR = red[400];
@@ -209,8 +210,10 @@ export default {
         const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
         const getQuery = () => {
             apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(state.pageStart,
-                    state.pageLimit)
+                .setPage(
+                    state.pageStart,
+                    state.pageLimit,
+                )
                 .setFiltersAsQueryTag(state.searchTags);
 
             let statusValues: JOB_TASK_STATUS[] = [];
@@ -235,7 +238,7 @@ export default {
                     job_id: props.jobId,
                 });
                 state.totalCount = res.total_count;
-                state.items = res.results.map(jobTask => ({
+                state.items = res.results.map((jobTask) => ({
                     ...jobTask,
                     created_at: iso8601Formatter(jobTask.created_at, state.timezone),
                     duration: durationFormatter(jobTask.created_at, jobTask.finished_at, state.timezone),

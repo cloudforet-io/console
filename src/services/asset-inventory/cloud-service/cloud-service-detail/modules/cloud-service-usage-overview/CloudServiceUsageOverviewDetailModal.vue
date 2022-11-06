@@ -11,9 +11,17 @@
             <div class="flex items-center">
                 <span class="text-sm text-gray-900 font-bold mb-3 mr-2">Filter: </span>
                 <span class="text-sm text-gray-500 mb-3">{{ period ? '' : 'Auto (Overall period)' }}</span>
-                <cloud-service-period-filter class="period-filter" read-only :period="period" />
-                <p-divider v-if="queryTags.length" vertical class="!h-4 !ml-4 !mr-4 mb-3" />
-                <p-query-search-tags :tags="queryTags" read-only />
+                <cloud-service-period-filter class="period-filter"
+                                             read-only
+                                             :period="period"
+                />
+                <p-divider v-if="queryTags.length"
+                           vertical
+                           class="!h-4 !ml-4 !mr-4 mb-3"
+                />
+                <p-query-search-tags :tags="queryTags"
+                                     read-only
+                />
             </div>
             <div class="modal-inner">
                 <cloud-service-usage-overview-summary v-if="summaryDataList.length"
@@ -61,12 +69,10 @@ import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/qu
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Filter } from '@cloudforet/core-lib/space-connector/type';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -75,7 +81,6 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import type { Reference } from '@/lib/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 import CloudServiceUsageOverviewSummary
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewSummary.vue';
@@ -160,7 +165,6 @@ export default defineComponent<Props>({
             }),
         });
 
-
         const fetchDataWithSchema = async (schema: DynamicWidgetSchema): Promise<Data[]> => {
             try {
                 const { results } = await SpaceConnector.client.inventory.cloudService.analyze({
@@ -175,9 +179,8 @@ export default defineComponent<Props>({
             }
         };
 
-
         const getDataListWithSchema = async () => {
-            const results: any[] = await Promise.allSettled(state.chartWidgetSchemaList.map(schema => fetchDataWithSchema(schema)));
+            const results: any[] = await Promise.allSettled(state.chartWidgetSchemaList.map((schema) => fetchDataWithSchema(schema)));
 
             state.chartDataList = results.map((d) => {
                 if (d.status === 'fulfilled') return d.value;
@@ -207,7 +210,6 @@ export default defineComponent<Props>({
             emit('update:visible', visible);
         };
 
-
         /* Watchers */
         watch([() => state.proxyVisible, () => props.schemaList, () => props.filters], async ([visible, schemaList, filters], [, prevSchemaList, prevFilters]) => {
             if (!visible) {
@@ -229,7 +231,6 @@ export default defineComponent<Props>({
             await getDataListWithSchema();
             state.dataLoading = false;
         }, { immediate: true });
-
 
         let initiated = false;
         watch(() => props.visible, async (visible) => {

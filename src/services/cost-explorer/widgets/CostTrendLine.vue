@@ -4,11 +4,15 @@
                                        :widget-link="widgetLink"
                                        :print-mode="printMode"
     >
-        <p-data-loader :loading="loading" class="chart-wrapper">
+        <p-data-loader :loading="loading"
+                       class="chart-wrapper"
+        >
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
-            <div ref="chartRef" class="chart" />
+            <div ref="chartRef"
+                 class="chart"
+            />
         </p-data-loader>
         <div class="table-wrapper">
             <cost-dashboard-data-table :fields="fields"
@@ -30,7 +34,6 @@
 
 <script lang="ts">
 
-
 import {
     computed, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -43,13 +46,11 @@ import type { DataTableField } from '@spaceone/design-system/dist/src/data-displ
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
-
 import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { CURRENCY } from '@/store/modules/display/config';
-
 
 import { toggleSeries } from '@/lib/amcharts/helper';
 import config from '@/lib/config';
@@ -77,7 +78,6 @@ import CostDashboardDataTable from '@/services/cost-explorer/widgets/modules/Cos
 import type {
     ChartData, CostAnalyzeModel, Legend, WidgetProps,
 } from '@/services/cost-explorer/widgets/type';
-
 
 const PAGE_SIZE = 5;
 const CATEGORY_KEY = 'date';

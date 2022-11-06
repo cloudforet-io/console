@@ -10,7 +10,8 @@
             <div class="content-wrapper">
                 <p>{{ $t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_HELP_TEXT') }}</p>
                 <div class="select-card-wrapper">
-                    <p-select-card v-for="(option, index) in selectOptions" :key="option.name"
+                    <p-select-card v-for="(option, index) in selectOptions"
+                                   :key="option.name"
                                    v-model="recoveryMode"
                                    :tab-index="index"
                                    :value="option.name"
@@ -24,7 +25,6 @@
 </template>
 
 <script lang="ts">
-
 
 import type { SetupContext } from 'vue';
 import {
@@ -40,7 +40,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';

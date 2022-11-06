@@ -2,7 +2,6 @@ import type { Tags, TimeStamp } from '@/models';
 
 import type { PolicyTypes, PolicyState } from '@/services/administration/iam/policy/lib/config';
 
-
 interface RepositoryInfoDataModel {
     repository_id: string;
     name: string;

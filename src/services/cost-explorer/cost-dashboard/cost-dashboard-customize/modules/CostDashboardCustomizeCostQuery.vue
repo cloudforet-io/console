@@ -3,16 +3,25 @@
         <div class="title-wrapper">
             <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.COST_ANALYSIS_QUERY') }}</p-label>
             <template v-if="!loading && costQuerySetList.length">
-                <p-icon-button name="ic_refresh" class="refresh-button" @click="handleRefresh" />
-                <p-button style-type="substitutive" icon-left="ic_plus_bold" @click="handleClickCreateQuery">
+                <p-icon-button name="ic_refresh"
+                               class="refresh-button"
+                               @click="handleRefresh"
+                />
+                <p-button style-type="substitutive"
+                          icon-left="ic_plus_bold"
+                          @click="handleClickCreateQuery"
+                >
                     {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}
                 </p-button>
             </template>
         </div>
         <div class="content-wrapper">
-            <p-data-loader :loading="loading" :data="costQuerySetList">
+            <p-data-loader :loading="loading"
+                           :data="costQuerySetList"
+            >
                 <div class="query-list-wrapper">
-                    <div v-for="(query, idx) in costQuerySetList" :key="`query-${idx}-${query.cost_query_set_id}`"
+                    <div v-for="(query, idx) in costQuerySetList"
+                         :key="`query-${idx}-${query.cost_query_set_id}`"
                          class="query-item"
                          :class="{ selected: query.cost_query_set_id === selectedQuery.cost_query_set_id }"
                          @click="handleClickQueryItem(query)"
@@ -20,7 +29,9 @@
                         <p class="name">
                             {{ query.name }}
                         </p>
-                        <p-button style-type="tertiary" icon-left="ic_plus_bold" size="sm"
+                        <p-button style-type="tertiary"
+                                  icon-left="ic_plus_bold"
+                                  size="sm"
                                   @click="handleAddToCustomWidget(query)"
                         >
                             <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ADD_TO_CUSTOM_WIDGET') }}</span>
@@ -30,12 +41,17 @@
                 <template #no-data>
                     <div class="refresh-wrapper">
                         <span class="text">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_SAVED_QUERY') }}</span>
-                        <p-icon-button name="ic_refresh" @click="handleRefresh" />
+                        <p-icon-button name="ic_refresh"
+                                       @click="handleRefresh"
+                        />
                     </div>
                     <p class="help-text">
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.NO_SAVED_QUERY_HELP_TEXT') }}
                     </p>
-                    <p-button style-type="substitutive" icon-left="ic_plus_bold" @click="handleClickCreateQuery">
+                    <p-button style-type="substitutive"
+                              icon-left="ic_plus_bold"
+                              @click="handleClickCreateQuery"
+                    >
                         <span>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.CREATE_QUERY') }}</span>
                     </p-button>
                 </template>
@@ -66,7 +82,6 @@ import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
-
 
 const LAYOUT = 100;
 

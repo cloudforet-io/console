@@ -6,12 +6,10 @@ import {
     computed, nextTick, onBeforeUnmount, onMounted, ref, watch,
 } from 'vue';
 
-
 import type {
     Lines, Meta, Mode, Theme, VirtualScroll,
 } from './types';
 import { renderLines } from './utils';
-
 
 interface Props {
   mode: Mode;
@@ -31,7 +29,7 @@ export const useRender = (
 ) => {
     const render = ref<Array<Lines>>([]);
     const meta = ref<Array<Meta>>([]);
-    const list = computed(() => meta.value.filter(item => (props.folding ? !item.foldable && item.visible : item.visible)));
+    const list = computed(() => meta.value.filter((item) => (props.folding ? !item.foldable && item.visible : item.visible)));
 
     const setRender = () => {
         render.value = renderLines(props.mode, props.prev, props.current);
@@ -113,16 +111,19 @@ export const useVirtualScroll = (
         }, 0);
     };
 
-    debouncedWatch([
-        () => props.mode,
-        () => props.prev,
-        () => props.current,
-        () => props.folding,
-    ], () => nextTick(setMeta),
-    {
-        debounce: props.inputDelay,
-        immediate: true,
-    });
+    debouncedWatch(
+        [
+            () => props.mode,
+            () => props.prev,
+            () => props.current,
+            () => props.folding,
+        ],
+        () => nextTick(setMeta),
+        {
+            debounce: props.inputDelay,
+            immediate: true,
+        },
+    );
 
     onMounted(() => {
         if (!scrollOptions.value) return;

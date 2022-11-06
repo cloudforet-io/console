@@ -9,8 +9,12 @@
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
-                <div v-if="mode === 'UPDATE'" class="button-wrapper">
-                    <p-button style-type="transparent" @click="handleClickCancelButton">
+                <div v-if="mode === 'UPDATE'"
+                     class="button-wrapper"
+                >
+                    <p-button style-type="transparent"
+                              @click="handleClickCancelButton"
+                    >
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
@@ -22,7 +26,9 @@
                 </div>
             </template>
         </p-panel-top>
-        <div v-if="!serviceAccountLoading" class="content-wrapper">
+        <div v-if="!serviceAccountLoading"
+             class="content-wrapper"
+        >
             <service-account-project-detail v-if="mode === 'READ'"
                                             :project-id="projectId"
                                             :service-account-type="serviceAccountType"
@@ -60,7 +66,6 @@ import ServiceAccountProjectDetail
 import ServiceAccountProjectForm
     from '@/services/asset-inventory/service-account/modules/ServiceAccountProjectForm.vue';
 import type { ProjectForm, AccountType, PageMode } from '@/services/asset-inventory/service-account/type';
-
 
 interface Props {
     serviceAccountId?: string;

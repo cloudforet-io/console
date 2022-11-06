@@ -3,7 +3,8 @@
         <p-divider />
         <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.EXISTING_DASHBOARD') }}</h3>
         <div class="dashboard-list">
-            <div v-for="(dashboardData, idx) in slicedDashboardData" :key="`$dashboard-${idx}-${getUUID()}`"
+            <div v-for="(dashboardData, idx) in slicedDashboardData"
+                 :key="`$dashboard-${idx}-${getUUID()}`"
                  class="dashboard-item"
             >
                 <!--                TODO:: apply keyboard event below this SelectCard-->
@@ -96,7 +97,7 @@ export default {
                     user_id: state.userId,
                 });
                 const dashboardList = [...publicDashboardList.results as PublicDashboardInfo[], ...userDashboardList.results as UserDashboardInfo[]];
-                state.existingDashboardData = dashboardList.map(d => ({
+                state.existingDashboardData = dashboardList.map((d) => ({
                     ...d,
                     custom_layouts: d.custom_layouts,
                     default_filter: d.default_filter,

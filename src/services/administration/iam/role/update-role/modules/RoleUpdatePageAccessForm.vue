@@ -10,16 +10,23 @@
             </div>
             <div class="content-wrapper">
                 <template v-for="menu in formState.menuItems">
-                    <div v-if="menu.id === 'all' || !hideAllMenu" :key="menu.id"
+                    <div v-if="menu.id === 'all' || !hideAllMenu"
+                         :key="menu.id"
                          class="menu-wrapper"
                          :class="menu.id"
                     >
-                        <role-update-page-access-menu-item :menu="menu" @update="handleUpdate" />
+                        <role-update-page-access-menu-item :menu="menu"
+                                                           @update="handleUpdate"
+                        />
                         <template v-for="subMenu in menu.subMenuList">
-                            <div v-if="menu.subMenuList && !menu.hideMenu && !hideAllMenu" :key="subMenu.id"
+                            <div v-if="menu.subMenuList && !menu.hideMenu && !hideAllMenu"
+                                 :key="subMenu.id"
                                  class="sub-menu-wrapper"
                             >
-                                <role-update-page-access-menu-item :menu="subMenu" is-sub-menu @update="handleUpdate" />
+                                <role-update-page-access-menu-item :menu="subMenu"
+                                                                   is-sub-menu
+                                                                   @update="handleUpdate"
+                                />
                             </div>
                         </template>
                     </div>
@@ -39,7 +46,6 @@ import {
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { find } from 'lodash';
 
-
 import type { RawPagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
@@ -50,7 +56,6 @@ import { getPageAccessMenuList } from '@/services/administration/iam/role/lib/pa
 import type { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
-
 
 const getPagePermissions = (menuItems: PageAccessMenuItem[]): RawPagePermission[] => {
     const allItem = find(menuItems, { id: 'all' });
@@ -97,7 +102,7 @@ export default {
             }]),
         });
         const state = reactive({
-            hideAllMenu: computed(() => formState.menuItems.find(d => d.id === 'all')?.hideMenu),
+            hideAllMenu: computed(() => formState.menuItems.find((d) => d.id === 'all')?.hideMenu),
             pagePermissions: computed<RawPagePermission[]>(() => getPagePermissions(formState.menuItems)),
         });
 
@@ -136,7 +141,7 @@ export default {
                         const subItem = find(menuItem.subMenuList, { id: menuId });
                         if (subItem) {
                             updateMenuItems(subItem, key, val, menuItem);
-                            if (menuItem.subMenuList.every(d => d[key])) updateMenuItems(menuItem, key, val);
+                            if (menuItem.subMenuList.every((d) => d[key])) updateMenuItems(menuItem, key, val);
                             if (!val) updateMenuItems(allItem, key, val); // deactivate 'all' menu
                         }
                     }
@@ -144,8 +149,8 @@ export default {
             }
 
             // activate 'all' menu if every menu were activated
-            const menus = formState.menuItems.filter(d => d.id !== 'all');
-            if (menus.every(d => d[key])) {
+            const menus = formState.menuItems.filter((d) => d.id !== 'all');
+            if (menus.every((d) => d[key])) {
                 updateMenuItems(allItem, key, val);
             }
         };

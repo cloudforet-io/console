@@ -5,13 +5,20 @@
             <span class="text-sm text-gray flex-grow">&nbsp; {{ unit.y ? `(${unit.y})` : '' }}</span>
             <p-spinner v-if="loading && chart" />
         </div>
-        <p-data-loader :loading="loading && !chart" :data="data" class="chart-wrapper">
+        <p-data-loader :loading="loading && !chart"
+                       :data="data"
+                       class="chart-wrapper"
+        >
             <template #loader>
                 <p-skeleton height="100%" />
             </template>
-            <div ref="chartRef" class="chart" />
+            <div ref="chartRef"
+                 class="chart"
+            />
             <transition name="fade-in">
-                <div v-if="error" class="shade">
+                <div v-if="error"
+                     class="shade"
+                >
                     <span>{{ $t('COMMON.COMPONENTS.METRIC_CHART.UNAVAILABLE') }}</span>
                 </div>
             </transition>
@@ -22,7 +29,9 @@
             </template>
         </p-data-loader>
         <transition name="fade">
-            <div class="tooltip-wrapper" :class="{ 'tooltip-visible': visibleTooltip }">
+            <div class="tooltip-wrapper"
+                 :class="{ 'tooltip-visible': visibleTooltip }"
+            >
                 <p class="date">
                     {{ tooltip.date }}
                 </p>
@@ -32,7 +41,9 @@
                         class="legend"
                     >
                         <td>
-                            <span class="circle" :style="{ 'background-color': legend.color }" />
+                            <span class="circle"
+                                  :style="{ 'background-color': legend.color }"
+                            />
                             <span class="count">{{ legend.count ? commaFormatter(numberFormatter(legend.count)) : 0 }}</span>
                         </td>
                         <td>
@@ -52,7 +63,6 @@
 
 <script lang="ts">
 
-
 import {
     defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -69,13 +79,11 @@ import { get } from 'lodash';
 
 import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 
-
 import config from '@/lib/config';
 
 import type { MetricChartProps, MonitoringResourceType, Unit } from '@/common/components/charts/metric-chart/type';
 
 import { gray } from '@/styles/colors';
-
 
 interface ChartData {
     label: string;
@@ -149,7 +157,7 @@ export default defineComponent<MetricChartProps>({
 
         const convertChartData = async () => {
             const chartDataList: ChartData[] = [];
-            const labels = props.labels.map(label => dayjs.tz(dayjs(label), props.timezone).format('MM/DD HH:mm'));
+            const labels = props.labels.map((label) => dayjs.tz(dayjs(label), props.timezone).format('MM/DD HH:mm'));
             labels.forEach((label, index) => {
                 const chartData: ChartData = { label };
                 Object.entries(props.dataset).forEach(([key, value]) => {

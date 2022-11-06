@@ -1,12 +1,19 @@
 <template>
     <div>
-        <p-radio v-for="(item, i) in scheduleMode" :key="i"
-                 :selected="item.value" :value="proxyIsScheduled" class="mr-4"
+        <p-radio v-for="(item, i) in scheduleMode"
+                 :key="i"
+                 :selected="item.value"
+                 :value="proxyIsScheduled"
+                 class="mr-4"
                  @click="handleScheduleMode(item.value)"
         >
-            <span class="radio-label" @click="handleScheduleMode(item.value)">{{ item.label }}</span>
+            <span class="radio-label"
+                  @click="handleScheduleMode(item.value)"
+            >{{ item.label }}</span>
         </p-radio>
-        <article v-if="proxyIsScheduled" class="schedule-wrapper">
+        <article v-if="proxyIsScheduled"
+                 class="schedule-wrapper"
+        >
             <info-message style-type="secondary"
                           :message="$t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE_INFO_MSG')"
                           block
@@ -14,7 +21,8 @@
             <h5 class="setting">
                 {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
             </h5>
-            <p-select-button v-for="day in weekDay" :key="day.value"
+            <p-select-button v-for="day in weekDay"
+                             :key="day.value"
                              :selected="dayOfWeek"
                              multi-selectable
                              :value="day.value"
@@ -56,7 +64,6 @@ import {
 } from '@spaceone/design-system';
 import { range } from 'lodash';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -67,7 +74,6 @@ import { timezoneToUtcFormatter, utcToTimezoneFormatter } from '@/services/admin
 
 const START_TIME_LIST = range(0, 24);
 const END_TIME_LIST = range(1, 25);
-
 
 export default {
     name: 'AddNotificationSchedule',
@@ -125,16 +131,15 @@ export default {
                 { label: 'Thursday', value: 'THU' }, { label: 'Friday', value: 'FRI' },
                 { label: 'Saturday', value: 'SAT' },
                 { label: 'Sunday', value: 'SUN' }],
-            startTimeList: START_TIME_LIST.map(d => ({
+            startTimeList: START_TIME_LIST.map((d) => ({
                 type: 'item', label: `${d}:00`, name: timezoneToUtcFormatter(d, timezoneForFormatter),
             })),
-            endTimeList: END_TIME_LIST.map(d => ({
+            endTimeList: END_TIME_LIST.map((d) => ({
                 type: 'item', label: `${d}:00`, name: timezoneToUtcFormatter(d, timezoneForFormatter),
             })),
             proxyIsScheduledValid: computed(() => !state.proxyIsScheduled || (!invalidState.dayOfWeek && !invalidState.timePeriod)),
             timezone: computed(() => store.state.user.timezone),
         });
-
 
         const emitChange = () => {
             if (state.proxyIsScheduled) {
@@ -175,7 +180,6 @@ export default {
             setForm('timePeriod', { ...timePeriod.value, endHour: value });
             emitChange();
         };
-
 
         return {
             ...toRefs(state),

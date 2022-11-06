@@ -15,7 +15,8 @@
                 <p-lazy-img class="flex-shrink-0 mr-8"
                             :src="imageUrl"
                             :loading="collector === null"
-                            width="5.5rem" height="5.5rem"
+                            width="5.5rem"
+                            height="5.5rem"
                 />
                 <div class="flex-grow">
                     <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_NAME_LABEL')"
@@ -24,7 +25,8 @@
                                    :required="true"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="inputModel.name" block
+                            <p-text-input v-model="inputModel.name"
+                                          block
                                           class="block"
                                           :invalid="invalid"
                             />
@@ -33,12 +35,19 @@
                     <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_VERSION_LABEL')"
                                    :required="true"
                     >
-                        <p-select-dropdown v-model="inputModel.version" :items="versions" :disabled="inputModel.isAutoUpgrade"
+                        <p-select-dropdown v-model="inputModel.version"
+                                           :items="versions"
+                                           :disabled="inputModel.isAutoUpgrade"
                                            use-fixed-menu-style
                         />
                     </p-field-group>
-                    <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL')" :required="true">
-                        <p-toggle-button :value="inputModel.isAutoUpgrade" sync @change="onChangeAutoUpgrade" />
+                    <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL')"
+                                   :required="true"
+                    >
+                        <p-toggle-button :value="inputModel.isAutoUpgrade"
+                                         sync
+                                         @change="onChangeAutoUpgrade"
+                        />
                     </p-field-group>
                 </div>
             </div>
@@ -70,7 +79,6 @@ import { get } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -83,7 +91,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type { CollectorPluginModel, CollectorUpdateParameter } from '@/services/asset-inventory/collector/type';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
-
 
 interface Props {
     visible: boolean;
@@ -167,7 +174,7 @@ export default {
         const getNames = async () => {
             apiQuery.setFilters([{ k: 'name', o: '!=', v: formState.inputModel.name }]);
             const res = await SpaceConnector.client.inventory.collector.list({ query: apiQuery.data });
-            state.collectorNames = res.results.map(v => v.name);
+            state.collectorNames = res.results.map((v) => v.name);
         };
         const getVersions = async () => {
             try {

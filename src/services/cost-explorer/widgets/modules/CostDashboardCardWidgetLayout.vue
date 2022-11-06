@@ -8,21 +8,30 @@
             <div class="header">
                 {{ title }}
                 <p class="title-extra">
-                    <span v-if="showTopText" class="show-top-text mr-2">{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.SHOWING_TOP_NUM', { num : dataRange }) }}
+                    <span v-if="showTopText"
+                          class="show-top-text mr-2"
+                    >{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.SHOWING_TOP_NUM', { num : dataRange }) }}
                         <!--                        <p-i name="ic_tooltip" width="1rem" height="1rem"-->
                         <!--                             color="inherit transparent" class="tooltip-button"-->
                         <!--                        />-->
                     </span>
-                    <router-link v-if="widgetLink && !printMode" :to="widgetLink" class="anchor-button">
+                    <router-link v-if="widgetLink && !printMode"
+                                 :to="widgetLink"
+                                 class="anchor-button"
+                    >
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
-                        <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                        <p-i name="ic_arrow_right"
+                             width="1rem"
+                             height="1rem"
                              color="inherit transparent"
                         />
                     </router-link>
                 </p>
             </div>
         </template>
-        <div v-if="noData" class="no-data">
+        <div v-if="noData"
+             class="no-data"
+        >
             No Item
         </div>
         <slot v-else />

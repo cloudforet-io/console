@@ -1,6 +1,10 @@
 <template>
-    <span class="info-message" :class="{[styleType]: true, block}">
-        <p-i name="ic_outlined-info" color="inherit" height="1em"
+    <span class="info-message"
+          :class="{[styleType]: true, block}"
+    >
+        <p-i name="ic_outlined-info"
+             color="inherit"
+             height="1em"
              width="1em"
         />
         <span class="message">

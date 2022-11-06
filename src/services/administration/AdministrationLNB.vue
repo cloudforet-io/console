@@ -1,5 +1,7 @@
 <template>
-    <l-n-b :header="header" :menu-set="menuSet">
+    <l-n-b :header="header"
+           :menu-set="menuSet"
+    >
         <template #right-extra />
     </l-n-b>
 </template>
@@ -21,7 +23,6 @@ import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-
 
 export default defineComponent({
     name: 'AdministrationLNB',

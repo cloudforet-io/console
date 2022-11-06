@@ -1,5 +1,7 @@
 <template>
-    <div class="cost-dashboard-data-table" :class="{'print-mode': printMode}">
+    <div class="cost-dashboard-data-table"
+         :class="{'print-mode': printMode}"
+    >
         <p-data-table :fields="items.length ? fields : []"
                       :items="slicedItems"
                       :total-count="totalCount"
@@ -8,16 +10,25 @@
                       table-style-type="simple"
                       disable-hover
         >
-            <template v-for="field in fields" #[`th-${field.name}-format`]>
-                <div :key="field.name" class="tooltip-container">
+            <template v-for="field in fields"
+                      #[`th-${field.name}-format`]
+            >
+                <div :key="field.name"
+                     class="tooltip-container"
+                >
                     <span>{{ field.label }}</span>
-                    <p-i v-if="field.tooltipText" v-tooltip.bottom="field.tooltipText"
-                         name="ic_tooltip" width="0.875rem" height="0.875rem"
+                    <p-i v-if="field.tooltipText"
+                         v-tooltip.bottom="field.tooltipText"
+                         name="ic_tooltip"
+                         width="0.875rem"
+                         height="0.875rem"
                     />
                 </div>
             </template>
             <template #col-format="{field: { name, type }, value, index, colIndex}">
-                <div class="status-wrapper" :class="{legend: showLegend && colIndex === 0}">
+                <div class="status-wrapper"
+                     :class="{legend: showLegend && colIndex === 0}"
+                >
                     <template v-if="fields[0].name === name && showIndex">
                         <p-status v-if="showLegend"
                                   class="toggle-button"
@@ -26,8 +37,12 @@
                                   :text-color="getLegendTextColor(index)"
                                   @click="handleClickLegend(index)"
                         />
-                        <slot :name="`${name}-format`" v-bind="{ value }">
-                            <span class="name" :style="{ color: labelColorFormatter(index) }">
+                        <slot :name="`${name}-format`"
+                              v-bind="{ value }"
+                        >
+                            <span class="name"
+                                  :style="{ color: labelColorFormatter(index) }"
+                            >
                                 {{ labelTextFormatter(index) }}
                             </span>
                         </slot>
@@ -59,7 +74,9 @@
                 </div>
             </template>
         </p-data-table>
-        <div v-if="paginationVisible" class="table-pagination-wrapper">
+        <div v-if="paginationVisible"
+             class="table-pagination-wrapper"
+        >
             <p-text-pagination :all-page="allPage"
                                :this-page.sync="proxyThisPage"
             />
@@ -90,7 +107,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
-
 
 interface Field extends DataTableFieldType {
     type?: 'cost'|'size'|'number';
@@ -171,9 +187,9 @@ export default {
         });
 
         /* util */
-        const getConvertedIndex = index => index + ((state.proxyThisPage - 1) * props.pageSize);
-        const labelColorFormatter = index => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].color : 'text-gray-900');
-        const labelTextFormatter = index => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].label : '');
+        const getConvertedIndex = (index) => index + ((state.proxyThisPage - 1) * props.pageSize);
+        const labelColorFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].color : 'text-gray-900');
+        const labelTextFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].label : '');
         const getIndexNumber = (index) => {
             const tableIndex = index + ((state.proxyThisPage - 1) * props.pageSize) + 1;
             return tableIndex?.toString();

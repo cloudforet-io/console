@@ -1,6 +1,8 @@
 <template>
     <div class="collector-credentials">
-        <p-panel-top use-total-count :total-count="totalCount">
+        <p-panel-top use-total-count
+                     :total-count="totalCount"
+        >
             {{ $t('PLUGIN.COLLECTOR.MAIN.SERVICE_ACCOUNT') }}
         </p-panel-top>
         <p-query-search-table :items="items"
@@ -80,7 +82,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const CollectDataModal = () => import('@/services/asset-inventory/collector/modules/CollectDataModal.vue');
-
 
 interface SecretModel {
     secret_id: string;

@@ -4,7 +4,9 @@
                                        :show-top-text="false"
                                        :print-mode="printMode"
     >
-        <budget-stat :query-store-filters="queryStoreFilters" :period="period" :print-mode="printMode"
+        <budget-stat :query-store-filters="queryStoreFilters"
+                     :period="period"
+                     :print-mode="printMode"
                      @rendered="handleRendered"
         />
     </cost-dashboard-card-widget-layout>
@@ -29,7 +31,6 @@ import {
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
-
 
 export default defineComponent<WidgetProps>({
     name: 'BudgetUsageSummary',

@@ -12,7 +12,9 @@
         :no-data="noData"
     >
         <template #default>
-            <div ref="chartRef" class="chart" />
+            <div ref="chartRef"
+                 class="chart"
+            />
         </template>
     </cost-dashboard-simple-card-widget>
 </template>
@@ -34,7 +36,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
-
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -50,7 +51,6 @@ import { getXYChartData } from '@/services/cost-explorer/widgets/lib/widget-data
 import CostDashboardSimpleCardWidget
     from '@/services/cost-explorer/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import type { WidgetProps, XYChartData } from '@/services/cost-explorer/widgets/type';
-
 
 const CATEGORY_KEY = 'date';
 const VALUE_KEY = 'totalCost';
@@ -106,7 +106,7 @@ export default defineComponent<WidgetProps>({
             lastMonth: computed(() => dayjs.utc(props.period?.end).subtract(1, 'month')),
             thisMonth: computed(() => dayjs.utc(props.period?.end)),
             lastMonthCost: computed(() => {
-                const cost = state.data.find(d => d.date === state.lastMonth.format('YYYY-MM'))?.totalCost || 0;
+                const cost = state.data.find((d) => d.date === state.lastMonth.format('YYYY-MM'))?.totalCost || 0;
                 return currencyMoneyFormatter(cost, props.currency, props.currencyRates, true, 10000000000);
             }),
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
@@ -120,7 +120,7 @@ export default defineComponent<WidgetProps>({
                     },
                 };
             }),
-            noData: computed(() => state.data.find(d => d.totalCost > 0) === undefined),
+            noData: computed(() => state.data.find((d) => d.totalCost > 0) === undefined),
         });
 
         const disposeChart = (chartContext) => {
@@ -227,7 +227,6 @@ export default defineComponent<WidgetProps>({
             await getChartData();
             if (state.data.length === 0 || state.noData) emit('rendered');
         }, { immediate: true });
-
 
         watch([() => state.chartRef, () => state.loading], ([chartContext, loading]) => {
             if (chartContext && !loading) {

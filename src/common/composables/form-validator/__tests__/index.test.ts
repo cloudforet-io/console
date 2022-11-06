@@ -2,7 +2,6 @@ import { defineComponent, reactive, toRefs } from 'vue';
 
 import { mount, createLocalVue } from '@vue/test-utils';
 
-
 import { useFormValidator } from '@/common/composables/form-validator';
 
 const localVue = createLocalVue();

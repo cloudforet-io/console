@@ -1,7 +1,10 @@
 <template>
     <div class="manage-notification-page">
-        <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
-        <p-page-title child :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')"
+        <p-breadcrumbs class="flex-grow"
+                       :routes="routeState.routes"
+        />
+        <p-page-title child
+                      :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')"
                       @goBack="goToUserManagement"
         />
         <notification-channel-list :manage-disabled="!isManageable" />
@@ -15,7 +18,6 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

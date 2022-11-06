@@ -14,7 +14,9 @@
         >
             <template #col-project-format="{ value }">
                 <div class="col-project">
-                    <p-i :name="value.projectId ? 'ic_project' : 'ic_tree_project-group'" width="1rem" height="1rem"
+                    <p-i :name="value.projectId ? 'ic_project' : 'ic_tree_project-group'"
+                         width="1rem"
+                         height="1rem"
                          class="project-icon"
                     />
                     {{ value.projectId ? projectNameFormatter(value.projectId, projects) : projectGroupNameFormatter(value.projectGroupId) }}
@@ -28,8 +30,13 @@
             </template>
             <template #col-usage-format="{ value }">
                 <div class="col-usage">
-                    <p-progress-bar :percentage="value" :disable-animation="printMode" :color="getColor(value)" />
-                    <span class="usage-text" :style="{ color: getColor(value) }">{{ value.toFixed(1) }}%</span>
+                    <p-progress-bar :percentage="value"
+                                    :disable-animation="printMode"
+                                    :color="getColor(value)"
+                    />
+                    <span class="usage-text"
+                          :style="{ color: getColor(value) }"
+                    >{{ value.toFixed(1) }}%</span>
                 </div>
             </template>
         </p-data-table>
@@ -49,7 +56,6 @@ import {
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
-
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -74,7 +80,6 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import CostDashboardCardWidgetLayout
     from '@/services/cost-explorer/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import type { WidgetProps } from '@/services/cost-explorer/widgets/type';
-
 
 interface BudgetItem {
     project: {projectId: string; projectGroupId: string};
@@ -159,18 +164,14 @@ export default {
         /* util */
         const getProjectLink = (value: string, isProject: boolean) => {
             if (isProject) {
-                const link = SpaceRouter.router.resolve(referenceRouter(
-                    value, {
-                        resource_type: 'identity.Project',
-                    },
-                ));
+                const link = SpaceRouter.router.resolve(referenceRouter(value, {
+                    resource_type: 'identity.Project',
+                }));
                 return link.href;
             }
-            const link = SpaceRouter.router.resolve(referenceRouter(
-                value, {
-                    resource_type: 'identity.ProjectGroup',
-                },
-            ));
+            const link = SpaceRouter.router.resolve(referenceRouter(value, {
+                resource_type: 'identity.ProjectGroup',
+            }));
             return link.href;
         };
         const getColor = (value) => {
@@ -179,7 +180,7 @@ export default {
             return gray[400];
         };
         const projectNameFormatter = (projectId: string, projects: ProjectReferenceMap) => projects[projectId]?.label || projectId;
-        const projectGroupNameFormatter = projectGroupId => state.projectGroups[projectGroupId]?.label || projectGroupId;
+        const projectGroupNameFormatter = (projectGroupId) => state.projectGroups[projectGroupId]?.label || projectGroupId;
 
         /* api */
         const getBudgetUsageData = async (period, filters) => {
@@ -201,7 +202,7 @@ export default {
                     },
                     ...budgetQueryHelper.apiQuery,
                 });
-                state.items = results.map(d => ({
+                state.items = results.map((d) => ({
                     project: { projectId: d.project_id, projectGroupId: d.project_group_id },
                     amountSpent: d.usd_cost,
                     totalBudget: d.limit,

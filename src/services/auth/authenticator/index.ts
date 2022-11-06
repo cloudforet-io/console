@@ -4,7 +4,6 @@ import { setI18nLocale } from '@/translations';
 
 type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
 
-
 abstract class Authenticator {
     static async signIn(credentials: Record<string, any>, userId?: string, userType?: UserType): Promise<void> {
         try {
@@ -37,7 +36,6 @@ abstract class Authenticator {
         }
     }
 }
-
 
 export {
     Authenticator,

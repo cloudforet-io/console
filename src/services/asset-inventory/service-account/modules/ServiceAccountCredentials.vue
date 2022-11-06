@@ -9,8 +9,12 @@
                 >
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.EDIT') }}
                 </p-button>
-                <div v-if="mode === 'UPDATE'" class="button-wrapper">
-                    <p-button style-type="transparent" @click="handleClickCancelButton">
+                <div v-if="mode === 'UPDATE'"
+                     class="button-wrapper"
+                >
+                    <p-button style-type="transparent"
+                              @click="handleClickCancelButton"
+                    >
                         {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
@@ -52,7 +56,6 @@ import {
 } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -70,7 +73,6 @@ import ServiceAccountCredentialsForm
 import type {
     PageMode, CredentialForm, AccountType, CredentialModel,
 } from '@/services/asset-inventory/service-account/type';
-
 
 interface Props {
     provider?: string;

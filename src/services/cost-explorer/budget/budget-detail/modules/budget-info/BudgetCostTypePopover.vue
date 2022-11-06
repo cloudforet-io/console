@@ -1,5 +1,7 @@
 <template>
-    <p-popover class="budget-cost-type-popover" position="bottom-end">
+    <p-popover class="budget-cost-type-popover"
+               position="bottom-end"
+    >
         <slot />
         <template #content>
             <div class="content-wrapper">
@@ -18,7 +20,6 @@
 
 <script lang="ts">
 import { PPopover } from '@spaceone/design-system';
-
 
 const costTypeMap = {
     region_code: 'Region',

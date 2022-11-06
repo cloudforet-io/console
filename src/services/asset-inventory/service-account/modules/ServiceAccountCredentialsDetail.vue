@@ -50,7 +50,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { CredentialModel } from '@/services/asset-inventory/service-account/type';
 
-
 interface Props {
     loading: boolean;
     credentialData: CredentialModel;

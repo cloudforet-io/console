@@ -5,8 +5,12 @@
             <cost-analysis-query-filter print-mode />
             <cost-analysis-group-by-filter print-mode />
         </div>
-        <cost-analysis-chart print-mode @rendered="handleChartRendered" />
-        <cost-analysis-data-table print-mode @rendered="handleDataTableRendered" />
+        <cost-analysis-chart print-mode
+                             @rendered="handleChartRendered"
+        />
+        <cost-analysis-data-table print-mode
+                                  @rendered="handleDataTableRendered"
+        />
     </div>
 </template>
 
@@ -15,7 +19,6 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-
 
 import { i18n } from '@/translations';
 
@@ -63,7 +66,7 @@ export default {
 
             const imageItems: Item[] = Array.from(topContainerRef.children)
                 .concat(chartElements)
-                .map(element => ({ element: element as HTMLElement, type: 'image' }));
+                .map((element) => ({ element: element as HTMLElement, type: 'image' }));
 
             emit('rendered', imageItems.concat(tableItems));
         });

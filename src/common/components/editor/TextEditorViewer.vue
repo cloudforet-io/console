@@ -1,6 +1,8 @@
 <template>
     <!--        eslint-disable-next-line vue/no-v-html-->
-    <div class="text-editor-contents" v-html="refinedContents" />
+    <div class="text-editor-contents"
+         v-html="refinedContents"
+    />
 </template>
 
 <script lang="ts">
@@ -14,7 +16,6 @@ import { setAttachmentsToContents } from '@/common/components/editor/extensions/
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 
 import { loadMonospaceFonts } from '@/styles/fonts';
-
 
 interface Props {
     contents: string,

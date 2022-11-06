@@ -1,9 +1,13 @@
 <template>
-    <l-n-b :header="header" :menu-set="menuSet">
+    <l-n-b :header="header"
+           :menu-set="menuSet"
+    >
         <template #default>
             <div class="member-profile">
-                <p-i class="member-icon" :name="icon"
-                     width="3rem" height="3rem"
+                <p-i class="member-icon"
+                     :name="icon"
+                     width="3rem"
+                     height="3rem"
                 />
                 <p class="member-id">
                     {{ userId }}
@@ -22,7 +26,6 @@ import {
 } from 'vue';
 
 import { PI } from '@spaceone/design-system';
-
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

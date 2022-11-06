@@ -1,5 +1,7 @@
 <template>
-    <div v-if="visible" class="pdf-download-overlay">
+    <div v-if="visible"
+         class="pdf-download-overlay"
+    >
         <div class="header-wrapper">
             <span class="title">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.PDF_PREVIEW') }}</span>
             <div class="button-group">
@@ -18,14 +20,18 @@
                 </p-button>
             </div>
         </div>
-        <div v-if="mode === 'PDF_EMBED' ? (loading && !pdfDataUrl) : true" class="preview-wrapper">
+        <div v-if="mode === 'PDF_EMBED' ? (loading && !pdfDataUrl) : true"
+             class="preview-wrapper"
+        >
             <div class="preview">
                 <div class="blocker">
                     <slot name="default" />
                 </div>
             </div>
         </div>
-        <div v-if="loading" class="loader-wrapper">
+        <div v-if="loading"
+             class="loader-wrapper"
+        >
             <div class="loader">
                 <p-spinner size="sm" />
                 <div class="progress-rate">
@@ -34,7 +40,9 @@
                 <span>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PDF.PROCESSING') }}...</span>
             </div>
         </div>
-        <iframe v-if="mode === 'PDF_EMBED' && pdfDataUrl" :src="pdfDataUrl" />
+        <iframe v-if="mode === 'PDF_EMBED' && pdfDataUrl"
+                :src="pdfDataUrl"
+        />
     </div>
 </template>
 
@@ -60,7 +68,6 @@ import {
 } from '@/common/components/layouts/PdfDownloadOverlay/fonts';
 
 import { gray, black, white } from '@/styles/colors';
-
 
 const paperSizes = ['A4'] as const;
 const modes = ['ELEMENT_EMBED', 'PDF_EMBED', 'PDF_NEW_TAB'] as const;
@@ -199,7 +206,7 @@ export default defineComponent<Props>({
         const applyTableHeaderStyle = (data: TableCell[][]): TableCell[][] => {
             let tableData = data;
             if (tableData[0]) {
-                tableData[0] = tableData[0].map(item => ({
+                tableData[0] = tableData[0].map((item) => ({
                     text: item,
                     style: 'tableHeader',
                 }));
@@ -221,7 +228,6 @@ export default defineComponent<Props>({
             }
             return tableData;
         };
-
 
         const createContentWithItem = async ({ element, type, tableData }: Item): Promise<Content> => {
             if (type === 'data-table' && tableData) {
@@ -261,8 +267,8 @@ export default defineComponent<Props>({
                     return 1;
                 },
                 vLineWidth: () => 0,
-                hLineColor: i => (i === 0 || i === 1 ? black : gray[300]),
-                paddingLeft: i => (i === 0 ? 8 : 2),
+                hLineColor: (i) => (i === 0 || i === 1 ? black : gray[300]),
+                paddingLeft: (i) => (i === 0 ? 8 : 2),
                 paddingTop: (i) => {
                     if (i === 0) return 4;
                     return 6;
@@ -320,7 +326,7 @@ export default defineComponent<Props>({
             state.loading = true;
             try {
                 state.isMakingContentsStarted = true;
-                const contents: Content[] = await Promise.all(items.map(item => createContentWithItem(item)));
+                const contents: Content[] = await Promise.all(items.map((item) => createContentWithItem(item)));
                 state.progressRate = COMPLETED_IMAGE_RATE;
 
                 state.isMakingPdfStarted = true;

@@ -1,11 +1,23 @@
 <template>
-    <div v-cloak id="app">
+    <div v-cloak
+         id="app"
+    >
         <template v-if="$store.state.display.isInitialized">
-            <p-notice-alert group="noticeTopLeft" position="top left" />
-            <p-notice-alert group="noticeTopRight" position="top right" />
-            <p-notice-alert group="noticeBottomLeft" position="bottom left" />
-            <p-notice-alert group="noticeBottomRight" position="bottom right" />
-            <p-toast-alert group="toastTopCenter" position="top center" />
+            <p-notice-alert group="noticeTopLeft"
+                            position="top left"
+            />
+            <p-notice-alert group="noticeTopRight"
+                            position="top right"
+            />
+            <p-notice-alert group="noticeBottomLeft"
+                            position="bottom left"
+            />
+            <p-notice-alert group="noticeBottomRight"
+                            position="bottom right"
+            />
+            <p-toast-alert group="toastTopCenter"
+                           position="top center"
+            />
             <top-notification />
             <template v-if="showGNB">
                 <g-n-b class="gnb" />
@@ -24,14 +36,26 @@
                             <router-view />
                         </main>
                         <template #title>
-                            <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info" name="info-title" />
-                            <portal-target v-else-if="$store.state.display.sidebarType === SIDEBAR_TYPE.widget" name="widget-title" />
-                            <portal-target v-else name="handbook-title" />
+                            <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info"
+                                           name="info-title"
+                            />
+                            <portal-target v-else-if="$store.state.display.sidebarType === SIDEBAR_TYPE.widget"
+                                           name="widget-title"
+                            />
+                            <portal-target v-else
+                                           name="handbook-title"
+                            />
                         </template>
                         <template #sidebar>
-                            <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info" name="info-contents" />
-                            <portal-target v-else-if="$store.state.display.sidebarType === SIDEBAR_TYPE.widget" name="widget-contents" />
-                            <portal-target v-else name="handbook-contents" />
+                            <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info"
+                                           name="info-contents"
+                            />
+                            <portal-target v-else-if="$store.state.display.sidebarType === SIDEBAR_TYPE.widget"
+                                           name="widget-contents"
+                            />
+                            <portal-target v-else
+                                           name="handbook-contents"
+                            />
                         </template>
                     </p-sidebar>
                 </div>
@@ -49,7 +73,9 @@
         </template>
         <!-- Iframe for file download -->
         <iframe class="hidden"
-                :src="$store.state.file.downloadSource" width="1" height="1"
+                :src="$store.state.file.downloadSource"
+                width="1"
+                height="1"
         />
         <!-- Modal for Cross Browsing -->
         <recommended-browser-modal v-if="showsBrowserRecommendation()" />
@@ -82,11 +108,9 @@ import GNB from '@/common/modules/navigations/gnb/GNB.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
-
 import MobileGuideModal from '@/services/auth/reset-password/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 // import SurveyModal from '@/common/modules/survey/SurveyModal.vue';
-
 
 export default defineComponent({
     name: 'App',

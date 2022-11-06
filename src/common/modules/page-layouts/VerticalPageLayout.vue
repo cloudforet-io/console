@@ -1,17 +1,27 @@
 '<template>
-    <p-vertical-layout v-bind="$props" class="vertical-page-layout" v-on="$listeners">
+    <p-vertical-layout v-bind="$props"
+                       class="vertical-page-layout"
+                       v-on="$listeners"
+    >
         <template #sidebar="prop">
             <slot name="sidebar"
                   :width="prop.width"
             />
         </template>
         <template #default>
-            <div ref="containerRef" class="right-container">
+            <div ref="containerRef"
+                 class="right-container"
+            >
                 <div class="header">
-                    <p-breadcrumbs v-if="breadcrumbs.length" :routes="breadcrumbs" :copiable="copiable" />
+                    <p-breadcrumbs v-if="breadcrumbs.length"
+                                   :routes="breadcrumbs"
+                                   :copiable="copiable"
+                    />
                     <slot name="handbook" />
                 </div>
-                <div class="page-contents" :class="{'without-breadcrumbs': !breadcrumbs.length}">
+                <div class="page-contents"
+                     :class="{'without-breadcrumbs': !breadcrumbs.length}"
+                >
                     <slot name="default" />
                 </div>
                 <div class="fnb">
@@ -29,10 +39,8 @@ import { computed, ref } from 'vue';
 
 import { PBreadcrumbs, PVerticalLayout } from '@spaceone/design-system';
 
-
 import FNB from '@/common/modules/navigations/FNB.vue';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
-
 
 export default {
     name: 'VerticalPageLayout',

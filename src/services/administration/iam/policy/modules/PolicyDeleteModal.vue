@@ -7,7 +7,9 @@
         :size="attachedRoles.length ? 'md' : 'sm'"
         @confirm="handleConfirm"
     >
-        <template v-if="attachedRoles.length" #delete-modal-body>
+        <template v-if="attachedRoles.length"
+                  #delete-modal-body
+        >
             <div class="modal-delete-disabled-title">
                 <span>{{ $t('IAM.POLICY.MODAL.DELETE_HELP_TEXT') }} </span>
                 <p-anchor
@@ -18,7 +20,9 @@
                     {{ $t('IAM.POLICY.MODAL.DELETE_FOLLOW_ROLES') }}
                 </p-anchor>
             </div>
-            <p-data-table :fields="fields" :items="attachedRoles" />
+            <p-data-table :fields="fields"
+                          :items="attachedRoles"
+            />
         </template>
     </delete-modal>
 </template>
@@ -32,7 +36,6 @@ import { PAnchor, PDataTable } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -42,7 +45,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-
 
 export default {
     name: 'PolicyDeleteModal',

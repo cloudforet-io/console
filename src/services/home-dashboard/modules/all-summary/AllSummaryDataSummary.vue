@@ -3,7 +3,9 @@
         <div class="title col-span-3">
             {{ title }}
         </div>
-        <p-data-loader :loading="loading" :data="summaryData">
+        <p-data-loader :loading="loading"
+                       :data="summaryData"
+        >
             <div class="summary-content-wrapper">
                 <router-link :to="getAllServiceLocation()"
                              class="summary-row"
@@ -14,13 +16,16 @@
                     </div>
                     <span class="count">{{ count }} {{ activeTab === DATA_TYPE.STORAGE ? storageSuffix : '' }}</span>
                 </router-link>
-                <router-link v-for="(data, idx) of summaryData" :key="idx"
+                <router-link v-for="(data, idx) of summaryData"
+                             :key="idx"
                              :to="data.to"
                              class="summary-row"
                              :class="{'link-text': !!data.to.name}"
                 >
                     <div class="text-group">
-                        <span class="provider" :style="{ color: providers[data.provider] ? providers[data.provider].color : ''}">
+                        <span class="provider"
+                              :style="{ color: providers[data.provider] ? providers[data.provider].color : ''}"
+                        >
                             {{ providers[data.provider] ? providers[data.provider].label : providers[data.provider] }}
                         </span>
                         <span class="type">{{ data.type }}</span>
@@ -29,13 +34,18 @@
                 </router-link>
             </div>
             <template #loader>
-                <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
+                <div v-for="v in skeletons"
+                     :key="v"
+                     class="flex items-center p-2 col-span-3"
+                >
                     <p-skeleton class="flex-grow" />
                 </div>
             </template>
             <template #no-data>
                 <div class="m-auto">
-                    <img src="@/assets/images/illust_cloud.svg" class="empty-image">
+                    <img src="@/assets/images/illust_cloud.svg"
+                         class="empty-image"
+                    >
                     <p class="text">
                         {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: label }) }}
                     </p>
@@ -73,7 +83,6 @@ import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { DAY_COUNT, MONTH_COUNT } from '@/services/home-dashboard/modules/all-summary/AllSummary.vue';
 import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
-
 
 interface SummaryData {
     type: string;

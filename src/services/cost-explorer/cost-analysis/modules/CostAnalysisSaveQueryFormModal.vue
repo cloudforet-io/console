@@ -16,8 +16,11 @@
                            required
             >
                 <template #default>
-                    <p-text-input v-model="formState.queryName" class="block w-full" :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MY_QUERY')"
-                                  :invalid="!isQueryNameValid" @input.once="handleFirstQueryNameInput"
+                    <p-text-input v-model="formState.queryName"
+                                  class="block w-full"
+                                  :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MY_QUERY')"
+                                  :invalid="!isQueryNameValid"
+                                  @input.once="handleFirstQueryNameInput"
                     />
                 </template>
             </p-field-group>
@@ -47,7 +50,6 @@ import {
     REQUEST_TYPE,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
-
 
 export default {
     name: 'CostAnalysisSaveQueryFormModal',

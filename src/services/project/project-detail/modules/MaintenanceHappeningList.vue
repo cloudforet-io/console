@@ -1,16 +1,25 @@
 <template>
     <p-list-card v-if="visible && !loading && maintenanceHappenings.length !== 0"
-                 :loading="loading" :items="maintenanceHappenings"
+                 :loading="loading"
+                 :items="maintenanceHappenings"
                  style-type="yellow500"
     >
         <template #header>
-            <div class="header-wrapper" @click="onClickHeader">
-                <p-i name="ic_state_duplicated" height="1.25rem" width="1.25rem"
-                     color="inherit" class="icon"
+            <div class="header-wrapper"
+                 @click="onClickHeader"
+            >
+                <p-i name="ic_state_duplicated"
+                     height="1.25rem"
+                     width="1.25rem"
+                     color="inherit"
+                     class="icon"
                 />
                 <span class="text">{{ $t('PROJECT.DETAIL.NOW_HAPPENING_MAINTENANCE') }}</span>
-                <p-i name="ic_delete" height="1.25rem" width="1.25rem"
-                     color="inherit" class="close-button"
+                <p-i name="ic_delete"
+                     height="1.25rem"
+                     width="1.25rem"
+                     color="inherit"
+                     class="close-button"
                 />
             </div>
         </template>
@@ -37,7 +46,6 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 import { store } from '@/store';
 
 import type { MaintenanceHappening } from '@/services/project/project-detail/store/type';
-
 
 const TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 export default {

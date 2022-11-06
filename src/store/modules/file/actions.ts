@@ -29,8 +29,8 @@ export interface ExcelPayload {
 const getFileName = (contentDisposition) => {
     const fileName = contentDisposition
         .split(';')
-        .filter(el => el.indexOf('filename') > -1)
-        .map(ele => ele.replace(/"/g, '').split('=')[1]);
+        .filter((el) => el.indexOf('filename') > -1)
+        .map((ele) => ele.replace(/"/g, '').split('=')[1]);
     return fileName[0];
 };
 export const downloadExcel: Action<FileState, any> = async ({ commit, rootState, dispatch }, payload: ExcelPayload[] | ExcelPayload): Promise<void> => {

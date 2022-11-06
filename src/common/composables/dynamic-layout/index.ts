@@ -10,11 +10,9 @@ import { makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandl
 import type { KeyItem, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import type { Filter } from '@cloudforet/core-lib/space-connector/type';
 
-
 import { store } from '@/store';
 
 import type { ConsoleSearchSchema } from '@/lib/component-util/dynamic-layout/type';
-
 
 const getKeyItemSets = (schemaList: ConsoleSearchSchema[], storeState): KeyItemSet[] => {
     const keyItemSets: KeyItemSet[] = [];
@@ -96,7 +94,6 @@ export function useQuerySearchPropsWithSearchSchema(
         keyItemSets: [] as KeyItemSet[],
         valueHandlerMap: {} as ValueHandlerMap,
     });
-
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

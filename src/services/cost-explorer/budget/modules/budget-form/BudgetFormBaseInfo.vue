@@ -10,7 +10,10 @@
                            required
                            class="base-info-field"
             >
-                <p-text-input :value="name" :invalid="invalidState.name" @input="setForm('name', $event)" />
+                <p-text-input :value="name"
+                              :invalid="invalidState.name"
+                              @input="setForm('name', $event)"
+                />
             </p-field-group>
 
             <budget-target-select @update="handleUpdateTarget" />
@@ -29,7 +32,6 @@ import {
     PFieldGroup, PPaneLayout, PPanelTop, PTextInput,
 } from '@spaceone/design-system';
 
-
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -37,7 +39,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import BudgetCostTypeSelect from '@/services/cost-explorer/budget/modules/BudgetCostTypeSelect.vue';
 import BudgetTargetSelect from '@/services/cost-explorer/budget/modules/BudgetTargetSelect.vue';
 import type { BudgetData } from '@/services/cost-explorer/budget/type';
-
 
 export type BudgetBaseInfo = Pick<BudgetData, 'name'|'cost_types'|'project_group_id'|'project_id'>;
 
@@ -104,11 +105,9 @@ export default {
             state.isCostTypesValid = isValid;
         };
 
-
         watch([() => state.budgetInfo, () => state.isAllValid], ([budgetInfo, isAllValid]) => {
             emit('update', budgetInfo, isAllValid);
         });
-
 
         return {
             name,

@@ -13,27 +13,41 @@
                 {{ moreGroupByItem.key }}
             </p-select-button>
         </template>
-        <p-popover position="bottom-end" :is-visible.sync="popoverVisible">
-            <p-icon-button name="ic_setting" size="sm" style-type="transparent"
+        <p-popover position="bottom-end"
+                   :is-visible.sync="popoverVisible"
+        >
+            <p-icon-button name="ic_setting"
+                           size="sm"
+                           style-type="transparent"
                            @click="handleClickSettingButton"
             />
             <template #content>
                 <div class="popover-content-wrapper">
-                    <div v-for="(popoverItem, idx) in popoverItems" :key="`popover-row-${idx}-${popoverItem.title}`"
+                    <div v-for="(popoverItem, idx) in popoverItems"
+                         :key="`popover-row-${idx}-${popoverItem.title}`"
                          class="group-by-wrapper"
                     >
                         <div class="title-wrapper">
                             <b>{{ popoverItem.title }}</b>
                             <span class="count-text"> ({{ popoverItem.count }})</span>
                         </div>
-                        <div v-for="(item, pIdx) in popoverItem.items" :key="`tags-${item.key}-${pIdx}`" class="list-item">
-                            <p-check-box :selected="!item.disabled" @change="handleChangeCheckBox(item, ...arguments)">
+                        <div v-for="(item, pIdx) in popoverItem.items"
+                             :key="`tags-${item.key}-${pIdx}`"
+                             class="list-item"
+                        >
+                            <p-check-box :selected="!item.disabled"
+                                         @change="handleChangeCheckBox(item, ...arguments)"
+                            >
                                 {{ item.key }}
                             </p-check-box>
-                            <p-icon-button name="ic_trashcan" size="sm" @click="handleDeleteItem(item)" />
+                            <p-icon-button name="ic_trashcan"
+                                           size="sm"
+                                           @click="handleDeleteItem(item)"
+                            />
                         </div>
                     </div>
-                    <p-button icon="ic_plus_bold" style-type="secondary"
+                    <p-button icon="ic_plus_bold"
+                              style-type="secondary"
                               @click="handleClickAddMoreButton"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ADD_MORE') }}
@@ -63,7 +77,6 @@ import CostAnalysisGroupByFilterMoreModal from '@/services/cost-explorer/cost-an
 import { MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { costExplorerStore } from '@/services/cost-explorer/store';
 import type { MoreGroupByItem } from '@/services/cost-explorer/type';
-
 
 export default defineComponent({
     name: 'CostAnalysisGroupByFilterMore',
@@ -99,12 +112,12 @@ export default defineComponent({
                     items: state.additionalInfoGroupByItems,
                 },
             ])),
-            tagsGroupByItems: computed(() => state.moreGroupByItems.filter(d => d.category === MORE_GROUP_BY.TAGS)),
-            additionalInfoGroupByItems: computed(() => state.moreGroupByItems.filter(d => d.category === MORE_GROUP_BY.ADDITIONAL_INFO)),
+            tagsGroupByItems: computed(() => state.moreGroupByItems.filter((d) => d.category === MORE_GROUP_BY.TAGS)),
+            additionalInfoGroupByItems: computed(() => state.moreGroupByItems.filter((d) => d.category === MORE_GROUP_BY.ADDITIONAL_INFO)),
         });
 
         /* Util */
-        const predicate = (current, data) => Object.keys(current).every(key => data && current[key] === data[key]);
+        const predicate = (current, data) => Object.keys(current).every((key) => data && current[key] === data[key]);
 
         /* Event */
         const handleClickSettingButton = () => {
@@ -118,7 +131,7 @@ export default defineComponent({
         };
         const handleSelectMoreGroupByItem = (item: MoreGroupByItem, _, val) => {
             const _moreGroupBy: MoreGroupByItem[] = cloneDeep(state.moreGroupByItems);
-            const target = _moreGroupBy.find(d => d.category === item.category && d.key === item.key);
+            const target = _moreGroupBy.find((d) => d.category === item.category && d.key === item.key);
             if (target) {
                 target.selected = val;
                 costExplorerStore.commit('costAnalysis/setMoreGroupBy', _moreGroupBy);
@@ -126,7 +139,7 @@ export default defineComponent({
         };
         const handleChangeCheckBox = (item: MoreGroupByItem, val) => {
             const _moreGroupBy: MoreGroupByItem[] = cloneDeep(state.moreGroupByItems);
-            const target = _moreGroupBy.find(d => d.category === item.category && d.key === item.key);
+            const target = _moreGroupBy.find((d) => d.category === item.category && d.key === item.key);
             if (target) {
                 target.disabled = !val;
                 if (!val) target.selected = false;
@@ -135,7 +148,7 @@ export default defineComponent({
         };
         const handleDeleteItem = (item: MoreGroupByItem) => {
             const _moreGroupBy: MoreGroupByItem[] = cloneDeep(state.moreGroupByItems);
-            const targetIdx = _moreGroupBy.findIndex(d => d.category === item.category && d.key === item.key);
+            const targetIdx = _moreGroupBy.findIndex((d) => d.category === item.category && d.key === item.key);
             _moreGroupBy.splice(targetIdx, 1);
             costExplorerStore.commit('costAnalysis/setMoreGroupBy', _moreGroupBy);
         };

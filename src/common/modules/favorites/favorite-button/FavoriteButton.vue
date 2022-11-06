@@ -1,22 +1,24 @@
 <template>
-    <p-i v-show="(visibleActiveCaseOnly || readOnly) ? active : true"
-         :name="active ? 'ic_favorite--added': 'ic_favorite'"
-         width="1rem" height="1rem"
-         :scale="scale"
-         color="inherit"
-         class="favorite-btn"
-         :class="{active, 'read-only': readOnly}"
-         @click.prevent="handleClickFavoriteButton"
+    <p-i
+        v-show="(visibleActiveCaseOnly || readOnly) ? active : true"
+        :name="active ? 'ic_favorite--added': 'ic_favorite'"
+        width="1rem"
+        height="1rem"
+        :scale="scale"
+        color="inherit"
+        class="favorite-btn"
+        :class="{active, 'read-only': readOnly}"
+        @click.prevent="handleClickFavoriteButton"
     />
 </template>
 
 <script lang="ts">
+import type { WatchStopHandle } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import { PI } from '@spaceone/design-system';
-
 
 import { store } from '@/store';
 
@@ -94,7 +96,8 @@ export default defineComponent<FavoriteButtonProps>({
             }
         };
 
-        const stopWatch = watch([() => state.hasLoaded, () => state.isLoading], async ([hasLoaded, isLoading]) => {
+        let stopWatch: WatchStopHandle;
+        stopWatch = watch([() => state.hasLoaded, () => state.isLoading], async ([hasLoaded, isLoading]) => {
             if (hasLoaded) {
                 if (stopWatch) stopWatch();
                 return;
