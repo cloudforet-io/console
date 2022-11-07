@@ -13,6 +13,9 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 
@@ -29,7 +32,7 @@ export default {
             default: () => ({}),
         },
         label: {
-            type: String,
+            type: String as PropType<string|undefined|TranslateResult>,
             default: '',
         },
         isBeta: {

@@ -8,13 +8,13 @@
     >
         <div class="menu-button"
              :class="[{
-                 opened: subMenuList.length > 0 && isOpened,
+                 opened: isMenuWithAdditionalMenu && isOpened,
                  selected: isSelected,
              }]"
         >
             <span tabindex="0">
                 <span>{{ label }}</span>
-                <p-i v-if="subMenuList.length > 0"
+                <p-i v-if="isMenuWithAdditionalMenu"
                      class="arrow-button"
                      :name="isOpened ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
                      width="0.5rem"
@@ -23,7 +23,25 @@
                 />
             </span>
 
-            <div v-if="isOpened && subMenuList.length > 0"
+            <div v-if="isOpened && hasCustomMenu"
+                 class="custom-menu-wrapper"
+                 @click.stop
+            >
+                <p-tab v-if="menuId === MENU_ID.DASHBOARD"
+                       :tabs="tabs"
+                       :active-tab.sync="activeTab"
+                >
+                    <template #recent>
+                        <g-n-b-dashboard-recent :visible="activeTab === 'recent'"
+                                                @close="hideMenu"
+                        />
+                    </template>
+                    <template #favorite>
+                        <g-n-b-dashboard-favorite @close="hideMenu" />
+                    </template>
+                </p-tab>
+            </div>
+            <div v-if="isOpened && hasSubMenu"
                  class="sub-menu-wrapper"
                  @click.stop="hideMenu"
             >
@@ -43,21 +61,39 @@
 <script lang="ts">
 
 import { vOnClickOutside } from '@vueuse/components';
-import { defineComponent } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
 import type { PropType, DirectiveFunction, SetupContext } from 'vue';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PTab } from '@spaceone/design-system';
+import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
+import GNBDashboardFavorite
+    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardFavorite.vue';
+import GNBDashboardRecent
+    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardRecent.vue';
+
+const customMenuNameList: MenuId[] = [
+    MENU_ID.DASHBOARD,
+];
 
 export default defineComponent({
     name: 'GNBMenu',
     components: {
+        PTab,
         PI,
+        GNBDashboardRecent,
+        GNBDashboardFavorite,
         GNBSubMenu,
     },
     directives: {
@@ -68,8 +104,8 @@ export default defineComponent({
             type: Boolean,
             default: true,
         },
-        name: {
-            type: String,
+        menuId: {
+            type: String as PropType<MenuId>,
             default: '',
         },
         label: {
@@ -98,11 +134,21 @@ export default defineComponent({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const state = reactive({
+            hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.menuId)),
+            hasSubMenu: computed<boolean>(() => props.subMenuList?.length > 0),
+            isMenuWithAdditionalMenu: computed<boolean>(() => state.hasSubMenu || state.hasCustomMenu),
+            tabs: computed(() => ([
+                { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
+                { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
+            ] as TabItem[])),
+            activeTab: 'recent',
+        });
         const handleMenu = () => {
-            if (props.subMenuList?.length > 0) {
-                emit('open-menu', props.name);
+            if (state.isMenuWithAdditionalMenu) {
+                emit('open-menu', props.menuId);
             } else {
-                const isDuplicatePath = SpaceRouter.router.currentRoute.name === props.name;
+                const isDuplicatePath = SpaceRouter.router.currentRoute.name === props.menuId;
                 if (isDuplicatePath) return;
                 SpaceRouter.router.push(props.to);
             }
@@ -113,8 +159,10 @@ export default defineComponent({
         };
 
         return {
+            ...toRefs(state),
             handleMenu,
             hideMenu,
+            MENU_ID,
         };
     },
 });
@@ -162,6 +210,16 @@ export default defineComponent({
         min-width: 10rem;
         box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
         padding: 0.5rem;
+    }
+    .custom-menu-wrapper {
+        @apply rounded-xs;
+        width: 22.5rem;
+        position: absolute;
+        top: $gnb-height;
+        margin-top: -0.5rem;
+        left: -1.125rem;
+        min-width: 10rem;
+        box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
     }
 }
 

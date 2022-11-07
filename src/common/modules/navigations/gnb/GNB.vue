@@ -13,7 +13,7 @@
             <g-n-b-menu v-for="(menu, idx) in gnbMenuList"
                         :key="idx"
                         :show="menu.show"
-                        :name="menu.id"
+                        :menu-id="menu.id"
                         :label="menu.label"
                         :to="menu.to"
                         :sub-menu-list="menu.subMenuList"
