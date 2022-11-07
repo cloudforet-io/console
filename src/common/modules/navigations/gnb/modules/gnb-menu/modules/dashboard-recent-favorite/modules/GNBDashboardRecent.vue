@@ -11,7 +11,10 @@
             />
             <template #no-data>
                 <div class="no-data">
-                    <img class="img" src="@/assets/images/illust_spaceship_3.svg">
+                    <img class="img"
+                         alt="no-data-image"
+                         src="@/assets/images/illust_spaceship_3.svg"
+                    >
                     <p class="text">
                         {{ $t('COMMON.GNB.RECENT.RECENT_HELP_TEXT') }}
                     </p>
@@ -23,7 +26,6 @@
 
 <script lang="ts">
 
-
 import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
@@ -31,7 +33,6 @@ import {
 
 import { PDataLoader } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
-
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -60,7 +61,6 @@ import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-se
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
 
 const RECENT_LIMIT = 30;
 
@@ -91,30 +91,30 @@ export default defineComponent({
                     .concat(state.recentCloudServiceItems)
                     .concat(state.recentProjectItems)
                     .concat(state.recentProjectGroupItems),
-                recent => recent.updatedAt,
+                (recent) => recent.updatedAt,
             ).reverse()),
             recentMenuItems: computed<RecentItem[]>(() => convertMenuConfigToReferenceData(
-                storeState.recents.filter(d => d.itemType === RECENT_TYPE.MENU),
+                storeState.recents.filter((d) => d.itemType === RECENT_TYPE.MENU),
                 storeState.menuItems,
             )),
             recentCloudServiceItems: computed<RecentItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE, store.getters['user/pagePermissionList']);
                 return isUserAccessible ? convertCloudServiceConfigToReferenceData(
-                    storeState.recents.filter(d => d.itemType === RECENT_TYPE.CLOUD_SERVICE),
+                    storeState.recents.filter((d) => d.itemType === RECENT_TYPE.CLOUD_SERVICE),
                     storeState.cloudServiceTypes,
                 ) : [];
             }),
             recentProjectItems: computed<RecentItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pagePermissionList']);
                 return isUserAccessible ? convertProjectConfigToReferenceData(
-                    storeState.recents.filter(d => d.itemType === RECENT_TYPE.PROJECT),
+                    storeState.recents.filter((d) => d.itemType === RECENT_TYPE.PROJECT),
                     storeState.projects,
                 ) : [];
             }),
             recentProjectGroupItems: computed<RecentItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pagePermissionList']);
                 return isUserAccessible ? convertProjectGroupConfigToReferenceData(
-                    storeState.recents.filter(d => d.itemType === RECENT_TYPE.PROJECT_GROUP),
+                    storeState.recents.filter((d) => d.itemType === RECENT_TYPE.PROJECT_GROUP),
                     storeState.projectGroups,
                 ) : [];
             }),
@@ -171,7 +171,7 @@ export default defineComponent({
 });
 </script>
 <style lang="postcss" scoped>
-.gnb-recent {
+.gnb-dashboard-recent {
     /* custom design-system component - p-data-loader */
     :deep(.p-data-loader) {
         &.loading {

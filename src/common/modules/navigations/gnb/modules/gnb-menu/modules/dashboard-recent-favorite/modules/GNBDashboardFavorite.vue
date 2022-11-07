@@ -18,7 +18,9 @@
                                  @click="handleClickShowAll(item.itemType)"
                             >
                                 <span class="text">{{ $t('COMMON.GNB.FAVORITES.SHOW_ALL') }}</span>
-                                <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                                <p-i name="ic_arrow_right"
+                                     width="1rem"
+                                     height="1rem"
                                      color="inherit"
                                 />
                             </div>
@@ -26,7 +28,8 @@
                     </template>
                     <template v-else>
                         <div class="all-items-header">
-                            <p-icon-button name="ic_back" size="sm"
+                            <p-icon-button name="ic_back"
+                                           size="sm"
                                            @click="handleGoBack"
                             />
                             <span class="title-text">{{ item.label }}</span>
@@ -36,7 +39,9 @@
             </g-n-b-suggestion-list>
             <template #no-data>
                 <div class="no-data">
-                    <img class="img" src="@/assets/images/illust_star.svg">
+                    <img class="img"
+                         src="@/assets/images/illust_star.svg"
+                    >
                     <p class="text">
                         {{ $t('COMMON.GNB.FAVORITES.FAVORITES_HELP_TEXT') }}
                     </p>
@@ -78,7 +83,6 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {

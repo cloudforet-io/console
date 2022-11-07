@@ -27,7 +27,8 @@
                  class="custom-menu-wrapper"
                  @click.stop
             >
-                <p-tab v-if="name === MENU_ID.DASHBOARD" :tabs="tabs"
+                <p-tab v-if="menuId === MENU_ID.DASHBOARD"
+                       :tabs="tabs"
                        :active-tab.sync="activeTab"
                 >
                     <template #recent>
@@ -103,7 +104,7 @@ export default defineComponent({
             type: Boolean,
             default: true,
         },
-        name: {
+        menuId: {
             type: String as PropType<MenuId>,
             default: '',
         },
@@ -134,7 +135,7 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.name)),
+            hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.menuId)),
             hasSubMenu: computed<boolean>(() => props.subMenuList?.length > 0),
             isMenuWithAdditionalMenu: computed<boolean>(() => state.hasSubMenu || state.hasCustomMenu),
             tabs: computed(() => ([
@@ -145,9 +146,9 @@ export default defineComponent({
         });
         const handleMenu = () => {
             if (state.isMenuWithAdditionalMenu) {
-                emit('open-menu', props.name);
+                emit('open-menu', props.menuId);
             } else {
-                const isDuplicatePath = SpaceRouter.router.currentRoute.name === props.name;
+                const isDuplicatePath = SpaceRouter.router.currentRoute.name === props.menuId;
                 if (isDuplicatePath) return;
                 SpaceRouter.router.push(props.to);
             }

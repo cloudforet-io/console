@@ -13,7 +13,9 @@
             <div v-else-if="!data"
                  class="no-data-wrapper"
             >
-                <img src="@/assets/images/illust_star.svg">
+                <img alt="no-data-image"
+                     src="@/assets/images/illust_star.svg"
+                >
                 <div class="text">
                     {{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.NO_DATA') }}
                 </div>
