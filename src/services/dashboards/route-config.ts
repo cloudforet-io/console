@@ -8,7 +8,7 @@ export const DASHBOARDS_ROUTE = Object.freeze({
     CREATE: {
         _NAME: `${MENU_ID.DASHBOARDS}.create`,
     },
-    EDIT: {
-        _NAME: `${MENU_ID.DASHBOARDS}.edit`,
+    CUSTOMIZE: {
+        _NAME: `${MENU_ID.DASHBOARDS}.customize`,
     },
 });
