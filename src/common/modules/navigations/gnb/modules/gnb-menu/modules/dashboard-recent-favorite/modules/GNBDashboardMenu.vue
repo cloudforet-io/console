@@ -11,7 +11,7 @@
             </template>
             <template #footer>
                 <div v-for="(subMenu, index) in subMenuList"
-                     :key="index"
+                     :key="`footer-${subMenu.label}-${index}`"
                      class="sub-menu"
                 >
                     <g-n-b-sub-menu :show="!subMenu.hideOnGNB"
@@ -44,7 +44,7 @@ import GNBDashboardFavorite
 import GNBDashboardRecent
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardRecent.vue';
 
-import { DASHBOARD_ROUTE } from '@/services/dashboard/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 export default defineComponent({
     name: 'GNBDashboardMenu',
@@ -64,11 +64,11 @@ export default defineComponent({
             subMenuList: [
                 {
                     label: 'View All Dashboards', // song-lang
-                    to: { name: DASHBOARD_ROUTE._NAME },
+                    to: { name: DASHBOARDS_ROUTE._NAME },
                 },
                 {
                     label: 'Create New Dashboard', // song-lang
-                    to: { name: DASHBOARD_ROUTE.CREATE._NAME },
+                    to: { name: DASHBOARDS_ROUTE.CREATE._NAME },
                 },
             ] as DisplayMenu[],
         });

@@ -25,9 +25,9 @@
 
             <div v-if="isOpened && hasCustomMenu"
                  class="custom-menu-wrapper"
-                 @click.stop
+                 @click.stop="hideMenu"
             >
-                <g-n-b-dashboard-menu v-if="menuId === MENU_ID.DASHBOARD" />
+                <g-n-b-dashboard-menu v-if="menuId === MENU_ID.DASHBOARDS" />
             </div>
             <div v-if="isOpened && hasSubMenu"
                  class="sub-menu-wrapper"
@@ -68,7 +68,7 @@ import GNBDashboardMenu
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardMenu.vue';
 
 const customMenuNameList: MenuId[] = [
-    MENU_ID.DASHBOARD,
+    MENU_ID.DASHBOARDS,
 ];
 
 export default defineComponent({
