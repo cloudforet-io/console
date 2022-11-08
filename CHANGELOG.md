@@ -1,3 +1,10 @@
+# [1.1.0-beta.449](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.448...v1.1.0-beta.449) (2022-11-08)
+
+
+### Features
+
+* **p-tab:** add footer slot ([#127](https://github.com/cloudforet-io/mirinae/issues/127)) ([950f515](https://github.com/cloudforet-io/mirinae/commit/950f515db87cbad32d5dc20f7c477a6ba21acdee))
+
 # [1.1.0-beta.448](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.447...v1.1.0-beta.448) (2022-11-04)
 
 
