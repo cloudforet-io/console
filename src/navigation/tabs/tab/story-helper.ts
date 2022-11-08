@@ -103,6 +103,20 @@ export const getTabArgTypes = (): ArgTypes => ({
             category: 'slots',
         },
     },
+    footerSlot: {
+        name: 'footer',
+        description: 'Use when all tabs require a common footer ui.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+    },
     /* events */
     onUpdateActiveTab: {
         name: 'update:activeTab',
