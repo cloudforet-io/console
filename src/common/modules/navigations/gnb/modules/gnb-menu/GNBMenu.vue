@@ -25,21 +25,9 @@
 
             <div v-if="isOpened && hasCustomMenu"
                  class="custom-menu-wrapper"
-                 @click.stop
+                 @click.stop="hideMenu"
             >
-                <p-tab v-if="menuId === MENU_ID.DASHBOARD"
-                       :tabs="tabs"
-                       :active-tab.sync="activeTab"
-                >
-                    <template #recent>
-                        <g-n-b-dashboard-recent :visible="activeTab === 'recent'"
-                                                @close="hideMenu"
-                        />
-                    </template>
-                    <template #favorite>
-                        <g-n-b-dashboard-favorite @close="hideMenu" />
-                    </template>
-                </p-tab>
+                <g-n-b-dashboard-menu v-if="menuId === MENU_ID.DASHBOARDS" />
             </div>
             <div v-if="isOpened && hasSubMenu"
                  class="sub-menu-wrapper"
@@ -66,11 +54,9 @@ import {
 } from 'vue';
 import type { PropType, DirectiveFunction, SetupContext } from 'vue';
 
-import { PI, PTab } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { PI } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 
@@ -78,22 +64,18 @@ import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
-import GNBDashboardFavorite
-    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardFavorite.vue';
-import GNBDashboardRecent
-    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardRecent.vue';
+import GNBDashboardMenu
+    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardMenu.vue';
 
 const customMenuNameList: MenuId[] = [
-    MENU_ID.DASHBOARD,
+    MENU_ID.DASHBOARDS,
 ];
 
 export default defineComponent({
     name: 'GNBMenu',
     components: {
-        PTab,
+        GNBDashboardMenu,
         PI,
-        GNBDashboardRecent,
-        GNBDashboardFavorite,
         GNBSubMenu,
     },
     directives: {
@@ -138,11 +120,6 @@ export default defineComponent({
             hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.menuId)),
             hasSubMenu: computed<boolean>(() => props.subMenuList?.length > 0),
             isMenuWithAdditionalMenu: computed<boolean>(() => state.hasSubMenu || state.hasCustomMenu),
-            tabs: computed(() => ([
-                { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
-                { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
-            ] as TabItem[])),
-            activeTab: 'recent',
         });
         const handleMenu = () => {
             if (state.isMenuWithAdditionalMenu) {
