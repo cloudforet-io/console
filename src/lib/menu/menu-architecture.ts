@@ -7,7 +7,7 @@ export const MENU_LIST: Menu[] = [
         hideOnGNB: true,
     },
     {
-        id: MENU_ID.DASHBOARD,
+        id: MENU_ID.DASHBOARDS,
         subMenuList: [],
     },
     { id: MENU_ID.PROJECT },

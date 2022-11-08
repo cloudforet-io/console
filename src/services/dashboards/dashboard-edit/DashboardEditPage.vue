@@ -1,11 +1,11 @@
 <template>
-    <div class="edit-dashboard-page">
+    <div class="dashboard-edit-page">
         EDIT DASHBOARD
     </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
-    name: 'EditDashboardPage.vue',
+    name: 'DashboardEditPage',
 };
 </script>
