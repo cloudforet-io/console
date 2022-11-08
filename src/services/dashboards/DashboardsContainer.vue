@@ -22,7 +22,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 export default {
-    name: 'DashboardContainer',
+    name: 'DashboardsContainer',
     components: { GeneralPageLayout, VerticalPageLayout },
     setup() {
         const { breadcrumbs } = useBreadcrumbs();
