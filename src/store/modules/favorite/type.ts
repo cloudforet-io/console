@@ -38,3 +38,11 @@ export interface FavoriteState {
     dashboardItems: FavoriteConfig[]|null;
     isLoading: FavoriteHasLoaded;
 }
+
+export const FAVORITE_TYPE_TO_STATE_NAME = {
+    [FAVORITE_TYPE.MENU]: 'menuItems',
+    [FAVORITE_TYPE.PROJECT]: 'projectItems',
+    [FAVORITE_TYPE.PROJECT_GROUP]: 'projectGroupItems',
+    [FAVORITE_TYPE.CLOUD_SERVICE]: 'cloudServiceItems',
+    [FAVORITE_TYPE.DASHBOARD]: 'dashboardItems',
+};
