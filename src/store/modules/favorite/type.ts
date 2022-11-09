@@ -1,12 +1,12 @@
 import type { TranslateResult } from 'vue-i18n';
 
-export const FAVORITE_TYPE = Object.freeze({
+export const FAVORITE_TYPE = {
     MENU: 'MENU',
     CLOUD_SERVICE: 'CLOUD_SERVICE',
     PROJECT: 'PROJECT',
     PROJECT_GROUP: 'PROJECT_GROUP',
     DASHBOARD: 'DASHBOARD',
-} as const);
+} as const;
 export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE];
 
 export interface FavoriteConfig {
