@@ -216,7 +216,7 @@ export default defineComponent<SelectDropdownProps>({
             e.stopPropagation();
         };
         const handleClickOutside = (): void => {
-            state.visibleMenu = false;
+            state.proxyVisibleMenu = false;
         };
         const handlePressDownKey = () => {
             if (!state.proxyVisibleMenu) state.proxyVisibleMenu = true;
