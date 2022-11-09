@@ -1,25 +1,30 @@
 <template>
-    <div class="g-n-b-dashboard-menu">
+    <div v-click-outside="hideMenu"
+         class="g-n-b-dashboard-menu"
+    >
         <p-tab :tabs="tabs"
                :active-tab.sync="activeTab"
         >
             <template #favorite>
-                <g-n-b-dashboard-favorite />
+                <g-n-b-dashboard-favorite @close="hideMenu" />
             </template>
             <template #recent>
                 <g-n-b-dashboard-recent :visible="activeTab === 'recent'" />
             </template>
             <template #footer>
-                <div v-for="(subMenu, index) in subMenuList"
-                     :key="`footer-${subMenu.label}-${index}`"
-                     class="sub-menu"
-                >
-                    <g-n-b-sub-menu :show="!subMenu.hideOnGNB"
-                                    :label="subMenu.label"
-                                    :to="subMenu.to"
-                                    :is-beta="subMenu.isBeta"
-                                    :is-new="subMenu.isNew"
-                    />
+                <div class="footer-wrapper">
+                    <div v-for="(subMenu, index) in subMenuList"
+                         :key="`footer-${subMenu.label}-${index}`"
+                         class="sub-menu"
+                         @click="hideMenu"
+                    >
+                        <g-n-b-sub-menu :label="subMenu.label"
+                                        :to="subMenu.to"
+                                        :is-beta="subMenu.isBeta"
+                                        :is-new="subMenu.isNew"
+                        />
+                    </div>
+                    <div class="gradient-box" />
                 </div>
             </template>
         </p-tab>
@@ -27,6 +32,8 @@
 </template>
 
 <script lang="ts">
+import { vOnClickOutside } from '@vueuse/components';
+import type { DirectiveFunction, SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -54,7 +61,10 @@ export default defineComponent({
         GNBDashboardFavorite,
         GNBSubMenu,
     },
-    setup() {
+    directives: {
+        clickOutside: vOnClickOutside as DirectiveFunction,
+    },
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             tabs: computed(() => ([
                 { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
@@ -72,8 +82,13 @@ export default defineComponent({
                 },
             ] as DisplayMenu[],
         });
+        const hideMenu = () => {
+            console.log('여기 맞을 텐데..');
+            emit('close');
+        };
         return {
             ...toRefs(state),
+            hideMenu,
         };
     },
 });
@@ -97,9 +112,25 @@ export default defineComponent({
             padding-bottom: 0;
         }
     }
-    .sub-menu {
-        @apply border-t border-gray-200;
-        padding: 0.5rem;
+    .footer-wrapper {
+        position: relative;
+        .sub-menu {
+            @apply border-t border-gray-200;
+            padding: 0.5rem;
+        }
+        .gradient-box {
+            position: absolute;
+            top: -3rem;
+            width: 100%;
+            height: 3rem;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 100%);
+        }
+    }
+
+    &:hover {
+        .gradient-box {
+            display: none;
+        }
     }
 }
 

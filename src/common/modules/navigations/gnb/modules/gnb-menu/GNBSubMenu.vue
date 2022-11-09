@@ -5,9 +5,16 @@
         :to="to"
     >
         <div class="gnb-sub-contents">
+            <p-i v-if="isDraggable"
+                 name="ic_drag-handle--slim"
+                 width="1rem"
+                 height="1rem"
+                 class="drag-icon"
+            />
             <span>{{ label }}</span>
             <beta-mark v-if="isBeta" />
             <new-mark v-if="isNew" />
+            <slot name="extra-mark" />
         </div>
     </router-link>
 </template>
@@ -16,12 +23,14 @@
 import type { PropType } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
+import { PI } from '@spaceone/design-system';
+
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 
 export default {
     name: 'GNBSubMenu',
-    components: { NewMark, BetaMark },
+    components: { NewMark, BetaMark, PI },
     props: {
         show: {
             type: Boolean,
@@ -40,6 +49,10 @@ export default {
             default: false,
         },
         isNew: {
+            type: Boolean,
+            default: false,
+        },
+        isDraggable: {
             type: Boolean,
             default: false,
         },
@@ -62,6 +75,10 @@ export default {
         padding: 0.5rem;
         &:hover, &:focus {
             @apply bg-violet-100 text-violet-600;
+        }
+        &selected {
+            @apply text-violet-600;
+            background-color: unset;
         }
         &:active {
             @apply bg-white;
