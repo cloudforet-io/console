@@ -32,6 +32,7 @@ const FAVORITE_TYPE_TO_STATE_NAME = {
     [FAVORITE_TYPE.PROJECT]: 'projectItems',
     [FAVORITE_TYPE.PROJECT_GROUP]: 'projectGroupItems',
     [FAVORITE_TYPE.CLOUD_SERVICE]: 'cloudServiceItems',
+    [FAVORITE_TYPE.DASHBOARD]: 'dashboardItems',
 };
 
 export default defineComponent<FavoriteButtonProps>({

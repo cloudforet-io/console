@@ -5,6 +5,7 @@ export const FAVORITE_TYPE = Object.freeze({
     CLOUD_SERVICE: 'CLOUD_SERVICE',
     PROJECT: 'PROJECT',
     PROJECT_GROUP: 'PROJECT_GROUP',
+    DASHBOARD: 'DASHBOARD',
 } as const);
 export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE];
 
@@ -26,6 +27,7 @@ export interface FavoriteHasLoaded {
     [FAVORITE_TYPE.CLOUD_SERVICE]: boolean;
     [FAVORITE_TYPE.PROJECT]: boolean;
     [FAVORITE_TYPE.PROJECT_GROUP]: boolean;
+    [FAVORITE_TYPE.DASHBOARD]: boolean;
 }
 
 export interface FavoriteState {
@@ -33,5 +35,6 @@ export interface FavoriteState {
     projectItems: FavoriteConfig[]|null;
     projectGroupItems: FavoriteConfig[]|null;
     cloudServiceItems: FavoriteConfig[]|null;
+    dashboardItems: FavoriteConfig[]|null;
     isLoading: FavoriteHasLoaded;
 }
