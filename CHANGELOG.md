@@ -1,3 +1,10 @@
+# [1.1.0-beta.450](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.449...v1.1.0-beta.450) (2022-11-09)
+
+
+### Bug Fixes
+
+* **p-select-dropdown:** fix minor bug ([#128](https://github.com/cloudforet-io/mirinae/issues/128)) ([2c496fe](https://github.com/cloudforet-io/mirinae/commit/2c496fe630a1e1ceafb5e71c75fdcb330b1ababd))
+
 # [1.1.0-beta.449](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.448...v1.1.0-beta.449) (2022-11-08)
 
 
