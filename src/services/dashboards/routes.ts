@@ -2,11 +2,11 @@ import type { RouteConfig } from 'vue-router';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
-const DashboardsContainer = () => import(/* webpackChunkName: "DashboardsContainer" */ '@/services/dashboards/DashboardsContainer.vue');
-const AllDashboardsPage = () => import(/* webpackChunkName: "DashboardsPage" */ '@/services/dashboards/all-dashboards/AllDashboardsPage.vue');
-const DashboardCreatePage = () => import(/* webpackChunkName: "DashboardCreatePage" */ '@/services/dashboards/dashboard-create/DashboardCreatePage.vue');
-const DashboardCustomizePage = () => import(/* webpackChunkName: "DashboardCustomizePage" */ '@/services/dashboards/dashboard-customize/DashboardCustomizePage.vue');
-const DashboardDetailPage = () => import(/* webpackChunkName: "DashboardDetailPage" */ '@/services/dashboards/dashboard-detail/DashboardDetailPage.vue');
+const DashboardsContainer = () => import('@/services/dashboards/DashboardsContainer.vue');
+const AllDashboardsPage = () => import('@/services/dashboards/all-dashboards/AllDashboardsPage.vue');
+const DashboardCreatePage = () => import('@/services/dashboards/dashboard-create/DashboardCreatePage.vue');
+const DashboardCustomizePage = () => import('@/services/dashboards/dashboard-customize/DashboardCustomizePage.vue');
+const DashboardDetailPage = () => import('@/services/dashboards/dashboard-detail/DashboardDetailPage.vue');
 
 const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
@@ -19,15 +19,15 @@ const dashboardsRoute: RouteConfig = {
             component: AllDashboardsPage,
         },
         {
+            path: 'create',
+            name: DASHBOARDS_ROUTE.CREATE._NAME,
+            component: DashboardCreatePage,
+        },
+        {
             path: ':dashboardId',
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             meta: { lnbVisible: true },
             component: DashboardDetailPage,
-        },
-        {
-            path: 'create',
-            name: DASHBOARDS_ROUTE.CREATE._NAME,
-            component: DashboardCreatePage,
         },
         {
             path: ':dashboardId/edit',

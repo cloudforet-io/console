@@ -4,7 +4,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
 
-const HomeDashboard = () => import(/* webpackChunkName: "HomeDashboard" */ '@/services/home-dashboard/HomeDashboardPage.vue');
+const HomeDashboard = () => import('@/services/home-dashboard/HomeDashboardPage.vue');
 
 export default {
     path: 'home-dashboard',
