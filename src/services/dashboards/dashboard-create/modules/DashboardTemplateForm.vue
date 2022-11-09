@@ -12,10 +12,25 @@
                         </span>
                         <div class="card-wrapper">
                             <p-select-card
-                                v-for="(item, idx) in [0,1]"
+                                v-for="(item, idx) in defaultTemplateData"
                                 :key="`default-template-${idx}`"
                                 :tabindex="idx"
-                            />
+                            >
+                                <template #bottom>
+                                    <div class="default-template-card">
+                                        <p-i :name="item.icon"
+                                             width="2.25rem"
+                                             height="2.25rem"
+                                        />
+                                        <span>{{ item.name }}</span>
+                                        <p-label v-for="(labelItem, labelIdx) in item.tags"
+                                                 :key="`template-label-${idx}-${labelIdx}`"
+                                        >
+                                            {{ labelItem }}
+                                        </p-label>
+                                    </div>
+                                </template>
+                            </p-select-card>
                         </div>
                     </div>
                     <div class="card-container">
@@ -39,7 +54,7 @@
 
 <script lang="ts">
 import {
-    PPaneLayout, PPanelTop, PSelectCard,
+    PPaneLayout, PPanelTop, PSelectCard, PI, PLabel,
 } from '@spaceone/design-system';
 
 export default {
@@ -48,6 +63,30 @@ export default {
         PPanelTop,
         PPaneLayout,
         PSelectCard,
+        PI,
+        PLabel,
+    },
+    setup() {
+        const defaultTemplateData = [
+            {
+                name: 'Monthly Cost Summary',
+                icon: 'ic_edit',
+                tags: [
+                    'Cost', 'AWS', 'Azure',
+                ],
+            },
+            {
+                name: 'Cloud Asset Overview',
+                icon: 'ic_delete',
+                tags: [
+                    'Resources', 'AWS', 'Google Cloud Platform',
+                ],
+            },
+        ];
+
+        return {
+            defaultTemplateData,
+        };
     },
 };
 </script>
