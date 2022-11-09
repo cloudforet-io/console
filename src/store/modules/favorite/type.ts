@@ -1,11 +1,12 @@
 import type { TranslateResult } from 'vue-i18n';
 
-export const FAVORITE_TYPE = Object.freeze({
+export const FAVORITE_TYPE = {
     MENU: 'MENU',
     CLOUD_SERVICE: 'CLOUD_SERVICE',
     PROJECT: 'PROJECT',
     PROJECT_GROUP: 'PROJECT_GROUP',
-} as const);
+    DASHBOARD: 'DASHBOARD',
+} as const;
 export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE];
 
 export interface FavoriteConfig {
@@ -26,6 +27,7 @@ export interface FavoriteHasLoaded {
     [FAVORITE_TYPE.CLOUD_SERVICE]: boolean;
     [FAVORITE_TYPE.PROJECT]: boolean;
     [FAVORITE_TYPE.PROJECT_GROUP]: boolean;
+    [FAVORITE_TYPE.DASHBOARD]: boolean;
 }
 
 export interface FavoriteState {
@@ -33,5 +35,14 @@ export interface FavoriteState {
     projectItems: FavoriteConfig[]|null;
     projectGroupItems: FavoriteConfig[]|null;
     cloudServiceItems: FavoriteConfig[]|null;
+    dashboardItems: FavoriteConfig[]|null;
     isLoading: FavoriteHasLoaded;
 }
+
+export const FAVORITE_TYPE_TO_STATE_NAME = {
+    [FAVORITE_TYPE.MENU]: 'menuItems',
+    [FAVORITE_TYPE.PROJECT]: 'projectItems',
+    [FAVORITE_TYPE.PROJECT_GROUP]: 'projectGroupItems',
+    [FAVORITE_TYPE.CLOUD_SERVICE]: 'cloudServiceItems',
+    [FAVORITE_TYPE.DASHBOARD]: 'dashboardItems',
+};

@@ -23,16 +23,9 @@ import { PI } from '@spaceone/design-system';
 import { store } from '@/store';
 
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 
 import type { FavoriteButtonProps } from '@/common/modules/favorites/favorite-button/type';
-
-const FAVORITE_TYPE_TO_STATE_NAME = {
-    [FAVORITE_TYPE.MENU]: 'menuItems',
-    [FAVORITE_TYPE.PROJECT]: 'projectItems',
-    [FAVORITE_TYPE.PROJECT_GROUP]: 'projectGroupItems',
-    [FAVORITE_TYPE.CLOUD_SERVICE]: 'cloudServiceItems',
-};
 
 export default defineComponent<FavoriteButtonProps>({
     name: 'FavoriteButton',
