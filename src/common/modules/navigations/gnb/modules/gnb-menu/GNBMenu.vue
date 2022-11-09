@@ -3,7 +3,7 @@
          v-click-outside="hideMenu"
          class="gnb-menu"
          :class="{disabled: !hasPermission}"
-         @click.stop="handleMenu"
+         @click.capture="handleMenu"
          @keydown.enter="handleMenu"
     >
         <div class="menu-button"
@@ -25,9 +25,11 @@
 
             <div v-if="isOpened && hasCustomMenu"
                  class="custom-menu-wrapper"
-                 @click.stop="hideMenu"
+                 @click.stop
             >
-                <g-n-b-dashboard-menu v-if="menuId === MENU_ID.DASHBOARDS" />
+                <g-n-b-dashboard-menu v-if="menuId === MENU_ID.DASHBOARDS"
+                                      @close="hideMenu"
+                />
             </div>
             <div v-if="isOpened && hasSubMenu"
                  class="sub-menu-wrapper"
@@ -63,13 +65,10 @@ import type { DisplayMenu } from '@/store/modules/display/type';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+import { customMenuNameList } from '@/common/modules/navigations/gnb/config';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardMenu
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardMenu.vue';
-
-const customMenuNameList: MenuId[] = [
-    MENU_ID.DASHBOARDS,
-];
 
 export default defineComponent({
     name: 'GNBMenu',
@@ -121,18 +120,17 @@ export default defineComponent({
             hasSubMenu: computed<boolean>(() => props.subMenuList?.length > 0),
             isMenuWithAdditionalMenu: computed<boolean>(() => state.hasSubMenu || state.hasCustomMenu),
         });
+        const hideMenu = () => { emit('hide-menu'); };
+
         const handleMenu = () => {
             if (state.isMenuWithAdditionalMenu) {
                 emit('open-menu', props.menuId);
             } else {
                 const isDuplicatePath = SpaceRouter.router.currentRoute.name === props.menuId;
                 if (isDuplicatePath) return;
+                hideMenu();
                 SpaceRouter.router.push(props.to);
             }
-        };
-
-        const hideMenu = () => {
-            emit('hide-menu');
         };
 
         return {
@@ -190,6 +188,7 @@ export default defineComponent({
     }
     .custom-menu-wrapper {
         @apply rounded-xs;
+        cursor: auto;
         width: 22.5rem;
         position: absolute;
         top: $gnb-height;
