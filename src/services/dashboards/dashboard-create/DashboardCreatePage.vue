@@ -10,7 +10,7 @@
             <dashboard-scope-form :scope.sync="scope"
                                   :project.sync="project"
             />
-            <dashboard-template-form />
+            <dashboard-template-form :template.sync="template" />
             <dashboard-viewer-form />
         </section>
     </div>
@@ -39,6 +39,7 @@ export default {
         const state = reactive({
             scope: undefined as undefined|DashboardScope,
             project: undefined as undefined|ProjectItemResp,
+            template: '',
         });
 
         return { ...toRefs(state) };

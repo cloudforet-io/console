@@ -11,11 +11,29 @@
                             Default Template
                         </span>
                         <div class="card-wrapper">
+                            <!--                            FIXME:: waiting for NEW card component-->
                             <p-select-card
-                                v-for="(item, idx) in [0,1]"
+                                v-for="(item, idx) in defaultTemplateMock"
                                 :key="`default-template-${idx}`"
-                                :tabindex="idx"
-                            />
+                                :selected="selectedTemplate === item.name"
+                                :tab-index="idx"
+                                @click="() => handleSelectTemplate(item.name)"
+                            >
+                                <template #bottom>
+                                    <div class="default-template-card">
+                                        <p-i :name="item.icon"
+                                             width="2.25rem"
+                                             height="2.25rem"
+                                        />
+                                        <span>{{ item.label }}</span>
+                                        <p-label v-for="(labelItem, labelIdx) in item.tags"
+                                                 :key="`default-template-label-${idx}-${labelIdx}`"
+                                        >
+                                            {{ labelItem }}
+                                        </p-label>
+                                    </div>
+                                </template>
+                            </p-select-card>
                         </div>
                     </div>
                     <div class="card-container">
@@ -24,11 +42,29 @@
                             Existing Dashboard
                         </span>
                         <div class="card-wrapper">
+                            <!--                            FIXME:: waiting for NEW card component-->
                             <p-select-card
-                                v-for="(item, idx) in [0]"
-                                :key="`existing-dashboard-${idx}`"
-                                :tabindex="idx"
-                            />
+                                v-for="(item, idx) in customTemplateMock"
+                                :key="`custom-template-${idx}`"
+                                :selected="selectedTemplate === item.name"
+                                :tab-index="idx"
+                                @click="() => handleSelectTemplate(item.name)"
+                            >
+                                <template #bottom>
+                                    <div class="custom-template-card">
+                                        <p-i :name="item.icon"
+                                             width="2.25rem"
+                                             height="2.25rem"
+                                        />
+                                        <span>{{ item.label }}</span>
+                                        <p-label v-for="(labelItem, labelIdx) in item.tags"
+                                                 :key="`custom-template-label-${idx}-${labelIdx}`"
+                                        >
+                                            {{ labelItem }}
+                                        </p-label>
+                                    </div>
+                                </template>
+                            </p-select-card>
                         </div>
                     </div>
                 </div>
@@ -38,8 +74,11 @@
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
+import { reactive, toRefs } from 'vue';
+
 import {
-    PPaneLayout, PPanelTop, PSelectCard,
+    PPaneLayout, PPanelTop, PSelectCard, PI, PLabel,
 } from '@spaceone/design-system';
 
 export default {
@@ -48,6 +87,63 @@ export default {
         PPanelTop,
         PPaneLayout,
         PSelectCard,
+        PI,
+        PLabel,
+    },
+    setup(props, { emit }: SetupContext) {
+        const state = reactive({
+            selectedTemplate: '',
+        });
+
+        const defaultTemplateMock: Array<any> = [
+            {
+                label: 'Monthly Cost Summary',
+                name: 'monthly_cost_summary',
+                icon: 'ic_edit',
+                tags: [
+                    'Cost', 'AWS', 'Azure',
+                ],
+            },
+            {
+                label: 'Cloud Asset Overview',
+                name: 'cloud_asset_overview',
+                icon: 'ic_delete',
+                tags: [
+                    'Resources', 'AWS', 'Google Cloud Platform',
+                ],
+            },
+        ];
+
+        const customTemplateMock: Array<any> = [
+            {
+                label: 'Dashboard 1',
+                name: 'dashboard_1',
+                icon: '',
+                tags: [
+                    'Cost', 'AWS', 'Azure',
+                ],
+            },
+            {
+                label: 'Wonny\'s Dashboard',
+                name: 'wonnys_dashboard',
+                icon: 'ic_delete',
+                tags: [
+                    'Resources', 'AWS', 'Google Cloud Platform',
+                ],
+            },
+        ];
+
+        const handleSelectTemplate = (templateName: string) => {
+            state.selectedTemplate = templateName;
+            emit('update:template', templateName);
+        };
+
+        return {
+            ...toRefs(state),
+            defaultTemplateMock,
+            customTemplateMock,
+            handleSelectTemplate,
+        };
     },
 };
 </script>
