@@ -10,7 +10,7 @@
             <dashboard-scope-form :dashboard-scope.sync="dashboardScope"
                                   :dashboard-project.sync="dashboardProject"
             />
-            <dashboard-template-form @set-template="(t) => setForm('dashboardTemplate', t)" />
+            <dashboard-template-form @set-template="setForm('dashboardTemplate', $event)" />
             <dashboard-viewer-form :dashboard-viewer-type.sync="dashboardViewerType" />
         </section>
         <div class="dashboard-create-buttons">
