@@ -4,9 +4,8 @@
                               :breadcrumbs="breadcrumbs"
         >
             <template #sidebar>
-                <div />
+                <dashboards-l-n-b />
             </template>
-            <router-view />
         </vertical-page-layout>
         <general-page-layout v-else
                              :breadcrumbs="breadcrumbs"
@@ -21,9 +20,11 @@ import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
+import DashboardsLNB from '@/services/dashboards/DashboardsLNB.vue';
+
 export default {
     name: 'DashboardsContainer',
-    components: { GeneralPageLayout, VerticalPageLayout },
+    components: { DashboardsLNB, GeneralPageLayout, VerticalPageLayout },
     setup() {
         const { breadcrumbs } = useBreadcrumbs();
         return {

@@ -10,30 +10,38 @@ const DashboardDetailPage = () => import('@/services/dashboards/dashboard-detail
 
 const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
+    name: DASHBOARDS_ROUTE._NAME,
     component: DashboardsContainer,
     children: [
         {
             path: '/',
-            name: DASHBOARDS_ROUTE._NAME,
-            meta: { lnbVisible: true },
-            component: AllDashboardsPage,
+            component: { template: '<router-view/>' },
+            children: [
+                {
+                    path: 'all',
+                    name: DASHBOARDS_ROUTE.ALL._NAME,
+                    meta: { lnbVisible: true },
+                    component: AllDashboardsPage,
+                },
+                {
+                    path: 'create',
+                    name: DASHBOARDS_ROUTE.CREATE._NAME,
+                    component: DashboardCreatePage,
+                },
+                {
+                    path: ':dashboardId',
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    meta: { lnbVisible: true },
+                    component: DashboardDetailPage,
+                },
+                {
+                    path: ':dashboardId/edit',
+                    name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                    component: DashboardCustomizePage,
+                },
+            ],
         },
-        {
-            path: 'create',
-            name: DASHBOARDS_ROUTE.CREATE._NAME,
-            component: DashboardCreatePage,
-        },
-        {
-            path: ':dashboardId',
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            meta: { lnbVisible: true },
-            component: DashboardDetailPage,
-        },
-        {
-            path: ':dashboardId/edit',
-            name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-            component: DashboardCustomizePage,
-        },
+
     ],
 };
 

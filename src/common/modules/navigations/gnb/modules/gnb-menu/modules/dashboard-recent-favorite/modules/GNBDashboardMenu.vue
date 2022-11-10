@@ -74,7 +74,7 @@ export default defineComponent({
             subMenuList: [
                 {
                     label: 'View All Dashboards', // song-lang
-                    to: { name: DASHBOARDS_ROUTE._NAME },
+                    to: { name: DASHBOARDS_ROUTE.ALL._NAME },
                 },
                 {
                     label: 'Create New Dashboard', // song-lang

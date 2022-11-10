@@ -5,17 +5,19 @@ import type { FavoriteType } from '@/store/modules/favorite/type';
 
 import type { MenuId } from '@/lib/menu/config';
 
-export const MENU_ITEM_TYPE = Object.freeze({
+export const MENU_ITEM_TYPE = {
     TITLE: 'title',
+    TOP_TITLE: 'top-title',
     ITEM: 'item',
     DIVIDER: 'divider',
-} as const);
+    FAVORITE_ONLY: 'favorite-only',
+} as const;
 type MenuItemType = typeof MENU_ITEM_TYPE[keyof typeof MENU_ITEM_TYPE];
 
 export interface LNBItem {
     type: MenuItemType;
     label?: TranslateResult;
-    id?: MenuId;
+    id?: MenuId | string; // It can be change MenuId or etc.
     foldable?: boolean;
     to?: Location;
     isNew?: boolean;

@@ -9,7 +9,7 @@
             >
                 <span v-if="item.foldable"
                       class="title foldable"
-                      @click="handleToggle"
+                      @click="handleFoldableToggle"
                 >{{ item.label }}</span>
                 <span v-else
                       class="title"
@@ -21,7 +21,7 @@
                 <beta-mark v-if="item.isBeta" />
                 <span v-if="item.foldable"
                       class="toggle-button"
-                      @click="handleToggle"
+                      @click="handleFoldableToggle"
                 >
                     <p-i width="1rem"
                          height="1rem"
@@ -30,6 +30,12 @@
                     />
                 </span>
             </p>
+            <p v-if="item.type === MENU_ITEM_TYPE.TOP_TITLE"
+               class="top-title-wrapper"
+            >
+                <span class="top-title">{{ item.label }}</span>
+            </p>
+
             <div v-if="item.type === MENU_ITEM_TYPE.DIVIDER && showMenu"
                  class="divider"
             >
@@ -72,7 +78,7 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -87,6 +93,7 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
@@ -120,7 +127,7 @@ export default defineComponent<Props>({
         },
     },
 
-    setup(props) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             processedMenuData: computed(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
@@ -128,9 +135,10 @@ export default defineComponent<Props>({
             isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
             showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
             hoveredItem: '',
+            proxyFavoriteOnly: useProxyValue('favoriteOnly', props, emit),
         });
 
-        const handleToggle = () => {
+        const handleFoldableToggle = () => {
             state.isFolded = !state.isFolded;
         };
 
@@ -147,7 +155,6 @@ export default defineComponent<Props>({
             let resolvedHref = resolved.href;
             if (!currentPath.endsWith('/')) currentPath += '/';
             if (!resolvedHref.endsWith('/')) resolvedHref += '/';
-
             return currentPath.startsWith(resolvedHref);
         };
 
@@ -155,7 +162,7 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            handleToggle,
+            handleFoldableToggle,
             isSelectedMenu,
             FAVORITE_TYPE,
             MENU_ITEM_TYPE,
@@ -186,6 +193,14 @@ export default defineComponent<Props>({
                 @apply text-gray-800 cursor-pointer;
             }
         }
+    }
+    .top-title-wrapper {
+        @apply font-bold inline-flex items-center;
+        font-size: 0.75rem;
+        line-height: 125%;
+        padding-top: 1.25rem;
+        padding-left: 0.5rem;
+        padding-bottom: 0.75rem;
     }
     .menu-item {
         @apply border border-transparent inline-flex items-center w-full h-full justify-between;
