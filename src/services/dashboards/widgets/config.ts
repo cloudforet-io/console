@@ -58,3 +58,31 @@ export const BASE_WIDGET_CONFIGS = {
     basePie,
     baseMap,
 };
+
+export const WIDGET_SIZE = {
+    sm: 'sm',
+    md: 'md',
+    lg: 'lg',
+    xl: 'xl',
+    full: 'full',
+} as const;
+
+export const GRANULARITY = {
+    ACCUMULATED: 'ACCUMULATED',
+    DAILY: 'DAILY',
+    MONTHLY: 'MONTHLY',
+    YEARLY: 'YEARLY',
+} as const;
+
+export const GROUP_BY = {
+    PROJECT_GROUP: 'project_group_id',
+    PROJECT: 'project_id',
+    PROVIDER: 'provider',
+    SERVICE_ACCOUNT: 'service_account_id',
+    CATEGORY: 'category',
+    RESOURCE_GROUP: 'resource_group',
+    PRODUCT: 'product',
+    REGION: 'region_code',
+    TYPE: 'usage_type',
+    ACCOUNT: 'account',
+} as const;

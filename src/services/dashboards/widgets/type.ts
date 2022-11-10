@@ -7,8 +7,11 @@ import type { Tags } from '@/models';
 
 import type { Currency } from '@/store/modules/display/config';
 
-import type { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import type { WidgetSize } from '@/services/dashboards/widgets/_components/type';
+import type { GRANULARITY, WIDGET_SIZE, GROUP_BY } from './config';
+
+export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
+export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
+export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 
 export interface WidgetConfig {
     widget_name: string; // unique name
@@ -50,7 +53,6 @@ interface Location {
     version: string;
 }
 
-type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
 interface WidgetOptions {
     currency?: Currency;
     date_range?: { start: string; end?: string; };

@@ -53,9 +53,9 @@ import { CURRENCY } from '@/store/modules/display/config';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
-import type { WidgetSize } from '@/services/dashboards/widgets/_components/type';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_components/type';
+import { WIDGET_SIZE } from '../config';
+import type { WidgetSize } from '../type';
+import CurrencySelectDropdown from './CurrencySelectDropdown.vue';
 
 interface Props {
     title: string;

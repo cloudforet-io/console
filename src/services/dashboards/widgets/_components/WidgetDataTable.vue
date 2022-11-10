@@ -106,7 +106,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
-import { GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { GROUP_BY } from '../config';
 
 interface Field extends DataTableFieldType {
     type?: 'cost'|'size'|'number';
