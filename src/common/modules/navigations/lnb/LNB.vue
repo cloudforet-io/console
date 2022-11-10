@@ -1,7 +1,9 @@
 <template>
     <nav class="lnb">
         <div class="header">
-            {{ header }}
+            <slot name="header">
+                {{ header }}
+            </slot>
         </div>
         <p-divider class="divider" />
         <div class="menu-wrapper">
@@ -42,46 +44,62 @@
                     />
                 </router-link>
             </div>
-            <l-n-b-menu-item v-for="(menuData, idx) in menuSet"
-                             :key="`${idx}-${getUUID()}`"
-                             :menu-data="menuData"
-                             :current-path="currentPath"
-                             :depth="Array.isArray(menuData) ? 2 : 1"
-            >
-                <template v-for="(_, slot) of $scopedSlots"
-                          #[slot]="scope"
+            <template v-for="(menuData, idx) in menuSet">
+                <div v-if="menuData.type === MENU_ITEM_TYPE.FAVORITE_ONLY"
+                     :key="`${idx}-${getUUID()}`"
+                     class="favorite-only-wrapper"
                 >
-                    <slot :name="slot"
-                          v-bind="scope"
+                    <!--song-lang-->
+                    <span>Show favorites only</span>
+                    <p-toggle-button :value="proxyShowFavoriteOnly"
+                                     sync
+                                     @change="handleFavoriteToggle"
                     />
-                </template>
-            </l-n-b-menu-item>
+                </div>
+                <l-n-b-menu-item v-else
+                                 :key="`${idx}-${getUUID()}`"
+                                 :menu-data="menuData"
+                                 :current-path="currentPath"
+                                 :depth="Array.isArray(menuData) ? 2 : 1"
+                >
+                    <template v-for="(_, slot) of $scopedSlots"
+                              #[slot]="scope"
+                    >
+                        <slot :name="slot"
+                              v-bind="scope"
+                        />
+                    </template>
+                </l-n-b-menu-item>
+            </template>
         </div>
     </nav>
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PDivider, PI, PLazyImg,
+    PDivider, PI, PLazyImg, PToggleButton,
 } from '@spaceone/design-system';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
 import LNBMenuItem from '@/common/modules/navigations/lnb/modules/LNBMenuItem.vue';
 import type {
     BackLink, LNBMenu, TopTitle,
 } from '@/common/modules/navigations/lnb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 export default {
     name: 'LNB',
     components: {
-        LNBMenuItem, PDivider, PI, PLazyImg,
+        LNBMenuItem, PDivider, PI, PLazyImg, PToggleButton,
     },
     props: {
         header: {
@@ -100,18 +118,29 @@ export default {
             type: Array as () => LNBMenu[],
             default: () => [],
         },
+        showFavoriteOnly: {
+            type: Boolean,
+            default: undefined,
+        },
     },
 
-    setup() {
+    setup(props, { emit }: SetupContext) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             currentPath: computed(() => vm.$route.fullPath),
+            proxyShowFavoriteOnly: useProxyValue<boolean | undefined>('showFavoriteOnly', props, emit),
         });
+
+        const handleFavoriteToggle = () => {
+            state.proxyShowFavoriteOnly = !state.proxyShowFavoriteOnly;
+        };
 
         return {
             ...toRefs(state),
+            MENU_ITEM_TYPE,
             assetUrlConverter,
             getUUID,
+            handleFavoriteToggle,
         };
     },
 };
@@ -145,6 +174,11 @@ export default {
             @apply text-gray-800 cursor-pointer;
             text-decoration: underline;
         }
+    }
+    .favorite-only-wrapper {
+        @apply flex justify-between items-center text-gray-500;
+        font-size: 0.75rem;
+        padding: 0 0.5rem;
     }
     .top-title {
         @apply text-gray-800 font-bold flex justify-between items-center;

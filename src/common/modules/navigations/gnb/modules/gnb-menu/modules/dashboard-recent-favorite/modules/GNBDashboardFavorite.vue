@@ -90,64 +90,64 @@ export default {
             loading: true,
             items: [
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard1', name: '1',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard1', name: '1',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard2', name: '2',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard2', name: '2',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard3', name: '3',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard3', name: '3',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard4', name: '4',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard4', name: '4',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard5', name: '5',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard5', name: '5',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard6', name: '6',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard6', name: '6',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard7', name: '7',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard7', name: '7',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard8', name: '8',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard8', name: '8',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard9', name: '9',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard9', name: '9',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard10', name: '10',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard10', name: '10',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard11', name: '11',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard11', name: '11',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard12', name: '12',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard12', name: '12',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard13', name: '13',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard13', name: '13',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard14', name: '14',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard14', name: '14',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard15', name: '15',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard15', name: '15',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard16', name: '16',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard16', name: '16',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard17', name: '17',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard17', name: '17',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard18', name: '18',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard18', name: '18',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard19', name: '19',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard19', name: '19',
                 },
                 {
-                    show: true, to: { name: DASHBOARDS_ROUTE._NAME }, label: 'dashboard20', name: '20',
+                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard20', name: '20',
                 },
             ],
         });
