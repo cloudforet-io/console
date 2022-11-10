@@ -1,0 +1,2 @@
+export const DASHBOARD_ENTIRE_SCOPE = 'ENTIRE';
+export const DASHBOARD_SINGLE_SCOPE = 'SINGLE';

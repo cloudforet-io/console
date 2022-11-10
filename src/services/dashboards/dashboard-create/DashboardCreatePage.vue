@@ -7,7 +7,9 @@
             @goBack="$router.go(-1)"
         />
         <section class="dashboard-create-form-container">
-            <dashboard-scope-form />
+            <dashboard-scope-form :scope.sync="scope"
+                                  :project.sync="project"
+            />
             <dashboard-template-form />
             <dashboard-viewer-form />
         </section>
@@ -15,11 +17,14 @@
 </template>
 
 <script lang="ts">
+import { reactive, toRefs } from 'vue';
+
 import { PPageTitle } from '@spaceone/design-system';
 
 import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/dashboard-create/modules/DashboardViewerForm.vue';
+import type { DashboardScope } from '@/services/dashboards/dashboard-create/type';
 
 export default {
     name: 'CreateDashboardPage',
@@ -28,6 +33,14 @@ export default {
         DashboardTemplateForm,
         DashboardScopeForm,
         PPageTitle,
+    },
+    setup() {
+        const state = reactive({
+            scope: undefined as undefined|DashboardScope,
+            project: [] as Array<string>,
+        });
+
+        return { ...toRefs(state) };
     },
 };
 </script>
