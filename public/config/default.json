@@ -11,7 +11,9 @@
     "ENABLED": false,
     "CHARTS": "",
     "MAPS": "",
-    "TIMELINE": ""
+    "TIMELINE": "",
+    "AM5_CHARTS": "",
+    "AM5_MAPS": ""
   },
   "MOCK": {
     "ALL": false,
