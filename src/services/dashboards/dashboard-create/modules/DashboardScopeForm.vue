@@ -54,7 +54,7 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            isEntireScope: undefined as undefined|boolean,
+            isEntireScope: true,
         });
 
         const handleSelectScope = (scopeType: DashboardScope) => {

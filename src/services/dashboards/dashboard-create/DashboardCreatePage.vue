@@ -10,7 +10,7 @@
             <dashboard-scope-form :dashboard-scope.sync="dashboardScope"
                                   :dashboard-project.sync="dashboardProject"
             />
-            <dashboard-template-form :dashboard-template.sync="dashboardTemplate" />
+            <dashboard-template-form @set-template="(t) => setForm('dashboardTemplate', t)" />
             <dashboard-viewer-form :dashboard-viewer-type.sync="dashboardViewerType" />
         </section>
         <div class="dashboard-create-buttons">
@@ -23,6 +23,8 @@
             </p-button>
             <p-button style-type="primary"
                       size="lg"
+                      :disabled="!isAllValid"
+                      @click="handleClickCreate"
             >
                 <!--                song-lang-->
                 Create
@@ -36,6 +38,9 @@ import { reactive, toRefs } from 'vue';
 
 import { PPageTitle, PButton } from '@spaceone/design-system';
 
+import { useFormValidator } from '@/common/composables/form-validator';
+
+import { DASHBOARD_SCOPE_ENTIRE, DASHBOARD_VIEWER_PUBLIC } from '@/services/dashboards/dashboard-create/config';
 import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/dashboard-create/modules/DashboardViewerForm.vue';
@@ -52,14 +57,41 @@ export default {
         PButton,
     },
     setup() {
-        const state = reactive({
-            dashboardScope: undefined as undefined|DashboardScope,
-            dashboardProject: undefined as undefined|ProjectItemResp,
+        const {
+            forms: {
+                dashboardTemplate,
+            },
+            setForm,
+            isAllValid,
+        } = useFormValidator({
             dashboardTemplate: '',
-            dashboardViewerType: undefined as undefined|DashboardViewerType,
+        }, {
+            dashboardTemplate(value: boolean) { return !value ? 'Please Select Project' : ''; },
         });
 
-        return { ...toRefs(state) };
+        const state = reactive({
+            dashboardScope: DASHBOARD_SCOPE_ENTIRE as DashboardScope,
+            dashboardProject: undefined as undefined|ProjectItemResp,
+            dashboardViewerType: DASHBOARD_VIEWER_PUBLIC as DashboardViewerType,
+        });
+
+        const handleClickCreate = () => {
+            const createDashboardFormData = {
+                dashboardScope: state.dashboardScope,
+                dashboardProject: state.dashboardScope === DASHBOARD_SCOPE_ENTIRE ? '' : state.dashboardProject,
+                dashboardTemplate: dashboardTemplate.value,
+                dashboardViewerType: state.dashboardViewerType,
+            };
+            console.log(createDashboardFormData);
+        };
+
+        return {
+            ...toRefs(state),
+            dashboardTemplate,
+            setForm,
+            isAllValid,
+            handleClickCreate,
+        };
     },
 };
 </script>
