@@ -25,6 +25,7 @@ import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/D
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/dashboard-create/modules/DashboardViewerForm.vue';
 import type { DashboardScope } from '@/services/dashboards/dashboard-create/type';
+import type { ProjectItemResp } from '@/services/project/type';
 
 export default {
     name: 'CreateDashboardPage',
@@ -37,7 +38,7 @@ export default {
     setup() {
         const state = reactive({
             scope: undefined as undefined|DashboardScope,
-            project: [] as Array<string>,
+            project: undefined as undefined|ProjectItemResp,
         });
 
         return { ...toRefs(state) };
