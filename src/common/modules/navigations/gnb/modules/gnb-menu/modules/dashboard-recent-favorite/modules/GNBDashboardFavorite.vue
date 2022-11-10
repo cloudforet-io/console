@@ -197,9 +197,9 @@ export default {
     }
     .no-data {
         text-align: center;
-        padding: 3rem 3.25rem;
+        padding: 1.875rem 3.25rem;
         .img {
-            margin: auto;
+            margin-bottom: 0.9375rem;
         }
         .text {
             @apply text-gray-400;
