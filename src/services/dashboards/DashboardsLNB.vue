@@ -6,9 +6,11 @@
         <template #header>
             <div class="header-wrapper">
                 <span>{{ header }}</span>
-                <p-icon-button name="ic_plus_bold"
-                               size="sm"
-                />
+                <router-link :to="{ name: DASHBOARDS_ROUTE.CREATE._NAME, path: DASHBOARDS_ROUTE.CREATE._NAME }">
+                    <p-icon-button name="ic_plus_bold"
+                                   size="sm"
+                    />
+                </router-link>
             </div>
         </template>
     </l-n-b>
@@ -93,7 +95,7 @@ export default {
             menuSet: computed<LNBMenu[]>(() => [
                 {
                     type: 'item',
-                    label: 'View All Dashboards',
+                    label: 'View All Dashboards', // song-lang
                     id: MENU_ID.DASHBOARDS,
                     foldable: false,
                     to: { name: DASHBOARDS_ROUTE.ALL._NAME },
@@ -120,6 +122,7 @@ export default {
 
         return {
             ...toRefs(state),
+            DASHBOARDS_ROUTE,
         };
     },
 };

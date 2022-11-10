@@ -11,6 +11,7 @@ const DashboardDetailPage = () => import('@/services/dashboards/dashboard-detail
 const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
     name: DASHBOARDS_ROUTE._NAME,
+    redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
     component: DashboardsContainer,
     children: [
         {

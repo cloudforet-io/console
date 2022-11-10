@@ -49,6 +49,7 @@
                      :key="`${idx}-${getUUID()}`"
                      class="favorite-only-wrapper"
                 >
+                    <!--song-lang-->
                     <span>Show favorites only</span>
                     <p-toggle-button :value="proxyFavoriteOnly"
                                      sync
