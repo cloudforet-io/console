@@ -7,7 +7,7 @@ import * as getters from './getters';
 import * as mutations from './mutations';
 
 const state: DashboardsState = {
-    workSpaceDashboardList: [],
+    workSpaceList: [],
     projectDashboardList: [],
 };
 
