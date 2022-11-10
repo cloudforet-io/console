@@ -51,7 +51,7 @@
                 >
                     <!--song-lang-->
                     <span>Show favorites only</span>
-                    <p-toggle-button :value="proxyFavoriteOnly"
+                    <p-toggle-button :value="proxyShowFavoriteOnly"
                                      sync
                                      @change="handleFavoriteToggle"
                     />
@@ -118,7 +118,7 @@ export default {
             type: Array as () => LNBMenu[],
             default: () => [],
         },
-        favoriteOnly: {
+        showFavoriteOnly: {
             type: Boolean,
             default: undefined,
         },
@@ -128,11 +128,11 @@ export default {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             currentPath: computed(() => vm.$route.fullPath),
-            proxyFavoriteOnly: useProxyValue<boolean | undefined>('favoriteOnly', props, emit),
+            proxyShowFavoriteOnly: useProxyValue<boolean | undefined>('showFavoriteOnly', props, emit),
         });
 
         const handleFavoriteToggle = () => {
-            state.proxyFavoriteOnly = !state.proxyFavoriteOnly;
+            state.proxyShowFavoriteOnly = !state.proxyShowFavoriteOnly;
         };
 
         return {

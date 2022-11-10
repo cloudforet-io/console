@@ -1,7 +1,7 @@
 <template>
     <l-n-b class="dashboards-lnb"
            :menu-set="menuSet"
-           :favorite-only.sync="favoriteOnly"
+           :show-favorite-only.sync="showFavoriteOnly"
     >
         <template #header>
             <div class="header-wrapper">
@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
 import { PIconButton } from '@spaceone/design-system';
@@ -38,13 +38,13 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
-export default {
+export default defineComponent({
     name: 'DashboardsLNB',
     components: { LNB, PIconButton },
     setup() {
         const state = reactive({
             loading: true,
-            favoriteOnly: false,
+            showFavoriteOnly: false,
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId)),
             favoriteItemMap: computed(() => {
                 const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.MENU];
@@ -64,8 +64,9 @@ export default {
                     type: 'item', id: 'Budget Summary', label: 'Budget Summary', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'work_02' } },
                 },
             ])),
-            projectMenuSet: computed<LNBMenu[]>(() => (
-                [
+            projectMenuSet: computed<LNBItem[][]>(() => {
+                const result = [] as LNBItem[][];
+                const projects: LNBItem[][] = [
                     [{
                         type: 'title',
                         label: 'Project_01',
@@ -90,8 +91,12 @@ export default {
                     {
                         type: 'item', id: 'Project_02_Dashboard2', label: 'Project_02_Dashboard2', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_02_2' } },
                     }],
-                ]
-            )),
+                ];
+                projects.forEach((d) => {
+                    result.push(filterFavoriteItems(d));
+                });
+                return result;
+            }),
             menuSet: computed<LNBMenu[]>(() => [
                 {
                     type: 'item',
@@ -110,14 +115,8 @@ export default {
         });
 
         const filterFavoriteItems = (menuItems: LNBItem[] = []) => {
-            if (!state.favoriteOnly) return menuItems;
-            const result = [] as LNBItem[];
-            menuItems.forEach((d) => {
-                if (d.id && state.favoriteItemMap[d.id] || d.type !== MENU_ITEM_TYPE.ITEM) {
-                    result.push(d);
-                }
-            });
-            return result;
+            if (!state.showFavoriteOnly) return menuItems;
+            return menuItems.filter((d) => (d.id && state.favoriteItemMap[d.id]) || d.type !== MENU_ITEM_TYPE.ITEM);
         };
 
         return {
@@ -125,7 +124,7 @@ export default {
             DASHBOARDS_ROUTE,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts">
-import type { PropType, SetupContext } from 'vue';
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -93,7 +93,6 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
-import { useProxyValue } from '@/common/composables/proxy-state';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
@@ -127,7 +126,7 @@ export default defineComponent<Props>({
         },
     },
 
-    setup(props, { emit }: SetupContext) {
+    setup(props) {
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             processedMenuData: computed(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
@@ -135,7 +134,6 @@ export default defineComponent<Props>({
             isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
             showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
             hoveredItem: '',
-            proxyFavoriteOnly: useProxyValue('favoriteOnly', props, emit),
         });
 
         const handleFoldableToggle = () => {
