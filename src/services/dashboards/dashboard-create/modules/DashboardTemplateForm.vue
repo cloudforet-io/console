@@ -75,7 +75,7 @@
 
 <script lang="ts">
 import type { SetupContext } from 'vue';
-import { reactive, toRefs, watch } from 'vue';
+import { reactive, toRefs } from 'vue';
 
 import {
     PPaneLayout, PPanelTop, PSelectCard, PI, PLabel,
@@ -137,10 +137,6 @@ export default {
             state.selectedTemplate = templateName;
             emit('update:template', templateName);
         };
-
-        watch(() => state.selectedTemplate, (d) => {
-            console.log(d);
-        });
 
         return {
             ...toRefs(state),
