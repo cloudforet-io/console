@@ -7,11 +7,11 @@
             @goBack="$router.go(-1)"
         />
         <section class="dashboard-create-form-container">
-            <dashboard-scope-form :scope.sync="scope"
-                                  :project.sync="project"
+            <dashboard-scope-form :dashboard-scope.sync="dashboardScope"
+                                  :dashboard-project.sync="dashboardProject"
             />
-            <dashboard-template-form :template.sync="template" />
-            <dashboard-viewer-form :viewer-type.sync="viewerType" />
+            <dashboard-template-form :dashboard-template.sync="dashboardTemplate" />
+            <dashboard-viewer-form :dashboard-viewer-type.sync="dashboardViewerType" />
         </section>
     </div>
 </template>
@@ -37,10 +37,10 @@ export default {
     },
     setup() {
         const state = reactive({
-            scope: undefined as undefined|DashboardScope,
-            project: undefined as undefined|ProjectItemResp,
-            template: '',
-            viewerType: undefined as undefined|DashboardViewerType,
+            dashboardScope: undefined as undefined|DashboardScope,
+            dashboardProject: undefined as undefined|ProjectItemResp,
+            dashboardTemplate: '',
+            dashboardViewerType: undefined as undefined|DashboardViewerType,
         });
 
         return { ...toRefs(state) };

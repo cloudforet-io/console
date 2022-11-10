@@ -63,7 +63,7 @@ export default {
 
         const handleSelectViewer = (viewerType: DashboardViewerType) => {
             state.isPublicViewer = viewerType === DASHBOARD_VIEWER_PUBLIC;
-            emit('update:viewerType', viewerType);
+            emit('update:dashboardViewerType', viewerType);
         };
 
         return {

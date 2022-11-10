@@ -135,7 +135,7 @@ export default {
 
         const handleSelectTemplate = (templateName: string) => {
             state.selectedTemplate = templateName;
-            emit('update:template', templateName);
+            emit('update:dashboardTemplate', templateName);
         };
 
         return {

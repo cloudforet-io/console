@@ -59,12 +59,12 @@ export default defineComponent({
 
         const handleSelectScope = (scopeType: DashboardScope) => {
             state.isEntireScope = scopeType === DASHBOARD_SCOPE_ENTIRE;
-            emit('update:scope', scopeType);
+            emit('update:dashboardScope', scopeType);
         };
 
         const handleSelectProjects = (projects: Array<ProjectItemResp>) => {
             // Emit projects as project.
-            emit('update:project', projects[0]);
+            emit('update:dashboardProject', projects[0]);
         };
 
         // LOAD REFERENCE STORE
