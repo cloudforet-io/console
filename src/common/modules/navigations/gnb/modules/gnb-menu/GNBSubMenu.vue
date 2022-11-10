@@ -1,40 +1,48 @@
 <template>
-    <router-link
-        v-if="show"
-        class="gnb-sub-menu"
-        :to="to"
+    <p-tooltip :contents="label"
+               position="bottom"
     >
-        <div class="gnb-sub-contents">
-            <div class="contents-left">
-                <p-i v-if="isDraggable"
-                     name="ic_drag-handle--slim"
-                     width="1rem"
-                     height="1rem"
-                     class="drag-icon"
-                />
-                <span>{{ label }}</span>
-                <beta-mark v-if="isBeta" />
-                <new-mark v-if="isNew" />
+        <router-link
+            v-if="show"
+            class="gnb-sub-menu"
+            :to="to"
+        >
+            <div class="gnb-sub-contents">
+                <div class="contents-left">
+                    <p-i v-if="isDraggable"
+                         name="ic_drag-handle--slim"
+                         width="1rem"
+                         height="1rem"
+                         class="drag-icon"
+                    />
+                    <div class="label">
+                        {{ label }}
+                    </div>
+                    <beta-mark v-if="isBeta" />
+                    <new-mark v-if="isNew" />
+                </div>
+                <div class="contents-right">
+                    <slot name="extra-mark" />
+                </div>
             </div>
-            <div class="contents-right">
-                <slot name="extra-mark" />
-            </div>
-        </div>
-    </router-link>
+        </router-link>
+    </p-tooltip>
 </template>
 
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PI } from '@spaceone/design-system';
+import { PI, PTooltip } from '@spaceone/design-system';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 
 export default {
     name: 'GNBSubMenu',
-    components: { NewMark, BetaMark, PI },
+    components: {
+        NewMark, BetaMark, PI, PTooltip,
+    },
     props: {
         show: {
             type: Boolean,
@@ -86,6 +94,15 @@ export default {
         }
         &:active {
             @apply bg-white;
+        }
+
+        .contents-left {
+            @apply flex items-center;
+            width: 80%;
+            .label {
+                @apply truncate;
+                display: inline-block;
+            }
         }
     }
 }
