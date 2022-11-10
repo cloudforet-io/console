@@ -20,7 +20,7 @@
                 </p-radio-group>
                 <project-select-dropdown v-show="!isEntireScope"
                                          project-selectable
-                                         @select="handleSelectProject"
+                                         @select="handleSelectProjects"
                 />
             </div>
         </p-pane-layout>
@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import type { PropType, SetupContext } from 'vue';
+import type { SetupContext } from 'vue';
 import { defineComponent, reactive, toRefs } from 'vue';
 
 import {
@@ -41,6 +41,7 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import { DASHBOARD_ENTIRE_SCOPE, DASHBOARD_SINGLE_SCOPE } from '@/services/dashboards/dashboard-create/config';
 import type { DashboardScope } from '@/services/dashboards/dashboard-create/type';
+import type { ProjectItemResp } from '@/services/project/type';
 
 export default defineComponent({
     name: 'DashboardScopeForm',
@@ -50,16 +51,6 @@ export default defineComponent({
         PRadio,
         PPanelTop,
         PPaneLayout,
-    },
-    props: {
-        scope: {
-            type: String as PropType<DashboardScope>,
-            default: undefined,
-        },
-        project: {
-            type: Array as PropType<Array<string>>,
-            default: () => [],
-        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -71,8 +62,9 @@ export default defineComponent({
             emit('update:scope', scopeType);
         };
 
-        const handleSelectProject = (project: Array<string>) => {
-            emit('update:project', project);
+        const handleSelectProjects = (projects: Array<ProjectItemResp>) => {
+            // Emit projects as project.
+            emit('update:project', projects[0]);
         };
 
         // LOAD REFERENCE STORE
@@ -83,7 +75,7 @@ export default defineComponent({
         return {
             ...toRefs(state),
             handleSelectScope,
-            handleSelectProject,
+            handleSelectProjects,
             DASHBOARD_ENTIRE_SCOPE,
             DASHBOARD_SINGLE_SCOPE,
         };
