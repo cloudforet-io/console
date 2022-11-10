@@ -180,7 +180,7 @@ export default {
 <style lang="postcss" scoped>
 .gnb-dashboard-favorite {
     .gnb-dashboard-favorite-context {
-        max-height: 39rem;
+        max-height: 85vh;
         overflow-y: scroll;
     }
 

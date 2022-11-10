@@ -98,7 +98,7 @@ export default defineComponent({
         @apply absolute bg-white rounded-xs border border-gray-200;
         display: flex;
         flex-direction: column;
-        width: 27.5rem;
+        width: 22.5rem;
         min-height: auto;
         top: 100%;
         right: 0;

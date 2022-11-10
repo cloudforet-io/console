@@ -5,16 +5,20 @@
         :to="to"
     >
         <div class="gnb-sub-contents">
-            <p-i v-if="isDraggable"
-                 name="ic_drag-handle--slim"
-                 width="1rem"
-                 height="1rem"
-                 class="drag-icon"
-            />
-            <span>{{ label }}</span>
-            <beta-mark v-if="isBeta" />
-            <new-mark v-if="isNew" />
-            <slot name="extra-mark" />
+            <div class="contents-left">
+                <p-i v-if="isDraggable"
+                     name="ic_drag-handle--slim"
+                     width="1rem"
+                     height="1rem"
+                     class="drag-icon"
+                />
+                <span>{{ label }}</span>
+                <beta-mark v-if="isBeta" />
+                <new-mark v-if="isNew" />
+            </div>
+            <div class="contents-right">
+                <slot name="extra-mark" />
+            </div>
         </div>
     </router-link>
 </template>
@@ -63,7 +67,7 @@ export default {
 <style lang="postcss" scoped>
 .gnb-sub-menu {
     .gnb-sub-contents {
-        @apply text-gray-900 rounded;
+        @apply text-gray-900 rounded flex items-center justify-between;
         position: relative;
         width: 100%;
         height: 2rem;
