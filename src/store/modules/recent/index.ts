@@ -10,6 +10,7 @@ const state: Required<RecentState> = {
     projectItems: [],
     projectGroupItems: [],
     cloudServiceItems: [],
+    dashboardItems: [],
 };
 
 export default {
