@@ -11,7 +11,7 @@
                                   :project.sync="project"
             />
             <dashboard-template-form :template.sync="template" />
-            <dashboard-viewer-form />
+            <dashboard-viewer-form :viewer-type.sync="viewerType" />
         </section>
     </div>
 </template>
@@ -24,7 +24,7 @@ import { PPageTitle } from '@spaceone/design-system';
 import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/dashboard-create/modules/DashboardViewerForm.vue';
-import type { DashboardScope } from '@/services/dashboards/dashboard-create/type';
+import type { DashboardScope, DashboardViewerType } from '@/services/dashboards/dashboard-create/type';
 import type { ProjectItemResp } from '@/services/project/type';
 
 export default {
@@ -40,6 +40,7 @@ export default {
             scope: undefined as undefined|DashboardScope,
             project: undefined as undefined|ProjectItemResp,
             template: '',
+            viewerType: undefined as undefined|DashboardViewerType,
         });
 
         return { ...toRefs(state) };

@@ -6,7 +6,10 @@
             <div class="dashboard-viewers-wrapper">
                 <p-radio-group direction="vertical">
                     <div>
-                        <p-radio>
+                        <p-radio
+                            :selected="isPublicViewer"
+                            @change="handleSelectViewer(DASHBOARD_VIEWER_PUBLIC)"
+                        >
                             <!--                    song-lang-->
                             Public
                         </p-radio>
@@ -16,7 +19,10 @@
                         </p>
                     </div>
                     <div>
-                        <p-radio>
+                        <p-radio
+                            :selected="!isPublicViewer"
+                            @change="handleSelectViewer(DASHBOARD_VIEWER_PRIVATE)"
+                        >
                             <!--                    song-lang-->
                             Private
                         </p-radio>
@@ -32,9 +38,15 @@
 </template>
 
 <script lang="ts">
+import type { SetupContext } from 'vue';
+import { reactive, toRefs } from 'vue';
+
 import {
     PPaneLayout, PPanelTop, PRadioGroup, PRadio,
 } from '@spaceone/design-system';
+
+import { DASHBOARD_VIEWER_PUBLIC, DASHBOARD_VIEWER_PRIVATE } from '@/services/dashboards/dashboard-create/config';
+import type { DashboardViewerType } from '@/services/dashboards/dashboard-create/type';
 
 export default {
     name: 'DashboardViewerForm',
@@ -43,6 +55,23 @@ export default {
         PPaneLayout,
         PRadioGroup,
         PRadio,
+    },
+    setup(props, { emit }: SetupContext) {
+        const state = reactive({
+            isPublicViewer: undefined as undefined|boolean,
+        });
+
+        const handleSelectViewer = (viewerType: DashboardViewerType) => {
+            state.isPublicViewer = viewerType === DASHBOARD_VIEWER_PUBLIC;
+            emit('update:viewerType', viewerType);
+        };
+
+        return {
+            ...toRefs(state),
+            DASHBOARD_VIEWER_PUBLIC,
+            DASHBOARD_VIEWER_PRIVATE,
+            handleSelectViewer,
+        };
     },
 };
 </script>
