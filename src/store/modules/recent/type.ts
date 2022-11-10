@@ -5,6 +5,7 @@ export const RECENT_TYPE = Object.freeze({
     CLOUD_SERVICE: 'CLOUD_SERVICE',
     PROJECT: 'PROJECT',
     PROJECT_GROUP: 'PROJECT_GROUP',
+    DASHBOARD: 'DASHBOARD',
 } as const);
 export type RecentType = typeof RECENT_TYPE[keyof typeof RECENT_TYPE];
 
@@ -16,7 +17,7 @@ export interface RecentConfig {
 
 export interface RecentItem extends RecentConfig {
     name?: string;
-    label?: TranslateResult;
+    label?: TranslateResult | string;
     icon?: string;
     provider?: string;
     parents?: { name?: string; label?: TranslateResult }[];
@@ -28,4 +29,5 @@ export interface RecentState {
     projectItems: RecentItem[];
     projectGroupItems: RecentItem[];
     cloudServiceItems: RecentItem[];
+    dashboardItems: RecentItem[];
 }

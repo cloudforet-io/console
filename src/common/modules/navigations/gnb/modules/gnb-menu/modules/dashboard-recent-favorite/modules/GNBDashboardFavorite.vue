@@ -26,25 +26,12 @@
             <template #no-data>
                 <div class="no-data">
                     <img class="img"
-                         src="@/assets/images/illust_star.svg"
+                         src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
                     >
                     <p class="text">
-                        {{ $t('COMMON.GNB.FAVORITES.FAVORITES_HELP_TEXT') }}
+                        <!--song-lang-->
+                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_ITEMS') }}
                     </p>
-                    <div class="button-wrapper">
-                        <p-button style-type="tertiary"
-                                  size="md"
-                                  @click="handleClickMenuButton(FAVORITE_TYPE.PROJECT)"
-                        >
-                            {{ $t('COMMON.GNB.FAVORITES.GO_TO_PROJECT') }}
-                        </p-button>
-                        <p-button style-type="tertiary"
-                                  size="md"
-                                  @click="handleClickMenuButton(FAVORITE_TYPE.CLOUD_SERVICE)"
-                        >
-                            {{ $t('COMMON.GNB.FAVORITES.GO_TO_CLOUD_SERVICE') }}
-                        </p-button>
-                    </div>
                 </div>
             </template>
         </p-data-loader>
@@ -56,9 +43,7 @@ import type { SetupContext } from 'vue';
 import { reactive, toRefs } from 'vue';
 import draggable from 'vuedraggable';
 
-import {
-    PButton, PDataLoader,
-} from '@spaceone/design-system';
+import { PDataLoader } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
@@ -81,7 +66,6 @@ export default {
         FavoriteButton,
         GNBSubMenu,
         PDataLoader,
-        PButton,
         draggable,
     },
     props: {},
@@ -196,7 +180,7 @@ export default {
 <style lang="postcss" scoped>
 .gnb-dashboard-favorite {
     .gnb-dashboard-favorite-context {
-        max-height: 39rem;
+        max-height: 85vh;
         overflow-y: scroll;
     }
 
@@ -213,9 +197,9 @@ export default {
     }
     .no-data {
         text-align: center;
-        padding: 3rem 3.25rem;
+        padding: 1.875rem 3.25rem;
         .img {
-            margin: auto;
+            margin-bottom: 0.9375rem;
         }
         .text {
             @apply text-gray-400;
