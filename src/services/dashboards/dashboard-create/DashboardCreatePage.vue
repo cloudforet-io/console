@@ -76,13 +76,13 @@ export default {
         });
 
         const handleClickCreate = () => {
-            const createDashboardFormData = {
+            const dashboardCreateParams = {
                 dashboardScope: state.dashboardScope,
                 dashboardProject: state.dashboardScope === DASHBOARD_SCOPE_ENTIRE ? '' : state.dashboardProject,
                 dashboardTemplate: dashboardTemplate.value,
                 dashboardViewerType: state.dashboardViewerType,
             };
-            console.log(createDashboardFormData);
+            console.log(dashboardCreateParams);
         };
 
         return {
