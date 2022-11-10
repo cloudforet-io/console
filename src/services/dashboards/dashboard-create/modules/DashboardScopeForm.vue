@@ -64,7 +64,7 @@ export default defineComponent({
 
         const handleSelectProjects = (projects: Array<ProjectItemResp>) => {
             // Emit projects as project.
-            emit('update:dashboardProject', projects[0]);
+            emit('set-project', projects[0]);
         };
 
         // LOAD REFERENCE STORE
