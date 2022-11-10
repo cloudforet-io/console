@@ -6,13 +6,13 @@
             <div class="dashboard-scope-wrapper">
                 <p-radio-group direction="vertical">
                     <p-radio :selected="isEntireScope"
-                             @change="handleSelectScope('ENTIRE')"
+                             @change="handleSelectScope(DASHBOARD_ENTIRE_SCOPE)"
                     >
                         <!--                    song-lang-->
                         Entire Workspaces
                     </p-radio>
                     <p-radio :selected="isSingleScope"
-                             @change="handleSelectScope('SINGLE')"
+                             @change="handleSelectScope(DASHBOARD_SINGLE_SCOPE)"
                     >
                         <!--                    song-lang-->
                         Single Project
@@ -29,9 +29,7 @@
 
 <script lang="ts">
 import type { PropType, SetupContext } from 'vue';
-import {
-    defineComponent, reactive, toRefs,
-} from 'vue';
+import { defineComponent, reactive, toRefs } from 'vue';
 
 import {
     PPaneLayout, PPanelTop, PRadio, PRadioGroup,
@@ -41,6 +39,7 @@ import { store } from '@/store';
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
+import { DASHBOARD_ENTIRE_SCOPE, DASHBOARD_SINGLE_SCOPE } from '@/services/dashboards/dashboard-create/config';
 import type { DashboardScope } from '@/services/dashboards/dashboard-create/type';
 
 export default defineComponent({
@@ -69,7 +68,7 @@ export default defineComponent({
         });
 
         const handleSelectScope = (scopeType: DashboardScope) => {
-            if (scopeType === 'ENTIRE') {
+            if (scopeType === DASHBOARD_ENTIRE_SCOPE) {
                 state.isEntireScope = true;
                 state.isSingleScope = false;
             } else {
@@ -92,6 +91,8 @@ export default defineComponent({
             ...toRefs(state),
             handleSelectScope,
             handleSelectProject,
+            DASHBOARD_ENTIRE_SCOPE,
+            DASHBOARD_SINGLE_SCOPE,
         };
     },
 });
