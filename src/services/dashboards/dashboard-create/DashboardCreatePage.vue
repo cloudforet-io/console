@@ -13,13 +13,28 @@
             <dashboard-template-form :dashboard-template.sync="dashboardTemplate" />
             <dashboard-viewer-form :dashboard-viewer-type.sync="dashboardViewerType" />
         </section>
+        <div class="dashboard-create-buttons">
+            <p-button style-type="tertiary"
+                      size="lg"
+                      @click="$router.go(-1)"
+            >
+                <!--                song-lang-->
+                Cancel
+            </p-button>
+            <p-button style-type="primary"
+                      size="lg"
+            >
+                <!--                song-lang-->
+                Create
+            </p-button>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { reactive, toRefs } from 'vue';
 
-import { PPageTitle } from '@spaceone/design-system';
+import { PPageTitle, PButton } from '@spaceone/design-system';
 
 import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
@@ -34,6 +49,7 @@ export default {
         DashboardTemplateForm,
         DashboardScopeForm,
         PPageTitle,
+        PButton,
     },
     setup() {
         const state = reactive({
@@ -52,5 +68,13 @@ export default {
 .dashboard-create-form-container {
     display: grid;
     grid-gap: 1rem;
+}
+.dashboard-create-buttons {
+    display: inline-flex;
+    float: right;
+    margin-top: 1rem;
+    & .p-button {
+        margin-left: 1rem;
+    }
 }
 </style>
