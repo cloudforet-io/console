@@ -1,9 +1,9 @@
 <template>
-    <p-tooltip :contents="label"
+    <p-tooltip v-if="show"
+               :contents="label"
                position="bottom"
     >
         <router-link
-            v-if="show"
             class="gnb-sub-menu"
             :to="to"
         >
