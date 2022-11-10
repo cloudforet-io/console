@@ -11,14 +11,14 @@
                         <!--                    song-lang-->
                         Entire Workspaces
                     </p-radio>
-                    <p-radio :selected="isSingleScope"
+                    <p-radio :selected="!isEntireScope"
                              @change="handleSelectScope(DASHBOARD_SINGLE_SCOPE)"
                     >
                         <!--                    song-lang-->
                         Single Project
                     </p-radio>
                 </p-radio-group>
-                <project-select-dropdown v-show="isSingleScope"
+                <project-select-dropdown v-show="!isEntireScope"
                                          project-selectable
                                          @select="handleSelectProject"
                 />
@@ -64,17 +64,10 @@ export default defineComponent({
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             isEntireScope: undefined as undefined|boolean,
-            isSingleScope: undefined as undefined|boolean,
         });
 
         const handleSelectScope = (scopeType: DashboardScope) => {
-            if (scopeType === DASHBOARD_ENTIRE_SCOPE) {
-                state.isEntireScope = true;
-                state.isSingleScope = false;
-            } else {
-                state.isEntireScope = false;
-                state.isSingleScope = true;
-            }
+            state.isEntireScope = scopeType === DASHBOARD_ENTIRE_SCOPE;
             emit('update:scope', scopeType);
         };
 
