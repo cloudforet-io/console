@@ -12,6 +12,7 @@ import { serviceRoutes } from '@/router/service-routes';
 import config from '@/lib/config';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initAmcharts } from '@/lib/site-initializer/amcharts';
+import { initAmcharts5 } from '@/lib/site-initializer/amcharts5';
 import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
 import { initApiClient } from '@/lib/site-initializer/api-client';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
@@ -58,6 +59,7 @@ const init = async () => {
         initGtag(store, config);
         initGtm(config);
         initAmcharts(config);
+        initAmcharts5(config);
         initErrorHandler(store);
         initRequestIdleCallback();
         await checkSsoAccessToken(store);
