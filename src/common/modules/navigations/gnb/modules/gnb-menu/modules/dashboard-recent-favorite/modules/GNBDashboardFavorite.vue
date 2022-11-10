@@ -12,7 +12,7 @@
                 >
                     <g-n-b-sub-menu :label="item.label"
                                     :is-draggable="true"
-                                    :to="makeDashboardRoute(item.name)"
+                                    :to="dashboardRouteFormatter(item.name)"
                     >
                         <template #extra-mark>
                             <favorite-button :favorite-type="FAVORITE_TYPE.DASHBOARD"
@@ -167,7 +167,7 @@ export default {
             hideMenu();
         };
 
-        const makeDashboardRoute = (id) => ({
+        const dashboardRouteFormatter = (id) => ({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: { dashboardId: id },
         });
@@ -187,7 +187,7 @@ export default {
             FAVORITE_LIMIT,
             handleClickMenuButton,
             handleSelect,
-            makeDashboardRoute,
+            dashboardRouteFormatter,
             hideMenu,
         };
     },

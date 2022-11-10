@@ -82,10 +82,7 @@ export default defineComponent({
                 },
             ] as DisplayMenu[],
         });
-        const hideMenu = () => {
-            console.log('여기 맞을 텐데..');
-            emit('close');
-        };
+        const hideMenu = () => { emit('close'); };
         return {
             ...toRefs(state),
             hideMenu,
