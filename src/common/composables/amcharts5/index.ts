@@ -1,18 +1,21 @@
-import type { ComputedRef } from 'vue';
+import type { Ref } from 'vue';
 import {
     computed, reactive, toRefs, watchEffect,
 } from 'vue';
 
 import * as am5 from '@amcharts/amcharts5';
 import type { Root } from '@amcharts/amcharts5';
+import type { IPieChartSettings } from '@amcharts/amcharts5/.internal/charts/pie/PieChart';
+import type { PieChart, IPieSeriesSettings } from '@amcharts/amcharts5/percent';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
+import type { IXYChartSettings, IXYSeriesSettings, XYChart } from '@amcharts/amcharts5/xy';
 
 import { createDonutChart, createPieChart, createPieSeries } from '@/common/composables/amcharts5/pie-chart-helper';
 import type { ChartContext } from '@/common/composables/amcharts5/type';
 import { createXYDateChart, createXYLineSeries, createXYStackedColumnSeries } from '@/common/composables/amcharts5/xy-chart-helper';
 
 export const useAmcharts5 = (
-    chartContext: ComputedRef<ChartContext>,
+    chartContext: Ref<ChartContext>,
 ) => {
     const state = reactive({
         root: computed(() => (chartContext.value ? am5.Root.new(chartContext.value) : undefined)),
@@ -45,12 +48,30 @@ export const useAmcharts5 = (
         disposeRoot,
         clearChildrenOfRoot,
         //
-        createXYDateChart,
-        createPieChart,
-        createDonutChart,
+        createXYDateChart: (settings?: IXYChartSettings) => {
+            if (!state.root) throw new Error('No root');
+            return createXYDateChart(state.root, settings);
+        },
+        createPieChart: (settings?: IPieChartSettings) => {
+            if (!state.root) throw new Error('No root');
+            return createPieChart(state.root, settings);
+        },
+        createDonutChart: (settings?: IPieChartSettings) => {
+            if (!state.root) throw new Error('No root');
+            return createDonutChart(state.root, settings);
+        },
         //
-        createXYLineSeries,
-        createXYStackedColumnSeries,
-        createPieSeries,
+        createXYLineSeries: (chart: XYChart, settings: IXYSeriesSettings, processor?: am5.DataProcessor) => {
+            if (!state.root) throw new Error('No root');
+            return createXYLineSeries(state.root, chart, settings, processor);
+        },
+        createXYStackedColumnSeries: (chart: XYChart, settings: IXYSeriesSettings, processor?: am5.DataProcessor) => {
+            if (!state.root) throw new Error('No root');
+            return createXYStackedColumnSeries(state.root, chart, settings, processor);
+        },
+        createPieSeries: (chart: PieChart, settings?: IPieSeriesSettings) => {
+            if (!state.root) throw new Error('No root');
+            return createPieSeries(state.root, chart, settings);
+        },
     };
 };
