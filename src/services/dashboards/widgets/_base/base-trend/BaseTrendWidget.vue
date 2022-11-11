@@ -12,8 +12,7 @@
 
 <script lang="ts">
 import {
-    computed,
-    defineComponent, onUnmounted, reactive, toRef, toRefs, watchEffect,
+    computed, defineComponent, onUnmounted, reactive, toRef, toRefs, watch,
 } from 'vue';
 
 import * as am5 from '@amcharts/amcharts5';
@@ -110,15 +109,14 @@ export default defineComponent<Props>({
         };
 
         /* Watcher */
-        watchEffect(() => {
-            if (state.chartRoot) {
+        watch(() => state.chartRoot, (chartRoot) => {
+            if (chartRoot) {
                 if (['LINE', 'STACKED_COLUMN'].includes(props.chartType)) {
-                    drawXYChart(state.chartRoot, props.chartType);
+                    drawXYChart(chartRoot, props.chartType);
                 } else if (['PIE', 'DONUT'].includes(props.chartType)) {
-                    drawPieChart(state.chartRoot, props.chartType);
+                    drawPieChart(chartRoot, props.chartType);
                 }
             }
-            // request data with period, currency, and filters
         });
         onUnmounted(() => disposeRoot());
 
