@@ -18,7 +18,6 @@ import {
 
 import * as am5 from '@amcharts/amcharts5';
 import type { Root } from '@amcharts/amcharts5';
-import type { IPieChartSettings } from '@amcharts/amcharts5/.internal/charts/pie/PieChart';
 import type { IPieSeriesSettings } from '@amcharts/amcharts5/percent';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
@@ -130,8 +129,6 @@ export default defineComponent<Props>({
             }
         };
         const drawPieChart = (chartRoot: Root, chartType: string) => {
-            const chartSettings: IPieChartSettings = {};
-            if (chartType === CHART_TYPE.DONUT) chartSettings.innerRadius = am5.percent(85);
             const { chart } = chartType === CHART_TYPE.DONUT ? createDonutChart(chartRoot) : createPieChart(chartRoot);
 
             const seriesSettings: IPieSeriesSettings = {
