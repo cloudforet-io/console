@@ -58,12 +58,12 @@ export default {
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            isPublicViewer: undefined as undefined|boolean,
+            isPublicViewer: true,
         });
 
         const handleSelectViewer = (viewerType: DashboardViewerType) => {
             state.isPublicViewer = viewerType === DASHBOARD_VIEWER_PUBLIC;
-            emit('update:viewerType', viewerType);
+            emit('update:dashboardViewerType', viewerType);
         };
 
         return {

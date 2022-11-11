@@ -54,17 +54,17 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            isEntireScope: undefined as undefined|boolean,
+            isEntireScope: true,
         });
 
         const handleSelectScope = (scopeType: DashboardScope) => {
             state.isEntireScope = scopeType === DASHBOARD_SCOPE_ENTIRE;
-            emit('update:scope', scopeType);
+            emit('update:dashboardScope', scopeType);
         };
 
         const handleSelectProjects = (projects: Array<ProjectItemResp>) => {
             // Emit projects as project.
-            emit('update:project', projects[0]);
+            emit('set-project', projects[0]);
         };
 
         // LOAD REFERENCE STORE
