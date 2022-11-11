@@ -55,11 +55,11 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings): {
 
 export const createXYLineSeries = (root: Root, chart: am5xy.XYChart, settings: IXYSeriesSettings, processor?: am5.DataProcessor) => {
     const series = chart.series.push(am5xy.LineSeries.new(root, {
-        ...settings,
         valueXField: DATE_VALUE_FIELD,
         tooltip: am5.Tooltip.new(root, {
             labelText: '{valueY}',
         }),
+        ...settings,
     }));
     if (processor) series.data.processor = processor;
     series.strokes.template.setAll({
