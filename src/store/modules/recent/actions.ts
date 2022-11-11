@@ -24,6 +24,7 @@ const addCommitsByItemType = {
     [RECENT_TYPE.PROJECT]: 'addProjectItem',
     [RECENT_TYPE.PROJECT_GROUP]: 'addProjectGroupItem',
     [RECENT_TYPE.CLOUD_SERVICE]: 'addCloudServiceItem',
+    [RECENT_TYPE.DASHBOARD]: 'addDashboardItem',
     [RECENT_TYPE.MENU]: 'addMenuItem',
 };
 export const addItem: Action<RecentState, any> = async ({ commit }, recent: RecentConfig): Promise<void> => {
@@ -41,6 +42,7 @@ const setCommitsByItemType = {
     [RECENT_TYPE.PROJECT]: 'setProjectItems',
     [RECENT_TYPE.PROJECT_GROUP]: 'setProjectGroupItems',
     [RECENT_TYPE.CLOUD_SERVICE]: 'setCloudServiceItems',
+    [RECENT_TYPE.DASHBOARD]: 'setDashboardItems',
     [RECENT_TYPE.MENU]: 'setMenuItems',
 };
 export const load: Action<RecentState, any> = async ({ commit }, payload: RecentLoadPayload): Promise<void|Error> => {
@@ -49,6 +51,7 @@ export const load: Action<RecentState, any> = async ({ commit }, payload: Recent
         type: itemType,
         limit: payload?.limit,
     });
+    console.log(results);
     const recents: RecentConfig[] = results.map((d) => ({
         itemType: d.data.type,
         itemId: d.data.id,

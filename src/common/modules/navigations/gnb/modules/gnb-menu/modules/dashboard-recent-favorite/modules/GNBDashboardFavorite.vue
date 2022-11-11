@@ -85,7 +85,7 @@ export default {
         const state = reactive({
             loading: true,
             favoriteDashboardId: computed<FavoriteItem[]>(() => store.state.favorite.dashboardItems),
-            dashboardList: [
+            dashboardList: [ // load from dashboard api
                 { name: 'dashboard1', dashboardId: '1' },
                 { name: 'dashboard2', dashboardId: '2' },
                 { name: 'dashboard3', dashboardId: '3' },
