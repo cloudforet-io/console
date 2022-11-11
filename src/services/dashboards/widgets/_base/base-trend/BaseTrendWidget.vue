@@ -13,7 +13,7 @@
 <script lang="ts">
 import {
     computed,
-    defineComponent, onUnmounted, reactive, toRefs, watchEffect,
+    defineComponent, onUnmounted, reactive, toRef, toRefs, watchEffect,
 } from 'vue';
 
 import * as am5 from '@amcharts/amcharts5';
@@ -81,7 +81,7 @@ export default defineComponent<Props>({
             createXYLineSeries,
             createXYStackedColumnSeries,
             disposeRoot,
-        } = useAmcharts5(computed(() => state.chartRef));
+        } = useAmcharts5(toRef(state, 'chartRef'));
 
         /* Util */
         const drawXYChart = (chartRoot: Root, chartType) => {
