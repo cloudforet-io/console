@@ -8,3 +8,5 @@ export const CHART_TYPE = Object.freeze({
     PIE: 'PIE',
 } as const);
 export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
+
+export const DATE_VALUE_FIELD = 'date';

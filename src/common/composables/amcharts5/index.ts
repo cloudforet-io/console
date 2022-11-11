@@ -9,7 +9,7 @@ import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 
 import { createDonutChart, createPieChart, createPieSeries } from '@/common/composables/amcharts5/pie-chart-helper';
 import type { ChartContext } from '@/common/composables/amcharts5/type';
-import { createXYDateChart } from '@/common/composables/amcharts5/xy-chart-helper';
+import { createXYDateChart, createXYLineSeries, createXYStackedColumnSeries } from '@/common/composables/amcharts5/xy-chart-helper';
 
 export const useAmcharts5 = (
     chartContext: ComputedRef<ChartContext>,
@@ -49,6 +49,8 @@ export const useAmcharts5 = (
         createPieChart,
         createDonutChart,
         //
+        createXYLineSeries,
+        createXYStackedColumnSeries,
         createPieSeries,
     };
 };

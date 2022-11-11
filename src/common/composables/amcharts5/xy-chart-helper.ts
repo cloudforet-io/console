@@ -1,7 +1,9 @@
 import type { Root } from '@amcharts/amcharts5';
 import * as am5 from '@amcharts/amcharts5';
-import type { IXYChartSettings } from '@amcharts/amcharts5/xy';
+import type { IXYChartSettings, IXYSeriesSettings } from '@amcharts/amcharts5/xy';
 import * as am5xy from '@amcharts/amcharts5/xy';
+
+import { DATE_VALUE_FIELD } from '@/common/composables/amcharts5/type';
 
 import { gray } from '@/styles/colors';
 
@@ -49,4 +51,32 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings): {
         renderer: yRenderer,
     }));
     return { chart, xAxis, yAxis };
+};
+
+export const createXYLineSeries = (root: Root, chart: am5xy.XYChart, settings: IXYSeriesSettings, processor?: am5.DataProcessor) => {
+    const series = chart.series.push(am5xy.LineSeries.new(root, {
+        ...settings,
+        valueXField: DATE_VALUE_FIELD,
+        tooltip: am5.Tooltip.new(root, {
+            labelText: '{valueY}',
+        }),
+    }));
+    if (processor) series.data.processor = processor;
+    series.strokes.template.setAll({
+        strokeWidth: 2,
+    });
+    return series;
+};
+
+export const createXYStackedColumnSeries = (root: Root, chart: am5xy.XYChart, settings: IXYSeriesSettings, processor?: am5.DataProcessor) => {
+    const series = chart.series.push(am5xy.ColumnSeries.new(root, {
+        stacked: true,
+        valueXField: DATE_VALUE_FIELD,
+        tooltip: am5.Tooltip.new(root, {
+            labelText: '{valueY}',
+        }),
+        ...settings,
+    }));
+    if (processor) series.data.processor = processor;
+    return series;
 };
