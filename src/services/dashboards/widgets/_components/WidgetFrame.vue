@@ -51,11 +51,11 @@ import { PDatetimePicker, PDivider, PI } from '@spaceone/design-system';
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 
-import type { WidgetSize } from '@/common/components/widgets/type';
-import { WIDGET_SIZE } from '@/common/components/widgets/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
+import { WIDGET_SIZE } from '../config';
+import type { WidgetSize } from '../type';
+import CurrencySelectDropdown from './CurrencySelectDropdown.vue';
 
 interface Props {
     title: string;
