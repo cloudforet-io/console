@@ -49,3 +49,14 @@ export const removeCloudServiceItem = (state: FavoriteState, favorite: Partial<F
 export const setCloudServiceItems = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
     state.cloudServiceItems = favorite;
 };
+
+/* Dashboard Type */
+export const addDashboardItem = (state: FavoriteState, favorite: FavoriteConfig): void => {
+    if (state.dashboardItems) state.dashboardItems.unshift(favorite);
+};
+export const removeDashboardItem = (state: FavoriteState, favorite: Partial<FavoriteConfig>): void => {
+    state.dashboardItems = state.dashboardItems?.filter((d) => d.itemId !== favorite.itemId) ?? null;
+};
+export const setDashboardItems = (state: FavoriteState, favorite: FavoriteConfig[]): void => {
+    state.dashboardItems = favorite;
+};

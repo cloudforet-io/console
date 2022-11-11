@@ -46,6 +46,7 @@ import draggable from 'vuedraggable';
 import { PDataLoader } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -73,66 +74,14 @@ export default {
         const state = reactive({
             loading: true,
             items: [
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard1', name: '1',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard2', name: '2',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard3', name: '3',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard4', name: '4',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard5', name: '5',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard6', name: '6',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard7', name: '7',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard8', name: '8',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard9', name: '9',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard10', name: '10',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard11', name: '11',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard12', name: '12',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard13', name: '13',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard14', name: '14',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard15', name: '15',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard16', name: '16',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard17', name: '17',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard18', name: '18',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard19', name: '19',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard20', name: '20',
-                },
+                { label: 'dashboard1', name: '1' },
+                { label: 'dashboard2', name: '2' },
+                { label: 'dashboard3', name: '3' },
+                { label: 'dashboard4', name: '4' },
+                { label: 'dashboard5', name: '5' },
+                { label: 'dashboard6', name: '6' },
+                { label: 'dashboard7', name: '7' },
+                { label: 'dashboard8', name: '8' },
             ],
         });
 
@@ -161,6 +110,7 @@ export default {
         (async () => {
             state.loading = true;
             await Promise.allSettled([
+                store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
             ]);
             state.loading = false;
         })();
