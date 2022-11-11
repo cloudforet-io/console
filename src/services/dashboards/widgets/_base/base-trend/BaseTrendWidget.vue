@@ -24,8 +24,7 @@ import { PDataLoader } from '@spaceone/design-system';
 import { random, range } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
-import type { ChartType } from '@/common/composables/amcharts5/type';
-import { CHART_TYPE, DATE_VALUE_FIELD } from '@/common/composables/amcharts5/type';
+import { DATE_VALUE_FIELD } from '@/common/composables/amcharts5/type';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface Props {
@@ -85,28 +84,28 @@ export default defineComponent<Props>({
         } = useAmcharts5(computed(() => state.chartRef));
 
         /* Util */
-        const drawXYChart = (chartRoot: Root, chartType: ChartType) => {
-            const { chart, xAxis, yAxis } = createXYDateChart(chartRoot);
+        const drawXYChart = (chartRoot: Root, chartType) => {
+            const { chart, xAxis, yAxis } = createXYDateChart();
             xAxis.get('baseInterval').timeUnit = 'month'; // TODO: will be changed dynamically
 
             const seriesDefaultSettings: IXYSeriesSettings = { xAxis, yAxis };
             state.labels.forEach((label) => {
                 seriesDefaultSettings.name = label;
                 seriesDefaultSettings.valueYField = label;
-                const series = chartType === CHART_TYPE.LINE
-                    ? createXYLineSeries(chartRoot, chart, seriesDefaultSettings, state.chartSeriesDataProcessor)
-                    : createXYStackedColumnSeries(chartRoot, chart, seriesDefaultSettings, state.chartSeriesDataProcessor);
+                const series = chartType === 'LINE'
+                    ? createXYLineSeries(chart, seriesDefaultSettings, state.chartSeriesDataProcessor)
+                    : createXYStackedColumnSeries(chart, seriesDefaultSettings, state.chartSeriesDataProcessor);
                 series.data.setAll(SAMPLE_XY_CHART_DATA); // TODO: mock data
             });
         };
         const drawPieChart = (chartRoot: Root, chartType: string) => {
-            const { chart } = chartType === CHART_TYPE.DONUT ? createDonutChart(chartRoot) : createPieChart(chartRoot);
+            const { chart } = chartType === 'DONUT' ? createDonutChart() : createPieChart();
 
             const seriesSettings: IPieSeriesSettings = {
                 categoryField: 'category', // TODO: will be changed dynamically
                 valueField: 'value', // TODO: will be changed dynamically
             };
-            const series = createPieSeries(chartRoot, chart, seriesSettings);
+            const series = createPieSeries(chart, seriesSettings);
             series.data.setAll(SAMPLE_PIE_CHART_DATA);
         };
 
@@ -121,9 +120,6 @@ export default defineComponent<Props>({
             }
             // request data with period, currency, and filters
         });
-        // watch(() => state.data, (data) => {
-        // refine data
-        // });
         onUnmounted(() => disposeRoot());
 
         return {
