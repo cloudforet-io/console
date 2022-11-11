@@ -112,12 +112,17 @@ export default {
             favoriteOrderList: [] as string[],
             sortedFavoriteList: computed<FavoriteItem[]>({
                 get: () => {
+                    const nonExistentOrderList: FavoriteItem[] = [];
                     const sortedList: FavoriteItem[] = [];
                     state.favoriteOrderList.forEach((dashboardId) => {
                         const favoriteItem = (state.favoriteDashboardList ?? []).filter((favorite) => favorite.itemId === dashboardId);
                         if (favoriteItem.length > 0) sortedList.push(favoriteItem[0]);
                     });
-                    return sortedList;
+                    state.favoriteDashboardList.forEach((item) => {
+                        const itemId = state.favoriteOrderList.find((id) => item.itemId === id);
+                        if (!itemId) nonExistentOrderList.push(item);
+                    });
+                    return [...nonExistentOrderList, ...sortedList];
                 },
                 set: (value) => {
                     state.favoriteOrderList = value.map((favorite) => favorite.itemId);
