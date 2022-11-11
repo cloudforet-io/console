@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
 import {
-    computed, reactive, toRefs, watchEffect,
+    reactive, toRefs, watch,
 } from 'vue';
 
 import * as am5 from '@amcharts/amcharts5';
@@ -18,29 +18,31 @@ export const useAmcharts5 = (
     chartContext: Ref<ChartContext>,
 ) => {
     const state = reactive({
-        root: computed(() => (chartContext.value ? am5.Root.new(chartContext.value) : undefined)),
+        chartContext,
+        root: undefined as undefined | Root,
     });
 
-    const initRoot = (root: Root): void => {
+    const initRoot = (root: Root) => {
         root.setThemes([am5themes_Animated.new(root)]);
         root.utc = true;
     };
 
     const disposeRoot = () => {
         if (!state.root) return;
-        am5.array.each(am5.registry.rootElements, (d) => {
-            if (d === state.root) {
-                d.dispose();
-            }
-        });
+        state.root.dispose();
+        state.root = undefined;
     };
 
     const clearChildrenOfRoot = () => {
         if (state.root) state.root.container.children.clear();
     };
 
-    watchEffect(() => {
-        if (state.root) initRoot(state.root);
+    watch(() => state.chartContext, (ctx) => {
+        if (ctx) {
+            disposeRoot();
+            state.root = am5.Root.new(ctx);
+            initRoot(state.root as Root);
+        }
     });
 
     return {
@@ -50,28 +52,28 @@ export const useAmcharts5 = (
         //
         createXYDateChart: (settings?: IXYChartSettings) => {
             if (!state.root) throw new Error('No root');
-            return createXYDateChart(state.root, settings);
+            return createXYDateChart(state.root as Root, settings);
         },
         createPieChart: (settings?: IPieChartSettings) => {
             if (!state.root) throw new Error('No root');
-            return createPieChart(state.root, settings);
+            return createPieChart(state.root as Root, settings);
         },
         createDonutChart: (settings?: IPieChartSettings) => {
             if (!state.root) throw new Error('No root');
-            return createDonutChart(state.root, settings);
+            return createDonutChart(state.root as Root, settings);
         },
         //
         createXYLineSeries: (chart: XYChart, settings: IXYSeriesSettings, processor?: am5.DataProcessor) => {
             if (!state.root) throw new Error('No root');
-            return createXYLineSeries(state.root, chart, settings, processor);
+            return createXYLineSeries(state.root as Root, chart, settings, processor);
         },
         createXYStackedColumnSeries: (chart: XYChart, settings: IXYSeriesSettings, processor?: am5.DataProcessor) => {
             if (!state.root) throw new Error('No root');
-            return createXYStackedColumnSeries(state.root, chart, settings, processor);
+            return createXYStackedColumnSeries(state.root as Root, chart, settings, processor);
         },
         createPieSeries: (chart: PieChart, settings?: IPieSeriesSettings) => {
             if (!state.root) throw new Error('No root');
-            return createPieSeries(state.root, chart, settings);
+            return createPieSeries(state.root as Root, chart, settings);
         },
     };
 };
