@@ -43,6 +43,7 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
+import { sortBy } from 'lodash';
 
 import { store } from '@/store';
 
@@ -77,22 +78,35 @@ export default defineComponent<Props>({
     setup() {
         const state = reactive({
             loading: false,
-            recents: computed<RecentConfig[]>(() => store.state.recent.allItems),
+            // load from dashboard api
+            dashboardList: [
+                { name: 'dashboard1', dashboardId: '1' },
+                { name: 'dashboard2', dashboardId: '2' },
+                { name: 'dashboard3', dashboardId: '3' },
+                { name: 'dashboard4', dashboardId: '4' },
+                { name: 'dashboard5', dashboardId: '5' },
+                { name: 'dashboard6', dashboardId: '6' },
+                { name: 'dashboard7', dashboardId: '7' },
+                { name: 'dashboard8', dashboardId: '8' },
+            ],
+            recents: computed<RecentConfig[]>(() => store.state.recent.dashboardItems),
             recentDashboardItems: computed<RecentItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
-                // Todo: create converter for recent items
-                // return isUserAccessible ? convertToRecentData(state.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD)) : [];
-                return isUserAccessible ? [
-                    {
-                        itemId: 'd1', itemType: RECENT_TYPE.DASHBOARD, label: 'dashboard1', name: '1',
-                    },
-                    {
-                        itemId: 'd2', itemType: RECENT_TYPE.DASHBOARD, label: 'dashboard2', name: '2',
-                    },
-                    {
-                        itemId: 'd3', itemType: RECENT_TYPE.DASHBOARD, label: 'dashboard3', name: '3',
-                    },
-                ] : [];
+                const recentItemList = [] as RecentItem[];
+                state.recents.forEach((recent) => {
+                    state.dashboardList.forEach((dashboard) => {
+                        if (recent.itemId === dashboard.dashboardId) {
+                            recentItemList.push({
+                                itemId: dashboard.dashboardId,
+                                label: dashboard.name,
+                                name: dashboard.name,
+                                itemType: RECENT_TYPE.DASHBOARD,
+                                updatedAt: recent.updatedAt,
+                            });
+                        }
+                    });
+                });
+                return isUserAccessible ? sortBy(recentItemList, (recent) => recent.updatedAt).reverse() : [];
             }),
         });
 
@@ -100,6 +114,12 @@ export default defineComponent<Props>({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: { dashboardId: id },
         });
+        /* Init */
+        (async () => {
+            state.loading = true;
+            await store.dispatch('recent/load', { type: RECENT_TYPE.DASHBOARD });
+            state.loading = false;
+        })();
         return {
             ...toRefs(state),
             dashboardRouteFormatter,

@@ -1,22 +1,22 @@
 <template>
     <div class="gnb-dashboard-favorite">
-        <p-data-loader :data="items"
+        <p-data-loader :data="sortedFavoriteList"
                        :loading="loading"
                        class="gnb-dashboard-favorite-context"
-                       :class="{ loading: loading }"
+                       :class="{ loading }"
         >
-            <draggable v-model="items">
-                <div v-for="(item, index) in items"
+            <draggable v-model="sortedFavoriteList">
+                <div v-for="(item, index) in sortedFavoriteList"
                      :key="`favorite-${item.label}-${index}`"
                      @click="hideMenu"
                 >
                     <g-n-b-sub-menu :label="item.label"
                                     :is-draggable="true"
-                                    :to="dashboardRouteFormatter(item.name)"
+                                    :to="dashboardRouteFormatter(item.itemId)"
                     >
                         <template #extra-mark>
                             <favorite-button :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                             :item-id="item.name"
+                                             :item-id="item.itemId"
                                              scale="0.65"
                             />
                         </template>
@@ -40,15 +40,22 @@
 
 <script lang="ts">
 import type { SetupContext } from 'vue';
-import { reactive, toRefs } from 'vue';
+import {
+    computed, reactive, toRefs,
+} from 'vue';
 import draggable from 'vuedraggable';
 
 import { PDataLoader } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+
+import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import type { SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
@@ -59,6 +66,11 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 const FAVORITE_LIMIT = 5;
+
+interface TempDashboardModel {
+    name: string;
+    dashboardId: string;
+}
 
 export default {
     name: 'GNBDashboardFavorite',
@@ -72,68 +84,51 @@ export default {
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             loading: true,
-            items: [
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard1', name: '1',
+            favoriteDashboardId: computed<FavoriteItem[]>(() => store.state.favorite.dashboardItems),
+            dashboardList: [ // load from dashboard api
+                { name: 'dashboard1', dashboardId: '1' },
+                { name: 'dashboard2', dashboardId: '2' },
+                { name: 'dashboard3', dashboardId: '3' },
+                { name: 'dashboard4', dashboardId: '4' },
+                { name: 'dashboard5', dashboardId: '5' },
+                { name: 'dashboard6', dashboardId: '6' },
+                { name: 'dashboard7', dashboardId: '7' },
+                { name: 'dashboard8', dashboardId: '8' },
+            ] as TempDashboardModel[],
+            favoriteDashboardList: computed<FavoriteItem[]>(() => {
+                const favoriteList: FavoriteItem[] = [];
+                state.dashboardList.forEach((dashboard) => {
+                    const isFavoriteDashboard = !!(state.favoriteDashboardId ?? []).filter((d) => dashboard.dashboardId === d.itemId).length;
+                    if (isFavoriteDashboard) {
+                        favoriteList.push({
+                            itemId: dashboard.dashboardId,
+                            label: dashboard.name,
+                            itemType: FAVORITE_TYPE.DASHBOARD,
+                        });
+                    }
+                });
+                return favoriteList;
+            }),
+            favoriteOrderList: [] as string[],
+            sortedFavoriteList: computed<FavoriteItem[]>({
+                get: () => {
+                    const nonExistentOrderList: FavoriteItem[] = [];
+                    const sortedList: FavoriteItem[] = [];
+                    state.favoriteOrderList.forEach((dashboardId) => {
+                        const favoriteItem = (state.favoriteDashboardList ?? []).find((favorite) => favorite.itemId === dashboardId);
+                        if (favoriteItem) sortedList.push(favoriteItem);
+                    });
+                    state.favoriteDashboardList.forEach((item) => {
+                        const itemId = state.favoriteOrderList.find((id) => item.itemId === id);
+                        if (!itemId) nonExistentOrderList.push(item);
+                    });
+                    return [...nonExistentOrderList, ...sortedList];
                 },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard2', name: '2',
+                set: (value) => {
+                    state.favoriteOrderList = value.map((favorite) => favorite.itemId);
+                    setFavoriteOrderList();
                 },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard3', name: '3',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard4', name: '4',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard5', name: '5',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard6', name: '6',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard7', name: '7',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard8', name: '8',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard9', name: '9',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard10', name: '10',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard11', name: '11',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard12', name: '12',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard13', name: '13',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard14', name: '14',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard15', name: '15',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard16', name: '16',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard17', name: '17',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard18', name: '18',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard19', name: '19',
-                },
-                {
-                    show: true, to: { name: DASHBOARDS_ROUTE.ALL._NAME }, label: 'dashboard20', name: '20',
-                },
-            ],
+            }),
         });
 
         const hideMenu = () => { emit('close'); };
@@ -157,10 +152,37 @@ export default {
         });
         const handleSelect = () => { hideMenu(); };
 
+        const getFavoriteOrderList = async () => {
+            try {
+                const { results } = await SpaceConnector.client.addOns.favorite.orderList.get({
+                    type: FAVORITE_TYPE.DASHBOARD,
+                });
+                state.favoriteOrderList = results[0]?.data?.order_list ?? [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.favoriteOrderList = [];
+            }
+        };
+
+        const setFavoriteOrderList = async () => {
+            try {
+                state.loading = true;
+                await SpaceConnector.client.addOns.favorite.orderList.set({
+                    type: FAVORITE_TYPE.DASHBOARD,
+                    order_list: state.favoriteOrderList,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
+        };
         /* Init */
         (async () => {
             state.loading = true;
             await Promise.allSettled([
+                getFavoriteOrderList(),
+                store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
             ]);
             state.loading = false;
         })();
