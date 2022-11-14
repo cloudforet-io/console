@@ -6,6 +6,9 @@
             <template #sidebar>
                 <dashboards-l-n-b />
             </template>
+            <template #default>
+                <router-view />
+            </template>
         </vertical-page-layout>
         <general-page-layout v-else
                              :breadcrumbs="breadcrumbs"
