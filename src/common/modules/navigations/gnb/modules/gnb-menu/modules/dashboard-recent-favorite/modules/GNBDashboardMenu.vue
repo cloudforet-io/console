@@ -1,7 +1,5 @@
 <template>
-    <div v-click-outside="hideMenu"
-         class="g-n-b-dashboard-menu"
-    >
+    <div class="g-n-b-dashboard-menu">
         <p-tab :tabs="tabs"
                :active-tab.sync="activeTab"
         >
@@ -32,8 +30,7 @@
 </template>
 
 <script lang="ts">
-import { vOnClickOutside } from '@vueuse/components';
-import type { DirectiveFunction, SetupContext } from 'vue';
+import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -60,9 +57,6 @@ export default defineComponent({
         GNBDashboardRecent,
         GNBDashboardFavorite,
         GNBSubMenu,
-    },
-    directives: {
-        clickOutside: vOnClickOutside as DirectiveFunction,
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -100,11 +94,8 @@ export default defineComponent({
         flex-direction: column;
         width: 22.5rem;
         min-height: auto;
-        top: 100%;
         right: 0;
         box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
-        margin-top: -0.5rem;
-        margin-right: -0.5rem;
         .tab-pane {
             padding-bottom: 0;
         }

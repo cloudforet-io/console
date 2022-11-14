@@ -48,7 +48,6 @@ import { isUserAccessibleToMenu } from '@/lib/access-control';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { customMenuNameList } from '@/common/modules/navigations/gnb/config';
 import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
 import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
 import GNBToolset from '@/common/modules/navigations/gnb/modules/GNBToolset.vue';
@@ -88,9 +87,6 @@ export default defineComponent({
         };
         const handleOpenMenu = (menuName: MenuId) => {
             if (state.openedMenu === menuName) {
-                if (customMenuNameList.includes(menuName)) {
-                    return;
-                }
                 hideMenu();
             } else if (state.hasPermission || includes(ALLOWED_MENUS_FOR_ALL_USERS, menuName)) {
                 state.openedMenu = menuName;

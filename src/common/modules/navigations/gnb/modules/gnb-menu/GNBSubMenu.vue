@@ -8,7 +8,9 @@
             :to="to"
         >
             <div class="gnb-sub-contents">
-                <div class="contents-left">
+                <div class="contents-left"
+                     :class="{ 'is-exist-extra-mark': $slots['extra-mark'] }"
+                >
                     <p-i v-if="isDraggable"
                          name="ic_drag-handle--slim"
                          width="1rem"
@@ -31,14 +33,25 @@
 
 <script lang="ts">
 import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Route } from 'vue-router';
 
 import { PI, PTooltip } from '@spaceone/design-system';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 
-export default {
+interface Props {
+    show?: boolean;
+    label: string|undefined|TranslateResult;
+    to: Route;
+    isBeta?: boolean;
+    isNew?: boolean;
+    isDraggable?: boolean;
+}
+
+export default defineComponent<Props>({
     name: 'GNBSubMenu',
     components: {
         NewMark, BetaMark, PI, PTooltip,
@@ -69,7 +82,7 @@ export default {
             default: false,
         },
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
@@ -98,11 +111,14 @@ export default {
 
         .contents-left {
             @apply flex items-center;
-            width: 80%;
+            width: 100%;
             .label {
                 @apply truncate;
                 display: inline-block;
             }
+        }
+        .is-exist-extra-mark {
+            width: 80%;
         }
     }
 }

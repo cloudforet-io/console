@@ -3,8 +3,6 @@
          v-click-outside="hideMenu"
          class="gnb-menu"
          :class="{disabled: !hasPermission}"
-         @click.capture="handleMenu"
-         @keydown.enter="handleMenu"
     >
         <div class="menu-button"
              :class="[{
@@ -12,7 +10,10 @@
                  selected: isSelected,
              }]"
         >
-            <span tabindex="0">
+            <span tabindex="0"
+                  @click="handleMenu"
+                  @keydown.enter="handleMenu"
+            >
                 <span>{{ label }}</span>
                 <p-i v-if="isMenuWithAdditionalMenu"
                      class="arrow-button"
