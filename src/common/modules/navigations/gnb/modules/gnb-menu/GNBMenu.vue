@@ -56,6 +56,8 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 import type { PropType, DirectiveFunction, SetupContext } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import type { RawLocation } from 'vue-router';
 
 import { PI } from '@spaceone/design-system';
 
@@ -71,7 +73,17 @@ import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSub
 import GNBDashboardMenu
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardMenu.vue';
 
-export default defineComponent({
+interface Props {
+    show: boolean;
+    menuId: MenuId;
+    label: TranslateResult;
+    to?: RawLocation;
+    hasPermission: boolean;
+    isOpened: boolean;
+    isSelected: boolean;
+    subMenuList: DisplayMenu[];
+}
+export default defineComponent<Props>({
     name: 'GNBMenu',
     components: {
         GNBDashboardMenu,
@@ -91,7 +103,7 @@ export default defineComponent({
             default: '',
         },
         label: {
-            type: String,
+            type: String as PropType<string | TranslateResult>,
             default: '',
         },
         to: {
@@ -130,7 +142,7 @@ export default defineComponent({
                 const isDuplicatePath = SpaceRouter.router.currentRoute.name === props.menuId;
                 if (isDuplicatePath) return;
                 hideMenu();
-                SpaceRouter.router.push(props.to);
+                if (props.to) SpaceRouter.router.push(props.to);
             }
         };
 

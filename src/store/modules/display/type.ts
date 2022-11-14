@@ -6,6 +6,7 @@ import type { SidebarType, Currency } from '@/store/modules/display/config';
 import type { Menu } from '@/lib/menu/config';
 
 export interface DisplayMenu extends Menu {
+    show?: boolean;
     label: TranslateResult;
     icon?: string;
     isNew?: boolean;
