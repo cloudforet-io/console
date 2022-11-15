@@ -1,0 +1,234 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { i18n } from '@/translations';
+import PBoardItem
+    from '@/data-display/borad-item/PBoardItem';
+import PTextButton from '@/inputs/buttons/text-button/PTextButton';
+import { reactive, toRefs, computed } from "vue";
+
+import { getBoardItemArgTypes } from '@/data-display/borad-item/story-helper';
+import { standardIconActionSet, extraIconActionSet } from '@/data-display/borad-item/mock';
+
+<Meta title='Data Display/Board Item' parameters={{
+    design: {
+        type: 'figma',
+        url: 'figma url',
+    }
+}} argTypes={getBoardItemArgTypes()}/>
+
+
+export const Template = (args, {argTypes}) => ({
+    props: Object.keys(argTypes),
+    i18n,
+    components: { PBoardItem },
+    template: `
+        <div class="h-full w-full overflow p-8">
+            <p-board-item
+                :left-icon="leftIcon"
+                :rounded="rounded"
+                :right-overlay-icon-actions="iconActionSet"
+            >
+                <template #content>
+                    <p>Content</p>
+                </template>
+            </p-board-item>
+        </div>
+    `,
+    setup(props) {
+        const state = reactive({
+            leftIcon: computed(() => props.leftIcon),
+            rounded: computed(() => props.rounded),
+            iconActionSet: computed(() => props.rightOverlayIconActions ?? []),
+        });
+        return { ...toRefs(state) };
+    }
+});
+
+# Board Item
+<br/>
+<br/>
+
+## Basic
+Main content used for `board-item` component is injected using `content` slot.<br/>
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            i18n,
+            components: { PBoardItem },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-board-item
+            left-icon="ic_more"
+            :right-overlay-icon-actions="standardIconActionSet"
+        >
+            <template #content>
+                <strong>Content Slot Area</strong>
+                <p>This area is content slot</p>
+                <p>Put the content you want in this space</p>
+            </template>
+        </p-board-item>
+    </div>
+    `,
+            setup() {
+                return {
+                    standardIconActionSet,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Left Icon
+
+By default, the icon name is injected into the icons component with a size of 40x40 and used,<br/>
+and when you want a custom ui, use the `left-content` slot to replace it.<br/>
+
+<Canvas>
+    <Story name="Left Icon">
+        {{
+            i18n,
+            components: { PBoardItem },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-board-item
+            left-icon="ic_collector_tags"
+        >
+            <template #content>
+                <strong>Left Icon</strong>
+                <p>Collector tags icon</p>
+            </template>
+        </p-board-item>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Rounded
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Rounded">
+        {{
+            i18n,
+            components: { PBoardItem },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-board-item
+            rounded
+        >
+            <template #content>
+                <strong>Rounded Card List Item</strong>
+                <p>Rounded edge</p>
+            </template>
+        </p-board-item>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Right Overlay Icon Actions
+
+The data type is object in array. The object follows the `IconAction` interface below. `iconName` is the name of the icon used in icons, and `ButtonEventHandler` is the event function to be bound to the icon button.<br/>
+
+```
+interface IconAction {
+    iconName: string;
+    eventAction: ButtonEventHandler;
+}
+```
+
+When the browser width size is reduced below 1024px (tablet mode), if there are more than two Icon buttons, it is shown as a `select-dropdown` with an 'ic_more' icon.
+If there is only one icon button, it will not be combined into a dropdown. <br/>
+**Try reducing your browser width size below 1024px**.<br/><br/>
+This area has an `absolute` position, and covers the contents of the `content` slot.<br/>
+That's why it's named overlay.<br/>
+<Canvas>
+    <Story name="Right Overlay Icon Actions">
+        {{
+            i18n,
+            components: { PBoardItem },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-board-item
+            rounded
+            :right-overlay-icon-actions="extraIconActionSet"
+        >
+            <template #content>
+                <strong>Right Icon Actions</strong>
+                <p>Hover your mouse over here</p>
+            </template>
+        </p-board-item>
+    </div>
+    `,
+            setup() {
+                return {
+                    extraIconActionSet,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Custom Right Overlay Content Slot
+Custom content injected into the `custom-right-overlay-content` slot is not replaced with the `ic_more` icon button, unlike the existing `right-overlay-icon-actions`.<br/>
+
+<Canvas>
+    <Story name="Custom Right Overlay Content Slot">
+        {{
+            i18n,
+            components: { PBoardItem, PTextButton },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-board-item>
+            <template #content>
+                <strong>Custom Right Overlay Content - Preview </strong>
+                <p>Hover your mouse over here</p>
+            </template>
+            <template #custom-right-overlay-content>
+                <p-text-button icon-right="ic_external-link">Preview</p-text-button>
+            </template>
+        </p-board-item>
+        </p-board-item>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
