@@ -9,7 +9,7 @@
     "serve:init": "npm install && npm run build --workspace=@cloudforet/core-lib && npm run serve",
     "serve:wipe": "rm -rf ./node_modules && rm -rf packages/cloudforet/core-lib/node_modules && npm run serve:init",
     "build": "NODE_OPTIONS=--max_old_space_size=8192 vite build",
-    "build:watch:core": "cd ./packages/@spaceone/console-core-lib && npm run build:watch --workpsace=@spaceone/console-core-lib",
+    "build:watch:core": "npm run build:watch --workspace=@cloudforet/core-lib",
     "preview": "npm run build --workspace=@cloudforet/core-lib && npm run build && vite preview",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest watch",
