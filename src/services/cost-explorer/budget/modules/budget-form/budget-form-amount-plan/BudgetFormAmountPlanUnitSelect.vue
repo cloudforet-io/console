@@ -7,9 +7,9 @@
                        :selected="selectedUnit"
                        @change="handleUnitChange"
         >
-            <p-label class="title">
+            <p-field-title class="title">
                 {{ title }}
-            </p-label>
+            </p-field-title>
             <p class="desc">
                 {{ desc }}
             </p>
@@ -24,7 +24,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PLabel, PSelectCard } from '@spaceone/design-system';
+import { PFieldTitle, PSelectCard } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -40,7 +40,7 @@ export default {
     name: 'BudgetFormAmountPlanUnitSelect',
     components: {
         PSelectCard,
-        PLabel,
+        PFieldTitle,
     },
     props: {
         selectedUnit: {

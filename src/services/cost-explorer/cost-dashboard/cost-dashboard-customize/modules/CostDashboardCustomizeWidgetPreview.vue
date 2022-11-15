@@ -3,7 +3,7 @@
         <slot name="description" />
         <slot name="chart" />
         <div class="layout-preview-area">
-            <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LAYOUT') }}</p-label>
+            <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LAYOUT') }}</p-field-title>
             <div class="layout-preview">
                 <span v-for="i in Math.round(100 / layout)"
                       :key="i"
@@ -18,12 +18,12 @@
 </template>
 
 <script lang="ts">
-import { PLabel } from '@spaceone/design-system';
+import { PFieldTitle } from '@spaceone/design-system';
 
 export default {
     name: 'CostDashboardCustomizeWidgetPreview',
     components: {
-        PLabel,
+        PFieldTitle,
     },
     props: {
         layout: {

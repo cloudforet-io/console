@@ -7,7 +7,7 @@
         />
         <p-pane-layout class="policy-create-info-wrapper">
             <div class="policy-create-contents">
-                <p-label>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-label>
+                <p-field-title>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-field-title>
                 <br>
                 <p-badge outline
                          style-type="primary1"
@@ -70,7 +70,7 @@ import {
 } from 'vue';
 
 import {
-    PPageTitle, PPaneLayout, PBadge, PLabel, PFieldGroup, PTextInput, PTextEditor, PButton,
+    PPageTitle, PPaneLayout, PBadge, PFieldTitle, PFieldGroup, PTextInput, PTextEditor, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -92,7 +92,7 @@ export default {
         PPageTitle,
         PPaneLayout,
         PBadge,
-        PLabel,
+        PFieldTitle,
         PFieldGroup,
         PTextInput,
         PTextEditor,

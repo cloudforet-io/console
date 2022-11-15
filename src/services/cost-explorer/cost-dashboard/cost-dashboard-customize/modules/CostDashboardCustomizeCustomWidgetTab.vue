@@ -5,7 +5,7 @@
                            :data="widgetList"
                            :loading="loading"
             >
-                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ widgetList.length }})</p-label>
+                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ widgetList.length }})</p-field-title>
                 <ul class="widget-list">
                     <li v-for="(widget, idx) in widgetList"
                         :key="`widget-${idx}-${widget.name}`"
@@ -76,7 +76,7 @@ import {
 } from 'vue';
 
 import {
-    PRadio, PTextPagination, PButton, PLabel, PDataLoader,
+    PRadio, PTextPagination, PButton, PFieldTitle, PDataLoader,
 } from '@spaceone/design-system';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -110,7 +110,7 @@ export default {
         PTextPagination,
         PRadio,
         PButton,
-        PLabel,
+        PFieldTitle,
         PDataLoader,
     },
     setup() {
@@ -240,7 +240,7 @@ export default {
             + .widgets-area {
                 @apply mt-4 border-t border-gray-200;
             }
-            .p-label {
+            .p-field-title {
                 @apply mt-6 mb-2;
             }
         }

@@ -3,7 +3,7 @@
         <template #chart>
             <div class="info-item">
                 <div class="type">
-                    <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.TYPE') }}</p-label>
+                    <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.TYPE') }}</p-field-title>
                     <p-anchor highlight
                               :href="thumbnailLink"
                     >
@@ -24,7 +24,7 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import { PAnchor, PLabel, PLazyImg } from '@spaceone/design-system';
+import { PAnchor, PFieldTitle, PLazyImg } from '@spaceone/design-system';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
@@ -36,7 +36,7 @@ export default {
     name: 'DefaultWidgetPreview',
     components: {
         CostDashboardCustomizeWidgetPreview,
-        PLabel,
+        PFieldTitle,
         PLazyImg,
         PAnchor,
     },

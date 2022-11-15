@@ -4,7 +4,7 @@
             <div v-if="recommendedWidgetList.length > 0"
                  class="widgets-area widgets-all"
             >
-                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.RECOMMENDED_WIDGET') }} ({{ recommendedWidgetList.length }})</p-label>
+                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.RECOMMENDED_WIDGET') }} ({{ recommendedWidgetList.length }})</p-field-title>
                 <ul class="widget-list">
                     <li v-for="widget in recommendedWidgetList"
                         :key="widget.widget_id"
@@ -30,7 +30,7 @@
                 </ul>
             </div>
             <div class="widgets-area widgets-all">
-                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ widgetList.length }})</p-label>
+                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ widgetList.length }})</p-field-title>
                 <ul class="widget-list">
                     <li v-for="widget in widgetList"
                         :key="widget.widget_id"
@@ -75,7 +75,7 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import { PRadio, PLabel, PTextPagination } from '@spaceone/design-system';
+import { PRadio, PFieldTitle, PTextPagination } from '@spaceone/design-system';
 
 import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
@@ -100,7 +100,7 @@ export default {
         DefaultWidgetPreview,
         CostDashboardCustomizeWidgetConfig,
         PRadio,
-        PLabel,
+        PFieldTitle,
         PTextPagination,
     },
 
@@ -164,7 +164,7 @@ export default {
         + .widgets-area {
             @apply mt-4 border-t border-gray-200;
         }
-        .p-label {
+        .p-field-title {
             @apply mt-6 mb-2;
         }
     }
