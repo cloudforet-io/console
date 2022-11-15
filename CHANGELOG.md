@@ -1,3 +1,10 @@
+# [1.1.0-beta.451](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.450...v1.1.0-beta.451) (2022-11-15)
+
+
+### Features
+
+* **board-item:** create `PBoardItem` component ([#129](https://github.com/cloudforet-io/mirinae/issues/129)) ([3f96946](https://github.com/cloudforet-io/mirinae/commit/3f969466c66ad17b8914dba68672cf11f27d3a04))
+
 # [1.1.0-beta.450](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.449...v1.1.0-beta.450) (2022-11-09)
 
 
