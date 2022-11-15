@@ -23,7 +23,7 @@
                         </div>
                         <div class="card-content">
                             <img class="card-image"
-                                 :src="require(`@/assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)"
+                                 :src="import(`../../../../../assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)"
                             >
                         </div>
                     </li>
@@ -49,7 +49,7 @@
                         </div>
                         <div class="card-content">
                             <img class="card-image"
-                                 :src="require(`@/assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)"
+                                 :src="import(`../../../../../assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)"
                             >
                         </div>
                     </li>
@@ -141,6 +141,12 @@ export default {
             costExplorerStore.commit('dashboard/setEditedSelectedWidget', value);
         };
 
+        // FIXME:: WIP
+        const getChartImage = (widget) => {
+            const chartImage = import(`../../../../../assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`);
+            return chartImage;
+        };
+
         (() => {
             getWidgets();
         })();
@@ -151,6 +157,7 @@ export default {
             selectWidget,
             getWidgets,
             getChartTypeImageFileName,
+            getChartImage,
         };
     },
 };
