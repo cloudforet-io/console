@@ -65,7 +65,7 @@
                           emoji
                           :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
                           :button-text="$t('COMMON.SESSION_MODAL.SIGNIN')"
-                          button-type="secondary"
+                          button-type="primary"
                           @clickButton="goToSignIn"
             />
             <notice-popup v-if="!$store.getters['user/hasSystemRole']" />
