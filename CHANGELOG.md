@@ -1,3 +1,10 @@
+# [1.1.0-beta.452](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.451...v1.1.0-beta.452) (2022-11-15)
+
+
+### Bug Fixes
+
+* **p-field-title:** fix component name from PLabel to PFieldTitle ([#131](https://github.com/cloudforet-io/mirinae/issues/131)) ([504b9c1](https://github.com/cloudforet-io/mirinae/commit/504b9c1767135fc49af6fe2f4fba8b03361a34b9))
+
 # [1.1.0-beta.451](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.450...v1.1.0-beta.451) (2022-11-15)
 
 
