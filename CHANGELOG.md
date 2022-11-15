@@ -1,3 +1,10 @@
+# [1.1.0-beta.453](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.452...v1.1.0-beta.453) (2022-11-15)
+
+
+### Bug Fixes
+
+* **p-field-title:** fix component name ([#132](https://github.com/cloudforet-io/mirinae/issues/132)) ([7d0b313](https://github.com/cloudforet-io/mirinae/commit/7d0b313a43c1a0bccedffa7484d3f6e0efabddfe))
+
 # [1.1.0-beta.452](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.451...v1.1.0-beta.452) (2022-11-15)
 
 
