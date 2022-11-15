@@ -1,5 +1,5 @@
 <template>
-    <label class="p-label" v-on="$listeners">
+    <label class="p-field-title" v-on="$listeners">
         <slot>
             {{ label }}
         </slot>
@@ -8,7 +8,7 @@
 
 <script lang="ts">
 export default {
-    name: 'PLabel',
+    name: 'PFiledTitle',
     props: {
         label: {
             type: String,
@@ -18,7 +18,7 @@ export default {
 };
 </script>
 <style lang="postcss">
-.p-label {
+.p-field-title {
     @apply text-gray-900;
     display: inline-block;
     font-size: 0.875rem;

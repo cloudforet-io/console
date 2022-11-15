@@ -1,26 +1,26 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 
-import PLabel from './PLabel.vue';
+import PFieldTitle from './PFieldTitle.vue';
 
-import { getLabelArgTypes } from '@/data-display/label/story-helper';
+import { getLabelArgTypes } from '@/data-display/field-title/story-helper';
 
 
-<Meta title='Data Display/Label' parameters={{
+<Meta title='Data Display/Field Title' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A193199'
     }
-}} component={PLabel} argTypes={getLabelArgTypes()}
+}} component={PFieldTitle} argTypes={getLabelArgTypes()}
 />
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
-    components: { PLabel },
+    components: { PFieldTitle },
     template: `
     <div class="h-full w-full overflow p-8">
-        <p-label :label="label">
+        <p-field-title :label="label">
             <template v-if="defaultSlot"><span v-html="defaultSlot"/></template>
-        </p-label>
+        </p-field-title>
     </div>
     `,
     setup() {
@@ -29,7 +29,7 @@ export const Template = (args, { argTypes }) => ({
 });
 
 
-# Label
+# Field Title
 <br/>
 <br/>
 
@@ -37,10 +37,10 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Basic">
         {{
-            components: { PLabel },
+            components: { PFieldTitle },
             template: `
     <div class="h-full w-full overflow p-8">
-        <p-label>Label</p-label>
+        <p-field-title>Field Title</p-field-title>
     </div>
     `,
             setup() {

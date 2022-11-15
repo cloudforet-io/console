@@ -4,8 +4,8 @@ export const getLabelArgTypes = (): ArgTypes => ({
     label: {
         name: 'label',
         type: { name: 'string' },
-        description: 'Label to display.',
-        defaultValue: 'Label',
+        description: 'text to display.',
+        defaultValue: 'Field Title',
         table: {
             type: {
                 summary: 'string',
@@ -22,7 +22,7 @@ export const getLabelArgTypes = (): ArgTypes => ({
     /* slots */
     defaultSlot: {
         name: 'default',
-        description: 'Slot for label.',
+        description: 'Slot for field-title.',
         defaultValue: '',
         table: {
             type: {
