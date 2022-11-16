@@ -3,7 +3,7 @@
         <div class="header">
             <div class="title">
                 <p>
-                    <p-label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-label> ($USD)
+                    <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-field-title> ($USD)
                 </p>
             </div>
             <p-button style-type="tertiary"
@@ -37,7 +37,7 @@ import {
     reactive, toRefs, watch,
 } from 'vue';
 
-import { PButton, PDivider, PLabel } from '@spaceone/design-system';
+import { PButton, PDivider, PFieldTitle } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
@@ -60,7 +60,7 @@ export default {
     components: {
         BudgetFormAmountPlanAutofillModal,
         BudgetFormAmountPlanMonthInput,
-        PLabel,
+        PFieldTitle,
         PButton,
         PDivider,
     },

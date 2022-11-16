@@ -45,7 +45,7 @@
         </p-page-title>
         <p-pane-layout class="policy-detail-info-wrapper">
             <div class="policy-detail-contents">
-                <p-label>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-label>
+                <p-field-title>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-field-title>
                 <br>
                 <div class="policy-detail-type-badge">
                     <p-badge v-if="type === POLICY_TYPES.MANAGED"
@@ -63,14 +63,14 @@
                 </div>
             </div>
             <div class="policy-detail-contents">
-                <p-label>{{ $t('IAM.POLICY.FORM.ID') }}</p-label>
+                <p-field-title>{{ $t('IAM.POLICY.FORM.ID') }}</p-field-title>
                 <p>{{ policyInfo ? policyInfo.policy_id : '' }}</p>
             </div>
             <div class="policy-detail-contents">
                 <div v-if="type === POLICY_TYPES.MANAGED">
-                    <p-label>
+                    <p-field-title>
                         {{ $t('IAM.POLICY.FORM.DESCRIPTION') }}
-                    </p-label>
+                    </p-field-title>
                     <br>
                     <p>{{ policyInfo ? policyInfo.tags.description : '' }}</p>
                 </div>
@@ -85,7 +85,7 @@
                 </p-field-group>
             </div>
             <div class="policy-detail-contents">
-                <p-label>{{ $t('IAM.POLICY.FORM.PERMISSION') }}</p-label>
+                <p-field-title>{{ $t('IAM.POLICY.FORM.PERMISSION') }}</p-field-title>
                 <p-text-editor
                     :read-only="type === POLICY_TYPES.MANAGED"
                     :code="code"
@@ -110,7 +110,7 @@ import {
 } from 'vue';
 
 import {
-    PPageTitle, PIconButton, PBadge, PPaneLayout, PLabel, PTextEditor, PButton, PTextInput, PFieldGroup,
+    PPageTitle, PIconButton, PBadge, PPaneLayout, PFieldTitle, PTextEditor, PButton, PTextInput, PFieldGroup,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -136,7 +136,7 @@ export default defineComponent<PolicyDetailPageProps>({
         PIconButton,
         PBadge,
         PPaneLayout,
-        PLabel,
+        PFieldTitle,
         PTextEditor,
         PButton,
         PTextInput,

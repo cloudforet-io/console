@@ -165,8 +165,8 @@ export default defineComponent({
 }
 
 .field-group {
-    /* custom design-system component - p-label */
-    :deep(.p-label) {
+    /* custom design-system component - p-field-title */
+    :deep(.p-field-title) {
         margin-bottom: 1rem;
     }
 }

@@ -1,7 +1,7 @@
 <template>
     <div class="cost-dashboard-customize-cost-query">
         <div class="title-wrapper">
-            <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.COST_ANALYSIS_QUERY') }}</p-label>
+            <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.COST_ANALYSIS_QUERY') }}</p-field-title>
             <template v-if="!loading && costQuerySetList.length">
                 <p-icon-button name="ic_refresh"
                                class="refresh-button"
@@ -65,7 +65,7 @@
 import { reactive, toRefs } from 'vue';
 
 import {
-    PDataLoader, PIconButton, PButton, PLabel,
+    PDataLoader, PIconButton, PButton, PFieldTitle,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -91,7 +91,7 @@ export default {
         PIconButton,
         PButton,
         PDataLoader,
-        PLabel,
+        PFieldTitle,
     },
     props: {
         selectedQuery: {
@@ -188,7 +188,7 @@ export default {
         .refresh-button {
             margin-right: 1rem;
         }
-        .p-label {
+        .p-field-title {
             @apply mr-auto;
         }
 

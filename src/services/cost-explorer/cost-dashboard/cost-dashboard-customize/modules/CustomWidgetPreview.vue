@@ -2,23 +2,23 @@
     <cost-dashboard-customize-widget-preview :layout="LAYOUT">
         <template #description>
             <div>
-                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_QUERY_NAME') }}</p-label>
+                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_QUERY_NAME') }}</p-field-title>
                 <span>{{ queryName }}</span>
             </div>
             <div>
-                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_GRANULARITY') }}</p-label>
+                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_GRANULARITY') }}</p-field-title>
                 <span>{{ granularityLabel }}</span>
             </div>
             <div>
-                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_STACK') }}</p-label>
+                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_STACK') }}</p-field-title>
                 <span>{{ stack ? 'On' : 'Off' }}</span>
             </div>
             <div>
-                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_GROUP_BY') }}</p-label>
+                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_GROUP_BY') }}</p-field-title>
                 <span :class="{ 'text-gray-500': !groupBy }">{{ groupByLabel }}</span>
             </div>
             <div>
-                <p-label>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_FILTERS') }}</p-label>
+                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.LABEL_FILTERS') }}</p-field-title>
                 <span :class="{'text-gray-500': noFilters }">{{ filterLabel }}</span>
             </div>
         </template>
@@ -39,7 +39,7 @@ import { computed, reactive, toRefs } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
 import {
-    PButton, PLabel,
+    PButton, PFieldTitle,
 } from '@spaceone/design-system';
 import { capitalize } from 'lodash';
 
@@ -63,7 +63,7 @@ export default {
     components: {
         CostDashboardCustomizeWidgetPreview,
         PButton,
-        PLabel,
+        PFieldTitle,
     },
     props: {
         selectedItem: {
@@ -140,7 +140,7 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.p-label {
+.p-field-title {
     @apply mb-0 mr-2;
 }
 .view-query-button {

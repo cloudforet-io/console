@@ -26,11 +26,11 @@
                                              height="2.25rem"
                                         />
                                         <span>{{ item.label }}</span>
-                                        <p-label v-for="(labelItem, labelIdx) in item.tags"
-                                                 :key="`default-template-label-${idx}-${labelIdx}`"
+                                        <p-field-title v-for="(labelItem, labelIdx) in item.tags"
+                                                       :key="`default-template-label-${idx}-${labelIdx}`"
                                         >
                                             {{ labelItem }}
-                                        </p-label>
+                                        </p-field-title>
                                     </div>
                                 </template>
                             </p-select-card>
@@ -57,11 +57,11 @@
                                              height="2.25rem"
                                         />
                                         <span>{{ item.label }}</span>
-                                        <p-label v-for="(labelItem, labelIdx) in item.tags"
-                                                 :key="`custom-template-label-${idx}-${labelIdx}`"
+                                        <p-field-title v-for="(labelItem, labelIdx) in item.tags"
+                                                       :key="`custom-template-label-${idx}-${labelIdx}`"
                                         >
                                             {{ labelItem }}
-                                        </p-label>
+                                        </p-field-title>
                                     </div>
                                 </template>
                             </p-select-card>
@@ -78,7 +78,7 @@ import type { SetupContext } from 'vue';
 import { reactive, toRefs } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PSelectCard, PI, PLabel,
+    PPaneLayout, PPanelTop, PSelectCard, PI, PFieldTitle,
 } from '@spaceone/design-system';
 
 export default {
@@ -88,7 +88,7 @@ export default {
         PPaneLayout,
         PSelectCard,
         PI,
-        PLabel,
+        PFieldTitle,
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({

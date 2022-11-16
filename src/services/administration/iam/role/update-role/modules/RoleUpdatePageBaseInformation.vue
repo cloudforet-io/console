@@ -28,7 +28,7 @@
                     />
                 </template>
             </p-field-group>
-            <p-label :label="$t('IAM.ROLE.DETAIL.ROLE_TYPE')" />
+            <p-field-title :label="$t('IAM.ROLE.DETAIL.ROLE_TYPE')" />
             <div v-if="!roleTypeInputDisabled"
                  class="select-card-wrapper"
             >
@@ -40,9 +40,9 @@
                                :value="roleType.key"
                                :label="roleType.label"
                 >
-                    <p-label class="role-type-name">
+                    <p-field-title class="role-type-name">
                         {{ roleType.label }}
-                    </p-label>
+                    </p-field-title>
                     <p class="role-type-description">
                         {{ roleType.description }}
                     </p>
@@ -63,7 +63,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PPaneLayout, PPanelTop, PFieldGroup, PLabel, PTextInput, PSelectCard,
+    PPaneLayout, PPanelTop, PFieldGroup, PFieldTitle, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -83,7 +83,7 @@ export default {
         PPanelTop,
         PFieldGroup,
         PTextInput,
-        PLabel,
+        PFieldTitle,
         PSelectCard,
     },
     props: {
