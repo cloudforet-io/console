@@ -60,10 +60,15 @@ export interface HandlerResponse {
     operators?: OperatorType[];
 }
 export interface ValueHandler {
+    // eslint-disable-next-line no-unused-vars
     (inputText: string,
+     // eslint-disable-next-line no-unused-vars
         rootKey: KeyItem,
+     // eslint-disable-next-line no-unused-vars
         dataType?: KeyDataType,
+     // eslint-disable-next-line no-unused-vars
         subPath?: string,
+     // eslint-disable-next-line no-unused-vars
         operator?: OperatorType): Promise<HandlerResponse>|HandlerResponse;
 }
 
@@ -90,10 +95,12 @@ export interface QueryTag extends QueryItem {
 }
 
 export interface QueryTagValidator {
+    // eslint-disable-next-line no-unused-vars
     (query: QueryTag, tags: QueryTag[]): boolean;
 }
 
 export interface QueryTagConverter {
+    // eslint-disable-next-line no-unused-vars
     (query: QueryItem, timezone: string): QueryTag;
 }
 
