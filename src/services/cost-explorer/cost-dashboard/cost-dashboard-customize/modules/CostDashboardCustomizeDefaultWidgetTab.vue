@@ -6,7 +6,7 @@
             >
                 <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.RECOMMENDED_WIDGET') }} ({{ recommendedWidgetList.length }})</p-field-title>
                 <ul class="widget-list">
-                    <li v-for="widget in recommendedWidgetList"
+                    <li v-for="(widget, index) in recommendedWidgetList"
                         :key="widget.widget_id"
                         class="widget-card"
                         :class="{'selected' : selectedWidget.widget_id === widget.widget_id}"
@@ -23,7 +23,7 @@
                         </div>
                         <div class="card-content">
                             <img class="card-image"
-                                 :src="import(`../../../../../assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)"
+                                 :src="widgetCardImageList[index].value.default"
                             >
                         </div>
                     </li>
@@ -32,7 +32,7 @@
             <div class="widgets-area widgets-all">
                 <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CUSTOMIZE.ADD_WIDGET_MODAL.ALL') }} ({{ widgetList.length }})</p-field-title>
                 <ul class="widget-list">
-                    <li v-for="widget in widgetList"
+                    <li v-for="(widget, index) in widgetList"
                         :key="widget.widget_id"
                         class="widget-card"
                         :class="{'selected' : selectedWidget.widget_id === widget.widget_id}"
@@ -49,7 +49,7 @@
                         </div>
                         <div class="card-content">
                             <img class="card-image"
-                                 :src="import(`../../../../../assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)"
+                                 :src="widgetCardImageList[index].value.default"
                             >
                         </div>
                     </li>
@@ -124,6 +124,7 @@ export default {
             thisPage: 1,
             allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
             layoutOfSpace: computed(() => costExplorerStore.state.dashboard.layoutOfSpace),
+            widgetCardImageList: [],
         });
         const getWidgets = async () => {
             try {
@@ -141,14 +142,15 @@ export default {
             costExplorerStore.commit('dashboard/setEditedSelectedWidget', value);
         };
 
-        // FIXME:: WIP
-        const getChartImage = (widget) => {
-            const chartImage = import(`../../../../../assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`);
-            return chartImage;
+        const getWidgetCardImageList = async (): Promise<void> => {
+            state.widgetCardImageList = await Promise.allSettled(
+                state.widgetList.map((d) => import(`../../../../../assets/images/${getChartTypeImageFileName(d.options.chart_type)}.svg`)),
+            );
         };
 
-        (() => {
-            getWidgets();
+        (async () => {
+            await getWidgets();
+            await getWidgetCardImageList();
         })();
 
         return {
@@ -157,7 +159,6 @@ export default {
             selectWidget,
             getWidgets,
             getChartTypeImageFileName,
-            getChartImage,
         };
     },
 };
