@@ -1,8 +1,7 @@
 <template>
     <div class="widget-frame"
-         :class="{
-             [size]: true,
-         }"
+         :class="{ full: isFull }"
+         :style="{ width: isFull ? '100%' : width }"
     >
         <div class="widget-header">
             <h3 class="title">
@@ -44,7 +43,9 @@
 
 <script lang="ts">
 import type { PropType, SetupContext } from 'vue';
-import { reactive, toRefs, defineComponent } from 'vue';
+import {
+    reactive, toRefs, defineComponent, computed,
+} from 'vue';
 
 import { PDatetimePicker, PDivider, PI } from '@spaceone/design-system';
 
@@ -60,6 +61,7 @@ import CurrencySelectDropdown from './CurrencySelectDropdown.vue';
 interface Props {
     title: string;
     size: WidgetSize;
+    width: string;
     widgetLink: string;
     noData: boolean;
     printMode: boolean;
@@ -83,6 +85,10 @@ export default defineComponent<Props>({
         size: {
             type: String as PropType<WidgetSize>,
             default: WIDGET_SIZE.md,
+        },
+        width: {
+            type: String,
+            default: '30rem', // default width of md size
         },
         widgetLink: {
             type: [Object, String],
@@ -109,6 +115,7 @@ export default defineComponent<Props>({
         const state = reactive({
             proxySelectedDates: useProxyValue('selectedDates', props, emit),
             proxyCurrency: useProxyValue('currency', props, emit),
+            isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
         });
 
         const handleUpdateCurrency = (currency: Currency) => {
@@ -117,20 +124,16 @@ export default defineComponent<Props>({
         return {
             ...toRefs(state),
             handleUpdateCurrency,
+            WIDGET_SIZE,
         };
     },
 });
 </script>
 
 <style lang="postcss" scoped>
-@define-mixin widget-size $widget-width {
-    & {
-        height: 29rem;
-        width: $widget-width;
-    }
-}
-
 .widget-frame {
+    height: 29rem;
+
     @apply border rounded-lg bg-white;
     border-color: theme('colors.gray.200');
     display: inline-flex;
@@ -151,8 +154,8 @@ export default defineComponent<Props>({
     }
     .body {
         height: auto;
-        flex-grow: 1;
-        flex-shrink: 1;
+        flex: 1 1;
+        overflow-y: scroll;
     }
     .widget-footer {
         @apply border-t rounded-b-lg flex justify-between items-center;
@@ -178,17 +181,10 @@ export default defineComponent<Props>({
             }
         }
     }
-    &.sm {
-        @mixin widget-size 24rem;
-    }
-    &.md {
-        @mixin widget-size 34.625rem;
-    }
-    &.lg {
-        @mixin widget-size 44rem;
-    }
-    &.xl {
-        @mixin widget-size 54rem;
+    &.full {
+        height: 100%;
+        min-height: 29rem;
     }
 }
+
 </style>
