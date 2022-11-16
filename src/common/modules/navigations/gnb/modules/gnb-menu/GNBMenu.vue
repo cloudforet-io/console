@@ -10,7 +10,8 @@
                  selected: isSelected,
              }]"
         >
-            <span tabindex="0"
+            <span class="button-label"
+                  tabindex="0"
                   @click="handleMenu"
                   @keydown.enter="handleMenu"
             >
@@ -169,6 +170,11 @@ export default defineComponent<Props>({
         cursor: pointer;
         text-decoration: none;
         text-transform: capitalize;
+
+        .button-label {
+            display: inline-block;
+            height: 100%;
+        }
 
         &.opened, &:hover {
             @apply text-violet-600;
