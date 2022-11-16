@@ -1,8 +1,8 @@
 import type {
-    IconAction,
-} from '@/data-display/borad-item/type';
+    IconSet,
+} from '@/data-display/board-item/type';
 
-export const standardIconActionSet: IconAction[] = [
+export const standardIconActionSet: IconSet[] = [
     {
         iconName: 'ic_edit',
         eventAction: () => {},
@@ -17,7 +17,7 @@ export const standardIconActionSet: IconAction[] = [
     },
 ];
 
-export const extraIconActionSet: IconAction[] = [
+export const extraIconActionSet: IconSet[] = [
     {
         iconName: 'ic_edit',
         eventAction: () => {},

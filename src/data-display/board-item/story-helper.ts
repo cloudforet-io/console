@@ -3,7 +3,7 @@ import icon from 'vue-svgicon';
 
 import {
     standardIconActionSet,
-} from '@/data-display/borad-item/mock';
+} from '@/data-display/board-item/mock';
 
 export const getBoardItemArgTypes = (): ArgTypes => ({
     leftIcon: {
@@ -25,8 +25,8 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
             options: Object.keys(icon.icons),
         },
     },
-    rightOverlayIconActions: {
-        name: 'rightOverlayIconActions',
+    iconButtonSets: {
+        name: 'iconButtonSets',
         type: { name: 'array' },
         description: 'Array of icon-button-set that will fit into the right overlay content area',
         defaultValue: standardIconActionSet,
@@ -83,9 +83,9 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
             defaultValue: 'Board Item Left Content',
         },
     },
-    customRightOverlayContentSlot: {
-        name: 'customRightOverlayContent',
-        description: 'Slot to replace right-overlay-content to custom content',
+    customRightContentSlot: {
+        name: 'customRightContentSlot',
+        description: 'Slot to replace right-icon-button-content to custom content',
         defaultValue: 'Board Item Custom Right Content',
         table: {
             type: {

@@ -12,26 +12,26 @@
             <div class="content">
                 <slot name="content" />
             </div>
-            <div v-if="iconActionSet.length > 0" class="right-overlay-wrapper desktop">
+            <div v-if="iconSetList.length > 0" class="right-overlay-wrapper desktop">
                 <div class="overlay-contents">
-                    <p-icon-button v-for="(iconAction, index) in iconActionSet"
+                    <p-icon-button v-for="(iconAction, index) in iconSetList"
                                    :key="`${iconAction.iconName}-desktop-${index}`"
                                    :name="iconAction.iconName"
                                    @click="iconAction.eventAction"
                     />
                 </div>
             </div>
-            <div v-if="iconActionSet.length > 0" class="right-overlay-wrapper tablet">
+            <div v-if="iconSetList.length > 0" class="right-overlay-wrapper tablet">
                 <div class="overlay-contents">
-                    <p-select-dropdown v-if="iconActionSet.length > 1"
-                                       :items="iconActionSet"
+                    <p-select-dropdown v-if="iconSetList.length > 1"
+                                       :items="iconSetList"
                                        style-type="icon-button"
                                        button-icon="ic_more"
                                        use-fixed-menu-style
                     >
                         <template #menu-menu>
                             <div class="custom-button-menu">
-                                <p-icon-button v-for="(iconAction, index) in iconActionSet"
+                                <p-icon-button v-for="(iconAction, index) in iconSetList"
                                                :key="`${iconAction.iconName}-context-menu-${index}`"
                                                :name="iconAction.iconName"
                                                @click="iconAction.eventAction"
@@ -39,14 +39,14 @@
                             </div>
                         </template>
                     </p-select-dropdown>
-                    <p-icon-button v-else-if="iconActionSet.length === 1"
-                                   :name="iconActionSet[0].iconName"
-                                   @click="iconActionSet[0].eventAction"
+                    <p-icon-button v-else-if="iconSetList.length === 1"
+                                   :name="iconSetList[0].iconName"
+                                   @click="iconSetList[0].eventAction"
                     />
                 </div>
             </div>
             <div v-else class="right-overlay-wrapper">
-                <slot name="custom-right-overlay-content" />
+                <slot name="custom-right-content" />
             </div>
         </div>
     </div>
@@ -58,7 +58,7 @@ import {
 } from 'vue';
 import type { PropType } from 'vue';
 
-import type { BoardItemProps, IconAction } from '@/data-display/borad-item/type';
+import type { BoardItemProps, IconSet } from '@/data-display/board-item/type';
 import PI from '@/foundation/icons/PI.vue';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
@@ -79,14 +79,14 @@ export default defineComponent<BoardItemProps>({
             type: Boolean,
             default: undefined,
         },
-        rightOverlayIconActions: {
-            type: Array as PropType<IconAction[]>,
+        iconButtonSets: {
+            type: Array as PropType<IconSet[]>,
             default: () => [],
         },
     },
     setup(props) {
         const state = reactive({
-            iconActionSet: computed(() => props.rightOverlayIconActions ?? []),
+            iconSetList: computed(() => props.iconButtonSets ?? []),
         });
 
 
@@ -97,7 +97,7 @@ export default defineComponent<BoardItemProps>({
 });
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 .p-board-item {
     @apply flex items-center bg-white border border-gray-200 relative;
     padding: 1rem;
