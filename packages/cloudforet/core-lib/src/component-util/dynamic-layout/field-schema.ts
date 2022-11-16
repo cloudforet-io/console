@@ -25,9 +25,10 @@ export interface BadgeOptions extends CommonOptions {
     text_color?: string;
 }
 
-// eslint-disable-next-line no-shadow
 export enum DATETIME_SOURCE_TYPE {
+    // eslint-disable-next-line no-unused-vars
     iso8601 = 'iso8601',
+    // eslint-disable-next-line no-unused-vars
     timestamp = 'timestamp'
 }
 
