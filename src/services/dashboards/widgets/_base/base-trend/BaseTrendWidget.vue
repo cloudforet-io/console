@@ -11,38 +11,27 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, onUnmounted, reactive, toRef, toRefs, watch,
 } from 'vue';
 
-import * as am5 from '@amcharts/amcharts5';
-import type { Root } from '@amcharts/amcharts5';
-import type { XYSeries } from '@amcharts/amcharts5/.internal/charts/xy/series/XYSeries';
-import type { IPieSeriesSettings } from '@amcharts/amcharts5/percent';
-import type { IXYSeriesSettings } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
 import { random, range } from 'lodash';
-
-import {
-    setSingleTooltipText,
-    setSharedTooltipText, setChartColors,
-} from '@/lib/amcharts5/helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { DATE_FIELD_NAME } from '@/common/composables/amcharts5/type';
 
-import { gray, red } from '@/styles/colors';
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface Props {
-}
+import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
+import type { WidgetProps } from '@/services/dashboards/widgets/type';
 
 // TODO: sample data
 const SAMPLE_XY_CHART_DATA = range(4).map((d) => ({
     date: `2022-${11 + d}`,
-    projectA: 10,
-    projectB: 20,
-    projectC: 30,
+    projectA: random(1000, 5000),
+    projectB: random(1000, 5000),
+    projectC: random(1000, 5000),
 }));
 const SAMPLE_PIE_CHART_DATA = [
     { category: 'google cloud', value: random(1000, 5000) },
@@ -51,10 +40,10 @@ const SAMPLE_PIE_CHART_DATA = [
     { category: 'alibaba', value: random(1000, 5000) },
 ];
 
-const SAMPLE_XY_SINGLE_CHART = range(4).map((d) => ({
-    date: `2022-${11 + d}`,
-    projectA: random(10000, 50000),
-}));
+// const SAMPLE_XY_SINGLE_CHART = range(4).map((d) => ({
+//     date: `2022-${11 + d}`,
+//     projectA: random(10000, 50000),
+// }));
 
 // const SAMPLE_WIDGET_CONFIG: WidgetConfig = {
 //     widget_name: 'costTrend',
@@ -83,15 +72,43 @@ const SAMPLE_XY_SINGLE_CHART = range(4).map((d) => ({
 //     },
 // };
 
-export default defineComponent<Props>({
+export default defineComponent<WidgetProps>({
     name: 'BaseTrendWidget',
     components: {
         PDataLoader,
     },
     props: {
-        chartType: { // TODO: just for example
+        chartType: {
             type: String,
-            default: 'LINE',
+            default: undefined,
+        },
+        widgetName: {
+            type: String,
+            default: undefined,
+        },
+        options: {
+            type: Object as PropType<WidgetOptions>,
+            default: () => ({}),
+        },
+        inheritOptions: {
+            type: Object,
+            default: () => ({}),
+        },
+        dashboardOptions: {
+            type: Object,
+            default: () => ({}),
+        },
+        size: {
+            type: String,
+            default: WIDGET_SIZE.md,
+        },
+        theme: {
+            type: String,
+            default: 'violet',
+        },
+        widgetKey: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props) {
@@ -102,13 +119,6 @@ export default defineComponent<Props>({
             chartData: SAMPLE_XY_CHART_DATA, // TODO: mock data
             timeUnit: 'month', // TODO: mock data
             labels: ['projectA', 'projectB', 'projectC'], // TODO: mock data
-            chartSeriesDataProcessor: computed<undefined | am5.DataProcessor>(() => {
-                if (!state.chartRoot) return undefined;
-                return am5.DataProcessor.new(state.chartRoot, {
-                    dateFormat: 'yyyy-M', // TODO: will be changed dynamically
-                    dateFields: [DATE_FIELD_NAME],
-                });
-            }),
         });
 
         const {
@@ -119,61 +129,53 @@ export default defineComponent<Props>({
             createPieSeries,
             createXYLineSeries,
             createXYStackedColumnSeries,
-            createXYTooltip,
+            createTooltip,
             disposeRoot,
+            setXYSharedTooltipText,
+            createDataProcessor,
+            setPieTooltipText,
         } = useAmcharts5(toRef(state, 'chartRef'));
 
         /* Util */
         const drawXYChart = (chartType) => {
             const { chart, xAxis } = createXYDateChart();
-            setChartColors(chart, [red[500], gray[500]]);
             xAxis.get('baseInterval').timeUnit = 'month';
 
-            const seriesDefaultSettings: Partial<IXYSeriesSettings> = {};
             state.labels.forEach((label) => {
-                seriesDefaultSettings.name = label;
-                seriesDefaultSettings.valueYField = label;
-                const series: XYSeries = chartType === 'LINE'
-                    ? createXYLineSeries(chart, seriesDefaultSettings)
-                    : createXYStackedColumnSeries(chart, seriesDefaultSettings);
+                const seriesSettings = {
+                    name: label,
+                    valueYField: label,
+                };
+                const series = chartType === 'LINE'
+                    ? createXYLineSeries(chart, seriesSettings)
+                    : createXYStackedColumnSeries(chart, seriesSettings);
 
-                // set processor
-                series.data.processor = state.chartSeriesDataProcessor;
+                // set data processor
+                series.data.processor = createDataProcessor({
+                    dateFormat: 'yyyy-M', // TODO will be changed dynamically
+                    dateFields: [DATE_FIELD_NAME],
+                });
 
                 // tooltip
-                const tooltip = createXYTooltip(chart);
-                setSharedTooltipText(chart, tooltip);
+                const tooltip = createTooltip();
+                setXYSharedTooltipText(chart, tooltip, 'KRW', { KRW: 1200 }); // mock currency
                 series.set('tooltip', tooltip);
 
                 // set data
                 series.data.setAll(SAMPLE_XY_CHART_DATA); // TODO: mock data
             });
         };
-        const drawXYSingleChart = () => {
-            const { chart, xAxis, yAxis } = createXYDateChart();
+        const drawPieChart = (chartType: string) => {
+            const chart = chartType === 'DONUT' ? createDonutChart() : createPieChart();
 
-            const seriesDefaultSettings: IXYSeriesSettings = { xAxis, yAxis };
-            seriesDefaultSettings.name = 'projectA';
-            seriesDefaultSettings.valueYField = 'projectA';
-            const series = createXYStackedColumnSeries(chart, seriesDefaultSettings);
-            series.data.processor = state.chartSeriesDataProcessor;
-
-            // tooltip
-            const tooltip = createXYTooltip(chart);
-            setSingleTooltipText(chart, tooltip, 'KRW', { KRW: 1200 });
-            series.set('tooltip', tooltip);
-
-            // set data
-            series.data.setAll(SAMPLE_XY_SINGLE_CHART); // TODO: mock data
-        };
-        const drawPieChart = (chartRoot: Root, chartType: string) => {
-            const { chart } = chartType === 'DONUT' ? createDonutChart() : createPieChart();
-
-            const seriesSettings: IPieSeriesSettings = {
+            const seriesSettings = {
                 categoryField: 'category', // TODO: will be changed dynamically
                 valueField: 'value', // TODO: will be changed dynamically
             };
             const series = createPieSeries(chart, seriesSettings);
+            const tooltip = createTooltip();
+            setPieTooltipText(series, tooltip, 'KRW', { KRW: 1200 });
+            series.slices.template.set('tooltip', tooltip);
             series.data.setAll(SAMPLE_PIE_CHART_DATA);
         };
 
@@ -183,9 +185,7 @@ export default defineComponent<Props>({
                 if (['LINE', 'STACKED_COLUMN'].includes(props.chartType)) {
                     drawXYChart(props.chartType);
                 } else if (['PIE', 'DONUT'].includes(props.chartType)) {
-                    drawPieChart(chartRoot, props.chartType);
-                } else if (props.chartType === 'SINGLE') {
-                    drawXYSingleChart();
+                    drawPieChart(props.chartType);
                 }
             }
         });
