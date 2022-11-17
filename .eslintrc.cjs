@@ -35,8 +35,9 @@ module.exports = {
         'no-unused-vars': 1,
         'no-mixed-operators': 0,
         'no-promise-executor-return': 1,
+        'no-multiple-empty-lines': 0,
         'prefer-regex-literals': 1,
-        'prefer-const': 1,
+        'prefer-const': 0,
 
         indent: ['error', 4],
         'prefer-destructuring': ['error', { object: false, array: false }],

@@ -18,3 +18,4 @@ const logger = createLogger({
 });
 
 export default DEBUG ? [logger, ...PLUGINS] : PLUGINS;
+// export default DEBUG ? [...PLUGINS] : PLUGINS;
