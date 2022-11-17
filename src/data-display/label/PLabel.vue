@@ -1,6 +1,6 @@
 <template>
     <div class="p-label"
-         :class="{ clickable, active: proxyActive, iconLabel: leftIcon }"
+         :class="{ clickable, active: proxyActive, 'icon-label': leftIcon }"
          @click.stop="handleClickLabel"
     >
         <span class="label-content">
@@ -120,10 +120,13 @@ export default defineComponent<LabelProps>({
     &.clickable {
         cursor: pointer;
 
-        &:hover {
-            @apply bg-blue-200 border-blue-400;
-            .label-content {
-                @apply text-blue-600;
+        @media (hover: hover) {
+            &:hover {
+                @apply bg-blue-200 border-blue-400;
+
+                .label-content {
+                    @apply text-blue-600;
+                }
             }
         }
     }
@@ -133,7 +136,7 @@ export default defineComponent<LabelProps>({
             @apply text-blue-600;
         }
     }
-    &.iconLabel {
+    &.icon-label {
         padding: 0 0.25rem;
     }
 }
