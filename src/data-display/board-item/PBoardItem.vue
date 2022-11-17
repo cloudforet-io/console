@@ -17,7 +17,7 @@
                     <p-icon-button v-for="(iconAction, index) in iconSetList"
                                    :key="`${iconAction.iconName}-desktop-${index}`"
                                    :name="iconAction.iconName"
-                                   @click="iconAction.eventAction"
+                                   @click.stop="iconAction.eventAction"
                     />
                 </div>
             </div>
@@ -34,14 +34,14 @@
                                 <p-icon-button v-for="(iconAction, index) in iconSetList"
                                                :key="`${iconAction.iconName}-context-menu-${index}`"
                                                :name="iconAction.iconName"
-                                               @click="iconAction.eventAction"
+                                               @click.stop="iconAction.eventAction"
                                 />
                             </div>
                         </template>
                     </p-select-dropdown>
                     <p-icon-button v-else-if="iconSetList.length === 1"
                                    :name="iconSetList[0].iconName"
-                                   @click="iconSetList[0].eventAction"
+                                   @click.stop="iconSetList[0].eventAction"
                     />
                 </div>
             </div>
