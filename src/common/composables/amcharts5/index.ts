@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import * as am5 from '@amcharts/amcharts5';
-import type { ITooltipSettings, Root } from '@amcharts/amcharts5';
+import type { IDataProcessorSettings, ITooltipSettings, Root } from '@amcharts/amcharts5';
 import type { IPieChartSettings } from '@amcharts/amcharts5/.internal/charts/pie/PieChart';
 import type { PieChart, IPieSeriesSettings } from '@amcharts/amcharts5/percent';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
@@ -12,11 +12,36 @@ import type { IXYChartSettings, IXYSeriesSettings, XYChart } from '@amcharts/amc
 
 import { Amcharts5GlobalTheme } from '@/lib/site-initializer/amcharts5';
 
-import { createDonutChart, createPieChart, createPieSeries } from '@/common/composables/amcharts5/pie-chart-helper';
-import type { ChartContext } from '@/common/composables/amcharts5/type';
 import {
-    createXYCategoryChart, createXYDateChart, createXYLineSeries, createXYStackedColumnSeries, createXYTooltip,
+    createDonutChart, createPieChart, createPieSeries, setPieTooltipText,
+} from '@/common/composables/amcharts5/pie-chart-helper';
+import type { ChartContext } from '@/common/composables/amcharts5/type';
+import { DATE_FIELD_NAME } from '@/common/composables/amcharts5/type';
+import {
+    createXYCategoryChart, createXYDateChart, createXYLineSeries, createXYStackedColumnSeries,
+    setXYSharedTooltipText, setXYSingleTooltipText,
 } from '@/common/composables/amcharts5/xy-chart-helper';
+
+import { gray, white } from '@/styles/colors';
+
+const createTooltip = (root: Root, settings?: ITooltipSettings): am5.Tooltip => {
+    const tooltip = am5.Tooltip.new(root, {
+        getFillFromSprite: false,
+        autoTextColor: false,
+        ...settings,
+    });
+    tooltip.get('background')?.setAll({
+        fill: am5.color(white),
+        stroke: am5.color(gray[300]),
+        fillOpacity: 0.9,
+    });
+    tooltip.label.setAll({
+        text: `[${gray[700]}]{valueX}[/]`,
+        fill: am5.color(gray[800]),
+        fontSize: 12,
+    });
+    return tooltip;
+};
 
 export const useAmcharts5 = (
     chartContext: Ref<ChartContext>,
@@ -43,6 +68,20 @@ export const useAmcharts5 = (
 
     const clearChildrenOfRoot = () => {
         if (state.root) state.root.container.children.clear();
+    };
+
+    const setChartColors = (chart: am5.SerialChart, colors: string[]) => {
+        const am5ColorSet = colors.map((color) => am5.color(color));
+        chart.get('colors')?.set('colors', am5ColorSet);
+    };
+
+    const createDataProcessor = (settings?: IDataProcessorSettings): undefined|am5.DataProcessor => {
+        if (!state.root) return undefined;
+        return am5.DataProcessor.new(state.root as Root, {
+            dateFormat: 'yyyy-M',
+            dateFields: [DATE_FIELD_NAME],
+            ...settings,
+        });
     };
 
     watch(() => state.chartContext, (ctx) => {
@@ -88,9 +127,14 @@ export const useAmcharts5 = (
             return createPieSeries(state.root as Root, chart, settings);
         },
         //
-        createXYTooltip: (chart: XYChart, settings?: ITooltipSettings) => {
+        createTooltip: (settings?: ITooltipSettings) => {
             if (!state.root) throw new Error('No root');
-            return createXYTooltip(state.root as Root, chart, settings);
+            return createTooltip(state.root as Root, settings);
         },
+        setXYSharedTooltipText,
+        setXYSingleTooltipText,
+        setPieTooltipText,
+        setChartColors,
+        createDataProcessor,
     };
 };

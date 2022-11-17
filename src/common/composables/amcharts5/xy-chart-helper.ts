@@ -1,33 +1,19 @@
-import type { ITooltipSettings, Root } from '@amcharts/amcharts5';
+import type { Root } from '@amcharts/amcharts5';
 import * as am5 from '@amcharts/amcharts5';
 import type { IXYAxis } from '@amcharts/amcharts5/.internal/charts/xy/series/XYSeries';
 import type { IXYChartSettings, IXYSeriesSettings } from '@amcharts/amcharts5/xy';
 import * as am5xy from '@amcharts/amcharts5/xy';
 
+import type { Currency } from '@/store/modules/display/config';
+import type { CurrencyRates } from '@/store/modules/display/type';
+
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
 import { DATE_FIELD_NAME, CATEGORY_FIELD_NAME } from '@/common/composables/amcharts5/type';
 
-import { gray, white } from '@/styles/colors';
+import { gray } from '@/styles/colors';
 
-export const createXYTooltip = (root: Root, chart: am5xy.XYChart, settings?: ITooltipSettings): am5.Tooltip => {
-    const tooltip = am5.Tooltip.new(root, {
-        getFillFromSprite: false,
-        getStrokeFromSprite: false,
-        autoTextColor: false,
-        ...settings,
-    });
-    tooltip.get('background')?.setAll({
-        fill: am5.color(white),
-        stroke: am5.color(gray[300]),
-        fillOpacity: 0.9,
-    });
-    tooltip.label.setAll({
-        text: `[${gray[700]}]{valueX}[/]`,
-        fill: am5.color(gray[800]),
-        fontSize: 12,
-    });
-    return tooltip;
-};
-
+// Chart
 const createXYChart = (root: Root, settings?: IXYChartSettings): am5xy.XYChart => {
     const cursor = am5xy.XYCursor.new(root, {});
     cursor.lineX.setAll({
@@ -127,11 +113,12 @@ export const createXYCategoryChart = (root: Root, settings?: IXYChartSettings): 
     return { chart, xAxis, yAxis };
 };
 
+// Series
 export const createXYLineSeries = (
     root: Root,
     chart: am5xy.XYChart,
     settings?: Partial<IXYSeriesSettings>,
-): am5xy.LineSeries => {
+): am5xy.XYSeries => {
     const series = chart.series.push(am5xy.LineSeries.new(root, {
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
@@ -148,10 +135,42 @@ export const createXYStackedColumnSeries = (
     root: Root,
     chart: am5xy.XYChart,
     settings?: Partial<IXYSeriesSettings>,
-): am5xy.ColumnSeries => chart.series.push(am5xy.ColumnSeries.new(root, {
+): am5xy.XYSeries => chart.series.push(am5xy.ColumnSeries.new(root, {
     xAxis: chart.xAxes.getIndex(0) as IXYAxis,
     yAxis: chart.yAxes.getIndex(0) as IXYAxis,
     stacked: true,
     valueXField: DATE_FIELD_NAME,
     ...settings,
 }));
+
+// Tooltip
+export const setXYSharedTooltipText = (chart: am5xy.XYChart, tooltip: am5.Tooltip, currency?: Currency, currencyRate?: CurrencyRates): void => {
+    tooltip.label.adapters.add('text', (text, target) => {
+        let _text = `[${gray[700]}]{valueX}[/]`;
+        chart.series.each((s) => {
+            const fieldName = s.get('valueYField') || '';
+            let value = target.dataItem?.dataContext?.[fieldName];
+            if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
+            _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
+        });
+        return _text;
+    });
+};
+
+export const setXYSingleTooltipText = (chart: am5xy.XYChart, tooltip: am5.Tooltip, currency?: Currency, currencyRate?: CurrencyRates): void => {
+    let strokeColor;
+    let fieldName;
+    chart.series.each((series) => {
+        strokeColor = series.get('stroke')?.toString();
+        fieldName = series.get('name');
+    });
+    tooltip.label.setAll({
+        fill: am5.color(gray[900]),
+        fontSize: 14,
+    });
+    tooltip.label.adapters.add('text', (_, target) => {
+        let value = target.dataItem?.dataContext?.[fieldName];
+        if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
+        return `[${strokeColor};fontSize: 10px]●[/] {valueX}: [bold]${value}[/]`;
+    });
+};
