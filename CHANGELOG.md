@@ -1,3 +1,10 @@
+# [1.1.0-beta.454](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.453...v1.1.0-beta.454) (2022-11-17)
+
+
+### Features
+
+* **board:** create `PBoard` component ([#135](https://github.com/cloudforet-io/mirinae/issues/135)) ([5dd8ebb](https://github.com/cloudforet-io/mirinae/commit/5dd8ebb8f781a9f9683800b7239e7f3c39e98dfd))
+
 # [1.1.0-beta.453](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.452...v1.1.0-beta.453) (2022-11-15)
 
 
