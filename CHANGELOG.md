@@ -1,3 +1,10 @@
+# [1.1.0-beta.455](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.454...v1.1.0-beta.455) (2022-11-17)
+
+
+### Features
+
+* **label:** create `PLabel` component ([#136](https://github.com/cloudforet-io/mirinae/issues/136)) ([c232444](https://github.com/cloudforet-io/mirinae/commit/c232444186d3ed7ec2dfc9af21643974baa9990d))
+
 # [1.1.0-beta.454](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.453...v1.1.0-beta.454) (2022-11-17)
 
 
