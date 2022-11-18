@@ -4,6 +4,7 @@ import process from 'process';
 import vuePlugin from '@vitejs/plugin-vue2';
 import { defineConfig, loadEnv } from 'vite';
 import StylelintPlugin from 'vite-plugin-stylelint';
+import VueTypeImports from 'vite-plugin-vue-type-imports'
 
 export default defineConfig(({ command, mode }) => {
     process.env = {...process.env, ...loadEnv(mode, process.cwd())};
@@ -13,6 +14,7 @@ export default defineConfig(({ command, mode }) => {
     return {
         plugins: [
             vuePlugin(),
+            VueTypeImports(),
             StylelintPlugin({
                 include: ['src/**/*.{css,vue,pcss,scss}'],
                 exclude: ['node_modules'],
