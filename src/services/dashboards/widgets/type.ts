@@ -7,68 +7,53 @@ import type { Tags } from '@/models';
 
 import type { Currency } from '@/store/modules/display/config';
 
-import type { GRANULARITY, WIDGET_SIZE, GROUP_BY } from './config';
+import type { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';
+
+import type {
+    GRANULARITY, WIDGET_SIZE, GROUP_BY,
+} from './config';
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
 export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
+type WidgetScope = 'DOMAIN'|'WORKSPACE'|'PROJECT';
 
 export interface WidgetConfig {
-    widget_name: string; // unique name
-    title: string;
-    labels: string[];
+    widget_config_id: string;
+    widget_component: string;
+    base_configs?: string[];
+    title?: string;
+    labels?: string[];
 
     description?: {
         translation_id?: string;
         preview_image?: string;
-        chart_type?: string;
     };
-    scopes: Array<'DOMAIN'|'WORKSPACE'|'PROJECT'>;
+    scopes: WidgetScope[];
 
-    theme: {
+    theme?: {
         inherit?: boolean;
         inherit_count?: number;
     };
-    link?: WidgetLink;
 
     sizes: WidgetSize[];
-    widget_options_schema: object;
-
-    base_widget_name?: string;
-    widget_options: WidgetOptions;
+    widget_options?: WidgetOptions;
+    widget_options_schema?: object;
 }
 
-interface WidgetLink {
-    enabled?: boolean;
-    external?: boolean;
-    location: Location; // Vue Router spec
-}
-type Dictionary<T> = { [key: string]: T };
-interface Location {
-    name?: string;
-    path?: string;
-    hash?: string;
-    query?: Dictionary<string | (string | null)[] | null | undefined>;
-    params?: Dictionary<string>;
-    version: string;
-}
-
+type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 interface WidgetOptions {
+    date_range?: { start?: string; end?: string; };
     currency?: Currency;
-    date_range?: { start: string; end?: string; };
-    stack?: boolean;
-    granularity?: Granularity;
-    enable_legends: boolean;
-    dynamic_widget_type?: DynamicWidgetType;
     group_by?: string[];
-    datetime_range?: { start: string; end?: string; };
-    page?: { start?: number; limit: number; };
-    sort?: Array<{ key: string; desc: boolean; }>;
-    field?: { string: { key?: string; operator: string; } };
-    field_options?: Record<string, DynamicField>;
-    // value_options?: DynamicField;
-    // name_options?: DynamicField;
+    granularity?: Granularity;
+    stacked?: boolean;
+    enable_legend?: boolean;
+    chart_type?: ChartType;
     filter?: QueryStoreFilter[];
+    dynamic_widget_type?: DynamicWidgetType;
+    name_options?: DynamicField;
+    value_options?: DynamicField;
 }
 
 export interface DashboardLayoutWidgetInfo {

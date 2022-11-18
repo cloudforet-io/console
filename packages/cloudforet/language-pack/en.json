@@ -1102,6 +1102,13 @@
 			}
 		}
 	},
+	"DASHBOARDS": {
+		"WIDGET": {
+			"MONTHLY_COST": {
+				"DESC": ""
+			}
+		}
+	},
 	"IAM": {
 		"POLICY": {
 			"FORM": {
