@@ -34,14 +34,12 @@ const oneLineRealignment = (oneLineArray, containerWidth: number): Array<number>
         let oneLineSum = 0;
         realignedList = [];
 
-
-        sequenceAry.unshift(i);
-        console.log(i);
         for (let k = 0; k < oneLineArray.length; k += 1) {
+            sequenceAry.unshift(i);
             oneLineSum += oneLineArray[k][sequenceAry[k]];
-            if (oneLineSum >= containerWidth) { break; }
-            console.log(sequenceAry, k);
+            if (oneLineSum >= containerWidth) { sequenceAry.shift(); }
             realignedList.push(oneLineArray[k][sequenceAry[k]]);
+            if (oneLineSum >= containerWidth) { break; }
         }
         if (oneLineSum > containerWidth) break;
     }
