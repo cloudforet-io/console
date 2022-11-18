@@ -17,7 +17,7 @@ const oneLineFirstChooser = (cardSizeList: Array<string>, containerWidth: number
     // 1: 기본 사이즈로 컨테이너 크기와 비교 후 1개 라인의 배열 생성
     for (let i = 0; i < cardSizeList.length; i += 1) {
         oneLineSum += sizeExtractor(cardSizeList[i])[0];
-        if (oneLineSum >= containerWidth) {
+        if (oneLineSum > containerWidth) {
             return oneLineArray;
         }
         oneLineArray.push(sizeExtractor(cardSizeList[i]));
@@ -36,17 +36,12 @@ const oneLineRealignment = (oneLineArray, containerWidth: number): Array<number>
         for (let k = 0; k < oneLineArray.length; k += 1) {
             realignedList = [];
             oneLineSum = 0;
+            sequenceAry.unshift(i);
             for (let l = 0; l < oneLineArray.length; l += 1) {
                 oneLineSum += oneLineArray[l][sequenceAry[l]];
-            }
-            for (let l = 0; l < oneLineArray.length; l += 1) {
                 realignedList.push(oneLineArray[l][sequenceAry[l]]);
             }
-            sequenceAry.unshift(i);
-            if (oneLineSum >= containerWidth) {
-                console.log(realignedList);
-                break;
-            }
+            if (oneLineSum >= containerWidth) break;
         }
         if (oneLineSum >= containerWidth) break;
     }
