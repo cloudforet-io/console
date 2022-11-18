@@ -1,26 +1,20 @@
 <template>
-    <div />
+    <widget-frame :title="state.title"
+                  :size="state.size"
+                  :width="props.width"
+    >
+        <!-- TODO: implementation -->
+    </widget-frame>
 </template>
 
-<script lang="ts">
-import {
-    defineComponent, reactive, toRefs,
-} from 'vue';
+<script setup lang="ts">
+import { defineProps } from 'vue';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface Props {
-}
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import type { WidgetProps } from '@/services/dashboards/widgets/config';
+// eslint-disable-next-line import/no-cycle
+import { useWidgetData } from '@/services/dashboards/widgets/use-widget-data';
 
-export default defineComponent<Props>({
-    name: 'MonthlyCostWidget',
-    components: {},
-    props: {},
-    setup() {
-        const state = reactive({});
-
-        return {
-            ...toRefs(state),
-        };
-    },
-});
+const props = defineProps<WidgetProps>();
+const state = useWidgetData(props);
 </script>
