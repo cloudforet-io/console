@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/type';
 
 const monthlyCostWidgetConfig: WidgetConfig = {
     widget_config_id: 'monthlyCost',
-    widget_component: 'MonthlyCost',
+    widget_component: 'monthly-cost/MonthlyCostWidget.vue',
     title: 'Monthly Cost',
     labels: ['Cost'],
     description: {

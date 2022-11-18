@@ -4,8 +4,8 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/type';
 
 const costAnalysisQueryWidgetConfig: WidgetConfig = {
     widget_config_id: 'costAnalysisQuery',
-    widget_component: 'CostAnalysisQueryWidget',
-    title: 'Monthly Cost',
+    widget_component: 'cost-analysis-query/CostAnalysisQueryWidget.vue',
+    title: 'Cost Analysis Query',
     labels: ['Cost'],
     description: {
     },
