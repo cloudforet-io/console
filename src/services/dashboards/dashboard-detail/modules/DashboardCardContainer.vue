@@ -5,7 +5,7 @@
         <p v-for="(item, index) in cardWidthList"
            :key="index"
         >
-            {{ item }} {{ containerWidth }}
+            {{ item }} {{ containerWidth - (containerWidth % 80) }}
         </p>
     </div>
 </template>
@@ -58,7 +58,7 @@ export default defineComponent({
 
         watch(() => state.containerWidth, (containerWidth: number) => {
             // state.cardWidthList = listMap(props.cardSizeList, containerWidth - (containerWidth % 80));
-            state.cardWidthList = listMap(['MD', 'XL', 'SM', 'LG', 'LG', 'SM'], containerWidth - (containerWidth % 80));
+            state.cardWidthList = listMap(['MD', 'MD', 'SM', 'MD', 'LG', 'SM'], containerWidth - (containerWidth % 80));
         });
 
         return { containerRef, ...toRefs(state) };

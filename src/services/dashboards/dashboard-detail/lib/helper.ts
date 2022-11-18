@@ -32,16 +32,23 @@ const oneLineRealignment = (oneLineArray, containerWidth: number): Array<number>
     // size 리스트로 i가 돌잖아? 근데 size 는 3개만 있으니까 i는 3 고정으로 해도 될거같아.
     for (let i = 1; i < 3; i += 1) {
         let oneLineSum = 0;
-        realignedList = [];
 
         for (let k = 0; k < oneLineArray.length; k += 1) {
+            realignedList = [];
+            oneLineSum = 0;
+            for (let l = 0; l < oneLineArray.length; l += 1) {
+                oneLineSum += oneLineArray[l][sequenceAry[l]];
+            }
+            for (let l = 0; l < oneLineArray.length; l += 1) {
+                realignedList.push(oneLineArray[l][sequenceAry[l]]);
+            }
             sequenceAry.unshift(i);
-            oneLineSum += oneLineArray[k][sequenceAry[k]];
-            if (oneLineSum >= containerWidth) { sequenceAry.shift(); }
-            realignedList.push(oneLineArray[k][sequenceAry[k]]);
-            if (oneLineSum >= containerWidth) { break; }
+            if (oneLineSum >= containerWidth) {
+                console.log(realignedList);
+                break;
+            }
         }
-        if (oneLineSum > containerWidth) break;
+        if (oneLineSum >= containerWidth) break;
     }
     return realignedList;
 };
