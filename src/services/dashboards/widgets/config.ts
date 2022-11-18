@@ -1,63 +1,15 @@
-// base widgets
-import baseHorizontal from './_base/base-horizontal/widget-config';
-import baseMap from './_base/base-map/widget-config';
-import basePie from './_base/base-pie/widget-config';
-import baseRegion from './_base/base-region/widget-config';
-import baseTrend from './_base/base-trend/widget-config';
-// console widgets
-import awsCloudFrontCost from './aws-cloud-front-cost/widget-config';
-import awsDataTransferByRegion from './aws-data-transfer-by-region/widget-config';
-import awsDataTransferCostTrend from './aws-data-transfer-cost-trend/widget-config';
-import budgetStatus from './budget-status/widget-config';
-import budgetUsageSummary from './budget-usage-summary/widget-config';
-import budgetUsageWithForecast from './budget-usage-with-forecast/widget-config';
-import costByRegion from './cost-by-region/widget-config';
-import costDonut from './cost-donut/widget-config';
-import costMap from './cost-map/widget-config';
-import costPie from './cost-pie/widget-config';
-import costTrendStacked from './cost-trend-stacked/widget-config';
-import costTrend from './cost-trend/widget-config';
-import monthlyCost from './monthly-cost/widget-config';
+import type { AsyncComponent } from 'vue';
 
-export const CONSOLE_WIDGET_ORDER = [
-    'monthlyCost',
-    'budgetUsageSummary',
-    'costMap',
-    'costTrend',
-    'awsDataTransferCostTrend',
-    'costTrendStacked',
-    'awsCloudFrontCost',
-    'costDonut',
-    'costByRegion',
-    'awsDataTransferByRegion',
-    'budgetStatus',
-    'budgetUsageWithForecast',
-    'costPie',
-];
+import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicWidgetType } from '@spaceone/design-system/src/data-display/dynamic/dynamic-widget/type';
 
-export const CONSOLE_WIDGET_CONFIGS = {
-    monthlyCost,
-    budgetUsageSummary,
-    costMap,
-    costTrend,
-    awsDataTransferCostTrend,
-    costTrendStacked,
-    awsCloudFrontCost,
-    costDonut,
-    costByRegion,
-    awsDataTransferByRegion,
-    budgetStatus,
-    budgetUsageWithForecast,
-    costPie,
-};
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
-export const BASE_WIDGET_CONFIGS = {
-    baseTrend,
-    baseRegion,
-    baseHorizontal,
-    basePie,
-    baseMap,
-};
+import type { Tags } from '@/models';
+
+import type { Currency } from '@/store/modules/display/config';
+
+import type { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';
 
 export const WIDGET_SIZE = {
     sm: 'sm',
@@ -86,3 +38,83 @@ export const GROUP_BY = {
     TYPE: 'usage_type',
     ACCOUNT: 'account',
 } as const;
+
+export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
+export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
+export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
+type WidgetScope = 'DOMAIN'|'WORKSPACE'|'PROJECT';
+
+interface BaseConfigInfo {
+    config_id: string;
+    version?: string;
+}
+export interface WidgetConfig {
+    widget_config_id: string;
+    widget_component?: AsyncComponent;
+    base_configs?: BaseConfigInfo[];
+    title?: string;
+    labels?: string[];
+
+    description?: {
+        translation_id?: string;
+        preview_image?: string;
+    };
+    scopes: WidgetScope[];
+
+    theme?: {
+        inherit?: boolean;
+        inherit_count?: number;
+    };
+
+    sizes: WidgetSize[];
+    widget_options?: WidgetOptions;
+    widget_options_schema?: object;
+}
+
+type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
+export interface WidgetOptions {
+    date_range?: { start?: string; end?: string; };
+    currency?: Currency;
+    group_by?: string[];
+    granularity?: Granularity;
+    stacked?: boolean;
+    enable_legend?: boolean;
+    chart_type?: ChartType;
+    filter?: QueryStoreFilter[];
+    dynamic_widget_type?: DynamicWidgetType;
+    name_options?: DynamicField;
+    value_options?: DynamicField;
+}
+
+export interface DashboardLayoutWidgetInfo {
+    widget_name: string; // widget config name
+    title: string; // widget title
+    widget_options: WidgetOptions;
+    size: WidgetSize;
+    version: string; // widget config version
+    inherit_options: InheritOptions; // inherit information for the widget option
+}
+export type InheritOptions = Record<string, {
+    enabled?: boolean;
+}>;
+
+export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
+    custom_widget_id: string;
+    user_id: string;
+    tags: Tags;
+    domain_id: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface WidgetProps {
+    widgetConfigId: string;
+    title?: string;
+    options?: WidgetOptions;
+    inheritOptions?: InheritOptions;
+    dashboardOptions?: object;
+    size?: WidgetSize;
+    width?: number;
+    theme?: string; // e.g. 'violet', 'coral', 'peacock', ... default: violet
+    widgetKey: string; // unique widget key to identify widgets in layout
+}
