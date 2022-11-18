@@ -1,3 +1,5 @@
+import type { WidgetConfig } from '@/services/dashboards/widgets/type';
+
 // base widgets
 import baseHorizontal from './_base/base-horizontal/widget-config';
 import baseMap from './_base/base-map/widget-config';
@@ -35,7 +37,7 @@ export const CONSOLE_WIDGET_ORDER = [
     'costPie',
 ];
 
-export const CONSOLE_WIDGET_CONFIGS = {
+export const CONSOLE_WIDGET_CONFIGS: Record<string, WidgetConfig> = {
     monthlyCost,
     budgetUsageSummary,
     costMap,
@@ -51,7 +53,7 @@ export const CONSOLE_WIDGET_CONFIGS = {
     costPie,
 };
 
-export const BASE_WIDGET_CONFIGS = {
+export const BASE_WIDGET_CONFIGS: Record<string, WidgetConfig> = {
     baseTrend,
     baseRegion,
     baseHorizontal,

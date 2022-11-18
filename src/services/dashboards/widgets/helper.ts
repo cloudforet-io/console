@@ -1,28 +1,41 @@
 import type { AsyncComponent } from 'vue';
 import type { ImportedComponent } from 'vue/types/options';
 
-import { kebabCase, merge, startCase } from 'lodash';
+import { merge } from 'lodash';
 
 import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/type';
 
 const widgetConfigCacheMap = {};
-export const getWidgetConfig = (widgetName: string): WidgetConfig => {
-    const config = CONSOLE_WIDGET_CONFIGS[widgetName];
-    if (!config?.base_widget_name) return config;
+export const getWidgetConfig = (widgetConfigId: string): WidgetConfig => {
+    if (widgetConfigCacheMap[widgetConfigId]) return widgetConfigCacheMap[widgetConfigId];
 
-    if (!widgetConfigCacheMap[widgetName]) {
-        const baseWidgetName = config?.base_widget_name;
-        widgetConfigCacheMap[widgetName] = merge({}, BASE_WIDGET_CONFIGS[baseWidgetName], config);
+    const config = CONSOLE_WIDGET_CONFIGS[widgetConfigId];
+    if (!config?.base_configs) {
+        widgetConfigCacheMap[widgetConfigId] = config;
+        return config;
     }
-    return widgetConfigCacheMap[widgetName];
+
+    if (!widgetConfigCacheMap[widgetConfigId]) {
+        const baseWidgetConfigs = config.base_configs;
+        widgetConfigCacheMap[widgetConfigId] = merge(
+            {},
+            baseWidgetConfigs.map((baseConfigId) => {
+                const baseConfig = BASE_WIDGET_CONFIGS[baseConfigId];
+                if (!baseConfig) throw new Error(`[No matched base widget config] ${baseConfigId} base widget config is not exist.`);
+                return baseConfig;
+            }),
+            config,
+        );
+    }
+    return widgetConfigCacheMap[widgetConfigId];
 };
 
-export const getWidgetComponent = (widgetName: string): AsyncComponent => {
-    const config = getWidgetConfig(widgetName);
-    const baseWidgetName = config?.base_widget_name;
-    const componentName = baseWidgetName ?? widgetName;
+export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {
+    const config = getWidgetConfig(widgetConfigId);
+    if (!config) throw new Error(`[No matched widget config] ${widgetConfigId} widget config is not exist.`);
+    const widgetComponent = config.widget_component;
     return () => ({
-        component: import(`./${baseWidgetName ? '_base/' : ''}${kebabCase(componentName)}/${startCase(componentName)}Widget.vue`) as Promise<ImportedComponent>,
+        component: import(`./${widgetComponent}`) as Promise<ImportedComponent>,
     });
 };

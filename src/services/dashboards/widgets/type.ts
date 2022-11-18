@@ -79,7 +79,7 @@ export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
 
 // component spec
 export interface WidgetProps {
-    widgetName: string;
+    widgetConfigId: string;
     title?: string;
     options?: WidgetOptions;
     inheritOptions?: InheritOptions;
