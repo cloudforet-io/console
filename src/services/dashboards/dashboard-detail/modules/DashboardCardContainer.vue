@@ -2,7 +2,11 @@
     <div ref="containerRef"
          class="dashboard-card-container"
     >
-        container
+        <p v-for="(item, index) in cardWidthList"
+           :key="index"
+        >
+            {{ item }} {{ containerWidth }}
+        </p>
     </div>
 </template>
 
@@ -25,7 +29,7 @@ export default defineComponent({
             default: () => exampleList,
         },
     },
-    setup(props) {
+    setup() {
         const state = reactive({
             containerWidth: CONTAINER_MIN_WIDTH,
             cardWidthList: [[]] as Array<Array<number>>,
@@ -53,7 +57,8 @@ export default defineComponent({
         });
 
         watch(() => state.containerWidth, (containerWidth: number) => {
-            state.cardWidthList = listMap(props.cardSizeList, containerWidth);
+            // state.cardWidthList = listMap(props.cardSizeList, containerWidth - (containerWidth % 80));
+            state.cardWidthList = listMap(['MD', 'XL', 'SM', 'LG', 'LG', 'SM'], containerWidth - (containerWidth % 80));
         });
 
         return { containerRef, ...toRefs(state) };
