@@ -8,6 +8,9 @@ const DashboardCreatePage = () => import('@/services/dashboards/dashboard-create
 const DashboardCustomizePage = () => import('@/services/dashboards/dashboard-customize/DashboardCustomizePage.vue');
 const DashboardDetailPage = () => import('@/services/dashboards/dashboard-detail/DashboardDetailPage.vue');
 
+// TODO: remove after test
+const WidgetPreviewPage = () => import('@/services/dashboards/widgets/WidgetsPreviewPage.vue');
+
 const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
     name: DASHBOARDS_ROUTE._NAME,
@@ -28,6 +31,12 @@ const dashboardsRoute: RouteConfig = {
                     path: 'create',
                     name: DASHBOARDS_ROUTE.CREATE._NAME,
                     component: DashboardCreatePage,
+                },
+                // TODO: remove after test
+                {
+                    path: 'widgets/:widgetId',
+                    props: true,
+                    component: WidgetPreviewPage,
                 },
                 {
                     path: ':dashboardId?',
