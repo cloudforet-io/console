@@ -1,8 +1,10 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/type';
+import type { WidgetConfig } from '@/services/dashboards/widgets/config';
 
 const monthlyCostWidgetConfig: WidgetConfig = {
     widget_config_id: 'monthlyCost',
-    widget_component: 'monthly-cost/MonthlyCostWidget.vue',
+    widget_component: () => ({
+        component: import('@/services/dashboards/widgets/monthly-cost/MonthlyCostWidget.vue'),
+    }),
     title: 'Monthly Cost',
     labels: ['Cost'],
     description: {

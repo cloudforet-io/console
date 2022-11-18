@@ -1,3 +1,3 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/type';
+import type { WidgetConfig } from '@/services/dashboards/widgets/config';
 
 export default {} as WidgetConfig;

@@ -1,10 +1,12 @@
 import { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/config';
-import type { WidgetConfig } from '@/services/dashboards/widgets/type';
+import type { WidgetConfig } from '@/services/dashboards/widgets/config';
 
 const costAnalysisQueryWidgetConfig: WidgetConfig = {
     widget_config_id: 'costAnalysisQuery',
-    widget_component: 'cost-analysis-query/CostAnalysisQueryWidget.vue',
+    widget_component: () => ({
+        component: import('@/services/dashboards/widgets/cost-analysis-query/CostAnalysisQueryWidget.vue'),
+    }),
     title: 'Cost Analysis Query',
     labels: ['Cost'],
     description: {
