@@ -10,19 +10,36 @@ const cardSizeExtractor = (s: string): Array<number> => {
     return [0];
 };
 
-const oneLineFirstChooser = (cardSizeList: Array<string>, containerWidth: number): Array<Array<number>> => {
+const oneLineFirstChooser = (cardSizeList: Array<string>, containerWidth: number): Array<Array<Array<number>>> => {
+    const retAry: Array<Array<Array<number>>> = [];
+    // shift() 수행하기 때문에 미리 length 저장해두어야 함.
+    const cardSizeListLen = cardSizeList.length;
     let oneLineSum = 0;
-    const oneLineArray: Array<Array<number>> = [];
+    let oneLineArray: Array<Array<number>> = [];
 
     // 1: 기본 사이즈로 컨테이너 크기와 비교 후 1개 라인의 배열 생성
-    for (let i = 0; i < cardSizeList.length; i += 1) {
-        oneLineSum += cardSizeExtractor(cardSizeList[i])[0];
+    for (let i = 0; i < cardSizeListLen; i += 1) {
+        const selected: Array<number> = cardSizeExtractor(cardSizeList.shift() as string);
+        oneLineSum += selected[0];
+        console.log('shift', oneLineSum);
         if (oneLineSum > containerWidth) {
-            return oneLineArray;
+            console.log('! push', oneLineSum);
+            retAry.push(oneLineArray);
+            oneLineArray = [];
+            oneLineSum = selected[0];
+        } else {
+            console.log('no push', oneLineSum);
         }
-        oneLineArray.push(cardSizeExtractor(cardSizeList[i]));
+        oneLineArray.push(selected);
     }
-    return [[0]];
+
+    // 마지막 원소 고려
+    if (oneLineArray.length) {
+        retAry.push(oneLineArray);
+    }
+
+    console.log('ret', retAry);
+    return retAry;
 };
 
 const oneLineRealignment = (oneLineArray, containerWidth: number): Array<number> => {
@@ -50,16 +67,16 @@ export const listMap = (cardSizeList: Array<string>, containerWidth: number): Ar
     const ary: Array<Array<number>> = [];
     const firstChosen = oneLineFirstChooser(cardSizeList, containerWidth);
 
-    let oneLineSum = 0;
-    firstChosen?.forEach((d) => { oneLineSum += d[0]; });
-
-    // 2: 기본 사이즈로 정렬이 된다면 그대로 리턴
-    if (oneLineSum === containerWidth) {
-        ary.push(firstChosen?.map((d) => d[0]));
-    // 3: else, 앞에 위치한 카드부터 1씩 크기 증가시킴
-    } else {
-        ary.push(oneLineRealignment(firstChosen, containerWidth));
-    }
+    // let oneLineSum = 0;
+    // firstChosen?.forEach((d) => { oneLineSum += d[0]; });
+    //
+    // // 2: 기본 사이즈로 정렬이 된다면 그대로 리턴
+    // if (oneLineSum === containerWidth) {
+    //     ary.push(firstChosen?.map((d) => d[0]));
+    // // 3: else, 앞에 위치한 카드부터 1씩 크기 증가시킴
+    // } else {
+    ary.push(oneLineRealignment(firstChosen, containerWidth));
+    // }
 
     return ary;
 };
