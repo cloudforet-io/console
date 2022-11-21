@@ -31,7 +31,6 @@ export const getWidgetConfig = (widgetConfigId: string): WidgetConfig => {
 export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {
     const config = getWidgetConfig(widgetConfigId);
     if (!config) throw new Error(`No matching widget configuration found. ${widgetConfigId} does not exist.`);
-    console.debug('config', config);
     const widgetComponent = config.widget_component;
     if (!widgetComponent) throw new Error(`No matching widget component found. ${widgetComponent} does not exist.`);
 
