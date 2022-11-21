@@ -18,7 +18,7 @@ export const getWidgetConfig = (widgetConfigId: string): WidgetConfig => {
     const baseWidgetConfigs = config.base_configs;
     widgetConfigCacheMap[widgetConfigId] = merge(
         {},
-        baseWidgetConfigs.map(({ config_id: baseConfigId }) => {
+        ...baseWidgetConfigs.map(({ config_id: baseConfigId }) => {
             const baseConfig = BASE_WIDGET_CONFIGS[baseConfigId];
             if (!baseConfig) throw new Error(`No matching base widget configuration found. ${baseConfigId} does not exist.`);
             return baseConfig;
@@ -31,7 +31,7 @@ export const getWidgetConfig = (widgetConfigId: string): WidgetConfig => {
 export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {
     const config = getWidgetConfig(widgetConfigId);
     if (!config) throw new Error(`No matching widget configuration found. ${widgetConfigId} does not exist.`);
-
+    console.debug('config', config);
     const widgetComponent = config.widget_component;
     if (!widgetComponent) throw new Error(`No matching widget component found. ${widgetComponent} does not exist.`);
 
