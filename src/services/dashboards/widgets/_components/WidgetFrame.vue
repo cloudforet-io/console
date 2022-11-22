@@ -23,19 +23,14 @@
             </div>
             <div class="footer-right">
                 <slot name="footer-right">
-                    <component :is="fullDataTag"
-                               v-if="(widgetLink || widgetRoute) && !printMode"
-                               :href="widgetLink"
-                               :to="widgetRoute"
-                               class="anchor-button"
+                    <p-anchor v-if="(widgetLink || widgetRoute) && !printMode"
+                              :href="widgetLink"
+                              :to="widgetRoute"
+                              class="anchor-button"
+                              icon-name="ic_arrow_right"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
-                        <p-i name="ic_arrow_right"
-                             width="1rem"
-                             height="1rem"
-                             color="inherit transparent"
-                        />
-                    </component>
+                    </p-anchor>
                 </slot>
             </div>
         </div>
@@ -50,7 +45,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import type { Route } from 'vue-router';
 
-import { PDivider, PI } from '@spaceone/design-system';
+import { PAnchor, PDivider } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { i18n } from '@/translations';
@@ -62,8 +57,6 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { WidgetOptions, WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
-
-import CurrencySelectDropdown from './CurrencySelectDropdown.vue';
 
 interface Props {
     title: string;
@@ -81,9 +74,8 @@ interface Props {
 export default defineComponent<Props>({
     name: 'WidgetFrame',
     components: {
-        CurrencySelectDropdown,
+        PAnchor,
         PDivider,
-        PI,
     },
     props: {
         title: {
@@ -132,7 +124,6 @@ export default defineComponent<Props>({
         const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
         const state = reactive({
             isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
-            fullDataTag: computed<string>(() => (props.widgetLink ? 'a' : 'router-link')),
             dateLabel: computed<TranslateResult|undefined>(() => {
                 const start = setBasicDateFormat(props.dateRange?.start);
                 const end = setBasicDateFormat(props.dateRange?.end);
@@ -140,8 +131,8 @@ export default defineComponent<Props>({
                     return `${start} ~ ${end}`;
                 }
                 if (start && !end) {
-                    const today = dayjs().utc();
-                    const diff = today.diff(dayjs(start), 'day', true);
+                    const today = dayjs();
+                    const diff = today.diff(start, 'day', true);
                     if (diff < 1) return i18n.t('Today'); // song-lang
                     if (diff >= 6 && diff < 7) return i18n.t('Past 7 days'); // song-lang
                     return i18nDayjs.value(start).from(today.subtract(1, 'day'));
