@@ -2,16 +2,17 @@
 - [ ] Skip (`style`, `chore` ONLY)
 - [ ] Not that difficult
 
-### 작업 분류
-- [ ] 신규 기능
-- [ ] 버그 수정
-- [ ] 기능 개선
-- [ ] 리팩토링 및 구조 변경
-- [ ] 기타 (문서, CI/CD 워크플로 변경 등)
+### Type of Change
+- [ ] New feature
+- [ ] Bug fixes
+- [ ] Feature improvement
+- [ ] Refactor
+- [ ] Others (performance improvement, refactoring, CI/CD, etc.)
 
-### 체크리스트
+### Checklist
 - [ ] `Error / Warning / Lint / Type`
 
-### 작업 내용
+### Description
 
-### 생각해볼 문제
+
+### Things to Talk About
