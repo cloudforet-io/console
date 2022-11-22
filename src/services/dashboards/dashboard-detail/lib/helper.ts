@@ -1,6 +1,5 @@
 import { CARD_SIZE_ARY } from '@/services/dashboards/dashboard-detail/lib/config';
 
-// const exampleList = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
 
 const cardSizeExtractor = (s: string): Array<number> => {
     if (s === 'SM') return CARD_SIZE_ARY[0];
@@ -10,8 +9,9 @@ const cardSizeExtractor = (s: string): Array<number> => {
     return [0];
 };
 
-const oneLineFirstChooser = (cardSizeList: Array<string>, containerWidth: number): Array<Array<Array<number>>> => {
-    const retAry: Array<Array<Array<number>>> = [];
+
+const eachLineCardWidthAssigner = (cardSizeList: Array<string>, containerWidth: number): Array<Array<Array<number>>> => {
+    const eachLineCardWidth: Array<Array<Array<number>>> = [];
     // shift() 수행하기 때문에 미리 length 저장해두어야 함.
     const cardSizeListLen = cardSizeList.length;
     let oneLineSum = 0;
@@ -21,62 +21,87 @@ const oneLineFirstChooser = (cardSizeList: Array<string>, containerWidth: number
     for (let i = 0; i < cardSizeListLen; i += 1) {
         const selected: Array<number> = cardSizeExtractor(cardSizeList.shift() as string);
         oneLineSum += selected[0];
-        console.log('shift', oneLineSum);
         if (oneLineSum > containerWidth) {
-            console.log('! push', oneLineSum);
-            retAry.push(oneLineArray);
+            eachLineCardWidth.push(oneLineArray);
             oneLineArray = [];
             oneLineSum = selected[0];
-        } else {
-            console.log('no push', oneLineSum);
         }
         oneLineArray.push(selected);
     }
 
     // 마지막 원소 고려
     if (oneLineArray.length) {
-        retAry.push(oneLineArray);
+        eachLineCardWidth.push(oneLineArray);
+    }
+
+    return eachLineCardWidth;
+};
+
+
+const oneLineRealignment = (oneLineArray: Array<Array<Array<number>>>, containerWidth: number): Array<Array<number>> => {
+    const sequenceAry: Array<Array<number>> = [];
+    const retAry: Array<Array<number>> = [];
+
+    for (let i = 0; i < oneLineArray.length; i += 1) {
+        const oneLineSequence: Array<number> = [];
+        for (let j = 0; j < oneLineArray[i].length; j += 1) {
+            oneLineSequence.push(0);
+        }
+        sequenceAry.push(oneLineSequence);
+    }
+
+    // j > 각 row 순회 => 0 < 3
+    for (let j = 0; j < oneLineArray.length; j += 1) {
+        let oneLineSum = 0;
+        let oneLineArrayRe: Array<number> = [];
+        // k > sequenceAry 순회   => 0 < 3
+        for (let i = 1; i < 3; i += 1) {
+            for (let k = 0; k < oneLineArray[j].length; k += 1) {
+                oneLineSum = 0;
+                oneLineArrayRe = [];
+                sequenceAry[j].unshift(i);
+                console.log('seq', j, sequenceAry[0], sequenceAry[1], sequenceAry[2]);
+                // l > 각 row 합 비교 / 한 줄 push    => 0 < 3
+                for (let l = 0; l < oneLineArray[j].length; l += 1) {
+                    oneLineSum += oneLineArray[j][l][sequenceAry[j][l]];
+                    console.log('+=', j, l, oneLineArray[j][l]);
+
+                    if (oneLineSum > containerWidth) {
+                        retAry.push(oneLineArrayRe);
+                        console.log('push>', j, l, oneLineArrayRe);
+                        break;
+                    }
+
+                    if (oneLineSum === containerWidth) {
+                        oneLineArrayRe.push(oneLineArray[j][l][sequenceAry[j][l]]);
+                        retAry.push(oneLineArrayRe);
+                        console.log('push=', j, l, oneLineArrayRe);
+                        break;
+                    }
+
+                    oneLineArrayRe.push(oneLineArray[j][l][sequenceAry[j][l]]);
+                }
+                if (oneLineSum >= containerWidth) {
+                    console.log('break1');
+                    break;
+                }
+            }
+            if (oneLineSum >= containerWidth) {
+                console.log('break2');
+                break;
+            }
+            if (i === 2 && oneLineArrayRe.length) {
+                console.log('pushF', oneLineArrayRe);
+                retAry.push(oneLineArrayRe);
+            }
+        }
     }
 
     console.log('ret', retAry);
     return retAry;
 };
 
-const oneLineRealignment = (oneLineArray, containerWidth: number): Array<number> => {
-    const sequenceAry: Array<number> = oneLineArray.map(() => 0);
-    let realignedList: Array<number> = [];
-
-    // size 리스트로 i가 돌잖아? 근데 size 는 3개만 있으니까 i는 3 고정으로 해도 될거같아.
-    for (let i = 1; i < 3; i += 1) {
-        let oneLineSum = 0;
-        for (let k = 0; k < oneLineArray.length; k += 1) {
-            realignedList = [];
-            oneLineSum = 0;
-            sequenceAry.unshift(i);
-            for (let l = 0; l < oneLineArray.length; l += 1) {
-                oneLineSum += oneLineArray[l][sequenceAry[l]];
-                realignedList.push(oneLineArray[l][sequenceAry[l]]);
-            }
-            if (oneLineSum >= containerWidth) break;
-        }
-    }
-    return realignedList;
-};
-
 export const listMap = (cardSizeList: Array<string>, containerWidth: number): Array<Array<number>> => {
-    const ary: Array<Array<number>> = [];
-    const firstChosen = oneLineFirstChooser(cardSizeList, containerWidth);
-
-    // let oneLineSum = 0;
-    // firstChosen?.forEach((d) => { oneLineSum += d[0]; });
-    //
-    // // 2: 기본 사이즈로 정렬이 된다면 그대로 리턴
-    // if (oneLineSum === containerWidth) {
-    //     ary.push(firstChosen?.map((d) => d[0]));
-    // // 3: else, 앞에 위치한 카드부터 1씩 크기 증가시킴
-    // } else {
-    ary.push(oneLineRealignment(firstChosen, containerWidth));
-    // }
-
-    return ary;
+    const eachLineCardList = eachLineCardWidthAssigner(cardSizeList, containerWidth);
+    return oneLineRealignment(eachLineCardList, containerWidth);
 };

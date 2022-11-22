@@ -16,7 +16,6 @@ import {
     defineComponent, reactive, toRefs, ref, onMounted, watch, onUnmounted,
 } from 'vue';
 
-import { CONTAINER_MIN_WIDTH } from '@/services/dashboards/dashboard-detail/lib/config';
 import { listMap } from '@/services/dashboards/dashboard-detail/lib/helper';
 
 const exampleList = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
@@ -31,7 +30,8 @@ export default defineComponent({
     },
     setup() {
         const state = reactive({
-            containerWidth: CONTAINER_MIN_WIDTH,
+            // containerWidth: CONTAINER_MIN_WIDTH,
+            containerWidth: 1360,
             cardWidthList: [[]] as Array<Array<number>>,
         });
         const containerRef = ref<HTMLDivElement|null>(null);
@@ -42,13 +42,13 @@ export default defineComponent({
             clearTimeout(timer);
             timer = setTimeout(() => {
                 // RESIZE containerWidth on `resize`
-                state.containerWidth = containerRef.value?.offsetWidth ?? CONTAINER_MIN_WIDTH;
+                // state.containerWidth = containerRef.value?.offsetWidth ?? CONTAINER_MIN_WIDTH;
             }, 100);
         };
 
         onMounted(() => {
             // INIT containerWidth
-            state.containerWidth = containerRef.value?.offsetWidth ?? CONTAINER_MIN_WIDTH;
+            // state.containerWidth = containerRef.value?.offsetWidth ?? CONTAINER_MIN_WIDTH;
             window.addEventListener('resize', handleWindowResize);
         });
 
@@ -59,7 +59,9 @@ export default defineComponent({
         watch(() => state.containerWidth, (containerWidth: number) => {
             // state.cardWidthList = listMap(props.cardSizeList, containerWidth - (containerWidth % 80));
             state.cardWidthList = listMap(['MD', 'MD', 'SM', 'MD', 'LG', 'SM'], containerWidth - (containerWidth % 80));
-        });
+            // state.cardWidthList = listMap(['SM', 'MD', 'LG', 'XL', 'SM', 'MD', 'LG'], 1360);
+        }, { immediate: true });
+        // TODO:: remove immediate
 
         return { containerRef, ...toRefs(state) };
     },
