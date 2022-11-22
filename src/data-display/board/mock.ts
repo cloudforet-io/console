@@ -1,5 +1,5 @@
 import { standardIconActionSet } from '@/data-display/board-item/mock';
-import type { BoardSet } from '@/data-display/board/type';
+import type { BoardSet, StyleOptions } from '@/data-display/board/type';
 
 export const basicItemSets: BoardSet[] = [
     {
@@ -62,3 +62,7 @@ export const boardStandardItemSets: BoardSet[] = [
         iconButtonSets: standardIconActionSet,
     },
 ];
+
+export const cardsStyleOption: StyleOptions = {
+    column: 3,
+};

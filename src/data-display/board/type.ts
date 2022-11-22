@@ -7,8 +7,13 @@ export const BOARD_STYLE_TYPE = {
 
 export type BOARD_STYLE_TYPE = typeof BOARD_STYLE_TYPE[keyof typeof BOARD_STYLE_TYPE];
 
+export interface StyleOptions {
+    column?: number;
+}
+
 export interface BoardProps {
     styleType?: BOARD_STYLE_TYPE;
+    styleOptions?: StyleOptions;
     boardSets: BoardItemProps[];
     pageLimit?: number;
 }

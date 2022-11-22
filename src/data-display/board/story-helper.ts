@@ -7,7 +7,7 @@ export const getBoardArgTypes = (): ArgTypes => ({
     styleType: {
         name: 'styleType',
         type: { name: 'string' },
-        description: `Card style types. [${Object.values(BOARD_STYLE_TYPE)}] are available`,
+        description: `Board style types. [${Object.values(BOARD_STYLE_TYPE)}] are available`,
         defaultValue: BOARD_STYLE_TYPE.list,
         table: {
             type: {
@@ -21,6 +21,21 @@ export const getBoardArgTypes = (): ArgTypes => ({
         control: {
             type: 'select',
             options: Object.values(BOARD_STYLE_TYPE),
+        },
+    },
+    styleOptions: {
+        name: 'styleOptions',
+        type: { name: 'object' },
+        description: "Board style type's options. Each styleType has a different styleOptions. Optional props",
+        defaultValue: {},
+        table: {
+            type: {
+                summary: 'object',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
         },
     },
     boardSets: {
