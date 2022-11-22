@@ -1,3 +1,10 @@
+# [1.1.0-beta.457](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.456...v1.1.0-beta.457) (2022-11-22)
+
+
+### Features
+
+* **assets:** update assets ([#139](https://github.com/cloudforet-io/mirinae/issues/139)) ([ec1b8d0](https://github.com/cloudforet-io/mirinae/commit/ec1b8d0ebcc6b02de6f19587457a0f79cb5d4919))
+
 # [1.1.0-beta.456](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.455...v1.1.0-beta.456) (2022-11-22)
 
 
