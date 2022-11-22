@@ -44,10 +44,10 @@ const createTooltip = (root: Root, settings?: ITooltipSettings): am5.Tooltip => 
 };
 
 export const useAmcharts5 = (
-    chartContext: Ref<ChartContext>,
+    chartContext?: Ref<ChartContext>|null,
 ) => {
     const state = reactive({
-        chartContext,
+        chartContext: chartContext ?? null,
         root: undefined as undefined | Root,
     });
 
@@ -105,7 +105,7 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return createXYCategoryChart(state.root as Root, settings);
         },
-        createPieChart: (settings?: IPieChartSettings) => {
+        createPieChart: (settings?: IPieChartSettings): PieChart => {
             if (!state.root) throw new Error('No root');
             return createPieChart(state.root as Root, settings);
         },
