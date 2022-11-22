@@ -1,3 +1,10 @@
+# [1.1.0-beta.456](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.455...v1.1.0-beta.456) (2022-11-22)
+
+
+### Features
+
+* **board:** add column case in board `cards` type ([#138](https://github.com/cloudforet-io/mirinae/issues/138)) ([7676984](https://github.com/cloudforet-io/mirinae/commit/7676984b568fc3c29a397d24f6daef2a81d4f6db))
+
 # [1.1.0-beta.455](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.454...v1.1.0-beta.455) (2022-11-17)
 
 
