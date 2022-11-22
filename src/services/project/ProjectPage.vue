@@ -101,12 +101,6 @@
                             </div>
                         </template>
                     </p-page-title>
-                    <widget-frame :widget-route="{name: 'my_page'}">
-                        <div style="background-color: #0062b8; height: 100%;" />
-                        <template #header-right>
-                            <span>hello</span>
-                        </template>
-                    </widget-frame>
                     <project-card-list class="card-container"
                                        :parent-groups="storeState.parentGroups"
                                        :manage-disabled="!hasRootProjectGroupManagePermission"
@@ -164,7 +158,6 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
 import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import ProjectCardList from '@/services/project/modules/ProjectCardList.vue';
 import ProjectGroupDeleteCheckModal from '@/services/project/modules/ProjectGroupDeleteCheckModal.vue';
 import ProjectGroupFormModal from '@/services/project/modules/ProjectGroupFormModal.vue';
@@ -180,7 +173,6 @@ import type {
 export default {
     name: 'ProjectGroupPage',
     components: {
-        WidgetFrame,
         ProjectGroupDeleteCheckModal,
         SidebarTitle,
         ProjectGroupMember,
