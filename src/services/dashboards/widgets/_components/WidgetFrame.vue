@@ -47,13 +47,18 @@ import type { PropType } from 'vue';
 import {
     reactive, toRefs, defineComponent, computed,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 import type { Route } from 'vue-router';
 
 import { PDivider, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+import { i18n } from '@/translations';
+
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { WidgetOptions, WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
@@ -65,8 +70,8 @@ interface Props {
     size: WidgetSize;
     width: string;
     widgetLink?: string;
-    widgetRoute: Route;
-    dateRange: WidgetOptions['date_range'];
+    widgetRoute?: Route;
+    dateRange?: WidgetOptions['date_range'];
     noData: boolean;
     printMode: boolean;
     selectedDates: string[];
@@ -123,25 +128,23 @@ export default defineComponent<Props>({
         },
     },
     setup(props) {
-        const specialDate = (startDate) => {
-            // custom date range
-            const diff = dayjs().diff(dayjs(startDate), 'day', true);
-            if (diff < 1) return 'Today';
-            if (diff >= 6 && diff < 7) return 'Past 7 days';
-            return dayjs(startDate).format('YY-MM');
-        };
+        const { i18nDayjs } = useI18nDayjs();
         const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
         const state = reactive({
             isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
             fullDataTag: computed<string>(() => (props.widgetLink ? 'a' : 'router-link')),
-            dateLabel: computed<string|undefined>(() => {
+            dateLabel: computed<TranslateResult|undefined>(() => {
                 const start = setBasicDateFormat(props.dateRange?.start);
                 const end = setBasicDateFormat(props.dateRange?.end);
                 if (start && end) {
                     return `${start} ~ ${end}`;
                 }
                 if (start && !end) {
-                    return specialDate(start);
+                    const today = dayjs().utc();
+                    const diff = today.diff(dayjs(start), 'day', true);
+                    if (diff < 1) return i18n.t('Today'); // song-lang
+                    if (diff >= 6 && diff < 7) return i18n.t('Past 7 days'); // song-lang
+                    return i18nDayjs.value(start).from(today.subtract(1, 'day'));
                 }
                 return undefined;
             }),
