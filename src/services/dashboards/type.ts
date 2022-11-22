@@ -1,6 +1,6 @@
 import type { Tags } from '@/models';
 
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/type';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
 type DomainDashboardScope = 'DOMAIN'|'USER'; // DOMAIN: Viewer is Public, USER: Viewer is Private
 type ProjectDashboardScope = 'PROJECT'|'USER';
