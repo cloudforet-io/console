@@ -6,35 +6,31 @@
         <div class="widget-header">
             <h3 class="title">
                 {{ title }}
-            </h3> <slot name="header-right" />
+            </h3><slot name="header-right" />
         </div>
         <div class="body">
             <slot />
         </div>
         <div class="widget-footer">
             <div class="footer-left">
-                <p-datetime-picker style-type="text"
-                                   select-mode="range"
-                                   :selected-dates.sync="proxySelectedDates"
+                <label v-if="dateLabel"
+                       class="widget-footer-label"
+                >{{ dateLabel }}</label>
+                <p-divider v-if="isDivided"
+                           :vertical="true"
                 />
-                <p-divider :vertical="true" />
-                <currency-select-dropdown :print-mode="printMode"
-                                          @update="handleUpdateCurrency"
-                />
+                <label class="widget-footer-label">{{ currencyLabel }}</label>
             </div>
             <div class="footer-right">
                 <slot name="footer-right">
-                    <router-link v-if="widgetLink && !printMode"
-                                 :to="widgetLink"
-                                 class="anchor-button"
+                    <p-anchor v-if="(widgetLink || widgetRoute) && !printMode"
+                              :href="widgetLink"
+                              :to="widgetRoute"
+                              class="anchor-button"
+                              icon-name="ic_arrow_right"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
-                        <p-i name="ic_arrow_right"
-                             width="1rem"
-                             height="1rem"
-                             color="inherit transparent"
-                        />
-                    </router-link>
+                    </p-anchor>
                 </slot>
             </div>
         </div>
@@ -42,40 +38,44 @@
 </template>
 
 <script lang="ts">
-import type { PropType, SetupContext } from 'vue';
+import type { PropType } from 'vue';
 import {
     reactive, toRefs, defineComponent, computed,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import type { Route } from 'vue-router';
 
-import { PDatetimePicker, PDivider, PI } from '@spaceone/design-system';
+import { PAnchor, PDivider } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY } from '@/store/modules/display/config';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import { WIDGET_SIZE } from '../config';
-import type { WidgetSize } from '../type';
-import CurrencySelectDropdown from './CurrencySelectDropdown.vue';
+import type { WidgetOptions, WidgetSize } from '@/services/dashboards/widgets/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 
 interface Props {
     title: string;
     size: WidgetSize;
     width: string;
-    widgetLink: string;
+    widgetLink?: string;
+    widgetRoute?: Route;
+    dateRange?: WidgetOptions['date_range'];
     noData: boolean;
     printMode: boolean;
     selectedDates: string[];
-    currency: Currency;
+    currency?: Currency;
 }
 
 export default defineComponent<Props>({
     name: 'WidgetFrame',
     components: {
-        CurrencySelectDropdown,
-        PDatetimePicker,
+        PAnchor,
         PDivider,
-        PI,
     },
     props: {
         title: {
@@ -91,7 +91,15 @@ export default defineComponent<Props>({
             default: '30rem', // default width of md size
         },
         widgetLink: {
-            type: [Object, String],
+            type: String,
+            default: undefined,
+        },
+        widgetRoute: {
+            type: Object as PropType<Route>,
+            default: undefined,
+        },
+        dateRange: {
+            type: Object as PropType<WidgetOptions['date_range']>,
             default: undefined,
         },
         noData: {
@@ -108,22 +116,35 @@ export default defineComponent<Props>({
         },
         currency: {
             type: String as PropType<Currency>,
-            default: CURRENCY.USD,
+            default: undefined,
         },
     },
-    setup(props, { emit }:SetupContext) {
+    setup(props) {
+        const { i18nDayjs } = useI18nDayjs();
+        const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
         const state = reactive({
-            proxySelectedDates: useProxyValue('selectedDates', props, emit),
-            proxyCurrency: useProxyValue('currency', props, emit),
             isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
+            dateLabel: computed<TranslateResult|undefined>(() => {
+                const start = setBasicDateFormat(props.dateRange?.start);
+                const end = setBasicDateFormat(props.dateRange?.end);
+                if (start && end) {
+                    return `${start} ~ ${end}`;
+                }
+                if (start && !end) {
+                    const today = dayjs();
+                    const diff = today.diff(start, 'day', true);
+                    if (diff < 1) return i18n.t('Today'); // song-lang
+                    if (diff >= 6 && diff < 7) return i18n.t('Past 7 days'); // song-lang
+                    return i18nDayjs.value(start).from(today.subtract(1, 'day'));
+                }
+                return undefined;
+            }),
+            currencyLabel: computed<string|undefined>(() => (props.currency ? `${CURRENCY_SYMBOL[props.currency]}${props.currency}` : undefined)),
+            isDivided: computed<boolean|undefined>(() => (state.dateLabel && !props.noData && state.currencyLabel)),
         });
 
-        const handleUpdateCurrency = (currency: Currency) => {
-            state.proxyCurrency = currency;
-        };
         return {
             ...toRefs(state),
-            handleUpdateCurrency,
             WIDGET_SIZE,
         };
     },
@@ -158,11 +179,17 @@ export default defineComponent<Props>({
         overflow-y: scroll;
     }
     .widget-footer {
-        @apply border-t rounded-b-lg flex justify-between items-center;
-        padding: 0 1rem;
+        @apply border-t rounded-b-lg flex justify-between items-center bg-gray-100;
+        padding: 0.3125rem 1rem;
         flex: 0 0;
         .footer-left {
             @apply flex items-center gap-2;
+            .widget-footer-label {
+                font-size: 0.875rem;
+                color: theme('colors.gray.700');
+                line-height: 1.25;
+                margin: 0;
+            }
             .p-divider {
                 &.vertical {
                     height: 1rem;
