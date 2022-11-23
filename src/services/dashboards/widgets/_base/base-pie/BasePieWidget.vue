@@ -29,7 +29,7 @@
 import {
     computed,
     defineExpose,
-    defineProps, nextTick, reactive,
+    defineProps, nextTick, reactive, ref,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -51,11 +51,11 @@ type ChartData = Partial<Record<GroupBy, string>> & { usd_cost: number; };
 
 const props = defineProps<WidgetProps>();
 
+const chartContext = ref<HTMLElement|null>(null);
 const {
-    chartContext,
     createPieChart, createTooltip, createPieSeries, setPieTooltipText,
     disposeRoot,
-} = useAmcharts5();
+} = useAmcharts5(chartContext);
 
 const state = reactive({
     ...useWidgetState<Data[]>(props),

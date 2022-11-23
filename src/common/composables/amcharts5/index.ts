@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
 import {
-    reactive, toRefs, watch,
+    reactive, toRef, watch,
 } from 'vue';
 
 import * as am5 from '@amcharts/amcharts5';
@@ -44,10 +44,10 @@ const createTooltip = (root: Root, settings?: ITooltipSettings): am5.Tooltip => 
 };
 
 export const useAmcharts5 = (
-    chartContext?: Ref<ChartContext>|null,
+    chartContext: Ref<ChartContext>,
 ) => {
     const state = reactive({
-        chartContext: chartContext ?? null,
+        chartContext,
         root: undefined as undefined | Root,
     });
 
@@ -93,7 +93,7 @@ export const useAmcharts5 = (
     });
 
     return {
-        ...toRefs(state),
+        root: toRef(state, 'root'),
         disposeRoot,
         clearChildrenOfRoot,
         //
