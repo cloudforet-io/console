@@ -1,16 +1,24 @@
 <template>
     <div>
+        <p-button class="m-4"
+                  @click="handleMount"
+        >
+            {{ mounted ? 'Unmount Widget' : 'Mount Widget' }}
+        </p-button>
+        <p-button class="m-4"
+                  style-type="secondary"
+                  @click="refresh"
+        >
+            Refresh Widget
+        </p-button>
+        <br>
         <component :is="widgetComponent"
+                   v-if="mounted"
                    ref="widgetRef"
                    :widget-config-id="widgetId"
                    :widget-key="widgetId"
                    :currency-rates="currencyRates"
         />
-        <p-button class="m-4"
-                  @click="refresh"
-        >
-            Refresh
-        </p-button>
     </div>
 </template>
 
@@ -44,13 +52,18 @@ export default defineComponent<Props>({
             widgetComponent: computed(() => (props.widgetId ? getWidgetComponent(props.widgetId) : null)),
             widgetRef: null as any,
             currencyRates: computed(() => store.state.display.currencyRates),
+            mounted: false,
         });
 
+        const handleMount = () => {
+            state.mounted = !state.mounted;
+        };
         const refresh = () => {
             if (state.widgetRef) state.widgetRef.refreshWidget();
         };
         return {
             ...toRefs(state),
+            handleMount,
             refresh,
         };
     },

@@ -52,7 +52,9 @@ type ChartData = Partial<Record<GroupBy, string>> & { usd_cost: number; };
 const props = defineProps<WidgetProps>();
 
 const {
-    chartContext, createPieChart, createTooltip, createPieSeries, setPieTooltipText,
+    chartContext,
+    createPieChart, createTooltip, createPieSeries, setPieTooltipText,
+    disposeRoot,
 } = useAmcharts5();
 
 const state = reactive({
@@ -70,7 +72,7 @@ const state = reactive({
     }),
     tableFields: computed(() => [
         { label: state.groupByLabel, name: state.groupBy },
-        { label: 'Cost', name: 'usd_cost' },
+        { label: 'Cost', name: 'usd_cost', type: 'cost' },
     ]),
 });
 
@@ -136,7 +138,7 @@ const refreshWidget = async () => {
 };
 
 useWidgetLifecycle({
-    initWidget,
+    initWidget, disposeWidget: disposeRoot,
 });
 
 defineExpose({

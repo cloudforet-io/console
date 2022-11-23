@@ -1,13 +1,14 @@
 import {
-    onMounted,
+    onMounted, onUnmounted,
 } from 'vue';
 
 interface UseWidgetLifecycleOptions {
     initWidget: () => void;
+    disposeWidget?: () => void;
 }
 
 export const useWidgetLifecycle = ({
-    initWidget,
+    initWidget, disposeWidget,
 }: UseWidgetLifecycleOptions): void => {
     let isInitiated = false;
     // auto initiating
@@ -16,5 +17,9 @@ export const useWidgetLifecycle = ({
             initWidget();
             isInitiated = true;
         }
+    });
+
+    onUnmounted(() => {
+        if (disposeWidget) disposeWidget();
     });
 };
