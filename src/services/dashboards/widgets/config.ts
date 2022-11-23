@@ -8,6 +8,7 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 import type { Tags } from '@/models';
 
 import type { Currency } from '@/store/modules/display/config';
+import type { CurrencyRates } from '@/store/modules/display/type';
 
 import type { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';
 
@@ -75,7 +76,7 @@ type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 export interface WidgetOptions {
     date_range?: { start?: string; end?: string; };
     currency?: Currency;
-    group_by?: string[];
+    group_by?: GroupBy[];
     granularity?: Granularity;
     stacked?: boolean;
     enable_legend?: boolean;
@@ -117,4 +118,5 @@ export interface WidgetProps {
     width?: number;
     theme?: string; // e.g. 'violet', 'coral', 'peacock', ... default: violet
     widgetKey: string; // unique widget key to identify widgets in layout
+    currencyRates?: CurrencyRates;
 }

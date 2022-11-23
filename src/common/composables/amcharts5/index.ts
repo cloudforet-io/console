@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
 import {
-    reactive, toRefs, watch,
+    reactive, toRef, watch,
 } from 'vue';
 
 import * as am5 from '@amcharts/amcharts5';
@@ -93,7 +93,7 @@ export const useAmcharts5 = (
     });
 
     return {
-        ...toRefs(state),
+        root: toRef(state, 'root'),
         disposeRoot,
         clearChildrenOfRoot,
         //
@@ -105,7 +105,7 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return createXYCategoryChart(state.root as Root, settings);
         },
-        createPieChart: (settings?: IPieChartSettings) => {
+        createPieChart: (settings?: IPieChartSettings): PieChart => {
             if (!state.root) throw new Error('No root');
             return createPieChart(state.root as Root, settings);
         },

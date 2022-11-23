@@ -1,4 +1,6 @@
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive,
+} from 'vue';
 
 import { merge } from 'lodash';
 
@@ -24,16 +26,25 @@ const getRefinedOptions = (
     return merge({}, mergedOptions, parentOptions);
 };
 
-export const useWidgetData = (props: WidgetProps) => {
+export function useWidgetState<Data = any>(
+    props: WidgetProps,
+) {
     const state = reactive({
         widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(props.widgetConfigId)),
         title: computed<string>(() => props.title ?? state.widgetConfig.title),
-        options: computed<WidgetOptions>(() => getRefinedOptions(state.widgetConfig.widget_options, props.options, props.inheritOptions, props.dashboardOptions)),
+        options: computed<WidgetOptions>(() => getRefinedOptions(
+            state.widgetConfig.widget_options,
+            props.options,
+            props.inheritOptions,
+            props.dashboardOptions,
+        )),
         size: computed<WidgetSize>(() => {
             if (state.widgetConfig.sizes.includes(props.size)) return props.size;
             return state.widgetConfig.sizes[0];
         }),
+        loading: true,
+        data: null as Data|null,
     });
 
     return state;
-};
+}
