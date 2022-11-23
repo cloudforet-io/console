@@ -40,7 +40,7 @@
             <div class="button-group">
                 <template v-for="icon in editModeIconButtonList">
                     <p-icon-button v-if="icon.isAvailable"
-                                   :key="icon.name"
+                                   :key="`${icon.name}-${getUUID()}`"
                                    :name="icon.name"
                                    shape="square"
                                    style-type="tertiary"
@@ -71,6 +71,8 @@ import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+
+import { getUUID } from '@/lib/component-util/getUUID';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
@@ -197,7 +199,7 @@ export default defineComponent<Props>({
                     isAvailable: !props.disableExpandIcon,
                     name: state.isFull ? 'ic_expand-angle' : 'ic_collapse-angle',
                     handleClick: () => {
-                        emit('expandIconClick', state.isFull ? 'collapse' : 'expand');
+                        emit('click-expand-icon', state.isFull ? 'collapse' : 'expand');
                     },
                 },
                 {
@@ -220,6 +222,7 @@ export default defineComponent<Props>({
         return {
             ...toRefs(state),
             WIDGET_SIZE,
+            getUUID,
         };
     },
 });
