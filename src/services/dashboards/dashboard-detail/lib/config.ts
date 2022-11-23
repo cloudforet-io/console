@@ -1,4 +1,4 @@
-export const CARD_TYPE_LIST = [
+export const CARD_WIDTH_LIST = [
     [320, 400, 480], // 0: SM
     [480, 560, 640], // 1: MD
     [640, 720, 800], // 2: LG

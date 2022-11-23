@@ -2,7 +2,7 @@
     <div ref="containerRef"
          class="dashboard-card-container"
     >
-        <p v-for="(item, index) in cardSizeList"
+        <p v-for="(item, index) in cardWidthList"
            :key="index"
         >
             {{ item }} {{ containerWidth - (containerWidth % 80) }}
@@ -17,7 +17,7 @@ import {
 } from 'vue';
 
 import { CONTAINER_MIN_WIDTH } from '@/services/dashboards/dashboard-detail/lib/config';
-import { cardSizeAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
+import { cardWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
 
 
 
@@ -32,7 +32,7 @@ export default defineComponent({
     setup() {
         const state = reactive({
             containerWidth: CONTAINER_MIN_WIDTH,
-            cardSizeList: [] as Array<Array<number>>,
+            cardWidthList: [] as Array<Array<number>>,
             // cardTypeList: computed(() => props.cardTypeList),
         });
         const containerRef = ref<HTMLDivElement|null>(null);
@@ -59,7 +59,7 @@ export default defineComponent({
 
         watch(() => state.containerWidth, (containerWidth: number) => {
             const cardTypeMock = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
-            state.cardSizeList = cardSizeAssigner(cardTypeMock, containerWidth - (containerWidth % 80));
+            state.cardWidthList = cardWidthAssigner(cardTypeMock, containerWidth - (containerWidth % 80));
         });
 
         return { containerRef, ...toRefs(state) };
