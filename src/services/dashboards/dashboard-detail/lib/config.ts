@@ -21,5 +21,7 @@ export const WIDGET_FRAME_WIDTH_RANGE_LIST = [
     [640, 720, 800], // 2: LG
     [800, 880, 960], // 3: XL
 ];
+export const WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX = 3;
+
 
 export const CONTAINER_MIN_WIDTH = 320;

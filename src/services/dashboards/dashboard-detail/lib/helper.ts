@@ -1,4 +1,8 @@
-import { WIDGET_FRAME_WIDTH_RANGE_LIST, CONTAINER_MIN_WIDTH } from '@/services/dashboards/dashboard-detail/lib/config';
+import {
+    WIDGET_FRAME_WIDTH_RANGE_LIST,
+    CONTAINER_MIN_WIDTH,
+    WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX,
+} from '@/services/dashboards/dashboard-detail/lib/config';
 
 
 const widgetFrameSizeRangeExtractor = (size: string, containerWidth: number = CONTAINER_MIN_WIDTH): Array<number> => {
@@ -64,7 +68,7 @@ const allWidgetFrameWidthReAligner = (allWidgetFrameWidthRange: Array<Array<Arra
         rowWidthSum = 0;
         reAssignedRowWidth = [];
         // j -> widgetFrame size 를 80 씩 증가시킴
-        for (let j = 0; j < WIDGET_FRAME_WIDTH_RANGE_LIST[0].length; j += 1) {
+        for (let j = 0; j < WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX; j += 1) {
             // k > allWidgetFrameWidthRange 순회
             for (let k = 0; k < allWidgetFrameWidthRange[i].length; k += 1) {
                 rowWidthSum = 0;
@@ -91,7 +95,7 @@ const allWidgetFrameWidthReAligner = (allWidgetFrameWidthRange: Array<Array<Arra
             }
             if (rowWidthSum >= containerWidth) break;
             // 마지막 원소 고려
-            if (j === 2 && reAssignedRowWidth.length) {
+            if (j === WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX && reAssignedRowWidth.length) {
                 reAssignedWidgetFrameWidthList.push(reAssignedRowWidth);
             }
         }
