@@ -58,7 +58,7 @@ export default defineComponent({
         });
 
         watch(() => state.containerWidth, (containerWidth: number) => {
-            const widgetFrameSizeMock = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
+            const widgetFrameSizeMock = ['MD', 'MD', 'SM', 'FULL', 'MD', 'LG', 'SM'];
             state.widgetFrameWidthList = widgetFrameWidthAssigner(widgetFrameSizeMock, containerWidth - (containerWidth % 80));
         });
 

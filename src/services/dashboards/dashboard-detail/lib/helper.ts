@@ -1,12 +1,13 @@
-import { CARD_WIDTH_RANGE_LIST } from '@/services/dashboards/dashboard-detail/lib/config';
+import { CARD_WIDTH_RANGE_LIST, CONTAINER_MIN_WIDTH } from '@/services/dashboards/dashboard-detail/lib/config';
 
 
-const widgetFrameSizeRangeExtractor = (size: string): Array<number> => {
+const widgetFrameSizeRangeExtractor = (size: string, containerWidth: number = CONTAINER_MIN_WIDTH): Array<number> => {
     if (size === 'SM') return CARD_WIDTH_RANGE_LIST[0];
     if (size === 'MD') return CARD_WIDTH_RANGE_LIST[1];
     if (size === 'LG') return CARD_WIDTH_RANGE_LIST[2];
     if (size === 'XL') return CARD_WIDTH_RANGE_LIST[3];
-    if (size === 'FULL') return CARD_WIDTH_RANGE_LIST[4];
+    // CARD_WIDTH_RANGE_LIST length 의 길이로, ${containerWidth} 로만 이루어진 배열을 return
+    if (size === 'FULL') return CARD_WIDTH_RANGE_LIST[0].map(() => containerWidth);
     return [0];
 };
 
@@ -24,7 +25,7 @@ const selectAllWidgetFrameWidthRange = (widgetFrameSizeList: Array<string>, cont
 
     for (let i = 0; i < widgetFrameSizeListLength; i += 1) {
         // card 를 한 개 씩 추출함.
-        const selectedWidgetFrameSize: Array<number> = widgetFrameSizeRangeExtractor(widgetFrameSizeList.shift() as string);
+        const selectedWidgetFrameSize: Array<number> = widgetFrameSizeRangeExtractor(widgetFrameSizeList.shift() as string, containerWidth);
         rowWidthSum += selectedWidgetFrameSize[0];
         // 한 개 line 의 card size 합과 containerWidth 를 비교하여 최댓값을 push 한 후 shift 한 카드의 기본값으로 초기화합니다.
         if (rowWidthSum > containerWidth) {
