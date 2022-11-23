@@ -8,7 +8,7 @@
  * allWidgetFrameWidthList: Array<Array<number>> -> [[320], [320, 480], [320, 480]]
 * */
 
-export const CARD_WIDTH_RANGE_LIST = [
+export const WIDGET_FRAME_WIDTH_RANGE_LIST = [
     [320, 400, 480], // 0: SM
     [480, 560, 640], // 1: MD
     [640, 720, 800], // 2: LG
