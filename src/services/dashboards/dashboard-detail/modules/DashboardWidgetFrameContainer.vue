@@ -58,8 +58,13 @@ export default defineComponent({
         });
 
         watch(() => state.containerWidth, (containerWidth: number) => {
-            const widgetFrameSizeMock = ['MD', 'MD', 'SM', 'FULL', 'MD', 'LG', 'SM'];
-            state.widgetFrameWidthList = widgetFrameWidthAssigner(widgetFrameSizeMock, containerWidth - (containerWidth % 80));
+            const WIDGET_FRAME_SIZE_MOCK = ['MD', 'MD', 'SM', 'FULL', 'MD', 'LG', 'SM'];
+
+            const refinedContainerWidth = containerWidth - (containerWidth % 80);
+
+            if (refinedContainerWidth < 800) {
+                state.widgetFrameWidthList = WIDGET_FRAME_SIZE_MOCK.map(() => [refinedContainerWidth]);
+            } else state.widgetFrameWidthList = widgetFrameWidthAssigner(WIDGET_FRAME_SIZE_MOCK, refinedContainerWidth);
         });
 
         return { containerRef, ...toRefs(state) };
