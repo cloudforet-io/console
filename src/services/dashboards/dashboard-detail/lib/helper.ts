@@ -6,6 +6,7 @@ const cardTypeExtractor = (s: string): Array<number> => {
     if (s === 'MD') return CARD_TYPE_LIST[1];
     if (s === 'LG') return CARD_TYPE_LIST[2];
     if (s === 'XL') return CARD_TYPE_LIST[3];
+    if (s === 'FULL') return CARD_TYPE_LIST[4];
     return [0];
 };
 
@@ -62,7 +63,7 @@ const reAssigner = (eachLineCardList: Array<Array<Array<number>>>, containerWidt
         oneLineCardSizeSum = 0;
         reAssignedLine = [];
         // j -> card size 를 80 씩 증가시킴
-        for (let j = 1; j < 3; j += 1) {
+        for (let j = 0; j < CARD_TYPE_LIST[0].length; j += 1) {
             // k > eachLineSequenceList 순회
             for (let k = 0; k < eachLineCardList[i].length; k += 1) {
                 oneLineCardSizeSum = 0;

@@ -43,13 +43,13 @@ export default defineComponent({
             window.clearTimeout(timer);
             timer = window.setTimeout(() => {
                 // RESIZE containerWidth on `resize`
-                state.containerWidth = containerRef.value?.offsetWidth ?? CONTAINER_MIN_WIDTH;
+                state.containerWidth = containerRef.value?.clientWidth ?? CONTAINER_MIN_WIDTH;
             }, 100);
         };
 
         onMounted(() => {
             // INIT containerWidth
-            state.containerWidth = containerRef.value?.offsetWidth ?? CONTAINER_MIN_WIDTH;
+            state.containerWidth = containerRef.value?.clientWidth ?? CONTAINER_MIN_WIDTH;
             window.addEventListener('resize', handleWindowResize);
         });
 
