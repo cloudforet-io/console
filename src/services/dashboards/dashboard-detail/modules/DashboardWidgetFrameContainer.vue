@@ -1,8 +1,8 @@
 <template>
     <div ref="containerRef"
-         class="dashboard-card-container"
+         class="dashboard-widget-frame-container"
     >
-        <p v-for="(item, index) in cardWidthList"
+        <p v-for="(item, index) in widgetFrameWidthList"
            :key="index"
         >
             {{ item }} {{ containerWidth - (containerWidth % 80) }}
@@ -17,12 +17,12 @@ import {
 } from 'vue';
 
 import { CONTAINER_MIN_WIDTH } from '@/services/dashboards/dashboard-detail/lib/config';
-import { cardWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
+import { widgetFrameWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
 
 
 
 export default defineComponent({
-    name: 'DashboardCardContainer',
+    name: 'DashboardWidgetFrameContainer',
     props: {
         cardTypeList: {
             type: Array as PropType<Array<string>>,
@@ -32,7 +32,7 @@ export default defineComponent({
     setup() {
         const state = reactive({
             containerWidth: CONTAINER_MIN_WIDTH,
-            cardWidthList: [] as Array<Array<number>>,
+            widgetFrameWidthList: [] as Array<Array<number>>,
             // cardTypeList: computed(() => props.cardTypeList),
         });
         const containerRef = ref<HTMLDivElement|null>(null);
@@ -58,8 +58,8 @@ export default defineComponent({
         });
 
         watch(() => state.containerWidth, (containerWidth: number) => {
-            const cardTypeMock = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
-            state.cardWidthList = cardWidthAssigner(cardTypeMock, containerWidth - (containerWidth % 80));
+            const widgetFrameSizeMock = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
+            state.widgetFrameWidthList = widgetFrameWidthAssigner(widgetFrameSizeMock, containerWidth - (containerWidth % 80));
         });
 
         return { containerRef, ...toRefs(state) };
@@ -68,7 +68,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.dashboard-card-container {
+.dashboard-widget-frame-container {
     min-width: 320px;
     max-width: 1840px;
 }
