@@ -23,13 +23,31 @@
             </template>
         </div>
         <br>
-        <component :is="widgetComponent"
-                   v-if="mounted"
-                   ref="widgetRef"
-                   :widget-config-id="widgetId"
-                   :widget-key="widgetId"
-                   :currency-rates="currencyRates"
-        />
+        <div v-if="mounted"
+             class="flex gap-4"
+        >
+            <component :is="widgetComponent"
+                       ref="widgetRef"
+                       :widget-config-id="widgetId"
+                       :widget-key="widgetId"
+                       :currency-rates="currencyRates"
+                       :dashboard-options="{
+                           currency
+                       }"
+                       :inherit-options="{
+                           currency: { enabled: true },
+                           date_range: { enabled: true },
+                       }"
+            />
+            <div>
+                <p-field-group label="Currency"
+                               required
+                               inline
+                >
+                    <currency-select-dropdown @update="currency = $event" />
+                </p-field-group>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -39,10 +57,13 @@ import {
     defineComponent, reactive, toRefs, computed, onUnmounted, watch,
 } from 'vue';
 
-import { PButton, PIconButton } from '@spaceone/design-system';
+import { PButton, PFieldGroup, PIconButton } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
+import { CURRENCY } from '@/store/modules/display/config';
+
+import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/helper';
 
 interface Props {
@@ -51,7 +72,9 @@ interface Props {
 
 export default defineComponent<Props>({
     name: 'WidgetsPreviewPage',
-    components: { PIconButton, PButton },
+    components: {
+        PFieldGroup, CurrencySelectDropdown, PIconButton, PButton,
+    },
     props: {
         widgetId: {
             type: String,
@@ -66,6 +89,7 @@ export default defineComponent<Props>({
             currencyRates: computed(() => store.state.display.currencyRates),
             mounted: false,
             autoRefresh: true,
+            currency: CURRENCY.USD,
         });
 
         const { counter, pause, resume } = useInterval(1000, { controls: true });
