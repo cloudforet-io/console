@@ -1,37 +1,33 @@
-# 가능한 위젯의 경우의 수
-SM, MD, LG, XL
+# Number of possible widget cases
+SM, MD, LG, XL, FULL
 
-- 1개 
-4PI1 = 4
-- 2개
-4PI2 = 16
-- 3개
-4PI3 = 64
-- 4개
-4PI4 = 256
-- 5개
-4PI5 = 1024
+- 1 select
+5PI1 = 5
+- 2 select
+5PI2 = 25
+- 3 select
+5PI3 = 125
+- 4 select
+5PI4 = 625
+- 5 select
+5PI5 = 3125
 - ...
-- n개
-4PIn = Math.pow(4,n)
+- n select
+5PIn = Math.pow(5,n) === 5 ** n
 
 ---
-# 가능한 화면 사이즈의 경우의 수
+# Number of possible screen size cases
 19 (320px, 400px, 480px ... 1840px)
 
 ---
-# 테스트의 수?
-위젯 n개 경우의 수 * 화면 사이즈의 경우의 수
+# Number of test cases
+Number of Widgets n * Number of Screen Size
 
-n:1 => 4 * 19 = 76
-n:2 => 16 * 19 = 304
-n:3 => 64 * 19 = 1216
-n:4 => 256 * 19 = 4864
-n:5 => 1024 * 19 = 19456
+n:1 => 5 * 19 = 95
+n:2 => 25 * 19 = 475
+n:3 => 125 * 19 = 2375
+n:4 => 625 * 19 = 11875
+n:5 => 3125 * 19 = 59375
 ...
-n:n => Math.pow(4,n) * 19 
+n:n => Math.pow(5,n) * 19 === (5 ** n) * 19 
 
----
-# 고려해야할 상황
-위젯의 최소사이즈가 화면사이즈보다 작은 경우.
-PDF 출력용으로 이쁘게 정렬하는 알고리즘?

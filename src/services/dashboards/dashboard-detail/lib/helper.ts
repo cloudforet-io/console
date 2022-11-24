@@ -19,7 +19,7 @@ const widgetFrameSizeRangeExtractor = (size: string, containerWidth: number = WI
     if (size === 'MD') return WIDGET_FRAME_WIDTH_RANGE_LIST[1];
     if (size === 'LG') return WIDGET_FRAME_WIDTH_RANGE_LIST[2];
     if (size === 'XL') return WIDGET_FRAME_WIDTH_RANGE_LIST[3];
-    // WIDGET_FRAME_WIDTH_RANGE_LIST length 의 길이로, ${containerWidth} 로만 이루어진 배열을 return
+    // WIDGET_FRAME_WIDTH_RANGE_LIST length, it will return filled by ${containerWidth}
     if (size === 'FULL') return WIDGET_FRAME_WIDTH_RANGE_LIST[0].map(() => containerWidth);
     return [0];
 };
