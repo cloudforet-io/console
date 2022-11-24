@@ -49,6 +49,7 @@ export default defineComponent({
     }
     .abcRioButtonContents {
         vertical-align: unset;
+        font-weight: normal;
     }
     span {
         @apply text-gray-900;

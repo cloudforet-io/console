@@ -12,8 +12,8 @@
                                     @select="handleSelect"
                     >
                         <template #item--format="{ item }">
-                            <div class="flex justify-between items-center">
-                                <span>{{ item.label }}</span>
+                            <div class="item-row">
+                                <span class="text">{{ item.label }}</span>
                                 <p-i v-if="item.updateType === 'ADDED'"
                                      name="ic_plus"
                                      color="#60B731"
@@ -164,6 +164,19 @@ export default defineComponent({
         height: calc(100% - 3.5rem);
         .cloud-service-history-changes-key-nav {
             width: 20%;
+
+            /* custom design-system component - p-context-menu */
+            :deep(.p-context-menu) {
+                .item-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    .text {
+                        @apply truncate;
+                        width: 90%;
+                    }
+                }
+            }
 
             /* custom design-system component - p-card */
             :deep(.p-card) {
