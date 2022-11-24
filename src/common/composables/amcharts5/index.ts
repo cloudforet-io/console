@@ -12,11 +12,11 @@ import type { IXYChartSettings, IXYSeriesSettings, XYChart } from '@amcharts/amc
 
 import { Amcharts5GlobalTheme } from '@/lib/site-initializer/amcharts5';
 
+import { DEFAULT_DATE_FIELD_NAME, DEFAULT_DATE_FORMAT } from '@/common/composables/amcharts5/config';
 import {
     createDonutChart, createPieChart, createPieSeries, setPieTooltipText,
 } from '@/common/composables/amcharts5/pie-chart-helper';
 import type { ChartContext } from '@/common/composables/amcharts5/type';
-import { DATE_FIELD_NAME } from '@/common/composables/amcharts5/type';
 import {
     createXYCategoryChart, createXYDateChart, createXYLineSeries, createXYStackedColumnSeries,
     setXYSharedTooltipText, setXYSingleTooltipText,
@@ -78,8 +78,8 @@ export const useAmcharts5 = (
     const createDataProcessor = (settings?: IDataProcessorSettings): undefined|am5.DataProcessor => {
         if (!state.root) return undefined;
         return am5.DataProcessor.new(state.root as Root, {
-            dateFormat: 'yyyy-M',
-            dateFields: [DATE_FIELD_NAME],
+            dateFormat: DEFAULT_DATE_FORMAT,
+            dateFields: [DEFAULT_DATE_FIELD_NAME],
             ...settings,
         });
     };

@@ -9,7 +9,7 @@ import type { CurrencyRates } from '@/store/modules/display/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import { DATE_FIELD_NAME, CATEGORY_FIELD_NAME } from '@/common/composables/amcharts5/type';
+import { DEFAULT_CATEGORY_FIELD_NAME, DEFAULT_DATE_FIELD_NAME } from '@/common/composables/amcharts5/config';
 
 import { gray } from '@/styles/colors';
 
@@ -18,6 +18,8 @@ const createXYChart = (root: Root, settings?: IXYChartSettings): am5xy.XYChart =
     const cursor = am5xy.XYCursor.new(root, {});
     cursor.lineX.setAll({
         visible: false,
+        strokeDasharray: undefined,
+        stroke: am5.color(gray[500]),
     });
     cursor.lineY.setAll({
         visible: false,
@@ -44,9 +46,15 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings): {
         strokeOpacity: 1,
         strokeWidth: 1,
         stroke: am5.color(gray[300]),
+        minGridDistance: 20,
     });
     xRenderer.grid.template.setAll({
         strokeOpacity: 0,
+    });
+    xRenderer.labels.template.setAll({
+        fontSize: 12,
+        fill: am5.color(gray[600]),
+        paddingTop: 6,
     });
     const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
         baseInterval: {
@@ -73,6 +81,11 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings): {
         strokeWidth: 1,
         stroke: am5.color(gray[200]),
     });
+    yRenderer.labels.template.setAll({
+        fontSize: 12,
+        fill: am5.color(gray[600]),
+        paddingRight: 8,
+    });
     const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
         renderer: yRenderer,
     }));
@@ -95,7 +108,7 @@ export const createXYCategoryChart = (root: Root, settings?: IXYChartSettings): 
         strokeOpacity: 0,
     });
     const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
-        categoryField: CATEGORY_FIELD_NAME,
+        categoryField: DEFAULT_CATEGORY_FIELD_NAME,
         renderer: xRenderer,
     }));
 
@@ -122,12 +135,18 @@ export const createXYLineSeries = (
     const series = chart.series.push(am5xy.LineSeries.new(root, {
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
-        valueXField: DATE_FIELD_NAME,
+        valueXField: DEFAULT_DATE_FIELD_NAME,
         ...settings,
     }));
     series.strokes.template.setAll({
         strokeWidth: 2,
     });
+    series.bullets.push(() => am5.Bullet.new(root, {
+        sprite: am5.Circle.new(root, {
+            radius: 3,
+            fill: series.get('fill'),
+        }),
+    }));
     return series;
 };
 
@@ -139,7 +158,7 @@ export const createXYStackedColumnSeries = (
     xAxis: chart.xAxes.getIndex(0) as IXYAxis,
     yAxis: chart.yAxes.getIndex(0) as IXYAxis,
     stacked: true,
-    valueXField: DATE_FIELD_NAME,
+    valueXField: DEFAULT_DATE_FIELD_NAME,
     ...settings,
 }));
 
@@ -150,6 +169,7 @@ export const setXYSharedTooltipText = (chart: am5xy.XYChart, tooltip: am5.Toolti
         chart.series.each((s) => {
             const fieldName = s.get('valueYField') || '';
             let value = target.dataItem?.dataContext?.[fieldName];
+            if (!value) return;
             if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
             _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
         });
