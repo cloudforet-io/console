@@ -1,16 +1,27 @@
 <template>
     <div>
-        <p-button class="m-4"
-                  @click="handleMount"
-        >
-            {{ mounted ? 'Unmount Widget' : 'Mount Widget' }}
-        </p-button>
-        <p-button class="m-4"
-                  style-type="secondary"
-                  @click="refresh"
-        >
-            Refresh Widget
-        </p-button>
+        <div class="my-4">
+            <p-button class="mx-4"
+                      @click="handleMount"
+            >
+                {{ mounted ? 'Unmount Widget' : 'Mount Widget' }}
+            </p-button>
+            <template v-if="mounted">
+                <div class="inline-block w-8 text-center">
+                    {{ autoRefresh ? 10 - counter : '' }}
+                </div>
+                <p-icon-button class="mx-2 inline-block"
+                               name="ic_refresh"
+                               @click="refresh"
+                />
+                <p-button class="mx-2"
+                          style-type="substitutive"
+                          @click="handleAutoRefresh"
+                >
+                    {{ autoRefresh ? 'Stop Auto Refresh' : 'Start Auto Refresh' }}
+                </p-button>
+            </template>
+        </div>
         <br>
         <component :is="widgetComponent"
                    v-if="mounted"
@@ -23,11 +34,12 @@
 </template>
 
 <script lang="ts">
+import { useInterval, useWindowFocus } from '@vueuse/core';
 import {
-    defineComponent, reactive, toRefs, computed,
+    defineComponent, reactive, toRefs, computed, onUnmounted, watch,
 } from 'vue';
 
-import { PButton } from '@spaceone/design-system';
+import { PButton, PIconButton } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
@@ -39,7 +51,7 @@ interface Props {
 
 export default defineComponent<Props>({
     name: 'WidgetsPreviewPage',
-    components: { PButton },
+    components: { PIconButton, PButton },
     props: {
         widgetId: {
             type: String,
@@ -53,18 +65,58 @@ export default defineComponent<Props>({
             widgetRef: null as any,
             currencyRates: computed(() => store.state.display.currencyRates),
             mounted: false,
+            autoRefresh: true,
         });
 
+        const { counter, pause, resume } = useInterval(1000, { controls: true });
+        const focused = useWindowFocus();
+
+        const resetCounter = () => {
+            if (state.autoRefresh) {
+                counter.value = 0;
+                resume();
+            }
+        };
         const handleMount = () => {
             state.mounted = !state.mounted;
+            if (state.autoRefresh) {
+                if (state.mounted) {
+                    resetCounter();
+                } else {
+                    pause();
+                }
+            }
         };
         const refresh = () => {
-            if (state.widgetRef) state.widgetRef.refreshWidget();
+            if (state.widgetRef) {
+                state.widgetRef.refreshWidget();
+                resetCounter();
+            }
         };
+        const handleAutoRefresh = () => {
+            state.autoRefresh = !state.autoRefresh;
+            if (state.autoRefresh) resetCounter();
+        };
+
+        watch(counter, (_counter) => {
+            if (!state.autoRefresh) return;
+            if (_counter === 10) refresh();
+        });
+        watch(focused, (_focused) => {
+            if (!state.mounted || !state.autoRefresh) return;
+            if (_focused) resume();
+            else pause();
+        });
+        onUnmounted(() => {
+            pause();
+        });
+
         return {
             ...toRefs(state),
             handleMount,
             refresh,
+            handleAutoRefresh,
+            counter,
         };
     },
 });
