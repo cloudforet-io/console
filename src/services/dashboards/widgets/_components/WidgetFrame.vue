@@ -1,6 +1,6 @@
 <template>
     <div class="widget-frame"
-         :class="{ full: isFull }"
+         :class="{ full: isFull, 'edit-mode': editMode }"
          :style="{ width: isFull ? '100%' : width }"
     >
         <div class="widget-header">
@@ -34,18 +34,37 @@
                 </slot>
             </div>
         </div>
+        <div v-if="editMode"
+             class="edit-mode-cover"
+        >
+            <div class="button-group">
+                <template v-for="icon in editModeIconButtonList">
+                    <p-icon-button v-if="icon.isAvailable"
+                                   :key="`${icon.name}-${getUUID()}`"
+                                   :name="icon.name"
+                                   shape="square"
+                                   style-type="tertiary"
+                                   @click="icon.handleClick"
+                    />
+                </template>
+            </div>
+        </div>
+        <delete-modal :visible.sync="visibleDeleteModal" />
+        <p-button-modal :visible.sync="visibleEditModal" />
     </div>
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     reactive, toRefs, defineComponent, computed,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Route } from 'vue-router';
 
-import { PAnchor, PDivider } from '@spaceone/design-system';
+import {
+    PAnchor, PButtonModal, PDivider, PIconButton,
+} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { i18n } from '@/translations';
@@ -53,13 +72,16 @@ import { i18n } from '@/translations';
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
+import { getUUID } from '@/lib/component-util/getUUID';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { WidgetOptions, WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 
 interface Props {
-    title: string;
+    title: TranslateResult;
     size: WidgetSize;
     width: string;
     widgetLink?: string;
@@ -69,17 +91,30 @@ interface Props {
     printMode: boolean;
     selectedDates: string[];
     currency?: Currency;
+    editMode: boolean;
+    disableExpandIcon: boolean;
+    disableEditIcon: boolean;
+    disableDeleteIcon: boolean;
+}
+
+interface IconConfig {
+    isAvailable: boolean;
+    name: string;
+    handleClick: () => void;
 }
 
 export default defineComponent<Props>({
     name: 'WidgetFrame',
     components: {
+        PButtonModal,
+        DeleteModal,
+        PIconButton,
         PAnchor,
         PDivider,
     },
     props: {
         title: {
-            type: String,
+            type: String as PropType<TranslateResult>,
             default: 'Title',
         },
         size: {
@@ -118,8 +153,24 @@ export default defineComponent<Props>({
             type: String as PropType<Currency>,
             default: undefined,
         },
+        editMode: {
+            type: Boolean,
+            default: false,
+        },
+        disableExpandIcon: {
+            type: Boolean,
+            default: false,
+        },
+        disableEditIcon: {
+            type: Boolean,
+            default: false,
+        },
+        disableDeleteIcon: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props) {
+    setup(props, { emit }: SetupContext) {
         const { i18nDayjs } = useI18nDayjs();
         const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
         const state = reactive({
@@ -141,11 +192,37 @@ export default defineComponent<Props>({
             }),
             currencyLabel: computed<string|undefined>(() => (props.currency ? `${CURRENCY_SYMBOL[props.currency]}${props.currency}` : undefined)),
             isDivided: computed<boolean|undefined>(() => (state.dateLabel && !props.noData && state.currencyLabel)),
+            visibleEditModal: false,
+            visibleDeleteModal: false,
+            editModeIconButtonList: computed<IconConfig[]>(() => [
+                {
+                    isAvailable: !props.disableExpandIcon,
+                    name: state.isFull ? 'ic_expand-angle' : 'ic_collapse-angle',
+                    handleClick: () => {
+                        emit('click-expand-icon', state.isFull ? 'collapse' : 'expand');
+                    },
+                },
+                {
+                    isAvailable: !props.disableEditIcon,
+                    name: 'ic_edit',
+                    handleClick: () => {
+                        state.visibleEditModal = true;
+                    },
+                },
+                {
+                    isAvailable: !props.disableDeleteIcon,
+                    name: 'ic_trashcan',
+                    handleClick: () => {
+                        state.visibleDeleteModal = true;
+                    },
+                },
+            ]),
         });
 
         return {
             ...toRefs(state),
             WIDGET_SIZE,
+            getUUID,
         };
     },
 });
@@ -211,6 +288,18 @@ export default defineComponent<Props>({
     &.full {
         height: 100%;
         min-height: 29rem;
+    }
+    &.edit-mode {
+        position: relative;
+    }
+    .edit-mode-cover {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        padding: 0.75rem;
+        .button-group {
+            @apply flex gap-2 flex-wrap justify-end;
+        }
     }
 }
 
