@@ -10,8 +10,6 @@ import type { Tags } from '@/models';
 import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
-import type { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';
-
 export const WIDGET_SIZE = {
     sm: 'sm',
     md: 'md',
@@ -39,6 +37,16 @@ export const GROUP_BY = {
     TYPE: 'usage_type',
     ACCOUNT: 'account',
 } as const;
+
+export const CHART_TYPE = Object.freeze({
+    TREEMAP: 'TREEMAP',
+    MAP: 'MAP',
+    LINE: 'LINE',
+    STACKED_COLUMN: 'STACKED_COLUMN',
+    DONUT: 'DONUT',
+    PIE: 'PIE',
+    WAFFLE: 'WAFFLE',
+} as const);
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
