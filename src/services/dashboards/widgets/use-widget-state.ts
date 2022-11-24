@@ -8,7 +8,7 @@ import type {
     WidgetConfig, WidgetOptions, WidgetSize,
     InheritOptions, WidgetProps,
 } from '@/services/dashboards/widgets/config';
-import { getWidgetConfig } from '@/services/dashboards/widgets/helper';
+import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 const getRefinedOptions = (
     configOptions?: WidgetOptions,
