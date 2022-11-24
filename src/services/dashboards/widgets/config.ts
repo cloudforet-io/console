@@ -38,7 +38,7 @@ export const GROUP_BY = {
     ACCOUNT: 'account',
 } as const;
 
-export const CHART_TYPE = Object.freeze({
+export const CHART_TYPE = {
     TREEMAP: 'TREEMAP',
     MAP: 'MAP',
     LINE: 'LINE',
@@ -46,7 +46,7 @@ export const CHART_TYPE = Object.freeze({
     DONUT: 'DONUT',
     PIE: 'PIE',
     WAFFLE: 'WAFFLE',
-} as const);
+} as const;
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
