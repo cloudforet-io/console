@@ -29,7 +29,7 @@
 import {
     computed,
     defineExpose,
-    defineProps, nextTick, reactive, ref,
+    defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -58,7 +58,7 @@ const {
 } = useAmcharts5(chartContext);
 
 const state = reactive({
-    ...useWidgetState<Data[]>(props),
+    ...toRefs(useWidgetState<Data[]>(props)),
     chart: null as null|ReturnType<typeof createPieChart>,
     series: null as null|ReturnType<typeof createPieSeries>,
     groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROVIDER),
