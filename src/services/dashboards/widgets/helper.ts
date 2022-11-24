@@ -1,8 +1,13 @@
 import type { AsyncComponent } from 'vue';
 
-import { merge } from 'lodash';
+import {
+    keyBy, merge, sortBy, values,
+} from 'lodash';
 
-import type { WidgetConfig } from '@/services/dashboards/widgets/config';
+import type {
+    GroupBy, WidgetConfig,
+} from '@/services/dashboards/widgets/config';
+import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widgets/type';
 import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/widget-config-list';
 
 const widgetConfigCacheMap: Record<string, WidgetConfig> = {};
@@ -35,4 +40,34 @@ export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {
     if (!widgetComponent) throw new Error(`No matching widget component found. ${widgetComponent} does not exist.`);
 
     return widgetComponent;
+};
+
+const mergeByKey = (arrA, arrB, key) => {
+    const merged = merge(keyBy(arrA, key), keyBy(arrB, key));
+    return values(merged);
+};
+/**
+ * @name getRefinedXYChartData
+ * @description Convert raw data to XYDateChart data.
+ * @example [{ date: '2021-11', aws: 100, azure: 300 }, { date: '2021-09', aws: 300, azure: 100 }]
+ */
+export const getRefinedXYChartData = (
+    rawData: HistoryDataModel['results'],
+    groupBy: GroupBy,
+    categoryKey = 'date',
+    valueKey = 'usd_cost_sum',
+): XYChartData[] => {
+    if (!rawData) return [];
+
+    let chartData;
+    rawData.forEach((data) => {
+        const groupByName = data[groupBy]; // AmazonCloudFront
+        const valueList = data[valueKey]; // [{date: '2022-11', value: 34}, ...]
+        const refinedList = valueList.map((valueSet) => ({
+            date: valueSet.date,
+            [groupByName]: valueSet.value,
+        }));
+        chartData = mergeByKey(chartData, refinedList, categoryKey);
+    });
+    return sortBy(chartData, categoryKey);
 };
