@@ -39,7 +39,7 @@ export const CONSOLE_WIDGET_ORDER = [
     'costPie',
 ];
 
-export const CONSOLE_WIDGET_CONFIGS: Record<string, WidgetConfig> = {
+export const CONSOLE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {
     monthlyCost,
     budgetUsageSummary,
     costMap,
@@ -56,7 +56,7 @@ export const CONSOLE_WIDGET_CONFIGS: Record<string, WidgetConfig> = {
     costAnalysisQuery,
 };
 
-export const BASE_WIDGET_CONFIGS: Record<string, WidgetConfig> = {
+export const BASE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {
     baseTrend,
     baseRegion,
     baseHorizontal,

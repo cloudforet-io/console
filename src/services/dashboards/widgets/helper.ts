@@ -9,7 +9,7 @@ const widgetConfigCacheMap: Record<string, WidgetConfig> = {};
 export const getWidgetConfig = (widgetConfigId: string): WidgetConfig => {
     if (widgetConfigCacheMap[widgetConfigId]) return widgetConfigCacheMap[widgetConfigId];
 
-    const config = CONSOLE_WIDGET_CONFIGS[widgetConfigId];
+    const config = CONSOLE_WIDGET_CONFIGS[widgetConfigId] as WidgetConfig;
     if (!config?.base_configs) {
         widgetConfigCacheMap[widgetConfigId] = config;
         return config;
