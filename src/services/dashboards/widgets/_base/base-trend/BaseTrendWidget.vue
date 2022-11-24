@@ -1,211 +1,178 @@
 <template>
-    <div class="base-trend-widget">
-        <p-data-loader class="chart-wrapper"
-                       :loading="loading"
-        >
-            <div ref="chartRef"
-                 class="chart"
-            />
-        </p-data-loader>
-    </div>
+    <widget-frame :title="state.title"
+                  :size="state.size"
+                  :width="props.width"
+                  class="base-trend-widget"
+    >
+        <div class="chart-wrapper">
+            <p-data-loader class="chart-loader"
+                           :loading="state.loading"
+                           :data="state.data"
+                           loader-type="skeleton"
+                           show-data-from-scratch
+            >
+                <div ref="chartContext"
+                     class="chart"
+                />
+            </p-data-loader>
+        </div>
+
+        <widget-data-table :loading="state.loading"
+                           :fields="state.tableFields"
+                           :items="state.chartData"
+                           :currency="state.options.currency"
+                           :currency-rates="props.currencyRates"
+        />
+    </widget-frame>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
+<script setup lang="ts">
 import {
-    computed, defineComponent, onUnmounted, reactive, toRef, toRefs, watch,
+    computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-import { random, range } from 'lodash';
+import { cloneDeep, random } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
-import { DATE_FIELD_NAME } from '@/common/composables/amcharts5/type';
 
-import type { WidgetOptions } from '@/services/cost-explorer/cost-dashboard/type';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
-import type { WidgetProps } from '@/services/dashboards/widgets/type';
+import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
+import { GROUP_BY, CHART_TYPE } from '@/services/dashboards/widgets/config';
+// eslint-disable-next-line import/no-cycle
+import { getRefinedXYChartData } from '@/services/dashboards/widgets/helper';
+import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widgets/type';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
+// eslint-disable-next-line import/no-cycle
+import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
+import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 
 // TODO: sample data
-const SAMPLE_XY_CHART_DATA = range(4).map((d) => ({
-    date: `2022-${11 + d}`,
-    projectA: random(1000, 5000),
-    projectB: random(1000, 5000),
-    projectC: random(1000, 5000),
-}));
-const SAMPLE_PIE_CHART_DATA = [
-    { category: 'google cloud', value: random(1000, 5000) },
-    { category: 'aws', value: random(1000, 5000) },
-    { category: 'azure', value: random(1000, 5000) },
-    { category: 'alibaba', value: random(1000, 5000) },
-];
+const SAMPLE_RAW_DATA = {
+    more: true,
+    results: [
+        {
+            product: 'AmazonCloudFront',
+            usd_cost_sum: [
+                { date: '2022-08', value: random(100, 5000) },
+                // { date: '2022-09', value: 0 },
+                { date: '2022-10', value: random(100, 5000) },
+                { date: '2022-11', value: random(100, 5000) },
+            ],
+        },
+        {
+            product: 'AmazonEC2',
+            usd_cost_sum: [
+                { date: '2022-08', value: random(100, 5000) },
+                { date: '2022-09', value: random(100, 5000) },
+                { date: '2022-10', value: random(100, 5000) },
+                { date: '2022-11', value: random(100, 5000) },
+            ],
+        },
+        {
+            product: 'AWSSecretsManager',
+            usd_cost_sum: [
+                { date: '2022-08', value: random(100, 5000) },
+                { date: '2022-09', value: random(100, 5000) },
+                { date: '2022-10', value: random(100, 5000) },
+                { date: '2022-11', value: random(100, 5000) },
+            ],
+        },
+    ],
+};
 
-// const SAMPLE_XY_SINGLE_CHART = range(4).map((d) => ({
-//     date: `2022-${11 + d}`,
-//     projectA: random(10000, 50000),
-// }));
+const DATE_FORMAT = 'yyyy-MM';
+const DATE_FIELD_NAME = 'date';
 
-// const SAMPLE_WIDGET_CONFIG: WidgetConfig = {
-//     widget_name: 'costTrend',
-//     title: 'Cost Trend',
-//     labels: [],
-//     scopes: ['DOMAIN'],
-//     theme: {
-//         inherit: true,
-//         inherit_count: 5,
-//     },
-//     sizes: [WIDGET_SIZE.lg, WIDGET_SIZE.full],
-//     widget_options_schema: {},
-//     base_widget_name: 'BaseTrend',
-//     widget_options: {
-//         date_range: {
-//             start: '',
-//             end: '2022-11',
-//         },
-//         granularity: GRANULARITY.MONTHLY,
-//         enable_legends: false,
-//         group_by: ['project'],
-//         page: {
-//             start: 0,
-//             limit: 5,
-//         },
-//     },
-// };
+const props = defineProps<WidgetProps>();
 
-export default defineComponent<WidgetProps>({
-    name: 'BaseTrendWidget',
-    components: {
-        PDataLoader,
-    },
-    props: {
-        chartType: {
-            type: String,
-            default: undefined,
-        },
-        widgetName: {
-            type: String,
-            default: undefined,
-        },
-        options: {
-            type: Object as PropType<WidgetOptions>,
-            default: () => ({}),
-        },
-        inheritOptions: {
-            type: Object,
-            default: () => ({}),
-        },
-        dashboardOptions: {
-            type: Object,
-            default: () => ({}),
-        },
-        size: {
-            type: String,
-            default: WIDGET_SIZE.md,
-        },
-        theme: {
-            type: String,
-            default: 'violet',
-        },
-        widgetKey: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            loading: false,
-            chartRef: null as HTMLElement | null,
-            chartRoot: computed(() => root.value),
-            chartData: SAMPLE_XY_CHART_DATA, // TODO: mock data
-            timeUnit: 'month', // TODO: mock data
-            labels: ['projectA', 'projectB', 'projectC'], // TODO: mock data
+const chartContext = ref<HTMLElement|null>(null);
+const {
+    createXYDateChart, createXYLineSeries, createXYStackedColumnSeries,
+    createTooltip, setXYSharedTooltipText, createDataProcessor,
+    disposeRoot,
+} = useAmcharts5(chartContext);
+
+const state = reactive({
+    ...useWidgetState<HistoryDataModel['results']>(props),
+    groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROVIDER),
+    groupByLabel: computed<string>(() => {
+        const groupBy = state.groupBy;
+        return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;
+    }),
+    chartType: computed(() => state.options.chart_type ?? CHART_TYPE.LINE),
+    chartData: computed(() => getRefinedXYChartData(state.data, state.groupBy)),
+    labels: computed(() => {
+        if (!state.data) return [];
+        return state.data.map((d) => d[state.groupBy]);
+    }),
+    tableFields: computed(() => [ // TODO: fill date fields
+        { label: state.groupByLabel, name: state.groupBy },
+    ]),
+});
+
+const fetchData = async () => new Promise((resolve) => {
+    setTimeout(() => {
+        resolve(SAMPLE_RAW_DATA.results);
+    }, 1000);
+});
+
+const drawChart = (chartData: XYChartData[]) => {
+    const { chart, xAxis } = createXYDateChart();
+    xAxis.get('baseInterval').timeUnit = 'month';
+    chart.get('cursor')?.lineX.setAll({
+        visible: true,
+    });
+
+    state.labels.forEach((label) => {
+        const seriesSettings = {
+            name: label,
+            valueYField: label,
+        };
+        const series = state.chartType === CHART_TYPE.LINE
+            ? createXYLineSeries(chart, seriesSettings)
+            : createXYStackedColumnSeries(chart, seriesSettings);
+
+        // set data processor
+        series.data.processor = createDataProcessor({
+            dateFormat: DATE_FORMAT,
+            dateFields: [DATE_FIELD_NAME],
         });
 
-        const {
-            root,
-            createXYDateChart,
-            createPieChart,
-            createDonutChart,
-            createPieSeries,
-            createXYLineSeries,
-            createXYStackedColumnSeries,
-            createTooltip,
-            disposeRoot,
-            setXYSharedTooltipText,
-            createDataProcessor,
-            setPieTooltipText,
-        } = useAmcharts5(toRef(state, 'chartRef'));
+        const tooltip = createTooltip();
+        setXYSharedTooltipText(chart, tooltip, state.options.currency, props.currencyRates); // mock currency
+        series.set('tooltip', tooltip);
+        series.data.setAll(cloneDeep(chartData));
+    });
+};
 
-        /* Util */
-        const drawXYChart = (chartType) => {
-            const { chart, xAxis } = createXYDateChart();
-            xAxis.get('baseInterval').timeUnit = 'month';
+const initWidget = async () => {
+    state.loading = true;
+    state.data = await fetchData();
+    await nextTick();
+    drawChart(state.chartData);
+    state.loading = false;
+};
 
-            state.labels.forEach((label) => {
-                const seriesSettings = {
-                    name: label,
-                    valueYField: label,
-                };
-                const series = chartType === 'LINE'
-                    ? createXYLineSeries(chart, seriesSettings)
-                    : createXYStackedColumnSeries(chart, seriesSettings);
+useWidgetLifecycle({
+    initWidget, disposeWidget: disposeRoot,
+});
 
-                // set data processor
-                series.data.processor = createDataProcessor({
-                    dateFormat: 'yyyy-M', // TODO will be changed dynamically
-                    dateFields: [DATE_FIELD_NAME],
-                });
-
-                // tooltip
-                const tooltip = createTooltip();
-                setXYSharedTooltipText(chart, tooltip, 'KRW', { KRW: 1200 }); // mock currency
-                series.set('tooltip', tooltip);
-
-                // set data
-                series.data.setAll(SAMPLE_XY_CHART_DATA); // TODO: mock data
-            });
-        };
-        const drawPieChart = (chartType: string) => {
-            const chart = chartType === 'DONUT' ? createDonutChart() : createPieChart();
-
-            const seriesSettings = {
-                categoryField: 'category', // TODO: will be changed dynamically
-                valueField: 'value', // TODO: will be changed dynamically
-            };
-            const series = createPieSeries(chart, seriesSettings);
-            const tooltip = createTooltip();
-            setPieTooltipText(series, tooltip, 'KRW', { KRW: 1200 });
-            series.slices.template.set('tooltip', tooltip);
-            series.data.setAll(SAMPLE_PIE_CHART_DATA);
-        };
-
-        /* Watcher */
-        watch(() => state.chartRoot, (chartRoot) => {
-            if (chartRoot) {
-                if (['LINE', 'STACKED_COLUMN'].includes(props.chartType)) {
-                    drawXYChart(props.chartType);
-                } else if (['PIE', 'DONUT'].includes(props.chartType)) {
-                    drawPieChart(props.chartType);
-                }
-            }
-        });
-        onUnmounted(() => disposeRoot());
-
-        return {
-            ...toRefs(state),
-        };
-    },
+defineExpose({
+    refreshWidget: initWidget,
 });
 </script>
 
 <style lang="postcss" scoped>
 .base-trend-widget {
-    width: 44rem;
-    height: 29rem;
     .chart-wrapper {
-        height: 15rem;
-        .chart {
+        height: 10rem;
+        .chart-loader {
             height: 100%;
+            .chart {
+                height: 100%;
+            }
         }
     }
 }
