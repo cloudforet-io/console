@@ -16,7 +16,7 @@ import {
     defineComponent, reactive, toRefs, ref, onMounted, watch, onUnmounted,
 } from 'vue';
 
-import { CONTAINER_MIN_WIDTH } from '@/services/dashboards/dashboard-detail/lib/config';
+import { WIDGET_FRAME_CONTAINER_MIN_WIDTH } from '@/services/dashboards/dashboard-detail/lib/config';
 import { widgetFrameWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
 
 
@@ -31,7 +31,7 @@ export default defineComponent({
     },
     setup() {
         const state = reactive({
-            containerWidth: CONTAINER_MIN_WIDTH,
+            containerWidth: WIDGET_FRAME_CONTAINER_MIN_WIDTH,
             widgetFrameWidthList: [] as Array<Array<number>>,
             // cardTypeList: computed(() => props.cardTypeList),
         });
@@ -43,13 +43,13 @@ export default defineComponent({
             window.clearTimeout(timer);
             timer = window.setTimeout(() => {
                 // RESIZE containerWidth on `resize`
-                state.containerWidth = containerRef.value?.clientWidth ?? CONTAINER_MIN_WIDTH;
+                state.containerWidth = containerRef.value?.clientWidth ?? WIDGET_FRAME_CONTAINER_MIN_WIDTH;
             }, 100);
         };
 
         onMounted(() => {
             // INIT containerWidth
-            state.containerWidth = containerRef.value?.clientWidth ?? CONTAINER_MIN_WIDTH;
+            state.containerWidth = containerRef.value?.clientWidth ?? WIDGET_FRAME_CONTAINER_MIN_WIDTH;
             window.addEventListener('resize', handleWindowResize);
         });
 
@@ -58,13 +58,10 @@ export default defineComponent({
         });
 
         watch(() => state.containerWidth, (containerWidth: number) => {
-            const WIDGET_FRAME_SIZE_MOCK = ['MD', 'MD', 'SM', 'FULL', 'MD', 'LG', 'SM'];
+            const WIDGET_FRAME_SIZE_MOCK = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
 
             const refinedContainerWidth = containerWidth - (containerWidth % 80);
-
-            if (refinedContainerWidth < 800) {
-                state.widgetFrameWidthList = WIDGET_FRAME_SIZE_MOCK.map(() => [refinedContainerWidth]);
-            } else state.widgetFrameWidthList = widgetFrameWidthAssigner(WIDGET_FRAME_SIZE_MOCK, refinedContainerWidth);
+            state.widgetFrameWidthList = widgetFrameWidthAssigner(WIDGET_FRAME_SIZE_MOCK, refinedContainerWidth);
         });
 
         return { containerRef, ...toRefs(state) };

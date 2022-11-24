@@ -1,11 +1,11 @@
 import {
     WIDGET_FRAME_WIDTH_RANGE_LIST,
-    CONTAINER_MIN_WIDTH,
+    WIDGET_FRAME_CONTAINER_MIN_WIDTH,
     WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX,
 } from '@/services/dashboards/dashboard-detail/lib/config';
 
 
-const widgetFrameSizeRangeExtractor = (size: string, containerWidth: number = CONTAINER_MIN_WIDTH): Array<number> => {
+const widgetFrameSizeRangeExtractor = (size: string, containerWidth: number = WIDGET_FRAME_CONTAINER_MIN_WIDTH): Array<number> => {
     if (size === 'SM') return WIDGET_FRAME_WIDTH_RANGE_LIST[0];
     if (size === 'MD') return WIDGET_FRAME_WIDTH_RANGE_LIST[1];
     if (size === 'LG') return WIDGET_FRAME_WIDTH_RANGE_LIST[2];
@@ -95,7 +95,7 @@ const allWidgetFrameWidthReAligner = (allWidgetFrameWidthRange: Array<Array<Arra
             }
             if (rowWidthSum >= containerWidth) break;
             // 마지막 원소 고려
-            if (j === WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX && reAssignedRowWidth.length) {
+            if (j === WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX - 1 && reAssignedRowWidth.length) {
                 reAssignedWidgetFrameWidthList.push(reAssignedRowWidth);
             }
         }
@@ -105,6 +105,8 @@ const allWidgetFrameWidthReAligner = (allWidgetFrameWidthRange: Array<Array<Arra
 };
 
 export const widgetFrameWidthAssigner = (widgetFrameSizeList: Array<string>, containerWidth: number): Array<Array<number>> => {
+    if (containerWidth < 800) return widgetFrameSizeList.map(() => [containerWidth]);
+
     const allWidgetFrameWidthRange = selectAllWidgetFrameWidthRange(widgetFrameSizeList, containerWidth);
     return allWidgetFrameWidthReAligner(allWidgetFrameWidthRange, containerWidth);
 };
