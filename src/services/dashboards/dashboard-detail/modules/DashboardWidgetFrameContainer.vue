@@ -16,7 +16,10 @@ import {
     defineComponent, reactive, toRefs, ref, onMounted, watch, onUnmounted,
 } from 'vue';
 
-import { WIDGET_FRAME_CONTAINER_MIN_WIDTH } from '@/services/dashboards/dashboard-detail/lib/config';
+import {
+    WIDGET_FRAME_CONTAINER_MAX_WIDTH,
+    WIDGET_FRAME_CONTAINER_MIN_WIDTH,
+} from '@/services/dashboards/dashboard-detail/lib/config';
 import { widgetFrameWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
 
 
@@ -37,6 +40,12 @@ export default defineComponent({
         });
         const containerRef = ref<HTMLDivElement|null>(null);
 
+
+        const refineContainerWidth = (containerWidth: number): number => {
+            if (containerWidth < WIDGET_FRAME_CONTAINER_MIN_WIDTH) return WIDGET_FRAME_CONTAINER_MIN_WIDTH;
+            if (containerWidth > WIDGET_FRAME_CONTAINER_MAX_WIDTH) return WIDGET_FRAME_CONTAINER_MAX_WIDTH;
+            return containerWidth - (containerWidth % 80);
+        };
 
         let timer: undefined|number;
         const handleWindowResize = () => {
@@ -60,8 +69,7 @@ export default defineComponent({
         watch(() => state.containerWidth, (containerWidth: number) => {
             const WIDGET_FRAME_SIZE_MOCK = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
 
-            const refinedContainerWidth = containerWidth - (containerWidth % 80);
-            state.widgetFrameWidthList = widgetFrameWidthAssigner(WIDGET_FRAME_SIZE_MOCK, refinedContainerWidth);
+            state.widgetFrameWidthList = widgetFrameWidthAssigner(WIDGET_FRAME_SIZE_MOCK, refineContainerWidth(containerWidth));
         });
 
         return { containerRef, ...toRefs(state) };
