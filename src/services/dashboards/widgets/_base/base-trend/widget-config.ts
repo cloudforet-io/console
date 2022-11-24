@@ -1,4 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/config';
 
 const baseTrendWidgetConfig: WidgetConfig = {
     widget_config_id: 'baseTrend',
@@ -7,12 +8,27 @@ const baseTrendWidgetConfig: WidgetConfig = {
     }),
     labels: ['Cost'],
     description: {
+        translation_id: 'DASHBOARDS.WIDGET.BASE_TREND.DESC',
+        preview_image: 'xxx.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {
         inherit: true,
     },
     sizes: ['lg', 'full'],
+    widget_options: {
+        granularity: 'MONTHLY',
+    },
+    widget_options_schema: {
+        type: 'object',
+        properties: {
+            group_by: {
+                type: 'string',
+                enum: Object.values(GROUP_BY),
+            },
+        },
+        required: ['group_by'],
+    },
 };
 
 export default baseTrendWidgetConfig;
