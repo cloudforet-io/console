@@ -32,7 +32,8 @@
                        :widget-key="widgetId"
                        :currency-rates="currencyRates"
                        :dashboard-options="{
-                           currency
+                           currency,
+                           dateRange
                        }"
                        :inherit-options="{
                            currency: { enabled: true },
@@ -45,6 +46,12 @@
                                inline
                 >
                     <currency-select-dropdown @update="currency = $event" />
+                </p-field-group>
+                <p-field-group label="Date Range"
+                               required
+                               inline
+                >
+                    <date-range-selector :date-range.sync="dateRange" />
                 </p-field-group>
             </div>
         </div>
@@ -64,7 +71,9 @@ import { store } from '@/store';
 import { CURRENCY } from '@/store/modules/display/config';
 
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
-import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/helper';
+import DateRangeSelector from '@/services/dashboards/widgets/_components/DateRangeSelector.vue';
+import type { DateRange } from '@/services/dashboards/widgets/config';
+import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 interface Props {
     widgetId: string
@@ -73,7 +82,11 @@ interface Props {
 export default defineComponent<Props>({
     name: 'WidgetsPreviewPage',
     components: {
-        PFieldGroup, CurrencySelectDropdown, PIconButton, PButton,
+        DateRangeSelector,
+        PFieldGroup,
+        CurrencySelectDropdown,
+        PIconButton,
+        PButton,
     },
     props: {
         widgetId: {
@@ -90,6 +103,7 @@ export default defineComponent<Props>({
             mounted: false,
             autoRefresh: true,
             currency: CURRENCY.USD,
+            dateRange: {} as DateRange,
         });
 
         const { counter, pause, resume } = useInterval(1000, { controls: true });

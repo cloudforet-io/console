@@ -81,8 +81,13 @@ export interface WidgetConfig {
 }
 
 type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
+export interface DateRange {
+    start?: string;
+    end?: string;
+}
+
 export interface WidgetOptions {
-    date_range?: { start?: string; end?: string; };
+    date_range?: DateRange;
     currency?: Currency;
     group_by?: GroupBy[];
     granularity?: Granularity;

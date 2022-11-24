@@ -40,13 +40,13 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
 import { GROUP_BY, CHART_TYPE } from '@/services/dashboards/widgets/config';
-// eslint-disable-next-line import/no-cycle
-import { getRefinedXYChartData } from '@/services/dashboards/widgets/helper';
 import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widgets/type';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
+// eslint-disable-next-line import/no-cycle
+import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-helper';
 
 // TODO: sample data
 const SAMPLE_RAW_DATA = {
