@@ -5,7 +5,7 @@
     >
         <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
-                           :loadig="state.loading"
+                           :loading="state.loading"
                            :data="state.data"
                            loader-type="skeleton"
                            show-data-from-scratch
