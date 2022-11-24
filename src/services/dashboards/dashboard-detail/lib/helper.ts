@@ -4,6 +4,15 @@ import {
     WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX,
 } from '@/services/dashboards/dashboard-detail/lib/config';
 
+/** NAMING
+ * widgetFrameSize: string -> 'SM'|'MD'|'LG'|'XL'
+ * widgetFrameWidth: number -> 320, 400... 880, 960
+ * widgetFrameWidthRange: Array<number> -> [320, 400, 480]|[480, 560, 640]|[800, 880, 960]|[800, 880, 960]
+ * rowWidgetFrameWidthRange: Array<Array<number>> -> [[MD_RANGE], [MD_RANGE], [SM_RANGE], [LG_RANGE]]
+ * allWidgetFrameWidthRange: Array<Array<Array<number>>> -> [[[MD_RANGE], [MD_RANGE]], [[SM_RANGE], [[LG_RANGE]]]
+ * rowWidgetFrameWidthList: Array<number> -> [320, 480]
+ * allWidgetFrameWidthList: Array<Array<number>> -> [[320], [320, 480], [320, 480]]
+ * */
 
 const widgetFrameSizeRangeExtractor = (size: string, containerWidth: number = WIDGET_FRAME_CONTAINER_MIN_WIDTH): Array<number> => {
     if (size === 'SM') return WIDGET_FRAME_WIDTH_RANGE_LIST[0];
@@ -17,31 +26,32 @@ const widgetFrameSizeRangeExtractor = (size: string, containerWidth: number = WI
 
 
 const selectAllWidgetFrameWidthRange = (widgetFrameSizeList: Array<string>, containerWidth: number): Array<Array<Array<number>>> => {
-    // 각 line 의 widgetFrame width 를 저장하여 return 할 배열
+    // Array for save each line's widgetFrame width and return
     const allWidgetFrameWidthRange: Array<Array<Array<number>>> = [];
-    // shift() 수행하기 때문에 미리 length 저장해두어야 함.
+    // it runs shift() method, so should save length
     const widgetFrameSizeListLength = widgetFrameSizeList.length;
 
-    // 한 개 line 의 widgetFrame width 합을 비교할 배열
+    // compare sum of one row's widgetFrame width
     let rowWidthSum = 0;
-    // 한 개 line 의 widgetFrame width 를 저장할 배열
+    // Array for save one row's widget Frame width
     let rowWidgetFrameWidthRange: Array<Array<number>> = [];
 
     for (let i = 0; i < widgetFrameSizeListLength; i += 1) {
-        // widgetFrame 를 한 개 씩 추출함.
+        // extract widgetFrame one by one
         const selectedWidgetFrameSize: Array<number> = widgetFrameSizeRangeExtractor(widgetFrameSizeList.shift() as string, containerWidth);
         rowWidthSum += selectedWidgetFrameSize[0];
-        // 한 개 line 의 widgetFrame size 합과 containerWidth 를 비교하여 최댓값을 push 한 후 shift 한 카드의 기본값으로 초기화합니다.
+        // Compare the sum of widgetFrame sizes of one row with containerWidth to push the maximum value
+        // and initialize it to the default value of the shifted card.
         if (rowWidthSum > containerWidth) {
             allWidgetFrameWidthRange.push(rowWidgetFrameWidthRange);
             rowWidgetFrameWidthRange = [];
             rowWidthSum = selectedWidgetFrameSize[0];
         }
-        // 한 개 줄에 가용 가능한 widgetFrame size 합의 최댓값을 구해야하기 때문에, 비교 구문 이후 push 를 합니다.
+        // Push after the comparison syntax because you need to find the maximum value of the widgetFrame size agreement available on one line.
         rowWidgetFrameWidthRange.push(selectedWidgetFrameSize);
     }
 
-    // 마지막 줄에 한 개의 widgetFrame 이 배치됐다면, 누락됨. 따라서 마지막 원소를 고려함.
+    // consider last element
     if (rowWidgetFrameWidthRange.length) allWidgetFrameWidthRange.push(rowWidgetFrameWidthRange);
 
     return allWidgetFrameWidthRange;
@@ -55,26 +65,27 @@ const allWidgetFrameWidthReAligner = (allWidgetFrameWidthRange: Array<Array<Arra
     let reAssignedRowWidth: Array<number> = [];
 
 
+    // Concept: https://www.notion.so/spaceone-io/WidgetFrame-width-assigner-Pointer-c4379b4cb4ce4053ad63405f58bcc261
     for (let i = 0; i < allWidgetFrameWidthRange.length; i += 1) {
-        const oneLineSequence: Array<number> = [];
+        const rowPointer: Array<number> = [];
         for (let j = 0; j < allWidgetFrameWidthRange[i].length; j += 1) {
-            oneLineSequence.push(0);
+            rowPointer.push(0);
         }
-        widthSelectPointer.push(oneLineSequence);
+        widthSelectPointer.push(rowPointer);
     }
 
-    // i -> 각 row 순회
+    // i -> circuit each row
     for (let i = 0; i < allWidgetFrameWidthRange.length; i += 1) {
         rowWidthSum = 0;
         reAssignedRowWidth = [];
-        // j -> widgetFrame size 를 80 씩 증가시킴
+        // j -> increase widgetFrame size as +80
         for (let j = 0; j < WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX; j += 1) {
-            // k > allWidgetFrameWidthRange 순회
+            // k -> circuit allWidgetFrameWidthRange
             for (let k = 0; k < allWidgetFrameWidthRange[i].length; k += 1) {
                 rowWidthSum = 0;
                 reAssignedRowWidth = [];
                 widthSelectPointer[i].unshift(j);
-                // l -> 각 row 합 비교 && 한 줄 push
+                // l -> compare sum of each row width && push one row
                 for (let l = 0; l < allWidgetFrameWidthRange[i].length; l += 1) {
                     rowWidthSum += allWidgetFrameWidthRange[i][l][widthSelectPointer[i][l]];
 
@@ -94,7 +105,7 @@ const allWidgetFrameWidthReAligner = (allWidgetFrameWidthRange: Array<Array<Arra
                 if (rowWidthSum >= containerWidth) break;
             }
             if (rowWidthSum >= containerWidth) break;
-            // 마지막 원소 고려
+            // consider last element
             if (j === WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX - 1 && reAssignedRowWidth.length) {
                 reAssignedWidgetFrameWidthList.push(reAssignedRowWidth);
             }

@@ -51,7 +51,6 @@ const _SELECT_WIDGET_AMOUNT = 2;
 const widgetFrameCases: Array<Array<string>> = permutation(['SM', 'MD', 'LG', 'XL', 'FULL'], _SELECT_WIDGET_AMOUNT);
 const widgetFrameCasesLength = widgetFrameCases.length;
 
-
 describe('Select widgetFrames as permutation', () => {
     it('Count of selected widgetFrames would be (5 ** _SELECT_WIDGET_AMOUNT)', () => {
         expect(widgetFrameCases.length).toBe(5 ** _SELECT_WIDGET_AMOUNT);
