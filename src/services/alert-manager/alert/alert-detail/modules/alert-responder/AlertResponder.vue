@@ -48,8 +48,7 @@
                                :selected.sync="responderState.selectedMemberItems"
                                :disabled="manageDisabled"
                                multi-selectable
-                               @hide-menu="onHideMenu"
-                               @delete-tag="onDeleteTag"
+                               @update:selected="handleUpdateSelected"
             />
         </article>
     </p-pane-layout>
@@ -65,7 +64,7 @@ import {
     PBadge, PCollapsibleList, PPaneLayout, PPanelTop, PSearchDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { difference } from 'lodash';
+import { differenceBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -139,6 +138,7 @@ export default {
                     type: 'item',
                 };
             })),
+            prevSelectedMemberItems: props.alertData.responders.map((d) => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[],
             selectedMemberItems: props.alertData.responders.map((d) => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[],
             selectedResourceIds: computed<string[]>(() => responderState.selectedMemberItems.map((d) => d.name)),
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
@@ -191,16 +191,6 @@ export default {
             }
         };
 
-        const onHideMenu = () => {
-            const originResponders = Object.fromEntries((
-                Object.entries(props.alertData.responders).map(([key, value]) => [key, value.resource_id])
-            ));
-            const targetItems = difference(responderState.selectedResourceIds, Object.values(originResponders));
-            targetItems.forEach((item) => {
-                addResponder(item);
-            });
-        };
-
         const removeResponder = async (userID: string) => {
             try {
                 await SpaceConnector.client.monitoring.alert.removeResponder({
@@ -213,10 +203,6 @@ export default {
             }
         };
 
-        const onDeleteTag = async (item) => {
-            await removeResponder(item.name);
-        };
-
         const listEscalationPolicy = async () => {
             const { rules } = await SpaceConnector.client.monitoring.escalationPolicy.get({
                 // eslint-disable-next-line camelcase
@@ -226,6 +212,20 @@ export default {
                 title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'),
                 data: d,
             }));
+        };
+
+        const handleUpdateSelected = (selected) => {
+            const addedItems = differenceBy(selected, responderState.prevSelectedMemberItems, 'name');
+            const deletedItems = differenceBy(responderState.prevSelectedMemberItems, selected, 'name');
+
+            if (addedItems.length) {
+                addedItems.forEach((item) => addResponder(item.name));
+            }
+            if (deletedItems.length) {
+                deletedItems.forEach((item) => removeResponder(item.name));
+            }
+
+            responderState.prevSelectedMemberItems = [...selected];
         };
 
         // LOAD REFERENCE STORE
@@ -242,10 +242,8 @@ export default {
         return {
             ...toRefs(state),
             responderState,
-            addResponder,
-            onDeleteTag,
-            onHideMenu,
             responderNameFormatter,
+            handleUpdateSelected,
         };
     },
 };
