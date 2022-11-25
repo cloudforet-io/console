@@ -243,7 +243,10 @@ export default {
             ]);
             vm.$router.replace({
                 name: ALERT_MANAGER_ROUTE.ALERT._NAME,
-                query: { filters: urlQueryHelper.rawQueryStrings },
+                query: {
+                    filters: urlQueryHelper.rawQueryStrings,
+                    state: 'ALL',
+                },
             });
         };
 
