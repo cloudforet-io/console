@@ -111,7 +111,7 @@
 
                     <project-group-delete-check-modal v-if="storeState.projectGroupDeleteCheckModalVisible" />
 
-                    <project-group-member :visible="groupMemberPageVisible && storeState.groupId"
+                    <project-group-member :visible="!!(groupMemberPageVisible && storeState.groupId)"
                                           :group-id="storeState.groupId"
                                           :manage-disabled="!hasManagePermission"
                                           @close="groupMemberPageVisible = false"
