@@ -80,6 +80,7 @@
                 >
                     <p-text-input
                         v-model="description"
+                        :disabled="!hasManagePermission"
                         @input="handleDescriptionUpdate"
                     />
                 </p-field-group>
@@ -87,7 +88,7 @@
             <div class="policy-detail-contents">
                 <p-field-title>{{ $t('IAM.POLICY.FORM.PERMISSION') }}</p-field-title>
                 <p-text-editor
-                    :read-only="type === POLICY_TYPES.MANAGED"
+                    :read-only="(type === POLICY_TYPES.MANAGED || !hasManagePermission)"
                     :code="code"
                     @update:code="handleCodeUpdate"
                 />
