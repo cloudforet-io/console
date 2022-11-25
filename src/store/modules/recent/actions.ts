@@ -51,7 +51,6 @@ export const load: Action<RecentState, any> = async ({ commit }, payload: Recent
         type: itemType,
         limit: payload?.limit,
     });
-    console.log(results);
     const recents: RecentConfig[] = results.map((d) => ({
         itemType: d.data.type,
         itemId: d.data.id,
