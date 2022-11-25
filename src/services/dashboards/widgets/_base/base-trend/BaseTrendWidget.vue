@@ -1,7 +1,7 @@
 <template>
     <widget-frame :title="state.title"
                   :size="state.size"
-                  :width="props.width"
+                  width="704px"
                   class="base-trend-widget"
     >
         <div class="chart-wrapper">
@@ -53,7 +53,7 @@ const SAMPLE_RAW_DATA = {
     more: true,
     results: [
         {
-            product: 'AmazonCloudFront',
+            provider: 'aws',
             usd_cost_sum: [
                 { date: '2022-08', value: random(100, 5000) },
                 // { date: '2022-09', value: 0 },
@@ -62,7 +62,7 @@ const SAMPLE_RAW_DATA = {
             ],
         },
         {
-            product: 'AmazonEC2',
+            provider: 'google_cloud',
             usd_cost_sum: [
                 { date: '2022-08', value: random(100, 5000) },
                 { date: '2022-09', value: random(100, 5000) },
@@ -71,7 +71,7 @@ const SAMPLE_RAW_DATA = {
             ],
         },
         {
-            product: 'AWSSecretsManager',
+            provider: 'azure',
             usd_cost_sum: [
                 { date: '2022-08', value: random(100, 5000) },
                 { date: '2022-09', value: random(100, 5000) },
@@ -121,9 +121,12 @@ const fetchData = async () => new Promise((resolve) => {
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis } = createXYDateChart();
     xAxis.get('baseInterval').timeUnit = 'month';
-    chart.get('cursor')?.lineX.setAll({
-        visible: true,
-    });
+
+    if (state.chartType === CHART_TYPE.LINE) {
+        chart.get('cursor')?.lineX.setAll({
+            visible: true,
+        });
+    }
 
     state.labels.forEach((label) => {
         const seriesSettings = {

@@ -75,6 +75,7 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings): {
 
     const yRenderer = am5xy.AxisRendererY.new(root, {
         strokeOpacity: 0,
+        // minGridDistance: 20,
     });
     yRenderer.grid.template.setAll({
         strokeOpacity: 1,
@@ -154,13 +155,19 @@ export const createXYStackedColumnSeries = (
     root: Root,
     chart: am5xy.XYChart,
     settings?: Partial<IXYSeriesSettings>,
-): am5xy.XYSeries => chart.series.push(am5xy.ColumnSeries.new(root, {
-    xAxis: chart.xAxes.getIndex(0) as IXYAxis,
-    yAxis: chart.yAxes.getIndex(0) as IXYAxis,
-    stacked: true,
-    valueXField: DEFAULT_DATE_FIELD_NAME,
-    ...settings,
-}));
+): am5xy.XYSeries => {
+    const series = chart.series.push(am5xy.ColumnSeries.new(root, {
+        xAxis: chart.xAxes.getIndex(0) as IXYAxis,
+        yAxis: chart.yAxes.getIndex(0) as IXYAxis,
+        stacked: true,
+        valueXField: DEFAULT_DATE_FIELD_NAME,
+        ...settings,
+    }));
+    series.columns.template.setAll({
+        width: am5.percent(45),
+    });
+    return series;
+};
 
 // Tooltip
 export const setXYSharedTooltipText = (chart: am5xy.XYChart, tooltip: am5.Tooltip, currency?: Currency, currencyRate?: CurrencyRates): void => {
