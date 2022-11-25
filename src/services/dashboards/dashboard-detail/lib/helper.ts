@@ -15,12 +15,12 @@ import {
  * */
 
 const widgetFrameSizeRangeExtractor = (size: string, containerWidth: number = WIDGET_FRAME_CONTAINER_MIN_WIDTH): Array<number> => {
-    if (size === 'SM') return WIDGET_FRAME_WIDTH_RANGE_LIST[0];
-    if (size === 'MD') return WIDGET_FRAME_WIDTH_RANGE_LIST[1];
-    if (size === 'LG') return WIDGET_FRAME_WIDTH_RANGE_LIST[2];
-    if (size === 'XL') return WIDGET_FRAME_WIDTH_RANGE_LIST[3];
+    if (size === 'SM') return WIDGET_FRAME_WIDTH_RANGE_LIST.SM;
+    if (size === 'MD') return WIDGET_FRAME_WIDTH_RANGE_LIST.MD;
+    if (size === 'LG') return WIDGET_FRAME_WIDTH_RANGE_LIST.LG;
+    if (size === 'XL') return WIDGET_FRAME_WIDTH_RANGE_LIST.XL;
     // WIDGET_FRAME_WIDTH_RANGE_LIST length, it will return filled by ${containerWidth}
-    if (size === 'FULL') return WIDGET_FRAME_WIDTH_RANGE_LIST[0].map(() => containerWidth);
+    if (size === 'FULL') return WIDGET_FRAME_WIDTH_RANGE_LIST.SM.map(() => containerWidth);
     return [0];
 };
 
