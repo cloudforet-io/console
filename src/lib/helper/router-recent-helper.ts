@@ -22,8 +22,9 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     /* PROJECT GROUP */
     if (to.name === PROJECT_ROUTE._NAME) {
         const projectGroupId = to?.query?.select_pg;
-        if (!projectGroupId) return undefined;
-        return { itemType: RECENT_TYPE.PROJECT_GROUP, itemId: projectGroupId as string };
+        if (projectGroupId?.length) {
+            return { itemType: RECENT_TYPE.PROJECT_GROUP, itemId: projectGroupId as string };
+        }
     }
 
     /* PROJECT */
