@@ -68,20 +68,19 @@
                     <template #data="{node}">
                         {{ node.data.name }}
                     </template>
-                    <template #toggle-right="{node}">
-                        <favorite-button v-if="node.data.item_type === 'PROJECT_GROUP'"
-                                         :item-id="node.data.id"
-                                         :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
-                                         scale="0.75"
-                                         read-only
-                        />
-                    </template>
                     <template #icon="{node}">
                         <p-i :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' : 'ic_tree_project-group'"
                              class="project-group-icon"
                              color="inherit"
                              width="1rem"
                              height="1rem"
+                        />
+                        <favorite-button v-if="node.data.item_type === 'PROJECT_GROUP'"
+                                         :item-id="node.data.id"
+                                         :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
+                                         scale="0.75"
+                                         read-only
+                                         class="mr-1"
                         />
                     </template>
                     <template #right-extra="{node, path}">

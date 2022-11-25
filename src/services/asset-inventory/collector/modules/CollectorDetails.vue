@@ -12,12 +12,13 @@
                           :theme="data === 'DISABLED' ? 'red' : 'green'"
                 />
             </template>
-            <template #data-plugin_name="{data}">
+            <template #data-plugin_name="{data: pluginName}">
                 <p-lazy-img :src="data.plugin_icon"
+                            :loading="loading"
                             width="1rem"
                             height="1rem"
                 />
-                <span class="ml-2 leading-none">{{ data }}</span>
+                <span class="ml-2 leading-none">{{ pluginName }}</span>
             </template>
             <template #data-plugin_info.metadata.metadata.supported_resource_type="{data}">
                 <p-text-list :items="data || []"
@@ -93,7 +94,7 @@ export default {
                 only: ['name', 'provider', 'state', 'plugin_info.version',
                     'last_collected_at', 'created_at', 'tags', 'plugin_info.plugin_id'],
             });
-            state.loading = false;
+
             if (res) {
                 state.data = {
                     plugin_name: state.plugins[res.plugin_info.plugin_id]?.label,
@@ -101,6 +102,7 @@ export default {
                     ...res,
                 };
             }
+            state.loading = false;
         };
         watch(() => props.collectorId, () => {
             getCollectorDetailData();
