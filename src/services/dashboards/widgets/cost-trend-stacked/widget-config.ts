@@ -4,7 +4,7 @@ import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/config';
 const costTrendStackedWidgetConfig: WidgetConfig = {
     widget_config_id: 'costTrendStacked',
     base_configs: [{ config_id: 'baseTrend' }],
-    title: 'Cost Trend',
+    title: 'Cost Trend Stacked',
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.COST_TREND_STACKED.DESC',
