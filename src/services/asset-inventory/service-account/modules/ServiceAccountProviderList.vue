@@ -70,10 +70,6 @@ export default defineComponent({
         padding: 0.75rem 1rem;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 
-        /* customize p-lazy-img */
-        :deep(.img-container) {
-            position: relative;
-        }
         .provider-name {
             display: -webkit-box;
             -webkit-line-clamp: 2;
