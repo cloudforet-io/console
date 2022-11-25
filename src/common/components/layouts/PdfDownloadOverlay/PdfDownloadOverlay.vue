@@ -273,6 +273,7 @@ export default defineComponent<Props>({
                     if (i === 0) return 4;
                     return 6;
                 },
+                // eslint-disable-next-line no-unsafe-optional-chaining
                 paddingRight: (i, node) => (node?.table.widths.length - 1 === i ? 6 : 8),
                 paddingBottom: (i) => {
                     if (i === 0) return 4;
