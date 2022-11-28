@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -91,11 +91,11 @@ const chartContext = ref<HTMLElement|null>(null);
 const {
     createXYDateChart, createXYLineSeries, createXYStackedColumnSeries,
     createTooltip, setXYSharedTooltipText, createDataProcessor,
-    disposeRoot,
+    disposeRoot, refreshRoot,
 } = useAmcharts5(chartContext);
 
 const state = reactive({
-    ...useWidgetState<HistoryDataModel['results']>(props),
+    ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
     groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROVIDER),
     groupByLabel: computed<string>(() => {
         const groupBy = state.groupBy;
@@ -144,7 +144,7 @@ const drawChart = (chartData: XYChartData[]) => {
         });
 
         const tooltip = createTooltip();
-        setXYSharedTooltipText(chart, tooltip, state.options.currency, props.currencyRates); // mock currency
+        setXYSharedTooltipText(chart, tooltip, state.options.currency, props.currencyRates);
         series.set('tooltip', tooltip);
         series.data.setAll(cloneDeep(chartData));
     });
@@ -158,12 +158,21 @@ const initWidget = async () => {
     state.loading = false;
 };
 
+const refreshWidget = async () => {
+    state.loading = true;
+    state.data = await fetchData();
+    await nextTick();
+    refreshRoot();
+    drawChart(state.chartData);
+    state.loading = false;
+};
+
 useWidgetLifecycle({
     initWidget, disposeWidget: disposeRoot,
 });
 
 defineExpose({
-    refreshWidget: initWidget,
+    refreshWidget,
 });
 </script>
 
