@@ -1,7 +1,7 @@
 <template>
     <div class="widget-frame"
          :class="{ full: isFull, 'edit-mode': editMode }"
-         :style="{ width: isFull ? '100%' : width }"
+         :style="{ width: `${width}px` }"
     >
         <div class="widget-header">
             <h3 class="title">
@@ -83,7 +83,7 @@ import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 interface Props {
     title: TranslateResult;
     size: WidgetSize;
-    width: string;
+    width: number;
     widgetLink?: string;
     widgetRoute?: Route;
     dateRange?: WidgetOptions['date_range'];
@@ -121,9 +121,10 @@ export default defineComponent<Props>({
             type: String as PropType<WidgetSize>,
             default: WIDGET_SIZE.md,
         },
+        // FIXME:: width should be -= 16 because of margin.
         width: {
-            type: String,
-            default: '30rem', // default width of md size
+            type: Number,
+            default: 320, // default width of sm size
         },
         widgetLink: {
             type: String,
@@ -231,6 +232,7 @@ export default defineComponent<Props>({
 <style lang="postcss" scoped>
 .widget-frame {
     height: 29rem;
+    margin: 0.5rem;
 
     @apply border rounded-lg bg-white;
     border-color: theme('colors.gray.200');

@@ -2,11 +2,16 @@
     <div ref="containerRef"
          class="dashboard-widget-frame-container"
     >
-        <p v-for="(item, index) in widgetFrameWidthList"
-           :key="index"
+        <div
+            v-for="(row, rowIndex) in widgetFrameWidthList"
+            :key="`widget-frame-row-${rowIndex}`"
         >
-            {{ item }} {{ containerWidth - (containerWidth % 80) }}
-        </p>
+            <widget-frame
+                v-for="(width, index) in row"
+                :key="`widget-frame-row-${rowIndex}-${index}`"
+                :width="width"
+            />
+        </div>
     </div>
 </template>
 
@@ -21,11 +26,14 @@ import {
     WIDGET_FRAME_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
 import { widgetFrameWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
-
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 
 
 export default defineComponent({
     name: 'DashboardWidgetFrameContainer',
+    components: {
+        WidgetFrame,
+    },
     props: {
         cardTypeList: {
             type: Array as PropType<Array<string>>,
@@ -38,7 +46,7 @@ export default defineComponent({
             widgetFrameWidthList: [] as Array<Array<number>>,
             // cardTypeList: computed(() => props.cardTypeList),
         });
-        const containerRef = ref<HTMLDivElement|null>(null);
+        const containerRef = ref<Element|null>(null);
 
 
         const refineContainerWidth = (containerWidth: number): number => {
@@ -48,22 +56,26 @@ export default defineComponent({
         };
 
         let timer: undefined|number;
-        const handleWindowResize = () => {
+        const handleResizeObserve = () => {
+            // timeouts for throttle
             window.clearTimeout(timer);
             timer = window.setTimeout(() => {
-                // RESIZE containerWidth on `resize`
+                // RESIZE containerWidth on `resizeObserve`
                 state.containerWidth = containerRef.value?.clientWidth ?? WIDGET_FRAME_CONTAINER_MIN_WIDTH;
-            }, 100);
+                // for less throttle, change below timeout ms
+            }, 500);
         };
+
+        const observeInstance = new ResizeObserver(handleResizeObserve);
 
         onMounted(() => {
             // INIT containerWidth
             state.containerWidth = containerRef.value?.clientWidth ?? WIDGET_FRAME_CONTAINER_MIN_WIDTH;
-            window.addEventListener('resize', handleWindowResize);
+            observeInstance.observe(containerRef?.value as Element);
         });
 
         onUnmounted(() => {
-            window.removeEventListener('resize', handleWindowResize);
+            observeInstance.unobserve(containerRef?.value as Element);
         });
 
         watch(() => state.containerWidth, (containerWidth: number) => {
