@@ -51,6 +51,13 @@ export const useAmcharts5 = (
         root: undefined as undefined | Root,
     });
 
+    const refreshRoot = () => {
+        disposeRoot();
+        const root = am5.Root.new(state.chartContext as HTMLElement);
+        state.root = root;
+        initRoot(root);
+    };
+
     const initRoot = (root: Root) => {
         root.setThemes([am5themes_Animated.new(root), Amcharts5GlobalTheme.new(root)]);
         root.utc = true;
@@ -94,6 +101,7 @@ export const useAmcharts5 = (
 
     return {
         root: toRef(state, 'root'),
+        refreshRoot,
         disposeRoot,
         clearChildrenOfRoot,
         //
