@@ -6,6 +6,7 @@ import {
 import * as am5 from '@amcharts/amcharts5';
 import type { IDataProcessorSettings, ITooltipSettings, Root } from '@amcharts/amcharts5';
 import type { IPieChartSettings } from '@amcharts/amcharts5/.internal/charts/pie/PieChart';
+import type { ILegendSettings } from '@amcharts/amcharts5/.internal/core/render/Legend';
 import type { PieChart, IPieSeriesSettings } from '@amcharts/amcharts5/percent';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import type { IXYChartSettings, IXYSeriesSettings, XYChart } from '@amcharts/amcharts5/xy';
@@ -41,6 +42,34 @@ const createTooltip = (root: Root, settings?: ITooltipSettings): am5.Tooltip => 
         fontSize: 12,
     });
     return tooltip;
+};
+
+const createLegend = (root: Root, settings?: ILegendSettings): am5.Legend => {
+    const legend = am5.Legend.new(root, {
+        layout: root.horizontalLayout,
+        paddingTop: 8,
+        useDefaultMarker: true,
+        x: am5.percent(0),
+        ...settings,
+    });
+    legend.labels.template.setAll({
+        fontSize: 12,
+        fill: am5.color(gray[700]),
+    });
+    legend.valueLabels.template.setAll({
+        width: 0,
+    });
+    legend.markers.template.setAll({
+        width: 10,
+        height: 10,
+    });
+    legend.markerRectangles.template.setAll({
+        cornerRadiusTL: 10,
+        cornerRadiusTR: 10,
+        cornerRadiusBL: 10,
+        cornerRadiusBR: 10,
+    });
+    return legend;
 };
 
 export const useAmcharts5 = (
@@ -138,6 +167,10 @@ export const useAmcharts5 = (
         createTooltip: (settings?: ITooltipSettings) => {
             if (!state.root) throw new Error('No root');
             return createTooltip(state.root as Root, settings);
+        },
+        createLegend: (settings?: ILegendSettings): am5.Legend => {
+            if (!state.root) throw new Error('No root');
+            return createLegend(state.root as Root, settings);
         },
         setXYSharedTooltipText,
         setXYSingleTooltipText,
