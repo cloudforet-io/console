@@ -90,7 +90,7 @@ const props = defineProps<WidgetProps>();
 const chartContext = ref<HTMLElement|null>(null);
 const {
     createXYDateChart, createXYLineSeries, createXYStackedColumnSeries,
-    createTooltip, setXYSharedTooltipText, createDataProcessor,
+    createTooltip, setXYSharedTooltipText, createDataProcessor, createLegend,
     disposeRoot, refreshRoot,
 } = useAmcharts5(chartContext);
 
@@ -128,6 +128,14 @@ const drawChart = (chartData: XYChartData[]) => {
         });
     }
 
+    let legend;
+    if (state.options.legend_options?.enabled && state.options.legend_options.show_at === 'chart') {
+        legend = createLegend({
+            nameField: 'name',
+        });
+        chart.children.push(legend);
+    }
+
     state.labels.forEach((label) => {
         const seriesSettings = {
             name: label,
@@ -147,6 +155,8 @@ const drawChart = (chartData: XYChartData[]) => {
         setXYSharedTooltipText(chart, tooltip, state.options.currency, props.currencyRates);
         series.set('tooltip', tooltip);
         series.data.setAll(cloneDeep(chartData));
+
+        if (legend) legend.data.push(series);
     });
 };
 
