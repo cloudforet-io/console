@@ -77,6 +77,7 @@ import { getUUID } from '@/lib/component-util/getUUID';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import { WIDGET_FRAME_WIDTH_RANGE_LIST } from '@/services/dashboards/dashboard-detail/lib/config';
 import type { WidgetOptions, WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 
@@ -124,7 +125,7 @@ export default defineComponent<Props>({
         // FIXME:: width should be -= 16 because of margin.
         width: {
             type: Number,
-            default: 320, // default width of sm size
+            default: WIDGET_FRAME_WIDTH_RANGE_LIST.SM[0],
         },
         widgetLink: {
             type: String,
