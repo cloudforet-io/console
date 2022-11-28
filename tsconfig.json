@@ -15,8 +15,6 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "declaration": true,
-    "outDir": "dist",
     "types": ["webpack-env", "@types/jest", "jest"],
     "paths": {
       "@/*": ["src/*"]

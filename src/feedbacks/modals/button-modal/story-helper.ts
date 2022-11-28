@@ -43,7 +43,7 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     size: {
         name: 'size',
         type: { name: 'string' },
-        description: `Modal size. ${Object.keys(SizeMapping).map(d => `\`${d}\``).join(', ')} are available.`,
+        description: `Modal size. ${Object.keys(SizeMapping).map((d) => `\`${d}\``).join(', ')} are available.`,
         defaultValue: 'md',
         table: {
             type: {
@@ -62,7 +62,7 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
     themeColor: {
         name: 'themeColor',
         type: { name: 'string' },
-        description: `Modal themes. ${THEME_COLORS.map(d => `\`${d}\``).join(', ')} are available.`,
+        description: `Modal themes. ${THEME_COLORS.map((d) => `\`${d}\``).join(', ')} are available.`,
         defaultValue: 'primary',
         table: {
             type: {

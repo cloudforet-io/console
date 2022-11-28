@@ -1,5 +1,8 @@
 <template>
-    <div v-click-outside="forceHideMenu" class="p-search-dropdown" :class="[ {'multi-selectable' : multiSelectable} ]">
+    <div v-click-outside="forceHideMenu"
+         class="p-search-dropdown"
+         :class="[ {'multi-selectable' : multiSelectable} ]"
+    >
         <p-search ref="targetRef"
                   v-model="proxyValue"
                   :placeholder="placeholderValue ? placeholderValue : $t('COMPONENT.SEARCH_DROPDOWN.PLACEHOLDER')"
@@ -18,32 +21,50 @@
                      !proxyIsFocused"
                  class="selected-radio-label"
             >
-                <span><slot name="selected-radio-label" :selected="proxySelected[0]">{{ proxySelected[0].label || proxySelected[0].name }}</slot></span>
-                <p-i class="delete-icon" name="ic_delete"
-                     height="1rem" width="1rem"
+                <span><slot name="selected-radio-label"
+                            :selected="proxySelected[0]"
+                >{{ proxySelected[0].label || proxySelected[0].name }}</slot></span>
+                <p-i class="delete-icon"
+                     name="ic_delete"
+                     height="1rem"
+                     width="1rem"
                      @click="onDeleteTag(proxySelected[0], 0)"
                 />
             </div>
-            <template v-if="multiSelectable && proxySelected.length" #left>
-                <p-tag v-for="(selectedItem, index) in proxySelected" :key="`tag-box-${index}`" :deletable="!disabled"
+            <template v-if="multiSelectable && proxySelected.length"
+                      #left
+            >
+                <p-tag v-for="(selectedItem, index) in proxySelected"
+                       :key="`tag-box-${index}`"
+                       :deletable="!disabled"
                        @delete="onDeleteTag(selectedItem, index)"
                 >
                     {{ selectedItem.label || selectedItem.name }}
                 </p-tag>
                 <p-i v-if="!disableDeleteAll"
-                     class="delete-icon" name="ic_delete"
-                     height="1rem" width="1rem"
+                     class="delete-icon"
+                     name="ic_delete"
+                     height="1rem"
+                     width="1rem"
                      @click="onDeleteAllTags"
                 />
             </template>
-            <template v-if="searchDropdownType !== SEARCH_DROPDOWN_TYPE.default || !proxySelected.length || visibleMenu" #right>
+            <template v-if="searchDropdownType !== SEARCH_DROPDOWN_TYPE.default || !proxySelected.length || visibleMenu"
+                      #right
+            >
                 <p-i :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                     color="inherit" class="dropdown-button" :class="disabled"
+                     color="inherit"
+                     class="dropdown-button"
+                     :class="disabled"
                      @click.stop="handleClickDropdownButton"
                 />
             </template>
-            <template v-for="(_, slot) of searchSlots" #[slot]="scope">
-                <slot :name="`search-${slot}`" v-bind="{...scope}" />
+            <template v-for="(_, slot) of searchSlots"
+                      #[slot]="scope"
+            >
+                <slot :name="`search-${slot}`"
+                      v-bind="{...scope}"
+                />
             </template>
         </p-search>
         <p-context-menu v-show="proxyVisibleMenu"
@@ -68,12 +89,18 @@
                           :key="`item-label--${text}-${i}`"
                           :class="{ 'selected': searchDropdownType === SEARCH_DROPDOWN_TYPE.default && item.name === selectedNames[0] }"
                     >
-                        <span v-if="i !== 0" class="font-bold">{{ getMatchText(item.label) }}</span><span>{{ text }}</span>
+                        <span v-if="i !== 0"
+                              class="font-bold"
+                        >{{ getMatchText(item.label) }}</span><span>{{ text }}</span>
                     </span>
                 </span>
             </template>
-            <template v-for="(_, slot) of menuSlots" #[slot]="scope">
-                <slot :name="`menu-${slot}`" v-bind="scope" />
+            <template v-for="(_, slot) of menuSlots"
+                      #[slot]="scope"
+            >
+                <slot :name="`menu-${slot}`"
+                      v-bind="scope"
+                />
             </template>
         </p-context-menu>
     </div>
@@ -209,9 +236,9 @@ export default defineComponent<SearchDropdownProps>({
             placeholderValue: undefined as string|undefined,
             filteredMenu: [] as SearchDropdownMenuItem[],
             bindingMenu: computed<SearchDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
-            searchableItems: computed<SearchDropdownMenuItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
+            searchableItems: computed<SearchDropdownMenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),
             searchRegex: computed(() => new RegExp(state.proxyValue || '', 'i')),
-            selectedNames: computed(() => state.proxySelected.map(item => item.name)),
+            selectedNames: computed(() => state.proxySelected.map((item) => item.name)),
             //
             menuSlots: computed(() => reduce(slots, (res, d, name) => {
                 if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
@@ -238,7 +265,7 @@ export default defineComponent<SearchDropdownProps>({
             const trimmed = inputText.trim();
             if (trimmed) {
                 const regex = new RegExp(inputText, 'i');
-                results = results.filter(d => regex.test(d.label as string));
+                results = results.filter((d) => regex.test(d.label as string));
             }
             return { results };
         };
@@ -255,7 +282,7 @@ export default defineComponent<SearchDropdownProps>({
 
                 const filtered = props.menu.filter((item) => {
                     if (item.type && item.type !== 'item') return true;
-                    return !!results.find(d => d.label === item.label);
+                    return !!results.find((d) => d.label === item.label);
                 });
                 if (filtered[filtered.length - 1]?.type === 'divider') filtered.pop();
                 state.filteredMenu = filtered;
@@ -393,7 +420,7 @@ export default defineComponent<SearchDropdownProps>({
 
         const onSearch = (val?: string) => {
             const trimmed = val?.trim() ?? '';
-            const menuItem = state.filteredMenu.find(d => trimmed.toLowerCase() === d.label?.toLowerCase());
+            const menuItem = state.filteredMenu.find((d) => trimmed.toLowerCase() === d.label?.toLowerCase());
             if (menuItem) {
                 emit('select-menu', menuItem);
                 state.proxyValue = menuItem.label ?? menuItem.name ?? '';

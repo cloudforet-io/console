@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const postcss = require('postcss');
 
-const postcssConfig = require('../postcss.config');
+const postcssConfig = require('../postcss.config.cjs');
 
 console.log('pcss to css processing...');
 const destDir = 'css';
@@ -15,7 +15,7 @@ const pcssToCss = (fileName, sourceFile) => {
     const file = fs.readFileSync(sourceFile);
     const destFile = `${destDir}/${fileName}`;
 
-    postcss(postcssConfig.plugins()).process(file, { from: sourceFile, to: destFile })
+    postcss(postcssConfig.plugins).process(file, { from: sourceFile, to: destFile })
         .then((result) => {
             fs.writeFileSync(destFile, result.css);
             console.log(`succeed to write ${fileName}`);

@@ -1,5 +1,7 @@
 <template>
-    <span class="toggle-button" :class="{'disabled': disabled}">
+    <span class="toggle-button"
+          :class="{'disabled': disabled}"
+    >
         <toggle-button
             :value="value"
             :sync="sync"
@@ -23,7 +25,7 @@ import { ToggleButton } from 'vue-js-toggle-button';
 import { TOGGLE_BUTTON_THEME } from '@/inputs/buttons/toggle-button/config';
 import type { ToggleButtonProps } from '@/inputs/buttons/toggle-button/type';
 
-import color from '@/styles/colors';
+import color from '@/styles/colors.cjs';
 
 /**
  * Used library: vue-js-toggle-button

@@ -7,13 +7,23 @@
          }"
          :style="tableCustomStyle"
     >
-        <div class="table-container" :style="tableCustomStyle.maxHeight && { maxHeight: 'inherit', height: 'inherit' }">
+        <div class="table-container"
+             :style="tableCustomStyle.maxHeight && { maxHeight: 'inherit', height: 'inherit' }"
+        >
             <table>
                 <thead>
-                    <slot name="head" v-bind="getDefaultSlotProps()">
+                    <slot name="head"
+                          v-bind="getDefaultSlotProps()"
+                    >
                         <template v-if="showHeader">
-                            <tr v-for="(fieldRow, fieldRowIdx) in tableFieldRows" :key="fieldRowIdx" class="fade-in">
-                                <th v-if="selectable && fieldRowIdx === 0" :rowspan="numOfFieldRows" class="all-select">
+                            <tr v-for="(fieldRow, fieldRowIdx) in tableFieldRows"
+                                :key="fieldRowIdx"
+                                class="fade-in"
+                            >
+                                <th v-if="selectable && fieldRowIdx === 0"
+                                    :rowspan="numOfFieldRows"
+                                    class="all-select"
+                                >
                                     <p-check-box v-if="multiSelect"
                                                  v-model="allState"
                                                  @change="onSelectAllToggle"
@@ -40,7 +50,9 @@
                                               }"
                                         >
                                             <span class="th-text">
-                                                <slot name="th-format" v-bind="getHeadSlotProps(field, fieldColIndex, fieldRowIdx)">
+                                                <slot name="th-format"
+                                                      v-bind="getHeadSlotProps(field, fieldColIndex, fieldRowIdx)"
+                                                >
                                                     <slot :name="`th-${field.name}-format`"
                                                           v-bind="getHeadSlotProps(field, fieldColIndex, fieldRowIdx)"
                                                     >
@@ -77,17 +89,28 @@
                     </slot>
                 </thead>
                 <tbody ref="tbodyRef">
-                    <slot v-if="showNoData" name="no-data" v-bind="getDefaultSlotProps()">
+                    <slot v-if="showNoData"
+                          name="no-data"
+                          v-bind="getDefaultSlotProps()"
+                    >
                         <div class="no-data">
-                            <slot name="no-data-format" v-bind="getDefaultSlotProps()">
+                            <slot name="no-data-format"
+                                  v-bind="getDefaultSlotProps()"
+                            >
                                 {{ $t('COMPONENT.DATA_TABLE.NO_DATA') }}
                             </slot>
                         </div>
-                        <tr :colspan="selectable ? leafFields.length +1 : leafFields.length" class="fake-row" />
+                        <tr :colspan="selectable ? leafFields.length +1 : leafFields.length"
+                            class="fake-row"
+                        />
                     </slot>
-                    <slot name="body" :items="items" v-bind="getDefaultSlotProps()">
+                    <slot name="body"
+                          :items="items"
+                          v-bind="getDefaultSlotProps()"
+                    >
                         <tr v-for="(item, rowIndex) in items"
-                            :key="`tr-${contextKey}-${rowIndex}`" :data-index="rowIndex"
+                            :key="`tr-${contextKey}-${rowIndex}`"
+                            :data-index="rowIndex"
                             class="fade-in"
                             :class="{
                                 ...(getRowClassNames && getRowClassNames()),
@@ -121,10 +144,18 @@
                                     [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
                                 }"
                             >
-                                <slot name="col-format" v-bind="getColSlotProps(item, field, colIndex, rowIndex)">
-                                    <slot :name="`col-${field.name}-format`" v-bind="getColSlotProps(item, field, colIndex, rowIndex)">
-                                        <slot :name="`col-${colIndex}-format`" v-bind="getColSlotProps(item, field, colIndex, rowIndex)">
-                                            <p-text-beautifier v-if="beautifyText" :value="getValue(item, field)" />
+                                <slot name="col-format"
+                                      v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                >
+                                    <slot :name="`col-${field.name}-format`"
+                                          v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                    >
+                                        <slot :name="`col-${colIndex}-format`"
+                                              v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                        >
+                                            <p-text-beautifier v-if="beautifyText"
+                                                               :value="getValue(item, field)"
+                                            />
                                             <template v-else>
                                                 {{ getValue(item, field) }}
                                             </template>
@@ -141,13 +172,19 @@
             </table>
         </div>
 
-        <div v-if="showLoading" class="loading-backdrop fade-in" />
-        <div v-if="showLoading" class="loading">
+        <div v-if="showLoading"
+             class="loading-backdrop fade-in"
+        />
+        <div v-if="showLoading"
+             class="loading"
+        >
             <slot name="loading">
                 <p-spinner size="xl" />
             </slot>
         </div>
-        <div v-if="invalid" class="invalid-cover" />
+        <div v-if="invalid"
+             class="invalid-cover"
+        />
     </div>
 </template>
 
@@ -284,7 +321,7 @@ export default defineComponent<DataTableProps>({
         },
     },
     setup(props, { emit }) {
-        const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map(child => ({ sortable: true, ...child }));
+        const getChildFields = (field: DataTableFieldType): DataTableFieldType[]|undefined => field.children?.map((child) => ({ sortable: true, ...child }));
 
         const isFieldSortable = (sortable: boolean | undefined): boolean => (props.sortable ? sortable !== false : false);
 
@@ -306,7 +343,7 @@ export default defineComponent<DataTableProps>({
 
         const isLeafField = (field: DataTableFieldType): boolean => !field.children || field.children.length === 0;
 
-        const getLeafFields = (fields: TableField[]): TableField[] => fields.filter(field => !field.children?.length);
+        const getLeafFields = (fields: TableField[]): TableField[] => fields.filter((field) => !field.children?.length);
 
         const getTableFields = (fields: DataTableField[], allFields: DataTableFieldType[] = [], depth = 0): TableField[] => {
             fields.forEach((f) => {
@@ -381,7 +418,7 @@ export default defineComponent<DataTableProps>({
 
         const getSelectedState = (item, index) => {
             if (props.getRowSelectable) return props.getRowSelectable(item, index);
-            return props.multiSelect ? proxyState.proxySelectIndex.some(d => index === d) : proxyState.proxySelectIndex[0] === index;
+            return props.multiSelect ? proxyState.proxySelectIndex.some((d) => index === d) : proxyState.proxySelectIndex[0] === index;
         };
 
         const checkboxToggle = (item, index) => {
@@ -449,7 +486,7 @@ export default defineComponent<DataTableProps>({
         const onClickColCopy = (field: DataTableFieldType) => {
             let result = '';
             const arr: Element[] = Array.from(state.copyTargetElement);
-            let idx = state.leafFields.findIndex(d => d === field);
+            let idx = state.leafFields.findIndex((d) => d === field);
             if (idx === -1) return;
 
             if (props.selectable) idx += 1;

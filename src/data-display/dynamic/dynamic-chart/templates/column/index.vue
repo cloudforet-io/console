@@ -22,7 +22,9 @@
                     />
                 </span>
             </div>
-            <p-progress-bar :color="progressBarColor" :percentage="getPercentage(value)" />
+            <p-progress-bar :color="progressBarColor"
+                            :percentage="getPercentage(value)"
+            />
         </div>
     </div>
 </template>
@@ -53,7 +55,7 @@ import { getValueByPath } from '@/data-display/dynamic/helper';
 import PProgressBar from '@/data-display/progress-bar/PProgressBar.vue';
 import { getContextKey } from '@/util/helpers';
 
-import { palette } from '@/styles/colors';
+import { palette } from '@/styles/colors.cjs';
 
 const themeColorMap: Record<DynamicChartTheme, string> = {
     VIOLET: palette.violet[400],
@@ -66,7 +68,7 @@ const themeColorMap: Record<DynamicChartTheme, string> = {
     INDIGO: palette.indigo[400],
 };
 
-type DynamicChartColumnProps = DynamicChartTemplateProps & { limit: number }
+type DynamicChartColumnProps = DynamicChartTemplateProps & { limit: number };
 export default defineComponent<DynamicChartColumnProps>({
     name: 'PDynamicChartColumn',
     components: { PDynamicField, PProgressBar },
@@ -104,7 +106,7 @@ export default defineComponent<DynamicChartColumnProps>({
             }),
             names: computed<number[]>(() => {
                 const nameKey = props.nameOptions.key;
-                return state.filteredData.map(d => getValueByPath(d, nameKey));
+                return state.filteredData.map((d) => getValueByPath(d, nameKey));
             }),
             values: computed<number[]>(() => {
                 const valueKey = props.valueOptions.key;

@@ -30,7 +30,7 @@ export interface ValueItem {
     name: any;
 }
 
-export type ValueSet = Record<string, ValueItem>
+export type ValueSet = Record<string, ValueItem>;
 
 export interface KeyItem {
     label: string;
@@ -46,7 +46,7 @@ export interface QueryItem {
     value: ValueItem;
 }
 
-export type MenuType ='ROOT_KEY'|'KEY'|'VALUE'|'OPERATOR'
+export type MenuType ='ROOT_KEY'|'KEY'|'VALUE'|'OPERATOR';
 
 export interface MenuItem<T> {
     type?: ContextMenuType;

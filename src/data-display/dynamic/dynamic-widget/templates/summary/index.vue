@@ -4,7 +4,9 @@
             {{ name }}
         </span>
         <span class="value">
-            <p-skeleton v-if="loading" height="1.75rem" />
+            <p-skeleton v-if="loading"
+                        height="1.75rem"
+            />
             <p-dynamic-field v-else
                              :type="valueOptions.type"
                              :data="value"
@@ -35,7 +37,7 @@ import type {
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 
-type DynamicWidgetSummaryProps = Exclude<DynamicWidgetProps, 'type'&'index'>
+type DynamicWidgetSummaryProps = Exclude<DynamicWidgetProps, 'type'&'index'>;
 
 export default defineComponent<DynamicWidgetSummaryProps>({
     name: 'PDynamicWidgetSummary',

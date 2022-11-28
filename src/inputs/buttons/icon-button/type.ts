@@ -4,7 +4,7 @@ export const ICON_BUTTON_STYLE_TYPE = {
     'negative-secondary': 'negative-secondary',
     'negative-transparent': 'negative-transparent',
 } as const;
-export type IconButtonStyleType = typeof ICON_BUTTON_STYLE_TYPE[keyof typeof ICON_BUTTON_STYLE_TYPE]
+export type IconButtonStyleType = typeof ICON_BUTTON_STYLE_TYPE[keyof typeof ICON_BUTTON_STYLE_TYPE];
 
 export const ICON_BUTTON_SHAPE = {
     circle: 'circle',
@@ -17,7 +17,7 @@ export const ICON_BUTTON_SIZE = {
     md: '1.5rem',
     lg: '2rem',
 } as const;
-export type IconButtonSize = typeof ICON_BUTTON_SIZE[keyof typeof ICON_BUTTON_SIZE]
+export type IconButtonSize = typeof ICON_BUTTON_SIZE[keyof typeof ICON_BUTTON_SIZE];
 
 export interface IconButtonProps {
     name: string;

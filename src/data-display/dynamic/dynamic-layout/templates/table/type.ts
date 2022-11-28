@@ -4,4 +4,4 @@ import type {
 import type { TableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 
-export type TableDynamicLayoutProps = DynamicLayoutProps <TableOptions>
+export type TableDynamicLayoutProps = DynamicLayoutProps <TableOptions>;

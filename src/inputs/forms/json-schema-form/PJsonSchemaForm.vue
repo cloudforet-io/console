@@ -1,5 +1,7 @@
 <template>
-    <form class="p-json-schema-form" @submit.prevent>
+    <form class="p-json-schema-form"
+          @submit.prevent
+    >
         <p-field-group v-if="isJsonInputMode"
                        class="input-form-wrapper"
                        :class="{'no-margin': !isRoot}"
@@ -11,7 +13,8 @@
                            @update:code="handleUpdateJsonData(schema, ...arguments)"
             />
             <template #invalid>
-                <span v-for="invalidMessage in invalidMessages" :key="invalidMessage"
+                <span v-for="invalidMessage in invalidMessages"
+                      :key="invalidMessage"
                       class="invalid-message"
                 >
                     {{ invalidMessage }}
@@ -26,11 +29,19 @@
                            :required="requiredList.includes(schemaProperty.propertyName)"
                            :invalid="getPropertyInvalidState(schemaProperty)"
             >
-                <template v-if="schemaProperty.markdown" #help>
-                    <p-markdown :markdown="schemaProperty.markdown" :language="language" remove-spacing />
+                <template v-if="schemaProperty.markdown"
+                          #help
+                >
+                    <p-markdown :markdown="schemaProperty.markdown"
+                                :language="language"
+                                remove-spacing
+                    />
                 </template>
-                <template v-if="invalidMessagesMap[schemaProperty.propertyName]" #invalid>
-                    <span v-for="invalidMessage in invalidMessagesMap[schemaProperty.propertyName]" :key="invalidMessage"
+                <template v-if="invalidMessagesMap[schemaProperty.propertyName]"
+                          #invalid
+                >
+                    <span v-for="invalidMessage in invalidMessagesMap[schemaProperty.propertyName]"
+                          :key="invalidMessage"
                           class="invalid-message"
                     >
                         {{ invalidMessage }}
@@ -191,8 +202,8 @@ export default defineComponent<JsonSchemaFormProps>({
                         };
                         return refined;
                     }).sort((a, b) => {
-                        const orderA = order.findIndex(propertyName => propertyName === a.propertyName);
-                        const orderB = order.findIndex(propertyName => propertyName === b.propertyName);
+                        const orderA = order.findIndex((propertyName) => propertyName === a.propertyName);
+                        const orderB = order.findIndex((propertyName) => propertyName === b.propertyName);
 
                         // If both do not have order information, they are sorted based on title or property name.
                         if (orderA === -1 && orderB === -1) {

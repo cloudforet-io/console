@@ -8,11 +8,16 @@
         />
         <div class="page-number-wrapper">
             <div class="page-number-list">
-                <span v-for="page in pageList.pages" :key="page"
+                <span v-for="page in pageList.pages"
+                      :key="page"
                       @click="clickPage(page)"
                 >
-                    <span v-if="page === proxyState.thisPage" class="page-number"><b>{{ proxyState.thisPage }}</b></span>
-                    <span v-else class="page-number"> {{ page }} </span>
+                    <span v-if="page === proxyState.thisPage"
+                          class="page-number"
+                    ><b>{{ proxyState.thisPage }}</b></span>
+                    <span v-else
+                          class="page-number"
+                    > {{ page }} </span>
                 </span>
             </div>
         </div>
@@ -115,7 +120,7 @@ export default {
             const endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
 
             // create an array of pages to ng-repeat in the pager control
-            const pages = Array.from(Array((endPage + 1) - startPage).keys()).map(i => startPage + i);
+            const pages = Array.from(Array((endPage + 1) - startPage).keys()).map((i) => startPage + i);
 
             // return object with all pager properties required by the view
             return {

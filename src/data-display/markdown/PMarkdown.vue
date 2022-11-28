@@ -18,9 +18,10 @@ marked.setOptions({
     gfm: true,
     breaks: true,
     pedantic: false,
-    highlight(code, language) {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires,global-require
-        const hljs = require('highlight.js');
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    highlight: async (code, language) => {
+        const hljs = await import('highlight.js');
         const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
         const result = hljs.highlight(validLanguage, code);
         return result.value;

@@ -7,4 +7,4 @@ export type DictTypeOptions = Pick<DynamicFieldTypeOptions, never>;
 export type DictDynamicFieldProps = DynamicFieldProps<
     DictOptions,
     DictTypeOptions
-    >
+    >;

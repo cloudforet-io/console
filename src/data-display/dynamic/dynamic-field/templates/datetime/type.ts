@@ -7,4 +7,4 @@ export type DatetimeTypeOptions = Pick<DynamicFieldTypeOptions, 'timezone'>;
 export type DatetimeDynamicFieldProps = DynamicFieldProps<
     DatetimeOptions,
     DatetimeTypeOptions
-    >
+    >;

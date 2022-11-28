@@ -1,33 +1,50 @@
 <template>
     <section class="p-icon-modal">
-        <transition v-if="visible" name="modal">
-            <article class="modal-mask" :class="{'no-backdrop':!backdrop}"
+        <transition v-if="visible"
+                    name="modal"
+        >
+            <article class="modal-mask"
+                     :class="{'no-backdrop':!backdrop}"
                      role="dialog"
                      aria-modal="true"
                      aria-labelledby="headerTitle"
                      tabindex="1"
             >
-                <div class="modal-wrapper" :class="size">
+                <div class="modal-wrapper"
+                     :class="size"
+                >
                     <div class="content-wrapper">
                         <p-lottie v-if="lottieName"
                                   :name="lottieName"
                                   :size="5"
                         />
                         <p-i v-if="iconName"
-                             class="block" :name="iconName"
+                             class="block"
+                             :name="iconName"
                              :color="primaryDark"
-                             width="5rem" height="5rem"
+                             width="5rem"
+                             height="5rem"
                         />
-                        <span v-if="emoji" class="wave">👋</span>
-                        <div class="header-wrapper" :class="size">
-                            <p v-if="headerTitle" class="header-title">
+                        <span v-if="emoji"
+                              class="wave"
+                        >👋</span>
+                        <div class="header-wrapper"
+                             :class="size"
+                        >
+                            <p v-if="headerTitle"
+                               class="header-title"
+                            >
                                 {{ headerTitle }}
                             </p>
-                            <span v-if="headerDesc" class="header-desc">
+                            <span v-if="headerDesc"
+                                  class="header-desc"
+                            >
                                 {{ headerDesc }}
                             </span>
                         </div>
-                        <div v-if="size === 'md'" class="body-wrapper">
+                        <div v-if="size === 'md'"
+                             class="body-wrapper"
+                        >
                             <slot name="body" />
                         </div>
                         <p-button
@@ -53,7 +70,7 @@ import PButton from '@/inputs/buttons/button/PButton.vue';
 import '../modal.pcss';
 import { makeProxy } from '@/util/composition-helpers';
 
-import { primaryDark } from '@/styles/colors';
+import { primaryDark } from '@/styles/colors.cjs';
 
 
 export default {

@@ -1,6 +1,7 @@
 <template>
     <div class="p-dynamic-layout-query-search-table">
-        <p-panel-top v-if="layoutName" class="panel-top"
+        <p-panel-top v-if="layoutName"
+                     class="panel-top"
                      :use-total-count="true"
                      :total-count="totalCount"
         >
@@ -35,24 +36,34 @@
                          @click-settings="$emit('click-settings')"
                          @rowLeftClick="onClickRow"
         >
-            <template v-for="(dynamicField, slotName) of dynamicFieldSlots" #[slotName]="{item, field}">
-                <p-dynamic-field v-if="slotName.startsWith('col')" :key="slotName"
+            <template v-for="(dynamicField, slotName) of dynamicFieldSlots"
+                      #[slotName]="{item, field}"
+            >
+                <p-dynamic-field v-if="slotName.startsWith('col')"
+                                 :key="slotName"
                                  v-bind="dynamicField"
                                  :data="getFieldData(item, field.name, dynamicField)"
                                  :handler="fieldHandler"
                 />
             </template>
 
-            <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" #[headerSlot]>
+            <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots"
+                      #[headerSlot]
+            >
                 {{ text }}
-                <span :key="`${headerSlot}-description`" class="field-description">{{ description }}</span>
+                <span :key="`${headerSlot}-description`"
+                      class="field-description"
+                >{{ description }}</span>
             </template>
 
-            <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
+            <template v-for="(_, slot) of $scopedSlots"
+                      #[slot]="scope"
+            >
                 <slot v-if="!dynamicFieldHeaderSlots[slot] &&
                           !dynamicFieldSlots[slot] &&
                           slot !== 'tag-data-type-datetime'"
-                      :name="slot" v-bind="scope"
+                      :name="slot"
+                      v-bind="scope"
                 />
             </template>
         </p-toolbox-table>
@@ -122,7 +133,7 @@ export default defineComponent<QuerySearchTableDynamicLayoutProps>({
             fields: computed<DataTableFieldType[]>(() => {
                 if (!props.options.fields) return [];
 
-                return props.options.fields.map(ds => ({
+                return props.options.fields.map((ds) => ({
                     name: ds.key,
                     label: ds.name,
                     sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
@@ -143,7 +154,7 @@ export default defineComponent<QuerySearchTableDynamicLayoutProps>({
 
                 return [{
                     title: 'Properties',
-                    items: props.options.fields.map(d => ({ label: d.name ?? d.key, name: d.key })),
+                    items: props.options.fields.map((d) => ({ label: d.name ?? d.key, name: d.key })),
                 }];
             }),
             valueHandlerMap: computed(() => (props.typeOptions?.valueHandlerMap || {})),

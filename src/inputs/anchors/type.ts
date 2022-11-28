@@ -9,4 +9,4 @@ export const AnchorSize = {
     md: 'md',
     lg: 'lg',
 } as const;
-export type AnchorSize = typeof AnchorSize[keyof typeof AnchorSize]
+export type AnchorSize = typeof AnchorSize[keyof typeof AnchorSize];

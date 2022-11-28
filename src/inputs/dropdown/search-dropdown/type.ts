@@ -5,7 +5,7 @@ interface HandlerRes {
     results: MenuItem[];
     totalCount?: number;
 }
-export type AutocompleteHandler = (inputText: string, list: MenuItem[]) => Promise<HandlerRes>|HandlerRes
+export type AutocompleteHandler = (inputText: string, list: MenuItem[]) => Promise<HandlerRes>|HandlerRes;
 
 export const SEARCH_DROPDOWN_TYPE = Object.freeze({
     default: 'default',

@@ -45,7 +45,7 @@ export const getTextHighlightingArgTypes = (): ArgTypes => {
         styleType: {
             name: 'styleType',
             type: { name: 'string' },
-            description: `Style type.  ${TEXT_HIGHLIGHTING_STYLE_TYPE.map(d => `\`${d}\``)} are available.`,
+            description: `Style type.  ${TEXT_HIGHLIGHTING_STYLE_TYPE.map((d) => `\`${d}\``)} are available.`,
             defaultValue: TEXT_HIGHLIGHTING_STYLE_TYPE[0],
             table: {
                 type: {

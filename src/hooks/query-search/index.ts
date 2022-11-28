@@ -63,7 +63,7 @@ export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySe
 
         /* Query */
         selectedKeys: [] as KeyItem[],
-        subPath: computed<string|undefined>(() => state.selectedKeys.slice(1).map(d => d.name).join('.') || undefined),
+        subPath: computed<string|undefined>(() => state.selectedKeys.slice(1).map((d) => d.name).join('.') || undefined),
         selectedKey: computed<KeyItem|null>(() => state.selectedKeys[state.selectedKeys.length - 1] || null),
         rootKey: computed<KeyItem|null>(() => state.selectedKeys[0] || null),
         operator: OPERATOR.contain as OperatorType,
@@ -186,7 +186,7 @@ export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySe
                 subPath: state.subPath,
                 hideKey: strict,
             });
-        } else state.menu = res.results.map(d => ({ ...d, type: 'item', data: d }));
+        } else state.menu = res.results.map((d) => ({ ...d, type: 'item', data: d }));
         if (!state.menu.length) hideMenu();
     };
     const updateMenuItems = throttle(async (inputText: string): Promise<void> => {
@@ -195,11 +195,13 @@ export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySe
 
         const input = NUMBER_TYPES.includes(state.currentDataType) ? Number(inputText) : inputText;
         if (state.handler) {
-            const func = state.handler(input,
+            const func = state.handler(
+                input,
                 state.rootKey as KeyItem,
                 state.currentDataType,
                 state.subPath,
-                state.operator);
+                state.operator,
+            );
             if (func instanceof Promise) {
                 res = await func;
             } else {
@@ -214,7 +216,7 @@ export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySe
 
     /* Utils */
     const getKeyItemsFromKeyText = (keyStr: string): KeyItem[] => {
-        const allKeyItems = state.keyItemSets.map(d => d.items).flat();
+        const allKeyItems = state.keyItemSets.map((d) => d.items).flat();
         const dotIdx = keyStr.indexOf('.');
         let keyItems: KeyItem[] = [];
 
@@ -323,7 +325,7 @@ export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySe
         /* check operator */
         if (state.searchText.length === 0 && !strict) {
             const op = state.operator + e.key;
-            if (state.supportOperators.some(d => d.startsWith(op))) {
+            if (state.supportOperators.some((d) => d.startsWith(op))) {
                 e.preventDefault();
                 updateOperator(op as OperatorType);
                 await updateMenuItems(state.searchText);

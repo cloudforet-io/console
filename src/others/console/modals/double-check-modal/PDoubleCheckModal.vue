@@ -65,7 +65,7 @@ export default {
         size: {
             type: String,
             default: 'md',
-            validator: value => Object.keys(SizeMapping).includes(value),
+            validator: (value) => Object.keys(SizeMapping).includes(value),
         },
         backdrop: {
             type: Boolean,

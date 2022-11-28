@@ -116,7 +116,7 @@ export const getDynamicChartArgTypes = (): ArgTypes => ({
     theme: {
         name: 'theme',
         type: { name: 'string' },
-        description: `The theme of chart. ${DYNAMIC_CHART_THEMES.map(d => `'${d}'`)} are available.`,
+        description: `The theme of chart. ${DYNAMIC_CHART_THEMES.map((d) => `'${d}'`)} are available.`,
         defaultValue: DYNAMIC_CHART_THEMES[0],
         table: {
             type: {

@@ -14,7 +14,7 @@ export const addAmchartsLicense = (licenses?: string[]) => {
 
 const customColorTheme = (target) => {
     if (target instanceof am4core.ColorSet) {
-        target.list = Array(5).fill(BASIC_CHART_COLORS.map(d => am4core.color(d))).flat();
+        target.list = Array(5).fill(BASIC_CHART_COLORS.map((d) => am4core.color(d))).flat();
     }
 };
 

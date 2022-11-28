@@ -6,11 +6,11 @@ export const CARD_STYLE_TYPE = {
     red400: 'red400',
     white: 'white',
 } as const;
-export type CARD_STYLE_TYPE = typeof CARD_STYLE_TYPE[keyof typeof CARD_STYLE_TYPE]
+export type CARD_STYLE_TYPE = typeof CARD_STYLE_TYPE[keyof typeof CARD_STYLE_TYPE];
 
 export const CARD_SIZE = {
     sm: 'sm',
     md: 'md',
     lg: 'lg',
 } as const;
-export type CARD_SIZE = typeof CARD_SIZE[keyof typeof CARD_SIZE]
+export type CARD_SIZE = typeof CARD_SIZE[keyof typeof CARD_SIZE];

@@ -26,7 +26,7 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
         name: 'size',
         type: { name: 'string' },
         description: `Select anchor size. ${
-            [...Object.values(AnchorSize)].map(d => `\`${d}\``)} are available.`,
+            [...Object.values(AnchorSize)].map((d) => `\`${d}\``)} are available.`,
         defaultValue: AnchorSize.md,
         table: {
             type: {
@@ -46,7 +46,7 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
         name: 'iconPosition',
         type: { name: 'string' },
         description: `Select icon position. ${
-            [...Object.values(IconPosition)].map(d => `\`${d}\``)} are available.`,
+            [...Object.values(IconPosition)].map((d) => `\`${d}\``)} are available.`,
         defaultValue: IconPosition.right,
         table: {
             type: {

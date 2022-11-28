@@ -1,10 +1,14 @@
 <template>
     <div class="p-toolbox">
         <div class="toolbox-inner">
-            <div v-if="$scopedSlots['left-area']" class="left-area-wrapper">
+            <div v-if="$scopedSlots['left-area']"
+                 class="left-area-wrapper"
+            >
                 <slot name="left-area" />
             </div>
-            <div v-if="searchable" class="search-wrapper">
+            <div v-if="searchable"
+                 class="search-wrapper"
+            >
                 <p-search v-if="searchType === SEARCH_TYPES.plain"
                           v-model="proxyState.searchText"
                           @search="onSearch"
@@ -17,13 +21,17 @@
                 />
             </div>
             <div class="tools-wrapper">
-                <div v-if="paginationVisible" class="tool">
+                <div v-if="paginationVisible"
+                     class="tool"
+                >
                     <p-text-pagination :this-page="proxyState.thisPage"
                                        :all-page="allPage"
                                        @pageChange="onChangeThisPage"
                     />
                 </div>
-                <div v-if="pageSizeChangeable" class="tool">
+                <div v-if="pageSizeChangeable"
+                     class="tool"
+                >
                     <p-select-dropdown class="dropdown-list"
                                        :items="pageMenu"
                                        @select="onChangePageSize"
@@ -31,7 +39,9 @@
                         {{ proxyState.pageSize }}
                     </p-select-dropdown>
                 </div>
-                <div v-if="sortable" class="tool">
+                <div v-if="sortable"
+                     class="tool"
+                >
                     <p-select-dropdown class="dropdown-list"
                                        :items="sortByOptions"
                                        :sort-by="sortBy"
@@ -41,17 +51,23 @@
                     </p-select-dropdown>
                 </div>
                 <div class="right-tool-group">
-                    <div v-if="exportable" class="tool">
+                    <div v-if="exportable"
+                         class="tool"
+                    >
                         <p-icon-button name="ic_excel"
                                        @click="$emit('export', $event)"
                         />
                     </div>
-                    <div v-if="settingsVisible" class="tool">
+                    <div v-if="settingsVisible"
+                         class="tool"
+                    >
                         <p-icon-button name="ic_setting"
                                        @click="$emit('click-settings', $event)"
                         />
                     </div>
-                    <div v-if="refreshable" class="tool">
+                    <div v-if="refreshable"
+                         class="tool"
+                    >
                         <p-icon-button name="ic_refresh"
                                        @click="$emit('refresh', $event)"
                         />
@@ -209,14 +225,14 @@ export default defineComponent<ToolboxProps>({
             allPage: computed(() => Math.ceil((props.totalCount || 0) / proxyState.pageSize) || 1),
             pageMenu: computed(() => {
                 if (!Array.isArray(props.pageSizeOptions)) return [];
-                return props.pageSizeOptions.map(d => ({
+                return props.pageSizeOptions.map((d) => ({
                     name: d, label: d, type: 'item',
                 }));
             }),
             selectedSortBy: computed(() => ((sortByOptionsData && props.sortable) ? sortByOptionsData[proxyState.sortBy][0]?.label : proxyState.sortBy)),
             valueSetMap: computed<Record<string, ValueSet>>(() => {
                 const valueSetMap: Record<string, ValueSet> = {};
-                (props.keyItemSets ?? []).forEach(keyItemSet => keyItemSet.items.forEach((item) => {
+                (props.keyItemSets ?? []).forEach((keyItemSet) => keyItemSet.items.forEach((item) => {
                     if (item.valueSet) valueSetMap[item.name] = item.valueSet;
                 }));
                 return valueSetMap;

@@ -1,8 +1,13 @@
 <template>
     <div class="p-dynamic-chart-donut">
-        <div ref="chartRef" class="donut-chart" />
+        <div ref="chartRef"
+             class="donut-chart"
+        />
         <div class="legend-group">
-            <p-status v-for="(item, idx) in filteredData" :key="`${contextKey}-${idx}`" :icon-color="colors[idx]">
+            <p-status v-for="(item, idx) in filteredData"
+                      :key="`${contextKey}-${idx}`"
+                      :icon-color="colors[idx]"
+            >
                 <span class="name">
                     <p-dynamic-field :type="nameOptions.type"
                                      :data="getValueByPath(item, nameOptions.key)"
@@ -68,7 +73,7 @@ const getColorSet = (start: number, limit?: number): string[] => {
     return results;
 };
 
-type DynamicChartDonutProps = DynamicChartTemplateProps & { limit: number }
+type DynamicChartDonutProps = DynamicChartTemplateProps & { limit: number };
 export default defineComponent<DynamicChartDonutProps>({
     name: 'PDynamicChartDonut',
     components: { PDynamicField, PStatus },

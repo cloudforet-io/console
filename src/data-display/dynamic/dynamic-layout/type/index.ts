@@ -55,7 +55,7 @@ export type DynamicLayoutFieldHandler<T = undefined> = DynamicFieldHandler<
     DynamicFieldOptions,
     DynamicFieldTypeOptions,
     DynamicLayoutFieldExtraData & T
-    >
+    >;
 
 
 export interface DynamicLayoutEventListener {

@@ -1,4 +1,4 @@
-export type TextListItem = Array<string|object>
+export type TextListItem = Array<string|object>;
 export interface TextListProps {
     items: TextListItem[];
     delimiter: string;

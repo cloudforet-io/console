@@ -7,4 +7,4 @@ export type EnumTypeOptions = DynamicFieldTypeOptions;
 export type EnumDynamicFieldProps = DynamicFieldProps<
     EnumOptions,
     EnumTypeOptions
-    >
+    >;

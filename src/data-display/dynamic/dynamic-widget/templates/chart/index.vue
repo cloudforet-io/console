@@ -1,10 +1,15 @@
 <template>
     <p-pane-layout class="p-dynamic-widget-chart">
         <p class="name-wrapper">
-            <p-skeleton v-if="loading" height="1rem" width="80%" />
+            <p-skeleton v-if="loading"
+                        height="1rem"
+                        width="80%"
+            />
             <template v-else>
                 <span class="name">{{ name }}</span>
-                <span v-if="isDataGreaterThanLimit" class="showing-top">Showing Top {{ chartLimit }}</span>
+                <span v-if="isDataGreaterThanLimit"
+                      class="showing-top"
+                >Showing Top {{ chartLimit }}</span>
             </template>
         </p>
         <p-dynamic-chart :type="chartType"
@@ -39,7 +44,7 @@ import type {
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 
-type DynamicWidgetChartProps = Exclude<DynamicWidgetProps, 'type'>
+type DynamicWidgetChartProps = Exclude<DynamicWidgetProps, 'type'>;
 
 export default defineComponent<DynamicWidgetChartProps>({
     name: 'PDynamicWidgetChart',

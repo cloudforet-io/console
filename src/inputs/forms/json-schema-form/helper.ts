@@ -19,8 +19,8 @@ const refineArrayTypeValue = (val?: any[], prefixItems?: any[]): string[] | unde
     if (!val?.length) return undefined;
     if (typeof val[0] === 'string') return val;
 
-    if (prefixItems?.length) return val.map(d => d.name);
-    return val.map(d => d.value);
+    if (prefixItems?.length) return val.map((d) => d.name);
+    return val.map((d) => d.value);
 };
 
 export const refineValueByProperty = (schema: JsonSchema, val?: any): any => {
@@ -46,7 +46,7 @@ export const initFormDataWithSchema = (schema?: JsonSchema, formData?: object): 
                 result[key] = undefined;
             } else {
                 const keyProperty = property.prefixItems?.length ? 'name' : 'value'; // 'name' for PSearchDropdown, 'value' for PTextInput
-                result[key] = result[key].map(d => ({ [keyProperty]: d }));
+                result[key] = result[key].map((d) => ({ [keyProperty]: d }));
             }
         }
     });
@@ -127,7 +127,7 @@ export const getMenuItemsBySchemaProperty = (schemaProperty: InnerJsonSchema): S
         try {
             schemaProperty.prefixItems.forEach((item) => {
                 if (item?.enum?.length) {
-                    results.push(...item.enum.map(d => ({ name: d, label: d })));
+                    results.push(...item.enum.map((d) => ({ name: d, label: d })));
                 }
             });
             return results;

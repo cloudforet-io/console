@@ -91,7 +91,7 @@ export default defineComponent<FileUploaderProps>({
         };
 
         const handleUpdateFiles = (files: File[]) => {
-            state.proxyUploadedFiles = files.map(fileItems => fileItems);
+            state.proxyUploadedFiles = files.map((fileItems) => fileItems);
         };
 
         return {

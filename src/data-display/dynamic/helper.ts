@@ -19,7 +19,7 @@ export const getValueByPath = (data: any, path: string|null, splitDisableKeys: s
     let target = data;
 
     let pathArr;
-    const key = splitDisableKeys.find(k => path.startsWith(`${k}.`));
+    const key = splitDisableKeys.find((k) => path.startsWith(`${k}.`));
     if (key) {
         pathArr = [key, path.slice(key.length + 1)];
     } else {

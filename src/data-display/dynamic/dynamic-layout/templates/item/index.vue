@@ -3,11 +3,16 @@
         <p-panel-top v-if="layoutName">
             {{ layoutName }}
         </p-panel-top>
-        <p-definition-table :fields="fields" :data="rootData" :loading="loading"
+        <p-definition-table :fields="fields"
+                            :data="rootData"
+                            :loading="loading"
                             v-on="$listeners"
         >
-            <template v-for="(item, slotName) of dynamicFieldSlots" #[slotName]>
-                <p-dynamic-field :key="slotName" v-bind="item"
+            <template v-for="(item, slotName) of dynamicFieldSlots"
+                      #[slotName]
+            >
+                <p-dynamic-field :key="slotName"
+                                 v-bind="item"
                                  :handler="fieldHandler"
                 />
             </template>
@@ -70,7 +75,7 @@ export default {
             fields: computed<DefinitionField[]>(() => {
                 if (!props.options.fields) return [];
                 const locale = vm.$i18n.locale;
-                return props.options.fields.map(d => ({
+                return props.options.fields.map((d) => ({
                     label: d.options?.translation_id ? vm.$t(d.options.translation_id as string, locale) : d.name,
                     name: d.key,
                     disableCopy: !!d.options?.disable_copy,

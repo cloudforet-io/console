@@ -9,7 +9,8 @@
             >
                 <p-i v-if="selected === button.name && theme === 'text'"
                      name="ic_check"
-                     width="1rem" height="1rem"
+                     width="1rem"
+                     height="1rem"
                      :color="secondary"
                 />
                 <span>{{ button.label }}</span>
@@ -27,7 +28,7 @@ import PI from '@/foundation/icons/PI.vue';
 import { SELECT_BUTTON_GROUP_THEME } from '@/inputs/buttons/select-button-group/config';
 import type { SelectButtonGroupProps, SelectButtonType } from '@/inputs/buttons/select-button-group/type';
 
-import { secondary } from '@/styles/colors';
+import { secondary } from '@/styles/colors.cjs';
 
 export default {
     name: 'PSelectButtonGroup',

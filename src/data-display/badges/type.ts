@@ -47,8 +47,8 @@ export const BADGE_STYLE_OUTLINE = Object.freeze({
     indigo: 'indigo',
 });
 
-export type BadgeStyleType = keyof typeof BADGE_STYLE
-export type BadgeShape = keyof typeof BADGE_SHAPE
+export type BadgeStyleType = keyof typeof BADGE_STYLE;
+export type BadgeShape = keyof typeof BADGE_SHAPE;
 
 export interface Badge {
     styleType: BadgeStyleType;

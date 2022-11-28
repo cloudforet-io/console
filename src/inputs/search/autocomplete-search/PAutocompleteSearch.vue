@@ -9,8 +9,12 @@
                   :is-focused.sync="proxyIsFocused"
                   v-on="searchListeners"
         >
-            <template v-for="(_, slot) of searchSlots" #[slot]="scope">
-                <slot :name="`search-${slot}`" v-bind="{...scope}" />
+            <template v-for="(_, slot) of searchSlots"
+                      #[slot]="scope"
+            >
+                <slot :name="`search-${slot}`"
+                      v-bind="{...scope}"
+                />
             </template>
         </p-search>
         <p-context-menu v-if="proxyVisibleMenu"
@@ -24,8 +28,12 @@
                         @keyup:esc="focusSearch"
                         @focus="onFocusMenuItem"
         >
-            <template v-for="(_, slot) of menuSlots" #[slot]="scope">
-                <slot :name="`menu-${slot}`" v-bind="scope" />
+            <template v-for="(_, slot) of menuSlots"
+                      #[slot]="scope"
+            >
+                <slot :name="`menu-${slot}`"
+                      v-bind="scope"
+                />
             </template>
         </p-context-menu>
     </div>
@@ -152,7 +160,7 @@ export default defineComponent<AutocompleteSearchProps>({
             proxyIsFocused: makeOptionalProxy('isFocused', vm, props.focused),
             filteredMenu: [] as MenuItem[],
             bindingMenu: computed<MenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
-            searchableItems: computed<MenuItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
+            searchableItems: computed<MenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),
             fuse: computed(() => new Fuse(state.searchableItems, fuseOptions)),
         });
         const {
@@ -179,7 +187,7 @@ export default defineComponent<AutocompleteSearchProps>({
             const trimmed = inputText.trim();
             if (trimmed) {
                 const regex = new RegExp(inputText, 'i');
-                results = results.filter(d => regex.test(d.label as string));
+                results = results.filter((d) => regex.test(d.label as string));
             }
             return { results };
         };
@@ -199,7 +207,7 @@ export default defineComponent<AutocompleteSearchProps>({
 
             const filtered = props.menu.filter((item) => {
                 if (item.type && item.type !== 'item') return true;
-                return !!results.find(d => d.name === item.name);
+                return !!results.find((d) => d.name === item.name);
             });
             if (filtered[filtered.length - 1]?.type === 'divider') filtered.pop();
             state.filteredMenu = filtered;
@@ -301,7 +309,7 @@ export default defineComponent<AutocompleteSearchProps>({
 
         const onSearch = (val?: string) => {
             const trimmed = val?.trim() ?? '';
-            const menuItem = state.filteredMenu.find(d => trimmed.toLowerCase() === d.label?.toLowerCase());
+            const menuItem = state.filteredMenu.find((d) => trimmed.toLowerCase() === d.label?.toLowerCase());
             if (menuItem) {
                 emitSelectMenu(menuItem);
                 state.proxyValue = menuItem.label;

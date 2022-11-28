@@ -33,7 +33,7 @@ const getSelectState = (state: UnwrapRef<SelectStateArgs>) => reactive({
         if (Array.isArray(state.selected)) {
             if (state.predicate) {
                 const predicateFunc = state.predicate;
-                return !!state.selected.find(d => predicateFunc(state.value, d));
+                return !!state.selected.find((d) => predicateFunc(state.value, d));
             }
             return state.selected.includes(state.value);
         }
@@ -63,7 +63,7 @@ const getMultiSelected = (state: UnwrapRef<SelectStateArgs>, selectState: Select
             result.push(state.value);
         } else if (state.predicate) {
             const predicateFunc = state.predicate;
-            remove(result, d => predicateFunc(state.value, d));
+            remove(result, (d) => predicateFunc(state.value, d));
         } else {
             pull(result, state.value);
         }

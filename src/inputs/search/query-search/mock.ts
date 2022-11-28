@@ -25,7 +25,7 @@ export const getValueHandler = (items = getValueItems()): ValueHandler => (input
     let results = items;
     if (inputText) {
         const regex = new RegExp(inputText, 'i');
-        results = results.filter(d => regex.test(d.label));
+        results = results.filter((d) => regex.test(d.label));
     }
 
     return {

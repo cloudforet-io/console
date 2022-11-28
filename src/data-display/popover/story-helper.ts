@@ -45,7 +45,7 @@ export const getPopoverArgTypes = () => {
             name: 'position',
             type: { name: 'string' },
             description: `Select popover placement. ${
-                [...Object.values(POPOVER_PLACEMENT)].map(d => `\`${d}\``)} are available.`,
+                [...Object.values(POPOVER_PLACEMENT)].map((d) => `\`${d}\``)} are available.`,
             defaultValue: POPOVER_PLACEMENT.BOTTOM_END,
             table: {
                 type: {
@@ -65,7 +65,7 @@ export const getPopoverArgTypes = () => {
             name: 'trigger',
             type: { name: 'string' },
             description: `Select popover trigger. ${
-                [...Object.values(POPOVER_TRIGGER)].map(d => `\`${d}\``)} are available.`,
+                [...Object.values(POPOVER_TRIGGER)].map((d) => `\`${d}\``)} are available.`,
             defaultValue: POPOVER_TRIGGER.CLICK,
             table: {
                 type: {

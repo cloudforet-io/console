@@ -12,14 +12,14 @@ import SvgIcon from 'vue-svgicon';
 import Fragment from "vue-fragment";
 
 import webFontLoader from 'webfontloader';
-import { fontUrls, webFonts } from '@/styles/web-fonts';
+import { fontUrls, webFonts } from '@/styles/web-fonts.cjs';
 
-import tailwindConfig from './tailwind.config';
 import VTooltip from 'v-tooltip';
 
 import SpaceOneTheme from './CloudforetTheme';
 import {i18n} from '@/translations'
 import { applyAmchartsGlobalSettings } from '@/plugins/amcharts';
+import screens from "@/styles/screens.cjs";
 
 Vue.use(VueRouter)
 Vue.use(VueI18n);
@@ -46,8 +46,8 @@ webFontLoader.load({
 
 
 const viewports = {}
-Object.keys(tailwindConfig.theme.screens).forEach(k => {
-    const v = tailwindConfig.theme.screens[k];
+Object.keys(screens).forEach(k => {
+    const v = screens[k];
     viewports[k] = {
         name: k,
         styles: {

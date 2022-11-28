@@ -1,15 +1,24 @@
 <template>
-    <div v-click-outside="hideMenu" class="p-search" :class="{ focused: proxyIsFocused }">
+    <div v-click-outside="hideMenu"
+         class="p-search"
+         :class="{ focused: proxyIsFocused }"
+    >
         <div ref="targetRef"
              class="input-container"
              :class="{ focused: proxyIsFocused, invalid, disabled }"
         >
-            <p-i v-if="!disableIcon && !proxyIsFocused && !value && !readonly" class="left-icon" name="ic_search"
+            <p-i v-if="!disableIcon && !proxyIsFocused && !value && !readonly"
+                 class="left-icon"
+                 name="ic_search"
                  color="inherit"
             />
-            <slot name="left" v-bind="{ value, placeholder: placeholderText }" />
+            <slot name="left"
+                  v-bind="{ value, placeholder: placeholderText }"
+            />
             <span class="input-wrapper">
-                <slot name="default" v-bind="{ value, placeholder: placeholderText }">
+                <slot name="default"
+                      v-bind="{ value, placeholder: placeholderText }"
+                >
                     <input v-focus.lazy="proxyIsFocused"
                            v-bind="$attrs"
                            :value="value"
@@ -20,10 +29,17 @@
                     >
                 </slot>
             </span>
-            <slot name="right" v-bind="{ value, placeholder: placeholderText }">
+            <slot name="right"
+                  v-bind="{ value, placeholder: placeholderText }"
+            >
                 <div class="right">
-                    <span v-if="value" class="delete-btn" @click="handleDelete">
-                        <p-i class="icon" name="ic_delete" height="1rem"
+                    <span v-if="value"
+                          class="delete-btn"
+                          @click="handleDelete"
+                    >
+                        <p-i class="icon"
+                             name="ic_delete"
+                             height="1rem"
                              width="1rem"
                         />
                     </span>
@@ -154,7 +170,7 @@ export default defineComponent<SearchProps>({
             }),
             isAutoMode: computed(() => props.visibleMenu === undefined),
             filteredMenu: [] as MenuItem[],
-            searchableItems: computed<MenuItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
+            searchableItems: computed<MenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),
             bindingMenu: computed<SearchDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
             proxyValue: useProxyValue('value', props, emit),
             menuRef: null,
@@ -164,7 +180,7 @@ export default defineComponent<SearchProps>({
             const trimmed = inputText.trim();
             if (trimmed) {
                 const regex = new RegExp(inputText, 'i');
-                results = results.filter(d => regex.test(d.label as string));
+                results = results.filter((d) => regex.test(d.label as string));
             }
             return results;
         };
@@ -187,7 +203,7 @@ export default defineComponent<SearchProps>({
 
                 const filtered = props.menu.filter((item) => {
                     if (item.type && item.type !== 'item') return true;
-                    return !!results.find(d => d.label === item.label);
+                    return !!results.find((d) => d.label === item.label);
                 });
                 if (filtered[filtered.length - 1]?.type === 'divider') filtered.pop();
                 state.filteredMenu = filtered;

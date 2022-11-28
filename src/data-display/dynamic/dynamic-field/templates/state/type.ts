@@ -7,4 +7,4 @@ export type StateTypeOptions = Pick<DynamicFieldTypeOptions, never>;
 export type StateDynamicFieldProps = DynamicFieldProps<
     StateOptions,
     StateTypeOptions
-    >
+    >;

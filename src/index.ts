@@ -13,6 +13,12 @@ export default mirinaeOptions;
 /* Languages */
 export { messages } from './translations';
 
+/* Styles */
+export { default as colors } from './styles/colors.cjs';
+export { default as screens } from './styles/screens.cjs';
+export { default as styleVariables } from './styles/variables.cjs';
+export { default as fonts } from './styles/web-fonts.cjs';
+
 /* Components */
 export { default as PBackToTopButton } from './navigation/scrolls/back-to-top-button/PBackToTopButton.vue';
 export { default as PBadge } from './data-display/badges/PBadge.vue';

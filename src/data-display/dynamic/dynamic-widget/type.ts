@@ -29,7 +29,7 @@ export type DynamicWidgetFieldHandler<T = undefined> = DynamicFieldHandler<
     DynamicFieldOptions,
     DynamicFieldTypeOptions,
     DynamicField & T
-    >
+    >;
 
 
 export interface DynamicWidgetProps<T=any> {

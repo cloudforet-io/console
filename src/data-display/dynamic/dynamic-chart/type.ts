@@ -3,15 +3,15 @@ import type { DynamicFieldHandler, DynamicFieldTypeOptions } from '@/data-displa
 import type { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 
-export type DynamicChartType = typeof DYNAMIC_CHART_TYPE[number]
+export type DynamicChartType = typeof DYNAMIC_CHART_TYPE[number];
 
 export type DynamicChartFieldHandler<T = undefined> = DynamicFieldHandler<
     DynamicFieldOptions,
     DynamicFieldTypeOptions,
     DynamicField & T
-    >
+    >;
 
-export type DynamicChartTheme = typeof DYNAMIC_CHART_THEMES[number]
+export type DynamicChartTheme = typeof DYNAMIC_CHART_THEMES[number];
 export interface DynamicChartTemplateProps<Data=any> {
     data: Data[];
     valueOptions: DynamicField;

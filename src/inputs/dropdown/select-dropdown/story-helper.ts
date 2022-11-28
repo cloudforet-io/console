@@ -169,7 +169,7 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
             name: 'styleType',
             type: { name: 'string' },
             description: `Select dropdown style Types. ${
-                [...Object.values(SELECT_DROPDOWN_STYLE_TYPE)].map(d => `\`${d}\``)} are available.`,
+                [...Object.values(SELECT_DROPDOWN_STYLE_TYPE)].map((d) => `\`${d}\``)} are available.`,
             defaultValue: SELECT_DROPDOWN_STYLE_TYPE.DEFAULT,
             table: {
                 type: {

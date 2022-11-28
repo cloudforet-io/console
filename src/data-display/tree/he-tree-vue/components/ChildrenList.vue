@@ -1,11 +1,17 @@
 <template>
-    <div class="tree-children" :class="{'tree-root': rootNode === parent}">
-        <div v-for="(node, index) in nodes" :key="index"
+    <div class="tree-children"
+         :class="{'tree-root': rootNode === parent}"
+    >
+        <div v-for="(node, index) in nodes"
+             :key="index"
              class="tree-branch"
              :class="{'he-tree--hidden': node.$hidden}"
              :data-tree-node-path="getTreeNodePath(index).join(',')"
         >
-            <div class="tree-node-back" :class="{selected: getSelectedState(index)}" :style="indentStyle">
+            <div class="tree-node-back"
+                 :class="{selected: getSelectedState(index)}"
+                 :style="indentStyle"
+            >
                 <div class="tree-node">
                     <slot v-bind="{node, index, path: getTreeNodePath(index)}">
                         {{ node.text ? node.text : node.data }}
@@ -87,7 +93,7 @@ export default defineComponent<ChildrenListProps>({
         const getTreeNodePath = (index: number) => [...props.parentPath, index];
         const getSelectedState = (index: number): boolean => {
             const path = JSON.stringify(getTreeNodePath(index));
-            return props.selectedPaths.some(p => JSON.stringify(p) === path);
+            return props.selectedPaths.some((p) => JSON.stringify(p) === path);
         };
         return {
             ...toRefs(state),

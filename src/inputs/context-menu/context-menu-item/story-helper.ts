@@ -147,7 +147,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
     selectMarker: {
         name: 'selectMarker',
         type: { name: 'string' },
-        description: `Whether to show checkbox, radio, or nothing. ${SELECT_MARKERS.map(d => `\`${d}\``).join(', ')}, \`undefined\` are available.`,
+        description: `Whether to show checkbox, radio, or nothing. ${SELECT_MARKERS.map((d) => `\`${d}\``).join(', ')}, \`undefined\` are available.`,
         defaultValue: undefined,
         table: {
             type: {

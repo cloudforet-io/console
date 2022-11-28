@@ -1,7 +1,13 @@
 <template>
-    <transition v-if="visible" name="modal">
-        <div class="modal-mask" :class="{'no-backdrop':!backdrop}">
-            <div class="modal-wrapper" :class="dialogClassObject">
+    <transition v-if="visible"
+                name="modal"
+    >
+        <div class="modal-mask"
+             :class="{'no-backdrop':!backdrop}"
+        >
+            <div class="modal-wrapper"
+                 :class="dialogClassObject"
+            >
                 <slot />
             </div>
         </div>
@@ -29,7 +35,7 @@ export default {
         size: {
             type: String,
             default: 'md',
-            validator: value => Object.keys(SizeMapping).includes(value),
+            validator: (value) => Object.keys(SizeMapping).includes(value),
         },
         backdrop: {
             type: Boolean,

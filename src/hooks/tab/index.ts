@@ -38,9 +38,9 @@ export const useTab = ({ tabs, activeTab }: TabStateArgs) => {
                 keepAlive: !!tab.keepAlive,
             };
         })),
-        keepAliveTabNames: computed<string[]>(() => tabState.tabItems.filter(tabItem => tabItem.keepAlive).map(tabItem => tabItem.name)),
-        nonKeepAliveTabNames: computed<string[]>(() => tabState.tabItems.filter(tabItem => !tabItem.keepAlive).map(tabItem => tabItem.name)),
-        currentTabItem: computed<TabItem | undefined>(() => tabState.tabItems.find(tabItem => tabItem.name === state.activeTab)),
+        keepAliveTabNames: computed<string[]>(() => tabState.tabItems.filter((tabItem) => tabItem.keepAlive).map((tabItem) => tabItem.name)),
+        nonKeepAliveTabNames: computed<string[]>(() => tabState.tabItems.filter((tabItem) => !tabItem.keepAlive).map((tabItem) => tabItem.name)),
+        currentTabItem: computed<TabItem | undefined>(() => tabState.tabItems.find((tabItem) => tabItem.name === state.activeTab)),
     });
 
     return {

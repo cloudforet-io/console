@@ -7,4 +7,4 @@ export type SizeTypeOptions = Pick<DynamicFieldTypeOptions, never>;
 export type SizeDynamicFieldProps = DynamicFieldProps<
     SizeOptions,
     SizeTypeOptions
-    >
+    >;

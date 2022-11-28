@@ -1,6 +1,6 @@
 import _, { get, toString } from 'lodash';
 
-import colors from '@/styles/colors';
+import colors from '@/styles/colors.cjs';
 
 /** @function
  * @name copyTextToClipboard

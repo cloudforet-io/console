@@ -15,4 +15,4 @@ export interface DefinitionTableProps {
     block?: boolean;
 }
 
-export type DefinitionField = Omit<DefinitionProps, 'data'>
+export type DefinitionField = Omit<DefinitionProps, 'data'>;

@@ -71,7 +71,7 @@ export type EnumOptions = {
 } | {
     items?: Record<string, EnumValue>;
     default?: any;
-} & CommonOptions
+} & CommonOptions;
 
 export interface SizeOptions extends CommonOptions {
     display_unit?: 'BYTES | KB | MB | GB | TB | PB';
@@ -79,9 +79,9 @@ export interface SizeOptions extends CommonOptions {
 }
 
 
-export type DictOptions = CommonOptions
+export type DictOptions = CommonOptions;
 
-export type TextOptions = CommonOptions
+export type TextOptions = CommonOptions;
 
 
 export type DynamicFieldOptions =
@@ -93,7 +93,7 @@ export type DynamicFieldOptions =
     | StateOptions
     | TextOptions
     | SizeOptions
-    | MoreOptions
+    | MoreOptions;
 
 
 export interface DynamicField {

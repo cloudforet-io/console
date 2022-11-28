@@ -7,4 +7,4 @@ import type { ItemOptions } from '@/data-display/dynamic/dynamic-layout/type/lay
 export type ItemFetchOptions = Pick<DynamicLayoutFetchOptions, never>;
 
 
-export type ItemDynamicLayoutProps = DynamicLayoutProps<ItemOptions>
+export type ItemDynamicLayoutProps = DynamicLayoutProps<ItemOptions>;

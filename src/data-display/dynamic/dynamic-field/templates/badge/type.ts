@@ -7,4 +7,4 @@ export type BadgeTypeOptions = Pick<DynamicFieldTypeOptions, never>;
 export type BadgeDynamicFieldProps = DynamicFieldProps<
     BadgeOptions,
     BadgeTypeOptions
-    >
+    >;

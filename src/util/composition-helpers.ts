@@ -12,8 +12,10 @@ import type { Vue } from 'vue/types/vue';
  * @param event params
  */
 export const makeByPassListeners = (listeners: Record<string, any | any[]>, name: string, ...args: any[]) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    if (Array.isArray(listeners[name])) listeners[name].forEach(f => f(...args));
+    if (Array.isArray(listeners[name])) listeners[name].forEach((f) => f(...args));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     else if (typeof listeners[name] === 'function') listeners[name](...args);
 };
@@ -60,7 +62,7 @@ export function makeOptionalProxy <T=any>(name: string, vm: Vue, initData: any, 
             if (vm.$listeners[`update:${name}`]) {
                 vm.$emit(`update:${name}`, val);
             } else currentVal.value = val;
-            if (Array.isArray(events)) events.forEach(d => vm.$emit(d, val));
+            if (Array.isArray(events)) events.forEach((d) => vm.$emit(d, val));
         },
         get() {
             if (vm.$listeners[`update:${name}`]) return vm.$props[name];

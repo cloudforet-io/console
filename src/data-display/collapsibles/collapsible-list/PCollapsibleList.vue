@@ -1,6 +1,9 @@
 <template>
-    <div class="p-collapsible-list" :class="theme">
-        <div v-for="(item, idx) in collapsibleItems" :key="`${contextKey}-${item.name || idx}`"
+    <div class="p-collapsible-list"
+         :class="theme"
+    >
+        <div v-for="(item, idx) in collapsibleItems"
+             :key="`${contextKey}-${item.name || idx}`"
              class="collapsible-item"
         >
             <p class="top-wrapper">
@@ -120,7 +123,7 @@ export default defineComponent<CollapsibleListProps>({
                 return;
             }
 
-            const foundIdx = state.proxyUnfoldedIndices.findIndex(d => d === idx);
+            const foundIdx = state.proxyUnfoldedIndices.findIndex((d) => d === idx);
             if (isCollapsed) {
                 if (foundIdx !== -1) {
                     const newIndices = [...state.proxyUnfoldedIndices];

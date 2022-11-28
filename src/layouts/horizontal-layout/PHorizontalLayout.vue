@@ -1,7 +1,11 @@
 <template>
     <div class="p-horizontal-layout">
-        <div class="horizontal-contents" :style="{height: `${containerHeight}px`}">
-            <slot name="container" :height="containerHeight" />
+        <div class="horizontal-contents"
+             :style="{height: `${containerHeight}px`}"
+        >
+            <slot name="container"
+                  :height="containerHeight"
+            />
         </div>
 
         <div class="dragger-container">
@@ -96,8 +100,10 @@ export default {
 
         const onMouseup = () => {
             if (state.dragging) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 emit('drag-end', state.containerHeight);
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 state.dragging = false;
                 state.pageY = null;

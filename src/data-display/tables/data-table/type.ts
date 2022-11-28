@@ -9,7 +9,7 @@ export interface DataTableEventListeners {
     'update:sortDesc'?: (sortDesc: boolean) => void|Promise<void>;
 }
 
-export type DataTableCellTextAlign = typeof DATA_TABLE_CELL_TEXT_ALIGN[keyof typeof DATA_TABLE_CELL_TEXT_ALIGN]
+export type DataTableCellTextAlign = typeof DATA_TABLE_CELL_TEXT_ALIGN[keyof typeof DATA_TABLE_CELL_TEXT_ALIGN];
 
 export interface DataTableFieldType {
     name: string;
@@ -22,9 +22,9 @@ export interface DataTableFieldType {
     children?: DataTableFieldType[];
     invisible?: boolean;
 }
-export type DataTableField = string | DataTableFieldType
+export type DataTableField = string | DataTableFieldType;
 
-export type DataTableStyleType = typeof DATA_TABLE_STYLE_TYPE[keyof typeof DATA_TABLE_STYLE_TYPE]
+export type DataTableStyleType = typeof DATA_TABLE_STYLE_TYPE[keyof typeof DATA_TABLE_STYLE_TYPE];
 
 export interface DataTableProps {
     loading?: boolean;

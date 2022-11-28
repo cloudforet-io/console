@@ -36,7 +36,7 @@ export const menuTypeMap = {
 const datetimeRegex = RegExp(/^(\d)|[-]$/);
 
 export const inputValidatorMap: Partial<Record<KeyDataType, (value: string) => boolean>> = {
-    datetime: value => datetimeRegex.test(value),
+    datetime: (value) => datetimeRegex.test(value),
 };
 
 
@@ -74,7 +74,7 @@ export const defaultHandlerMap: Partial<Record<KeyDataType, ValueHandler>> = {
     datetime: (inputText: string) => {
         const regex = RegExp(inputText || '', 'i');
         return {
-            results: datetimeItems.filter(d => regex.test(d.name)) as ValueItem[],
+            results: datetimeItems.filter((d) => regex.test(d.name)) as ValueItem[],
             menuType: 'OPERATOR' as const,
         };
     },

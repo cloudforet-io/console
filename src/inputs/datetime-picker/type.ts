@@ -20,7 +20,7 @@ export const STYLE_TYPE = Object.freeze({
     default: 'default',
     text: 'text',
 });
-export type STYLE_TYPE = typeof STYLE_TYPE[keyof typeof STYLE_TYPE]
+export type STYLE_TYPE = typeof STYLE_TYPE[keyof typeof STYLE_TYPE];
 
 
 export interface DatetimePickerProps {

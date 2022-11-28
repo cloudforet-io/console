@@ -11,7 +11,8 @@
         </template>
         <table>
             <tbody>
-                <p-definition v-for="(item, idx) in items" :key="`${contextKey}-${idx}`"
+                <p-definition v-for="(item, idx) in items"
+                              :key="`${contextKey}-${idx}`"
                               class="def-row"
                               :label="item.label"
                               :name="item.name"
@@ -23,8 +24,9 @@
                               :copy-value-formatter="item.copyValueFormatter"
                 >
                     <template #default="scope">
-                        <slot name="data" v-bind="{
-                            ...scope, index: idx, items}"
+                        <slot name="data"
+                              v-bind="{
+                                  ...scope, index: idx, items}"
                         >
                             <slot :name="`data-${item.name}`"
                                   v-bind="{...scope, index: idx, items}"
@@ -37,11 +39,19 @@
                             </slot>
                         </slot>
                     </template>
-                    <template v-if="$scopedSlots.key" #key="scope">
-                        <slot name="key" v-bind="{...scope, index: idx, items}" />
+                    <template v-if="$scopedSlots.key"
+                              #key="scope"
+                    >
+                        <slot name="key"
+                              v-bind="{...scope, index: idx, items}"
+                        />
                     </template>
-                    <template v-if="$scopedSlots.extra" #extra="scope">
-                        <slot name="extra" v-bind="scope" />
+                    <template v-if="$scopedSlots.extra"
+                              #extra="scope"
+                    >
+                        <slot name="extra"
+                              v-bind="scope"
+                        />
                     </template>
                 </p-definition>
             </tbody>
@@ -71,7 +81,7 @@ import type {
 } from '@/data-display/tables/definition-table/type';
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
-const makeDefItems = (fields: DefinitionField[], data?: DefinitionData|DefinitionData[]): DefinitionProps[] => fields.map(field => ({
+const makeDefItems = (fields: DefinitionField[], data?: DefinitionData|DefinitionData[]): DefinitionProps[] => fields.map((field) => ({
     ...field,
     data: get(data, field.name) ?? getValueByPath(data, field.name) ?? '',
 }));
@@ -119,7 +129,7 @@ export default defineComponent<DefinitionTableProps>({
     setup(props) {
         const state = reactive({
             contextKey: Math.floor(Math.random() * Date.now()),
-            isNoData: computed(() => every(state.items, def => !def.data)),
+            isNoData: computed(() => every(state.items, (def) => !def.data)),
             skeletons: computed(() => range(props.skeletonRows ?? 5)),
             items: computed(() => makeDefItems(props.fields, props.data)),
         });

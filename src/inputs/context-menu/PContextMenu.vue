@@ -2,22 +2,34 @@
     <div class="p-context-menu"
          @keyup.esc="onClickEsc"
     >
-        <slot v-show="menu.length > 0" name="menu" v-bind="{...$props}">
-            <div v-if="multiSelectable" class="selected-list-wrapper">
+        <slot v-show="menu.length > 0"
+              name="menu"
+              v-bind="{...$props}"
+        >
+            <div v-if="multiSelectable"
+                 class="selected-list-wrapper"
+            >
                 <div>
                     <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
                     <span class="pl-2">({{ selectedCountInFilteredMenu }} / {{ menuItemLength }})</span>
                 </div>
-                <p-button size="sm" style-type="primary" :disabled="!proxySelected.length"
+                <p-button size="sm"
+                          style-type="primary"
+                          :disabled="!proxySelected.length"
                           @click="$emit('click-done', $event)"
                 >
                     {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
                 </p-button>
             </div>
             <slot name="help-text" />
-            <div v-if="multiSelectable" class="select-all-wrapper" @click.stop="onClickSelectAll">
+            <div v-if="multiSelectable"
+                 class="select-all-wrapper"
+                 @click.stop="onClickSelectAll"
+            >
                 <p-i :name="isAllSelected ? 'ic_checkbox--checked' : 'ic_checkbox'"
-                     class="select-marker" width="1em" height="1em"
+                     class="select-marker"
+                     width="1em"
+                     height="1em"
                 />
                 <span>{{ $t('COMPONENT.CONTEXT_MENU.SELECT_ALL') }}</span>
             </div>
@@ -41,19 +53,33 @@
                                      @keydown.down="onKeyDown(index)"
                 >
                     <template #default>
-                        <slot name="item--format" v-bind="{...$props, item, index}" />
+                        <slot name="item--format"
+                              v-bind="{...$props, item, index}"
+                        />
                     </template>
                     <template #text-list="{text, matched, textList, regex, index: textIndex}">
-                        <slot name="item-text-list" v-bind="{...$props, item, index, text, matched, textList, regex, textIndex}" />
+                        <slot name="item-text-list"
+                              v-bind="{...$props, item, index, text, matched, textList, regex, textIndex}"
+                        />
                     </template>
                 </p-context-menu-item>
-                <div v-else-if="item.type==='divider'" :key="`divider-${index}`" class="context-divider" />
-                <slot v-else-if="item.type==='header'" :name="`header-${item.name}`" v-bind="{...$props, item, key: index}">
-                    <div :key="index" class="context-header">
+                <div v-else-if="item.type==='divider'"
+                     :key="`divider-${index}`"
+                     class="context-divider"
+                />
+                <slot v-else-if="item.type==='header'"
+                      :name="`header-${item.name}`"
+                      v-bind="{...$props, item, key: index}"
+                >
+                    <div :key="index"
+                         class="context-header"
+                    >
                         {{ item.label }}
                     </div>
                 </slot>
-                <div v-else-if="item.type === 'button'" :key="`button-${index}`" class="context-button"
+                <div v-else-if="item.type === 'button'"
+                     :key="`button-${index}`"
+                     class="context-button"
                      :class="{disabled: item.disabled}"
                 >
                     <p-button :disabled="item.disabled"
@@ -68,12 +94,18 @@
                 </div>
             </template>
         </slot>
-        <div v-show="menu.length === 0" class="no-data">
-            <slot name="no-data-format" v-bind="{...$props}">
+        <div v-show="menu.length === 0"
+             class="no-data"
+        >
+            <slot name="no-data-format"
+                  v-bind="{...$props}"
+            >
                 {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
             </slot>
         </div>
-        <div v-show="loading" class="loader-wrapper">
+        <div v-show="loading"
+             class="loader-wrapper"
+        >
             <div class="loader-backdrop" />
             <p-spinner class="loader" />
         </div>
@@ -97,7 +129,7 @@ import { i18n } from '@/translations';
 
 
 const getFilteredSelectedItems = (selected: MenuItem[], menu: MenuItem[]): MenuItem[] => {
-    const filtered = selected.filter(d => menu.find(item => item.name === d.name));
+    const filtered = selected.filter((d) => menu.find((item) => item.name === d.name));
     if (filtered.length === selected.length) return selected;
     return filtered;
 };
@@ -161,18 +193,18 @@ export default defineComponent<ContextMenuProps>({
                 });
                 return selectedMap;
             }),
-            selectableMenuItems: computed(() => props.menu.filter(d => !d.disabled && (d.type === undefined || d.type === 'item'))),
+            selectableMenuItems: computed(() => props.menu.filter((d) => !d.disabled && (d.type === undefined || d.type === 'item'))),
             isAllSelected: computed(() => state.selectableMenuItems.length
                     && state.selectableMenuItems.length === state.proxySelected.length
-                && state.proxySelected.every(item => state.selectableMenuItems.find(selected => selected.name === item.name))),
-            selectedCountInFilteredMenu: computed(() => state.selectableMenuItems.filter(d => state.selectedNameMap[d.name] !== undefined).length),
-            menuItemLength: computed(() => props.menu.filter(d => d.type === undefined || d.type === 'item').length),
+                && state.proxySelected.every((item) => state.selectableMenuItems.find((selected) => selected.name === item.name))),
+            selectedCountInFilteredMenu: computed(() => state.selectableMenuItems.filter((d) => state.selectedNameMap[d.name] !== undefined).length),
+            menuItemLength: computed(() => props.menu.filter((d) => d.type === undefined || d.type === 'item').length),
         });
 
 
         const {
             focus: _focus, blur: _blur, handleMoveUp, handleMoveDown, getItemId,
-        } = useListFocus<MenuItem>(computed(() => props.menu), FOCUS_GROUP_ID, item => (!item.type || item.type === 'item') && !item.disabled);
+        } = useListFocus<MenuItem>(computed(() => props.menu), FOCUS_GROUP_ID, (item) => (!item.type || item.type === 'item') && !item.disabled);
 
         /* util */
         const focus = (position) => {
@@ -220,7 +252,7 @@ export default defineComponent<ContextMenuProps>({
             if (state.isAllSelected) {
                 state.proxySelected = [];
             } else {
-                state.proxySelected = state.selectableMenuItems.filter(d => d.type === undefined || d.type === 'item');
+                state.proxySelected = state.selectableMenuItems.filter((d) => d.type === undefined || d.type === 'item');
             }
         };
 

@@ -1,5 +1,6 @@
 <template>
-    <tree ref="treeRef" :value="treeData"
+    <tree ref="treeRef"
+          :value="treeData"
           :indent="16"
           class="p-tree"
           :draggable="!dragOptions.disabled"
@@ -12,49 +13,77 @@
           @drop="handleDrop"
     >
         <template #default="{node, path}">
-            <div class="node" :class="{
+            <div class="node"
+                 :class="{
                      'drag-target-parent': dragTargetParentPath ? dragTargetParentPath.toString() === path.toString() : false,
                      ...getClassNames(node)
                  }"
                  @click.stop="onClickNode(node, path, $event)"
                  @keypress.enter="onClickNode(node, path, $event)"
             >
-                <slot name="node" v-bind="{node, path, selected: getSelectState(path)}">
-                    <span v-if="$scopedSlots[`left-extra`]" class="left-extra">
-                        <slot name="left-extra" v-bind="{node, path, selected: getSelectState(path)}" />
+                <slot name="node"
+                      v-bind="{node, path, selected: getSelectState(path)}"
+                >
+                    <span v-if="$scopedSlots[`left-extra`]"
+                          class="left-extra"
+                    >
+                        <slot name="left-extra"
+                              v-bind="{node, path, selected: getSelectState(path)}"
+                        />
                     </span>
-                    <span v-if="!toggleOptions.disabled || $scopedSlots[`toggle`]" class="toggle"
+                    <span v-if="!toggleOptions.disabled || $scopedSlots[`toggle`]"
+                          class="toggle"
                           @click.stop="onToggle(node, path)"
                     >
-                        <slot name="toggle" v-bind="{node, path, selected: getSelectState(path)}">
-                            <p-spinner v-if="node.loading" size="sm" />
+                        <slot name="toggle"
+                              v-bind="{node, path, selected: getSelectState(path)}"
+                        >
+                            <p-spinner v-if="node.loading"
+                                       size="sm"
+                            />
                             <p-i v-else-if="!toggleOptions.validator || (toggleOptions.validator && toggleOptions.validator(node))"
                                  :name="node.$folded ? 'ic_tree_arrow' : 'ic_tree_arrow--opened'"
-                                 width="1em" height="1em"
+                                 width="1em"
+                                 height="1em"
                                  color="inherit"
                             />
                         </slot>
                     </span>
                     <p-text-input v-if="isEditing && getSelectState(path)"
-                                  v-model="editText" v-focus="true"
+                                  v-model="editText"
+                                  v-focus="true"
                                   :invalid="invalid"
                                   @blur="finishEdit(node)"
                                   @keydown.enter="finishEdit(node)"
                     />
                     <template v-else>
-                        <span v-if="$scopedSlots[`toggle-right`]" class="toggle-right">
-                            <slot name="toggle-right" v-bind="{node, path, selected: getSelectState(path)}" />
+                        <span v-if="$scopedSlots[`toggle-right`]"
+                              class="toggle-right"
+                        >
+                            <slot name="toggle-right"
+                                  v-bind="{node, path, selected: getSelectState(path)}"
+                            />
                         </span>
-                        <span v-if="$scopedSlots[`icon`]" class="icon">
-                            <slot name="icon" v-bind="{node, path, selected: getSelectState(path)}" />
+                        <span v-if="$scopedSlots[`icon`]"
+                              class="icon"
+                        >
+                            <slot name="icon"
+                                  v-bind="{node, path, selected: getSelectState(path)}"
+                            />
                         </span>
                         <span class="data">
-                            <slot name="data" v-bind="{node, path, selected: getSelectState(path)}">
+                            <slot name="data"
+                                  v-bind="{node, path, selected: getSelectState(path)}"
+                            >
                                 {{ dataGetter(node) }}
                             </slot>
                         </span>
-                        <span v-if="$scopedSlots[`right-extra`]" class="right-extra">
-                            <slot name="right-extra" v-bind="{node, path, selected: getSelectState(path)}" />
+                        <span v-if="$scopedSlots[`right-extra`]"
+                              class="right-extra"
+                        >
+                            <slot name="right-extra"
+                                  v-bind="{node, path, selected: getSelectState(path)}"
+                            />
                         </span>
                     </template>
                 </slot>
@@ -145,7 +174,7 @@ export default defineComponent<Props>({
         },
         dataGetter: {
             type: Function,
-            default: node => node.data,
+            default: (node) => node.data,
         },
         dataSetter: {
             type: Function,
@@ -175,12 +204,12 @@ export default defineComponent<Props>({
                 return undefined;
             }),
             selectedItems: [] as TreeNode[],
-            selectedPaths: computed<number[]>(() => state.selectedItems.map(d => d.path)),
+            selectedPaths: computed<number[]>(() => state.selectedItems.map((d) => d.path)),
             isFetchAndFinding: false,
             dragTargetParentPath: null as null|number[],
         });
         //
-        const getSelectState = (path: number[]) => !!state.selectedPaths.find(d => d.toString() === path.toString());
+        const getSelectState = (path: number[]) => !!state.selectedPaths.find((d) => d.toString() === path.toString());
 
         const resetSelect = () => {
             state.selectedItems = [];
@@ -193,7 +222,7 @@ export default defineComponent<Props>({
 
             // multi select
             if (props.selectOptions.multiSelectable) {
-                const idx = state.selectedItems.findIndex(d => d.path.toString() === path.toString());
+                const idx = state.selectedItems.findIndex((d) => d.path.toString() === path.toString());
                 if (idx === -1) {
                     if (value) {
                         state.selectedItems = [...state.selectedItems, { node, path }];
@@ -226,7 +255,7 @@ export default defineComponent<Props>({
             if (props.selectOptions.multiSelectable) {
                 if (!state.treeRef) return;
 
-                targetItems = unionBy(state.selectedItems, targetItems, d => d.path.toString());
+                targetItems = unionBy(state.selectedItems, targetItems, (d) => d.path.toString());
                 if (value) {
                     state.selectedItems = targetItems;
                 } else {
@@ -399,7 +428,7 @@ export default defineComponent<Props>({
         };
 
         const addNode = (data: any[]|any): void => {
-            if (Array.isArray(data)) state.treeData = state.treeData.concat(data.map(d => getDefaultNode(d)));
+            if (Array.isArray(data)) state.treeData = state.treeData.concat(data.map((d) => getDefaultNode(d)));
             else state.treeData.push(getDefaultNode(data));
         };
         const findNodePath = (predicate: Predicate, paths: number[] = [], _children?: any[]): number[] => {
@@ -441,12 +470,12 @@ export default defineComponent<Props>({
                 const predicate = predicates[i];
                 let children: TreeNode[] = node?.children || state.treeData;
 
-                let idx: number = children.findIndex(d => predicate(d.data));
+                let idx: number = children.findIndex((d) => predicate(d.data));
 
                 if (idx === -1) {
                     await fetchData(node);
                     children = node?.children || state.treeData;
-                    idx = children.findIndex(d => predicate(d.data));
+                    idx = children.findIndex((d) => predicate(d.data));
                     if (idx === -1) {
                         state.isFetchAndFinding = false;
                         return { node: null, path: [] };
@@ -529,7 +558,7 @@ export default defineComponent<Props>({
                 const parent = state.treeRef.getNodeByPath(path) as TreeNode || null;
                 if (parent) {
                     if (Array.isArray(data)) {
-                        parent.children = parent.children.concat(data.map(d => getDefaultNode(d)));
+                        parent.children = parent.children.concat(data.map((d) => getDefaultNode(d)));
                     } else {
                         parent.children = [...parent.children, getDefaultNode(data)];
                     }

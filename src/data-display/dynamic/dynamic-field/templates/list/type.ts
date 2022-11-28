@@ -7,4 +7,4 @@ export type ListTypeOptions = DynamicFieldTypeOptions;
 export type ListDynamicFieldProps = DynamicFieldProps<
     ListOptions,
     ListTypeOptions
-    >
+    >;

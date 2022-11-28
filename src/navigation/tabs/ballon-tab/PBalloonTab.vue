@@ -1,6 +1,11 @@
 <template>
-    <div ref="tabContainerRef" class="p-balloon-tab" :class="[tabPosition, styleType, size]">
-        <div class="balloon-group" :class="{stretch}">
+    <div ref="tabContainerRef"
+         class="p-balloon-tab"
+         :class="[tabPosition, styleType, size]"
+    >
+        <div class="balloon-group"
+             :class="{stretch}"
+        >
             <button v-for="(tab, idx) in tabItems"
                     :key="tab.name"
                     ref="buttonRefs"
@@ -10,17 +15,27 @@
                     }"
                     @click="handleClickTab(tab, idx)"
             >
-                <slot name="tab" v-bind="tab">
+                <slot name="tab"
+                      v-bind="tab"
+                >
                     {{ tab.label }}
                 </slot>
             </button>
         </div>
-        <div ref="paneRef" class="tab-pane">
+        <div ref="paneRef"
+             class="tab-pane"
+        >
             <slot />
             <keep-alive>
-                <slot v-if="keepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+                <slot v-if="keepAliveTabNames.includes(activeTab)"
+                      :name="activeTab"
+                      v-bind="currentTabItem"
+                />
             </keep-alive>
-            <slot v-if="nonKeepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+            <slot v-if="nonKeepAliveTabNames.includes(activeTab)"
+                  :name="activeTab"
+                  v-bind="currentTabItem"
+            />
         </div>
     </div>
 </template>
@@ -38,7 +53,7 @@ import {
 import type { BalloonTabProps } from '@/navigation/tabs/ballon-tab/type';
 import type { TabItem } from '@/navigation/tabs/tab/type';
 
-import screens from '@/styles/screens';
+import screens from '@/styles/screens.cjs';
 
 
 export default {

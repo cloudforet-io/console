@@ -3,4 +3,4 @@ export const DIRECTION = {
     vertical: 'vertical',
 } as const;
 
-export type Direction = typeof DIRECTION[keyof typeof DIRECTION]
+export type Direction = typeof DIRECTION[keyof typeof DIRECTION];

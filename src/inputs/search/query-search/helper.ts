@@ -15,20 +15,22 @@ export const getRootKeyItemHandler = (keyItemSets: KeyItemSet[]): ValueHandler =
         let items: KeyItem[];
         totalCount += set.items.length;
 
-        if (regex) items = set.items.filter(d => regex.test(d.label));
+        if (regex) items = set.items.filter((d) => regex.test(d.label));
         else items = set.items;
 
         if (items.length > 0) {
-            results.push({
-                label: `${set.title} (${set.items.length})`,
-                name: set.title,
-                type: 'header',
-            },
-            ...items.map(k => ({
-                ...k,
-                type: 'item' as const,
-                data: k,
-            })));
+            results.push(
+                {
+                    label: `${set.title} (${set.items.length})`,
+                    name: set.title,
+                    type: 'header',
+                },
+                ...items.map((k) => ({
+                    ...k,
+                    type: 'item' as const,
+                    data: k,
+                })),
+            );
         }
     });
 
@@ -51,7 +53,7 @@ export const getKeyMenuForm = ({ menuResponse, selectedKeys, subPath }: MenuForm
             name: key,
             type: 'header',
         },
-        ...menuResponse.results.map(d => ({
+        ...menuResponse.results.map((d) => ({
             label: d.label,
             name: d.name,
             type: (d as ValueMenuItem).type || 'item' as const,
@@ -74,7 +76,7 @@ export const getValueMenuForm = ({
             name: key,
             type: 'header',
         },
-        ...menuResponse.results.map(d => ({
+        ...menuResponse.results.map((d) => ({
             label: hideKey ? d.label : `${key}:${operator} ${d.label}`,
             name: d.name,
             type: 'item' as const,
@@ -83,7 +85,7 @@ export const getValueMenuForm = ({
     ];
 };
 
-export const getOperatorMenuForm = (items: ValueItem[]): ValueMenuItem[] => items.map(d => ({ ...d, type: 'item', data: d }));
+export const getOperatorMenuForm = (items: ValueItem[]): ValueMenuItem[] => items.map((d) => ({ ...d, type: 'item', data: d }));
 
 export const findKey = (val: string, items: KeyItem[]): KeyItem|undefined => {
     const value = val.toLowerCase();

@@ -1,5 +1,4 @@
 const path = require('path');
-const forkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const postCssLoader = {
   loader: 'postcss-loader',
@@ -65,8 +64,6 @@ module.exports = {
       include: /node_modules/,
       type: 'javascript/auto',
     });
-
-    config.plugins.push(new forkTsCheckerWebpackPlugin());
 
     return config;
   },

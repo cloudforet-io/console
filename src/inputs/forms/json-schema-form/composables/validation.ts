@@ -71,7 +71,7 @@ export const useValidation = (props: JsonSchemaFormProps, { ajv, formData, local
             if (localize.value) {
                 localize.value(state.validatorErrors);
             }
-            errorTexts = errorTexts.concat(state.validatorErrors.map(error => getErrorMessage(error)));
+            errorTexts = errorTexts.concat(state.validatorErrors.map((error) => getErrorMessage(error)));
             return errorTexts;
         }),
         jsonInputOccurred: false,

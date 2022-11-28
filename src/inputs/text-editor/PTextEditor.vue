@@ -1,7 +1,10 @@
 <template>
     <div class="p-text-editor">
-        <p-data-loader :data="true" :loading="loading" disable-empty-case
-                       show-data-from-scratch loader-backdrop-color="gray.900"
+        <p-data-loader :data="true"
+                       :loading="loading"
+                       disable-empty-case
+                       show-data-from-scratch
+                       loader-backdrop-color="gray.900"
         >
             <textarea ref="textareaRef"
                       name="codemirror"
@@ -36,18 +39,17 @@ import { forEach } from 'lodash';
 
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('codemirror/mode/javascript/javascript');
-require('codemirror/addon/fold/brace-fold');
-require('codemirror/addon/fold/comment-fold');
-require('codemirror/addon/fold/foldcode');
-require('codemirror/addon/fold/foldgutter');
-require('codemirror/addon/fold/indent-fold');
-require('codemirror/addon/fold/markdown-fold');
-require('codemirror/addon/fold/xml-fold');
-require('codemirror/addon/lint/json-lint');
-require('codemirror/addon/edit/closebrackets');
-require('codemirror/addon/edit/closetag');
+import('codemirror/mode/javascript/javascript');
+import('codemirror/addon/fold/brace-fold');
+import('codemirror/addon/fold/comment-fold');
+import('codemirror/addon/fold/foldcode');
+import('codemirror/addon/fold/foldgutter');
+import('codemirror/addon/fold/indent-fold');
+import('codemirror/addon/fold/markdown-fold');
+import('codemirror/addon/fold/xml-fold');
+import('codemirror/addon/lint/json-lint');
+import('codemirror/addon/edit/closebrackets');
+import('codemirror/addon/edit/closetag');
 
 interface Props {
     code: string|Record<string, any>|Array<any>;

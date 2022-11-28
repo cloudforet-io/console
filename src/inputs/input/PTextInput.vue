@@ -7,8 +7,11 @@
              class="input-container"
              :class="{invalid: isInvalid || invalid, disabled}"
         >
-            <div v-if="proxySelectedValue.length && multiInput" class="tag-container">
-                <p-tag v-for="(tag, index) in proxySelectedValue" :key="index"
+            <div v-if="proxySelectedValue.length && multiInput"
+                 class="tag-container"
+            >
+                <p-tag v-for="(tag, index) in proxySelectedValue"
+                       :key="index"
                        :deletable="!disabled"
                        :selected="index === deleteTargetIdx"
                        :invalid="tag.invalid"
@@ -17,7 +20,9 @@
                 >
                     {{ tag.label || tag.value }}
                 </p-tag>
-                <slot name="default" v-bind="{ value }">
+                <slot name="default"
+                      v-bind="{ value }"
+                >
                     <input v-bind="$attrs"
                            :type="inputType"
                            :value="proxyValue"
@@ -28,7 +33,10 @@
                     >
                 </slot>
             </div>
-            <slot v-else name="default" v-bind="{ value }">
+            <slot v-else
+                  name="default"
+                  v-bind="{ value }"
+            >
                 <input v-bind="$attrs"
                        :type="inputType"
                        :value="proxyValue"
@@ -39,11 +47,19 @@
                 >
             </slot>
             <!-- right-extra slot will be deprecated. use input-right slot. -->
-            <span v-if="$slots['right-extra']" class="right-extra">
-                <slot name="right-extra" v-bind="{ value }" />
+            <span v-if="$slots['right-extra']"
+                  class="right-extra"
+            >
+                <slot name="right-extra"
+                      v-bind="{ value }"
+                />
             </span>
-            <span v-if="$slots['input-right']" class="input-right">
-                <slot name="input-right" v-bind="{ value }" />
+            <span v-if="$slots['input-right']"
+                  class="input-right"
+            >
+                <slot name="input-right"
+                      v-bind="{ value }"
+                />
             </span>
             <p-button v-if="($attrs.type === 'password') && maskingMode"
                       size="sm"
@@ -56,13 +72,19 @@
             <p-i v-else
                  v-show="(isFocused || isInvalid)"
                  class="delete-all-icon"
-                 name="ic_delete" height="1rem" width="1rem"
+                 name="ic_delete"
+                 height="1rem"
+                 width="1rem"
                  color="inherit transparent"
                  @mousedown.native.prevent
                  @click="handleDeleteAllTags"
             />
-            <span v-if="$slots['right-edge']" class="right-edge">
-                <slot name="right-edge" v-bind="{ value }" />
+            <span v-if="$slots['right-edge']"
+                  class="right-edge"
+            >
+                <slot name="right-edge"
+                      v-bind="{ value }"
+                />
             </span>
         </div>
         <p-context-menu v-if="proxyVisibleMenu && useAutoComplete"
@@ -225,8 +247,8 @@ export default defineComponent<TextInputProps>({
             deleteTarget: undefined as string | undefined,
             deleteTargetIdx: -1,
             isTagDeletable: false,
-            isInvalid: props.selected.some(item => item.invalid),
-            searchableItems: computed<MenuItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
+            isInvalid: props.selected.some((item) => item.invalid),
+            searchableItems: computed<MenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),
             filteredMenu: [] as MenuItem[],
             bindingMenu: computed<SearchDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
         });
@@ -244,7 +266,7 @@ export default defineComponent<TextInputProps>({
             const _selectedItems: SelectedItem[] = [...state.proxySelectedValue];
             _selectedItems.splice(idx, 1);
 
-            const _selectedValues = _selectedItems.map(d => d.value);
+            const _selectedValues = _selectedItems.map((d) => d.value);
             _selectedItems.forEach((selected, sIdx) => {
                 selected.duplicated = _selectedValues.slice(0, sIdx).includes(selected.value);
             });
@@ -276,7 +298,7 @@ export default defineComponent<TextInputProps>({
             const trimmed = inputText.trim();
             if (trimmed) {
                 const regex = new RegExp(inputText, 'i');
-                results = results.filter(d => regex.test(d.label as string));
+                results = results.filter((d) => regex.test(d.label as string));
             }
             return { results };
         };
@@ -293,7 +315,7 @@ export default defineComponent<TextInputProps>({
 
                 const filtered = props.menu.filter((item) => {
                     if (item.type && item.type !== 'item') return true;
-                    return !!results.find(d => d.label === item.label);
+                    return !!results.find((d) => d.label === item.label);
                 });
                 if (filtered[filtered.length - 1]?.type === 'divider') filtered.pop();
                 state.filteredMenu = filtered;
@@ -306,7 +328,7 @@ export default defineComponent<TextInputProps>({
 
         const handleSelectMenuItem = ({ label, name }: SearchDropdownMenuItem) => {
             const _selectedItems = [...state.proxySelectedValue, { label, value: name }];
-            const _selectedValues = _selectedItems.map(d => d.value);
+            const _selectedValues = _selectedItems.map((d) => d.value);
             _selectedItems.forEach((selected, idx) => {
                 selected.duplicated = _selectedValues.slice(0, idx).includes(selected.value);
             });

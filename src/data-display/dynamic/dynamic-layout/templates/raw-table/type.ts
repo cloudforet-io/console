@@ -3,4 +3,4 @@ import type {
 } from '@/data-display/dynamic/dynamic-layout/type';
 import type { RawTableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-export type RawTableDynamicLayoutProps = DynamicLayoutProps<RawTableOptions>
+export type RawTableDynamicLayoutProps = DynamicLayoutProps<RawTableOptions>;

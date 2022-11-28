@@ -1,9 +1,9 @@
 // eslint-disable-next-line import/no-cycle
 import type { Store } from './plugins/draggable/draggable-types';
 
-export type Path = number[]
+export type Path = number[];
 
-type IsDraggableOrIsDroppable = boolean | undefined
+type IsDraggableOrIsDroppable = boolean | undefined;
 export interface Node {
     [propName: string]: any;
     children?: Node[];
@@ -26,14 +26,14 @@ export interface Node {
 export interface CloneTreeDataOptions {
     afterNodeCreated(newNode: object, info: {oldNode: object; index: number; parent: object; path: Path}): void;
 }
-type WalkTreeDataCallbackReturn = void|false|'skip children'|'skip siblings'
+type WalkTreeDataCallbackReturn = void|false|'skip children'|'skip siblings';
 export type WalkTreeDataHandler<T> = (
     node: T,
     index: number,
     parent: T | null,
     path: TreeDataPath
 ) => WalkTreeDataCallbackReturn;
-export type WalkTreeDataCallback = WalkTreeDataHandler<Node>
+export type WalkTreeDataCallback = WalkTreeDataHandler<Node>;
 
 export type TreeDataPath = number[];
 

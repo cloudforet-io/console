@@ -125,6 +125,7 @@ If your project doesn't use tailwindcss, add the code below to ```main.ts```.
 
 ```javascript
 import '@spaceone/design-system/dist/css/style.css';
+import '@spaceone/design-system/dist/style.css';
 ```
 
 ### Case 2. Without tailwindcss styles
@@ -153,6 +154,7 @@ Also, you need to add codes below to your ```main.js```.
 
 ```javascript
 import '@spaceone/design-system/dist/css/light-style.css';
+import '@spaceone/design-system/dist/style.css';
 ```
 
 

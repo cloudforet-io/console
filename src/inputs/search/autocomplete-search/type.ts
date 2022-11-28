@@ -4,4 +4,4 @@ interface HandlerRes {
     results: MenuItem[];
     totalCount?: number;
 }
-export type AutocompleteHandler = (inputText: string, list: MenuItem[]) => Promise<HandlerRes>|HandlerRes
+export type AutocompleteHandler = (inputText: string, list: MenuItem[]) => Promise<HandlerRes>|HandlerRes;

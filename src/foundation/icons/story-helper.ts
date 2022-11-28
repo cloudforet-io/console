@@ -171,7 +171,7 @@ export const getIconsArgTypes = (): ArgTypes => ({
     animation: {
         name: 'animation',
         type: { name: 'string' },
-        description: `Animation type. ${Object.values(ANIMATION_TYPE).map(d => `'${d}'`)} are available.`,
+        description: `Animation type. ${Object.values(ANIMATION_TYPE).map((d) => `'${d}'`)} are available.`,
         defaultValue: undefined,
         table: {
             type: {

@@ -12,9 +12,7 @@
 
 ### Checklist
 - [ ] Updated Storybook documents
-- <del>[ ] Tested with console</del> 
-- Currently, `npm link` does not work between console and mirinae
-- **Please check on console with released mirinae**
+- [ ] Tested with console(if usages are changed) 
 
 ### Description
 

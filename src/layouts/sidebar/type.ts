@@ -3,7 +3,7 @@ export const STYLE_TYPE = Object.freeze({
     secondary: 'secondary',
 } as const);
 
-type STYLE_TYPE = typeof STYLE_TYPE[keyof typeof STYLE_TYPE]
+type STYLE_TYPE = typeof STYLE_TYPE[keyof typeof STYLE_TYPE];
 
 
 export const SIZE = Object.freeze({
@@ -11,7 +11,7 @@ export const SIZE = Object.freeze({
     md: 'md',
     lg: 'lg',
 } as const);
-export type SIZE = typeof SIZE[keyof typeof SIZE]
+export type SIZE = typeof SIZE[keyof typeof SIZE];
 
 export interface SidebarProps {
     visible: boolean;

@@ -54,5 +54,5 @@ export class MirinaeInstaller {
     static install: PluginFunction<MirinaeOptions> = (vueConstructor: VueConstructor, options: MirinaeOptions = {}) => {
         MirinaeInstaller._options = options;
         MirinaeInstaller._install(vueConstructor);
-    }
+    };
 }

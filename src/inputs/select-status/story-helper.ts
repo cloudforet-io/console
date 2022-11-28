@@ -131,7 +131,7 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
     iconAnimation: {
         name: 'iconAnimation',
         type: { name: 'string' },
-        description: `Icon Animation type. ${Object.values(ANIMATION_TYPE).map(d => `'${d}'`)} are available.`,
+        description: `Icon Animation type. ${Object.values(ANIMATION_TYPE).map((d) => `'${d}'`)} are available.`,
         defaultValue: undefined,
         table: {
             type: {

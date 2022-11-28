@@ -10,4 +10,4 @@ export type MoreTypeOptions = Pick<DynamicFieldTypeOptions, 'displayKey'>;
 export type MoreDynamicFieldProps = DynamicFieldProps<
     MoreOptions,
     MoreTypeOptions
-    >
+    >;

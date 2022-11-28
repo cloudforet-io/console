@@ -1,6 +1,6 @@
 import {
     palette,
-} from '@/styles/colors';
+} from '@/styles/colors.cjs';
 
 const {
     blue, coral, gray, green, indigo, peacock, red, violet, yellow,

@@ -1,8 +1,11 @@
 <template>
-    <div v-if="proxyTags.length > 0" class="p-query-search-tags">
+    <div v-if="proxyTags.length > 0"
+         class="p-query-search-tags"
+    >
         <div class="tags-container">
             <div class="left-wrapper">
-                <p-button v-if="!readOnly" class="delete-btn"
+                <p-button v-if="!readOnly"
+                          class="delete-btn"
                           size="sm"
                           style-type="tertiary"
                           @click="deleteAllTags"
@@ -11,7 +14,8 @@
                 </p-button>
             </div>
             <div class="tags-wrapper">
-                <p-tag v-for="(tag, idx) in proxyTags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
+                <p-tag v-for="(tag, idx) in proxyTags"
+                       :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
                        class="tag"
                        :invalid="tag.invalid"
                        :deletable="!readOnly"
@@ -25,7 +29,9 @@
                             {{ tag.key.label || tag.key.name }}
                         </span>
                         <span class="operator">:{{ tag.operator }}</span>
-                        <slot :name="`data-type-${tag.key.dataType || 'string'}`" v-bind="{ ...$props, tag }">
+                        <slot :name="`data-type-${tag.key.dataType || 'string'}`"
+                              v-bind="{ ...$props, tag }"
+                        >
                             <span class="value-label">
                                 {{ tag.value.label || tag.value.name }}
                             </span>
@@ -122,7 +128,7 @@ export default defineComponent<QuerySearchTagsProps>({
 
         const isTagsSame = (tagsA: QueryTag[], tagsB: QueryTag[]) => {
             if (tagsA.length !== tagsB.length) return false;
-            return tagsA.map(d => d.value.name).toString() === tagsB.map(d => d.value.name).toString();
+            return tagsA.map((d) => d.value.name).toString() === tagsB.map((d) => d.value.name).toString();
         };
 
         watch(() => props.tags, (tags) => {

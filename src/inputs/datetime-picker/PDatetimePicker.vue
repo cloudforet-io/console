@@ -1,5 +1,6 @@
 <template>
-    <div ref="datePickerRef" class="p-datetime-picker"
+    <div ref="datePickerRef"
+         class="p-datetime-picker"
          :class="{
              [styleType] : true,
              open : visiblePicker,
@@ -59,7 +60,7 @@ const FLATPICKR_MODE = Object.freeze({
     range: 'range',
     time: 'time',
 } as const);
-type FlatpickrMode = typeof FLATPICKR_MODE[keyof typeof FLATPICKR_MODE]
+type FlatpickrMode = typeof FLATPICKR_MODE[keyof typeof FLATPICKR_MODE];
 
 export default {
     name: 'PDatetimePicker',
@@ -79,7 +80,7 @@ export default {
         styleType: {
             type: String,
             default: STYLE_TYPE.default,
-            validator: styleType => Object.values(STYLE_TYPE).includes(styleType as string),
+            validator: (styleType) => Object.values(STYLE_TYPE).includes(styleType as string),
         },
         timezone: {
             type: String,
@@ -203,9 +204,9 @@ export default {
                 let defaultDate;
                 if (state.proxySelectedDates.length) {
                     if (props.dataType === DATA_TYPE.yearToMonth) {
-                        defaultDate = state.proxySelectedDates.map(d => Flatpickr.formatDate(dayjs(d).tz(props.timezone).toDate(), 'F Y'));
+                        defaultDate = state.proxySelectedDates.map((d) => Flatpickr.formatDate(dayjs(d).tz(props.timezone).toDate(), 'F Y'));
                     } else {
-                        defaultDate = state.proxySelectedDates.map(d => dayjs(d).tz(props.timezone).format('YYYY-MM-DD HH:mm'));
+                        defaultDate = state.proxySelectedDates.map((d) => dayjs(d).tz(props.timezone).format('YYYY-MM-DD HH:mm'));
                     }
                 }
                 state.datePicker = Flatpickr(datePickerRef, {

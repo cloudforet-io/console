@@ -2,7 +2,7 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "target": "es2018",
-    "module": "CommonJS",
+    "module": "ESNext",
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
@@ -15,14 +15,15 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "baseUrl": ".",
+    "outDir": "dist/src",
     "declaration": true,
-    "outDir": "dist",
+    "emitDeclarationOnly": true,
     "types": ["webpack-env", "@types/jest"],
     "paths": {
       "@/*": ["src/*"]
     },
-    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"],
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.ts", "tests/**/*.tsx"],
-  "exclude": ["node_modules", "src/**/*.stories.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "src/**/*.stories.ts",  "src/**/story-helper.ts", "src/**/mock.ts"]
 }

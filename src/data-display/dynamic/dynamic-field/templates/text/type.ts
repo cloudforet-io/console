@@ -7,4 +7,4 @@ export type TextTypeOptions = Pick<DynamicFieldTypeOptions, never>;
 export type TextDynamicFieldProps = DynamicFieldProps<
     TextOptions,
     TextTypeOptions
-    >
+    >;

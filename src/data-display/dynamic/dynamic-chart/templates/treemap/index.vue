@@ -1,5 +1,7 @@
 <template>
-    <div ref="chartRef" class="p-dynamic-chart-treemap" />
+    <div ref="chartRef"
+         class="p-dynamic-chart-treemap"
+    />
 </template>
 
 <script lang="ts">
@@ -28,14 +30,14 @@ import type {
 } from '@/data-display/dynamic/dynamic-chart/type';
 import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
-import { palette } from '@/styles/colors';
+import { palette } from '@/styles/colors.cjs';
 
 const getColoredData = (chartData: any[], theme: DynamicChartTheme, valueOptions: DynamicField): any[] => {
     const results: any[] = [];
     const key = valueOptions.key;
 
-    const maxItem = maxBy(chartData, d => d[key] ?? 0);
-    const minItem = minBy(chartData, d => d[key] ?? 0);
+    const maxItem = maxBy(chartData, (d) => d[key] ?? 0);
+    const minItem = minBy(chartData, (d) => d[key] ?? 0);
     const max = maxItem ? maxItem[key] ?? 0 : 0;
     const min = minItem ? minItem[key] ?? 0 : 0;
 
@@ -75,7 +77,7 @@ const getColoredData = (chartData: any[], theme: DynamicChartTheme, valueOptions
     return results;
 };
 
-type DynamicChartTreemapProps = DynamicChartTemplateProps & { limit: number }
+type DynamicChartTreemapProps = DynamicChartTemplateProps & { limit: number };
 export default defineComponent<DynamicChartTreemapProps>({
     name: 'PDynamicChartTreemap',
     props: {
@@ -127,7 +129,7 @@ export default defineComponent<DynamicChartTreemapProps>({
 
             const chart = am4core.create(ctx, TreeMap);
 
-            const totalValue = sum(state.filteredData.map(d => d[props.valueOptions.key] ?? 0));
+            const totalValue = sum(state.filteredData.map((d) => d[props.valueOptions.key] ?? 0));
             drawTreemapChart(chart, props.nameOptions, props.valueOptions, totalValue);
             state.chart = chart;
 

@@ -26,7 +26,7 @@ const drawPieSeries = (chart: PieChart, nameOptions: DynamicField, valueOptions:
     series.hiddenState.properties.endAngle = -90;
     series.hiddenState.properties.startAngle = -90;
 
-    series.colors.list = colors.map(d => am4core.color(d));
+    series.colors.list = colors.map((d) => am4core.color(d));
     return series;
 };
 
