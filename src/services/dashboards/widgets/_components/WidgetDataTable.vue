@@ -1,79 +1,97 @@
 <template>
-    <div class="widget-data-table"
-         :class="{'print-mode': printMode}"
-    >
-        <p-data-table :fields="items.length ? fields : []"
-                      :items="slicedItems"
-                      :total-count="totalCount"
-                      :loading="loading"
-                      :row-height-fixed="!printMode"
-                      table-style-type="simple"
-                      disable-hover
+    <div class="widget-data-table">
+        <p-data-loader class="table-container"
+                       :loading="loading"
+                       :data="items"
+                       show-data-from-scratch
         >
-            <template v-for="field in fields"
-                      #[`th-${field.name}-format`]
-            >
-                <div :key="field.name"
-                     class="tooltip-container"
+            <template #no-data>
+                <div class="no-data-wrapper"
+                     :style="{minHeight: noDataMinHeight}"
                 >
-                    <span>{{ field.label }}</span>
-                    <p-i v-if="field.tooltipText"
-                         v-tooltip.bottom="field.tooltipText"
-                         name="ic_tooltip"
-                         width="0.875rem"
-                         height="0.875rem"
-                    />
+                    <!--                    song-lang-->
+                    {{ $t('No Data') }}
                 </div>
             </template>
-            <template #col-format="{field: { name, type }, value, index, colIndex}">
-                <div class="status-wrapper"
-                     :class="{legend: showLegend && colIndex === 0}"
-                >
-                    <template v-if="fields[0].name === name && showIndex">
-                        <p-status v-if="showLegend"
-                                  class="toggle-button"
-                                  :text="(getConvertedIndex(index) + 1)?.toString()"
-                                  :icon-color="getLegendIconColor(index)"
-                                  :text-color="getLegendTextColor(index)"
-                                  @click="handleClickLegend(index)"
-                        />
-                        <slot :name="`${name}-format`"
-                              v-bind="{ value }"
+            <table>
+                <thead>
+                    <tr>
+                        <th v-for="(field, fieldColIndex) in fields"
+                            :key="`th-${contextKey}-${fieldColIndex}`"
+                            :style="{
+                                minWidth: field.width || undefined,
+                                width: field.width || undefined,
+                            }"
                         >
-                            <span class="name"
-                                  :style="{ color: labelColorFormatter(index) }"
+                            <slot :name="`th-${field.name}`"
+                                  v-bind="getHeadSlotProps(field, fieldColIndex)"
                             >
-                                {{ labelTextFormatter(index) }}
-                            </span>
-                        </slot>
-                    </template>
-                    <template v-else-if="typeof value === 'string'">
-                        {{ value }}
-                    </template>
-                    <template v-else-if="typeof value === 'number'">
-                        <template v-if="type === 'size'">
-                            {{ byteFormatter(value) }}
-                        </template>
-                        <template v-else-if="type === 'number'">
-                            {{ numberFormatter(value) }}
-                        </template>
-                        <template v-else>
-                            {{ CURRENCY_SYMBOL[currency] }}{{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
-                        </template>
-                    </template>
-                    <template v-else>
-                        --
-                    </template>
-                    <!--                    <template v-else>-->
-                    <!--                        <span v-if="value.isRaised" :class="{raised: value.isRaised}">-->
-                    <!--                            <span>{{ value.value }}</span>-->
-                    <!--                            <p-i name="ic_bold-arrow-up" width="0.75rem" />-->
-                    <!--                        </span>-->
-                    <!--                        <span>{{ value.value }}</span>-->
-                    <!--                    </template>-->
-                </div>
-            </template>
-        </p-data-table>
+                                <span class="th-contents"
+                                      :class="{
+                                          [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                          'has-icon': field.tooltipText,
+                                      }"
+                                >
+                                    <span class="th-text">
+                                        <slot name="th-format"
+                                              v-bind="getHeadSlotProps(field, fieldColIndex)"
+                                        >
+                                            <slot :name="`th-${field.name}-format`"
+                                                  v-bind="getHeadSlotProps(field, fieldColIndex)"
+                                            >
+                                                {{ field.label ? field.label : field.name }}
+                                            </slot>
+                                        </slot>
+                                    </span>
+                                    <template v-if="field.tooltipText">
+                                        <p-i name="ic_tooltip"
+                                             class="sort-icon"
+                                        />
+                                    </template>
+                                </span>
+                            </slot>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody ref="tbodyRef">
+                    <slot name="body"
+                          :items="items"
+                          v-bind="{fields}"
+                    >
+                        <tr v-for="(item, rowIndex) in items"
+                            :key="`tr-${contextKey}-${rowIndex}`"
+                            :data-index="rowIndex"
+                            @click.left="() => {console.log('row click');}"
+                        >
+                            <td v-for="(field, colIndex) in fields"
+                                :key="`td-${contextKey}-${rowIndex}-${colIndex}`"
+                                :class="{
+                                    'has-width': !!field.width,
+                                    [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                }"
+                            >
+                                <slot name="col-format"
+                                      v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                >
+                                    <slot :name="`col-${field.name}-format`"
+                                          v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                    >
+                                        <slot :name="`col-${colIndex}-format`"
+                                              v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                        >
+                                            {{ getValue(item, field) }}
+                                        </slot>
+                                    </slot>
+                                </slot>
+                            </td>
+                        </tr>
+                    </slot>
+                </tbody>
+                <tfoot>
+                    <slot name="foot" />
+                </tfoot>
+            </table>
+        </p-data-loader>
         <div v-if="paginationVisible"
              class="table-pagination-wrapper"
         >
@@ -92,32 +110,33 @@ import {
 import type { PropType } from 'vue';
 
 import {
-    PDataTable, PTextPagination, PStatus, PI,
+    PTextPagination, PI, PDataLoader,
 } from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { DATA_TABLE_CELL_TEXT_ALIGN } from '@spaceone/design-system/src/data-display/tables/data-table/config';
+import { get } from 'lodash';
 
 import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import type { CurrencyRates } from '@/store/modules/display/type';
 
+import { getUUID } from '@/lib/component-util/getUUID';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
+import type { Field } from '@/services/dashboards/widgets/_components/type';
+
 import { GROUP_BY } from '../config';
 
-interface Field extends DataTableFieldType {
-    type?: 'cost'|'size'|'number';
-}
 export default {
     name: 'WidgetDataTable',
     components: {
-        PDataTable,
         PTextPagination,
-        PStatus,
         PI,
+        PDataLoader,
     },
     props: {
         loading: {
@@ -144,9 +163,12 @@ export default {
             type: Boolean,
             default: true,
         },
-        showLegend: {
-            type: Boolean,
-            default: false,
+        legendOption: {
+            type: Object as PropType<Field['legendOptions']>,
+            default: () => ({
+                enabled: false,
+                index: false,
+            }),
         },
         legends: {
             type: Array,
@@ -157,21 +179,21 @@ export default {
             default: CURRENCY.USD,
         },
         currencyRates: {
-            type: Object,
+            type: Object as PropType<CurrencyRates>,
             default: () => ({}),
         },
-        // showSharpRises: {
-        //     type: Boolean,
-        //     default: false,
-        // },
         paginationVisible: {
             type: Boolean,
             default: true,
         },
-        printMode: {
-            type: Boolean,
-            default: false,
+        noDataMinHeight: {
+            type: String,
+            default: '7rem',
         },
+        // printMode: {
+        //     type: Boolean,
+        //     default: false,
+        // },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -184,6 +206,7 @@ export default {
             totalCount: computed(() => props.items.length),
             allPage: computed(() => Math.ceil(state.totalCount / props.pageSize) || 1),
             proxyThisPage: useProxyValue('thisPage', props, emit),
+            contextKey: getUUID(),
         });
 
         /* util */
@@ -205,46 +228,24 @@ export default {
             if (legend?.disabled) return DISABLED_LEGEND_COLOR;
             return null;
         };
-        // const getConvertedItems = (items) => {
-        //     const convertedItems: Item[] = [];
-        //     items.forEach((item) => {
-        //         const convertedItem: Item = {};
-        //         Object.entries(item).forEach(([k, v]) => {
-        //             const date = dayjs.utc(k);
-        //             if (date.isValid()) {
-        //                 const pastDate = date.subtract(1, 'month').format('YYYY-MM');
-        //                 const pastValue = item[pastDate] || undefined;
-        //                 let isRaised = false;
-        //                 const value: number = v as number;
-        //                 if (value && pastValue && pastValue * 1.5 < value) {
-        //                     isRaised = true;
-        //                 }
-        //                 convertedItem[k] = {
-        //                     value: commaFormatter(numberFormatter(value)),
-        //                     isRaised,
-        //                 };
-        //             } else {
-        //                 convertedItem[k] = {
-        //                     value: v,
-        //                 };
-        //             }
-        //         });
-        //         convertedItems.push(convertedItem);
-        //     });
-        //     return convertedItems;
-        // };
+        const getHeadSlotProps = (field, colIndex) => ({
+            field, index: colIndex, colIndex,
+        });
+        const getValue = (item, field: Field) => {
+            if (typeof item === 'object') {
+                return get(item, field.name);
+            }
+            return item;
+        };
+        const getColSlotProps = (item, field, colIndex, rowIndex) => ({
+            item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
+        });
 
         /* event */
         const handleClickLegend = (index) => {
             if (props.printMode) return;
             emit('toggle-legend', index);
         };
-
-        // watch([() => props.showSharpRises, () => props.items], ([showSharpRises, items]) => {
-        //     if (showSharpRises && items.length) {
-        //         state.convertedItems = getConvertedItems(items);
-        //     }
-        // }, { immediate: true });
 
         return {
             ...toRefs(state),
@@ -260,6 +261,10 @@ export default {
             byteFormatter,
             numberFormatter,
             CURRENCY_SYMBOL,
+            getHeadSlotProps,
+            getColSlotProps,
+            getValue,
+            DATA_TABLE_CELL_TEXT_ALIGN,
         };
     },
 };
@@ -267,61 +272,111 @@ export default {
 
 <style lang="postcss" scoped>
 .widget-data-table {
-    .tooltip-container {
-        @apply flex flex-wrap gap-2 items-end;
-        line-height: 0.9375rem;
-        .tooltip-button:hover {
-            cursor: pointer;
+    .table-container {
+        @apply overflow-auto h-full w-full;
+        .no-data-wrapper {
+            @apply flex justify-center items-center;
         }
     }
-    .table-pagination-wrapper {
-        text-align: center;
+    table {
+        @apply min-w-full;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed;
+    }
+    thead {
+        tr {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    }
+    th {
+        vertical-align: bottom;
+        line-height: 1.25rem;
         font-size: 0.875rem;
-    }
-
-    /* custom design-system component - p-data-table */
-    :deep(.p-data-table) {
-        .status-wrapper {
-            display: inline-flex;
-            .toggle-button {
-                cursor: pointer;
+        text-align: left;
+        letter-spacing: 0;
+        white-space: nowrap;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        .th-contents {
+            @apply flex justify-between pl-4;
+            line-height: 2;
+            .th-text {
+                display: inline-flex;
+                align-content: center;
+                .p-copy-button {
+                    @apply inline-block text-center;
+                    width: 1.5rem;
+                }
+            }
+            &.right {
+                justify-content: flex-end;
                 padding-right: 1rem;
-                > .text {
-                    flex-shrink: 0;
-                    white-space: nowrap;
-                }
             }
-            &.legend {
-                width: 100%;
-                > .name {
-                    word-break: break-all;
-                }
+            &.center {
+                justify-content: center;
+                padding-right: 1rem;
+            }
+            &.has-icon {
+                padding-right: 0;
             }
         }
-
-        .raised {
-            @apply text-alert;
+        .sort-icon {
+            @apply text-gray-500 float-right my-px;
+            &:hover { cursor: pointer; }
         }
-        tr:nth-of-type(even) {
-            @apply bg-gray-100;
+        &.fix-width {
+            @apply min-w-19;
         }
-        td {
-            @apply border-none;
+        &:last-child {
+            .th-contents:not(.has-icon) {
+                padding-right: 1rem;
+            }
+        }
+        &.all-select {
+            @apply py-1 pl-4;
+            width: 2.5rem;
+            min-width: 2.5rem;
+            max-width: 2.5rem;
+        }
+    }
+    td {
+        @apply h-10 px-4 z-0 align-middle min-w-28 text-sm;
+        &.has-width {
+            word-break: break-word;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+        &.right {
+            @apply text-right;
+        }
+        &.center {
+            @apply text-center;
+        }
+        i, span, div, input, textarea, article, main, ul, li {
+            vertical-align: baseline;
+        }
+    }
+    tr {
+        &.row-height-fixed {
+            td:not(.has-width) {
+                overflow-x: hidden;
+                white-space: nowrap;
+            }
+        }
+        &.row-cursor-pointer {
+            cursor: pointer;
         }
     }
 
     &.print-mode {
-        /* custom design-system component - p-data-table */
-        :deep(.p-data-table) {
-            .table-container {
-                overflow: hidden;
-            }
-            table {
-                width: 100%;
-            }
-            .toggle-button {
-                cursor: default;
-            }
+        .table-container {
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
         }
         .status-wrapper {
             min-width: 2rem;
