@@ -86,13 +86,18 @@ export interface DateRange {
     end?: string;
 }
 
+interface LegendOptions {
+    enabled?: boolean;
+    show_at?: 'table'|'chart';
+}
+
 export interface WidgetOptions {
     date_range?: DateRange;
     currency?: Currency;
     group_by?: GroupBy[];
     granularity?: Granularity;
     stacked?: boolean;
-    enable_legend?: boolean;
+    legend_options?: LegendOptions;
     chart_type?: ChartType;
     filter?: QueryStoreFilter[];
     dynamic_widget_type?: DynamicWidgetType;

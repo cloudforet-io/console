@@ -1,3 +1,29 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
+import { CHART_TYPE } from '@/services/dashboards/widgets/config';
 
-export default {} as WidgetConfig;
+const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
+    widget_config_id: 'awsDataTransferCostTrend',
+    base_configs: [{ config_id: 'baseTrend' }],
+    title: 'AWS Data-Transfer Cost Trend',
+    labels: ['Cost'],
+    description: {
+        translation_id: 'DASHBOARDS.WIDGET.AWS_DATA_TRANSFER_COST_TREND.DESC',
+        preview_image: 'xxx.png',
+    },
+    scopes: ['PROJECT', 'WORKSPACE'],
+    theme: {
+        inherit: true,
+        inherit_count: 3,
+    },
+    sizes: ['lg', 'full'],
+    widget_options: {
+        granularity: 'MONTHLY',
+        chart_type: CHART_TYPE.LINE,
+        legend_options: {
+            enabled: true,
+            show_at: 'chart',
+        },
+    },
+};
+
+export default awsDataTransferCostTrendWidgetConfig;

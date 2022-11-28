@@ -17,8 +17,11 @@ const costTrendWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     widget_options: {
         granularity: 'MONTHLY',
-        enable_legend: false,
         chart_type: CHART_TYPE.LINE,
+        legend_options: {
+            enabled: true,
+            show_at: 'table',
+        },
     },
     widget_options_schema: {
         type: 'object',
