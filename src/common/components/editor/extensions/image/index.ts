@@ -42,6 +42,7 @@ export const createImageExtension = (uploadFn: ImageUploader) => Node.create({
     ],
     renderHTML: ({ HTMLAttributes }) => ['img', HTMLAttributes],
 
+    // eslint-disable-next-line no-unused-vars
     addCommands(this: any) {
         return (attrs) => (state, dispatch) => {
             const { selection } = state;

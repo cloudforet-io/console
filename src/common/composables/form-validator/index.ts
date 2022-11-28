@@ -7,6 +7,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { clone } from 'lodash';
 
 type ValidatorResult = boolean|TranslateResult;
+// eslint-disable-next-line no-unused-vars
 interface Validator { (value?: any): ValidatorResult }
 type ValidationResult = boolean;
 

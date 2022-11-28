@@ -19,6 +19,7 @@ interface MockRequestConfig extends AxiosRequestConfig {
 }
 
 interface AfterCallApi {
+    // eslint-disable-next-line no-unused-vars
     (data?: any): Promise<void>|void
 }
 
