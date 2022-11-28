@@ -1,7 +1,7 @@
 <template>
     <div class="widget-frame"
          :class="{ full: isFull, 'edit-mode': editMode }"
-         :style="{ width: isFull ? '100%' : width }"
+         :style="{ width: `${width}px` }"
     >
         <div class="widget-header">
             <h3 class="title">
@@ -77,13 +77,14 @@ import { getUUID } from '@/lib/component-util/getUUID';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import { WIDGET_FRAME_WIDTH_RANGE_LIST } from '@/services/dashboards/dashboard-detail/lib/config';
 import type { WidgetOptions, WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 
 interface Props {
     title: TranslateResult;
     size: WidgetSize;
-    width: string;
+    width: number;
     widgetLink?: string;
     widgetRoute?: Route;
     dateRange?: WidgetOptions['date_range'];
@@ -121,9 +122,10 @@ export default defineComponent<Props>({
             type: String as PropType<WidgetSize>,
             default: WIDGET_SIZE.md,
         },
+        // FIXME:: width should be -= 16 because of margin.
         width: {
-            type: String,
-            default: '30rem', // default width of md size
+            type: Number,
+            default: WIDGET_FRAME_WIDTH_RANGE_LIST.SM[0],
         },
         widgetLink: {
             type: String,
@@ -231,6 +233,7 @@ export default defineComponent<Props>({
 <style lang="postcss" scoped>
 .widget-frame {
     height: 29rem;
+    margin: 0.5rem;
 
     @apply border rounded-lg bg-white;
     border-color: theme('colors.gray.200');
