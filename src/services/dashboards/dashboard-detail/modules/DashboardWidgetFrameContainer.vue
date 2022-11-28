@@ -5,6 +5,7 @@
         <div
             v-for="(row, rowIndex) in widgetFrameWidthList"
             :key="`widget-frame-row-${rowIndex}`"
+            class="dashboard-widget-frame-row"
         >
             <widget-frame
                 v-for="(width, index) in row"
@@ -93,5 +94,11 @@ export default defineComponent({
 .dashboard-widget-frame-container {
     min-width: 320px;
     max-width: 1840px;
+    display: grid;
+    gap: 16px;
+    .dashboard-widget-frame-row {
+        display: flex;
+        gap: 16px;
+    }
 }
 </style>

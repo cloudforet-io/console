@@ -233,7 +233,6 @@ export default defineComponent<Props>({
 <style lang="postcss" scoped>
 .widget-frame {
     height: 29rem;
-    margin: 0.5rem;
 
     @apply border rounded-lg bg-white;
     border-color: theme('colors.gray.200');
