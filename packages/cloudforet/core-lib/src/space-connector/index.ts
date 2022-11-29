@@ -3,7 +3,7 @@ import axios from 'axios';
 import { camelCase } from 'lodash';
 
 import type {
-    SessionTimeoutCallback, APIInfo, MockInfo, AxiosPostResponse,
+    APIInfo, MockInfo, AxiosPostResponse,
 } from '@/space-connector/type';
 
 import ServiceAPI from './service-api';
@@ -44,12 +44,12 @@ export class SpaceConnector {
 
     constructor(
         endpoint: string,
-        sessionTimeoutCallback: SessionTimeoutCallback = () => undefined,
+        tokenApi: TokenAPI,
         mockInfo: MockInfo,
         afterCallApiMap: AfterCallApiMap,
     ) {
         this.mockInfo = mockInfo;
-        this.tokenApi = TokenAPI.getInstance(endpoint, sessionTimeoutCallback);
+        this.tokenApi = tokenApi;
         this.serviceApi = new ServiceAPI(endpoint, this.tokenApi);
         this.afterCallApiMap = afterCallApiMap;
         this.setApiTokenCheckInterval();
@@ -67,9 +67,9 @@ export class SpaceConnector {
         }
     }
 
-    static async init(endpoint: string, sessionTimeoutCallback?: SessionTimeoutCallback, mockInfo: MockInfo = {}, afterCallApiMap: AfterCallApiMap = {}): Promise<void> {
+    static async init(endpoint: string, tokenApi: TokenAPI, mockInfo: MockInfo = {}, afterCallApiMap: AfterCallApiMap = {}): Promise<void> {
         if (!SpaceConnector.instance) {
-            SpaceConnector.instance = new SpaceConnector(endpoint, sessionTimeoutCallback, mockInfo, afterCallApiMap);
+            SpaceConnector.instance = new SpaceConnector(endpoint, tokenApi, mockInfo, afterCallApiMap);
             await SpaceConnector.instance.loadAPI();
         }
     }
