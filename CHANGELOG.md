@@ -1,3 +1,10 @@
+# [1.1.0-beta.459](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.458...v1.1.0-beta.459) (2022-11-29)
+
+
+### Bug Fixes
+
+* **board-item:** apply design changes ([#140](https://github.com/cloudforet-io/mirinae/issues/140)) ([3d23433](https://github.com/cloudforet-io/mirinae/commit/3d234339e91588b20b6e6ddb4970f9ef03826e0a))
+
 # [1.1.0-beta.458](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.457...v1.1.0-beta.458) (2022-11-29)
 
 
