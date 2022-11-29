@@ -88,6 +88,6 @@ export interface Query {
 
 export interface MockInfo {
     all?: boolean;
-    endpoint?: string;
+    endpoints?: string[];
     reflection?: boolean;
 }

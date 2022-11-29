@@ -1,5 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import TokenAPI from '@cloudforet/core-lib/space-connector/token-api';
 import type { MockInfo } from '@cloudforet/core-lib/space-connector/type';
+
 
 const getAfterCallApiMap = (store) => ({
     '/inventory/cloud-service-type/create': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
@@ -33,17 +35,19 @@ const getSessionTimeoutCallback = (store) => () => {
     store.dispatch('user/setIsSessionExpired', true);
     store.dispatch('error/showSessionExpiredError');
 };
-const getApiEndpoint = (config) => config.get('CONSOLE_API.ENDPOINT');
+const getApiEndpoints = (config) => [config.get('CONSOLE_API.ENDPOINT'), config.get('CONSOLE_API_V2.ENDPOINT')];
 const getMockInfo = (config): MockInfo => ({
-    endpoint: config.get('MOCK.ENDPOINT'),
+    endpoints: [config.get('MOCK.ENDPOINT')],
     all: config.get('MOCK.ALL'),
     reflection: config.get('MOCK.REFLECTION'),
 });
 
 export const initApiClient = async (store, config) => {
+    const endpoints = getApiEndpoints(config);
+    const tokenApi = new TokenAPI(endpoints[0], getSessionTimeoutCallback(store));
     await SpaceConnector.init(
-        getApiEndpoint(config),
-        getSessionTimeoutCallback(store),
+        endpoints,
+        tokenApi,
         getMockInfo(config),
         getAfterCallApiMap(store),
     );
