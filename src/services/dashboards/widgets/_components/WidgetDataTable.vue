@@ -105,7 +105,7 @@
 <script lang="ts">
 
 import {
-    computed, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from 'vue';
 import type { PropType } from 'vue';
 
@@ -117,6 +117,7 @@ import { get } from 'lodash';
 
 import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 
+import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
@@ -125,13 +126,25 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
-
-import type { Field } from '@/services/dashboards/widgets/_components/type';
+import type { Field, LegendOptions } from '@/services/dashboards/widgets/_components/type';
 
 import { GROUP_BY } from '../config';
 
-export default {
+interface Props {
+    loading: boolean;
+    fields: Field[];
+    items: any[];
+    thisPage: number;
+    pageSize: number;
+    showIndex: number;
+    legendOption: LegendOptions;
+    allPage: number;
+    currency: Currency;
+    currencyRates: CurrencyRates;
+    paginationVisible: boolean;
+    noDataMinHeight: string;
+}
+export default defineComponent<Props>({
     name: 'WidgetDataTable',
     components: {
         PTextPagination,
@@ -164,18 +177,18 @@ export default {
             default: true,
         },
         legendOption: {
-            type: Object as PropType<Field['legendOptions']>,
+            type: Object as PropType<LegendOptions>,
             default: () => ({
                 enabled: false,
                 index: false,
             }),
         },
-        legends: {
-            type: Array,
-            default: undefined,
-        },
+        // legends: {
+        //     type: Array,
+        //     default: undefined,
+        // },
         currency: {
-            type: String,
+            type: String as PropType<Currency>,
             default: CURRENCY.USD,
         },
         currencyRates: {
@@ -197,12 +210,12 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            slicedItems: computed(() => {
-                if (props.printMode) return props.items;
-                const startIndex = state.proxyThisPage * props.pageSize - props.pageSize;
-                const endIndex = state.proxyThisPage * props.pageSize;
-                return props.items.slice(startIndex, endIndex);
-            }),
+            // slicedItems: computed(() => {
+            //     if (props.printMode) return props.items;
+            //     const startIndex = state.proxyThisPage * props.pageSize - props.pageSize;
+            //     const endIndex = state.proxyThisPage * props.pageSize;
+            //     return props.items.slice(startIndex, endIndex);
+            // }),
             totalCount: computed(() => props.items.length),
             allPage: computed(() => Math.ceil(state.totalCount / props.pageSize) || 1),
             proxyThisPage: useProxyValue('thisPage', props, emit),
@@ -210,24 +223,24 @@ export default {
         });
 
         /* util */
-        const getConvertedIndex = (index) => index + ((state.proxyThisPage - 1) * props.pageSize);
-        const labelColorFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].color : 'text-gray-900');
-        const labelTextFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].label : '');
-        const getIndexNumber = (index) => {
-            const tableIndex = index + ((state.proxyThisPage - 1) * props.pageSize) + 1;
-            return tableIndex?.toString();
-        };
-        const getLegendIconColor = (index) => {
-            const legend = props.legends[getConvertedIndex(index)];
-            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-            if (legend?.color) return legend.color;
-            return DEFAULT_CHART_COLORS[getConvertedIndex(index)];
-        };
-        const getLegendTextColor = (index) => {
-            const legend = props.legends[getConvertedIndex(index)];
-            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-            return null;
-        };
+        // const getConvertedIndex = (index) => index + ((state.proxyThisPage - 1) * props.pageSize);
+        // const labelColorFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].color : 'text-gray-900');
+        // const labelTextFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].label : '');
+        // const getIndexNumber = (index) => {
+        //     const tableIndex = index + ((state.proxyThisPage - 1) * props.pageSize) + 1;
+        //     return tableIndex?.toString();
+        // };
+        // const getLegendIconColor = (index) => {
+        //     const legend = props.legends[getConvertedIndex(index)];
+        //     if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+        //     if (legend?.color) return legend.color;
+        //     return DEFAULT_CHART_COLORS[getConvertedIndex(index)];
+        // };
+        // const getLegendTextColor = (index) => {
+        //     const legend = props.legends[getConvertedIndex(index)];
+        //     if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+        //     return null;
+        // };
         const getHeadSlotProps = (field, colIndex) => ({
             field, index: colIndex, colIndex,
         });
@@ -242,21 +255,21 @@ export default {
         });
 
         /* event */
-        const handleClickLegend = (index) => {
-            if (props.printMode) return;
-            emit('toggle-legend', index);
-        };
+        // const handleClickLegend = (index) => {
+        //     if (props.printMode) return;
+        //     emit('toggle-legend', index);
+        // };
 
         return {
             ...toRefs(state),
             GROUP_BY,
-            getIndexNumber,
-            getConvertedIndex,
-            getLegendIconColor,
-            getLegendTextColor,
-            handleClickLegend,
-            labelColorFormatter,
-            labelTextFormatter,
+            // getIndexNumber,
+            // getConvertedIndex,
+            // getLegendIconColor,
+            // getLegendTextColor,
+            // labelColorFormatter,
+            // labelTextFormatter,
+            // handleClickLegend,
             currencyMoneyFormatter,
             byteFormatter,
             numberFormatter,
@@ -267,7 +280,7 @@ export default {
             DATA_TABLE_CELL_TEXT_ALIGN,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

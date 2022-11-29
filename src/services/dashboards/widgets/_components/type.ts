@@ -29,13 +29,14 @@ export interface Field {
     textAlign?: 'left'|'right'|'center';
     styleOptions: TextOption;
     dataOptions: CostOption | PercentOption | SizeOption;
-    legendOptions?: {
-        enabled: boolean;
-        index: boolean;
-    };
     detailOptions?: {
         enabled: boolean;
         type: 'modal'|'popover';
     }
     tooltipText?: string;
+}
+
+export interface LegendOptions {
+    enabled: boolean;
+    index: boolean;
 }
