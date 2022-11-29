@@ -31,6 +31,7 @@ const createXYChart = (root: Root, settings?: IXYChartSettings): am5xy.XYChart =
         layout: root.verticalLayout,
         maxTooltipDistance: -1,
         cursor,
+        pinchZoomX: false,
         ...settings,
     }));
 };
@@ -57,6 +58,7 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings): {
         paddingTop: 6,
     });
     const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+        extraMax: 0.01,
         baseInterval: {
             timeUnit: 'month',
             count: 1,

@@ -47,7 +47,7 @@ const createTooltip = (root: Root, settings?: ITooltipSettings): am5.Tooltip => 
 const createLegend = (root: Root, settings?: ILegendSettings): am5.Legend => {
     const legend = am5.Legend.new(root, {
         layout: root.horizontalLayout,
-        paddingTop: 8,
+        paddingTop: 4,
         useDefaultMarker: true,
         x: am5.percent(0),
         ...settings,
