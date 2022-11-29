@@ -63,8 +63,7 @@ import {
 } from 'vue';
 import type { DirectiveFunction, SetupContext } from 'vue';
 
-import { PI } from '@spaceone/design-system';
-import { laptop } from '@spaceone/design-system/src/styles/screens';
+import { PI, screens } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce, throttle } from 'lodash';
@@ -108,7 +107,7 @@ interface CloudServiceData {
     icon: string;
 }
 
-const LAPTOP_WINDOW_SIZE = laptop.max;
+const LAPTOP_WINDOW_SIZE = screens.laptop.max;
 
 const RECENT_LIMIT = 5;
 const SEARCH_LIMIT = 15;
