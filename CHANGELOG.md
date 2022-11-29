@@ -1,3 +1,10 @@
+# [1.1.0-beta.458](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.457...v1.1.0-beta.458) (2022-11-29)
+
+
+### Features
+
+* migrate build tool from vue-cli 4 to vite(for lib build only) & export style modules ([#141](https://github.com/cloudforet-io/mirinae/issues/141)) ([0704b0e](https://github.com/cloudforet-io/mirinae/commit/0704b0e5c708a0b8b147f840653d3bf7f5274506))
+
 # [1.1.0-beta.457](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.456...v1.1.0-beta.457) (2022-11-22)
 
 
