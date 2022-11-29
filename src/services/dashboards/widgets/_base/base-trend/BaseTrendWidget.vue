@@ -1,7 +1,7 @@
 <template>
     <widget-frame :title="state.title"
                   :size="state.size"
-                  width="704px"
+                  :width="props.width"
                   class="base-trend-widget"
     >
         <div class="chart-wrapper">
@@ -155,9 +155,8 @@ const drawChart = (chartData: XYChartData[]) => {
         setXYSharedTooltipText(chart, tooltip, state.options.currency, props.currencyRates);
         series.set('tooltip', tooltip);
         series.data.setAll(cloneDeep(chartData));
-
-        if (legend) legend.data.push(series);
     });
+    if (legend) legend.data.setAll(chart.series.values);
 };
 
 const initWidget = async () => {
@@ -189,7 +188,7 @@ defineExpose({
 <style lang="postcss" scoped>
 .base-trend-widget {
     .chart-wrapper {
-        height: 10rem;
+        height: 11.5rem;
         .chart-loader {
             height: 100%;
             .chart {
