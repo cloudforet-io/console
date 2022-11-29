@@ -41,6 +41,7 @@ jobs:
           cp -r .storybook ${{ env.BUILD_PATH }}/.storybook
           cp -r public ${{ env.BUILD_PATH }}/public
           cp -r tsconfig.json ${{ env.BUILD_PATH }}/
+          cp -r tailwind.config.cjs ${{ env.BUILD_PATH }}/
 
       - name: Install dependencies
         working-directory: ${{ env.BUILD_PATH }}
