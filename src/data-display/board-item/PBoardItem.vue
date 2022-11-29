@@ -122,7 +122,8 @@ export default defineComponent<BoardItemProps>({
             right: 1rem;
 
             .overlay-contents {
-                @apply h-full w-full flex items-center bg-blue-100;
+                @apply h-full w-full flex bg-blue-100;
+                padding: 1rem 0 1rem;
             }
         }
         .tablet {
