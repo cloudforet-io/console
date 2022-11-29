@@ -26,12 +26,11 @@ export interface Field {
     name: string;
     width?: string;
     label?: string;
-    textAlign?: 'left'|'right'|'center';
     styleOptions: TextOption;
     dataOptions: CostOption | PercentOption | SizeOption;
     detailOptions?: {
-        enabled: boolean;
-        type: 'modal'|'popover';
+        enabled?: boolean;
+        type?: 'modal'|'popover';
     }
     tooltipText?: string;
 }

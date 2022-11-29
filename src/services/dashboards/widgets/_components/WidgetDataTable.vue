@@ -17,7 +17,7 @@
                 <thead>
                     <tr>
                         <th v-for="(field, fieldColIndex) in fields"
-                            :key="`th-${contextKey}-${fieldColIndex}`"
+                            :key="`th-${widgetKey}-${fieldColIndex}`"
                             :style="{
                                 minWidth: field.width || undefined,
                                 width: field.width || undefined,
@@ -33,14 +33,10 @@
                                       }"
                                 >
                                     <span class="th-text">
-                                        <slot name="th-format"
+                                        <slot :name="`th-${field.name}`"
                                               v-bind="getHeadSlotProps(field, fieldColIndex)"
                                         >
-                                            <slot :name="`th-${field.name}-format`"
-                                                  v-bind="getHeadSlotProps(field, fieldColIndex)"
-                                            >
-                                                {{ field.label ? field.label : field.name }}
-                                            </slot>
+                                            {{ field.label ? field.label : field.name }}
                                         </slot>
                                     </span>
                                     <template v-if="field.tooltipText">
@@ -59,28 +55,24 @@
                           v-bind="{fields}"
                     >
                         <tr v-for="(item, rowIndex) in items"
-                            :key="`tr-${contextKey}-${rowIndex}`"
+                            :key="`tr-${widgetKey}-${rowIndex}`"
                             :data-index="rowIndex"
                             @click.left="() => {console.log('row click');}"
                         >
                             <td v-for="(field, colIndex) in fields"
-                                :key="`td-${contextKey}-${rowIndex}-${colIndex}`"
+                                :key="`td-${widgetKey}-${rowIndex}-${colIndex}`"
                                 :class="{
                                     'has-width': !!field.width,
                                     [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
                                 }"
                             >
-                                <slot name="col-format"
+                                <slot :name="`col-${field.name}`"
                                       v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                 >
-                                    <slot :name="`col-${field.name}-format`"
+                                    <slot :name="`col-${colIndex}`"
                                           v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                     >
-                                        <slot :name="`col-${colIndex}-format`"
-                                              v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
-                                        >
-                                            {{ getValue(item, field) }}
-                                        </slot>
+                                        {{ getValue(item, field) }}
                                     </slot>
                                 </slot>
                             </td>
@@ -121,7 +113,6 @@ import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
-import { getUUID } from '@/lib/component-util/getUUID';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -137,12 +128,12 @@ interface Props {
     thisPage: number;
     pageSize: number;
     showIndex: number;
-    legendOption: LegendOptions;
-    allPage: number;
+    legendOptions: LegendOptions;
     currency: Currency;
     currencyRates: CurrencyRates;
     paginationVisible: boolean;
     noDataMinHeight: string;
+    widgetKey: string;
 }
 export default defineComponent<Props>({
     name: 'WidgetDataTable',
@@ -172,10 +163,6 @@ export default defineComponent<Props>({
             type: Number,
             default: 5,
         },
-        showIndex: {
-            type: Boolean,
-            default: true,
-        },
         legendOption: {
             type: Object as PropType<LegendOptions>,
             default: () => ({
@@ -203,6 +190,10 @@ export default defineComponent<Props>({
             type: String,
             default: '7rem',
         },
+        widgetKey: {
+            type: String,
+            default: '7rem',
+        },
         // printMode: {
         //     type: Boolean,
         //     default: false,
@@ -219,7 +210,6 @@ export default defineComponent<Props>({
             totalCount: computed(() => props.items.length),
             allPage: computed(() => Math.ceil(state.totalCount / props.pageSize) || 1),
             proxyThisPage: useProxyValue('thisPage', props, emit),
-            contextKey: getUUID(),
         });
 
         /* util */
@@ -382,6 +372,10 @@ export default defineComponent<Props>({
         &.row-cursor-pointer {
             cursor: pointer;
         }
+    }
+
+    .table-pagination-wrapper {
+        text-align: center;
     }
 
     &.print-mode {
