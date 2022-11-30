@@ -40,7 +40,7 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/config';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
@@ -53,19 +53,21 @@ const props = defineProps<WidgetProps>();
 
 const chartContext = ref<HTMLElement|null>(null);
 const {
-    createPieChart, createTooltip, createPieSeries, setPieTooltipText,
-    disposeRoot,
+    createPieChart, createDonutChart, createPieSeries,
+    createTooltip, setPieTooltipText,
+    disposeRoot, refreshRoot, setChartColors,
 } = useAmcharts5(chartContext);
 
 const state = reactive({
     ...toRefs(useWidgetState<Data[]>(props)),
-    chart: null as null|ReturnType<typeof createPieChart>,
+    chart: null as null|ReturnType<typeof createPieChart | typeof createDonutChart>,
     series: null as null|ReturnType<typeof createPieSeries>,
     groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROVIDER),
     groupByLabel: computed<string>(() => {
         const groupBy = state.groupBy;
         return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;
     }),
+    chartType: computed(() => state.options.chart_type ?? CHART_TYPE.PIE),
     chartData: computed<Data[]>(() => {
         if (!state.data) return [];
         return state.data;
@@ -100,15 +102,18 @@ const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
 });
 
 const drawChart = (chartData: ChartData[]) => {
-    const chart = createPieChart();
-
+    let chart;
+    if (state.chartType === CHART_TYPE.DONUT) chart = createDonutChart();
+    else chart = createPieChart();
     const seriesSettings = {
         categoryField: state.groupBy,
         valueField: 'usd_cost',
     };
-    const series = createPieSeries(chart, seriesSettings);
+    const series = createPieSeries(seriesSettings);
     const tooltip = createTooltip();
+    chart.series.push(series);
     setPieTooltipText(series, tooltip, state.options.currency, props.currencyRates);
+    setChartColors(chart, state.colorSet);
     series.slices.template.set('tooltip', tooltip);
     series.data.setAll(chartData);
 
@@ -116,10 +121,10 @@ const drawChart = (chartData: ChartData[]) => {
     state.series = series;
 };
 
-const updateChart = (chartData: ChartData[]) => {
-    if (!state.series) return;
-    state.series.data.setAll(chartData);
-};
+// const updateChart = (chartData: ChartData[]) => {
+//     if (!state.series) return;
+//     state.series.data.setAll(chartData);
+// };
 
 const initWidget = async () => {
     state.loading = true;
@@ -133,7 +138,8 @@ const refreshWidget = async () => {
     state.loading = true;
     state.data = await fetchData();
     await nextTick();
-    updateChart(state.chartData);
+    refreshRoot();
+    drawChart(state.chartData);
     state.loading = false;
 };
 
