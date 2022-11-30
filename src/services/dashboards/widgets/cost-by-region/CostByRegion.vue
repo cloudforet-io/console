@@ -113,7 +113,7 @@ const state = reactive({
 
 const chartContext = ref<HTMLElement|null>(null);
 const {
-    createMapChart, createPointSeries, createPieChart, createPieSeries,
+    createMapChart, createMapPointSeries, createPieChart, createPieSeries,
     createBullet, createTooltip, setPieTooltipText,
     disposeRoot, clearChildrenOfRoot,
 } = useAmcharts5(chartContext);
@@ -126,9 +126,9 @@ const fetchData = async () => new Promise((resolve) => {
 
 const drawChart = () => {
     const mapChart = createMapChart();
-    const pointSeries = createPointSeries();
-    mapChart.series.push(pointSeries);
-    pointSeries.bullets.push(() => {
+    const mapPointSeries = createMapPointSeries();
+    mapChart.series.push(mapPointSeries);
+    mapPointSeries.bullets.push(() => {
         const pieChart = createPieChart({
             width: 32,
             height: 32,
@@ -150,7 +150,7 @@ const drawChart = () => {
             sprite: pieChart,
         });
     });
-    pointSeries.data.setAll(state.data);
+    mapPointSeries.data.setAll(state.data);
 };
 
 const initWidget = async () => {

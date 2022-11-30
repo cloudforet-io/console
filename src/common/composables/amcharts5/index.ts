@@ -15,7 +15,7 @@ import { Amcharts5GlobalTheme } from '@/lib/site-initializer/amcharts5';
 import {
     createBullet, createDataProcessor, createLegend, createTooltip,
 } from '@/common/composables/amcharts5/concepts-helper';
-import { createMapChart, createPointSeries } from '@/common/composables/amcharts5/map-chart-helper';
+import { createMapChart, createMapPointSeries } from '@/common/composables/amcharts5/map-chart-helper';
 import {
     createDonutChart, createPieChart, createPieSeries, setPieTooltipText,
 } from '@/common/composables/amcharts5/pie-chart-helper';
@@ -115,9 +115,9 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return createPieSeries(state.root as Root, settings);
         },
-        createPointSeries: (settings?: am5map.IMapPointSeriesSettings): am5map.MapPointSeries => {
+        createMapPointSeries: (settings?: am5map.IMapPointSeriesSettings): am5map.MapPointSeries => {
             if (!state.root) throw new Error('No root');
-            return createPointSeries(state.root as Root, settings);
+            return createMapPointSeries(state.root as Root, settings);
         },
         //
         createTooltip: (settings?: am5.ITooltipSettings): am5.Tooltip => {

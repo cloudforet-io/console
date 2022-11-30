@@ -19,7 +19,7 @@ export const createMapChart = (root: Root, settings?: IMapChartSettings): am5map
     return chart;
 };
 
-export const createPointSeries = (root: Root, settings?: am5map.IMapPointSeriesSettings): am5map.MapPointSeries => am5map.MapPointSeries.new(root, {
+export const createMapPointSeries = (root: Root, settings?: am5map.IMapPointSeriesSettings): am5map.MapPointSeries => am5map.MapPointSeries.new(root, {
     latitudeField: 'latitude',
     longitudeField: 'longitude',
     ...settings,
