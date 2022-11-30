@@ -114,7 +114,7 @@ const state = reactive({
 const chartContext = ref<HTMLElement|null>(null);
 const {
     createMapChart, createPointSeries, createPieChart, createPieSeries,
-    createBullet,
+    createBullet, createTooltip, setPieTooltipText,
     disposeRoot, clearChildrenOfRoot,
 } = useAmcharts5(chartContext);
 
@@ -140,6 +140,11 @@ const drawChart = () => {
         pieSeries.labels.template.set('forceHidden', true);
         pieSeries.ticks.template.set('forceHidden', true);
         pieChart.series.push(pieSeries);
+
+        const tooltip = createTooltip();
+        setPieTooltipText(pieSeries, tooltip, state.options.currency, props.currencyRates);
+        pieSeries.slices.template.set('tooltip', tooltip);
+
         pieSeries.data.setAll(SAMPLE_PIE_DATA);
         return createBullet({
             sprite: pieChart,
