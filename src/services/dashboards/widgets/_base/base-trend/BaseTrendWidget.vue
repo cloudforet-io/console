@@ -89,7 +89,7 @@ const props = defineProps<WidgetProps>();
 
 const chartContext = ref<HTMLElement|null>(null);
 const {
-    createXYDateChart, createXYLineSeries, createXYStackedColumnSeries,
+    createXYDateChart, createXYLineSeries, createXYColumnSeries,
     createTooltip, setXYSharedTooltipText, createDataProcessor, createLegend,
     disposeRoot, refreshRoot,
 } = useAmcharts5(chartContext);
@@ -143,7 +143,7 @@ const drawChart = (chartData: XYChartData[]) => {
         };
         const series = state.chartType === CHART_TYPE.LINE
             ? createXYLineSeries(chart, seriesSettings)
-            : createXYStackedColumnSeries(chart, seriesSettings);
+            : createXYColumnSeries(chart, { ...seriesSettings, stacked: true });
 
         // set data processor
         series.data.processor = createDataProcessor({
