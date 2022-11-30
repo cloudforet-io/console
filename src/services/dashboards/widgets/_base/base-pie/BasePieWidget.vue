@@ -110,10 +110,11 @@ const drawChart = (chartData: ChartData[]) => {
         valueField: 'usd_cost',
     };
     const series = createPieSeries(seriesSettings);
-    const tooltip = createTooltip();
     chart.series.push(series);
-    setPieTooltipText(series, tooltip, state.options.currency, props.currencyRates);
     setChartColors(chart, state.colorSet);
+
+    const tooltip = createTooltip();
+    setPieTooltipText(series, tooltip, state.options.currency, props.currencyRates);
     series.slices.template.set('tooltip', tooltip);
     series.data.setAll(chartData);
 
