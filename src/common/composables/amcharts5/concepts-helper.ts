@@ -58,6 +58,6 @@ export const createLegend = (root: Root, settings?: am5.ILegendSettings): am5.Le
     return legend;
 };
 
-export const createBullet = (root: Root, settings: IBulletSettings) => am5.Bullet.new(root, {
+export const createBullet = (root: Root, settings: IBulletSettings): am5.Bullet => am5.Bullet.new(root, {
     ...settings,
 });

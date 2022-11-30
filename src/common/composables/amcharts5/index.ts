@@ -4,73 +4,24 @@ import {
 } from 'vue';
 
 import * as am5 from '@amcharts/amcharts5';
-import type { IDataProcessorSettings, ITooltipSettings, Root } from '@amcharts/amcharts5';
-import type { IPieChartSettings } from '@amcharts/amcharts5/.internal/charts/pie/PieChart';
-import type { ILegendSettings } from '@amcharts/amcharts5/.internal/core/render/Legend';
-import type { PieChart, IPieSeriesSettings } from '@amcharts/amcharts5/percent';
+import type { Root } from '@amcharts/amcharts5';
+import * as am5percent from '@amcharts/amcharts5/percent';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
-import type { IXYChartSettings, IXYSeriesSettings, XYChart } from '@amcharts/amcharts5/xy';
+import type * as am5xy from '@amcharts/amcharts5/xy';
 
 import { Amcharts5GlobalTheme } from '@/lib/site-initializer/amcharts5';
 
-import { DEFAULT_DATE_FIELD_NAME, DEFAULT_DATE_FORMAT } from '@/common/composables/amcharts5/config';
+import {
+    createBullet, createDataProcessor, createLegend, createTooltip,
+} from '@/common/composables/amcharts5/concepts-helper';
 import {
     createDonutChart, createPieChart, createPieSeries, setPieTooltipText,
 } from '@/common/composables/amcharts5/pie-chart-helper';
 import type { ChartContext } from '@/common/composables/amcharts5/type';
 import {
-    createXYCategoryChart, createXYDateChart, createXYLineSeries, createXYStackedColumnSeries,
+    createXYCategoryChart, createXYDateChart, createXYLineSeries, createXYColumnSeries,
     setXYSharedTooltipText, setXYSingleTooltipText,
 } from '@/common/composables/amcharts5/xy-chart-helper';
-
-import { gray, white } from '@/styles/colors';
-
-const createTooltip = (root: Root, settings?: ITooltipSettings): am5.Tooltip => {
-    const tooltip = am5.Tooltip.new(root, {
-        getFillFromSprite: false,
-        autoTextColor: false,
-        ...settings,
-    });
-    tooltip.get('background')?.setAll({
-        fill: am5.color(white),
-        stroke: am5.color(gray[300]),
-        fillOpacity: 0.9,
-    });
-    tooltip.label.setAll({
-        text: `[${gray[700]}]{valueX}[/]`,
-        fill: am5.color(gray[800]),
-        fontSize: 12,
-    });
-    return tooltip;
-};
-
-const createLegend = (root: Root, settings?: ILegendSettings): am5.Legend => {
-    const legend = am5.Legend.new(root, {
-        layout: root.horizontalLayout,
-        paddingTop: 4,
-        useDefaultMarker: true,
-        x: am5.percent(0),
-        ...settings,
-    });
-    legend.labels.template.setAll({
-        fontSize: 12,
-        fill: am5.color(gray[700]),
-    });
-    legend.valueLabels.template.setAll({
-        width: 0,
-    });
-    legend.markers.template.setAll({
-        width: 10,
-        height: 10,
-    });
-    legend.markerRectangles.template.setAll({
-        cornerRadiusTL: 10,
-        cornerRadiusTR: 10,
-        cornerRadiusBL: 10,
-        cornerRadiusBR: 10,
-    });
-    return legend;
-};
 
 export const useAmcharts5 = (
     chartContext: Ref<ChartContext>,
@@ -108,16 +59,11 @@ export const useAmcharts5 = (
 
     const setChartColors = (chart: am5.SerialChart, colors: string[]) => {
         const am5ColorSet = colors.map((color) => am5.color(color));
-        chart.get('colors')?.set('colors', am5ColorSet);
-    };
-
-    const createDataProcessor = (settings?: IDataProcessorSettings): undefined|am5.DataProcessor => {
-        if (!state.root) return undefined;
-        return am5.DataProcessor.new(state.root as Root, {
-            dateFormat: DEFAULT_DATE_FORMAT,
-            dateFields: [DEFAULT_DATE_FIELD_NAME],
-            ...settings,
-        });
+        if (chart instanceof am5percent.PieChart) {
+            chart.series.getIndex(0)?.get('colors')?.set('colors', am5ColorSet);
+        } else {
+            chart.get('colors')?.set('colors', am5ColorSet);
+        }
     };
 
     watch(() => state.chartContext, (ctx) => {
@@ -134,48 +80,63 @@ export const useAmcharts5 = (
         disposeRoot,
         clearChildrenOfRoot,
         //
-        createXYDateChart: (settings?: IXYChartSettings) => {
+        createXYDateChart: (settings?: am5xy.IXYChartSettings) => {
             if (!state.root) throw new Error('No root');
             return createXYDateChart(state.root as Root, settings);
         },
-        createXYCategoryChart: (settings?: IXYChartSettings) => {
+        createXYCategoryChart: (settings?: am5xy.IXYChartSettings) => {
             if (!state.root) throw new Error('No root');
             return createXYCategoryChart(state.root as Root, settings);
         },
-        createPieChart: (settings?: IPieChartSettings): PieChart => {
+        createPieChart: (settings?: am5percent.IPieChartSettings): am5percent.PieChart => {
             if (!state.root) throw new Error('No root');
             return createPieChart(state.root as Root, settings);
         },
-        createDonutChart: (settings?: IPieChartSettings) => {
+        createDonutChart: (settings?: am5percent.IPieChartSettings): am5percent.PieChart => {
             if (!state.root) throw new Error('No root');
             return createDonutChart(state.root as Root, settings);
         },
+        // createMapChart: (settings?: am5map.IMapChartSettings): am5map.MapChart => {
+        //     if (!state.root) throw new Error('No root');
+        //     return createMapChart(state.root as Root, settings);
+        // },
         //
-        createXYLineSeries: (chart: XYChart, settings?: Partial<IXYSeriesSettings>) => {
+        createXYLineSeries: (chart: am5xy.XYChart, settings?: Partial<am5xy.IXYSeriesSettings>): am5xy.XYSeries => {
             if (!state.root) throw new Error('No root');
             return createXYLineSeries(state.root as Root, chart, settings);
         },
-        createXYStackedColumnSeries: (chart: XYChart, settings?: Partial<IXYSeriesSettings>) => {
+        createXYColumnSeries: (chart: am5xy.XYChart, settings?: Partial<am5xy.IXYSeriesSettings>): am5xy.XYSeries => {
             if (!state.root) throw new Error('No root');
-            return createXYStackedColumnSeries(state.root as Root, chart, settings);
+            return createXYColumnSeries(state.root as Root, chart, settings);
         },
-        createPieSeries: (chart: PieChart, settings?: IPieSeriesSettings) => {
+        createPieSeries: (settings?: am5percent.IPieSeriesSettings): am5percent.PieSeries => {
             if (!state.root) throw new Error('No root');
-            return createPieSeries(state.root as Root, chart, settings);
+            return createPieSeries(state.root as Root, settings);
         },
+        // createPointSeries: (settings?: am5map.IMapPointSeriesSettings): am5map.MapPointSeries => {
+        //     if (!state.root) throw new Error('No root');
+        //     return createPointSeries(state.root as Root, settings);
+        // },
         //
-        createTooltip: (settings?: ITooltipSettings) => {
+        createTooltip: (settings?: am5.ITooltipSettings): am5.Tooltip => {
             if (!state.root) throw new Error('No root');
             return createTooltip(state.root as Root, settings);
         },
-        createLegend: (settings?: ILegendSettings): am5.Legend => {
+        createLegend: (settings?: am5.ILegendSettings): am5.Legend => {
             if (!state.root) throw new Error('No root');
             return createLegend(state.root as Root, settings);
+        },
+        createBullet: (settings: am5.IBulletSettings): am5.Bullet => {
+            if (!state.root) throw new Error('No root');
+            return createBullet(state.root as Root, settings);
+        },
+        createDataProcessor: (settings: am5.IDataProcessorSettings): am5.DataProcessor => {
+            if (!state.root) throw new Error('No root');
+            return createDataProcessor(state.root as Root, settings);
         },
         setXYSharedTooltipText,
         setXYSingleTooltipText,
         setPieTooltipText,
         setChartColors,
-        createDataProcessor,
     };
 };
