@@ -28,7 +28,7 @@
                             >
                                 <span class="th-contents"
                                       :class="{
-                                          [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                          [field?.styleOptions?.align || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
                                           'has-icon': field.tooltipText,
                                       }"
                                 >
@@ -38,12 +38,17 @@
                                         >
                                             {{ field.label ? field.label : field.name }}
                                         </slot>
+                                        <template v-if="field.tooltipText">
+                                            <p-tooltip :contents="field.tooltipText">
+                                                <p-i name="ic_tooltip"
+                                                     width="0.875rem"
+                                                     height="0.875rem"
+                                                     :color="gray[300]"
+                                                     class="tooltip-icon"
+                                                />
+                                            </p-tooltip>
+                                        </template>
                                     </span>
-                                    <template v-if="field.tooltipText">
-                                        <p-i name="ic_tooltip"
-                                             class="sort-icon"
-                                        />
-                                    </template>
                                 </span>
                             </slot>
                         </th>
@@ -63,7 +68,7 @@
                                 :key="`td-${widgetKey}-${rowIndex}-${colIndex}`"
                                 :class="{
                                     'has-width': !!field.width,
-                                    [field.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                    [field?.styleOptions?.align || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
                                 }"
                             >
                                 <slot :name="`col-${field.name}`"
@@ -102,7 +107,7 @@ import {
 import type { PropType } from 'vue';
 
 import {
-    PTextPagination, PI, PDataLoader,
+    PTextPagination, PI, PDataLoader, PTooltip,
 } from '@spaceone/design-system';
 import { DATA_TABLE_CELL_TEXT_ALIGN } from '@spaceone/design-system/src/data-display/tables/data-table/config';
 import { get } from 'lodash';
@@ -116,6 +121,8 @@ import type { CurrencyRates } from '@/store/modules/display/type';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { gray } from '@/styles/colors';
 
 import type { Field, LegendOptions } from '@/services/dashboards/widgets/_components/type';
 
@@ -138,6 +145,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'WidgetDataTable',
     components: {
+        PTooltip,
         PTextPagination,
         PI,
         PDataLoader,
@@ -268,6 +276,7 @@ export default defineComponent<Props>({
             getColSlotProps,
             getValue,
             DATA_TABLE_CELL_TEXT_ALIGN,
+            gray,
         };
     },
 });
@@ -295,24 +304,17 @@ export default defineComponent<Props>({
         }
     }
     th {
-        vertical-align: bottom;
+        @apply border-t border-b-2 border-gray-200 text-gray-600;
         line-height: 1.25rem;
-        font-size: 0.875rem;
-        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 700;
         letter-spacing: 0;
         white-space: nowrap;
-        border-top: 1px solid black;
-        border-bottom: 1px solid black;
         .th-contents {
             @apply flex justify-between pl-4;
             line-height: 2;
             .th-text {
-                display: inline-flex;
-                align-content: center;
-                .p-copy-button {
-                    @apply inline-block text-center;
-                    width: 1.5rem;
-                }
+                @apply inline-flex items-center gap-1;
             }
             &.right {
                 justify-content: flex-end;
@@ -322,13 +324,9 @@ export default defineComponent<Props>({
                 justify-content: center;
                 padding-right: 1rem;
             }
-            &.has-icon {
-                padding-right: 0;
-            }
         }
-        .sort-icon {
-            @apply text-gray-500 float-right my-px;
-            &:hover { cursor: pointer; }
+        .tooltip-icon {
+            @apply float-right my-px;
         }
         &.fix-width {
             @apply min-w-19;

@@ -2,7 +2,7 @@ import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
 interface TextOption {
-    type: 'text';
+    type?: 'text';
     align?: 'left'|'right';
     icon?: string;
 }
@@ -26,8 +26,8 @@ export interface Field {
     name: string;
     width?: string;
     label?: string;
-    styleOptions: TextOption;
-    dataOptions: CostOption | PercentOption | SizeOption;
+    styleOptions?: TextOption;
+    dataOptions?: CostOption | PercentOption | SizeOption;
     detailOptions?: {
         enabled?: boolean;
         type?: 'modal'|'popover';
