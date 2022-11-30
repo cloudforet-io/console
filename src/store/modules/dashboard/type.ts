@@ -7,12 +7,11 @@ export const VIEWERS_TYPE = Object.freeze({
 export type ViewersType = typeof VIEWERS_TYPE[keyof typeof VIEWERS_TYPE];
 
 export interface DashboardState {
-    domainItems: DashboardItem[];
-    projectItems: DashboardItem[];
+    domainItems: DomainDashboardItem[];
+    projectItems: ProjectDashboardItem[];
 }
 
 export interface DashboardItem {
-    domain_dashboard_id: string;
     name: string;
     viewers: ViewersType;
     version: number;
@@ -27,3 +26,11 @@ export interface DashboardItem {
     created_at: string;
     updated_at: string;
 }
+
+export interface DomainDashboardItem extends DashboardItem {
+    domain_dashboard_id: string;
+}
+export interface ProjectDashboardItem extends DashboardItem {
+    project_dashboard_id: string;
+}
+

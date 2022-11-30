@@ -4,6 +4,7 @@ import * as getters from './getters';
 import * as mutations from './mutations';
 import type { DashboardState } from './type';
 
+// TODO: implementation
 const state: DashboardState = {
     domainItems: [],
     projectItems: [],

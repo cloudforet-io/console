@@ -4,6 +4,7 @@ import type { DashboardState } from '@/store/modules/dashboard/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+// TODO: implementation
 export const loadDomainDashboard: Action<DashboardState, any> = ({ commit }): void => {
     try {
         const response = {};
