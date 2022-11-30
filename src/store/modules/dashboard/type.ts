@@ -2,13 +2,13 @@
 export const VIEWERS_TYPE = Object.freeze({
     PUBLIC: 'PUBLIC',
     PRIVATE: 'PRIVATE',
-} as const);
+});
 
 export type ViewersType = typeof VIEWERS_TYPE[keyof typeof VIEWERS_TYPE];
 
 export interface DashboardState {
-    domainItems: DomainDashboardItem[];
-    projectItems: ProjectDashboardItem[];
+    domainItems?: DomainDashboardItem[];
+    projectItems?: ProjectDashboardItem[];
 }
 
 export interface DashboardItem {
