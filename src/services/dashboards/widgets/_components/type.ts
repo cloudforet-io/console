@@ -22,6 +22,12 @@ interface SizeOption {
     source_unit?: 'BYTES | KB | MB | GB | TB | PB';
 }
 
+export interface LegendConfig {
+    color?: string;
+    disabled?: boolean;
+    name?: string;
+}
+
 export interface Field {
     name: string;
     width?: string;
@@ -33,9 +39,6 @@ export interface Field {
         type?: 'modal'|'popover';
     }
     tooltipText?: string;
-}
-
-export interface LegendOptions {
-    enabled: boolean;
-    index: boolean;
+    showLegend?: boolean;
+    showLegendIndex?: boolean;
 }
