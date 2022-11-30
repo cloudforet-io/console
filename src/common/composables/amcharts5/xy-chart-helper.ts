@@ -153,7 +153,7 @@ export const createXYLineSeries = (
     return series;
 };
 
-export const createXYStackedColumnSeries = (
+export const createXYColumnSeries = (
     root: Root,
     chart: am5xy.XYChart,
     settings?: Partial<IXYSeriesSettings>,
@@ -161,7 +161,6 @@ export const createXYStackedColumnSeries = (
     const series = chart.series.push(am5xy.ColumnSeries.new(root, {
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
-        stacked: true,
         valueXField: DEFAULT_DATE_FIELD_NAME,
         ...settings,
     }));
