@@ -60,6 +60,7 @@ export default {
     setup() {
         const state = reactive({
             keyword: '',
+            queryForSearch: {},
             viewersStatus: { label: i18n.t('All'), name: 'ALL' },
             scopeStatus: { label: i18n.t('All'), name: 'ALL' },
             workspaceDashboardList: computed(() => [
