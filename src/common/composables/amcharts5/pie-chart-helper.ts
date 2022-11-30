@@ -26,10 +26,10 @@ export const createDonutChart = (root: Root, settings?: IPieChartSettings): am5p
     }),
 );
 
-export const createPieSeries = (root: Root, chart: am5percent.PieChart, settings?: IPieSeriesSettings): am5percent.PieSeries => {
-    const series = chart.series.push(am5percent.PieSeries.new(root, {
+export const createPieSeries = (root: Root, settings?: IPieSeriesSettings): am5percent.PieSeries => {
+    const series: am5percent.PieSeries = am5percent.PieSeries.new(root, {
         ...settings,
-    }));
+    });
     series.ticks.template.set('visible', false);
     series.labels.template.set('forceHidden', true);
     series.slices.template.setAll({
