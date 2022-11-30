@@ -4,10 +4,16 @@ import {
 
 import { merge } from 'lodash';
 
+import {
+    palette,
+} from '@/styles/colors';
+
 import type {
     WidgetConfig, WidgetOptions, WidgetSize,
     InheritOptions, WidgetProps,
 } from '@/services/dashboards/widgets/config';
+import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/view-config';
+import { WIDGET_THEMES } from '@/services/dashboards/widgets/view-config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 const getRefinedOptions = (
@@ -24,6 +30,22 @@ const getRefinedOptions = (
         if (inheritOptions[key].enabled) parentOptions[key] = dashboardOptions[key];
     });
     return merge({}, mergedOptions, parentOptions);
+};
+
+const getColorSet = (theme: WidgetTheme, colorSetType: WidgetColorSetType = 'basic') => {
+    let colorSet = WIDGET_THEMES.map((d) => palette[d][400]);
+    if (colorSetType === 'massive') {
+        const colors1 = WIDGET_THEMES.map((d) => [palette[d][400], palette[d][600]]).flat();
+        const colors2 = WIDGET_THEMES.map((d) => [palette[d][500], palette[d][700]]).flat();
+        colorSet = colors1.concat(colors2);
+    }
+    const themeIndex = WIDGET_THEMES.findIndex((d) => d === theme);
+    if (themeIndex > -1) {
+        const arr1 = colorSet.slice(themeIndex, WIDGET_THEMES.length);
+        const arr2 = colorSet.slice(0, themeIndex);
+        return arr1.concat(arr2);
+    }
+    return colorSet;
 };
 
 export function useWidgetState<Data = any>(
@@ -44,6 +66,11 @@ export function useWidgetState<Data = any>(
         }),
         loading: true,
         data: null as Data|null,
+        colorSet: computed(() => {
+            if (!props.theme) return [];
+            const colorSetType: WidgetColorSetType = state.data?.length > 9 ? 'massive' : 'basic';
+            return getColorSet(props.theme, colorSetType);
+        }),
     });
 
     return state;

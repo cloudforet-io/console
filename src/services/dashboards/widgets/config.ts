@@ -10,6 +10,8 @@ import type { Tags } from '@/models';
 import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
+import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
+
 export const WIDGET_SIZE = {
     sm: 'sm',
     md: 'md',
@@ -134,7 +136,7 @@ export interface WidgetProps {
     dashboardOptions?: object;
     size?: WidgetSize;
     width?: number;
-    theme?: string; // e.g. 'violet', 'coral', 'peacock', ... default: violet
+    theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
     widgetKey: string; // unique widget key to identify widgets in layout
     currencyRates?: CurrencyRates;
 }

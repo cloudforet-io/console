@@ -12,3 +12,7 @@ export const GROUP_BY_ITEM_MAP = {
     [GROUP_BY.TYPE]: { name: GROUP_BY.TYPE, label: 'Type' },
     [GROUP_BY.ACCOUNT]: { name: GROUP_BY.ACCOUNT, label: 'Account ID' },
 } as const;
+
+export const WIDGET_THEMES = ['violet', 'blue', 'coral', 'yellow', 'gray', 'green', 'indigo', 'peacock'] as const;
+export type WidgetTheme = typeof WIDGET_THEMES[number];
+export type WidgetColorSetType = 'basic'|'massive';

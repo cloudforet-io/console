@@ -31,6 +31,7 @@
                        :widget-config-id="widgetId"
                        :widget-key="widgetId"
                        :currency-rates="currencyRates"
+                       :theme="theme"
                        :dashboard-options="{
                            currency,
                            dateRange
@@ -53,6 +54,14 @@
                 >
                     <date-range-selector :date-range.sync="dateRange" />
                 </p-field-group>
+                <p-field-group label="Theme"
+                               required
+                               inline
+                >
+                    <p-select-dropdown v-model="theme"
+                                       :items="widgetThemeItems"
+                    />
+                </p-field-group>
             </div>
         </div>
     </div>
@@ -64,7 +73,9 @@ import {
     defineComponent, reactive, toRefs, computed, onUnmounted, watch,
 } from 'vue';
 
-import { PButton, PFieldGroup, PIconButton } from '@spaceone/design-system';
+import {
+    PButton, PFieldGroup, PIconButton, PSelectDropdown,
+} from '@spaceone/design-system';
 
 import { store } from '@/store';
 
@@ -73,6 +84,7 @@ import { CURRENCY } from '@/store/modules/display/config';
 import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 import DateRangeSelector from '@/services/dashboards/widgets/_components/DateRangeSelector.vue';
 import type { DateRange } from '@/services/dashboards/widgets/config';
+import { WIDGET_THEMES } from '@/services/dashboards/widgets/view-config';
 import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 interface Props {
@@ -82,6 +94,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'WidgetsPreviewPage',
     components: {
+        PSelectDropdown,
         DateRangeSelector,
         PFieldGroup,
         CurrencySelectDropdown,
@@ -104,6 +117,10 @@ export default defineComponent<Props>({
             autoRefresh: true,
             currency: CURRENCY.USD,
             dateRange: {} as DateRange,
+            theme: 'violet',
+            widgetThemeItems: computed(() => WIDGET_THEMES.map((d) => ({
+                type: 'item', name: d, label: d,
+            }))),
         });
 
         const { counter, pause, resume } = useInterval(1000, { controls: true });
@@ -144,6 +161,9 @@ export default defineComponent<Props>({
             if (!state.mounted || !state.autoRefresh) return;
             if (_focused) resume();
             else pause();
+        });
+        watch([() => state.currency, () => state.dateRange, () => state.theme], () => {
+            refresh();
         });
         onUnmounted(() => {
             pause();
