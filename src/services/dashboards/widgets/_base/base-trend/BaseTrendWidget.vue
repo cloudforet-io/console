@@ -4,6 +4,13 @@
                   :width="props.width"
                   class="base-trend-widget"
     >
+        <template v-for="(_, slot) of $scopedSlots"
+                  #[slot]="scope"
+        >
+            <slot :name="slot"
+                  v-bind="scope"
+            />
+        </template>
         <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
                            :loading="state.loading"
