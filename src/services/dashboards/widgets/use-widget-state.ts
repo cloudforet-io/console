@@ -41,7 +41,7 @@ const getColorSet = (theme: WidgetTheme, colorSetType: WidgetColorSetType = 'bas
     }
     const themeIndex = WIDGET_THEMES.findIndex((d) => d === theme);
     if (themeIndex > -1) {
-        const arr1 = colorSet.slice(themeIndex, WIDGET_THEMES.length);
+        const arr1 = colorSet.slice(themeIndex, colorSet.length);
         const arr2 = colorSet.slice(0, themeIndex);
         return arr1.concat(arr2);
     }

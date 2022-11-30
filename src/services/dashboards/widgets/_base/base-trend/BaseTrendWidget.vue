@@ -90,7 +90,7 @@ const props = defineProps<WidgetProps>();
 const chartContext = ref<HTMLElement|null>(null);
 const {
     createXYDateChart, createXYLineSeries, createXYColumnSeries,
-    createTooltip, setXYSharedTooltipText, createDataProcessor, createLegend,
+    createTooltip, setXYSharedTooltipText, setChartColors, createDataProcessor, createLegend,
     disposeRoot, refreshRoot,
 } = useAmcharts5(chartContext);
 
@@ -121,6 +121,7 @@ const fetchData = async () => new Promise((resolve) => {
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis } = createXYDateChart();
     xAxis.get('baseInterval').timeUnit = 'month';
+    setChartColors(chart, state.colorSet);
 
     if (state.chartType === CHART_TYPE.LINE) {
         chart.get('cursor')?.lineX.setAll({
@@ -150,7 +151,6 @@ const drawChart = (chartData: XYChartData[]) => {
             dateFormat: DATE_FORMAT,
             dateFields: [DATE_FIELD_NAME],
         });
-
         const tooltip = createTooltip();
         setXYSharedTooltipText(chart, tooltip, state.options.currency, props.currencyRates);
         series.set('tooltip', tooltip);
