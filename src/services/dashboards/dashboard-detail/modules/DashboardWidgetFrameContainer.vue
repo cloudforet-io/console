@@ -8,11 +8,11 @@
             class="dashboard-widget-frame-row"
         >
             <widget-frame
-                v-for="(width, index) in row"
-                :key="`widget-frame-row-${rowIndex}-${index}`"
+                v-for="(width, colIndex) in row"
+                :key="`widget-frame-row-${rowIndex}-${colIndex}`"
                 :width="width"
                 :is-full="containerWidth === width"
-                :widget-index="widgetFrameIndexList[rowIndex][index]"
+                :widget-index="widgetFrameIndexList[rowIndex][colIndex]"
                 @click-expand-icon="handleExpand"
             />
         </div>
