@@ -86,7 +86,7 @@ const state = reactive({
             label: 'Cost', name: 'usd_cost', type: 'cost', styleOptions: { align: 'right' },
         },
     ]),
-    legends: computed<LegendConfig[]>(() => state.chartData.map((i) => ({
+    legends: computed<LegendConfig[]>(() => state.chartItems.map((i) => ({
         name: i.provider,
     }))),
 });
@@ -143,7 +143,7 @@ const initWidget = async () => {
     state.loading = true;
     state.data = await fetchData();
     await nextTick();
-    drawChart(state.chartData);
+    drawChart(state.chartItems);
     state.loading = false;
 };
 
@@ -152,7 +152,7 @@ const refreshWidget = async () => {
     state.data = await fetchData();
     await nextTick();
     refreshRoot();
-    drawChart(state.chartData);
+    drawChart(state.chartItems);
     state.loading = false;
 };
 
