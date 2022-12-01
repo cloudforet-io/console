@@ -115,9 +115,12 @@ const allWidgetFrameWidthReAligner = (allWidgetFrameWidthRange: Array<Array<Arra
     return reAssignedWidgetFrameWidthList;
 };
 
+
 export const widgetFrameWidthAssigner = (widgetFrameSizeList: Array<string>, containerWidth: number): Array<Array<number>> => {
+    // This function runs .shift(), so cloning object is implemented.
+    const _widgetFrameSizeList = [...widgetFrameSizeList];
     if (containerWidth < 800) return widgetFrameSizeList.map(() => [containerWidth]);
 
-    const allWidgetFrameWidthRange = selectAllWidgetFrameWidthRange(widgetFrameSizeList, containerWidth);
+    const allWidgetFrameWidthRange = selectAllWidgetFrameWidthRange(_widgetFrameSizeList, containerWidth);
     return allWidgetFrameWidthReAligner(allWidgetFrameWidthRange, containerWidth);
 };

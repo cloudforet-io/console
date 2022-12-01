@@ -87,6 +87,7 @@ interface Props {
     width: number;
     widgetLink?: string;
     widgetRoute?: Route;
+    widgetIndex: number;
     dateRange?: WidgetOptions['date_range'];
     noData: boolean;
     printMode: boolean;
@@ -96,6 +97,7 @@ interface Props {
     disableExpandIcon: boolean;
     disableEditIcon: boolean;
     disableDeleteIcon: boolean;
+    isFull: boolean;
 }
 
 interface IconConfig {
@@ -135,6 +137,10 @@ export default defineComponent<Props>({
             type: Object as PropType<Route>,
             default: undefined,
         },
+        widgetIndex: {
+            type: Number,
+            default: undefined,
+        },
         dateRange: {
             type: Object as PropType<WidgetOptions['date_range']>,
             default: undefined,
@@ -171,12 +177,16 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
+        isFull: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const { i18nDayjs } = useI18nDayjs();
         const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
         const state = reactive({
-            isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
+            isFull: computed<boolean>(() => props.isFull),
             dateLabel: computed<TranslateResult|undefined>(() => {
                 const start = setBasicDateFormat(props.dateRange?.start);
                 const end = setBasicDateFormat(props.dateRange?.end);
@@ -199,9 +209,9 @@ export default defineComponent<Props>({
             editModeIconButtonList: computed<IconConfig[]>(() => [
                 {
                     isAvailable: !props.disableExpandIcon,
-                    name: state.isFull ? 'ic_expand-angle' : 'ic_collapse-angle',
+                    name: state.isFull ? 'ic_collapse-angle' : 'ic_expand-angle',
                     handleClick: () => {
-                        emit('click-expand-icon', state.isFull ? 'collapse' : 'expand');
+                        emit('click-expand-icon', state.isFull ? 'collapse' : 'expand', props.widgetIndex);
                     },
                 },
                 {
