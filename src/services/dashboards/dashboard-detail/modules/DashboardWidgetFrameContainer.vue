@@ -61,6 +61,16 @@ export default defineComponent({
             return containerWidth - (containerWidth % 80);
         };
 
+        /**
+         * If widgetSizeList is given: ['MD', 'MD', **'SM'**, 'LG', 'SM'],
+         * And user wants to expand 'SM' to 'FULL'
+         * -> Each widgetFrame has its own widgetIndex (in this case, widgetIndex is 2)
+         * If expand button has clicked, individual widgetFrame emits its own widgetIndex.
+         * and widgetFrameContainer gains widgetIndex which wants to be changed.
+         *
+         * So on, widgetSizeList is changed by ['MD', 'MD', **'FULL'**, 'LG', 'SM']
+         * And realign widths to every widget.
+         * */
         const handleExpand = (type: 'expand'|'collapse', widgetIndex: number): void => {
             const _widgetFrameSizeList = [...state.widgetFrameSizeList];
             if (type === 'expand') _widgetFrameSizeList[widgetIndex] = WIDGET_FRAME_WIDTH_FULL;
