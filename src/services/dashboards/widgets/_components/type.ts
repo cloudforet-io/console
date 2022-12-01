@@ -2,7 +2,7 @@ import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
 interface TextOption {
-    type: 'text';
+    type?: 'text';
     align?: 'left'|'right';
     icon?: string;
 }
@@ -22,20 +22,23 @@ interface SizeOption {
     source_unit?: 'BYTES | KB | MB | GB | TB | PB';
 }
 
+export interface LegendConfig {
+    color?: string;
+    disabled?: boolean;
+    name?: string;
+}
+
 export interface Field {
     name: string;
     width?: string;
     label?: string;
-    styleOptions: TextOption;
-    dataOptions: CostOption | PercentOption | SizeOption;
+    styleOptions?: TextOption;
+    dataOptions?: CostOption | PercentOption | SizeOption;
     detailOptions?: {
         enabled?: boolean;
         type?: 'modal'|'popover';
     }
     tooltipText?: string;
-}
-
-export interface LegendOptions {
-    enabled: boolean;
-    index: boolean;
+    showLegend?: boolean;
+    showLegendIndex?: boolean;
 }

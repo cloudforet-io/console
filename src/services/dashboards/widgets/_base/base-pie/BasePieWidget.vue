@@ -19,6 +19,9 @@
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
                            :items="state.chartData"
+                           show-legend
+                           show-legend-index
+                           :legends="state.legends"
                            :currency="state.options.currency"
                            :currency-rates="props.currencyRates"
         />
@@ -37,6 +40,7 @@ import { random } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
+import type { Field, LegendConfig } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
@@ -72,10 +76,19 @@ const state = reactive({
         if (!state.data) return [];
         return state.data;
     }),
-    tableFields: computed(() => [
-        { label: state.groupByLabel, name: state.groupBy },
-        { label: 'Cost', name: 'usd_cost', type: 'cost' },
+    tableFields: computed<Field[]>(() => [
+        {
+            label: state.groupByLabel,
+            name: state.groupBy,
+            tooltipText: 'test tooltip',
+        },
+        {
+            label: 'Cost', name: 'usd_cost', type: 'cost', styleOptions: { align: 'right' },
+        },
     ]),
+    legends: computed<LegendConfig[]>(() => state.chartData.map((i) => ({
+        name: i.provider,
+    }))),
 });
 
 // TODO: api binding
@@ -98,7 +111,7 @@ const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
             usd_cost: random(1000, 5000),
         },
         ]);
-    }, 2000);
+    }, 1000);
 });
 
 const drawChart = (chartData: ChartData[]) => {
