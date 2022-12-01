@@ -4,6 +4,14 @@
                   :width="props.width"
                   class="base-trend-widget"
     >
+        <template v-if="state.selectorItems.length"
+                  #header-right
+        >
+            <widget-frame-header-dropdown :items="state.selectorItems"
+                                          :selected="state.selectedSelectorType"
+                                          @select="handleSelectSelectorType"
+            />
+        </template>
         <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
                            :loading="state.loading"
@@ -38,6 +46,7 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
 import { GROUP_BY, CHART_TYPE } from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widgets/type';
@@ -112,12 +121,14 @@ const state = reactive({
     ]),
 });
 
+/* Api */
 const fetchData = async () => new Promise((resolve) => {
     setTimeout(() => {
         resolve(SAMPLE_RAW_DATA.results);
     }, 1000);
 });
 
+/* Util */
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis } = createXYDateChart();
     xAxis.get('baseInterval').timeUnit = 'month';
@@ -174,6 +185,12 @@ const refreshWidget = async () => {
     refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
+};
+
+/* Event */
+const handleSelectSelectorType = (selected: string) => {
+    state.selectedSelectorType = selected;
+    refreshWidget();
 };
 
 useWidgetLifecycle({

@@ -23,6 +23,10 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
             enabled: true,
             show_at: 'chart',
         },
+        selector_options: {
+            enabled: true,
+            type: 'cost-usage',
+        },
     },
 };
 
