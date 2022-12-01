@@ -10,7 +10,7 @@
                 <div class="inline-block w-8 text-center">
                     {{ autoRefresh ? 10 - counter : '' }}
                 </div>
-                <p-icon-button class="mx-2 inline-block"
+                <p-icon-button class="refresh-button"
                                name="ic_refresh"
                                @click="refresh"
                 />
@@ -34,7 +34,7 @@
                        :theme="theme"
                        :dashboard-options="{
                            currency,
-                           dateRange
+                           date_range: dateRange
                        }"
                        :inherit-options="{
                            currency: { enabled: true },
@@ -179,3 +179,9 @@ export default defineComponent<Props>({
     },
 });
 </script>
+
+<style scoped lang="postcss">
+.refresh-button {
+    @apply mx-2 inline-block;
+}
+</style>
