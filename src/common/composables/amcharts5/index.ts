@@ -5,6 +5,7 @@ import {
 
 import * as am5 from '@amcharts/amcharts5';
 import type { Root } from '@amcharts/amcharts5';
+import type * as am5map from '@amcharts/amcharts5/map';
 import * as am5percent from '@amcharts/amcharts5/percent';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import type * as am5xy from '@amcharts/amcharts5/xy';
@@ -14,6 +15,7 @@ import { Amcharts5GlobalTheme } from '@/lib/site-initializer/amcharts5';
 import {
     createBullet, createDataProcessor, createLegend, createTooltip,
 } from '@/common/composables/amcharts5/concepts-helper';
+import { createMapChart, createMapPointSeries } from '@/common/composables/amcharts5/map-chart-helper';
 import {
     createDonutChart, createPieChart, createPieSeries, setPieTooltipText,
 } from '@/common/composables/amcharts5/pie-chart-helper';
@@ -96,10 +98,10 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return createDonutChart(state.root as Root, settings);
         },
-        // createMapChart: (settings?: am5map.IMapChartSettings): am5map.MapChart => {
-        //     if (!state.root) throw new Error('No root');
-        //     return createMapChart(state.root as Root, settings);
-        // },
+        createMapChart: (settings?: am5map.IMapChartSettings): am5map.MapChart => {
+            if (!state.root) throw new Error('No root');
+            return createMapChart(state.root as Root, settings);
+        },
         //
         createXYLineSeries: (chart: am5xy.XYChart, settings?: Partial<am5xy.IXYSeriesSettings>): am5xy.XYSeries => {
             if (!state.root) throw new Error('No root');
@@ -113,10 +115,10 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return createPieSeries(state.root as Root, settings);
         },
-        // createPointSeries: (settings?: am5map.IMapPointSeriesSettings): am5map.MapPointSeries => {
-        //     if (!state.root) throw new Error('No root');
-        //     return createPointSeries(state.root as Root, settings);
-        // },
+        createMapPointSeries: (settings?: am5map.IMapPointSeriesSettings): am5map.MapPointSeries => {
+            if (!state.root) throw new Error('No root');
+            return createMapPointSeries(state.root as Root, settings);
+        },
         //
         createTooltip: (settings?: am5.ITooltipSettings): am5.Tooltip => {
             if (!state.root) throw new Error('No root');
