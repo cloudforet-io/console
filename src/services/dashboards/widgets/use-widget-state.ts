@@ -2,6 +2,7 @@ import {
     computed, reactive,
 } from 'vue';
 
+import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { merge } from 'lodash';
 
 import {
@@ -71,6 +72,22 @@ export function useWidgetState<Data = any>(
             const colorSetType: WidgetColorSetType = state.data?.length > 9 ? 'massive' : 'basic';
             return getColorSet(props.theme, colorSetType);
         }),
+        selectorItems: computed<MenuItem[]>(() => {
+            if (!state.options.selector_options?.enabled) return [];
+            if (state.options.selector_options.type === 'cost-usage') {
+                if (!state.selectedSelectorType) state.selectedSelectorType = 'cost';
+                return [
+                    { type: 'item', name: 'cost', label: 'Cost' },
+                    { type: 'item', name: 'usage', label: 'Usage' },
+                ];
+            }
+            if (!state.selectedSelectorType) state.selectedSelectorType = 'day';
+            return [
+                { type: 'item', name: 'day', label: 'Day' },
+                { type: 'item', name: 'month', label: 'Month' },
+            ];
+        }),
+        selectedSelectorType: undefined,
     });
 
     return state;
