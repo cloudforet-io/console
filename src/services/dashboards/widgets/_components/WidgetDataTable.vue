@@ -101,7 +101,7 @@
                 </tfoot>
             </table>
         </p-data-loader>
-        <div v-if="paginationVisible"
+        <div v-if="showPagination"
              class="table-pagination-wrapper"
         >
             this page : {{ proxyThisPage }}
@@ -149,7 +149,7 @@ interface Props {
     legends: Array<any>;
     currency?: Currency;
     currencyRates?: CurrencyRates;
-    paginationVisible?: boolean;
+    showPagination?: boolean;
     noDataMinHeight?: string;
     widgetKey: string;
 }
@@ -198,7 +198,7 @@ export default defineComponent<Props>({
             type: Object as PropType<CurrencyRates>,
             default: () => ({}),
         },
-        paginationVisible: {
+        showPagination: {
             type: Boolean,
             default: true,
         },
@@ -257,9 +257,9 @@ export default defineComponent<Props>({
             // if (props.printMode) return;
             emit('toggle-legend', props.legends[index]);
         };
-        const handleClickRow = (index) => {
+        const handleClickRow = (rowData) => {
             // if (props.printMode) return;
-            emit('click-row', index);
+            emit('click-row', rowData);
         };
 
         return {
@@ -325,10 +325,6 @@ export default defineComponent<Props>({
                 justify-content: flex-end;
                 padding-right: 1rem;
             }
-            &.center {
-                justify-content: center;
-                padding-right: 1rem;
-            }
         }
         .tooltip-icon {
             @apply float-right my-px;
@@ -366,9 +362,6 @@ export default defineComponent<Props>({
         }
         &.right {
             @apply text-right;
-        }
-        &.center {
-            @apply text-center;
         }
         i, span, div, input, textarea, article, main, ul, li {
             vertical-align: baseline;

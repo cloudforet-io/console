@@ -18,7 +18,7 @@
 
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
-                           :items="state.chartData"
+                           :items="state.chartItems"
                            show-legend
                            show-legend-index
                            :legends="state.legends"
@@ -50,7 +50,7 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lif
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 
-type Data = Partial<Record<GroupBy, string>> & { usd_cost: number; };
+type Item = Partial<Record<GroupBy, string>> & { usd_cost: number; };
 type ChartData = Partial<Record<GroupBy, string>> & { usd_cost: number; };
 
 const props = defineProps<WidgetProps>();
@@ -63,7 +63,7 @@ const {
 } = useAmcharts5(chartContext);
 
 const state = reactive({
-    ...toRefs(useWidgetState<Data[]>(props)),
+    ...toRefs(useWidgetState<Item[]>(props)),
     chart: null as null|ReturnType<typeof createPieChart | typeof createDonutChart>,
     series: null as null|ReturnType<typeof createPieSeries>,
     groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROVIDER),
@@ -72,7 +72,7 @@ const state = reactive({
         return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;
     }),
     chartType: computed(() => state.options.chart_type ?? CHART_TYPE.PIE),
-    chartData: computed<Data[]>(() => {
+    chartItems: computed<Item[]>(() => {
         if (!state.data) return [];
         return state.data;
     }),
@@ -92,7 +92,7 @@ const state = reactive({
 });
 
 // TODO: api binding
-const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
+const fetchData = async (): Promise<Item[]> => new Promise((resolve) => {
     setTimeout(() => {
         resolve([{
             provider: 'google cloud',
