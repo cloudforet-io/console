@@ -3,9 +3,10 @@ import {
     WIDGET_FRAME_CONTAINER_MIN_WIDTH,
     WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX,
 } from '@/services/dashboards/dashboard-detail/lib/config';
+import type { WidgetFrameSize } from '@/services/dashboards/dashboard-detail/lib/type';
 
 /** NAMING
- * widgetFrameSize: string -> 'SM'|'MD'|'LG'|'XL'
+ * widgetFrameSize: WidgetFrameSize -> 'SM'|'MD'|'LG'|'XL'
  * widgetFrameWidth: number -> 320, 400... 880, 960
  * widgetFrameWidthRange: Array<number> -> [320, 400, 480]|[480, 560, 640]|[800, 880, 960]|[800, 880, 960]
  * rowWidgetFrameWidthRange: Array<Array<number>> -> [[MD_RANGE], [MD_RANGE], [SM_RANGE], [LG_RANGE]]
@@ -14,7 +15,7 @@ import {
  * allWidgetFrameWidthList: Array<Array<number>> -> [[320], [320, 480], [320, 480]]
  * */
 
-const widgetFrameSizeRangeExtractor = (size: string, containerWidth: number = WIDGET_FRAME_CONTAINER_MIN_WIDTH): Array<number> => {
+const widgetFrameSizeRangeExtractor = (size: WidgetFrameSize, containerWidth: number = WIDGET_FRAME_CONTAINER_MIN_WIDTH): Array<number> => {
     if (size === 'SM') return WIDGET_FRAME_WIDTH_RANGE_LIST.SM;
     if (size === 'MD') return WIDGET_FRAME_WIDTH_RANGE_LIST.MD;
     if (size === 'LG') return WIDGET_FRAME_WIDTH_RANGE_LIST.LG;
@@ -25,7 +26,7 @@ const widgetFrameSizeRangeExtractor = (size: string, containerWidth: number = WI
 };
 
 
-const selectAllWidgetFrameWidthRange = (widgetFrameSizeList: Array<string>, containerWidth: number): Array<Array<Array<number>>> => {
+const selectAllWidgetFrameWidthRange = (widgetFrameSizeList: Array<WidgetFrameSize>, containerWidth: number): Array<Array<Array<number>>> => {
     // Array for save each line's widgetFrame width and return
     const allWidgetFrameWidthRange: Array<Array<Array<number>>> = [];
     // it runs shift() method, so should save length
@@ -38,7 +39,7 @@ const selectAllWidgetFrameWidthRange = (widgetFrameSizeList: Array<string>, cont
 
     for (let i = 0; i < widgetFrameSizeListLength; i += 1) {
         // extract widgetFrame one by one
-        const selectedWidgetFrameSize: Array<number> = widgetFrameSizeRangeExtractor(widgetFrameSizeList.shift() as string, containerWidth);
+        const selectedWidgetFrameSize: Array<number> = widgetFrameSizeRangeExtractor(widgetFrameSizeList.shift() as WidgetFrameSize, containerWidth);
         rowWidthSum += selectedWidgetFrameSize[0];
         // Compare the sum of widgetFrame sizes of one row with containerWidth to push the maximum value
         // and initialize it to the default value of the shifted card.
@@ -116,7 +117,7 @@ const allWidgetFrameWidthReAligner = (allWidgetFrameWidthRange: Array<Array<Arra
 };
 
 
-export const widgetFrameWidthAssigner = (widgetFrameSizeList: Array<string>, containerWidth: number): Array<Array<number>> => {
+export const widgetFrameWidthAssigner = (widgetFrameSizeList: Array<WidgetFrameSize>, containerWidth: number): Array<Array<number>> => {
     // This function runs .shift(), so cloning object is implemented.
     const _widgetFrameSizeList = [...widgetFrameSizeList];
     if (containerWidth < 800) return widgetFrameSizeList.map(() => [containerWidth]);

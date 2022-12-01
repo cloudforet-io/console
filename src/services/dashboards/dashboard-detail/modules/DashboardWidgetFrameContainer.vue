@@ -30,6 +30,7 @@ import {
     WIDGET_FRAME_CONTAINER_MIN_WIDTH, WIDGET_FRAME_WIDTH_FULL,
 } from '@/services/dashboards/dashboard-detail/lib/config';
 import { widgetFrameWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
+import type { WidgetFrameSize } from '@/services/dashboards/dashboard-detail/lib/type';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 
 
@@ -40,7 +41,7 @@ export default defineComponent({
     },
     props: {
         widgetFrameSizeList: {
-            type: Array as PropType<Array<string>>,
+            type: Array as PropType<Array<WidgetFrameSize>>,
             default: () => ([]),
         },
     },
