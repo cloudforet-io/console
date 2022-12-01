@@ -14,6 +14,7 @@ export const WIDGET_FRAME_WIDTH_RANGE_LIST = {
     LG: [640, 720, 800], // 2: LG
     XL: [800, 880, 960], // 3: XL
 };
+export const WIDGET_FRAME_WIDTH_FULL = 'FULL';
 export const WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX = lodash.maxBy(
     Object.values(WIDGET_FRAME_WIDTH_RANGE_LIST).map((d) => d.length),
 ) as number;
