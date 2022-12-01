@@ -105,6 +105,10 @@ export interface WidgetOptions {
     dynamic_widget_type?: DynamicWidgetType;
     name_options?: DynamicField;
     value_options?: DynamicField;
+    selector_options?: {
+        enabled?: boolean;
+        type: 'cost-usage'|'days';
+    };
 }
 
 export interface DashboardLayoutWidgetInfo {
