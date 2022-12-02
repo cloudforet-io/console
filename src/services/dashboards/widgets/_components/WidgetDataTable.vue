@@ -66,6 +66,7 @@
                                     'has-width': !!field.width,
                                     [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
                                     [size]: true,
+                                    'link-item': item[field?.name]?.link,
                                 }"
                             >
                                 <slot :name="`col-${field.name}`"
@@ -91,7 +92,13 @@
                                         <slot :name="`col-${colIndex}-text`"
                                               v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                         >
-                                            {{ getValue(item, field) }}
+                                            <span v-if="!item[field?.name]?.link">{{ getValue(item, field) }}</span>
+                                            <router-link v-else
+                                                         :to="item[field?.name]?.link"
+                                                         class="link"
+                                            >
+                                                {{ getValue(item, field) }}
+                                            </router-link>
                                         </slot>
                                     </span>
                                 </slot>
@@ -358,6 +365,10 @@ export default defineComponent<Props>({
                 cursor: pointer;
                 margin-right: -0.25rem;
             }
+            .link {
+                @apply text-blue-600 underline;
+                cursor: pointer;
+            }
         }
         &.has-width {
             word-break: break-word;
@@ -366,6 +377,9 @@ export default defineComponent<Props>({
         }
         &.right {
             @apply text-right;
+        }
+        &.link-item:hover {
+            @apply bg-blue-100;
         }
 
         &.sm {
@@ -377,17 +391,6 @@ export default defineComponent<Props>({
 
         i, span, div, input, textarea, article, main, ul, li {
             vertical-align: baseline;
-        }
-    }
-    tr {
-        &.row-height-fixed {
-            td:not(.has-width) {
-                overflow-x: hidden;
-                white-space: nowrap;
-            }
-        }
-        &.row-cursor-pointer {
-            cursor: pointer;
         }
     }
     tbody {

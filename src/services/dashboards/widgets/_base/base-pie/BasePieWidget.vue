@@ -83,6 +83,7 @@ const state = reactive({
     tableItems: computed<TableItem[]>(() => state.chartData.map((d) => {
         d[state.tableFields[0].name] = {
             icon: 'ic_tree_project-group',
+            link: '/home-dashboard',
             name: d[state.tableFields[0].name],
         };
         return d;
