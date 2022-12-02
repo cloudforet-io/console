@@ -371,7 +371,7 @@ export default defineComponent<Props>({
     td {
         @apply px-4 z-0 align-middle min-w-28 text-sm;
         .td-contents {
-            @apply flex gap-2;
+            @apply inline-flex gap-2;
             .toggle-button {
                 cursor: pointer;
                 margin-right: -0.25rem;
