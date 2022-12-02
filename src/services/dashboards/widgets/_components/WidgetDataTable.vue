@@ -92,13 +92,20 @@
                                         <slot :name="`col-${colIndex}-text`"
                                               v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                         >
-                                            <span v-if="!item[field?.name]?.link">{{ getValue(item, field) }}</span>
-                                            <router-link v-else
+                                            <router-link v-if="item[field?.name]?.link"
                                                          :to="item[field?.name]?.link"
                                                          class="link"
                                             >
                                                 {{ getValue(item, field) }}
                                             </router-link>
+                                            <div v-else-if="item[field?.name]?.rapidIncrease"
+                                                 class="rapid-increase"
+                                            ><span>{{ getValue(item, field) }}</span> <p-i name="ic_bold-arrow-up"
+                                                                                           width="1rem"
+                                                                                           height="1rem"
+                                            />
+                                            </div>
+                                            <span v-else>{{ getValue(item, field) }}</span>
                                         </slot>
                                     </span>
                                 </slot>
@@ -364,6 +371,9 @@ export default defineComponent<Props>({
             .toggle-button {
                 cursor: pointer;
                 margin-right: -0.25rem;
+            }
+            .rapid-increase {
+                @apply text-red-500 inline-flex justify-center gap-1;
             }
             .link {
                 @apply text-blue-600 underline;

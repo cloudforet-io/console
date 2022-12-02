@@ -86,6 +86,10 @@ const state = reactive({
             link: '/home-dashboard',
             name: d[state.tableFields[0].name],
         };
+        d[state.tableFields[1].name] = {
+            rapidIncrease: true,
+            name: d[state.tableFields[1].name],
+        };
         return d;
     })),
     tableFields: computed<Field[]>(() => [
