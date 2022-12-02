@@ -92,7 +92,8 @@ const state = reactive({
             name: 'usd_cost',
             type: 'cost',
             textAlign: 'right',
-            rapidIncrease: (item) => item?.usd_cost > 3000,
+            textType: 'percent',
+            rapidIncrease: (item) => item?.usd_cost > 30000,
         },
     ]),
     legends: computed<LegendConfig[]>(() => state.chartData.map((i) => ({
@@ -105,19 +106,19 @@ const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
     setTimeout(() => {
         resolve([{
             provider: 'google cloud',
-            usd_cost: random(1000, 5000),
+            usd_cost: random(10000, 50000),
         },
         {
             provider: 'aws',
-            usd_cost: random(1000, 5000),
+            usd_cost: random(10000, 50000),
         },
         {
             provider: 'azure',
-            usd_cost: random(1000, 5000),
+            usd_cost: random(10000, 50000),
         },
         {
             provider: 'alibaba',
-            usd_cost: random(1000, 5000),
+            usd_cost: random(10000, 50000),
         },
         ]);
     }, 1000);

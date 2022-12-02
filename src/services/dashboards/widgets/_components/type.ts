@@ -31,6 +31,7 @@ export interface Field {
     width?: string;
     label?: string;
     textAlign?: 'left' | 'right';
+    textType?: 'number' | 'cost' | 'percent' | 'size';
     dataOptions?: CostOption | PercentOption | SizeOption;
     detailOptions?: {
         enabled?: boolean;

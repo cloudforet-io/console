@@ -261,11 +261,26 @@ export default defineComponent<Props>({
         const getHeadSlotProps = (field, colIndex) => ({
             field, index: colIndex, colIndex,
         });
-        const getValue = (item, field: Field) => {
-            if (typeof item === 'object') {
-                return get(item, field.name);
+        const textFormatter = (value:string|number, textType: Field['textType']) => {
+            if (typeof value === 'number') {
+                if (textType === 'size') {
+                    return byteFormatter(value);
+                } if (textType === 'cost') {
+                    return currencyMoneyFormatter(value, props.currency, props.currencyRates);
+                } if (textType === 'number') {
+                    return numberFormatter(value);
+                } if (textType === 'percent') {
+                    return `${value}%`;
+                }
+                return value;
             }
-            return item;
+            return value;
+        };
+        const getValue = (item:string|number|object, field: Field):string|number => {
+            if (typeof item === 'object') {
+                return textFormatter(get(item, field.name), field.textType);
+            }
+            return textFormatter(item, field.textType);
         };
         const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
             if (typeof option === 'string' || typeof option === 'boolean') {
@@ -383,6 +398,10 @@ export default defineComponent<Props>({
                 @apply text-blue-600 underline;
                 cursor: pointer;
             }
+        }
+        .detail {
+            @apply text-blue-700;
+            cursor: pointer;
         }
         &.has-width {
             word-break: break-word;
