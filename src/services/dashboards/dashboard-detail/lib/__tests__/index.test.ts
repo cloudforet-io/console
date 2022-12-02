@@ -5,13 +5,14 @@ import {
     WIDGET_FRAME_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
 import { widgetFrameWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
+import type { WidgetFrameSize } from '@/services/dashboards/dashboard-detail/lib/type';
 
 
 /**
  * For manual test
  * */
 const _MANUAL_CONTAINER_WIDTH = 1360;
-const _MANUAL_WIDGET_FRAME_SELECT = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
+const _MANUAL_WIDGET_FRAME_SELECT: Array<WidgetFrameSize> = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
 // WidgetFrame Array would be shift(), so length should be saved
 const _MANUAL_WIDGET_FRAME_LENGTH = _MANUAL_WIDGET_FRAME_SELECT.length;
 
@@ -48,7 +49,7 @@ function permutation(arr, selectNum) {
 // for more specific test, please scale up the AMOUNT.
 const _SELECT_WIDGET_AMOUNT = 2;
 // e.g) [['SM', 'SM', 'MD'], ['SM', 'SM', 'LG'] ...]
-const widgetFrameCases: Array<Array<string>> = permutation(['SM', 'MD', 'LG', 'XL', 'FULL'], _SELECT_WIDGET_AMOUNT);
+const widgetFrameCases: Array<Array<WidgetFrameSize>> = permutation(['SM', 'MD', 'LG', 'XL', 'FULL'], _SELECT_WIDGET_AMOUNT);
 const widgetFrameCasesLength = widgetFrameCases.length;
 
 describe('Select widgetFrames as permutation', () => {

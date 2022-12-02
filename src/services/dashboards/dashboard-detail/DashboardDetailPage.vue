@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import DashboardWidgetFrameContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetFrameContainer.vue';
+import DashboardWidgetFrameContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 
 export default {
     name: 'DashboardDetailPage',
