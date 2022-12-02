@@ -1,7 +1,7 @@
 <template>
     <div class="widget-frame"
          :class="{ full: isFull, 'edit-mode': editMode }"
-         :style="{ width: `${width}px` }"
+         :style="{ width: width ? `${width}px` : '100%' }"
     >
         <div class="widget-header">
             <h3 class="title">
@@ -12,26 +12,28 @@
             <slot />
         </div>
         <div class="widget-footer">
-            <div class="footer-left">
-                <label v-if="dateLabel"
-                       class="widget-footer-label"
-                >{{ dateLabel }}</label>
-                <p-divider v-if="isDivided"
-                           :vertical="true"
-                />
-                <label class="widget-footer-label">{{ currencyLabel }}</label>
-            </div>
-            <div class="footer-right">
-                <slot name="footer-right">
-                    <p-anchor v-if="(widgetLink || widgetRoute) && !printMode"
-                              :href="widgetLink"
-                              :to="widgetRoute"
-                              class="anchor-button"
-                              icon-name="ic_arrow_right"
-                    >
-                        {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
-                    </p-anchor>
-                </slot>
+            <div class="widget-footer-wrapper">
+                <div class="footer-left">
+                    <label v-if="dateLabel"
+                           class="widget-footer-label"
+                    >{{ dateLabel }}</label>
+                    <p-divider v-if="isDivided"
+                               :vertical="true"
+                    />
+                    <label class="widget-footer-label">{{ currencyLabel }}</label>
+                </div>
+                <div class="footer-right">
+                    <slot name="footer-right">
+                        <p-anchor v-if="(widgetLink || widgetRoute) && !printMode"
+                                  :href="widgetLink"
+                                  :to="widgetRoute"
+                                  class="anchor-button"
+                                  icon-name="ic_arrow_right"
+                        >
+                            {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
+                        </p-anchor>
+                    </slot>
+                </div>
             </div>
         </div>
         <div v-if="editMode"
@@ -77,14 +79,13 @@ import { getUUID } from '@/lib/component-util/getUUID';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import { WIDGET_FRAME_WIDTH_RANGE_LIST } from '@/services/dashboards/dashboard-detail/lib/config';
 import type { WidgetOptions, WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 
 interface Props {
     title: TranslateResult;
     size: WidgetSize;
-    width: number;
+    width?: number;
     widgetLink?: string;
     widgetRoute?: Route;
     widgetIndex: number;
@@ -127,7 +128,7 @@ export default defineComponent<Props>({
         // FIXME:: width should be -= 16 because of margin.
         width: {
             type: Number,
-            default: WIDGET_FRAME_WIDTH_RANGE_LIST.SM[0],
+            default: undefined,
         },
         widgetLink: {
             type: String,
@@ -268,31 +269,37 @@ export default defineComponent<Props>({
         overflow-y: scroll;
     }
     .widget-footer {
-        @apply border-t rounded-b-lg flex justify-between items-center bg-gray-100;
+        @apply border-t rounded-b-lg bg-gray-100;
         padding: 0.3125rem 1rem;
-        flex: 0 0;
-        .footer-left {
-            @apply flex items-center gap-2;
-            .widget-footer-label {
-                font-size: 0.875rem;
-                color: theme('colors.gray.700');
-                line-height: 1.25;
-                margin: 0;
-            }
-            .p-divider {
-                &.vertical {
-                    height: 1rem;
+        height: 1.75rem;
+        > .widget-footer-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 0 0;
+            .footer-left {
+                @apply flex items-center gap-2;
+                .widget-footer-label {
+                    font-size: 0.875rem;
+                    color: theme('colors.gray.700');
+                    line-height: 1.25;
+                    margin: 0;
+                }
+                .p-divider {
+                    &.vertical {
+                        height: 1rem;
+                    }
                 }
             }
-        }
-        .footer-right {
-            .anchor-button {
-                @apply flex items-center flex-shrink-0 text-blue-700 font-normal cursor-pointer;
-                font-size: 0.75rem;
-                line-height: 150%;
-                margin-top: 0.1rem;
-                &:hover {
-                    @apply text-secondary underline;
+            .footer-right {
+                .anchor-button {
+                    @apply flex items-center flex-shrink-0 text-blue-700 font-normal cursor-pointer;
+                    font-size: 0.75rem;
+                    line-height: 150%;
+                    margin-top: 0.1rem;
+                    &:hover {
+                        @apply text-secondary underline;
+                    }
                 }
             }
         }
