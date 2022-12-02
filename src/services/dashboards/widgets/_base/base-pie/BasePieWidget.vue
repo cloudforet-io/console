@@ -202,4 +202,7 @@ defineExpose({
 .chart-loader {
     height: 100%;
 }
+.widget-data-table {
+    height: 50%;
+}
 </style>
