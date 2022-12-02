@@ -1,18 +1,18 @@
 <template>
     <div ref="containerRef"
-         class="dashboard-widget-frame-container"
+         class="dashboard-widget-container"
     >
         <div
-            v-for="(row, rowIndex) in widgetFrameWidthList"
-            :key="`widget-frame-row-${rowIndex}`"
-            class="dashboard-widget-frame-row"
+            v-for="(row, rowIndex) in widgetWidthList"
+            :key="`widget-row-${rowIndex}`"
+            class="dashboard-widget-row"
         >
             <widget-frame
                 v-for="(width, colIndex) in row"
-                :key="`widget-frame-row-${rowIndex}-${colIndex}`"
+                :key="`widget-row-${rowIndex}-${colIndex}`"
                 :width="width"
                 :is-full="containerWidth === width"
-                :widget-index="widgetFrameIndexList[rowIndex][colIndex]"
+                :widget-index="widgetList[rowIndex][colIndex]"
                 @click-expand-icon="handleExpand"
             />
         </div>
@@ -26,56 +26,56 @@ import {
 } from 'vue';
 
 import {
-    WIDGET_FRAME_CONTAINER_MAX_WIDTH,
-    WIDGET_FRAME_CONTAINER_MIN_WIDTH, WIDGET_FRAME_WIDTH_FULL,
+    WIDGET_CONTAINER_MAX_WIDTH,
+    WIDGET_CONTAINER_MIN_WIDTH, WIDGET_WIDTH_FULL,
 } from '@/services/dashboards/dashboard-detail/lib/config';
-import { widgetFrameWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
-import type { WidgetFrameSize } from '@/services/dashboards/dashboard-detail/lib/type';
+import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
+import type { WidgetSize } from '@/services/dashboards/dashboard-detail/lib/type';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 
 
 export default defineComponent({
-    name: 'DashboardWidgetFrameContainer',
+    name: 'DashboardWidgetContainer',
     components: {
         WidgetFrame,
     },
     props: {
-        widgetFrameSizeList: {
-            type: Array as PropType<Array<WidgetFrameSize>>,
+        widgetSizeList: {
+            type: Array as PropType<Array<WidgetSize>>,
             default: () => ([]),
         },
     },
     setup(props) {
         const state = reactive({
-            containerWidth: WIDGET_FRAME_CONTAINER_MIN_WIDTH,
-            widgetFrameSizeList: props.widgetFrameSizeList,
-            widgetFrameWidthList: [] as Array<Array<number>>,
-            widgetFrameIndexList: [] as Array<Array<number>>,
+            containerWidth: WIDGET_CONTAINER_MIN_WIDTH,
+            widgetSizeList: props.widgetSizeList,
+            widgetWidthList: [] as Array<Array<number>>,
+            widgetList: [] as Array<Array<number>>,
         });
         const containerRef = ref<Element|null>(null);
 
 
         const refineContainerWidth = (containerWidth: number|undefined): number => {
-            if (!containerWidth || containerWidth < WIDGET_FRAME_CONTAINER_MIN_WIDTH) return WIDGET_FRAME_CONTAINER_MIN_WIDTH;
-            if (containerWidth > WIDGET_FRAME_CONTAINER_MAX_WIDTH) return WIDGET_FRAME_CONTAINER_MAX_WIDTH;
+            if (!containerWidth || containerWidth < WIDGET_CONTAINER_MIN_WIDTH) return WIDGET_CONTAINER_MIN_WIDTH;
+            if (containerWidth > WIDGET_CONTAINER_MAX_WIDTH) return WIDGET_CONTAINER_MAX_WIDTH;
             return containerWidth - (containerWidth % 80);
         };
 
         /**
          * If widgetSizeList is given: ['MD', 'MD', **'SM'**, 'LG', 'SM'],
          * And user wants to expand 'SM' to 'FULL'
-         * -> Each widgetFrame has its own widgetIndex (in this case, widgetIndex is 2)
-         * If expand button has clicked, individual widgetFrame emits its own widgetIndex.
-         * and widgetFrameContainer gains widgetIndex which wants to be changed.
+         * -> Each widget has its own widgetIndex (in this case, widgetIndex is 2)
+         * If expand button has clicked, individual widget emits its own widgetIndex.
+         * and widgetContainer gains widgetIndex which wants to be changed.
          *
          * So on, widgetSizeList is changed by ['MD', 'MD', **'FULL'**, 'LG', 'SM']
          * And realign widths to every widget.
          * */
         const handleExpand = (type: 'expand'|'collapse', widgetIndex: number): void => {
-            const _widgetFrameSizeList = [...state.widgetFrameSizeList];
-            if (type === 'expand') _widgetFrameSizeList[widgetIndex] = WIDGET_FRAME_WIDTH_FULL;
-            if (type === 'collapse') _widgetFrameSizeList[widgetIndex] = props.widgetFrameSizeList[widgetIndex];
-            state.widgetFrameSizeList = [..._widgetFrameSizeList];
+            const _widgetSizeList = [...state.widgetSizeList];
+            if (type === 'expand') _widgetSizeList[widgetIndex] = WIDGET_WIDTH_FULL;
+            if (type === 'collapse') _widgetSizeList[widgetIndex] = props.widgetSizeList[widgetIndex];
+            state.widgetSizeList = [..._widgetSizeList];
         };
 
         let timer: undefined|number;
@@ -101,11 +101,11 @@ export default defineComponent({
             observeInstance.unobserve(containerRef?.value as Element);
         });
 
-        watch([() => state.containerWidth, () => state.widgetFrameSizeList], ([containerWidth, widgetFrameSizeList]) => {
-            state.widgetFrameWidthList = widgetFrameWidthAssigner(widgetFrameSizeList, refineContainerWidth(containerWidth));
+        watch([() => state.containerWidth, () => state.widgetSizeList], ([containerWidth, widgetSizeList]) => {
+            state.widgetWidthList = widgetWidthAssigner(widgetSizeList, refineContainerWidth(containerWidth));
 
             let widgetIndex = -1;
-            state.widgetFrameIndexList = state.widgetFrameWidthList.map((d) => d.map(() => { widgetIndex += 1; return widgetIndex; }));
+            state.widgetList = state.widgetWidthList.map((d) => d.map(() => { widgetIndex += 1; return widgetIndex; }));
         });
 
         return {
@@ -118,12 +118,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.dashboard-widget-frame-container {
+.dashboard-widget-container {
     min-width: 320px;
     max-width: 1840px;
     display: grid;
     gap: 16px;
-    .dashboard-widget-frame-row {
+    .dashboard-widget-row {
         display: flex;
         gap: 16px;
     }

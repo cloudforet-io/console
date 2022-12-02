@@ -1,19 +1,19 @@
 <template>
     <div class="dashboard-detail-page">
-        <dashboard-widget-frame-container :widget-frame-size-list="WIDGET_FRAME_SIZE_MOCK" />
+        <dashboard-widget-container :widget-size-list="WIDGET_SIZE_MOCK" />
     </div>
 </template>
 
 <script lang="ts">
-import DashboardWidgetFrameContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetFrameContainer.vue';
+import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 
 export default {
     name: 'DashboardDetailPage',
-    components: { DashboardWidgetFrameContainer },
+    components: { DashboardWidgetContainer },
     setup() {
-        const WIDGET_FRAME_SIZE_MOCK = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
+        const WIDGET_SIZE_MOCK = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
 
-        return { WIDGET_FRAME_SIZE_MOCK };
+        return { WIDGET_SIZE_MOCK };
     },
 };
 </script>

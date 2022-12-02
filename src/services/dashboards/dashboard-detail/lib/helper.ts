@@ -1,127 +1,127 @@
 import {
-    WIDGET_FRAME_WIDTH_RANGE_LIST,
-    WIDGET_FRAME_CONTAINER_MIN_WIDTH,
-    WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX,
+    WIDGET_WIDTH_RANGE_LIST,
+    WIDGET_WIDTH_RANGE_LENGTH_MAX,
+    WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
-import type { WidgetFrameSize } from '@/services/dashboards/dashboard-detail/lib/type';
+import type { WidgetSize } from '@/services/dashboards/dashboard-detail/lib/type';
 
 /** NAMING
- * widgetFrameSize: WidgetFrameSize -> 'SM'|'MD'|'LG'|'XL'
- * widgetFrameWidth: number -> 320, 400... 880, 960
- * widgetFrameWidthRange: Array<number> -> [320, 400, 480]|[480, 560, 640]|[800, 880, 960]|[800, 880, 960]
- * rowWidgetFrameWidthRange: Array<Array<number>> -> [[MD_RANGE], [MD_RANGE], [SM_RANGE], [LG_RANGE]]
- * allWidgetFrameWidthRange: Array<Array<Array<number>>> -> [[[MD_RANGE], [MD_RANGE]], [[SM_RANGE], [[LG_RANGE]]]
- * rowWidgetFrameWidthList: Array<number> -> [320, 480]
- * allWidgetFrameWidthList: Array<Array<number>> -> [[320], [320, 480], [320, 480]]
+ * widgetSize: WidgetSize -> 'SM'|'MD'|'LG'|'XL'
+ * widgetWidth: number -> 320, 400... 880, 960
+ * widgetWidthRange: Array<number> -> [320, 400, 480]|[480, 560, 640]|[800, 880, 960]|[800, 880, 960]
+ * rowWidgetWidthRange: Array<Array<number>> -> [[MD_RANGE], [MD_RANGE], [SM_RANGE], [LG_RANGE]]
+ * allWidgetWidthRange: Array<Array<Array<number>>> -> [[[MD_RANGE], [MD_RANGE]], [[SM_RANGE], [[LG_RANGE]]]
+ * rowWidgetWidthList: Array<number> -> [320, 480]
+ * allWidgetWidthList: Array<Array<number>> -> [[320], [320, 480], [320, 480]]
  * */
 
-const widgetFrameSizeRangeExtractor = (size: WidgetFrameSize, containerWidth: number = WIDGET_FRAME_CONTAINER_MIN_WIDTH): Array<number> => {
-    if (size === 'SM') return WIDGET_FRAME_WIDTH_RANGE_LIST.SM;
-    if (size === 'MD') return WIDGET_FRAME_WIDTH_RANGE_LIST.MD;
-    if (size === 'LG') return WIDGET_FRAME_WIDTH_RANGE_LIST.LG;
-    if (size === 'XL') return WIDGET_FRAME_WIDTH_RANGE_LIST.XL;
-    // WIDGET_FRAME_WIDTH_RANGE_LIST length, it will return filled by ${containerWidth}
-    if (size === 'FULL') return WIDGET_FRAME_WIDTH_RANGE_LIST.SM.map(() => containerWidth);
+const widgetSizeRangeExtractor = (size: WidgetSize, containerWidth: number = WIDGET_CONTAINER_MIN_WIDTH): Array<number> => {
+    if (size === 'SM') return WIDGET_WIDTH_RANGE_LIST.SM;
+    if (size === 'MD') return WIDGET_WIDTH_RANGE_LIST.MD;
+    if (size === 'LG') return WIDGET_WIDTH_RANGE_LIST.LG;
+    if (size === 'XL') return WIDGET_WIDTH_RANGE_LIST.XL;
+    // WIDGET_WIDTH_RANGE_LIST length, it will return filled by ${containerWidth}
+    if (size === 'FULL') return WIDGET_WIDTH_RANGE_LIST.SM.map(() => containerWidth);
     return [0];
 };
 
 
-const selectAllWidgetFrameWidthRange = (widgetFrameSizeList: Array<WidgetFrameSize>, containerWidth: number): Array<Array<Array<number>>> => {
-    // Array for save each line's widgetFrame width and return
-    const allWidgetFrameWidthRange: Array<Array<Array<number>>> = [];
+const selectAllWidgetWidthRange = (widgetSizeList: Array<WidgetSize>, containerWidth: number): Array<Array<Array<number>>> => {
+    // Array for save each line's widget width and return
+    const allWidgetWidthRange: Array<Array<Array<number>>> = [];
     // it runs shift() method, so should save length
-    const widgetFrameSizeListLength = widgetFrameSizeList.length;
+    const widgetSizeListLength = widgetSizeList.length;
 
-    // compare sum of one row's widgetFrame width
+    // compare sum of one row's widget width
     let rowWidthSum = 0;
-    // Array for save one row's widget Frame width
-    let rowWidgetFrameWidthRange: Array<Array<number>> = [];
+    // Array for save one row's widget width
+    let rowWidgetWidthRange: Array<Array<number>> = [];
 
-    for (let i = 0; i < widgetFrameSizeListLength; i += 1) {
-        // extract widgetFrame one by one
-        const selectedWidgetFrameSize: Array<number> = widgetFrameSizeRangeExtractor(widgetFrameSizeList.shift() as WidgetFrameSize, containerWidth);
-        rowWidthSum += selectedWidgetFrameSize[0];
-        // Compare the sum of widgetFrame sizes of one row with containerWidth to push the maximum value
+    for (let i = 0; i < widgetSizeListLength; i += 1) {
+        // extract widget one by one
+        const selectedWidgetSize: Array<number> = widgetSizeRangeExtractor(widgetSizeList.shift() as WidgetSize, containerWidth);
+        rowWidthSum += selectedWidgetSize[0];
+        // Compare the sum of widget sizes of one row with containerWidth to push the maximum value
         // and initialize it to the default value of the shifted card.
         if (rowWidthSum > containerWidth) {
-            allWidgetFrameWidthRange.push(rowWidgetFrameWidthRange);
-            rowWidgetFrameWidthRange = [];
-            rowWidthSum = selectedWidgetFrameSize[0];
+            allWidgetWidthRange.push(rowWidgetWidthRange);
+            rowWidgetWidthRange = [];
+            rowWidthSum = selectedWidgetSize[0];
         }
-        // Push after the comparison syntax because you need to find the maximum value of the widgetFrame size agreement available on one line.
-        rowWidgetFrameWidthRange.push(selectedWidgetFrameSize);
+        // Push after the comparison syntax because you need to find the maximum value of the widget size agreement available on one line.
+        rowWidgetWidthRange.push(selectedWidgetSize);
     }
 
     // consider last element
-    if (rowWidgetFrameWidthRange.length) allWidgetFrameWidthRange.push(rowWidgetFrameWidthRange);
+    if (rowWidgetWidthRange.length) allWidgetWidthRange.push(rowWidgetWidthRange);
 
-    return allWidgetFrameWidthRange;
+    return allWidgetWidthRange;
 };
 
 
-const allWidgetFrameWidthReAligner = (allWidgetFrameWidthRange: Array<Array<Array<number>>>, containerWidth: number): Array<Array<number>> => {
+const allWidgetWidthReAligner = (allWidgetWidthRange: Array<Array<Array<number>>>, containerWidth: number): Array<Array<number>> => {
     const widthSelectPointer: Array<Array<number>> = [];
-    const reAssignedWidgetFrameWidthList: Array<Array<number>> = [];
+    const reAssignedWidgetWidthList: Array<Array<number>> = [];
     let rowWidthSum = 0;
     let reAssignedRowWidth: Array<number> = [];
 
 
-    // Concept: https://www.notion.so/spaceone-io/WidgetFrame-width-assigner-Pointer-c4379b4cb4ce4053ad63405f58bcc261
-    for (let i = 0; i < allWidgetFrameWidthRange.length; i += 1) {
+    // Concept: https://www.notion.so/spaceone-io/Widget-width-assigner-Pointer-c4379b4cb4ce4053ad63405f58bcc261
+    for (let i = 0; i < allWidgetWidthRange.length; i += 1) {
         const rowPointer: Array<number> = [];
-        for (let j = 0; j < allWidgetFrameWidthRange[i].length; j += 1) {
+        for (let j = 0; j < allWidgetWidthRange[i].length; j += 1) {
             rowPointer.push(0);
         }
         widthSelectPointer.push(rowPointer);
     }
 
     // i -> circuit each row
-    for (let i = 0; i < allWidgetFrameWidthRange.length; i += 1) {
+    for (let i = 0; i < allWidgetWidthRange.length; i += 1) {
         rowWidthSum = 0;
         reAssignedRowWidth = [];
-        // j -> increase widgetFrame size as +80
-        for (let j = 0; j < WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX; j += 1) {
-            // k -> circuit allWidgetFrameWidthRange
-            for (let k = 0; k < allWidgetFrameWidthRange[i].length; k += 1) {
+        // j -> increase widget size as +80
+        for (let j = 0; j < WIDGET_WIDTH_RANGE_LENGTH_MAX; j += 1) {
+            // k -> circuit allWidgetWidthRange
+            for (let k = 0; k < allWidgetWidthRange[i].length; k += 1) {
                 rowWidthSum = 0;
                 reAssignedRowWidth = [];
                 widthSelectPointer[i].unshift(j);
                 // l -> compare sum of each row width && push one row
-                for (let l = 0; l < allWidgetFrameWidthRange[i].length; l += 1) {
-                    rowWidthSum += allWidgetFrameWidthRange[i][l][widthSelectPointer[i][l]];
+                for (let l = 0; l < allWidgetWidthRange[i].length; l += 1) {
+                    rowWidthSum += allWidgetWidthRange[i][l][widthSelectPointer[i][l]];
 
                     if (rowWidthSum > containerWidth) {
-                        reAssignedWidgetFrameWidthList.push(reAssignedRowWidth);
+                        reAssignedWidgetWidthList.push(reAssignedRowWidth);
                         break;
                     }
 
                     if (rowWidthSum === containerWidth) {
-                        reAssignedRowWidth.push(allWidgetFrameWidthRange[i][l][widthSelectPointer[i][l]]);
-                        reAssignedWidgetFrameWidthList.push(reAssignedRowWidth);
+                        reAssignedRowWidth.push(allWidgetWidthRange[i][l][widthSelectPointer[i][l]]);
+                        reAssignedWidgetWidthList.push(reAssignedRowWidth);
                         break;
                     }
 
-                    reAssignedRowWidth.push(allWidgetFrameWidthRange[i][l][widthSelectPointer[i][l]]);
+                    reAssignedRowWidth.push(allWidgetWidthRange[i][l][widthSelectPointer[i][l]]);
                 }
                 if (rowWidthSum >= containerWidth) break;
             }
             if (rowWidthSum >= containerWidth) break;
             // consider last element
-            if (j === WIDGET_FRAME_WIDTH_RANGE_LENGTH_MAX - 1 && reAssignedRowWidth.length) {
-                reAssignedWidgetFrameWidthList.push(reAssignedRowWidth);
+            if (j === WIDGET_WIDTH_RANGE_LENGTH_MAX - 1 && reAssignedRowWidth.length) {
+                reAssignedWidgetWidthList.push(reAssignedRowWidth);
             }
         }
     }
 
-    return reAssignedWidgetFrameWidthList;
+    return reAssignedWidgetWidthList;
 };
 
 
-export const widgetFrameWidthAssigner = (widgetFrameSizeList: Array<WidgetFrameSize>, containerWidth: number): Array<Array<number>> => {
-    // This function runs .shift(), so cloning object is implemented.
-    const _widgetFrameSizeList = [...widgetFrameSizeList];
-    if (containerWidth < 800) return widgetFrameSizeList.map(() => [containerWidth]);
+export const widgetWidthAssigner = (widgetSizeList: Array<WidgetSize>, containerWidth: number): Array<Array<number>> => {
+    // This function runs .shift(), so cloning object is needed.
+    const _widgetSizeList = [...widgetSizeList];
+    if (containerWidth < 800) return widgetSizeList.map(() => [containerWidth]);
 
-    const allWidgetFrameWidthRange = selectAllWidgetFrameWidthRange(_widgetFrameSizeList, containerWidth);
-    return allWidgetFrameWidthReAligner(allWidgetFrameWidthRange, containerWidth);
+    const allWidgetWidthRange = selectAllWidgetWidthRange(_widgetSizeList, containerWidth);
+    return allWidgetWidthReAligner(allWidgetWidthRange, containerWidth);
 };
