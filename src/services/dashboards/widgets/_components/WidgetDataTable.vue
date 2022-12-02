@@ -4,134 +4,141 @@
                        :loading="loading"
                        :data="items"
                        show-data-from-scratch
+                       disable-empty-case
         >
-            <template #no-data>
-                <!--                    song-lang-->
-                {{ $t('No Data') }}
-            </template>
-            <table>
-                <thead>
-                    <tr>
-                        <th v-for="(field, fieldColIndex) in fields"
-                            :key="`th-${widgetKey}-${fieldColIndex}`"
-                            :style="{
-                                minWidth: field.width || undefined,
-                                width: field.width || undefined,
-                            }"
-                        >
-                            <slot :name="`th-${field.name}`"
-                                  v-bind="getHeadSlotProps(field, fieldColIndex)"
-                            >
-                                <span class="th-contents"
-                                      :class="{
-                                          [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
-                                          'has-icon': field.tooltipText,
-                                      }"
-                                >
-                                    <span class="th-text">
-                                        <slot :name="`th-${field.name}-text`"
-                                              v-bind="getHeadSlotProps(field, fieldColIndex)"
-                                        >
-                                            {{ field.label ? field.label : field.name }}
-                                        </slot>
-                                        <template v-if="field.tooltipText">
-                                            <p-tooltip :contents="field.tooltipText">
-                                                <p-i name="ic_tooltip"
-                                                     width="0.875rem"
-                                                     height="0.875rem"
-                                                     :color="gray[300]"
-                                                     class="tooltip-icon"
-                                                />
-                                            </p-tooltip>
-                                        </template>
-                                    </span>
-                                </span>
-                            </slot>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody ref="tbodyRef">
-                    <slot name="body"
-                          :items="items"
-                          v-bind="{fields}"
-                    >
-                        <tr v-for="(item, rowIndex) in items"
-                            :key="`tr-${widgetKey}-${rowIndex}`"
-                            :data-index="rowIndex"
-                            @click="handleClickRow({rowIndex, item})"
-                        >
-                            <td v-for="(field, colIndex) in fields"
-                                :key="`td-${widgetKey}-${rowIndex}-${colIndex}`"
-                                :class="{
-                                    'has-width': !!field.width,
-                                    [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
-                                    [size]: true,
-                                    'link-item': field?.link,
-                                    'detail-item': field?.detailOptions?.enabled,
+            <template #default="{isEmpty}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th v-for="(field, fieldColIndex) in fields"
+                                :key="`th-${widgetKey}-${fieldColIndex}`"
+                                :style="{
+                                    minWidth: field.width || undefined,
+                                    width: field.width || undefined,
                                 }"
                             >
-                                <slot :name="`col-${field.name}`"
-                                      v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                <slot :name="`th-${field.name}`"
+                                      v-bind="getHeadSlotProps(field, fieldColIndex)"
                                 >
-                                    <div class="detail-item-wrapper">
-                                        <span class="td-contents">
-                                            <template v-if="colIndex === 0 && showLegend">
-                                                <p-status v-if="showLegend"
-                                                          class="toggle-button"
-                                                          :text="showLegendIndex ? (getConvertedIndex(rowIndex) + 1)?.toString() : ''"
-                                                          :icon-color="getLegendIconColor(rowIndex)"
-                                                          :text-color="getLegendTextColor(rowIndex)"
-                                                          @click.stop="handleClickLegend(rowIndex)"
-                                                />
-                                            </template>
-                                            <template v-if="field?.icon">
-                                                <p-i :name="getHandler(field.icon, item)"
-                                                     width="1rem"
-                                                     height="1rem"
-                                                     class="icon"
-                                                />
-                                            </template>
-                                            <slot :name="`col-${colIndex}-text`"
-                                                  v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                    <span class="th-contents"
+                                          :class="{
+                                              [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                              'has-icon': field.tooltipText,
+                                          }"
+                                    >
+                                        <span class="th-text">
+                                            <slot :name="`th-${field.name}-text`"
+                                                  v-bind="getHeadSlotProps(field, fieldColIndex)"
                                             >
-                                                <router-link v-if="getHandler(field.link, item)"
-                                                             :to="getHandler(field.link, item)"
-                                                             class="link"
-                                                >
-                                                    {{ getValue(item, field) }}
-                                                </router-link>
-                                                <div v-else-if="getHandler(field.rapidIncrease, item)"
-                                                     class="rapid-increase"
-                                                ><span>{{ getValue(item, field) }}</span> <p-i name="ic_bold-arrow-up"
-                                                                                               width="1rem"
-                                                                                               height="1rem"
-                                                />
-                                                </div>
-                                                <span v-else>{{ getValue(item, field) }}</span>
+                                                {{ field.label ? field.label : field.name }}
                                             </slot>
+                                            <template v-if="field.tooltipText">
+                                                <p-tooltip :contents="field.tooltipText">
+                                                    <p-i name="ic_tooltip"
+                                                         width="0.875rem"
+                                                         height="0.875rem"
+                                                         :color="gray[300]"
+                                                         class="tooltip-icon"
+                                                    />
+                                                </p-tooltip>
+                                            </template>
                                         </span>
-                                        <template v-if="field?.detailOptions?.enabled">
-                                            <p-popover position="bottom">
-                                                <span class="detail">Details</span><!--song-lang-->
-                                                <template #content>
-                                                    <div class="popover-content">
-                                                        <slot :name="`detail-${field.name}`"
-                                                              v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
-                                                        />
-                                                    </div>
-                                                </template>
-                                            </p-popover>
-                                        </template>
-                                    </div>
+                                    </span>
                                 </slot>
-                            </td>
+                            </th>
                         </tr>
-                    </slot>
-                </tbody>
-                <tfoot>
-                    <slot name="foot" />
-                </tfoot>
-            </table>
+                    </thead>
+                    <tbody ref="tbodyRef">
+                        <p-empty v-if="isEmpty"
+                                 class="no-data-wrapper"
+                                 :colspan="fields.length"
+                        >
+                            <!--song-lang-->
+                            {{ $t('No Data') }}
+                        </p-empty>
+                        <slot v-else
+                              name="body"
+                              :items="items"
+                              v-bind="{fields}"
+                        >
+                            <tr v-for="(item, rowIndex) in items"
+                                :key="`tr-${widgetKey}-${rowIndex}`"
+                                :data-index="rowIndex"
+                                @click="handleClickRow({rowIndex, item})"
+                            >
+                                <td v-for="(field, colIndex) in fields"
+                                    :key="`td-${widgetKey}-${rowIndex}-${colIndex}`"
+                                    :class="{
+                                        'has-width': !!field.width,
+                                        [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                        [size]: true,
+                                        'link-item': field?.link,
+                                        'detail-item': field?.detailOptions?.enabled,
+                                    }"
+                                >
+                                    <slot :name="`col-${field.name}`"
+                                          v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                    >
+                                        <div class="detail-item-wrapper">
+                                            <span class="td-contents">
+                                                <template v-if="colIndex === 0 && showLegend">
+                                                    <p-status v-if="showLegend"
+                                                              class="toggle-button"
+                                                              :text="showLegendIndex ? (getConvertedIndex(rowIndex) + 1)?.toString() : ''"
+                                                              :icon-color="getLegendIconColor(rowIndex)"
+                                                              :text-color="getLegendTextColor(rowIndex)"
+                                                              @click.stop="handleClickLegend(rowIndex)"
+                                                    />
+                                                </template>
+                                                <template v-if="field?.icon">
+                                                    <p-i :name="getHandler(field.icon, item)"
+                                                         width="1rem"
+                                                         height="1rem"
+                                                         class="icon"
+                                                    />
+                                                </template>
+                                                <slot :name="`col-${colIndex}-text`"
+                                                      v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                                >
+                                                    <router-link v-if="getHandler(field.link, item)"
+                                                                 :to="getHandler(field.link, item)"
+                                                                 class="link"
+                                                    >
+                                                        {{ getValue(item, field) }}
+                                                    </router-link>
+                                                    <div v-else-if="getHandler(field.rapidIncrease, item)"
+                                                         class="rapid-increase"
+                                                    ><span>{{ getValue(item, field) }}</span> <p-i name="ic_bold-arrow-up"
+                                                                                                   width="1rem"
+                                                                                                   height="1rem"
+                                                    />
+                                                    </div>
+                                                    <span v-else>{{ getValue(item, field) }}</span>
+                                                </slot>
+                                            </span>
+                                            <template v-if="field?.detailOptions?.enabled">
+                                                <p-popover position="bottom">
+                                                    <span class="detail">Details</span><!--song-lang-->
+                                                    <template #content>
+                                                        <div class="popover-content">
+                                                            <slot :name="`detail-${field.name}`"
+                                                                  v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                                            />
+                                                        </div>
+                                                    </template>
+                                                </p-popover>
+                                            </template>
+                                        </div>
+                                    </slot>
+                                </td>
+                            </tr>
+                        </slot>
+                    </tbody>
+                    <tfoot>
+                        <slot name="foot" />
+                    </tfoot>
+                </table>
+            </template>
         </p-data-loader>
         <div v-if="showPagination"
              class="table-pagination-wrapper"
@@ -149,7 +156,7 @@ import {
 import type { PropType } from 'vue';
 
 import {
-    PI, PDataLoader, PTooltip, PStatus, PPopover,
+    PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover,
 } from '@spaceone/design-system';
 import { DATA_TABLE_CELL_TEXT_ALIGN } from '@spaceone/design-system/src/data-display/tables/data-table/config';
 import { get } from 'lodash';
@@ -195,6 +202,7 @@ export default defineComponent<Props>({
         PI,
         PDataLoader,
         PStatus,
+        PEmpty,
     },
     props: {
         loading: {
@@ -345,8 +353,14 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .widget-data-table {
+    display: flex;
+    flex-direction: column;
+    .p-data-loader {
+        flex-grow: 1;
+        flex-shrink: 0;
+    }
     .table-container {
-        @apply overflow-auto h-full w-full;
+        @apply overflow-auto w-full;
     }
     table {
         @apply min-w-full;
@@ -397,6 +411,21 @@ export default defineComponent<Props>({
             width: 2.5rem;
             min-width: 2.5rem;
             max-width: 2.5rem;
+        }
+    }
+    tbody {
+        .no-data-wrapper {
+            position: absolute;
+            height: calc(100% - 2rem);
+            max-height: 12.875rem;
+        }
+        tr {
+            &:nth-child(odd) {
+                @apply bg-gray-100;
+            }
+            &:hover {
+                background-color: rgba(theme('colors.gray.200'), 0.7);
+            }
         }
     }
     td {
@@ -450,18 +479,9 @@ export default defineComponent<Props>({
             vertical-align: baseline;
         }
     }
-    tbody {
-        tr {
-            &:nth-child(odd) {
-                @apply bg-gray-100;
-            }
-            &:hover {
-                background: #dddddfb2;
-            }
-        }
-    }
 
     .table-pagination-wrapper {
+        flex-shrink: 0;
         text-align: center;
     }
 
