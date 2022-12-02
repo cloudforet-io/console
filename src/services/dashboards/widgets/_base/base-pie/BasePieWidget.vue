@@ -18,7 +18,7 @@
 
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
-                           :items="state.tableItems"
+                           :items="state.chartData"
                            show-legend
                            :legends="state.legends"
                            :currency="state.options.currency"
@@ -43,7 +43,6 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import type {
     Field,
     LegendConfig,
-    TableItem,
 } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
@@ -80,26 +79,20 @@ const state = reactive({
         if (!state.data) return [];
         return state.data;
     }),
-    tableItems: computed<TableItem[]>(() => state.chartData.map((d) => {
-        d[state.tableFields[0].name] = {
-            icon: 'ic_tree_project-group',
-            link: '/home-dashboard',
-            name: d[state.tableFields[0].name],
-        };
-        d[state.tableFields[1].name] = {
-            rapidIncrease: true,
-            name: d[state.tableFields[1].name],
-        };
-        return d;
-    })),
     tableFields: computed<Field[]>(() => [
         {
             label: state.groupByLabel,
             name: state.groupBy,
             tooltipText: 'test tooltip',
+            icon: (item) => (item?.provider.length > 4 ? 'ic_tree_project-group' : 'ic_tree_project'),
+            link: '/home-dashboard',
         },
         {
-            label: 'Cost', name: 'usd_cost', type: 'cost', textAlign: 'right',
+            label: 'Cost',
+            name: 'usd_cost',
+            type: 'cost',
+            textAlign: 'right',
+            rapidIncrease: (item) => item?.usd_cost > 3000,
         },
     ]),
     legends: computed<LegendConfig[]>(() => state.chartData.map((i) => ({

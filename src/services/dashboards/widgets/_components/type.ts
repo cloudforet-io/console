@@ -23,6 +23,9 @@ export interface LegendConfig {
     name?: string;
 }
 
+type Handler = (item:any) => string;
+type BoolHandler = (item:any) => boolean;
+
 export interface Field {
     name: string;
     width?: string;
@@ -36,17 +39,10 @@ export interface Field {
     tooltipText?: string;
     showLegend?: boolean;
     showLegendIndex?: boolean;
+    icon?: string | Handler;
+    link?: string | Handler;
+    rapidIncrease?: boolean | BoolHandler;
 }
-
-export interface TableItemValueOptions {
-    value?: string;
-    name?: string;
-    icon?: string;
-    rapidIncrease?: boolean;
-    link?: string;
-}
-
-export type TableItem = Record<string, TableItemValueOptions | string>;
 
 export const TABLE_SIZE = {
     sm: 'sm',

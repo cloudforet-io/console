@@ -82,8 +82,8 @@
                                                       @click.stop="handleClickLegend(rowIndex)"
                                             />
                                         </template>
-                                        <template v-if="item[field?.name]?.icon">
-                                            <p-i :name="item[field?.name]?.icon"
+                                        <template v-if="field?.icon">
+                                            <p-i :name="getHandler(field.icon, item)"
                                                  :width="'1rem'"
                                                  :height="'1rem'"
                                                  class="icon"
@@ -92,13 +92,13 @@
                                         <slot :name="`col-${colIndex}-text`"
                                               v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                         >
-                                            <router-link v-if="item[field?.name]?.link"
-                                                         :to="item[field?.name]?.link"
+                                            <router-link v-if="getHandler(field.link, item)"
+                                                         :to="getHandler(field.link, item)"
                                                          class="link"
                                             >
                                                 {{ getValue(item, field) }}
                                             </router-link>
-                                            <div v-else-if="item[field?.name]?.rapidIncrease"
+                                            <div v-else-if="getHandler(field.rapidIncrease, item)"
                                                  class="rapid-increase"
                                             ><span>{{ getValue(item, field) }}</span> <p-i name="ic_bold-arrow-up"
                                                                                            width="1rem"
@@ -153,7 +153,7 @@ import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import type {
-    Field, LegendConfig, TableItem, TableSize,
+    Field, LegendConfig, TableSize,
 } from '@/services/dashboards/widgets/_components/type';
 import { TABLE_SIZE } from '@/services/dashboards/widgets/_components/type';
 
@@ -190,7 +190,7 @@ export default defineComponent<Props>({
             default: () => ([]),
         },
         items: {
-            type: Array as PropType<TableItem[]>,
+            type: Array,
             default: () => ([]),
         },
         thisPage: {
@@ -263,13 +263,16 @@ export default defineComponent<Props>({
         });
         const getValue = (item, field: Field) => {
             if (typeof item === 'object') {
-                const itemValue = get(item, field.name);
-                if (typeof itemValue === 'object') {
-                    return itemValue?.label ?? itemValue?.name;
-                }
-                return itemValue;
+                return get(item, field.name);
             }
             return item;
+        };
+        const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item) => {
+            if (typeof option === 'string' || typeof option === 'boolean') {
+                return option;
+            }
+            if (option) return option(item);
+            return undefined;
         };
         const getColSlotProps = (item, field, colIndex, rowIndex) => ({
             item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
@@ -303,6 +306,7 @@ export default defineComponent<Props>({
             getHeadSlotProps,
             getColSlotProps,
             getValue,
+            getHandler,
             DATA_TABLE_CELL_TEXT_ALIGN,
             gray,
         };
