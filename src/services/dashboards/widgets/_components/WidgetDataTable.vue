@@ -84,8 +84,8 @@
                                         </template>
                                         <template v-if="field?.icon">
                                             <p-i :name="getHandler(field.icon, item)"
-                                                 :width="'1rem'"
-                                                 :height="'1rem'"
+                                                 width="1rem"
+                                                 height="1rem"
                                                  class="icon"
                                             />
                                         </template>
@@ -267,7 +267,7 @@ export default defineComponent<Props>({
             }
             return item;
         };
-        const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item) => {
+        const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
             if (typeof option === 'string' || typeof option === 'boolean') {
                 return option;
             }
