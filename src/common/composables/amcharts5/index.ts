@@ -13,9 +13,9 @@ import type * as am5xy from '@amcharts/amcharts5/xy';
 import { Amcharts5GlobalTheme } from '@/lib/site-initializer/amcharts5';
 
 import {
-    createBullet, createDataProcessor, createLegend, createTooltip,
+    createBullet, createCircle, createDataProcessor, createLegend, createTooltip,
 } from '@/common/composables/amcharts5/concepts-helper';
-import { createMapChart, createMapPointSeries } from '@/common/composables/amcharts5/map-chart-helper';
+import { createMapChart, createMapPointSeries, createMapPolygonSeries } from '@/common/composables/amcharts5/map-chart-helper';
 import {
     createDonutChart, createPieChart, createPieSeries, setPieTooltipText,
 } from '@/common/composables/amcharts5/pie-chart-helper';
@@ -24,6 +24,7 @@ import {
     createXYCategoryChart, createXYDateChart, createXYLineSeries, createXYColumnSeries,
     setXYSharedTooltipText, setXYSingleTooltipText,
 } from '@/common/composables/amcharts5/xy-chart-helper';
+
 
 export const useAmcharts5 = (
     chartContext: Ref<ChartContext>,
@@ -115,6 +116,10 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return createPieSeries(state.root as Root, settings);
         },
+        createMapPolygonSeries: (settings?: am5map.IMapPolygonSeriesSettings): am5map.MapPolygonSeries => {
+            if (!state.root) throw new Error('No root');
+            return createMapPolygonSeries(state.root as Root, settings);
+        },
         createMapPointSeries: (settings?: am5map.IMapPointSeriesSettings): am5map.MapPointSeries => {
             if (!state.root) throw new Error('No root');
             return createMapPointSeries(state.root as Root, settings);
@@ -131,6 +136,10 @@ export const useAmcharts5 = (
         createBullet: (settings: am5.IBulletSettings): am5.Bullet => {
             if (!state.root) throw new Error('No root');
             return createBullet(state.root as Root, settings);
+        },
+        createCircle: (settings: am5.ICircleSettings, circleTemplate: am5.Template<am5.Circle>): am5.Circle => {
+            if (!state.root) throw new Error('No root');
+            return createCircle(state.root as Root, settings, circleTemplate);
         },
         createDataProcessor: (settings: am5.IDataProcessorSettings): am5.DataProcessor => {
             if (!state.root) throw new Error('No root');
