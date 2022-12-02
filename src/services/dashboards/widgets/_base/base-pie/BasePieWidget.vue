@@ -20,10 +20,10 @@
                            :fields="state.tableFields"
                            :items="state.chartData"
                            show-legend
-                           show-legend-index
                            :legends="state.legends"
                            :currency="state.options.currency"
                            :currency-rates="props.currencyRates"
+                           :size="'md'"
         />
     </widget-frame>
 </template>
@@ -40,7 +40,10 @@ import { random } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import type { Field, LegendConfig } from '@/services/dashboards/widgets/_components/type';
+import type {
+    Field,
+    LegendConfig,
+} from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
@@ -81,9 +84,15 @@ const state = reactive({
             label: state.groupByLabel,
             name: state.groupBy,
             tooltipText: 'test tooltip',
+            icon: (item) => (item?.provider.length > 4 ? 'ic_tree_project-group' : 'ic_tree_project'),
+            link: '/home-dashboard',
         },
         {
-            label: 'Cost', name: 'usd_cost', type: 'cost', styleOptions: { align: 'right' },
+            label: 'Cost',
+            name: 'usd_cost',
+            type: 'cost',
+            textAlign: 'right',
+            rapidIncrease: (item) => item?.usd_cost > 3000,
         },
     ]),
     legends: computed<LegendConfig[]>(() => state.chartData.map((i) => ({

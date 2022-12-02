@@ -24,7 +24,7 @@
                             >
                                 <span class="th-contents"
                                       :class="{
-                                          [field?.styleOptions?.align || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                          [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
                                           'has-icon': field.tooltipText,
                                       }"
                                 >
@@ -64,7 +64,9 @@
                                 :key="`td-${widgetKey}-${rowIndex}-${colIndex}`"
                                 :class="{
                                     'has-width': !!field.width,
-                                    [field?.styleOptions?.align || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                    [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                    [size]: true,
+                                    'link-item': item[field?.name]?.link,
                                 }"
                             >
                                 <slot :name="`col-${field.name}`"
@@ -80,11 +82,30 @@
                                                       @click.stop="handleClickLegend(rowIndex)"
                                             />
                                         </template>
-
+                                        <template v-if="field?.icon">
+                                            <p-i :name="getHandler(field.icon, item)"
+                                                 width="1rem"
+                                                 height="1rem"
+                                                 class="icon"
+                                            />
+                                        </template>
                                         <slot :name="`col-${colIndex}-text`"
                                               v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                         >
-                                            {{ getValue(item, field) }}
+                                            <router-link v-if="getHandler(field.link, item)"
+                                                         :to="getHandler(field.link, item)"
+                                                         class="link"
+                                            >
+                                                {{ getValue(item, field) }}
+                                            </router-link>
+                                            <div v-else-if="getHandler(field.rapidIncrease, item)"
+                                                 class="rapid-increase"
+                                            ><span>{{ getValue(item, field) }}</span> <p-i name="ic_bold-arrow-up"
+                                                                                           width="1rem"
+                                                                                           height="1rem"
+                                            />
+                                            </div>
+                                            <span v-else>{{ getValue(item, field) }}</span>
                                         </slot>
                                     </span>
                                 </slot>
@@ -131,7 +152,10 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
-import type { Field, LegendConfig } from '@/services/dashboards/widgets/_components/type';
+import type {
+    Field, LegendConfig, TableSize,
+} from '@/services/dashboards/widgets/_components/type';
+import { TABLE_SIZE } from '@/services/dashboards/widgets/_components/type';
 
 import { GROUP_BY } from '../config';
 
@@ -201,6 +225,10 @@ export default defineComponent<Props>({
             type: String,
             default: '7rem',
         },
+        size: {
+            type: String as PropType<TableSize>,
+            default: TABLE_SIZE.sm,
+        },
         // printMode: {
         //     type: Boolean,
         //     default: false,
@@ -239,6 +267,13 @@ export default defineComponent<Props>({
             }
             return item;
         };
+        const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
+            if (typeof option === 'string' || typeof option === 'boolean') {
+                return option;
+            }
+            if (option) return option(item);
+            return undefined;
+        };
         const getColSlotProps = (item, field, colIndex, rowIndex) => ({
             item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
         });
@@ -271,6 +306,7 @@ export default defineComponent<Props>({
             getHeadSlotProps,
             getColSlotProps,
             getValue,
+            getHandler,
             DATA_TABLE_CELL_TEXT_ALIGN,
             gray,
         };
@@ -333,14 +369,19 @@ export default defineComponent<Props>({
         }
     }
     td {
-        @apply h-10 px-4 z-0 align-middle min-w-28 text-sm;
+        @apply px-4 z-0 align-middle min-w-28 text-sm;
         .td-contents {
+            @apply inline-flex gap-2;
             .toggle-button {
                 cursor: pointer;
-                > .text {
-                    flex-shrink: 0;
-                    white-space: nowrap;
-                }
+                margin-right: -0.25rem;
+            }
+            .rapid-increase {
+                @apply text-red-500 inline-flex justify-center gap-1;
+            }
+            .link {
+                @apply text-blue-600 underline;
+                cursor: pointer;
             }
         }
         &.has-width {
@@ -351,19 +392,29 @@ export default defineComponent<Props>({
         &.right {
             @apply text-right;
         }
+        &.link-item:hover {
+            @apply bg-blue-100;
+        }
+
+        &.sm {
+            height: 1.75rem;
+        }
+        &.md {
+            height: 2.125rem;
+        }
+
         i, span, div, input, textarea, article, main, ul, li {
             vertical-align: baseline;
         }
     }
-    tr {
-        &.row-height-fixed {
-            td:not(.has-width) {
-                overflow-x: hidden;
-                white-space: nowrap;
+    tbody {
+        tr {
+            &:nth-child(odd) {
+                @apply bg-gray-100;
             }
-        }
-        &.row-cursor-pointer {
-            cursor: pointer;
+            &:hover {
+                background: #dddddfb2;
+            }
         }
     }
 

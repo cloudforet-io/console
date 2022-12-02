@@ -1,11 +1,6 @@
 import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
-interface TextOption {
-    type?: 'text';
-    align?: 'left'|'right';
-    icon?: string;
-}
 
 interface CostOption {
     type: 'cost';
@@ -28,11 +23,14 @@ export interface LegendConfig {
     name?: string;
 }
 
+type Handler = (item:any) => string;
+type BoolHandler = (item:any) => boolean;
+
 export interface Field {
     name: string;
     width?: string;
     label?: string;
-    styleOptions?: TextOption;
+    textAlign?: 'left' | 'right';
     dataOptions?: CostOption | PercentOption | SizeOption;
     detailOptions?: {
         enabled?: boolean;
@@ -41,4 +39,14 @@ export interface Field {
     tooltipText?: string;
     showLegend?: boolean;
     showLegendIndex?: boolean;
+    icon?: string | Handler;
+    link?: string | Handler;
+    rapidIncrease?: boolean | BoolHandler;
 }
+
+export const TABLE_SIZE = {
+    sm: 'sm',
+    md: 'md',
+} as const;
+
+export type TableSize = typeof TABLE_SIZE[keyof typeof TABLE_SIZE];
