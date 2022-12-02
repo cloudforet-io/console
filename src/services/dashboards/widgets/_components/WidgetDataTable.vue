@@ -65,6 +65,7 @@
                                 :class="{
                                     'has-width': !!field.width,
                                     [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                    [size]: true,
                                 }"
                             >
                                 <slot :name="`col-${field.name}`"
@@ -137,7 +138,10 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
-import type { Field, LegendConfig, TableItem } from '@/services/dashboards/widgets/_components/type';
+import type {
+    Field, LegendConfig, TableItem, TableSize,
+} from '@/services/dashboards/widgets/_components/type';
+import { TABLE_SIZE } from '@/services/dashboards/widgets/_components/type';
 
 import { GROUP_BY } from '../config';
 
@@ -206,6 +210,10 @@ export default defineComponent<Props>({
         widgetKey: {
             type: String,
             default: '7rem',
+        },
+        size: {
+            type: String as PropType<TableSize>,
+            default: TABLE_SIZE.sm,
         },
         // printMode: {
         //     type: Boolean,
@@ -343,7 +351,7 @@ export default defineComponent<Props>({
         }
     }
     td {
-        @apply h-10 px-4 z-0 align-middle min-w-28 text-sm;
+        @apply px-4 z-0 align-middle min-w-28 text-sm;
         .td-contents {
             @apply flex gap-2;
             .toggle-button {
@@ -359,6 +367,14 @@ export default defineComponent<Props>({
         &.right {
             @apply text-right;
         }
+
+        &.sm {
+            height: 1.75rem;
+        }
+        &.md {
+            height: 2.125rem;
+        }
+
         i, span, div, input, textarea, article, main, ul, li {
             vertical-align: baseline;
         }
@@ -372,6 +388,16 @@ export default defineComponent<Props>({
         }
         &.row-cursor-pointer {
             cursor: pointer;
+        }
+    }
+    tbody {
+        tr {
+            &:nth-child(odd) {
+                @apply bg-gray-100;
+            }
+            &:hover {
+                background: #dddddfb2;
+            }
         }
     }
 

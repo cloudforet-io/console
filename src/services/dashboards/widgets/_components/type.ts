@@ -47,3 +47,10 @@ export interface TableItemValueOptions {
 }
 
 export type TableItem = Record<string, TableItemValueOptions | string>;
+
+export const TABLE_SIZE = {
+    sm: 'sm',
+    md: 'md',
+} as const;
+
+export type TableSize = typeof TABLE_SIZE[keyof typeof TABLE_SIZE];

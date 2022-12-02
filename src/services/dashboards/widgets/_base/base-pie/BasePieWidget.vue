@@ -23,6 +23,7 @@
                            :legends="state.legends"
                            :currency="state.options.currency"
                            :currency-rates="props.currencyRates"
+                           :size="'md'"
         />
     </widget-frame>
 </template>
