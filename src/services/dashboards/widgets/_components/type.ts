@@ -1,11 +1,6 @@
 import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
-interface TextOption {
-    type?: 'text';
-    align?: 'left'|'right';
-    icon?: string;
-}
 
 interface CostOption {
     type: 'cost';
@@ -32,7 +27,7 @@ export interface Field {
     name: string;
     width?: string;
     label?: string;
-    styleOptions?: TextOption;
+    textAlign?: 'left' | 'right';
     dataOptions?: CostOption | PercentOption | SizeOption;
     detailOptions?: {
         enabled?: boolean;
@@ -42,3 +37,13 @@ export interface Field {
     showLegend?: boolean;
     showLegendIndex?: boolean;
 }
+
+export interface TableItemValueOptions {
+    value?: string;
+    name?: string;
+    icon?: string;
+    rapidIncrease?: boolean;
+    link?: string;
+}
+
+export type TableItem = Record<string, TableItemValueOptions | string>;

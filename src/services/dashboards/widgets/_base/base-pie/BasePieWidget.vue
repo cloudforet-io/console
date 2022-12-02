@@ -18,9 +18,8 @@
 
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
-                           :items="state.chartData"
+                           :items="state.tableItems"
                            show-legend
-                           show-legend-index
                            :legends="state.legends"
                            :currency="state.options.currency"
                            :currency-rates="props.currencyRates"
@@ -40,7 +39,11 @@ import { random } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import type { Field, LegendConfig } from '@/services/dashboards/widgets/_components/type';
+import type {
+    Field,
+    LegendConfig,
+    TableItem,
+} from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
@@ -76,6 +79,13 @@ const state = reactive({
         if (!state.data) return [];
         return state.data;
     }),
+    tableItems: computed<TableItem[]>(() => state.chartData.map((d) => {
+        d[state.tableFields[0].name] = {
+            icon: 'ic_tree_project-group',
+            name: d[state.tableFields[0].name],
+        };
+        return d;
+    })),
     tableFields: computed<Field[]>(() => [
         {
             label: state.groupByLabel,
@@ -83,7 +93,7 @@ const state = reactive({
             tooltipText: 'test tooltip',
         },
         {
-            label: 'Cost', name: 'usd_cost', type: 'cost', styleOptions: { align: 'right' },
+            label: 'Cost', name: 'usd_cost', type: 'cost', textAlign: 'right',
         },
     ]),
     legends: computed<LegendConfig[]>(() => state.chartData.map((i) => ({

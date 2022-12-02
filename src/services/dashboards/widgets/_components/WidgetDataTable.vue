@@ -24,7 +24,7 @@
                             >
                                 <span class="th-contents"
                                       :class="{
-                                          [field?.styleOptions?.align || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                          [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
                                           'has-icon': field.tooltipText,
                                       }"
                                 >
@@ -64,7 +64,7 @@
                                 :key="`td-${widgetKey}-${rowIndex}-${colIndex}`"
                                 :class="{
                                     'has-width': !!field.width,
-                                    [field?.styleOptions?.align || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                    [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
                                 }"
                             >
                                 <slot :name="`col-${field.name}`"
@@ -80,7 +80,13 @@
                                                       @click.stop="handleClickLegend(rowIndex)"
                                             />
                                         </template>
-
+                                        <template v-if="item[field?.name]?.icon">
+                                            <p-i :name="item[field?.name]?.icon"
+                                                 :width="'1rem'"
+                                                 :height="'1rem'"
+                                                 class="icon"
+                                            />
+                                        </template>
                                         <slot :name="`col-${colIndex}-text`"
                                               v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                         >
@@ -131,7 +137,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
-import type { Field, LegendConfig } from '@/services/dashboards/widgets/_components/type';
+import type { Field, LegendConfig, TableItem } from '@/services/dashboards/widgets/_components/type';
 
 import { GROUP_BY } from '../config';
 
@@ -166,7 +172,7 @@ export default defineComponent<Props>({
             default: () => ([]),
         },
         items: {
-            type: Array,
+            type: Array as PropType<TableItem[]>,
             default: () => ([]),
         },
         thisPage: {
@@ -235,7 +241,11 @@ export default defineComponent<Props>({
         });
         const getValue = (item, field: Field) => {
             if (typeof item === 'object') {
-                return get(item, field.name);
+                const itemValue = get(item, field.name);
+                if (typeof itemValue === 'object') {
+                    return itemValue?.label ?? itemValue?.name;
+                }
+                return itemValue;
             }
             return item;
         };
@@ -335,12 +345,10 @@ export default defineComponent<Props>({
     td {
         @apply h-10 px-4 z-0 align-middle min-w-28 text-sm;
         .td-contents {
+            @apply flex gap-2;
             .toggle-button {
                 cursor: pointer;
-                > .text {
-                    flex-shrink: 0;
-                    white-space: nowrap;
-                }
+                margin-right: -0.25rem;
             }
         }
         &.has-width {
