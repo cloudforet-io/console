@@ -32,7 +32,6 @@
 
 <script lang="ts">
 import {
-    computed,
     reactive, toRefs,
 } from 'vue';
 
@@ -41,10 +40,10 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
 
 import AllDashboardsSelectFilter from '@/services/dashboards/all-dashboards/modules/AllDashboardsSelectFilter.vue';
 import DashboardBoardList from '@/services/dashboards/all-dashboards/modules/DashboardBoardList.vue';
+import { SCOPE_TYPE, VIEWERS_TYPE } from '@/services/dashboards/all-dashboards/type';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 export default {
@@ -61,9 +60,9 @@ export default {
         const state = reactive({
             keyword: '',
             queryForSearch: {},
-            viewersStatus: { label: i18n.t('All'), name: 'ALL' },
-            scopeStatus: { label: i18n.t('All'), name: 'ALL' },
-            workspaceDashboardList: computed(() => [
+            viewersStatus: VIEWERS_TYPE.ALL,
+            scopeStatus: SCOPE_TYPE.ALL,
+            workspaceDashboardList: [
                 {
                     domain_dashboard_id: '123',
                     name: 'Cafe Gondry',
@@ -94,8 +93,8 @@ export default {
                     created_at: '',
                     updated_at: '',
                 },
-            ]),
-            projectDashboardList: computed(() => [
+            ],
+            projectDashboardList: [
                 {
                     domain_dashboard_id: '1234',
                     name: 'Cafe Gondry33',
@@ -141,7 +140,7 @@ export default {
                     created_at: '',
                     updated_at: '',
                 },
-            ]),
+            ],
         });
 
         const handleCreateDashboard = () => { SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME }); };

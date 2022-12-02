@@ -22,22 +22,27 @@
                 <p class="board-item-description">
                     What item I fill in this area?
                 </p>
-                <p-label :class="{'viewers-label': true, 'private-label': board.viewers === 'PRIVATE'}"
-                         :text="board.viewers === 'PUBLIC' ? 'Public' : 'Private'"
-                         :left-icon="board.viewers === 'PUBLIC' ? 'ic_public' : 'ic_private'"
-                />
-                <p-label v-for="(label, idx) in board.labels"
-                         :key="`${board.domain_dashboard_id}-label-${idx}`"
-                         :text="label"
-                         clickable
-                />
+                <div class="label-wrapper">
+                    <p-label :class="{'viewers-label': true, 'private-label': board.viewers === 'PRIVATE'}"
+                             :text="board.viewers === 'PUBLIC' ? 'Public' : 'Private'"
+                             :left-icon="board.viewers === 'PUBLIC' ? 'ic_public' : 'ic_private'"
+                    />
+                    <p-label v-for="(label, idx) in board.labels"
+                             :key="`${board.domain_dashboard_id}-label-${idx}`"
+                             :text="label"
+                             clickable
+                    />
+                </div>
             </template>
         </p-board>
     </div>
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+import type { PropType } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
 
 import { PBoard, PFieldTitle, PLabel } from '@spaceone/design-system';
 
@@ -45,7 +50,13 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
-export default {
+interface DashboardBoardListProps {
+    fieldTitle: string;
+    // TODO: implementation
+    dashboardList: any[];
+}
+
+export default defineComponent<DashboardBoardListProps>({
     name: 'DashboardBoardList',
     components: {
         PLabel, FavoriteButton, PBoard, PFieldTitle,
@@ -56,7 +67,7 @@ export default {
             default: undefined,
         },
         dashboardList: {
-            type: Array,
+            type: Array as PropType<any[]>,
             default: () => [],
         },
     },
@@ -84,7 +95,7 @@ export default {
             FAVORITE_TYPE,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
@@ -122,6 +133,10 @@ export default {
             line-height: 1.25;
             color: gray;
             margin: 0.25rem 0 0.75rem;
+        }
+
+        .label-wrapper {
+            @apply flex items-center;
         }
 
         /* custom design-system component - p-label */
