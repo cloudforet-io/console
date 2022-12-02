@@ -24,7 +24,14 @@
                            :currency="state.options.currency"
                            :currency-rates="props.currencyRates"
                            :size="'md'"
-        />
+        >
+            <template #detail-provider>
+                This is test popover content
+            </template>
+            <template #detail-usd_cost>
+                This is test popover content2
+            </template>
+        </widget-data-table>
     </widget-frame>
 </template>
 
@@ -86,6 +93,10 @@ const state = reactive({
             tooltipText: 'test tooltip',
             icon: (item) => (item?.provider.length > 4 ? 'ic_tree_project-group' : 'ic_tree_project'),
             link: '/home-dashboard',
+            detailOptions: {
+                enabled: true,
+                type: 'popover',
+            },
         },
         {
             label: 'Cost',
@@ -93,6 +104,10 @@ const state = reactive({
             type: 'cost',
             textAlign: 'right',
             textType: 'percent',
+            detailOptions: {
+                enabled: true,
+                type: 'popover',
+            },
             rapidIncrease: (item) => item?.usd_cost > 30000,
         },
     ]),
