@@ -5,7 +5,7 @@
     >
         <div class="widget-header">
             <h3 class="title">
-                {{ title }} {{ theme }}
+                {{ title }}
             </h3><slot name="header-right" />
         </div>
         <div class="body">
@@ -81,7 +81,6 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { WidgetOptions, WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
 
 interface Props {
     title: TranslateResult;
@@ -100,7 +99,6 @@ interface Props {
     disableEditIcon: boolean;
     disableDeleteIcon: boolean;
     isFull: boolean;
-    theme: WidgetTheme;
 }
 
 interface IconConfig {
@@ -183,10 +181,6 @@ export default defineComponent<Props>({
         isFull: {
             type: Boolean,
             default: false,
-        },
-        theme: {
-            type: String as PropType<WidgetTheme>,
-            default: undefined,
         },
     },
     setup(props, { emit }: SetupContext) {
