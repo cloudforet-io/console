@@ -130,8 +130,6 @@ interface CountMap {
     [key: string]: number | string;
 }
 
-const BOX_SWITCH_INTERVAL = 10000;
-
 export default {
     name: 'AllSummary',
     components: {
@@ -287,19 +285,6 @@ export default {
             chart.cursor.behavior = 'none';
         };
 
-        let tabInterval;
-        const setTabInterval = () => {
-            tabInterval = setInterval(() => {
-                disposeChart(state.chartRef);
-                let activeTabIndex = state.tabs.findIndex((d) => d.name === state.activeTab);
-                if (activeTabIndex < 3) {
-                    activeTabIndex += 1;
-                } else {
-                    activeTabIndex = 0;
-                }
-                state.activeTab = state.tabs[activeTabIndex].name as DataType;
-            }, BOX_SWITCH_INTERVAL);
-        };
         const setChartData = (data) => {
             const chartData: ChartData[] = [];
             const dateType = state.selectedDateType;
@@ -469,11 +454,9 @@ export default {
         const handleChangeTab = (name) => {
             if (state.activeTab !== name) disposeChart(state.chartRef);
             state.activeTab = name;
-            if (tabInterval) clearInterval(tabInterval);
         };
         const handleChangeDateType = (type) => {
             state.selectedDateType = type;
-            if (tabInterval) clearInterval(tabInterval);
         };
 
         const init = async () => {
@@ -481,7 +464,6 @@ export default {
                 getCount(),
                 getBillingCount(),
             ]);
-            setTabInterval();
         };
         const chartInit = async () => {
             await getTrend(DATA_TYPE.SERVER);
