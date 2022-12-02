@@ -1,5 +1,7 @@
 import type { RouteConfig } from 'vue-router';
 
+import { MENU_ID } from '@/lib/menu/config';
+
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const DashboardsContainer = () => import('@/services/dashboards/DashboardsContainer.vue');
@@ -20,11 +22,13 @@ const dashboardsRoute: RouteConfig = {
         {
             path: '/',
             component: { template: '<router-view/>' },
+            meta: { menuId: MENU_ID.DASHBOARDS },
             children: [
                 {
                     path: 'all',
                     name: DASHBOARDS_ROUTE.ALL._NAME,
-                    meta: { lnbVisible: true },
+                    // song lang
+                    meta: { lnbVisible: true, translationId: 'DASHBOARDS.ALL' },
                     component: AllDashboardsPage,
                 },
                 {
