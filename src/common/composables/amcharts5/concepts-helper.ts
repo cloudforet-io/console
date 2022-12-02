@@ -1,5 +1,7 @@
-import type { IBulletSettings, Root } from '@amcharts/amcharts5';
 import * as am5 from '@amcharts/amcharts5';
+import type {
+    IBulletSettings, ICircleSettings, Root, Circle,
+} from '@amcharts/amcharts5';
 
 import { DEFAULT_DATE_FIELD_NAME, DEFAULT_DATE_FORMAT } from '@/common/composables/amcharts5/config';
 
@@ -61,3 +63,7 @@ export const createLegend = (root: Root, settings?: am5.ILegendSettings): am5.Le
 export const createBullet = (root: Root, settings: IBulletSettings): am5.Bullet => am5.Bullet.new(root, {
     ...settings,
 });
+
+export const createCircle = (root: Root, settings: ICircleSettings, circleTemplate: am5.Template<Circle>): am5.Circle => am5.Circle.new(root, {
+    ...settings,
+}, circleTemplate);
