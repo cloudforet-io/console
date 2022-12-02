@@ -1,27 +1,27 @@
 import { describe, expect } from 'vitest';
 
 import {
-    WIDGET_FRAME_CONTAINER_MAX_WIDTH,
-    WIDGET_FRAME_CONTAINER_MIN_WIDTH,
+    WIDGET_CONTAINER_MAX_WIDTH,
+    WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
-import { widgetFrameWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
-import type { WidgetFrameSize } from '@/services/dashboards/dashboard-detail/lib/type';
+import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
+import type { WidgetSize } from '@/services/dashboards/dashboard-detail/lib/type';
 
 
 /**
  * For manual test
  * */
 const _MANUAL_CONTAINER_WIDTH = 1360;
-const _MANUAL_WIDGET_FRAME_SELECT: Array<WidgetFrameSize> = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
-// WidgetFrame Array would be shift(), so length should be saved
-const _MANUAL_WIDGET_FRAME_LENGTH = _MANUAL_WIDGET_FRAME_SELECT.length;
+const MANUAL_WIDGET_SELECT: Array<WidgetSize> = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
+// Widget Array would be shift(), so length should be saved
+const _MANUAL_WIDGET_LENGTH = MANUAL_WIDGET_SELECT.length;
 
-describe(`WidgetFrame test with ${_MANUAL_WIDGET_FRAME_SELECT} in ${_MANUAL_CONTAINER_WIDTH}`, () => {
-    it('Count of widgetFrames should not be changed after assigning its width', () => {
-        let outputWidgetFrameCount = 0;
-        widgetFrameWidthAssigner(_MANUAL_WIDGET_FRAME_SELECT, _MANUAL_CONTAINER_WIDTH)
-            .forEach((d) => { outputWidgetFrameCount += d.length; });
-        expect(_MANUAL_WIDGET_FRAME_LENGTH).toEqual(outputWidgetFrameCount);
+describe(`Widget test with ${MANUAL_WIDGET_SELECT} in ${_MANUAL_CONTAINER_WIDTH}`, () => {
+    it('Count of widget should not be changed after assigning its width', () => {
+        let outputWidgetCount = 0;
+        widgetWidthAssigner(MANUAL_WIDGET_SELECT, _MANUAL_CONTAINER_WIDTH)
+            .forEach((d) => { outputWidgetCount += d.length; });
+        expect(_MANUAL_WIDGET_LENGTH).toEqual(outputWidgetCount);
     });
 });
 
@@ -30,7 +30,7 @@ describe(`WidgetFrame test with ${_MANUAL_WIDGET_FRAME_SELECT} in ${_MANUAL_CONT
  * For automatic every tests
  * */
 
-// Selecting all collections of widgetFrames
+// Selecting all collections of widgets
 function permutation(arr, selectNum) {
     const result: Array<string> = [];
     if (selectNum === 1) return arr.map((v) => [v]);
@@ -49,41 +49,41 @@ function permutation(arr, selectNum) {
 // for more specific test, please scale up the AMOUNT.
 const _SELECT_WIDGET_AMOUNT = 2;
 // e.g) [['SM', 'SM', 'MD'], ['SM', 'SM', 'LG'] ...]
-const widgetFrameCases: Array<Array<WidgetFrameSize>> = permutation(['SM', 'MD', 'LG', 'XL', 'FULL'], _SELECT_WIDGET_AMOUNT);
-const widgetFrameCasesLength = widgetFrameCases.length;
+const widgetCases: Array<Array<WidgetSize>> = permutation(['SM', 'MD', 'LG', 'XL', 'FULL'], _SELECT_WIDGET_AMOUNT);
+const widgetCasesLength = widgetCases.length;
 
-describe('Select widgetFrames as permutation', () => {
-    it('Count of selected widgetFrames would be (5 ** _SELECT_WIDGET_AMOUNT)', () => {
-        expect(widgetFrameCases.length).toBe(5 ** _SELECT_WIDGET_AMOUNT);
+describe('Select widgets as permutation', () => {
+    it('Count of selected widgets would be (5 ** _SELECT_WIDGET_AMOUNT)', () => {
+        expect(widgetCases.length).toBe(5 ** _SELECT_WIDGET_AMOUNT);
     });
 });
 
-describe('Assign width for permutation selected widgetFrames', () => {
-    let assignedWidgetFrameCasesCount = 0;
-    let rowWidgetFrameWidthSum = 0;
+describe('Assign width for permutation selected widgets', () => {
+    let assignedWidgetCasesCount = 0;
+    let rowWidgetWidthSum = 0;
 
-    it('Count of widgetFrames should not be changed after assigning its width', () => {
-        for (let caseCount = 0; caseCount < widgetFrameCasesLength; caseCount += 1) {
-            for (let containerWidth = WIDGET_FRAME_CONTAINER_MIN_WIDTH; containerWidth <= WIDGET_FRAME_CONTAINER_MAX_WIDTH; containerWidth += 80) {
-                assignedWidgetFrameCasesCount = 0;
-                const selectedCase = [...widgetFrameCases[caseCount]];
+    it('Count of widgets should not be changed after assigning its width', () => {
+        for (let caseCount = 0; caseCount < widgetCasesLength; caseCount += 1) {
+            for (let containerWidth = WIDGET_CONTAINER_MIN_WIDTH; containerWidth <= WIDGET_CONTAINER_MAX_WIDTH; containerWidth += 80) {
+                assignedWidgetCasesCount = 0;
+                const selectedCase = [...widgetCases[caseCount]];
 
                 // eslint-disable-next-line no-loop-func
-                widgetFrameWidthAssigner(selectedCase, containerWidth).forEach((row) => {
-                    assignedWidgetFrameCasesCount += row.length;
+                widgetWidthAssigner(selectedCase, containerWidth).forEach((row) => {
+                    assignedWidgetCasesCount += row.length;
                     row.forEach((element) => {
-                        rowWidgetFrameWidthSum += element;
+                        rowWidgetWidthSum += element;
                     });
                 });
 
                 // eslint-disable-next-line no-loop-func
-                it(`Output in containerWidth = ${containerWidth} would be ${assignedWidgetFrameCasesCount}`, () => {
-                    expect(assignedWidgetFrameCasesCount).toBe(widgetFrameCases[caseCount]);
+                it(`Output in containerWidth = ${containerWidth} would be ${assignedWidgetCasesCount}`, () => {
+                    expect(assignedWidgetCasesCount).toBe(widgetCases[caseCount]);
                 });
 
                 // eslint-disable-next-line no-loop-func
-                it('Each row sum of widgetFrames should not bigger than containerWidth', () => {
-                    expect(rowWidgetFrameWidthSum).lessThanOrEqual(containerWidth);
+                it('Each row sum of widgets should not bigger than containerWidth', () => {
+                    expect(rowWidgetWidthSum).lessThanOrEqual(containerWidth);
                 });
             }
         }
