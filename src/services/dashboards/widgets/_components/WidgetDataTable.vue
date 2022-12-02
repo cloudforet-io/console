@@ -6,12 +6,8 @@
                        show-data-from-scratch
         >
             <template #no-data>
-                <div class="no-data-wrapper"
-                     :style="{minHeight: noDataMinHeight}"
-                >
-                    <!--                    song-lang-->
-                    {{ $t('No Data') }}
-                </div>
+                <!--                    song-lang-->
+                {{ $t('No Data') }}
             </template>
             <table>
                 <thead>
@@ -150,7 +146,6 @@ interface Props {
     currency?: Currency;
     currencyRates?: CurrencyRates;
     showPagination?: boolean;
-    noDataMinHeight?: string;
     widgetKey: string;
 }
 export default defineComponent<Props>({
@@ -201,10 +196,6 @@ export default defineComponent<Props>({
         showPagination: {
             type: Boolean,
             default: true,
-        },
-        noDataMinHeight: {
-            type: String,
-            default: '7rem',
         },
         widgetKey: {
             type: String,
@@ -291,9 +282,6 @@ export default defineComponent<Props>({
 .widget-data-table {
     .table-container {
         @apply overflow-auto h-full w-full;
-        .no-data-wrapper {
-            @apply flex justify-center items-center;
-        }
     }
     table {
         @apply min-w-full;

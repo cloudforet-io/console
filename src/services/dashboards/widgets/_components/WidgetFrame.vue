@@ -8,7 +8,9 @@
                 {{ title }}
             </h3><slot name="header-right" />
         </div>
-        <div class="body">
+        <div class="body"
+             :style="{overflowY}"
+        >
             <slot />
         </div>
         <div class="widget-footer">
@@ -182,6 +184,10 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
+        overflowY: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const { i18nDayjs } = useI18nDayjs();
@@ -266,7 +272,6 @@ export default defineComponent<Props>({
     .body {
         height: auto;
         flex: 1 1;
-        overflow-y: scroll;
     }
     .widget-footer {
         @apply border-t rounded-b-lg bg-gray-100;
