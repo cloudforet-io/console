@@ -12,7 +12,7 @@
                 :key="`widget-row-${rowIndex}-${colIndex}`"
                 :width="width"
                 :is-full="containerWidth === width"
-                :widget-index="widgetList[rowIndex][colIndex]"
+                :widget-index="widgetIndexList[rowIndex][colIndex]"
                 @click-expand-icon="handleExpand"
             />
         </div>
@@ -29,8 +29,10 @@ import {
     WIDGET_CONTAINER_MAX_WIDTH,
     WIDGET_CONTAINER_MIN_WIDTH, WIDGET_WIDTH_FULL,
 } from '@/services/dashboards/dashboard-detail/lib/config';
-import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
-import type { WidgetSize } from '@/services/dashboards/dashboard-detail/lib/type';
+import type { WidgetThemeAssignedList } from '@/services/dashboards/dashboard-detail/lib/themeHelper';
+import { widgetThemeAssigner } from '@/services/dashboards/dashboard-detail/lib/themeHelper';
+import type { WidgetSize, WidgetThemeOption } from '@/services/dashboards/dashboard-detail/lib/type';
+import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/widthHelper';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 
 
@@ -44,13 +46,20 @@ export default defineComponent({
             type: Array as PropType<Array<WidgetSize>>,
             default: () => ([]),
         },
+        widgetThemeOptionList: {
+            type: Array as PropType<Array<WidgetThemeOption>>,
+            default: () => ([]),
+        },
     },
     setup(props) {
         const state = reactive({
+            // width
             containerWidth: WIDGET_CONTAINER_MIN_WIDTH,
             widgetSizeList: props.widgetSizeList,
             widgetWidthList: [] as Array<Array<number>>,
-            widgetList: [] as Array<Array<number>>,
+            widgetIndexList: [] as Array<Array<number>>,
+            // theme
+            widgetThemeList: [] as WidgetThemeAssignedList,
         });
         const containerRef = ref<Element|null>(null);
 
@@ -78,6 +87,7 @@ export default defineComponent({
             state.widgetSizeList = [..._widgetSizeList];
         };
 
+
         let timer: undefined|number;
         const handleResizeObserve = () => {
             // timeouts for throttle
@@ -101,12 +111,19 @@ export default defineComponent({
             observeInstance.unobserve(containerRef?.value as Element);
         });
 
+        // for width realignment
         watch([() => state.containerWidth, () => state.widgetSizeList], ([containerWidth, widgetSizeList]) => {
             state.widgetWidthList = widgetWidthAssigner(widgetSizeList, refineContainerWidth(containerWidth));
 
             let widgetIndex = -1;
-            state.widgetList = state.widgetWidthList.map((d) => d.map(() => { widgetIndex += 1; return widgetIndex; }));
+            state.widgetIndexList = state.widgetWidthList.map((d) => d.map(() => { widgetIndex += 1; return widgetIndex; }));
         });
+
+        // for theme align
+        watch(() => state.widgetSizeList, () => {
+            state.widgetThemeList = widgetThemeAssigner(props.widgetThemeOptionList);
+            console.log(state.widgetThemeList);
+        }, { immediate: true });
 
         return {
             containerRef,
