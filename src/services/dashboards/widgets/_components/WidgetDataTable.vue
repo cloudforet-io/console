@@ -278,17 +278,15 @@ export default defineComponent<Props>({
             field, index: colIndex, colIndex,
         });
         const textFormatter = (value:string|number, textType: Field['textType']) => {
-            if (typeof value === 'number') {
-                if (textType === 'size') {
-                    return byteFormatter(value);
-                } if (textType === 'cost') {
-                    return currencyMoneyFormatter(value, props.currency, props.currencyRates);
-                } if (textType === 'number') {
-                    return numberFormatter(value);
-                } if (textType === 'percent') {
-                    return `${value}%`;
-                }
-                return value;
+            if (typeof value !== 'number') return value;
+            if (textType === 'size') {
+                return byteFormatter(value);
+            } if (textType === 'cost') {
+                return currencyMoneyFormatter(value, props.currency, props.currencyRates);
+            } if (textType === 'number') {
+                return numberFormatter(value);
+            } if (textType === 'percent') {
+                return `${value}%`;
             }
             return value;
         };
