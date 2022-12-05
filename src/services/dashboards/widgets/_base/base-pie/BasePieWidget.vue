@@ -26,6 +26,7 @@
                            size="md"
                            :disable-next-page="state.limit"
                            :this-page.sync="state.thisPage"
+                           @toggle-legend="handleToggleLegend"
         >
             <template #detail-provider>
                 This is test popover content
@@ -71,7 +72,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const {
     createPieChart, createDonutChart, createPieSeries,
     createTooltip, setPieTooltipText,
-    disposeRoot, refreshRoot, setChartColors,
+    disposeRoot, refreshRoot, setChartColors, toggleSeries,
 } = useAmcharts5(chartContext);
 
 const state = reactive({
@@ -168,6 +169,10 @@ const drawChart = (chartData: ChartData[]) => {
 //     if (!state.series) return;
 //     state.series.data.setAll(chartData);
 // };
+
+const handleToggleLegend = (index) => {
+    toggleSeries(state.chart, index);
+};
 
 const initWidget = async () => {
     state.loading = true;
