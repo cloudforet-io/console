@@ -27,7 +27,7 @@
 
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
-                           :items="state.chartData"
+                           :items="state.data"
                            :currency="state.options.currency"
                            :currency-rates="props.currencyRates"
         />
