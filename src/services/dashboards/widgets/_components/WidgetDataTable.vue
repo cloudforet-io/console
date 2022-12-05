@@ -326,7 +326,7 @@ export default defineComponent<Props>({
         /* event */
         const handleClickLegend = (index) => {
             // if (props.printMode) return;
-            emit('toggle-legend', props.legends[index]);
+            emit('toggle-legend', index);
         };
         const handleClickRow = (rowData) => {
             // if (props.printMode) return;
