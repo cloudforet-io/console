@@ -6,16 +6,18 @@
                        :disabled="thisPage === 1"
                        @click="update(thisPage-1)"
         />
-        <div v-if="showPageNumber" class="page-number">
+        <div v-if="showPageNumber"
+             class="page-number"
+        >
             <div class="page-number-text">
-                <span class="this-page">{{ thisPage }}</span> / <span>{{ allPage }}</span>
+                <span class="this-page">{{ thisPage }}</span><span v-if="allPage"> / {{ allPage }}</span>
             </div>
         </div>
 
         <p-icon-button class="text"
                        name="ic_arrow_right"
                        color="inherit transparent"
-                       :disabled="thisPage === allPage"
+                       :disabled="thisPage === allPage || disableNextPage"
                        @click="update(thisPage+1)"
         />
     </nav>
@@ -44,6 +46,10 @@ export default {
             default: undefined,
         },
         showPageNumber: {
+            type: Boolean,
+            default: true,
+        },
+        disableNextPage: {
             type: Boolean,
             default: true,
         },

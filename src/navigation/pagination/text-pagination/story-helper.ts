@@ -53,4 +53,22 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    disableNextPage: {
+        name: 'disableNextPage',
+        type: { name: 'boolean' },
+        description: 'This prop used only for "only this page number". When allPage is undefined, you can use disableNextPage to activate the next icons',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
 });
