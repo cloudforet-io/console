@@ -1,3 +1,10 @@
+# [1.1.0-beta.460](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.459...v1.1.0-beta.460) (2022-12-05)
+
+
+### Features
+
+* **data-loader:** add isEmpty slot prop ([#144](https://github.com/cloudforet-io/mirinae/issues/144)) ([97bd5e7](https://github.com/cloudforet-io/mirinae/commit/97bd5e73d54b8dcf0a3dea104413c694280017d0))
+
 # [1.1.0-beta.459](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.458...v1.1.0-beta.459) (2022-11-29)
 
 
