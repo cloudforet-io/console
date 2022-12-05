@@ -23,7 +23,9 @@
                            :legends="state.legends"
                            :currency="state.options.currency"
                            :currency-rates="props.currencyRates"
-                           :size="'md'"
+                           size="md"
+                           :disable-next-page="state.limit"
+                           :this-page.sync="state.thisPage"
         >
             <template #detail-provider>
                 This is test popover content
@@ -114,6 +116,8 @@ const state = reactive({
     legends: computed<LegendConfig[]>(() => state.chartData.map((i) => ({
         name: i.provider,
     }))),
+    thisPage: 1,
+    limit: computed(() => state.thisPage > 3),
 });
 
 // TODO: api binding
