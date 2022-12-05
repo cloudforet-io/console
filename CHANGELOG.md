@@ -1,3 +1,10 @@
+# [1.1.0-beta.461](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.460...v1.1.0-beta.461) (2022-12-05)
+
+
+### Features
+
+* **text-pagination:** add "only this page number" type to pagination ([#146](https://github.com/cloudforet-io/mirinae/issues/146)) ([5ade03a](https://github.com/cloudforet-io/mirinae/commit/5ade03a782170de9db1dbb46eab93ab9e58fe384))
+
 # [1.1.0-beta.460](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.459...v1.1.0-beta.460) (2022-12-05)
 
 
