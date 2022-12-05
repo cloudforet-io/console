@@ -24,7 +24,14 @@
                            :currency="state.options.currency"
                            :currency-rates="props.currencyRates"
                            :size="'md'"
-        />
+        >
+            <template #detail-provider>
+                This is test popover content
+            </template>
+            <template #detail-usd_cost>
+                This is test popover content2
+            </template>
+        </widget-data-table>
     </widget-frame>
 </template>
 
@@ -86,13 +93,22 @@ const state = reactive({
             tooltipText: 'test tooltip',
             icon: (item) => (item?.provider.length > 4 ? 'ic_tree_project-group' : 'ic_tree_project'),
             link: '/home-dashboard',
+            detailOptions: {
+                enabled: true,
+                type: 'popover',
+            },
         },
         {
             label: 'Cost',
             name: 'usd_cost',
             type: 'cost',
             textAlign: 'right',
-            rapidIncrease: (item) => item?.usd_cost > 3000,
+            textType: 'percent',
+            detailOptions: {
+                enabled: true,
+                type: 'popover',
+            },
+            rapidIncrease: (item) => item?.usd_cost > 30000,
         },
     ]),
     legends: computed<LegendConfig[]>(() => state.chartData.map((i) => ({
@@ -105,19 +121,19 @@ const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
     setTimeout(() => {
         resolve([{
             provider: 'google cloud',
-            usd_cost: random(1000, 5000),
+            usd_cost: random(10000, 50000),
         },
         {
             provider: 'aws',
-            usd_cost: random(1000, 5000),
+            usd_cost: random(10000, 50000),
         },
         {
             provider: 'azure',
-            usd_cost: random(1000, 5000),
+            usd_cost: random(10000, 50000),
         },
         {
             provider: 'alibaba',
-            usd_cost: random(1000, 5000),
+            usd_cost: random(10000, 50000),
         },
         ]);
     }, 1000);

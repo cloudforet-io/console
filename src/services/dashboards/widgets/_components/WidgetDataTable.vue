@@ -66,48 +66,63 @@
                                     'has-width': !!field.width,
                                     [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
                                     [size]: true,
-                                    'link-item': item[field?.name]?.link,
+                                    'link-item': field?.link,
+                                    'detail-item': field?.detailOptions?.enabled,
                                 }"
                             >
                                 <slot :name="`col-${field.name}`"
                                       v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                 >
-                                    <span class="td-contents">
-                                        <template v-if="colIndex === 0 && showLegend">
-                                            <p-status v-if="showLegend"
-                                                      class="toggle-button"
-                                                      :text="showLegendIndex ? (getConvertedIndex(rowIndex) + 1)?.toString() : ''"
-                                                      :icon-color="getLegendIconColor(rowIndex)"
-                                                      :text-color="getLegendTextColor(rowIndex)"
-                                                      @click.stop="handleClickLegend(rowIndex)"
-                                            />
-                                        </template>
-                                        <template v-if="field?.icon">
-                                            <p-i :name="getHandler(field.icon, item)"
-                                                 width="1rem"
-                                                 height="1rem"
-                                                 class="icon"
-                                            />
-                                        </template>
-                                        <slot :name="`col-${colIndex}-text`"
-                                              v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
-                                        >
-                                            <router-link v-if="getHandler(field.link, item)"
-                                                         :to="getHandler(field.link, item)"
-                                                         class="link"
+                                    <div class="detail-item-wrapper">
+                                        <span class="td-contents">
+                                            <template v-if="colIndex === 0 && showLegend">
+                                                <p-status v-if="showLegend"
+                                                          class="toggle-button"
+                                                          :text="showLegendIndex ? (getConvertedIndex(rowIndex) + 1)?.toString() : ''"
+                                                          :icon-color="getLegendIconColor(rowIndex)"
+                                                          :text-color="getLegendTextColor(rowIndex)"
+                                                          @click.stop="handleClickLegend(rowIndex)"
+                                                />
+                                            </template>
+                                            <template v-if="field?.icon">
+                                                <p-i :name="getHandler(field.icon, item)"
+                                                     width="1rem"
+                                                     height="1rem"
+                                                     class="icon"
+                                                />
+                                            </template>
+                                            <slot :name="`col-${colIndex}-text`"
+                                                  v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                             >
-                                                {{ getValue(item, field) }}
-                                            </router-link>
-                                            <div v-else-if="getHandler(field.rapidIncrease, item)"
-                                                 class="rapid-increase"
-                                            ><span>{{ getValue(item, field) }}</span> <p-i name="ic_bold-arrow-up"
-                                                                                           width="1rem"
-                                                                                           height="1rem"
-                                            />
-                                            </div>
-                                            <span v-else>{{ getValue(item, field) }}</span>
-                                        </slot>
-                                    </span>
+                                                <router-link v-if="getHandler(field.link, item)"
+                                                             :to="getHandler(field.link, item)"
+                                                             class="link"
+                                                >
+                                                    {{ getValue(item, field) }}
+                                                </router-link>
+                                                <div v-else-if="getHandler(field.rapidIncrease, item)"
+                                                     class="rapid-increase"
+                                                ><span>{{ getValue(item, field) }}</span> <p-i name="ic_bold-arrow-up"
+                                                                                               width="1rem"
+                                                                                               height="1rem"
+                                                />
+                                                </div>
+                                                <span v-else>{{ getValue(item, field) }}</span>
+                                            </slot>
+                                        </span>
+                                        <template v-if="field?.detailOptions?.enabled">
+                                            <p-popover position="bottom">
+                                                <span class="detail">Details</span><!--song-lang-->
+                                                <template #content>
+                                                    <div class="popover-content">
+                                                        <slot :name="`detail-${field.name}`"
+                                                              v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                                        />
+                                                    </div>
+                                                </template>
+                                            </p-popover>
+                                        </template>
+                                    </div>
                                 </slot>
                             </td>
                         </tr>
@@ -134,7 +149,7 @@ import {
 import type { PropType } from 'vue';
 
 import {
-    PI, PDataLoader, PTooltip, PStatus,
+    PI, PDataLoader, PTooltip, PStatus, PPopover,
 } from '@spaceone/design-system';
 import { DATA_TABLE_CELL_TEXT_ALIGN } from '@spaceone/design-system/src/data-display/tables/data-table/config';
 import { get } from 'lodash';
@@ -175,6 +190,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'WidgetDataTable',
     components: {
+        PPopover,
         PTooltip,
         PI,
         PDataLoader,
@@ -261,11 +277,24 @@ export default defineComponent<Props>({
         const getHeadSlotProps = (field, colIndex) => ({
             field, index: colIndex, colIndex,
         });
-        const getValue = (item, field: Field) => {
-            if (typeof item === 'object') {
-                return get(item, field.name);
+        const textFormatter = (value:string|number, textType: Field['textType']) => {
+            if (typeof value !== 'number') return value;
+            if (textType === 'size') {
+                return byteFormatter(value);
+            } if (textType === 'cost') {
+                return currencyMoneyFormatter(value, props.currency, props.currencyRates);
+            } if (textType === 'number') {
+                return numberFormatter(value);
+            } if (textType === 'percent') {
+                return `${value}%`;
             }
-            return item;
+            return value;
+        };
+        const getValue = (item:string|number|object, field: Field):string|number => {
+            if (typeof item === 'object') {
+                return textFormatter(get(item, field.name), field.textType);
+            }
+            return textFormatter(item, field.textType);
         };
         const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
             if (typeof option === 'string' || typeof option === 'boolean') {
@@ -339,6 +368,7 @@ export default defineComponent<Props>({
         font-weight: 700;
         letter-spacing: 0;
         white-space: nowrap;
+
         .th-contents {
             @apply flex justify-between pl-4;
             line-height: 2;
@@ -353,6 +383,7 @@ export default defineComponent<Props>({
         .tooltip-icon {
             @apply float-right my-px;
         }
+
         &.fix-width {
             @apply min-w-19;
         }
@@ -370,17 +401,29 @@ export default defineComponent<Props>({
     }
     td {
         @apply px-4 z-0 align-middle min-w-28 text-sm;
-        .td-contents {
-            @apply inline-flex gap-2;
-            .toggle-button {
-                cursor: pointer;
-                margin-right: -0.25rem;
+        .detail-item-wrapper {
+            @apply flex justify-between items-center;
+
+            .td-contents {
+                @apply inline-flex gap-2;
+
+                .toggle-button {
+                    cursor: pointer;
+                    margin-right: -0.25rem;
+                }
+
+                .rapid-increase {
+                    @apply text-red-500 inline-flex justify-center gap-1;
+                }
+
+                .link {
+                    @apply text-blue-600 underline;
+                    cursor: pointer;
+                }
             }
-            .rapid-increase {
-                @apply text-red-500 inline-flex justify-center gap-1;
-            }
-            .link {
-                @apply text-blue-600 underline;
+
+            .detail {
+                @apply text-blue-700;
                 cursor: pointer;
             }
         }
