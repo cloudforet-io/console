@@ -143,7 +143,9 @@
         <div v-if="showPagination"
              class="table-pagination-wrapper"
         >
-            this page : {{ proxyThisPage }}
+            <p-text-pagination :this-page.sync="proxyThisPage"
+                               :disable-next-page="disableNextPage"
+            />
         </div>
     </div>
 </template>
@@ -156,7 +158,7 @@ import {
 import type { PropType } from 'vue';
 
 import {
-    PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover,
+    PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
 } from '@spaceone/design-system';
 import { DATA_TABLE_CELL_TEXT_ALIGN } from '@spaceone/design-system/src/data-display/tables/data-table/config';
 import { get } from 'lodash';
@@ -193,6 +195,7 @@ interface Props {
     currencyRates?: CurrencyRates;
     showPagination?: boolean;
     widgetKey: string;
+    disableNextPage: boolean;
 }
 export default defineComponent<Props>({
     name: 'WidgetDataTable',
@@ -203,6 +206,7 @@ export default defineComponent<Props>({
         PDataLoader,
         PStatus,
         PEmpty,
+        PTextPagination,
     },
     props: {
         loading: {
@@ -252,6 +256,10 @@ export default defineComponent<Props>({
         size: {
             type: String as PropType<TableSize>,
             default: TABLE_SIZE.sm,
+        },
+        disableNextPage: {
+            type: Boolean,
+            default: true,
         },
         // printMode: {
         //     type: Boolean,
