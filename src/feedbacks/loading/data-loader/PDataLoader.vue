@@ -1,17 +1,25 @@
 <template>
     <div class="p-data-loader">
         <div class="data-loader-container">
-            <div v-show="(showDataFromScratch || dataLoadOccurred) && showEmptyCase" key="no-data" class="no-data-wrapper">
+            <div v-show="(showDataFromScratch || dataLoadOccurred) && showEmptyCase"
+                 key="no-data"
+                 class="no-data-wrapper"
+            >
                 <slot name="no-data">
                     {{ $t('COMPONENT.DATA_LOADER.NO_DATA') }}
                 </slot>
             </div>
 
-            <div v-show="(showDataFromScratch || dataLoadOccurred) && !showEmptyCase" key="data" class="data-wrapper">
-                <slot />
+            <div v-show="(showDataFromScratch || dataLoadOccurred) && !showEmptyCase"
+                 key="data"
+                 class="data-wrapper"
+            >
+                <slot v-bind="{isEmpty}" />
             </div>
 
-            <div v-show="showLoader" key="loader" class="loader-wrapper"
+            <div v-show="showLoader"
+                 key="loader"
+                 class="loader-wrapper"
                  :class="{
                      'no-empty-case': disableEmptyCase && isEmpty,
                      'fade-out': isTransitioning,
@@ -25,7 +33,9 @@
                          backgroundColor: refinedLoaderBackdropColor
                      }"
                 />
-                <div class="loader" :class="{[loaderType]: !$scopedSlots.loader}">
+                <div class="loader"
+                     :class="{[loaderType]: !$scopedSlots.loader}"
+                >
                     <slot name="loader">
                         <template v-if="loaderType === LOADER_TYPES.spinner">
                             <p-spinner :size="spinnerSize" />
