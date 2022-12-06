@@ -13,16 +13,26 @@
             </template>
         </p-page-title>
         <p-divider class="dashboards-divider" />
-        <all-dashboards-select-filter :viewer-status.sync="viewersStatus"
-                                      :scope-status.sync="scopeStatus"
+        <all-dashboards-select-filter />
+        <p-toolbox filters-visible
+                   search-type="query"
+                   :pagination-visible="false"
+                   :page-size-changeable="false"
+                   :refreshable="false"
+                   :key-item-sets="queryState.keyItemSets"
+                   :value-handler-map="queryState.valueHandlerMap"
+                   :query-tags="queryState.queryTags"
+                   @change="handleQueryChange"
+                   @refresh="handleQueryChange()"
         />
-        <p-search :value="keyword" />
         <div class="dashboard-list-wrapper">
-            <dashboard-board-list class="dashboard-list"
+            <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.PROJECT"
+                                  class="dashboard-list"
                                   :field-title="'Entire Workspace'"
                                   :dashboard-list="workspaceDashboardList"
             />
-            <dashboard-board-list class="dashboard-list"
+            <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.DOMAIN"
+                                  class="dashboard-list"
                                   :field-title="'Single Project'"
                                   :dashboard-list="projectDashboardList"
             />
@@ -32,25 +42,33 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs,
+    computed, onUnmounted,
+    reactive, toRefs, watch,
 } from 'vue';
 
 import {
-    PPageTitle, PDivider, PButton, PSearch,
+    PPageTitle, PDivider, PButton, PToolbox,
 } from '@spaceone/design-system';
+import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+
+import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+
+import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
 
 import AllDashboardsSelectFilter from '@/services/dashboards/all-dashboards/modules/AllDashboardsSelectFilter.vue';
 import DashboardBoardList from '@/services/dashboards/all-dashboards/modules/DashboardBoardList.vue';
-import { SCOPE_TYPE, VIEWERS_TYPE } from '@/services/dashboards/all-dashboards/type';
+import { SCOPE_TYPE } from '@/services/dashboards/all-dashboards/type';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 export default {
     name: 'AllDashboardsPage',
     components: {
+        PToolbox,
         DashboardBoardList,
-        PSearch,
         AllDashboardsSelectFilter,
         PButton,
         PPageTitle,
@@ -60,94 +78,79 @@ export default {
         const state = reactive({
             keyword: '',
             queryForSearch: {},
-            viewersStatus: VIEWERS_TYPE.ALL,
-            scopeStatus: SCOPE_TYPE.ALL,
-            workspaceDashboardList: [
-                {
-                    domain_dashboard_id: '123',
-                    name: 'Cafe Gondry',
-                    version: 0,
-                    viewers: 'PUBLIC',
-                    labels: ['Chicken', 'Hop', 'Pub'],
-                    tags: {},
-                    user_id: '',
-                    domain_id: '',
-                    settings: {},
-                    dashboard_options: {},
-                    dashboard_options_schema: {},
-                    created_at: '',
-                    updated_at: '',
-                },
-                {
-                    domain_dashboard_id: '123',
-                    name: 'Cafe Gondry2',
-                    version: 0,
-                    viewers: 'PRIVATE',
-                    labels: ['Hop', 'Pub'],
-                    tags: {},
-                    user_id: '',
-                    domain_id: '',
-                    settings: {},
-                    dashboard_options: {},
-                    dashboard_options_schema: {},
-                    created_at: '',
-                    updated_at: '',
-                },
-            ],
-            projectDashboardList: [
-                {
-                    domain_dashboard_id: '1234',
-                    name: 'Cafe Gondry33',
-                    version: 0,
-                    viewers: 'PUBLIC',
-                    labels: ['Chicken', 'Hop', 'Pub'],
-                    tags: {},
-                    user_id: '',
-                    domain_id: '',
-                    settings: {},
-                    dashboard_options: {},
-                    dashboard_options_schema: {},
-                    created_at: '',
-                    updated_at: '',
-                },
-                {
-                    domain_dashboard_id: '1235',
-                    name: 'Cafe Gondry2',
-                    version: 0,
-                    viewers: 'PRIVATE',
-                    labels: ['Hop', 'Pub', 'Test', 'Test2'],
-                    tags: {},
-                    user_id: '',
-                    domain_id: '',
-                    settings: {},
-                    dashboard_options: {},
-                    dashboard_options_schema: {},
-                    created_at: '',
-                    updated_at: '',
-                },
-                {
-                    domain_dashboard_id: '1235',
-                    name: 'Cafe Gondry21',
-                    version: 0,
-                    viewers: 'PRIVATE',
-                    labels: ['Hop', 'Pub', 'Test', 'Test3'],
-                    tags: {},
-                    user_id: '',
-                    domain_id: '',
-                    settings: {},
-                    dashboard_options: {},
-                    dashboard_options_schema: {},
-                    created_at: '',
-                    updated_at: '',
-                },
-            ],
+            viewersStatus: computed(() => store.state.dashboard.viewers),
+            scopeStatus: computed(() => store.state.dashboard.scope),
+            workspaceDashboardList: computed(() => store.state.dashboard.domainItems),
+            projectDashboardList: computed(() => store.state.dashboard.projectItems),
+        });
+
+        const searchQueryHelper = new QueryHelper();
+        const queryState = reactive({
+            searchFilters: computed(() => store.state.dashboard.searchFilters),
+            urlQueryString: computed(() => ({
+                viewers: store.state.dashboard.viewers === 'ALL' ? null : primitiveToQueryString(store.state.dashboard.viewers),
+                scope: store.state.dashboard.scope === 'ALL' ? null : primitiveToQueryString(store.state.dashboard.scope),
+                filters: searchQueryHelper.setFilters(queryState.searchFilters).rawQueryStrings,
+            })),
+            keyItemSets: computed<KeyItemSet[]>(() => [{
+                title: 'Properties',
+                items: [
+                    { name: 'label', label: 'Label' },
+                ],
+            }]),
+            valueHandlerMap: computed(() => ({
+                /* TODO: Apply ADD_ONS API */
+                // label: makeReferenceValueHandler('dashboard.ProjectDashboard'),
+            } as ValueHandlerMap)),
+            queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(store.state.dashboard.searchFilters).queryTags),
         });
 
         const handleCreateDashboard = () => { SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME }); };
+        const handleQueryChange = (options: ToolboxOptions = {}) => {
+            if (options.queryTags !== undefined) {
+                searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsQueryTag(options.queryTags);
+                store.dispatch('dashboard/setSearchFilters', searchQueryHelper.filters);
+            }
+        };
+
+
+        /* init */
+        let urlQueryStringWatcherStop;
+        const init = async () => {
+            const currentQuery = SpaceRouter.router.currentRoute.query;
+            const useQueryValue = {
+                viewers: queryStringToString(currentQuery.viewers) ?? 'ALL',
+                scope: queryStringToString(currentQuery.scope) ?? 'ALL',
+                filters: searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
+            };
+
+            /* TODO: init states from url query */
+            // store.dispatch('dashboard/loadDomainDashboard');
+            store.dispatch('dashboard/setSelectedViewers', useQueryValue.viewers);
+            store.dispatch('dashboard/setSelectedScope', useQueryValue.scope);
+            store.dispatch('dashboard/setSearchFilters', searchQueryHelper.filters);
+
+            /* TODO: implementation */
+            urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
+                replaceUrlQuery(urlQueryString);
+            });
+        };
+
+        (async () => {
+            await init();
+        })();
+
+        onUnmounted(() => {
+            // urlQueryString watcher is referencing assetInventoryStore which is destroyed on unmounted. so urlQueryString watcher must be destroyed on unmounted too.
+            if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
+        });
 
         return {
             ...toRefs(state),
             handleCreateDashboard,
+            handleQueryChange,
+            queryState,
+            SCOPE_TYPE,
         };
     },
 };

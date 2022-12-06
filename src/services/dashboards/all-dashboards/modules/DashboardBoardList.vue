@@ -12,7 +12,8 @@
             <template #item-content="{board}">
                 <div class="board-item-title-wrapper">
                     <div class="favorite-button-wrapper">
-                        <favorite-button :item-id="board.domain_dashboard_id"
+                        <!--TODO: implementation about id-->
+                        <favorite-button :item-id="board.name"
                                          :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                          scale="0.666"
                         />
@@ -28,7 +29,7 @@
                              :left-icon="board.viewers === 'PUBLIC' ? 'ic_public' : 'ic_private'"
                     />
                     <p-label v-for="(label, idx) in board.labels"
-                             :key="`${board.domain_dashboard_id}-label-${idx}`"
+                             :key="`${board.name}-label-${idx}`"
                              :text="label"
                              clickable
                     />
@@ -100,8 +101,6 @@ export default defineComponent<DashboardBoardListProps>({
 
 <style lang="postcss" scoped>
 .dashboard-board-list {
-
-    padding-top: 1.125rem;
     flex-grow: 1;
 
     /* custom design-system component - p-field-title */
