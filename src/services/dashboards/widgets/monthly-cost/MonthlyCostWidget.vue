@@ -89,7 +89,7 @@ const SAMPLE_RAW_DATA = {
     more: false,
     results: [
         {
-            usd_cost: [
+            usd_cost_sum: [
                 { date: '2022-01', value: random(100, 5000) },
                 { date: '2022-02', value: random(100, 5000) },
                 { date: '2022-03', value: random(100, 5000) },
@@ -154,10 +154,12 @@ const drawChart = (chartData: XYChartData[]) => {
         paddingLeft: -10,
     });
 
+
     const seriesSettings = {
-        valueYField: 'date',
+        valueYField: 'value',
     };
     const series = createXYColumnSeries(chart, seriesSettings);
+
     series.columns.template.setAll({
         fillOpacity: 0.5,
         strokeOpacity: 0,
