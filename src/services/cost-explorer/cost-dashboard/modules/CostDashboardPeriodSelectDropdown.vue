@@ -134,11 +134,10 @@ export default {
                         name: dayjs.utc().subtract(i, 'month').format('YYYY-MM'),
                     });
                 });
-                return monthData.reverse();
+                return monthData;
             }),
             MonthMenuItems: computed<MenuItem[]>(() => ([
-                // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-                ...state.getMonthMenuItem.reverse(),
+                ...state.getMonthMenuItem,
                 {
                     type: 'divider',
                 },
