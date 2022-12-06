@@ -23,7 +23,7 @@
                         </div>
                         <div class="card-content">
                             <img class="card-image"
-                                 :src="require(`@/assets/images/${getChartTypeImageFileName(widget.options.chart_type)}.svg`)"
+                                 :src="widgetCardImageList[idx].value.default"
                             >
                         </div>
                     </li>
@@ -125,6 +125,7 @@ export default {
             allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
             thisPage: 1,
             userId: computed(() => store.state.user.userId),
+            widgetCardImageList: [],
         });
 
         /* Api */
@@ -187,8 +188,15 @@ export default {
         };
         const getChartTypeImageFileName = (chartType: ChartType) => chartTypeItemMap[chartType].imageFileName;
 
-        (() => {
-            listCustomWidget();
+        const getWidgetCardImageList = async (): Promise<void> => {
+            state.widgetCardImageList = await Promise.allSettled(
+                state.widgetList.map((d) => import(`../../../../../assets/images/${getChartTypeImageFileName(d.options.chart_type)}.svg`)),
+            );
+        };
+
+        (async () => {
+            await listCustomWidget();
+            await getWidgetCardImageList();
         })();
 
         watch(() => state.selectedQuery, (selectedQuery) => {
