@@ -23,7 +23,10 @@
                            :legends="state.legends"
                            :currency="state.options.currency"
                            :currency-rates="props.currencyRates"
-                           :size="'md'"
+                           size="md"
+                           :disable-next-page="state.limit"
+                           :this-page.sync="state.thisPage"
+                           @toggle-legend="handleToggleLegend"
         >
             <template #detail-provider>
                 This is test popover content
@@ -69,7 +72,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const {
     createPieChart, createDonutChart, createPieSeries,
     createTooltip, setPieTooltipText,
-    disposeRoot, refreshRoot, setChartColors,
+    disposeRoot, refreshRoot, setChartColors, toggleSeries,
 } = useAmcharts5(chartContext);
 
 const state = reactive({
@@ -114,6 +117,8 @@ const state = reactive({
     legends: computed<LegendConfig[]>(() => state.chartData.map((i) => ({
         name: i.provider,
     }))),
+    thisPage: 1,
+    limit: computed(() => state.thisPage > 3),
 });
 
 // TODO: api binding
@@ -164,6 +169,10 @@ const drawChart = (chartData: ChartData[]) => {
 //     if (!state.series) return;
 //     state.series.data.setAll(chartData);
 // };
+
+const handleToggleLegend = (index) => {
+    toggleSeries(state.chart, index);
+};
 
 const initWidget = async () => {
     state.loading = true;

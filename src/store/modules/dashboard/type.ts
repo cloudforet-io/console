@@ -1,3 +1,4 @@
+import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 export const VIEWERS_TYPE = Object.freeze({
     PUBLIC: 'PUBLIC',
@@ -9,6 +10,9 @@ export type ViewersType = typeof VIEWERS_TYPE[keyof typeof VIEWERS_TYPE];
 export interface DashboardState {
     domainItems?: DomainDashboardItem[];
     projectItems?: ProjectDashboardItem[];
+    searchFilters: QueryStoreFilter[];
+    viewers: string;
+    scope: string;
 }
 
 export interface DashboardItem {
