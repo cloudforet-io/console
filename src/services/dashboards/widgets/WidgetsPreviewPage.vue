@@ -7,11 +7,14 @@
                 {{ mounted ? 'Unmount Widget' : 'Mount Widget' }}
             </p-button>
             <template v-if="mounted">
-                <div class="inline-block w-8 text-center">
+                <div class="inline-block w-8 text-center"
+                     :class="{'text-gray': loading}"
+                >
                     {{ autoRefresh ? 10 - counter : '' }}
                 </div>
                 <p-icon-button class="refresh-button"
                                name="ic_refresh"
+                               :disabled="loading"
                                @click="refresh"
                 />
                 <p-button class="mx-2"
@@ -121,6 +124,7 @@ export default defineComponent<Props>({
             widgetThemeItems: computed(() => WIDGET_THEMES.map((d) => ({
                 type: 'item', name: d, label: d,
             }))),
+            loading: false,
         });
 
         const { counter, pause, resume } = useInterval(1000, { controls: true });
@@ -142,9 +146,12 @@ export default defineComponent<Props>({
                 }
             }
         };
-        const refresh = () => {
+        const refresh = async () => {
             if (state.widgetRef) {
-                state.widgetRef.refreshWidget();
+                state.loading = true;
+                pause();
+                await state.widgetRef.refreshWidget();
+                state.loading = false;
                 resetCounter();
             }
         };
