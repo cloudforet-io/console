@@ -79,10 +79,11 @@ import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
+import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
+
 import BudgetToolboxUsageRange
     from '@/services/cost-explorer/budget/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
 import type { BudgetUsageAnalyzeRequestParam, BudgetUsageRange } from '@/services/cost-explorer/budget/type';
-import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 import type { Period } from '@/services/cost-explorer/type';
 
 export interface Pagination {
