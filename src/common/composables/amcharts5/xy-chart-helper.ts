@@ -180,12 +180,12 @@ export const createXYLineSeries = (
     chart: am5xy.XYChart,
     settings?: Partial<IXYSeriesSettings>,
 ): am5xy.XYSeries => {
-    const series = chart.series.push(am5xy.LineSeries.new(root, {
+    const series = am5xy.LineSeries.new(root, {
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
         valueXField: DEFAULT_DATE_FIELD_NAME,
         ...settings,
-    }));
+    });
     series.strokes.template.setAll({
         strokeWidth: 2,
     });
@@ -203,12 +203,12 @@ export const createXYColumnSeries = (
     chart: am5xy.XYChart,
     settings?: Partial<IXYSeriesSettings>,
 ): am5xy.XYSeries => {
-    const series = chart.series.push(am5xy.ColumnSeries.new(root, {
+    const series = am5xy.ColumnSeries.new(root, {
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
         valueXField: DEFAULT_DATE_FIELD_NAME,
         ...settings,
-    }));
+    });
     series.columns.template.setAll({
         width: am5.percent(45),
         height: am5.percent(45),
