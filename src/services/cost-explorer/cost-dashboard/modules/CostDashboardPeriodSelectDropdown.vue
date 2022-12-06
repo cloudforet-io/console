@@ -68,12 +68,12 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import CostManagementCustomRangeModal
     from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
-import CurrencySelectDropdown from '@/services/cost-explorer/modules/CurrencySelectDropdown.vue';
 import type { Period } from '@/services/cost-explorer/type';
 
 const initialPeriodStart = dayjs.utc().startOf('month').format('YYYY-MM-DD');
