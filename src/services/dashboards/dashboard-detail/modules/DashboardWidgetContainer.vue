@@ -29,10 +29,10 @@ import {
     WIDGET_CONTAINER_MAX_WIDTH,
     WIDGET_CONTAINER_MIN_WIDTH, WIDGET_WIDTH_FULL,
 } from '@/services/dashboards/dashboard-detail/lib/config';
-import type { WidgetThemeAssignedList } from '@/services/dashboards/dashboard-detail/lib/themeHelper';
-import { widgetThemeAssigner } from '@/services/dashboards/dashboard-detail/lib/themeHelper';
+import type { WidgetThemeAssignedList } from '@/services/dashboards/dashboard-detail/lib/theme-helper';
+import { widgetThemeAssigner } from '@/services/dashboards/dashboard-detail/lib/theme-helper';
 import type { WidgetSize, WidgetThemeOption } from '@/services/dashboards/dashboard-detail/lib/type';
-import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/widthHelper';
+import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 
 
@@ -122,7 +122,6 @@ export default defineComponent({
         // for theme align
         watch(() => state.widgetSizeList, () => {
             state.widgetThemeList = widgetThemeAssigner(props.widgetThemeOptionList);
-            console.log(state.widgetThemeList);
         }, { immediate: true });
 
         return {
