@@ -4,8 +4,8 @@ import {
     WIDGET_CONTAINER_MAX_WIDTH,
     WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
-import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/helper';
 import type { WidgetSize } from '@/services/dashboards/dashboard-detail/lib/type';
+import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
 
 
 /**
