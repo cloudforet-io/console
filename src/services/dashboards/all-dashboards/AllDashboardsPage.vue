@@ -13,9 +13,7 @@
             </template>
         </p-page-title>
         <p-divider class="dashboards-divider" />
-        <all-dashboards-select-filter :viewer-status="viewersStatus"
-                                      :scope-status="scopeStatus"
-        />
+        <all-dashboards-select-filter />
         <p-toolbox filters-visible
                    search-type="query"
                    :pagination-visible="false"
@@ -90,8 +88,8 @@ export default {
         const queryState = reactive({
             searchFilters: computed(() => store.state.dashboard.searchFilters),
             urlQueryString: computed(() => ({
-                viewers: state.viewersStatus === 'ALL' ? null : primitiveToQueryString(state.viewersStatus),
-                scope: state.scopeStatus === 'ALL' ? null : primitiveToQueryString(state.scopeStatus),
+                viewers: store.state.dashboard.viewers === 'ALL' ? null : primitiveToQueryString(store.state.dashboard.viewers),
+                scope: store.state.dashboard.scope === 'ALL' ? null : primitiveToQueryString(store.state.dashboard.scope),
                 filters: searchQueryHelper.setFilters(queryState.searchFilters).rawQueryStrings,
             })),
             keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -121,14 +119,13 @@ export default {
         const init = async () => {
             const currentQuery = SpaceRouter.router.currentRoute.query;
             const useQueryValue = {
-                viewers: queryStringToString(currentQuery.viewers),
-                scope: queryStringToString(currentQuery.scope),
+                viewers: queryStringToString(currentQuery.viewers) ?? 'ALL',
+                scope: queryStringToString(currentQuery.scope) ?? 'ALL',
                 filters: searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
             };
 
             /* TODO: init states from url query */
             // store.dispatch('dashboard/loadDomainDashboard');
-            console.log(useQueryValue);
             store.dispatch('dashboard/setSelectedViewers', useQueryValue.viewers);
             store.dispatch('dashboard/setSelectedScope', useQueryValue.scope);
             store.dispatch('dashboard/setSearchFilters', searchQueryHelper.filters);

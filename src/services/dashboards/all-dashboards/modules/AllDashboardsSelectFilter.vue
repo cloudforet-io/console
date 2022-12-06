@@ -3,7 +3,7 @@
         <span class="filter-header">Viewers</span>
         <p-select-status v-for="(view, idx) in viewerFilterList"
                          :key="`view-${idx}`"
-                         v-model="proxyViewersStatus"
+                         v-model="viewersStatus"
                          class="select-desktop"
                          :value="view.name"
         >
@@ -11,7 +11,7 @@
         </p-select-status>
         <p-select-dropdown class="select-tablet"
                            :items="viewerFilterList"
-                           :selected.sync="proxyViewersStatus"
+                           :selected.sync="viewersStatus"
                            style-type="transparent"
         />
         <p-divider class="divider"
@@ -20,7 +20,7 @@
         <span class="filter-header">Scope</span>
         <p-select-status v-for="(scope, idx) in scopeFilterList"
                          :key="`scope-${idx}`"
-                         v-model="proxyScopeStatus"
+                         v-model="scopeStatus"
                          class="select-desktop"
                          :value="scope.name"
         >
@@ -28,14 +28,13 @@
         </p-select-status>
         <p-select-dropdown class="select-tablet"
                            :items="scopeFilterList"
-                           :selected.sync="proxyScopeStatus"
+                           :selected.sync="scopeStatus"
                            style-type="transparent"
         />
     </div>
 </template>
 
 <script lang="ts">
-import type { PropType, SetupContext } from 'vue';
 import {
     computed, defineComponent,
     reactive, toRefs, watch,
@@ -46,30 +45,12 @@ import { PSelectDropdown, PSelectStatus, PDivider } from '@spaceone/design-syste
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-
 import { SCOPE_TYPE, VIEWERS_TYPE } from '@/services/dashboards/all-dashboards/type';
-import type { ViewersType, ScopeType } from '@/services/dashboards/all-dashboards/type';
 
-interface AllDashboardsSelectFilterProps {
-    viewerStatus: string | undefined;
-    scopeStatus: string | undefined;
-}
-
-export default defineComponent<AllDashboardsSelectFilterProps>({
+export default defineComponent({
     name: 'AllDashboardsSelectFilter',
     components: { PSelectStatus, PSelectDropdown, PDivider },
-    props: {
-        viewerStatus: {
-            type: String as PropType<ViewersType>,
-            default: VIEWERS_TYPE.ALL,
-        },
-        scopeStatus: {
-            type: String as PropType<ScopeType>,
-            default: SCOPE_TYPE.ALL,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
+    setup() {
         const state = reactive({
             viewerFilterList: computed(() => [
                 { label: i18n.t('All'), name: VIEWERS_TYPE.ALL },
@@ -81,14 +62,14 @@ export default defineComponent<AllDashboardsSelectFilterProps>({
                 { label: i18n.t('Entire Workspace'), name: SCOPE_TYPE.DOMAIN },
                 { label: i18n.t('Single Project'), name: SCOPE_TYPE.PROJECT },
             ]),
-            proxyViewersStatus: useProxyValue('viewerStatus', props, emit),
-            proxyScopeStatus: useProxyValue('scopeStatus', props, emit),
+            viewersStatus: store.state.dashboard.viewers,
+            scopeStatus: store.state.dashboard.scope,
         });
 
-        watch(() => state.proxyViewersStatus, (selectedViewers) => {
+        watch(() => state.viewersStatus, (selectedViewers) => {
             store.dispatch('dashboard/setSelectedViewers', selectedViewers);
         });
-        watch(() => state.proxyScopeStatus, (selectedScope) => {
+        watch(() => state.scopeStatus, (selectedScope) => {
             store.dispatch('dashboard/setSelectedScope', selectedScope);
         });
 
