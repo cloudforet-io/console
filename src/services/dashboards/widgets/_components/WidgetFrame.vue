@@ -11,7 +11,29 @@
         <div class="body"
              :style="{overflowY}"
         >
-            <slot />
+            <slot v-if="!errorMode" />
+            <div v-else
+                 class="error-container"
+            >
+                <p-i name="sad-face"
+                     :color="gray[500]"
+                     width="3.5rem"
+                     height="3.5rem"
+                />
+                <div class="error-title">
+                    {{ $t('Unable to load') }}
+                </div>
+                <!--song-lang-->
+                <span class="error-message">
+                    {{ $t("There seems to be an incompatibility between dashboard's variables and widget options. You need to edit the filters to make it work.") }}
+                </span>
+                <p-button class="edit-button"
+                          style-type="tertiary"
+                          @click="handleEditButtonClick"
+                >
+                    {{ $t('Edit Widget') }}
+                </p-button>
+            </div>
         </div>
         <div class="widget-footer">
             <div class="widget-footer-wrapper">
@@ -67,7 +89,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Route } from 'vue-router';
 
 import {
-    PAnchor, PButtonModal, PDivider, PIconButton,
+    PAnchor, PButton, PButtonModal, PDivider, PI, PIconButton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -81,8 +103,11 @@ import { getUUID } from '@/lib/component-util/getUUID';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import { gray } from '@/styles/colors';
+
 import type { WidgetOptions, WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
+
 
 interface Props {
     title: TranslateResult;
@@ -96,7 +121,8 @@ interface Props {
     printMode: boolean;
     selectedDates: string[];
     currency?: Currency;
-    editMode: boolean;
+    editMode?: boolean;
+    errorMode?: boolean;
     disableExpandIcon: boolean;
     disableEditIcon: boolean;
     disableDeleteIcon: boolean;
@@ -112,6 +138,8 @@ interface IconConfig {
 export default defineComponent<Props>({
     name: 'WidgetFrame',
     components: {
+        PButton,
+        PI,
         PButtonModal,
         DeleteModal,
         PIconButton,
@@ -168,6 +196,10 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
+        errorMode: {
+            type: Boolean,
+            default: false,
+        },
         disableExpandIcon: {
             type: Boolean,
             default: false,
@@ -192,6 +224,7 @@ export default defineComponent<Props>({
     setup(props, { emit }: SetupContext) {
         const { i18nDayjs } = useI18nDayjs();
         const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
+        const handleEditButtonClick = () => { state.visibleEditModal = true; };
         const state = reactive({
             isFull: computed<boolean>(() => props.isFull),
             dateLabel: computed<TranslateResult|undefined>(() => {
@@ -224,9 +257,7 @@ export default defineComponent<Props>({
                 {
                     isAvailable: !props.disableEditIcon,
                     name: 'ic_edit',
-                    handleClick: () => {
-                        state.visibleEditModal = true;
-                    },
+                    handleClick: handleEditButtonClick,
                 },
                 {
                     isAvailable: !props.disableDeleteIcon,
@@ -242,6 +273,8 @@ export default defineComponent<Props>({
             ...toRefs(state),
             WIDGET_SIZE,
             getUUID,
+            gray,
+            handleEditButtonClick,
         };
     },
 });
@@ -272,6 +305,24 @@ export default defineComponent<Props>({
     .body {
         height: auto;
         flex: 1 1;
+    }
+    .error-container {
+        @apply flex justify-center items-center flex-col h-full;
+        padding: 0 1.5625rem;
+
+        .error-title {
+            @apply text-gray-500 mt-2;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        .error-message {
+            margin-top: 3.625rem;
+            line-height: 1.25;
+            font-size: 0.875rem;
+        }
+        .edit-button {
+            margin-top: 1rem;
+        }
     }
     .widget-footer {
         @apply border-t rounded-b-lg bg-gray-100;
