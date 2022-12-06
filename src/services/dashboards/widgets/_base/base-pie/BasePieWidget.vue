@@ -2,6 +2,7 @@
     <widget-frame :title="state.title"
                   :size="state.size"
                   :width="props.width"
+                  error-mode
     >
         <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
