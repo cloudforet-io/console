@@ -1,11 +1,12 @@
 <template>
     <div class="p-label"
-         :class="{ clickable, active: proxyActive, 'icon-label': leftIcon }"
+         :class="{ clickable, 'icon-label': leftIcon }"
          @click.stop="handleClickLabel"
     >
         <span class="label-content">
             <slot name="label-content">
-                <p-i v-if="leftIcon" class="left-icon"
+                <p-i v-if="leftIcon"
+                     class="label-left-icon"
                      :name="leftIcon"
                      color="inherit"
                      width="0.75rem"
@@ -21,7 +22,7 @@
              name="ic_delete"
              width="1rem"
              height="1rem"
-             class="delete-icon"
+             class="label-delete-icon"
              color="inherit"
              @click.stop="$emit('delete')"
         />
@@ -29,11 +30,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue';
+import { defineComponent } from 'vue';
 import type { SetupContext } from 'vue';
 
 import PI from '@/foundation/icons/PI.vue';
-import { useProxyValue } from '@/hooks';
 
 interface LabelProps {
     leftIcon?: string;
@@ -71,17 +71,12 @@ export default defineComponent<LabelProps>({
         },
     },
     setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            proxyActive: useProxyValue('active', props, emit),
-        });
-
         const handleClickLabel = () => {
             if (!props.clickable) return;
-            state.proxyActive = !state.proxyActive;
             emit('item-click');
         };
+
         return {
-            ...toRefs(state),
             handleClickLabel,
         };
     },
@@ -90,7 +85,7 @@ export default defineComponent<LabelProps>({
 
 <style lang="postcss">
 .p-label {
-    @apply bg-white rounded border border-gray-200;
+    @apply rounded border border-gray-200;
     display: inline-flex;
     align-items: center;
     height: 1.25rem;
@@ -106,18 +101,19 @@ export default defineComponent<LabelProps>({
         font-size: 0.75rem;
         line-height: normal;
     }
-    .left-icon {
+    .label-left-icon {
         width: 0.75rem;
         height: 0.75rem;
         margin-right: 0.125rem;
     }
-    .delete-icon {
+    .label-delete-icon {
         @apply text-gray-400;
         cursor: pointer;
         margin-left: 0.25rem;
     }
 
     &.clickable {
+        @apply bg-white;
         cursor: pointer;
 
         @media (hover: hover) {
@@ -128,12 +124,6 @@ export default defineComponent<LabelProps>({
                     @apply text-blue-600;
                 }
             }
-        }
-    }
-    &.active {
-        @apply bg-blue-200 border-blue-600;
-        .label-content {
-            @apply text-blue-600;
         }
     }
     &.icon-label {

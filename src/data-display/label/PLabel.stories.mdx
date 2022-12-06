@@ -23,7 +23,6 @@ export const Template = (args, {argTypes}) => ({
                      :left-icon="icon"
                      :deletable="deletable"
                      :clickable="clickable"
-                     :active="active"
                      :background-color="theme"
             />
         </div>
@@ -31,7 +30,6 @@ export const Template = (args, {argTypes}) => ({
     setup(props) {
         const state = reactive({
             text: computed(() => props.text),
-            active: computed(() => props.active),
             deletable: computed(() => props.deletable),
             clickable: computed(() => props.clickable),
             icon: computed(() => props.leftIcon),
@@ -60,14 +58,12 @@ export const Template = (args, {argTypes}) => ({
                     <div class="flex items-center">
                         <p-label text="Label"/>
                         <p-label text="Label" clickable/>
-                        <p-label text="Label" active/>
                         <p-label left-icon="ic_private" text="Label"/>
                     </div>
                     <br/>
                     <div class="flex items-center">
                         <p-label text="Label" deletable/>
                         <p-label text="Label" deletable clickable/>
-                        <p-label text="Label" deletable active/>
                         <p-label left-icon="ic_public" text="Label" deletable/>
                     </div>
                 </div>
@@ -121,7 +117,6 @@ export const Template = (args, {argTypes}) => ({
                 <div class="h-full w-full overflow p-8">
                     <p-label text="Label1" deletable/>
                     <p-label text="Label2" deletable clickable/>
-                    <p-label text="Label3" deletable active/>
                 </div>
             `
         }}

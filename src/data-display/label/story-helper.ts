@@ -81,21 +81,21 @@ export const getLabelArgTypes = (): ArgTypes => ({
             },
         },
     },
-    active: {
-        name: 'active',
-        type: { name: 'boolean' },
-        description: 'The active status of label. This is the state when it is clicked in the clickable state.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-    },
+    // active: {
+    //     name: 'active',
+    //     type: { name: 'boolean' },
+    //     description: 'The active status of label. This is the state when it is clicked in the clickable state.',
+    //     defaultValue: false,
+    //     table: {
+    //         type: {
+    //             summary: 'boolean',
+    //         },
+    //         category: 'props',
+    //         defaultValue: {
+    //             summary: 'false',
+    //         },
+    //     },
+    // },
     // events
     itemClick: {
         name: 'item-click',
