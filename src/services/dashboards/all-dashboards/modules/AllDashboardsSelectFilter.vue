@@ -3,16 +3,18 @@
         <span class="filter-header">Viewers</span>
         <p-select-status v-for="(view, idx) in viewerFilterList"
                          :key="`view-${idx}`"
-                         v-model="viewersStatus"
+                         :selected="viewersStatus"
                          class="select-desktop"
                          :value="view.name"
+                         @change="handleChangeViewers"
         >
             {{ view.label }}
         </p-select-status>
         <p-select-dropdown class="select-tablet"
                            :items="viewerFilterList"
-                           :selected.sync="viewersStatus"
+                           :selected="viewersStatus"
                            style-type="transparent"
+                           @update:selected="handleChangeViewers"
         />
         <p-divider class="divider"
                    vertical
@@ -20,16 +22,18 @@
         <span class="filter-header">Scope</span>
         <p-select-status v-for="(scope, idx) in scopeFilterList"
                          :key="`scope-${idx}`"
-                         v-model="scopeStatus"
+                         :selected="scopeStatus"
                          class="select-desktop"
                          :value="scope.name"
+                         @change="handleChangeScope"
         >
             {{ scope.label }}
         </p-select-status>
         <p-select-dropdown class="select-tablet"
                            :items="scopeFilterList"
-                           :selected.sync="scopeStatus"
+                           :selected="scopeStatus"
                            style-type="transparent"
+                           @update:selected="handleChangeScope"
         />
     </div>
 </template>
@@ -37,7 +41,7 @@
 <script lang="ts">
 import {
     computed, defineComponent,
-    reactive, toRefs, watch,
+    reactive, toRefs,
 } from 'vue';
 
 import { PSelectDropdown, PSelectStatus, PDivider } from '@spaceone/design-system';
@@ -62,19 +66,21 @@ export default defineComponent({
                 { label: i18n.t('Entire Workspace'), name: SCOPE_TYPE.DOMAIN },
                 { label: i18n.t('Single Project'), name: SCOPE_TYPE.PROJECT },
             ]),
-            viewersStatus: store.state.dashboard.viewers,
-            scopeStatus: store.state.dashboard.scope,
+            viewersStatus: computed(() => store.state.dashboard.viewers),
+            scopeStatus: computed(() => store.state.dashboard.scope),
         });
 
-        watch(() => state.viewersStatus, (selectedViewers) => {
-            store.dispatch('dashboard/setSelectedViewers', selectedViewers);
-        });
-        watch(() => state.scopeStatus, (selectedScope) => {
-            store.dispatch('dashboard/setSelectedScope', selectedScope);
-        });
+        const handleChangeViewers = (selected) => {
+            store.dispatch('dashboard/setSelectedViewers', selected);
+        };
+        const handleChangeScope = (selected) => {
+            store.dispatch('dashboard/setSelectedScope', selected);
+        };
 
         return {
             ...toRefs(state),
+            handleChangeViewers,
+            handleChangeScope,
         };
     },
 });
