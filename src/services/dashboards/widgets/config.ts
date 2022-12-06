@@ -96,7 +96,7 @@ interface LegendOptions {
 export interface WidgetOptions {
     date_range?: DateRange;
     currency?: Currency;
-    group_by?: GroupBy[];
+    group_by?: GroupBy;
     granularity?: Granularity;
     stacked?: boolean;
     legend_options?: LegendOptions;

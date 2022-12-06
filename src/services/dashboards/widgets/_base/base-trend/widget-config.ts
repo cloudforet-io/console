@@ -18,6 +18,7 @@ const baseTrendWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     widget_options: {
         granularity: 'MONTHLY',
+        group_by: GROUP_BY.PROVIDER,
     },
     widget_options_schema: {
         type: 'object',
