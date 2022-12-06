@@ -58,11 +58,11 @@
                     <date-range-selector :date-range.sync="dateRange" />
                 </p-field-group>
                 <p-field-group label="Theme"
-                               required
                                inline
                 >
                     <p-select-dropdown v-model="theme"
                                        :items="widgetThemeItems"
+                                       :disabled="disableTheme"
                     />
                 </p-field-group>
             </div>
@@ -125,6 +125,7 @@ export default defineComponent<Props>({
                 type: 'item', name: d, label: d,
             }))),
             loading: false,
+            disableTheme: computed(() => state.widgetConfig.theme.inherit === false),
         });
 
         const { counter, pause, resume } = useInterval(1000, { controls: true });

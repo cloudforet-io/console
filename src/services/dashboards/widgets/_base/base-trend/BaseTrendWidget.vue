@@ -156,7 +156,7 @@ const drawChart = (chartData: XYChartData[]) => {
         const series = state.chartType === CHART_TYPE.LINE
             ? createXYLineSeries(chart, seriesSettings)
             : createXYColumnSeries(chart, { ...seriesSettings, stacked: true });
-
+        chart.series.push(series);
         // set data processor
         series.data.processor = createDataProcessor({
             dateFormat: DATE_FORMAT,
