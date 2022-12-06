@@ -42,6 +42,8 @@ import { PDataLoader } from '@spaceone/design-system';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
+import { blue, coral, red } from '@/styles/colors';
+
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
@@ -61,6 +63,9 @@ const SAMPLE_RAW_DATA = {
             latitude: 47.212106,
             longitude: 103.183594,
             value: 30,
+            circleSettings: {
+                fill: color(coral[400]),
+            },
         },
         {
             usage_quantity: 'data-transfer.out',
@@ -68,6 +73,9 @@ const SAMPLE_RAW_DATA = {
             latitude: 47.212106,
             longitude: 103.183594,
             value: 234,
+            circleSettings: {
+                fill: color(blue[400]),
+            },
         },
         {
             usage_quantity: 'data-transfer.out',
@@ -75,6 +83,9 @@ const SAMPLE_RAW_DATA = {
             latitude: 39.563353,
             longitude: -99.316406,
             value: 333,
+            circleSettings: {
+                fill: color(red[400]),
+            },
         },
     ],
 };
@@ -124,8 +135,9 @@ const drawChart = () => {
     pointSeries.bullets.push(() => {
         const circle = createCircle({
             radius: 5,
-            fill: color(0xff621f), // TODO: must change dynamically
-            fillOpacity: 0.5,
+            // fill: color(0xff621f), // TODO: must change dynamically
+            fillOpacity: 0.6,
+            templateField: 'circleSettings',
         }, circleTemplate);
         return createBullet({
             sprite: circle,

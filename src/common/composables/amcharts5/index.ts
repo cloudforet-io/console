@@ -13,7 +13,7 @@ import type * as am5xy from '@amcharts/amcharts5/xy';
 import { Amcharts5GlobalTheme } from '@/lib/site-initializer/amcharts5';
 
 import {
-    createBullet, createCircle, createDataProcessor, createLegend, createTooltip,
+    createBullet, createCircle, createDataProcessor, createLegend, createTooltip, toggleSeries,
 } from '@/common/composables/amcharts5/concepts-helper';
 import { createMapChart, createMapPointSeries, createMapPolygonSeries } from '@/common/composables/amcharts5/map-chart-helper';
 import {
@@ -22,7 +22,7 @@ import {
 import type { ChartContext } from '@/common/composables/amcharts5/type';
 import {
     createXYCategoryChart, createXYDateChart, createXYLineSeries, createXYColumnSeries,
-    setXYSharedTooltipText, setXYSingleTooltipText,
+    setXYSharedTooltipText, setXYSingleTooltipText, createXYVerticalChart,
 } from '@/common/composables/amcharts5/xy-chart-helper';
 
 
@@ -91,6 +91,10 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return createXYCategoryChart(state.root as Root, settings);
         },
+        createXYVerticalChart: (settings?: am5xy.IXYChartSettings) => {
+            if (!state.root) throw new Error('No root');
+            return createXYVerticalChart(state.root as Root, settings);
+        },
         createPieChart: (settings?: am5percent.IPieChartSettings): am5percent.PieChart => {
             if (!state.root) throw new Error('No root');
             return createPieChart(state.root as Root, settings);
@@ -149,5 +153,6 @@ export const useAmcharts5 = (
         setXYSingleTooltipText,
         setPieTooltipText,
         setChartColors,
+        toggleSeries,
     };
 };

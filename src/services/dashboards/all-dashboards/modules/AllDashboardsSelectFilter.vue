@@ -3,16 +3,18 @@
         <span class="filter-header">Viewers</span>
         <p-select-status v-for="(view, idx) in viewerFilterList"
                          :key="`view-${idx}`"
-                         v-model="proxyViewersStatus"
+                         :selected="viewersStatus"
                          class="select-desktop"
                          :value="view.name"
+                         @change="handleChangeViewers"
         >
             {{ view.label }}
         </p-select-status>
         <p-select-dropdown class="select-tablet"
                            :items="viewerFilterList"
-                           :selected.sync="proxyViewersStatus"
+                           :selected="viewersStatus"
                            style-type="transparent"
+                           @update:selected="handleChangeViewers"
         />
         <p-divider class="divider"
                    vertical
@@ -20,22 +22,23 @@
         <span class="filter-header">Scope</span>
         <p-select-status v-for="(scope, idx) in scopeFilterList"
                          :key="`scope-${idx}`"
-                         v-model="proxyScopeStatus"
+                         :selected="scopeStatus"
                          class="select-desktop"
                          :value="scope.name"
+                         @change="handleChangeScope"
         >
             {{ scope.label }}
         </p-select-status>
         <p-select-dropdown class="select-tablet"
                            :items="scopeFilterList"
-                           :selected.sync="proxyScopeStatus"
+                           :selected="scopeStatus"
                            style-type="transparent"
+                           @update:selected="handleChangeScope"
         />
     </div>
 </template>
 
 <script lang="ts">
-import type { PropType, SetupContext } from 'vue';
 import {
     computed, defineComponent,
     reactive, toRefs,
@@ -43,32 +46,15 @@ import {
 
 import { PSelectDropdown, PSelectStatus, PDivider } from '@spaceone/design-system';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-
 import { SCOPE_TYPE, VIEWERS_TYPE } from '@/services/dashboards/all-dashboards/type';
-import type { ViewersType, ScopeType } from '@/services/dashboards/all-dashboards/type';
 
-interface AllDashboardsSelectFilterProps {
-    viewerStatus: string | undefined;
-    scopeStatus: string | undefined;
-}
-
-export default defineComponent<AllDashboardsSelectFilterProps>({
+export default defineComponent({
     name: 'AllDashboardsSelectFilter',
     components: { PSelectStatus, PSelectDropdown, PDivider },
-    props: {
-        viewerStatus: {
-            type: String as PropType<ViewersType>,
-            default: VIEWERS_TYPE.ALL,
-        },
-        scopeStatus: {
-            type: String as PropType<ScopeType>,
-            default: SCOPE_TYPE.ALL,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
+    setup() {
         const state = reactive({
             viewerFilterList: computed(() => [
                 { label: i18n.t('All'), name: VIEWERS_TYPE.ALL },
@@ -80,12 +66,21 @@ export default defineComponent<AllDashboardsSelectFilterProps>({
                 { label: i18n.t('Entire Workspace'), name: SCOPE_TYPE.DOMAIN },
                 { label: i18n.t('Single Project'), name: SCOPE_TYPE.PROJECT },
             ]),
-            proxyViewersStatus: useProxyValue('viewerStatus', props, emit),
-            proxyScopeStatus: useProxyValue('scopeStatus', props, emit),
+            viewersStatus: computed(() => store.state.dashboard.viewers),
+            scopeStatus: computed(() => store.state.dashboard.scope),
         });
+
+        const handleChangeViewers = (selected) => {
+            store.dispatch('dashboard/setSelectedViewers', selected);
+        };
+        const handleChangeScope = (selected) => {
+            store.dispatch('dashboard/setSelectedScope', selected);
+        };
 
         return {
             ...toRefs(state),
+            handleChangeViewers,
+            handleChangeScope,
         };
     },
 });

@@ -129,18 +129,63 @@ export const createXYCategoryChart = (root: Root, settings?: IXYChartSettings): 
     return { chart, xAxis, yAxis };
 };
 
+export const createXYVerticalChart = (root: Root, settings?: IXYChartSettings): {
+    chart: am5xy.XYChart,
+    xAxis: am5xy.ValueAxis<am5xy.AxisRenderer>,
+    yAxis: am5xy.CategoryAxis<am5xy.AxisRenderer>
+} => {
+    const chart = createXYChart(root, settings);
+
+    const xRenderer = am5xy.AxisRendererX.new(root, {});
+    xRenderer.grid.template.setAll({
+        strokeOpacity: 1,
+        strokeWidth: 1,
+        stroke: am5.color(gray[200]),
+    });
+    xRenderer.labels.template.setAll({
+        fontSize: 12,
+        fill: am5.color(gray[600]),
+        paddingTop: 6,
+    });
+    const xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, {
+        min: 0,
+        renderer: xRenderer,
+    }));
+
+    const yRenderer = am5xy.AxisRendererY.new(root, {
+        strokeOpacity: 1,
+        strokeWidth: 1,
+        stroke: am5.color(gray[300]),
+        minGridDistance: 0,
+    });
+    yRenderer.grid.template.setAll({
+        strokeOpacity: 1,
+        strokeWidth: 1,
+        stroke: am5.color(gray[200]),
+    });
+    yRenderer.labels.template.setAll({
+        fontSize: 12,
+        fill: am5.color(gray[600]),
+    });
+    const yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root, {
+        categoryField: DEFAULT_CATEGORY_FIELD_NAME,
+        renderer: yRenderer,
+    }));
+    return { chart, xAxis, yAxis };
+};
+
 // Series
 export const createXYLineSeries = (
     root: Root,
     chart: am5xy.XYChart,
     settings?: Partial<IXYSeriesSettings>,
 ): am5xy.XYSeries => {
-    const series = chart.series.push(am5xy.LineSeries.new(root, {
+    const series = am5xy.LineSeries.new(root, {
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
         valueXField: DEFAULT_DATE_FIELD_NAME,
         ...settings,
-    }));
+    });
     series.strokes.template.setAll({
         strokeWidth: 2,
     });
@@ -157,15 +202,16 @@ export const createXYColumnSeries = (
     root: Root,
     chart: am5xy.XYChart,
     settings?: Partial<IXYSeriesSettings>,
-): am5xy.ColumnSeries => {
-    const series = chart.series.push(am5xy.ColumnSeries.new(root, {
+): am5xy.XYSeries => {
+    const series = am5xy.ColumnSeries.new(root, {
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
         valueXField: DEFAULT_DATE_FIELD_NAME,
         ...settings,
-    }));
+    });
     series.columns.template.setAll({
         width: am5.percent(45),
+        height: am5.percent(45),
     });
     return series;
 };
@@ -175,7 +221,7 @@ export const setXYSharedTooltipText = (chart: am5xy.XYChart, tooltip: am5.Toolti
     tooltip.label.adapters.add('text', (text, target) => {
         let _text = `[${gray[700]}]{valueX}[/]`;
         chart.series.each((s) => {
-            const fieldName = s.get('valueYField') || '';
+            const fieldName = s.get('valueYField') || s.get('valueXField') || '';
             let value = target.dataItem?.dataContext?.[fieldName];
             if (!value) return;
             if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);

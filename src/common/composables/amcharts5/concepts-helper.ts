@@ -2,6 +2,7 @@ import * as am5 from '@amcharts/amcharts5';
 import type {
     IBulletSettings, ICircleSettings, Root, Circle,
 } from '@amcharts/amcharts5';
+import * as am5percent from '@amcharts/amcharts5/percent';
 
 import { DEFAULT_DATE_FIELD_NAME, DEFAULT_DATE_FORMAT } from '@/common/composables/amcharts5/config';
 
@@ -67,3 +68,27 @@ export const createBullet = (root: Root, settings: IBulletSettings): am5.Bullet 
 export const createCircle = (root: Root, settings: ICircleSettings, circleTemplate: am5.Template<Circle>): am5.Circle => am5.Circle.new(root, {
     ...settings,
 }, circleTemplate);
+
+export const toggleSeries = (chart: am5.SerialChart, index: number) => {
+    if (chart instanceof am5percent.PieChart) {
+        const series = chart.series?.getIndex(0);
+        if (!series) return;
+
+        const slice = series.slices.values[index];
+        if (!slice || !slice.dataItem) return;
+
+        if (slice.isHiding() || slice.isHidden()) {
+            slice.dataItem.show();
+        } else {
+            slice.dataItem.hide();
+        }
+    } else {
+        const series = chart.series?.getIndex(index);
+        if (!series) return;
+        if (series.isHiding() || series.isHidden()) {
+            series.show();
+        } else {
+            series.hide();
+        }
+    }
+};
