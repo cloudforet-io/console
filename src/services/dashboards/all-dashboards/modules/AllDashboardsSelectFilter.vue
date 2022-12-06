@@ -38,11 +38,12 @@
 import type { PropType, SetupContext } from 'vue';
 import {
     computed, defineComponent,
-    reactive, toRefs,
+    reactive, toRefs, watch,
 } from 'vue';
 
 import { PSelectDropdown, PSelectStatus, PDivider } from '@spaceone/design-system';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -82,6 +83,13 @@ export default defineComponent<AllDashboardsSelectFilterProps>({
             ]),
             proxyViewersStatus: useProxyValue('viewerStatus', props, emit),
             proxyScopeStatus: useProxyValue('scopeStatus', props, emit),
+        });
+
+        watch(() => state.proxyViewersStatus, (selectedViewers) => {
+            store.dispatch('dashboard/setSelectedViewers', selectedViewers);
+        });
+        watch(() => state.proxyScopeStatus, (selectedScope) => {
+            store.dispatch('dashboard/setSelectedScope', selectedScope);
         });
 
         return {
