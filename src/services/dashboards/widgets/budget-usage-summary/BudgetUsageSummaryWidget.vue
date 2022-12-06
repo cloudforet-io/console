@@ -202,6 +202,7 @@ defineExpose({
 }
 .chart-wrapper {
     @apply relative;
+    width: 9rem;
     height: 9rem;
     .chart {
         height: 100%;
