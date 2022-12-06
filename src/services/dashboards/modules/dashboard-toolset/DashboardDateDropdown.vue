@@ -65,7 +65,7 @@ export default defineComponent({
                         name: dayjs.utc().subtract(i, 'month').format('YYYY-MM'),
                     });
                 });
-                return monthData.reverse();
+                return monthData;
             }),
             monthMenuItems: computed<MenuItem[]>(() => ([
                 {
@@ -76,8 +76,7 @@ export default defineComponent({
                     // song-lang
                     badge: 'Auto',
                 },
-                // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-                ...state.getMonthMenuItem.reverse(),
+                ...state.getMonthMenuItem,
                 { type: 'divider' },
                 {
                     type: 'item',
