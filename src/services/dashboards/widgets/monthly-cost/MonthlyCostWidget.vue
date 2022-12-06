@@ -159,7 +159,7 @@ const drawChart = (chartData: XYChartData[]) => {
         valueYField: 'value',
     };
     const series = createXYColumnSeries(chart, seriesSettings);
-
+    chart.series.push(series);
     series.columns.template.setAll({
         fillOpacity: 0.5,
         strokeOpacity: 0,
