@@ -68,22 +68,44 @@ import {
 } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { cloneDeep, random } from 'lodash';
+import { random } from 'lodash';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import {
-    green, red, violet,
-} from '@/styles/colors';
+import { green, red } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
-import type { XYChartData } from '@/services/dashboards/widgets/type';
+import type { XYChartData, HistoryDataModel } from '@/services/dashboards/widgets/type';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
+// eslint-disable-next-line import/no-cycle
+import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-helper';
+
+const SAMPLE_RAW_DATA = {
+    more: false,
+    results: [
+        {
+            usd_cost_sum: [
+                { date: '2022-01', value: random(100, 5000) },
+                { date: '2022-02', value: random(100, 5000) },
+                { date: '2022-03', value: random(100, 5000) },
+                { date: '2022-04', value: random(100, 5000) },
+                { date: '2022-05', value: random(100, 5000) },
+                { date: '2022-06', value: random(100, 5000) },
+                { date: '2022-07', value: random(100, 5000) },
+                { date: '2022-08', value: random(100, 5000) },
+                { date: '2022-09', value: 0 },
+                { date: '2022-10', value: random(100, 5000) },
+                { date: '2022-11', value: random(100, 5000) },
+                { date: '2022-12', value: random(100, 5000) },
+            ],
+        },
+    ],
+};
 
 const chartContext = ref<HTMLElement | null>(null);
 const {
@@ -98,11 +120,8 @@ const DATE_FIELD_NAME = 'date';
 const props = defineProps<WidgetProps>();
 
 const state = reactive({
-    ...toRefs(useWidgetState(props)),
-    chartData: computed(() => {
-        if (!state.data) return [];
-        return state.data;
-    }),
+    ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
+    chartData: computed(() => getRefinedXYChartData(state.data)),
     currentMonthlyCost: 0,
     previousMonthlyCost: 0,
     differenceCost: computed<number>(() => state.currentMonthlyCost - state.previousMonthlyCost),
@@ -114,40 +133,7 @@ const state = reactive({
 // TODO: api binding
 const fetchData = async () => new Promise((resolve) => {
     setTimeout(() => {
-        resolve([{
-            date: '2022-01',
-            usd_cost: random(1000, 5000),
-        }, {
-            date: '2022-02',
-            usd_cost: random(1000, 5000),
-        }, {
-            date: '2022-03',
-            usd_cost: random(1000, 5000),
-        }, {
-            date: '2022-04',
-            usd_cost: random(1000, 5000),
-        }, {
-            date: '2022-05',
-            usd_cost: random(1000, 5000),
-        }, {
-            date: '2022-06',
-            usd_cost: random(1000, 5000),
-        }, {
-            date: '2022-07',
-            usd_cost: random(1000, 5000),
-        }, {
-            date: '2022-08',
-            usd_cost: random(1000, 5000),
-        }, {
-            date: '2022-09',
-            usd_cost: random(1000, 5000),
-        }, {
-            date: '2022-10',
-            usd_cost: random(1000, 5000),
-        }, {
-            date: '2022-11',
-            usd_cost: random(1000, 5000),
-        }]);
+        resolve(SAMPLE_RAW_DATA.results);
     }, 2000);
 });
 
@@ -155,6 +141,7 @@ const fetchData = async () => new Promise((resolve) => {
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis, yAxis } = createXYDateChart();
     setChartColors(chart, state.colorSet);
+
     xAxis.get('baseInterval').timeUnit = 'month';
     const yRendered = yAxis.get('renderer');
     yRendered.grid.template.setAll({ strokeOpacity: 0 });
@@ -167,35 +154,42 @@ const drawChart = (chartData: XYChartData[]) => {
         paddingLeft: -10,
     });
 
+
     const seriesSettings = {
-        name: 'usd_cost',
-        valueYField: 'usd_cost',
-        valueXField: 'date',
+        valueYField: 'value',
     };
     const series = createXYColumnSeries(chart, seriesSettings);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    series.columns.template.adapters.add('fill', (fill, target) => {
-        const thisMonth = dayjs.utc(state.options.date_range?.start).format(DATE_FORMAT);
+    chart.series.push(series);
+    series.columns.template.setAll({
+        fillOpacity: 0.5,
+        strokeOpacity: 0,
+    });
+    series.columns.template.adapters.add('fillOpacity', (fillOpacity, target) => {
+        const selectedMonth = dayjs.utc(state.options.date_range?.start).format(DATE_FORMAT);
         const previousMonth = dayjs.utc(state.options.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
-
-        if (dayjs.utc(target.dataItem?.dataContext?.date).format(DATE_FORMAT) === thisMonth) {
-            return violet[200];
+        const targetMonth = dayjs.utc(target.dataItem?.dataContext?.[DATE_FIELD_NAME]).format(DATE_FORMAT);
+        if (targetMonth === previousMonth) {
+            return 1;
         }
-        if (dayjs.utc(target.dataItem?.dataContext?.date).format(DATE_FORMAT) === previousMonth) {
-            return violet[600];
+        if (targetMonth === selectedMonth) {
+            return 0.2;
         }
-        return fill;
+        return fillOpacity;
     });
-    series.data.processor = createDataProcessor({
-        dateFormat: DATE_FORMAT,
-        dateFields: [DATE_FIELD_NAME],
-    });
-    series.data.setAll(cloneDeep(chartData));
 
     const tooltip = createTooltip();
     setXYSingleTooltipText(chart, tooltip, state.options.currency, props.currencyRates);
+    tooltip.label.adapters.add('text', (_, target) => {
+        let value = target.dataItem?.dataContext?.[DATE_FIELD_NAME];
+        if (state.options.currency) value = currencyMoneyFormatter(value, state.options.currency, props.currencyRates);
+        return `{valueX.formatDate('MMM')}: [bold]${value}[/]`;
+    });
     series.set('tooltip', tooltip);
+
+    series.data.processor = createDataProcessor({
+        dateFormat: DATE_FORMAT,
+    });
+    series.data.setAll(chartData);
 };
 
 const initWidget = async () => {
@@ -231,7 +225,6 @@ defineExpose({
     .cost {
         @apply text-gray-900;
         line-height: 1.25;
-
         .cost-label {
             font-size: 1rem;
         }
@@ -240,7 +233,10 @@ defineExpose({
             font-size: 1.5rem;
         }
         .cost-info {
-            @apply text-gray-700 font-medium;
+            @apply flex items-center text-gray-700 font-medium;
+        }
+        .p-badge {
+            margin-left: 0.5rem;
         }
     }
 

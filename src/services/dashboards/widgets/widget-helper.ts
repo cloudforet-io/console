@@ -53,7 +53,7 @@ const mergeByKey = (arrA, arrB, key) => {
  */
 export const getRefinedXYChartData = (
     rawData: HistoryDataModel['results'],
-    groupBy: GroupBy,
+    groupBy?: GroupBy,
     categoryKey = 'date',
     valueKey = 'usd_cost_sum',
 ): XYChartData[] => {
@@ -61,7 +61,7 @@ export const getRefinedXYChartData = (
 
     let chartData;
     rawData.forEach((data) => {
-        const groupByName = data[groupBy]; // AmazonCloudFront
+        const groupByName = groupBy ? data[groupBy] : 'value'; // AmazonCloudFront
         const valueList = data[valueKey]; // [{date: '2022-11', value: 34}, ...]
         const refinedList = valueList.map((valueSet) => ({
             date: valueSet.date,
