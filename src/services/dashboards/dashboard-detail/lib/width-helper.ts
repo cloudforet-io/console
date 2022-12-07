@@ -3,10 +3,11 @@ import {
     WIDGET_WIDTH_RANGE_LENGTH_MAX,
     WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
-import type { WidgetSize } from '@/services/dashboards/dashboard-detail/lib/type';
+import type { WidgetSize } from '@/services/dashboards/widgets/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 
 /** NAMING
- * widgetSize: WidgetSize -> 'SM'|'MD'|'LG'|'XL'
+ * widgetSize: WidgetSize -> 'sm'|'md'|'lg'|'xl'
  * widgetWidth: number -> 320, 400... 880, 960
  * widgetWidthRange: Array<number> -> [320, 400, 480]|[480, 560, 640]|[800, 880, 960]|[800, 880, 960]
  * rowWidgetWidthRange: Array<Array<number>> -> [[MD_RANGE], [MD_RANGE], [SM_RANGE], [LG_RANGE]]
@@ -16,12 +17,12 @@ import type { WidgetSize } from '@/services/dashboards/dashboard-detail/lib/type
  * */
 
 const widgetSizeRangeExtractor = (size: WidgetSize, containerWidth: number = WIDGET_CONTAINER_MIN_WIDTH): Array<number> => {
-    if (size === 'SM') return WIDGET_WIDTH_RANGE_LIST.SM;
-    if (size === 'MD') return WIDGET_WIDTH_RANGE_LIST.MD;
-    if (size === 'LG') return WIDGET_WIDTH_RANGE_LIST.LG;
-    if (size === 'XL') return WIDGET_WIDTH_RANGE_LIST.XL;
+    if (size === WIDGET_SIZE.sm) return WIDGET_WIDTH_RANGE_LIST.sm;
+    if (size === WIDGET_SIZE.md) return WIDGET_WIDTH_RANGE_LIST.md;
+    if (size === WIDGET_SIZE.lg) return WIDGET_WIDTH_RANGE_LIST.lg;
+    if (size === WIDGET_SIZE.xl) return WIDGET_WIDTH_RANGE_LIST.xl;
     // WIDGET_WIDTH_RANGE_LIST length, it will return filled by ${containerWidth}
-    if (size === 'FULL') return WIDGET_WIDTH_RANGE_LIST.SM.map(() => containerWidth);
+    if (size === WIDGET_SIZE.full) return WIDGET_WIDTH_RANGE_LIST.sm.map(() => containerWidth);
     return [0];
 };
 

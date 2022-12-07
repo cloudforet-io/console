@@ -27,13 +27,14 @@ import {
 
 import {
     WIDGET_CONTAINER_MAX_WIDTH,
-    WIDGET_CONTAINER_MIN_WIDTH, WIDGET_WIDTH_FULL,
+    WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
-import type { WidgetThemeAssignedList } from '@/services/dashboards/dashboard-detail/lib/theme-helper';
 import { widgetThemeAssigner } from '@/services/dashboards/dashboard-detail/lib/theme-helper';
-import type { WidgetSize, WidgetThemeOption } from '@/services/dashboards/dashboard-detail/lib/type';
+import type { WidgetThemeAssignedList, WidgetThemeOption } from '@/services/dashboards/dashboard-detail/lib/type';
 import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import type { WidgetSize } from '@/services/dashboards/widgets/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 
 
 export default defineComponent({
@@ -82,7 +83,7 @@ export default defineComponent({
          * */
         const handleExpand = (type: 'expand'|'collapse', widgetIndex: number): void => {
             const _widgetSizeList = [...state.widgetSizeList];
-            if (type === 'expand') _widgetSizeList[widgetIndex] = WIDGET_WIDTH_FULL;
+            if (type === 'expand') _widgetSizeList[widgetIndex] = WIDGET_SIZE.full;
             if (type === 'collapse') _widgetSizeList[widgetIndex] = props.widgetSizeList[widgetIndex];
             state.widgetSizeList = [..._widgetSizeList];
         };
