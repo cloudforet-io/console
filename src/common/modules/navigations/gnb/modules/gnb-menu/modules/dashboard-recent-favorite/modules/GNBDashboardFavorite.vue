@@ -84,7 +84,7 @@ export default {
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             loading: true,
-            favoriteDashboardId: computed<FavoriteItem[]>(() => store.state.favorite.dashboardItems),
+            favoriteDashboardIdList: computed<FavoriteItem[]>(() => store.state.favorite.dashboardItems),
             dashboardList: [ // load from dashboard api
                 { name: 'dashboard1', dashboardId: '1' },
                 { name: 'dashboard2', dashboardId: '2' },
@@ -92,13 +92,13 @@ export default {
                 { name: 'dashboard4', dashboardId: '4' },
                 { name: 'dashboard5', dashboardId: '5' },
                 { name: 'dashboard6', dashboardId: '6' },
-                { name: 'dashboard7', dashboardId: '7' },
+                { name: 'dashboard7dashboard7dashboard7dashboard7dashboard7dashboard7dashboard7', dashboardId: '7' },
                 { name: 'dashboard8', dashboardId: '8' },
             ] as TempDashboardModel[],
             favoriteDashboardList: computed<FavoriteItem[]>(() => {
                 const favoriteList: FavoriteItem[] = [];
                 state.dashboardList.forEach((dashboard) => {
-                    const isFavoriteDashboard = !!(state.favoriteDashboardId ?? []).filter((d) => dashboard.dashboardId === d.itemId).length;
+                    const isFavoriteDashboard = !!(state.favoriteDashboardIdList ?? []).filter((d) => dashboard.dashboardId === d.itemId).length;
                     if (isFavoriteDashboard) {
                         favoriteList.push({
                             itemId: dashboard.dashboardId,

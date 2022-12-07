@@ -27,7 +27,6 @@
 
             <div v-if="isOpened && hasCustomMenu"
                  class="custom-menu-wrapper"
-                 @click.stop
             >
                 <g-n-b-dashboard-menu v-if="menuId === MENU_ID.DASHBOARDS"
                                       @close="hideMenu"
@@ -35,7 +34,7 @@
             </div>
             <div v-if="isOpened && hasSubMenu"
                  class="sub-menu-wrapper"
-                 @click.stop="hideMenu"
+                 @click="hideMenu"
             >
                 <g-n-b-sub-menu v-for="(subMenu, index) in subMenuList"
                                 :key="index"
