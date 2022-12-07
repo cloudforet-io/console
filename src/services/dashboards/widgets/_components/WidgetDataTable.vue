@@ -161,6 +161,7 @@ import {
     PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
 } from '@spaceone/design-system';
 import { DATA_TABLE_CELL_TEXT_ALIGN } from '@spaceone/design-system/src/data-display/tables/data-table/config';
+import bytes from 'bytes';
 import { get } from 'lodash';
 
 import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
@@ -179,7 +180,7 @@ import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets'
 import type {
     Field, LegendConfig, TableSize,
 } from '@/services/dashboards/widgets/_components/type';
-import { TABLE_SIZE } from '@/services/dashboards/widgets/_components/type';
+import { TABLE_SIZE, UNIT_MAP } from '@/services/dashboards/widgets/_components/type';
 
 import { GROUP_BY } from '../config';
 
@@ -293,24 +294,51 @@ export default defineComponent<Props>({
         const getHeadSlotProps = (field, colIndex) => ({
             field, index: colIndex, colIndex,
         });
-        const textFormatter = (value:string|number, textType: Field['textType']) => {
+        const textFormatter = (value:string|number, textOptions: Field['textOptions']) => {
             if (typeof value !== 'number') return value;
-            if (textType === 'size') {
-                return byteFormatter(value);
-            } if (textType === 'cost') {
+            if (textOptions?.type === 'size') {
+                let data: number|null;
+                const UNIT_SEPARATOR = ' ';
+
+                if (typeof value === 'number') data = value;
+                else if (typeof value === 'string') data = Number(value);
+                else if (textOptions?.default !== undefined) data = textOptions?.default ?? 0;
+                else data = null;
+
+                let formattedValue: string;
+                if (data === null) formattedValue = '-';
+                else {
+                    const displayUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.display_unit as string] || undefined;
+                    const sourceUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.source_unit as string] || undefined;
+                    const bytesOptions: bytes.BytesOptions = { unit: displayUnit, unitSeparator: UNIT_SEPARATOR };
+
+                    if (sourceUnit) {
+                        data = bytes.parse(`${value}${sourceUnit}`);
+                    }
+
+                    const res = bytes(data, bytesOptions);
+                    if (!res) formattedValue = '-';
+                    else if (res.split(UNIT_SEPARATOR)[1] === 'B') {
+                        formattedValue = `${data} bytes`;
+                    } else {
+                        formattedValue = res;
+                    }
+                }
+                return formattedValue;
+            } if (textOptions?.type === 'cost') {
                 return currencyMoneyFormatter(value, props.currency, props.currencyRates);
-            } if (textType === 'number') {
+            } if (textOptions?.type === 'number') {
                 return numberFormatter(value);
-            } if (textType === 'percent') {
+            } if (textOptions?.type === 'percent') {
                 return `${value}%`;
             }
             return value;
         };
         const getValue = (item:string|number|object, field: Field):string|number => {
             if (typeof item === 'object') {
-                return textFormatter(get(item, field.name), field.textType);
+                return textFormatter(get(item, field.name), field.textOptions);
             }
-            return textFormatter(item, field.textType);
+            return textFormatter(item, field.textOptions);
         };
         const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
             if (typeof option === 'string' || typeof option === 'boolean') {

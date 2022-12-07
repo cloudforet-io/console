@@ -1,20 +1,28 @@
-import type { Currency } from '@/store/modules/display/config';
-import type { CurrencyRates } from '@/store/modules/display/type';
+export const UNIT_MAP = {
+    B: 'B',
+    KB: 'KB',
+    MB: 'MB',
+    GB: 'GB',
+    PB: 'PB',
+    TB: 'TB',
+} as const;
 
+export type UnitMap = typeof UNIT_MAP[keyof typeof UNIT_MAP];
 
 interface CostOption {
     type: 'cost';
-    currencyLabel: string;
-    currency: Currency;
-    currencyRates: CurrencyRates;
 }
 interface PercentOption {
     type: 'percent';
 }
+interface NumberOption {
+    type: 'number';
+}
 interface SizeOption {
     type: 'size';
-    display_unit?: 'BYTES | KB | MB | GB | TB | PB';
-    source_unit?: 'BYTES | KB | MB | GB | TB | PB';
+    display_unit?: UnitMap;
+    source_unit?: UnitMap;
+    default?: number;
 }
 
 export interface LegendConfig {
@@ -31,8 +39,7 @@ export interface Field {
     width?: string;
     label?: string;
     textAlign?: 'left' | 'right';
-    textType?: 'number' | 'cost' | 'percent' | 'size';
-    dataOptions?: CostOption | PercentOption | SizeOption;
+    textOptions?: CostOption | PercentOption | SizeOption | NumberOption;
     detailOptions?: {
         enabled?: boolean;
         type?: 'modal'|'popover';
