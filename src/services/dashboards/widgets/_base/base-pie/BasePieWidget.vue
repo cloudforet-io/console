@@ -2,7 +2,6 @@
     <widget-frame :title="state.title"
                   :size="state.size"
                   :width="props.width"
-                  error-mode
     >
         <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
@@ -107,7 +106,11 @@ const state = reactive({
             name: 'usd_cost',
             type: 'cost',
             textAlign: 'right',
-            textType: 'percent',
+            textOptions: {
+                type: 'size',
+                display_unit: 'GB',
+                source_unit: 'MB',
+            },
             detailOptions: {
                 enabled: true,
                 type: 'popover',
