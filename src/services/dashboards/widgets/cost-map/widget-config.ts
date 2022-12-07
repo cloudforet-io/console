@@ -5,7 +5,6 @@ const costMapWidgetConfig: WidgetConfig = {
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/cost-map/CostMapWidget.vue'),
     }),
-    base_configs: [{ config_id: 'baseMap', version: 'version1' }],
     title: 'Cost Map',
     labels: ['Cost'],
     description: {

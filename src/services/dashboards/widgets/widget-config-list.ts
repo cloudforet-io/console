@@ -1,5 +1,4 @@
 // base widgets
-import baseMap from '@/services/dashboards/widgets/_base/base-map/widget-config';
 import basePie from '@/services/dashboards/widgets/_base/base-pie/widget-config';
 import baseRegion from '@/services/dashboards/widgets/_base/base-region/widget-config';
 import baseTrend from '@/services/dashboards/widgets/_base/base-trend/widget-config';
@@ -59,5 +58,4 @@ export const BASE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {
     baseTrend,
     baseRegion,
     basePie,
-    baseMap,
 };

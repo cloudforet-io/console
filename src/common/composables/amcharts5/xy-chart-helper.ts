@@ -202,7 +202,7 @@ export const createXYColumnSeries = (
     root: Root,
     chart: am5xy.XYChart,
     settings?: Partial<IXYSeriesSettings>,
-): am5xy.XYSeries => {
+): am5xy.ColumnSeries => {
     const series = am5xy.ColumnSeries.new(root, {
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
