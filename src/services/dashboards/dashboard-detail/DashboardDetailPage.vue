@@ -14,7 +14,7 @@ export default {
     name: 'DashboardDetailPage',
     components: { DashboardWidgetContainer },
     setup() {
-        const WIDGET_SIZE_MOCK = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
+        const WIDGET_SIZE_MOCK = ['md', 'md', 'sm', 'md', 'lg', 'sm'];
         const WIDGET_THEME_OPTION_MOCK = [
             { inherit: true, inherit_count: 3 },
             { inherit: true, inherit_count: undefined },

@@ -4,15 +4,15 @@ import {
     WIDGET_CONTAINER_MAX_WIDTH,
     WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
-import type { WidgetSize } from '@/services/dashboards/dashboard-detail/lib/type';
 import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
+import type { WidgetSize } from '@/services/dashboards/widgets/config';
 
 
 /**
  * For manual test
  * */
 const _MANUAL_CONTAINER_WIDTH = 1360;
-const MANUAL_WIDGET_SELECT: Array<WidgetSize> = ['MD', 'MD', 'SM', 'MD', 'LG', 'SM'];
+const MANUAL_WIDGET_SELECT: Array<WidgetSize> = ['md', 'md', 'sm', 'md', 'lg', 'sm'];
 // Widget Array would be shift(), so length should be saved
 const _MANUAL_WIDGET_LENGTH = MANUAL_WIDGET_SELECT.length;
 
@@ -48,8 +48,8 @@ function permutation(arr, selectNum) {
 // if AMOUNT is more than 10, call stack boom
 // for more specific test, please scale up the AMOUNT.
 const _SELECT_WIDGET_AMOUNT = 2;
-// e.g) [['SM', 'SM', 'MD'], ['SM', 'SM', 'LG'] ...]
-const widgetCases: Array<Array<WidgetSize>> = permutation(['SM', 'MD', 'LG', 'XL', 'FULL'], _SELECT_WIDGET_AMOUNT);
+// e.g) [['sm', 'sm', 'md'], ['sm', 'sm', 'lg'] ...]
+const widgetCases: Array<Array<WidgetSize>> = permutation(['sm', 'md', 'lg', 'xl', 'full'], _SELECT_WIDGET_AMOUNT);
 const widgetCasesLength = widgetCases.length;
 
 describe('Select widgets as permutation', () => {

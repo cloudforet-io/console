@@ -1,5 +1,5 @@
 # Number of possible widget cases
-SM, MD, LG, XL, FULL
+sm, md, lg, xl, full
 
 - 1 select
 5PI1 = 5
