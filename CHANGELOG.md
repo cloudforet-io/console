@@ -1,3 +1,10 @@
+# [1.1.0-beta.462](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.461...v1.1.0-beta.462) (2022-12-07)
+
+
+### Features
+
+* **select-dropdown:** add v-bind in slot ([#149](https://github.com/cloudforet-io/mirinae/issues/149)) ([699c617](https://github.com/cloudforet-io/mirinae/commit/699c617d3bbfa09ff26520985bd353e8a8fa18df))
+
 # [1.1.0-beta.461](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.460...v1.1.0-beta.461) (2022-12-05)
 
 
