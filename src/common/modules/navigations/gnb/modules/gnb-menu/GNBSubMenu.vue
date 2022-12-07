@@ -1,6 +1,6 @@
 <template>
     <p-tooltip v-if="show"
-               :contents="label"
+               :contents="isEllipsisActive() ? label : undefined"
                position="bottom"
     >
         <router-link
@@ -17,7 +17,9 @@
                          height="1rem"
                          class="drag-icon"
                     />
-                    <div class="label">
+                    <div ref="labelRef"
+                         class="label"
+                    >
                         {{ label }}
                     </div>
                     <beta-mark v-if="isBeta" />
@@ -33,7 +35,9 @@
 
 <script lang="ts">
 import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+import {
+    defineComponent, reactive, toRefs,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Route } from 'vue-router';
 
@@ -82,6 +86,21 @@ export default defineComponent<Props>({
             default: false,
         },
     },
+    setup() {
+        const state = reactive({
+            labelRef: null as HTMLElement|null,
+        });
+        const isEllipsisActive = () => {
+            if (state.labelRef) {
+                return (state.labelRef?.offsetWidth < state.labelRef?.scrollWidth);
+            } return false;
+        };
+
+        return {
+            ...toRefs(state),
+            isEllipsisActive,
+        };
+    },
 });
 </script>
 
@@ -115,6 +134,7 @@ export default defineComponent<Props>({
             .label {
                 @apply truncate;
                 display: inline-block;
+                width: 100%;
             }
         }
         .is-exist-extra-mark {
