@@ -21,6 +21,9 @@ spec:
 {{ include "spaceone.labels" . | indent 8 }}
         spaceone.service: {{ .Values.name }}
     spec:
+{{- if .Values.global.serviceAccountName }}
+      serviceAccountName: {{ .Values.global.serviceAccountName }}
+{{- end }}
       terminationGracePeriodSeconds: {{ .Values.gracePeriod }}
       containers:
         - name: {{ .Values.name }}
