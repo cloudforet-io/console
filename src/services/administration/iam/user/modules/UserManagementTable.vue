@@ -246,8 +246,8 @@ export default {
         const getArrayWithNotDuplicatedItem = (array) => [...new Set(array)];
         const getUserType = (userType: UserType) => {
             let formattedUserType;
-            if (userType === USER_TYPE.API_USER) formattedUserType = 'Console, API';
-            else formattedUserType = 'User';
+            if (userType === USER_TYPE.API_USER) formattedUserType = 'API Only';
+            else formattedUserType = 'Console, API';
             return formattedUserType;
         };
 
