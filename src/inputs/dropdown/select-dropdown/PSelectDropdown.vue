@@ -1,5 +1,6 @@
 <template>
-    <div v-click-outside="handleClickOutside" class="p-select-dropdown"
+    <div v-click-outside="handleClickOutside"
+         class="p-select-dropdown"
          :class="{
              [styleType] : true,
              invalid,
@@ -24,8 +25,12 @@
                 @click="handleClick"
                 @keydown.down="handlePressDownKey"
         >
-            <span class="text" :class="{placeholder: !$scopedSlots.default && !selectedItem}">
-                <slot name="default">
+            <span class="text"
+                  :class="{placeholder: !$scopedSlots.default && !selectedItem}"
+            >
+                <slot name="default"
+                      v-bind="{item: selectedItem}"
+                >
                     {{
                         selectedItem ?
                             (selectedItem.label || selectedItem.name || '') :
@@ -55,8 +60,12 @@
                         no-select-indication
                         @select="onSelectMenu"
         >
-            <template v-for="(_, slot) of menuSlots" #[slot]="scope">
-                <slot :name="`menu-${slot}`" v-bind="scope" />
+            <template v-for="(_, slot) of menuSlots"
+                      #[slot]="scope"
+            >
+                <slot :name="`menu-${slot}`"
+                      v-bind="scope"
+                />
             </template>
         </p-context-menu>
     </div>

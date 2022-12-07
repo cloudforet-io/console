@@ -243,7 +243,7 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
         ...contextMenuSlots,
         defaultSlot: {
             name: 'default',
-            description: 'Slot for dropdown button text. Default value is placeholder or selected item\'s label.',
+            description: 'Slot for dropdown button text. Default value is placeholder or selected item\'s label. Selected item will be given as slot props.',
             defaultValue: null,
             table: {
                 type: {
