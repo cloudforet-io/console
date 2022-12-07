@@ -35,7 +35,6 @@
 </template>
 
 <script lang="ts">
-
 import type { PropType } from 'vue';
 import {
     computed,
@@ -82,7 +81,7 @@ export default {
             }))),
         });
 
-        const handleSelectCurrency = (currency: string) => {
+        const handleSelectCurrency = (currency: Currency) => {
             store.commit('display/setCurrency', currency);
             emit('update', currency);
         };
