@@ -153,7 +153,7 @@ export default {
             }
         }
         .ghost {
-            @apply bg-blue-100;
+            @apply bg-blue-200;
         }
     }
 }
