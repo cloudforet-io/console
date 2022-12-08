@@ -79,8 +79,8 @@ export default {
             granularity: queryStringToString(urlQuery.granularity) as Granularity,
             stack: queryStringToBoolean(urlQuery.stack),
             group_by: queryStringToArray(urlQuery.groupBy),
-            primary_group_by: queryStringToString(urlQuery.primaryGroupBy) as string,
-            more_group_by: queryStringToArray(urlQuery.moreGroupBy),
+            primary_group_by: queryStringToString(urlQuery.primaryGroupBy) as string, // will be deprecated(< v1.10.5)
+            more_group_by: queryStringToArray(urlQuery.moreGroupBy), // will be deprecated(< v1.10.5)
             period: queryStringToObject(urlQuery.period),
             filters: queryStringToObject(urlQuery.filters),
         });
@@ -108,8 +108,8 @@ export default {
                     granularity: primitiveToQueryString(options.granularity),
                     stack: primitiveToQueryString(options.stack),
                     groupBy: arrayToQueryString(options.groupBy),
-                    primaryGroupBy: primitiveToQueryString(options.primaryGroupBy),
-                    moreGroupBy: arrayToQueryString(options.moreGroupBy),
+                    primaryGroupBy: primitiveToQueryString(options.primaryGroupBy), // will be deprecated(< 1.10.5)
+                    moreGroupBy: arrayToQueryString(options.moreGroupBy), // will be deprecated(< 1.10.5)
                     period: objectToQueryString(options.period),
                     filters: objectToQueryString(options.filters),
                 };
