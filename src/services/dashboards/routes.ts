@@ -49,9 +49,17 @@ const dashboardsRoute: RouteConfig = {
                     component: DashboardDetailPage,
                 },
                 {
-                    path: ':dashboardId/edit',
-                    name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-                    component: DashboardCustomizePage,
+                    path: 'customize',
+                    component: { template: '<router-view />' },
+                    children: [
+                        {
+                            path: ':dashboardId',
+                            name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                            meta: { label: ({ params }) => params.dashboardId, copiable: true },
+                            props: true,
+                            component: DashboardCustomizePage,
+                        },
+                    ],
                 },
             ],
         },
