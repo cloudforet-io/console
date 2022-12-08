@@ -44,6 +44,7 @@ export default defineComponent<Props>({
     props: {
         visible: {
             type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }: SetupContext) {

@@ -16,9 +16,9 @@
                         {{ widget.title }}
                     </div>
                     <div class="card-content">
-                        <img class="card-image"
-                             :src="widget.description?.preview_image"
-                        >
+                        <p-lazy-img :src="widget.description?.preview_image"
+                                    height="4.75rem"
+                        />
                     </div>
                 </li>
             </ul>
@@ -38,37 +38,42 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import { PButtonTab } from '@spaceone/design-system';
+import { PButtonTab, PLazyImg } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
 
 import { i18n } from '@/translations';
 
+import type { WidgetConfig } from '@/services/dashboards/widgets/config';
 import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/widget-config-list';
 
 export default {
     name: 'DashboardDefaultWidgetTab',
     components: {
+        PLazyImg,
         PButtonTab,
     },
     setup() {
         const state = reactive({
-            widgets: computed(() => {
-                const allConfigs = Object.values(CONSOLE_WIDGET_CONFIGS);
-                if (tabState.activeTab === 'all') return allConfigs;
-                return allConfigs.filter((config) => config.labels?.includes(tabState.activeTab));
-            }),
+            widgets: computed(() => getWidgetConfigsByLabel(tabState.activeTab)),
             selectedWidgetConfigId: undefined as string | undefined,
         });
         const tabState = reactive({
-            tabs: computed<TabItem[]>(() => ([
+            tabs: computed<TabItem[]>(() => [
                 // song-lang
-                { name: 'all', label: i18n.t('All') },
-                { name: 'Cost', label: i18n.t('Cost') },
-                { name: 'Asset', label: i18n.t('Asset') },
-                { name: 'Alert', label: i18n.t('Alert') },
-            ])),
+                { name: 'all', label: `${i18n.t('All')} (${getWidgetConfigsByLabel('all').length})` },
+                { name: 'Cost', label: `${i18n.t('Cost')} (${getWidgetConfigsByLabel('Cost').length})` },
+                { name: 'Asset', label: `${i18n.t('Asset')} (${getWidgetConfigsByLabel('Asset').length})` },
+                { name: 'Alert', label: `${i18n.t('Alert')} (${getWidgetConfigsByLabel('Alert').length})` },
+            ]),
             activeTab: 'all',
         });
+
+        /* Util */
+        const getWidgetConfigsByLabel = (label: string): Array<Partial<WidgetConfig>> => {
+            const allConfigs = Object.values(CONSOLE_WIDGET_CONFIGS);
+            if (label === 'all') return allConfigs;
+            return allConfigs.filter((config) => config.labels?.includes(label));
+        };
 
         /* Event */
         const handleChangeTab = (selectedTab) => {
