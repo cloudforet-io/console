@@ -1,5 +1,8 @@
 <template>
-    <span class="p-badge" :class="allBodyClass" :style="[inlineStyles]">
+    <span class="p-badge"
+          :class="allBodyClass"
+          :style="[inlineStyles]"
+    >
         <slot />
     </span>
 </template>
@@ -126,6 +129,7 @@ export default defineComponent<Badge>({
     @mixin badge-color coral500, theme('colors.coral.500'), theme('colors.white');
     @mixin badge-color peacock, theme('colors.peacock.500'), theme('colors.white');
     @mixin badge-color indigo, theme('colors.indigo.500'), theme('colors.white');
+    @mixin badge-color indigo100, theme('colors.indigo.100'), theme('colors.indigo.600');
 
     /* Styles without outline case */
     @mixin badge-without-outline primary3, theme('colors.primary3'), theme('colors.violet.600');

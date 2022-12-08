@@ -18,6 +18,7 @@ export const BADGE_STYLE = Object.freeze({
     safe: 'safe',
     peacock: 'peacock',
     indigo: 'indigo',
+    indigo100: 'indigo100',
 
     primary3: 'primary3',
     blue200: 'blue200',
