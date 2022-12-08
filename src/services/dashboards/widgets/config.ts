@@ -3,9 +3,8 @@ import type { AsyncComponent } from 'vue';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DynamicWidgetType } from '@spaceone/design-system/src/data-display/dynamic/dynamic-widget/type';
 
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
-
 import type { Tags } from '@/models';
+import type { RawQueryOperator } from '@/query/type';
 
 import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
@@ -93,6 +92,14 @@ interface LegendOptions {
     show_at?: 'table'|'chart';
 }
 
+interface WidgetFilter {
+    k?: string;
+    v: null|string|boolean|number;
+    o?: RawQueryOperator;
+}
+interface WidgetFiltersMap {
+    [key: string]: WidgetFilter[]
+}
 export interface WidgetOptions {
     date_range?: DateRange;
     currency?: Currency;
@@ -101,7 +108,7 @@ export interface WidgetOptions {
     stacked?: boolean;
     legend_options?: LegendOptions;
     chart_type?: ChartType;
-    filter?: QueryStoreFilter[];
+    filter?: WidgetFiltersMap[];
     dynamic_widget_type?: DynamicWidgetType;
     name_options?: DynamicField;
     value_options?: DynamicField;
