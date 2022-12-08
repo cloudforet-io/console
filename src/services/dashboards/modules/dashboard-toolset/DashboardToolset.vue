@@ -3,6 +3,7 @@
         <dashboard-date-range-badge />
         <dashboard-date-dropdown />
         <currency-select-dropdown default-mode />
+        <dashboard-refresh-dropdown filled />
     </div>
 </template>
 
@@ -11,6 +12,7 @@ import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dr
 
 import DashboardDateDropdown from '@/services/dashboards/modules/dashboard-toolset/DashboardDateDropdown.vue';
 import DashboardDateRangeBadge from '@/services/dashboards/modules/dashboard-toolset/DashboardDateRangeBadge.vue';
+import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
 </script>
 
 <style scoped>
