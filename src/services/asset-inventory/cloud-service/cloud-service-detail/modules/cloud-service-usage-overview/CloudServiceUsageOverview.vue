@@ -149,25 +149,10 @@ export default defineComponent<Props>({
 
         const fetchDataWithSchema = async (schema: DynamicWidgetSchema, idx: number): Promise<Data> => {
             fetchDataTokenList[idx] = axios.CancelToken.source();
-            /* TODO:: This is a temporary defense code. Fundamental solution is needed in Mirinae.  */
-            const editedApiQueryForNullIssue = {
-                ...state.apiQuery,
-                filter: state.apiQuery.filter?.map((d) => {
-                    if (d.k.includes('tags') && d.v.includes('null')) {
-                        return {
-                            ...d,
-                            v: d.v.map((value) => {
-                                if (value === 'null') return null;
-                                return value;
-                            }),
-                        };
-                    }
-                    return d;
-                }),
-            };
+
             try {
                 const { results } = await SpaceConnector.client.inventory.cloudService.analyze({
-                    ...editedApiQueryForNullIssue,
+                    ...state.apiQuery,
                     default_query: schema.query,
                     date_range: state.dateRange,
                 });
