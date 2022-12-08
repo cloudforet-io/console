@@ -156,10 +156,7 @@ export default defineComponent<Props>({
                     if (d.k.includes('tags') && d.v.includes('null')) {
                         return {
                             ...d,
-                            v: d.v.map((value) => {
-                                if (value === 'null') return null;
-                                return value;
-                            }),
+                            v: d.v.filter((value) => value !== 'null'),
                         };
                     }
                     return d;
