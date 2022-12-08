@@ -1,3 +1,11 @@
+# [1.1.0-beta.464](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.463...v1.1.0-beta.464) (2022-12-08)
+
+
+### Features
+
+* **p-badge:** new style-type - indigo100 ([#154](https://github.com/cloudforet-io/mirinae/issues/154)) ([b66a6d0](https://github.com/cloudforet-io/mirinae/commit/b66a6d03cc032d1feb02e98b54b166559ff66fa5))
+* **p-i:** add reserve direction spin animation to PI ([#153](https://github.com/cloudforet-io/mirinae/issues/153)) ([07674d1](https://github.com/cloudforet-io/mirinae/commit/07674d1599d8a3f23cc09ca99436f6e34fdf8224))
+
 # [1.1.0-beta.463](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.462...v1.1.0-beta.463) (2022-12-08)
 
 
