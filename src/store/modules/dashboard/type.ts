@@ -1,11 +1,18 @@
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
-export const VIEWERS_TYPE = Object.freeze({
+export const VIEWERS_TYPE = {
     PUBLIC: 'PUBLIC',
     PRIVATE: 'PRIVATE',
-});
+} as const;
 
 export type ViewersType = typeof VIEWERS_TYPE[keyof typeof VIEWERS_TYPE];
+
+export const SCOPE_TYPE = {
+    DOMAIN: 'DOMAIN',
+    PROJECT: 'PROJECT',
+} as const;
+
+export type ScopeType = typeof SCOPE_TYPE[keyof typeof SCOPE_TYPE];
 
 export interface DashboardState {
     domainItems?: DomainDashboardItem[];

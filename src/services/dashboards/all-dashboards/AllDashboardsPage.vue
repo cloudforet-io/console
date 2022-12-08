@@ -27,11 +27,13 @@
         />
         <div class="dashboard-list-wrapper">
             <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.PROJECT"
+                                  :scope-type="SCOPE_TYPE.DOMAIN"
                                   class="dashboard-list"
                                   :field-title="'Entire Workspace'"
                                   :dashboard-list="workspaceDashboardList"
             />
             <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.DOMAIN"
+                                  :scope-type="SCOPE_TYPE.PROJECT"
                                   class="dashboard-list"
                                   :field-title="'Single Project'"
                                   :dashboard-list="projectDashboardList"
@@ -141,7 +143,7 @@ export default {
         })();
 
         onUnmounted(() => {
-            // urlQueryString watcher is referencing assetInventoryStore which is destroyed on unmounted. so urlQueryString watcher must be destroyed on unmounted too.
+            // urlQueryString watcher is referencing dashboardStore which is destroyed on unmounted. so urlQueryString watcher must be destroyed on unmounted too.
             if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
         });
 

@@ -1,8 +1,7 @@
 import type { Action } from 'vuex';
 
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
-
-// import { SpaceConnector } from '@/space-connector';
+// import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { DashboardState } from '@/store/modules/dashboard/type';
 
@@ -11,9 +10,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 // TODO: implementation
 export const loadDomainDashboard: Action<DashboardState, any> = async ({ commit }): Promise<void> => {
     try {
-        const response = {};
-        // const response = await SpaceConnector.clientV2.dashboard.domainDashboard.list({});
-        // console.log(response);
+        const response = [];
+        // const response = await SpaceConnector.clientV2.dashboard.domainDashboard.list({
+        //     domain_id: '',
+        // });
         commit('setDomainItems', response);
     } catch (e) {
         ErrorHandler.handleError(e);
