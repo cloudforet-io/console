@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/config';
 
 const awsCloudFrontCostWidgetConfig: WidgetConfig = {
-    widget_config_id: 'awsDataTransferCostTrend',
+    widget_config_id: 'awsCloudFrontCost',
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/aws-cloud-front-cost/AWSCloudFrontCost.vue'),
     }),
