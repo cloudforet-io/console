@@ -3,8 +3,9 @@ import type { AsyncComponent } from 'vue';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DynamicWidgetType } from '@spaceone/design-system/src/data-display/dynamic/dynamic-widget/type';
 
+import type { RawQueryOperator } from '@cloudforet/core-lib/query/type';
+
 import type { Tags } from '@/models';
-import type { RawQueryOperator } from '@/query/type';
 
 import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
