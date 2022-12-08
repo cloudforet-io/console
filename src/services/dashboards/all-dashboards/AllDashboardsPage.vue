@@ -26,12 +26,14 @@
                    @refresh="handleQueryChange()"
         />
         <div class="dashboard-list-wrapper">
+            <!--song-lang-->
             <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.PROJECT"
                                   :scope-type="SCOPE_TYPE.DOMAIN"
                                   class="dashboard-list"
                                   :field-title="'Entire Workspace'"
                                   :dashboard-list="workspaceDashboardList"
             />
+            <!--song-lang-->
             <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.DOMAIN"
                                   :scope-type="SCOPE_TYPE.PROJECT"
                                   class="dashboard-list"
