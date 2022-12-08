@@ -13,7 +13,7 @@
             </p-button>
         </div>
         <div class="content-wrapper">
-            <div>
+            <div class="radio-wrapper">
                 <p-radio v-for="policy in conditionsPolicies"
                          :key="policy.name"
                          v-model="proxyConditionsPolicy"
@@ -201,6 +201,9 @@ export default {
     font-size: 0.875rem;
     padding: 1rem;
 
+    .radio-wrapper {
+        @apply flex items-center;
+    }
     .input-wrapper {
         display: flex;
         margin-top: 0.75rem;
