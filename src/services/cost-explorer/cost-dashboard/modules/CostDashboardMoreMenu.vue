@@ -123,6 +123,7 @@ export default {
                 await costExplorerStore.dispatch('setDashboardList');
                 await SpaceRouter.router.replace({ name: COST_EXPLORER_ROUTE._NAME });
             } catch (e) {
+                // song-lang
                 ErrorHandler.handleRequestError(e, 'Failed to delete dashboard');
             } finally {
                 checkDeleteState.loading = false;
