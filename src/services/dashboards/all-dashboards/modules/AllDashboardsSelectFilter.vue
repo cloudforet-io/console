@@ -55,6 +55,7 @@ export default defineComponent({
     name: 'AllDashboardsSelectFilter',
     components: { PSelectStatus, PSelectDropdown, PDivider },
     setup() {
+        /* song-lang */
         const state = reactive({
             viewerFilterList: computed(() => [
                 { label: i18n.t('All'), name: VIEWERS_TYPE.ALL },
