@@ -25,6 +25,9 @@
                     />
                 </span>
             </template>
+            <template #extra>
+                <dashboard-control-buttons />
+            </template>
         </p-page-title>
         <dashboard-widget-container
             :widget-size-list="WIDGET_SIZE_MOCK"
@@ -46,6 +49,7 @@ import { gray } from '@/styles/colors';
 
 import { DASHBOARD_VIEWER_PUBLIC } from '@/services/dashboards/dashboard-create/config';
 import type { DashboardViewerType } from '@/services/dashboards/dashboard-create/type';
+import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/DashboardMoreMenu.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 
