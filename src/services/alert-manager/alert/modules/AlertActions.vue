@@ -159,13 +159,13 @@ export default {
             buttonGroup: computed(() => ([
                 {
                     name: ALERT_ACTION.acknowledge,
-                    styleType: 'primary',
+                    styleType: 'secondary',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.BUTTON_ACKNOWLEDGE'),
                     disabled: props.manageDisabled || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.ACKNOWLEDGED)) || state.isSelectedError,
                 },
                 {
                     name: ALERT_ACTION.resolve,
-                    styleType: 'primary',
+                    styleType: 'secondary',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.BUTTON_RESOLVE'),
                     disabled: props.manageDisabled || state.isSelectedNone || (state.isSelectedOne && state.selectedItemsState.includes(ALERT_STATE.RESOLVED)) || state.isSelectedError,
 
