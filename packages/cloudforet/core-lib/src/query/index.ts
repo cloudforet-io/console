@@ -36,7 +36,8 @@ const filterToQueryTag = (
         if (filter.v === null || filter.v === undefined) return null;
         return { value: { label: filter.v?.toString() ?? 'Null', name: filter.v } };
     }
-    if (filter.v === null || filter.v === undefined) {
+    // TODO: remove checking string 'null' case. This is defense code for v1.10.4.1
+    if (filter.v === 'null' || filter.v === null || filter.v === undefined) {
         /* null case */
         return {
             key: keyMap[filter.k] || { label: filter.k, name: filter.k },
