@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import dashboard from './modules/dashboard';
 import display from './modules/display';
 import domain from './modules/domain';
 import error from './modules/error';
@@ -18,6 +19,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store<any>({
     modules: {
         user,
+        dashboard,
         settings,
         domain,
         favorite,

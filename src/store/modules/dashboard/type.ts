@@ -7,6 +7,13 @@ export const VIEWERS_TYPE = Object.freeze({
 
 export type ViewersType = typeof VIEWERS_TYPE[keyof typeof VIEWERS_TYPE];
 
+export const SCOPE_TYPE = Object.freeze({
+    DOMAIN: 'DOMAIN',
+    PROJECT: 'PROJECT',
+});
+
+export type ScopeType = typeof SCOPE_TYPE[keyof typeof SCOPE_TYPE];
+
 export interface DashboardState {
     domainItems?: DomainDashboardItem[];
     projectItems?: ProjectDashboardItem[];

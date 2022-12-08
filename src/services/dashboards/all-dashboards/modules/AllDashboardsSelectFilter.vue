@@ -71,9 +71,11 @@ export default defineComponent({
         });
 
         const handleChangeViewers = (selected) => {
+            if (selected === state.viewersStatus) return;
             store.dispatch('dashboard/setSelectedViewers', selected);
         };
         const handleChangeScope = (selected) => {
+            if (selected === state.scopeStatus) return;
             store.dispatch('dashboard/setSelectedScope', selected);
         };
 
