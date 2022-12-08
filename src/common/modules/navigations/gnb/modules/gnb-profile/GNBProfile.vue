@@ -23,6 +23,10 @@
             </div>
             <div class="info-wrapper">
                 <div class="info-menu">
+                    <span class="label">{{ $t('IDENTITY.USER.MAIN.DOMAIN_ID') }}</span>
+                    <span class="value">{{ domainId }}</span>
+                </div>
+                <div class="info-menu">
                     <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
                     <span class="value">{{ role }}</span>
                 </div>
@@ -188,6 +192,7 @@ export default defineComponent<Props>({
             }),
             language: computed(() => store.getters['user/languageLabel']),
             timezone: computed(() => store.state.user.timezone),
+            domainId: computed(() => store.state.domain.domainId),
             userId: computed(() => store.state.user.userId),
             hasDomainRole: computed((() => store.getters['user/hasDomainRole'])),
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
@@ -321,12 +326,11 @@ export default defineComponent<Props>({
         right: -0.5rem;
         left: auto;
         margin-top: -0.5rem;
-        max-width: 17.5rem;
         box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
     }
     .profile-menu-wrapper {
         @mixin menu-dropdown;
-        min-width: 15.125rem;
+        min-width: 19.5rem;
 
         .user-info {
             @apply flex items-center;
