@@ -1,3 +1,10 @@
+# [1.1.0-beta.463](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.462...v1.1.0-beta.463) (2022-12-08)
+
+
+### Features
+
+* **icon:** add renew icon ([#150](https://github.com/cloudforet-io/mirinae/issues/150)) ([bf5f186](https://github.com/cloudforet-io/mirinae/commit/bf5f1864cf35b0c159db9d88169c6e115a49ae20))
+
 # [1.1.0-beta.462](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.461...v1.1.0-beta.462) (2022-12-07)
 
 
