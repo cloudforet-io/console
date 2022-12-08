@@ -32,6 +32,10 @@ export const serviceRoutes: RouteConfig[] = [
         },
         component: { template: '<router-view />' },
         children: [
+            {
+                path: 'dashboard',
+                redirect: '/home-dashboard',
+            },
             homeDashboardRoute,
             administrationRoute,
             assetInventoryRoute,
