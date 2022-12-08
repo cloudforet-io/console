@@ -200,6 +200,7 @@ export default defineComponent<DashboardBoardListProps>({
     }
     .dashboard-list-pagination {
         @apply w-full flex justify-center;
+        margin-top: 0.5rem;
     }
 }
 </style>
