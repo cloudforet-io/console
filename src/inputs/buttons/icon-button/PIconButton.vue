@@ -6,7 +6,9 @@
         :disabled="disabled || loading"
         v-on="$listeners"
     >
-        <p-spinner v-if="loading" :size="loadingSize" />
+        <p-spinner v-if="loading"
+                   :size="loadingSize"
+        />
         <slot v-else>
             <p-i :name="name"
                  :width="sizeValue"
@@ -19,12 +21,14 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
+import type { AnimationType } from '@/foundation/icons/config';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
@@ -81,9 +85,9 @@ export default defineComponent<IconButtonProps>({
             },
         },
         animation: {
-            type: String,
+            type: String as PropType<AnimationType|undefined>,
             default: undefined,
-            validator(animation: any) {
+            validator(animation: AnimationType|undefined) {
                 return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
             },
         },
