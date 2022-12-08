@@ -3,7 +3,7 @@
         <dashboard-date-range-badge />
         <dashboard-date-dropdown />
         <currency-select-dropdown default-mode />
-        <dashboard-refresh-dropdown filled />
+        <dashboard-refresh-dropdown :filled="false" />
     </div>
 </template>
 

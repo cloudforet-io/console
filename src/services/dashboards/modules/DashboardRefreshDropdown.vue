@@ -10,10 +10,10 @@
                            :items="intervalItems"
                            :selected="interval"
                            :read-only="loading"
-                           :class="{ loading }"
+                           :class="{ loading, unfilled: !filled }"
                            @select="handleSelectInterval"
         >
-            <span v-if="!filled">d</span>
+            <span v-if="!filled" />
         </p-select-dropdown>
     </div>
 </template>
@@ -103,7 +103,7 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .dashboard-refresh-dropdown {
-    @apply flex items-center;
+    @apply inline-flex items-center;
 
     /* custom design-system component - p-icon-button */
     :deep(.left-icon-button) {
@@ -121,6 +121,11 @@ export default defineComponent<Props>({
         .dropdown-button {
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
+        }
+        &.unfilled {
+            .dropdown-button {
+                padding-left: 0.25rem;
+            }
         }
     }
 }
