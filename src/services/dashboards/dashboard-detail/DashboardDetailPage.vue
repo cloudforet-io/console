@@ -29,6 +29,7 @@
                 <dashboard-control-buttons />
             </template>
         </p-page-title>
+        <dashboard-refresher loading />
         <dashboard-widget-container
             :widget-size-list="WIDGET_SIZE_MOCK"
             :widget-theme-option-list="WIDGET_THEME_OPTION_MOCK"
@@ -51,9 +52,8 @@ import { DASHBOARD_VIEWER_PUBLIC } from '@/services/dashboards/dashboard-create/
 import type { DashboardViewerType } from '@/services/dashboards/dashboard-create/type';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/DashboardMoreMenu.vue';
+import DashboardRefresher from '@/services/dashboards/dashboard-detail/modules/DashboardRefresher.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
-
-
 
 const PUBLIC_ICON_COLOR = gray[500];
 
