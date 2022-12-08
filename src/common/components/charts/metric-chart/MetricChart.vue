@@ -1,8 +1,12 @@
 <template>
     <div class="p-metric-chart">
-        <div class="flex justify-between">
-            <span class="text-sm font-bold capitalize">{{ title }}</span>
-            <span class="text-sm text-gray flex-grow">&nbsp; {{ unit.y ? `(${unit.y})` : '' }}</span>
+        <div class="chart-title-wrapper">
+            <p-tooltip
+                :contents="`${title}`"
+            >
+                <span class="chart-title">{{ title }}</span>
+            </p-tooltip>
+            <span class="chart-unit ">&nbsp; {{ unit.y ? `(${unit.y})` : '' }}</span>
             <p-spinner v-if="loading && chart" />
         </div>
         <p-data-loader :loading="loading && !chart"
@@ -72,7 +76,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import {
-    PDataLoader, PSkeleton, PSpinner,
+    PDataLoader, PSkeleton, PSpinner, PTooltip,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
@@ -104,7 +108,9 @@ interface Tooltip {
 
 export default defineComponent<MetricChartProps>({
     name: 'PMetricChart',
-    components: { PSkeleton, PDataLoader, PSpinner },
+    components: {
+        PSkeleton, PDataLoader, PSpinner, PTooltip,
+    },
     props: {
         loading: {
             type: Boolean,
@@ -274,6 +280,24 @@ export default defineComponent<MetricChartProps>({
     position: relative;
     box-shadow: 0 2px 4px rgba(theme('colors.black'), 0.06);
     padding: 1.25rem;
+
+    .chart-title-wrapper {
+        @apply flex justify-between;
+        .has-tooltip {
+            @apply flex-grow;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .chart-title {
+            @apply text-sm font-bold capitalize;
+        }
+        .chart-unit {
+            @apply text-sm text-gray flex-shrink ml-2;
+        }
+    }
 
     .chart-wrapper {
         position: relative;
