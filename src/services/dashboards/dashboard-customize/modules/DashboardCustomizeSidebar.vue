@@ -48,6 +48,7 @@
                 </draggable>
             </div>
         </portal>
+        <dashboard-add-widget-modal :visible.sync="addWidgetModalVisible" />
     </div>
 </template>
 
@@ -64,19 +65,20 @@ import {
 
 import { store } from '@/store';
 
+import DashboardAddWidgetModal from '@/services/dashboards/dashboard-customize/modules/DashboardAddWidgetModal.vue';
+
 export default {
     name: 'DashboardCustomizeSidebar',
     components: {
+        DashboardAddWidgetModal,
         PI,
         PButton,
         PDivider,
         PToggleButton,
         draggable,
     },
-    props: {},
     setup() {
         const state = reactive({
-            customizeModalVisible: false,
             enableDateRange: true,
             enableCurrency: true,
             sampleWidgets: [ // TODO: sample data
@@ -88,11 +90,12 @@ export default {
                 { name: 'widget6', label: 'Cost Trend by Provider Cost Trend by Provider' },
                 { name: 'widget7', label: 'Month-to-Date Spend' },
             ],
+            addWidgetModalVisible: false,
         });
 
         /* Event */
         const handleClickAddWidget = () => {
-            console.log('add widget!'); // TODO: to be deleted
+            state.addWidgetModalVisible = true;
         };
 
         onMounted(() => {
