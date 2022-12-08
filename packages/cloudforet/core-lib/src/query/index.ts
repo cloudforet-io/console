@@ -36,8 +36,7 @@ const filterToQueryTag = (
         if (filter.v === null || filter.v === undefined) return null;
         return { value: { label: filter.v?.toString() ?? 'Null', name: filter.v } };
     }
-    // TODO: remove checking string 'null' case. This is defense code for v1.10.4.1
-    if (filter.v === 'null' || filter.v === null || filter.v === undefined) {
+    if (filter.v === null || filter.v === undefined) {
         /* null case */
         return {
             key: keyMap[filter.k] || { label: filter.k, name: filter.k },
@@ -75,26 +74,38 @@ const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') 
     _filters.forEach((f) => {
         if (f.k) {
             let op: RawQueryOperator;
+            let value = f.v;
             /* null case */
-            if (f.v === null || f.v === undefined) op = f.o?.startsWith('!') ? '!=' : '=';
-            else op = f.o ?? '';
+            // TODO: remove checking string 'null' case. This is defense code for v1.10.4.2
+            if (value === 'null' || value === null || value === undefined) {
+                op = f.o?.startsWith('!') ? '!=' : '=';
+                value = null;
+            } else op = f.o ?? '';
 
             if (datetimeRawQueryOperatorToQueryTagOperatorMap[op]) {
                 /* datetime case */
                 const datetimeFilters = convertDatetimeQueryStoreFilterToFilters(f, timezone);
                 if (datetimeFilters) filter = filter.concat(datetimeFilters);
-            } else if (Array.isArray(f.v)) {
+            } else if (Array.isArray(value)) {
+                // TODO: remove checking string 'null' case. This is defense code for v1.10.4.2
+                if (f.k.startsWith('tags.')) {
+                    value = value.map((d) => {
+                        if (d === 'null') return null;
+                        return d;
+                    });
+                }
+
                 /* plural case */
                 if (rawQueryOperatorToPluralApiQueryOperatorMap[op]) {
-                    filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToPluralApiQueryOperatorMap[op] as FilterOperator });
+                    filter.push({ k: f.k, v: value, o: rawQueryOperatorToPluralApiQueryOperatorMap[op] as FilterOperator });
                 } else {
-                    f.v.forEach((v) => {
+                    value.forEach((v) => {
                         filter.push({ k: f.k as string, v, o: rawQueryOperatorToApiQueryOperatorMap[op] });
                     });
                 }
             } else {
                 /* general case */
-                filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToApiQueryOperatorMap[op] });
+                filter.push({ k: f.k, v: value, o: rawQueryOperatorToApiQueryOperatorMap[op] });
             }
         } else if (f.v !== null && f.v !== undefined) {
             /* keyword case */
