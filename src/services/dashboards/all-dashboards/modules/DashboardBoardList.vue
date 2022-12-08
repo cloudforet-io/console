@@ -41,8 +41,8 @@
              class="dashboard-list-pagination"
         >
             <p-pagination :total-count="dashboardList.length"
-                          :page-size="10"
-                          :current-page="currentPage"
+                          :page-size="PAGE_SIZE"
+                          :current-page="thisPage"
                           @change="handlePage"
             />
         </div>
@@ -62,6 +62,7 @@ import {
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { QueryStoreFilterValue } from '@/query/type';
 import { store } from '@/store';
 
 import type { DashboardItem, ScopeType } from '@/store/modules/dashboard/type';
@@ -69,6 +70,8 @@ import { SCOPE_TYPE } from '@/store/modules/dashboard/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+
+const PAGE_SIZE = 10;
 
 interface DashboardBoardListProps {
     scopeType: ScopeType;
@@ -102,10 +105,10 @@ export default defineComponent<DashboardBoardListProps>({
     },
     setup(props) {
         const state = reactive({
-            currentPage: 1,
+            thisPage: 1,
             dashboardScopeType: computed(() => (props.scopeType === SCOPE_TYPE.DOMAIN ? 'domain' : 'project')),
             dashboardListByBoardSets: computed(() => props.dashboardList
-                .slice((state.currentPage - 1) * 10, state.currentPage * 10)
+                .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
                 .map((d) => (
                     {
                         ...d,
@@ -125,19 +128,22 @@ export default defineComponent<DashboardBoardListProps>({
             },
             {
                 iconName: 'ic_trashcan',
-                eventAction: () => SpaceConnector.clientV2.dashboard[`${state.dashboardScopeType}Dashboard`].delete({
-                    [`${state.dashboardScopeType}_dashboard_id`]: dashboardId,
-                }),
+                /* TODO: Implementation */
+                eventAction: async () => {
+                    await SpaceConnector.clientV2.dashboard[`${state.dashboardScopeType}Dashboard`].delete({
+                        [`${state.dashboardScopeType}_dashboard_id`]: dashboardId,
+                    });
+                },
             },
         ];
 
         const labelQueryHelper = new QueryHelper();
-        const handleSetQuery = (selectedLabel) => {
+        const handleSetQuery = (selectedLabel: QueryStoreFilterValue | QueryStoreFilterValue[]) => {
             labelQueryHelper.setFilters(store.state.dashboard.searchFilters).addFilter({ k: 'label', o: '=', v: selectedLabel });
             store.dispatch('dashboard/setSearchFilters', labelQueryHelper.filters);
         };
-        const handlePage = (page) => {
-            state.currentPage = page;
+        const handlePage = (page: number) => {
+            state.thisPage = page;
         };
 
         return {
@@ -146,6 +152,7 @@ export default defineComponent<DashboardBoardListProps>({
             handlePage,
             FAVORITE_TYPE,
             SCOPE_TYPE,
+            PAGE_SIZE,
         };
     },
 });
