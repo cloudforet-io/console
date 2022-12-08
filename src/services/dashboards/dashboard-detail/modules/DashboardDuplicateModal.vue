@@ -56,25 +56,19 @@ import {
     PButtonModal, PCheckBox, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { fetchDefaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/helper';
 import type {
-    CustomLayout, DashboardCreateParam,
     DashboardInfo,
-    DashboardPrivacyType, PeriodType,
+    DashboardPrivacyType,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import {
-    DASHBOARD_PRIVACY_TYPE, PERIOD_TYPE,
+    DASHBOARD_PRIVACY_TYPE,
 } from '@/services/cost-explorer/cost-dashboard/type';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 interface Props {
     visible: boolean;
@@ -137,7 +131,9 @@ export default defineComponent<Props>({
             name: '',
             visibility: '',
         }, {
+            // song-lang
             name(value: string) { return value.trim().length ? '' : 'Required Field'; },
+            // song-lang
             visibility(value: DashboardPrivacyType) { return value.length ? '' : 'Required Field'; },
         });
         const state = reactive({
@@ -151,38 +147,40 @@ export default defineComponent<Props>({
             emit('update:visible', visible);
         };
 
-        const getCustomLayouts = async () => {
-            const hasDefaultId = Object.prototype.hasOwnProperty.call(props.dashboard, 'default_layout_id');
-            if (hasDefaultId && (!props.dashboard.custom_layouts || props.dashboard.custom_layouts.length === 0)) {
-                return await fetchDefaultLayoutData(props.dashboard.default_layout_id as string) as CustomLayout[];
-            }
-            return props.dashboard.custom_layouts as CustomLayout[];
-        };
+        // const getCustomLayouts = async () => {
+        //     const hasDefaultId = Object.prototype.hasOwnProperty.call(props.dashboard, 'default_layout_id');
+        //     if (hasDefaultId && (!props.dashboard.custom_layouts || props.dashboard.custom_layouts.length === 0)) {
+        //         return await fetchDefaultLayoutData(props.dashboard.default_layout_id as string) as CustomLayout[];
+        //     }
+        //     return props.dashboard.custom_layouts as CustomLayout[];
+        // };
 
-        const makeDashboardCreateParam = async (): Promise<DashboardCreateParam> => ({
-            name: name.value,
-            custom_layouts: await getCustomLayouts(),
-            period_type: props.dashboard.period_type as PeriodType ?? PERIOD_TYPE.AUTO,
-            period: props.dashboard.period,
-            default_filter: state.includesFilter ? props.dashboard.default_filter : {},
-        });
+        // const makeDashboardCreateParam = async (): Promise<DashboardCreateParam> => ({
+        //     name: name.value,
+        //     custom_layouts: await getCustomLayouts(),
+        //     period_type: props.dashboard.period_type as PeriodType ?? PERIOD_TYPE.AUTO,
+        //     period: props.dashboard.period,
+        //     default_filter: state.includesFilter ? props.dashboard.default_filter : {},
+        // });
 
         const createPublicDashboard = async (): Promise<string|undefined> => {
             try {
-                const res = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
-                return res.public_dashboard_id;
+                // const res = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
+                // return res.public_dashboard_id;
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
+                // song-lang
+                ErrorHandler.handleRequestError(e, 'Failed to create dashboard');
             }
             return undefined;
         };
 
         const createUserDashboard = async (): Promise<string|undefined> => {
             try {
-                const res = await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
-                return res.user_dashboard_id;
+                // const res = await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
+                // return res.user_dashboard_id;
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.ALT_E_CREATE_ALERT'));
+                // song-lang
+                ErrorHandler.handleRequestError(e, 'Failed to create dashboard');
             }
             return undefined;
         };
@@ -190,10 +188,11 @@ export default defineComponent<Props>({
         const handleConfirm = async () => {
             if (!isAllValid) return;
             const duplicatedDashboardId = visibility.value === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
-            await costExplorerStore.dispatch('setDashboardList');
+            // TODO:: connect dashboard store
+            // await costExplorerStore.dispatch('setDashboardList');
             if (duplicatedDashboardId) {
                 await SpaceRouter.router.push({
-                    name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
+                    name: DASHBOARDS_ROUTE._NAME,
                     params: { dashboardId: duplicatedDashboardId },
                 });
             }
