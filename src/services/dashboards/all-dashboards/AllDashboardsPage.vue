@@ -44,6 +44,22 @@
                                   :dashboard-list="projectDashboardList"
             />
         </div>
+        <div v-else
+             class="empty-case"
+        >
+            <img class="empty-image"
+                 src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
+            >
+            <p-empty class="empty-text">
+                {{ $t('Create a dashboard to get insights at a glance.') }}
+            </p-empty>
+            <p-button icon-left="ic_plus"
+                      @click="handleCreateDashboard"
+            >
+                <!--song lang-->
+                {{ $t('Create New Dashboard') }}
+            </p-button>
+        </div>
     </div>
 </template>
 
@@ -54,7 +70,7 @@ import {
 } from 'vue';
 
 import {
-    PPageTitle, PDivider, PButton, PToolbox,
+    PPageTitle, PDivider, PButton, PToolbox, PEmpty,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 
@@ -74,6 +90,7 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 export default {
     name: 'AllDashboardsPage',
     components: {
+        PEmpty,
         PToolbox,
         DashboardBoardList,
         AllDashboardsSelectFilter,
@@ -174,6 +191,15 @@ export default {
     @screen tablet {
         .dashboard-list-wrapper {
             display: block;
+        }
+    }
+
+    .empty-case {
+        @apply flex flex-col items-center;
+        padding-top: 1.5rem;
+        .empty-text {
+            margin: 1rem 0 1.5rem;
+            text-align: center;
         }
     }
 }
