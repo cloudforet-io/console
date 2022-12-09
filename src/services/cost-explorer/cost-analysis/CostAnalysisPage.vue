@@ -78,9 +78,7 @@ export default {
         const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): Partial<CostQuerySetOption> => ({
             granularity: queryStringToString(urlQuery.granularity) as Granularity,
             stack: queryStringToBoolean(urlQuery.stack),
-            group_by: queryStringToArray(urlQuery.groupBy),
-            primary_group_by: queryStringToString(urlQuery.primaryGroupBy) as string, // will be deprecated(< v1.10.5)
-            more_group_by: queryStringToArray(urlQuery.moreGroupBy), // will be deprecated(< v1.10.5)
+            group_by: queryStringToArray(urlQuery.group_by),
             period: queryStringToObject(urlQuery.period),
             filters: queryStringToObject(urlQuery.filters),
         });
@@ -101,15 +99,13 @@ export default {
 
         let unregisterStoreWatch;
         const registerStoreWatch = (currentQuery) => {
-            unregisterStoreWatch = watch(() => costExplorerStore.getters['costAnalysis/currentQuerySetOptions'], (options) => {
+            unregisterStoreWatch = watch(() => costExplorerStore.getters['costAnalysis/currentQuerySetOptions'], (options: CostQuerySetOption) => {
                 if (props.querySetId) return;
 
                 const newQuery: CostAnalysisPageUrlQuery = {
                     granularity: primitiveToQueryString(options.granularity),
                     stack: primitiveToQueryString(options.stack),
-                    groupBy: arrayToQueryString(options.groupBy),
-                    primaryGroupBy: primitiveToQueryString(options.primaryGroupBy), // will be deprecated(< 1.10.5)
-                    moreGroupBy: arrayToQueryString(options.moreGroupBy), // will be deprecated(< 1.10.5)
+                    group_by: arrayToQueryString(options.group_by),
                     period: objectToQueryString(options.period),
                     filters: objectToQueryString(options.filters),
                 };
