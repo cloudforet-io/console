@@ -92,6 +92,7 @@ export default defineComponent<Props>({
             }))),
         });
 
+        // Todo: After the dashboard refresh function is completed, decide whether to include the above two functions inside the component.
         const handleSelectInterval = (interval) => {
             emit('update', interval);
         };
