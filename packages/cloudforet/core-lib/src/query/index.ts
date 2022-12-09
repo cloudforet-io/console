@@ -18,7 +18,7 @@ import { convertDatetimeQueryStoreFilterToFilters } from '@/query/helper';
 import type {
     ConsoleFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
 } from '@/query/type';
-import type { Filter, ApiFilterOperator } from '@/space-connector/type';
+import type { ApiFilter, ApiFilterOperator } from '@/space-connector/type';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -68,7 +68,7 @@ const filterToQueryTag = (
     };
 };
 const filterToApiQueryFilter = (_filters: ConsoleFilter[], timezone = 'UTC') => {
-    let filter: Filter[] = [];
+    let filter: ApiFilter[] = [];
     const keyword: string[] = [];
 
     _filters.forEach((f) => {

@@ -72,7 +72,7 @@ import { isEmpty } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { Filter } from '@cloudforet/core-lib/space-connector/type';
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -154,7 +154,7 @@ export default defineComponent<Props>({
             dataLoading: true,
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo?.cloud_service_type_id ?? ''),
             queryTags: [] as QueryTag[],
-            apiQuery: { filter: [] as Filter[], keyword: '' },
+            apiQuery: { filter: [] as ApiFilter[], keyword: '' },
             dateRange: computed<Period|undefined>(() => {
                 if (isEmpty(props.period)) return undefined;
                 const period = props.period as Period;

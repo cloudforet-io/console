@@ -8,7 +8,7 @@ import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/
 
 import { makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItem, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
-import type { Filter } from '@cloudforet/core-lib/space-connector/type';
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import { store } from '@/store';
 
@@ -43,7 +43,7 @@ const getKeyItemSets = (schemaList: ConsoleSearchSchema[], storeState): KeyItemS
     });
     return keyItemSets;
 };
-const getValueHandlerMap = (schemaList: ConsoleSearchSchema[], resourceType: string, filters?: Filter[]): ValueHandlerMap => {
+const getValueHandlerMap = (schemaList: ConsoleSearchSchema[], resourceType: string, filters?: ApiFilter[]): ValueHandlerMap => {
     const valueHandlerMap: ValueHandlerMap = {};
     schemaList.forEach((schema) => {
         schema.items.forEach((item) => {
@@ -70,7 +70,7 @@ const getValueHandlerMap = (schemaList: ConsoleSearchSchema[], resourceType: str
 export function useQuerySearchPropsWithSearchSchema(
     searchSchema: ComputedRef<ConsoleSearchSchema[]>,
     resourceType: string,
-    filters?: ComputedRef<Filter[]>,
+    filters?: ComputedRef<ApiFilter[]>,
 ): { keyItemSets: ComputedRef<KeyItemSet[]>, valueHandlerMap: ComputedRef<ValueHandlerMap>, isAllLoaded: ComputedRef<boolean> } {
     (async () => {
         await store.dispatch('reference/loadAll');

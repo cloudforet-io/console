@@ -50,7 +50,7 @@ import { debounce, isEmpty } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { Filter } from '@cloudforet/core-lib/space-connector/type';
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -107,7 +107,7 @@ export default defineComponent<Props>({
             summaryDataList: [] as Data[],
             dataLoading: false,
             cloudServiceTypeId: computed<string>(() => props.cloudServiceTypeInfo.cloud_service_type_id ?? ''),
-            apiQuery: computed<{filter?: Filter[]; keyword?: string}>(() => {
+            apiQuery: computed<{filter?: ApiFilter[]; keyword?: string}>(() => {
                 if (props.filters) {
                     const { filter, keyword } = queryHelper.setFilters(props.filters).apiQuery;
                     return { filter, keyword };

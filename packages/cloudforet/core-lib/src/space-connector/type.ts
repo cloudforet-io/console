@@ -56,7 +56,7 @@ export type ApiFilterOperator =
     | 'datetime_lt' | 'datetime_lte' | 'datetime_gt' | 'datetime_gte'
     | 'timediff_lt' | 'timediff_lte' | 'timediff_gt' | 'timediff_gte';
 
-export interface Filter {
+export interface ApiFilter {
     k: string;
     v: any;
     o: ApiFilterOperator;
@@ -68,8 +68,8 @@ export interface Sort {
 }
 
 export interface Query {
-    filter?: Array<Filter>;
-    filter_or?: Array<Filter>;
+    filter?: Array<ApiFilter>;
+    filter_or?: Array<ApiFilter>;
     page?: {
         start?: number;
         limit?: number;
