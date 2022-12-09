@@ -1,6 +1,6 @@
 import type { Mutation } from 'vuex';
 
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { CloudServiceFilterMap, Period } from '@/services/asset-inventory/cloud-service/type';
 import type { CloudServiceStoreState } from '@/services/asset-inventory/store/cloud-service/type';
@@ -17,6 +17,6 @@ export const setAdditionalFilters: Mutation<CloudServiceStoreState> = (state, ad
     state.additionalFilters = additionalFilters;
 };
 
-export const setSearchFilters: Mutation<CloudServiceStoreState> = (state, searchFilters: QueryStoreFilter[]) => {
+export const setSearchFilters: Mutation<CloudServiceStoreState> = (state, searchFilters: ConsoleFilter[]) => {
     state.searchFilters = searchFilters;
 };

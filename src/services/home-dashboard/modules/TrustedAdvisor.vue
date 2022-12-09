@@ -91,7 +91,7 @@ import {
 } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
@@ -199,7 +199,7 @@ export default {
             const category = CATEGORY[rowNum];
             const projectId = state.projectSummaryData[colNum]?.projectId;
 
-            const filters: QueryStoreFilter[] = [];
+            const filters: ConsoleFilter[] = [];
             filters.push({ k: 'data.status', o: '=', v: status });
             if (category) filters.push({ k: 'data.category', o: '=', v: category });
             if (projectId) filters.push({ k: 'project_id', o: '=', v: projectId });

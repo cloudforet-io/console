@@ -83,7 +83,7 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { QueryStoreFilter } from '@/query/type';
+import type { ConsoleFilter } from '@/query/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -183,7 +183,7 @@ export default defineComponent<Props>({
             const filterHelper = new ApiQueryHelper()
                 .setPage(1, NOTICE_ITEM_LIMIT)
                 .setSort('created_at', true);
-            const filter = [] as QueryStoreFilter[];
+            const filter = [] as ConsoleFilter[];
             if (state.selectedPostType !== 'ALL') filter.push({ k: 'post_type', v: state.selectedPostType, o: '=' });
             if (state.searchText) filter.push({ k: 'title', v: state.searchText, o: '' });
             filterHelper.setFilters(filter);

@@ -119,7 +119,7 @@ import { find, sum } from 'lodash';
 
 import { commaFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -248,7 +248,7 @@ export default {
                 .setSort('created_at', true)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
 
-            const filters: QueryStoreFilter[] = [];
+            const filters: ConsoleFilter[] = [];
             filters.push({ k: 'project_id', v: props.activatedProjects, o: '' });
             if (state.selectedUrgency !== ALERT_URGENCY.ALL) {
                 filters.push({ k: 'urgency', v: state.selectedUrgency, o: '=' });

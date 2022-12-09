@@ -98,7 +98,7 @@ import { PSelectableItem, PSkeleton, PI } from '@spaceone/design-system';
 import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -156,7 +156,7 @@ export default {
                 href: string;
             }>,
             cloudServiceTypeLink: computed(() => {
-                const filters: QueryStoreFilter[] = [];
+                const filters: ConsoleFilter[] = [];
                 if (props.projectId) filters.push({ k: 'project_id', o: '=', v: props.projectId });
                 return {
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,

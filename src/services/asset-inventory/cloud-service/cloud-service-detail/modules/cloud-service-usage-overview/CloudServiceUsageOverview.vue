@@ -48,7 +48,7 @@ import dayjs from 'dayjs';
 import { debounce, isEmpty } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Filter } from '@cloudforet/core-lib/space-connector/type';
 
@@ -65,7 +65,7 @@ import type { Period } from '@/services/cost-explorer/type';
 
 interface Props {
     cloudServiceTypeInfo: CloudServiceTypeInfo;
-    filters?: QueryStoreFilter[];
+    filters?: ConsoleFilter[];
     period?: Period;
 }
 
@@ -87,7 +87,7 @@ export default defineComponent<Props>({
             default: () => ({}),
         },
         filters: {
-            type: Array as () => QueryStoreFilter[]|undefined,
+            type: Array as () => ConsoleFilter[]|undefined,
             default: undefined,
         },
         period: {

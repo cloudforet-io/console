@@ -6,7 +6,7 @@ export type RawQuery = [any] | [any|null, string] | [any|null, string, RawQueryO
 
 export type QueryStoreFilterValue = number | string | boolean | null;
 
-export type QueryStoreFilter = {
+export type ConsoleFilter = {
     k?: string;
     v: QueryStoreFilterValue | QueryStoreFilterValue[];
     o?: RawQueryOperator;

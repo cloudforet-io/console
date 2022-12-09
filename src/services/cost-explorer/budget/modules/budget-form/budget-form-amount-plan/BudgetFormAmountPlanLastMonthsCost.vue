@@ -20,7 +20,7 @@ import {
 
 import dayjs from 'dayjs';
 
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
@@ -95,7 +95,7 @@ export default {
             currency: computed(() => store.state.display.currency),
             // api request params
             budgetListParams: computed(() => {
-                let filters: QueryStoreFilter[] = [];
+                let filters: ConsoleFilter[] = [];
 
                 if (props.projectId) filters.push({ k: 'project_id', v: props.projectId, o: '=' });
                 if (props.costTypes) filters = filters.concat(getConvertedFilter(props.costTypes));
@@ -114,8 +114,8 @@ export default {
         });
 
         /* Util */
-        const getConvertedFilter = (costTypes: CostTypes): QueryStoreFilter[] => {
-            const results: QueryStoreFilter[] = [];
+        const getConvertedFilter = (costTypes: CostTypes): ConsoleFilter[] => {
+            const results: ConsoleFilter[] = [];
             Object.entries(costTypes).forEach(([type, values]) => {
                 if (values?.length) {
                     results.push({

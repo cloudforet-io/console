@@ -16,7 +16,7 @@ import {
 } from '@/query/config';
 import { convertDatetimeQueryStoreFilterToFilters } from '@/query/helper';
 import type {
-    QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
+    ConsoleFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
 } from '@/query/type';
 import type { Filter, FilterOperator } from '@/space-connector/type';
 
@@ -67,7 +67,7 @@ const filterToQueryTag = (
         operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string] || filter.o || '' as OperatorType,
     };
 };
-const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') => {
+const filterToApiQueryFilter = (_filters: ConsoleFilter[], timezone = 'UTC') => {
     let filter: Filter[] = [];
     const keyword: string[] = [];
 
@@ -126,9 +126,9 @@ export class QueryHelper {
 
     private _keyMap: Record<string, KeyItem> = {};
 
-    private _filters: QueryStoreFilter[] = [];
+    private _filters: ConsoleFilter[] = [];
 
-    private _orFilters: QueryStoreFilter[] = [];
+    private _orFilters: ConsoleFilter[] = [];
 
     private _timezone: string | undefined;
 
@@ -218,12 +218,12 @@ export class QueryHelper {
         return this;
     }
 
-    setFilters(filters: QueryStoreFilter[]): this {
+    setFilters(filters: ConsoleFilter[]): this {
         this._filters = [...filters];
         return this;
     }
 
-    setOrFilters(orFilters: Required<QueryStoreFilter>[]): this {
+    setOrFilters(orFilters: Required<ConsoleFilter>[]): this {
         orFilters.forEach((f) => {
             if (f.k === undefined || f.o === undefined || f.o === '') {
                 throw new Error('QueryHelper: orFilter must have key and operator');
@@ -233,12 +233,12 @@ export class QueryHelper {
         return this;
     }
 
-    addFilter(...filters: QueryStoreFilter[]): this {
+    addFilter(...filters: ConsoleFilter[]): this {
         this._filters.push(...filters);
         return this;
     }
 
-    addOrFilter(...orFilters: Required<QueryStoreFilter>[]): this {
+    addOrFilter(...orFilters: Required<ConsoleFilter>[]): this {
         orFilters.forEach((f) => {
             if (f.k === undefined || f.o === undefined || f.o === '') {
                 throw new Error('QueryHelper: orFilter must have key and operator');
@@ -248,11 +248,11 @@ export class QueryHelper {
         return this;
     }
 
-    get filters(): QueryStoreFilter[] {
+    get filters(): ConsoleFilter[] {
         return [...this._filters];
     }
 
-    get orFilters(): QueryStoreFilter[] {
+    get orFilters(): ConsoleFilter[] {
         return [...this._orFilters];
     }
 

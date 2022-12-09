@@ -1,4 +1,4 @@
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
@@ -20,7 +20,7 @@ export type CloudServicePageUrlQueryValue = {
     service?: CloudServiceCategory[];
     region?: string[];
     period?: Period;
-    filters?: QueryStoreFilter[];
+    filters?: ConsoleFilter[];
 };
 
 export type CloudServiceFilterKey = typeof CLOUD_SERVICE_FILTER_KEY[keyof typeof CLOUD_SERVICE_FILTER_KEY];

@@ -54,7 +54,7 @@ import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation
 
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -111,7 +111,7 @@ export default defineComponent<Props>({
             default: () => ({}),
         },
         tagFilters: {
-            type: Array as PropType<QueryStoreFilter[]>,
+            type: Array as PropType<ConsoleFilter[]>,
             default: () => ([]),
         },
     },
@@ -123,7 +123,7 @@ export default defineComponent<Props>({
             period: computed(() => assetInventoryStore.state.cloudService.period),
             selectedCategories: computed(() => assetInventoryStore.getters['cloudService/selectedCategories']),
             selectedRegions: computed(() => assetInventoryStore.getters['cloudService/selectedRegions']),
-            allFilters: computed<QueryStoreFilter[]>(() => assetInventoryStore.getters['cloudService/allFilters']),
+            allFilters: computed<ConsoleFilter[]>(() => assetInventoryStore.getters['cloudService/allFilters']),
             queryTags: computed(() => searchQueryHelper.setFilters(assetInventoryStore.state.cloudService.searchFilters).queryTags),
             cloudServiceFilters: computed(() => state.allFilters.filter((f: any) => f.k && ![
                 'labels',

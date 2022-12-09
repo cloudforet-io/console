@@ -43,7 +43,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
@@ -113,7 +113,7 @@ export default {
 
         /* Util */
         const overallLinkFormatter = (status) => {
-            const filters: QueryStoreFilter[] = [];
+            const filters: ConsoleFilter[] = [];
             filters.push({ k: 'data.status', o: '=', v: status });
 
             return {

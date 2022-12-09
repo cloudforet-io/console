@@ -1,4 +1,4 @@
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { Tags, TimeStamp } from '@/models';
 
@@ -89,7 +89,7 @@ export interface AlertBottomFilters {
 }
 
 export interface AlertListTableFilters extends AlertBottomFilters {
-    filters: QueryStoreFilter[];
+    filters: ConsoleFilter[];
 }
 
 export interface AlertStateUpdateParams {

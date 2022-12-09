@@ -21,7 +21,7 @@ import { PToolbox } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -30,7 +30,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 
 interface Props {
     totalCount: number;
-    filters: QueryStoreFilter[];
+    filters: ConsoleFilter[];
     handlers: { keyItemSets: KeyItemSet[]; valueHandlerMap: ValueHandlerMap };
 }
 
@@ -61,7 +61,7 @@ export default {
             selectedRegions: computed(() => store.state.service.assetInventory.cloudService.selectedRegions),
             keyItemSets: props.handlers.keyItemSets,
             valueHandlerMap: props.handlers.valueHandlerMap,
-            cloudServiceFilters: computed(() => props.filters.filter((f: QueryStoreFilter) => f.k && ![
+            cloudServiceFilters: computed(() => props.filters.filter((f: ConsoleFilter) => f.k && ![
                 'labels',
                 'service_code',
             ].includes(f.k))),

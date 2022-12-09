@@ -72,7 +72,7 @@ import { PI } from '@spaceone/design-system';
 import { findKey } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
@@ -182,7 +182,7 @@ export default {
         const linkFormatter = (category, status) => {
             if (!state.trustedAdvisorId) return '';
 
-            const filters: QueryStoreFilter[] = [];
+            const filters: ConsoleFilter[] = [];
             filters.push({ k: 'project_id', o: '=', v: props.projectId });
             filters.push({ k: 'data.status', o: '=', v: status });
             filters.push({ k: 'data.category', o: '=', v: category });
