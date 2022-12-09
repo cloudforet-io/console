@@ -15,22 +15,18 @@
             <div v-else
                  class="error-container"
             >
-                <p-i name="sad-face"
-                     :color="gray[500]"
-                     width="3.5rem"
-                     height="3.5rem"
-                />
                 <div class="error-title">
-                    {{ $t('Unable to load') }}
+                    <span>{{ $t('Unable to load') }}</span>
                 </div>
                 <!--song-lang-->
                 <span class="error-message">
-                    {{ $t("There seems to be an incompatibility between dashboard's variables and widget options. You need to edit the filters to make it work.") }}
+                    {{ $t("There is an error from an incompatibility dashboard's variables and widget options.") }}
                 </span>
                 <p-button class="edit-button"
                           style-type="tertiary"
                           @click="handleEditButtonClick"
                 >
+                    <!--song-lang-->
                     {{ $t('Edit Widget') }}
                 </p-button>
             </div>
@@ -89,7 +85,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Route } from 'vue-router';
 
 import {
-    PAnchor, PButton, PButtonModal, PDivider, PI, PIconButton,
+    PAnchor, PButton, PButtonModal, PDivider, PIconButton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -139,7 +135,6 @@ export default defineComponent<Props>({
     name: 'WidgetFrame',
     components: {
         PButton,
-        PI,
         PButtonModal,
         DeleteModal,
         PIconButton,
@@ -155,7 +150,6 @@ export default defineComponent<Props>({
             type: String as PropType<WidgetSize>,
             default: WIDGET_SIZE.md,
         },
-        // FIXME:: width should be -= 16 because of margin.
         width: {
             type: Number,
             default: undefined,
@@ -307,15 +301,17 @@ export default defineComponent<Props>({
         flex: 1 1;
     }
     .error-container {
-        @apply flex justify-center items-center flex-col h-full;
+        @apply flex items-center flex-col h-full;
         padding: 0 1.5625rem;
 
         .error-title {
-            @apply text-gray-500 mt-2;
-            font-weight: 700;
-            font-size: 0.875rem;
+            @apply text-gray-700 flex justify-center items-center;
+            font-size: 1.125rem;
+            height: 42%;
         }
         .error-message {
+            @apply text-gray-700;
+            text-align: center;
             margin-top: 3.625rem;
             line-height: 1.25;
             font-size: 0.875rem;
