@@ -1,3 +1,10 @@
+# [1.1.0-beta.465](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.464...v1.1.0-beta.465) (2022-12-09)
+
+
+### Bug Fixes
+
+* **p-select-dropdown:** fix menuPosition function ([#156](https://github.com/cloudforet-io/mirinae/issues/156)) ([9d581e5](https://github.com/cloudforet-io/mirinae/commit/9d581e5400c1003caa8478e9698921a084f7dd1e))
+
 # [1.1.0-beta.464](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.463...v1.1.0-beta.464) (2022-12-08)
 
 
