@@ -4,13 +4,16 @@
                        name="ic_renew"
                        style-type="tertiary"
                        shape="square"
+                       :disabled="customizeMode || loading"
                        :animation="loading ? 'reserve-spin' : undefined"
+                       @click="handleImmediateRefresh"
         />
         <p-select-dropdown class="currency-select-dropdown"
                            :items="intervalItems"
                            :selected="interval"
                            :read-only="loading"
                            :class="{ loading, unfilled: !filled }"
+                           menu-position="right"
                            @select="handleSelectInterval"
         >
             <span v-if="!filled" />
@@ -89,13 +92,18 @@ export default defineComponent<Props>({
             }))),
         });
 
+        // Todo: After the dashboard refresh function is completed, decide whether to include the above two functions inside the component.
         const handleSelectInterval = (interval) => {
             emit('update', interval);
+        };
+        const handleImmediateRefresh = () => {
+            emit('immediate-refresh');
         };
 
         return {
             ...toRefs(state),
             handleSelectInterval,
+            handleImmediateRefresh,
         };
     },
 });
@@ -110,6 +118,9 @@ export default defineComponent<Props>({
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
         border-right: 0;
+        &.tertiary.disabled {
+            @apply bg-gray-100 border-gray-300;
+        }
     }
 
     .currency-select-dropdown {
@@ -122,9 +133,17 @@ export default defineComponent<Props>({
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         }
+        .p-context-menu {
+            min-width: 6.5rem;
+        }
         &.unfilled {
             .dropdown-button {
                 padding-left: 0.25rem;
+            }
+        }
+        &.loading {
+            .dropdown-button {
+                @apply bg-gray-100;
             }
         }
     }
