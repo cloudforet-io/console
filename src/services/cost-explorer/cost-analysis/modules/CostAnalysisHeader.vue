@@ -258,8 +258,8 @@ export default {
                         stack,
                         period,
                         group_by: groupBy,
-                        primary_group_by: primaryGroupBy,
-                        more_group_by: moreGroupBy,
+                        primary_group_by: primaryGroupBy, // will be deprecated(< v1.10.5)
+                        more_group_by: moreGroupBy, // will be deprecated(< v1.10.5)
                         filters,
                     },
                 });

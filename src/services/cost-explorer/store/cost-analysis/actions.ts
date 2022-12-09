@@ -25,8 +25,8 @@ export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit },
     if (options.granularity) commit('setGranularity', options.granularity);
     if (typeof options.stack === 'boolean') commit('setStack', options.stack);
     if (options.group_by?.length) commit('setGroupBy', options.group_by);
-    if (options.primary_group_by) commit('setPrimaryGroupBy', options.primary_group_by);
-    if (options.more_group_by?.length) commit('setMoreGroupBy', options.more_group_by);
+    if (options.primary_group_by) commit('setPrimaryGroupBy', options.primary_group_by); // will be deprecated(< v1.10.5)
+    if (options.more_group_by?.length) commit('setMoreGroupBy', options.more_group_by); // will be deprecated(< v1.10.5)
     if (options.period) commit('setPeriod', { start: options.period.start, end: options.period.end });
     if (options.filters) {
         commit('setFilters', convertFiltersInToNewType(options.filters));
@@ -58,8 +58,8 @@ export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, co
             stack,
             period,
             group_by: groupBy,
-            primary_group_by: primaryGroupBy,
-            more_group_by: moreGroupBy,
+            primary_group_by: primaryGroupBy, // will be deprecated(< v1.10.5)
+            more_group_by: moreGroupBy, // will be deprecated(< v1.10.5)
             filters,
         };
         const updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.create({

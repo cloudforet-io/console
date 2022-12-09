@@ -20,9 +20,9 @@ export type Filter = typeof FILTER[keyof typeof FILTER];
 export type CostFiltersMap = Record<Filter, FilterItem[]>;
 
 export interface CostQuerySetOption {
-    group_by?: GroupBy[];
-    primary_group_by?: GroupBy | string;
-    more_group_by: MoreGroupByItem[];
+    group_by?: Array<string|GroupBy>;
+    primary_group_by?: GroupBy | string; // will be deprecated(< v1.10.5)
+    more_group_by?: MoreGroupByItem[]; // will be deprecated(< v1.10.5)
     granularity: Granularity;
     stack?: boolean;
     period: Period;
