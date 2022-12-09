@@ -6,6 +6,7 @@
                        shape="square"
                        :disabled="customizeMode || loading"
                        :animation="loading ? 'reserve-spin' : undefined"
+                       @click="handleImmediateRefresh"
         />
         <p-select-dropdown class="currency-select-dropdown"
                            :items="intervalItems"
@@ -94,10 +95,14 @@ export default defineComponent<Props>({
         const handleSelectInterval = (interval) => {
             emit('update', interval);
         };
+        const handleImmediateRefresh = () => {
+            emit('immediate-refresh');
+        };
 
         return {
             ...toRefs(state),
             handleSelectInterval,
+            handleImmediateRefresh,
         };
     },
 });
