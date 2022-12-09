@@ -4,7 +4,7 @@
                       use-total-count
         >
             <template #extra>
-                <p-button v-if="workspaceDashboardList > 0 || projectDashboardList > 0"
+                <p-button v-if="workspaceDashboardList || projectDashboardList"
                           icon-left="ic_plus"
                           @click="handleCreateDashboard"
                 >
@@ -26,7 +26,7 @@
                    @change="handleQueryChange"
                    @refresh="handleQueryChange()"
         />
-        <div v-if="projectDashboardList.length > 0 || workspaceDashboardList.length > 0"
+        <div v-if="projectDashboardList.length || workspaceDashboardList.length"
              class="dashboard-list-wrapper"
         >
             <!--song-lang-->
