@@ -361,6 +361,12 @@ export default defineComponent<SelectDropdownProps>({
         z-index: 1000;
         min-width: 100%;
         width: auto;
+        &.left {
+            left: 0;
+        }
+        &.right {
+            right: 0;
+        }
     }
 
     /* disabled */
