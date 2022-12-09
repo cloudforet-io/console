@@ -80,12 +80,10 @@ export default {
     },
     setup() {
         const state = reactive({
-            keyword: '',
-            queryForSearch: {},
             viewersStatus: computed(() => store.state.dashboard.viewers),
             scopeStatus: computed(() => store.state.dashboard.scope),
-            workspaceDashboardList: computed(() => store.state.dashboard.domainItems),
-            projectDashboardList: computed(() => store.state.dashboard.projectItems),
+            workspaceDashboardList: computed(() => store.getters['dashboard/getItems'](SCOPE_TYPE.DOMAIN, queryState.searchFilters, state.viewersStatus)),
+            projectDashboardList: computed(() => store.getters['dashboard/getItems'](SCOPE_TYPE.PROJECT, queryState.searchFilters, state.viewersStatus)),
         });
 
         const searchQueryHelper = new QueryHelper();
@@ -116,7 +114,6 @@ export default {
                 store.dispatch('dashboard/setSearchFilters', searchQueryHelper.filters);
             }
         };
-
 
         /* init */
         let urlQueryStringWatcherStop;
@@ -164,7 +161,6 @@ export default {
 .all-dashboards-page {
     .dashboard-list-wrapper {
         @apply flex;
-        padding-top: 0.5rem;
         gap: 0.5rem;
 
         .dashboard-list {
