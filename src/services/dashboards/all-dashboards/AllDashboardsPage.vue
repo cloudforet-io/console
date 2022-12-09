@@ -4,11 +4,12 @@
                       use-total-count
         >
             <template #extra>
-                <p-button icon-left="ic_plus"
+                <p-button v-if="workspaceDashboardList > 0 || projectDashboardList > 0"
+                          icon-left="ic_plus"
                           @click="handleCreateDashboard"
                 >
                     <!--song lang-->
-                    Create
+                    {{ $t('Create') }}
                 </p-button>
             </template>
         </p-page-title>
@@ -25,16 +26,18 @@
                    @change="handleQueryChange"
                    @refresh="handleQueryChange()"
         />
-        <div class="dashboard-list-wrapper">
+        <div v-if="projectDashboardList.length > 0 || workspaceDashboardList.length > 0"
+             class="dashboard-list-wrapper"
+        >
             <!--song-lang-->
-            <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.PROJECT"
+            <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.PROJECT && workspaceDashboardList.length > 0"
                                   :scope-type="SCOPE_TYPE.DOMAIN"
                                   class="dashboard-list"
                                   :field-title="'Entire Workspace'"
                                   :dashboard-list="workspaceDashboardList"
             />
             <!--song-lang-->
-            <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.DOMAIN"
+            <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.DOMAIN && projectDashboardList.length > 0"
                                   :scope-type="SCOPE_TYPE.PROJECT"
                                   class="dashboard-list"
                                   :field-title="'Single Project'"
@@ -82,8 +85,8 @@ export default {
         const state = reactive({
             viewersStatus: computed(() => store.state.dashboard.viewers),
             scopeStatus: computed(() => store.state.dashboard.scope),
-            workspaceDashboardList: computed(() => store.getters['dashboard/getItems'](SCOPE_TYPE.DOMAIN, queryState.searchFilters, state.viewersStatus)),
-            projectDashboardList: computed(() => store.getters['dashboard/getItems'](SCOPE_TYPE.PROJECT, queryState.searchFilters, state.viewersStatus)),
+            workspaceDashboardList: computed(() => store.getters['dashboard/getDomainItems']),
+            projectDashboardList: computed(() => store.getters['dashboard/getProjectItems']),
         });
 
         const searchQueryHelper = new QueryHelper();
