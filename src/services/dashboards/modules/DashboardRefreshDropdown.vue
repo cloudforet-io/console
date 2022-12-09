@@ -4,6 +4,7 @@
                        name="ic_renew"
                        style-type="tertiary"
                        shape="square"
+                       :disabled="customizeMode || loading"
                        :animation="loading ? 'reserve-spin' : undefined"
         />
         <p-select-dropdown class="currency-select-dropdown"
@@ -11,6 +12,7 @@
                            :selected="interval"
                            :read-only="loading"
                            :class="{ loading, unfilled: !filled }"
+                           menu-position="right"
                            @select="handleSelectInterval"
         >
             <span v-if="!filled" />
@@ -110,6 +112,9 @@ export default defineComponent<Props>({
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
         border-right: 0;
+        &.tertiary.disabled {
+            @apply bg-gray-100 border-gray-300;
+        }
     }
 
     .currency-select-dropdown {
@@ -122,9 +127,17 @@ export default defineComponent<Props>({
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         }
+        .p-context-menu {
+            min-width: 6.5rem;
+        }
         &.unfilled {
             .dropdown-button {
                 padding-left: 0.25rem;
+            }
+        }
+        &.loading {
+            .dropdown-button {
+                @apply bg-gray-100;
             }
         }
     }
