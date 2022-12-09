@@ -16,7 +16,7 @@ import {
 } from '@/query/config';
 import { convertDatetimeQueryStoreFilterToFilters } from '@/query/helper';
 import type {
-    ConsoleFilter, QueryStoreFilterValue, RawQuery, ConsoleFilterOperator,
+    ConsoleFilter, ConsoleFilterValue, RawQuery, ConsoleFilterOperator,
 } from '@/query/type';
 import type { ApiFilter, ApiFilterOperator } from '@/space-connector/type';
 
@@ -27,7 +27,7 @@ interface QueryTag extends Tag, QueryItem {}
 type ReferenceStore = Record<string, any>;
 
 const filterToQueryTag = (
-    filter: { k?: string; v: QueryStoreFilterValue; o?: ConsoleFilterOperator },
+    filter: { k?: string; v: ConsoleFilterValue; o?: ConsoleFilterOperator },
     keyMap: Record<string, KeyItem>,
     referenceStore: ReferenceStore | undefined,
 ): QueryTag | null => {
