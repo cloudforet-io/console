@@ -16,7 +16,7 @@ import {
 } from '@/query/config';
 import { convertDatetimeQueryStoreFilterToFilters } from '@/query/helper';
 import type {
-    ConsoleFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
+    ConsoleFilter, QueryStoreFilterValue, RawQuery, ConsoleFilterOperator,
 } from '@/query/type';
 import type { ApiFilter, ApiFilterOperator } from '@/space-connector/type';
 
@@ -27,7 +27,7 @@ interface QueryTag extends Tag, QueryItem {}
 type ReferenceStore = Record<string, any>;
 
 const filterToQueryTag = (
-    filter: { k?: string; v: QueryStoreFilterValue; o?: RawQueryOperator },
+    filter: { k?: string; v: QueryStoreFilterValue; o?: ConsoleFilterOperator },
     keyMap: Record<string, KeyItem>,
     referenceStore: ReferenceStore | undefined,
 ): QueryTag | null => {
@@ -73,7 +73,7 @@ const filterToApiQueryFilter = (_filters: ConsoleFilter[], timezone = 'UTC') => 
 
     _filters.forEach((f) => {
         if (f.k) {
-            let op: RawQueryOperator;
+            let op: ConsoleFilterOperator;
             let value = f.v;
             /* null case */
             // TODO: remove checking string 'null' case. This is defense code for v1.10.4.2
@@ -163,10 +163,10 @@ export class QueryHelper {
                 if (q.key && typeof q.key === 'object') {
                     const key = this._keyMap[q.key.name] || { ...q.key };
 
-                    let op: RawQueryOperator;
-                    if (key.dataType === 'datetime') op = `${q.operator}t` as RawQueryOperator;
+                    let op: ConsoleFilterOperator;
+                    if (key.dataType === 'datetime') op = `${q.operator}t` as ConsoleFilterOperator;
                     else if (q.value.name === null || q.value.name === undefined) op = q.operator?.startsWith('!') ? '!=' : '=';
-                    else op = q.operator ?? '' as RawQueryOperator;
+                    else op = q.operator ?? '' as ConsoleFilterOperator;
 
                     if (filterMap[key.name]) {
                         if (filterMap[key.name][op]) filterMap[key.name][op].push(q.value.name);
@@ -179,7 +179,7 @@ export class QueryHelper {
         });
         forEach(filterMap, (opMap, k) => {
             forEach(opMap, (v, o) => {
-                this._filters.push({ k, v, o: o as RawQueryOperator });
+                this._filters.push({ k, v, o: o as ConsoleFilterOperator });
             });
         });
         // this._filters.push({
