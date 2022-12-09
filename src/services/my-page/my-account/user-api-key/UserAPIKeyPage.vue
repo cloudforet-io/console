@@ -69,8 +69,7 @@ export default {
             state.loading = true;
             try {
                 const { results } = await SpaceConnector.client.identity.endpoint.list();
-                state.items = results.filter((d) => d.service === 'inventory' || d.service === 'statistics' || d.service === 'monitoring'
-                    || d.service === 'cost-analysis' || d.service === 'notification');
+                state.items = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.items = [];
