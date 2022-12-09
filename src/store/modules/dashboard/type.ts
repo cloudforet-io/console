@@ -30,7 +30,7 @@ export interface DashboardItem {
     dashboard_options: any;
     settings: any;
     dashboard_options_schema: any;
-    labels: string[];
+    labels: any[];
     tags: any;
     user_id: string;
     domain_id: string;

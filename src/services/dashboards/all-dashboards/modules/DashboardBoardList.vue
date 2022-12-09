@@ -52,7 +52,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import {
@@ -146,6 +146,10 @@ export default defineComponent<DashboardBoardListProps>({
             state.thisPage = page;
         };
 
+        watch(() => props.dashboardList, () => {
+            state.thisPage = 1;
+        });
+
         return {
             ...toRefs(state),
             handleSetQuery,
@@ -161,6 +165,7 @@ export default defineComponent<DashboardBoardListProps>({
 <style lang="postcss" scoped>
 .dashboard-board-list {
     flex-grow: 1;
+    margin-top: 0.5rem;
 
     /* custom design-system component - p-field-title */
     :deep(.p-field-title) {
