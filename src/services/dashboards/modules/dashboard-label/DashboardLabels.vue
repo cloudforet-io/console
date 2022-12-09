@@ -43,9 +43,10 @@ interface Props {
     editable?: boolean;
 }
 const props = defineProps<Props>();
+const emit = defineEmits(['update:labelList']);
 
 const state = reactive({
-    labelList: props.labelList,
+    labelList: [...props.labelList],
     inputMode: false,
     inputText: '',
 });
@@ -61,9 +62,11 @@ const handleEscape = () => {
 const handlePushLabel = () => {
     state.labelList.push({ label: state.inputText });
     state.inputText = '';
+    emit('update:labelList', state.labelList);
 };
 const handleDelete = (index: number) => {
     state.labelList.splice(index, 1);
+    emit('update:labelList', state.labelList);
 };
 
 </script>

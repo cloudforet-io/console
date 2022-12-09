@@ -4,6 +4,7 @@
         <div class="flex justify-between">
             <dashboard-labels editable
                               :label-list="state.labelList"
+                              @update:labelList="handleUpdateLabelList"
             />
             <dashboard-toolset />
         </div>
@@ -26,4 +27,8 @@ import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRef
 const state = reactive({
     labelList: [] as Array<{label: string}>,
 });
+
+const handleUpdateLabelList = (labelList: Array<{label: string}>) => {
+    state.labelList = labelList;
+};
 </script>
