@@ -15,11 +15,13 @@ export const SCOPE_TYPE = {
 export type ScopeType = typeof SCOPE_TYPE[keyof typeof SCOPE_TYPE];
 
 export interface DashboardState {
-    domainItems?: DomainDashboardItem[];
-    projectItems?: ProjectDashboardItem[];
+    domainItems: DomainDashboardItem[];
+    projectItems: ProjectDashboardItem[];
     searchFilters: QueryStoreFilter[];
     viewers: string;
     scope: string;
+    domainItemCount: number;
+    projectItemCount: number;
 }
 
 export interface DashboardItem {

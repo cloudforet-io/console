@@ -2,6 +2,7 @@
     <div class="all-dashboards-page">
         <p-page-title :title="'Dashboards'"
                       use-total-count
+                      :total-count="dashboardTotalCount"
         >
             <template #extra>
                 <p-button v-if="workspaceDashboardList || projectDashboardList"
@@ -104,6 +105,7 @@ export default {
             scopeStatus: computed(() => store.state.dashboard.scope),
             workspaceDashboardList: computed(() => store.getters['dashboard/getDomainItems']),
             projectDashboardList: computed(() => store.getters['dashboard/getProjectItems']),
+            dashboardTotalCount: computed(() => store.getters['dashboard/getDashboardCount']),
         });
 
         const searchQueryHelper = new QueryHelper();
@@ -146,7 +148,8 @@ export default {
             };
 
             /* TODO: init states from url query */
-            // store.dispatch('dashboard/loadDomainDashboard');
+            store.dispatch('dashboard/loadDomainDashboard');
+            store.dispatch('dashboard/loadProjectDashboard');
             store.dispatch('dashboard/setSelectedViewers', useQueryValue.viewers);
             store.dispatch('dashboard/setSelectedScope', useQueryValue.scope);
             store.dispatch('dashboard/setSearchFilters', searchQueryHelper.filters);
