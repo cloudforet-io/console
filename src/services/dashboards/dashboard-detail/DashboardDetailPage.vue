@@ -29,6 +29,11 @@
                 <dashboard-control-buttons />
             </template>
         </p-page-title>
+        <div class="flex justify-between mt-4">
+            <dashboard-labels :label-list="state.labelList" />
+            <dashboard-toolset />
+        </div>
+        <p-divider />
         <dashboard-refresher loading />
         <dashboard-widget-container
             :widget-size-list="WIDGET_SIZE_MOCK"
@@ -40,7 +45,9 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { PI, PIconButton, PPageTitle } from '@spaceone/design-system';
+import {
+    PDivider, PI, PIconButton, PPageTitle,
+} from '@spaceone/design-system';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -54,6 +61,8 @@ import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modu
 import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/DashboardMoreMenu.vue';
 import DashboardRefresher from '@/services/dashboards/dashboard-detail/modules/DashboardRefresher.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
+import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
+import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 
 const PUBLIC_ICON_COLOR = gray[500];
 
@@ -61,6 +70,7 @@ const PUBLIC_ICON_COLOR = gray[500];
 const state = reactive({
     dashboardType: DASHBOARD_VIEWER_PUBLIC as DashboardViewerType,
     dashboardId: 'dashboard-idxxx',
+    labelList: [] as Array<{label: string}>,
 });
 
 const WIDGET_SIZE_MOCK = ['md', 'md', 'sm', 'md', 'lg', 'sm'];
