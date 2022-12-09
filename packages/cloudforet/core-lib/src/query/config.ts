@@ -1,8 +1,8 @@
 import type { OperatorType } from '@/component-util/query-search/type';
 import type { RawQueryOperator } from '@/query/type';
-import type { FilterOperator } from '@/space-connector/type';
+import type { ApiFilterOperator } from '@/space-connector/type';
 
-export const rawQueryOperatorToApiQueryOperatorMap: Record<RawQueryOperator, FilterOperator> = {
+export const rawQueryOperatorToApiQueryOperatorMap: Record<RawQueryOperator, ApiFilterOperator> = {
     '': 'contain',
     '!': 'not_contain',
     '=': 'eq',
@@ -29,7 +29,7 @@ export const datetimeRawQueryOperatorToQueryTagOperatorMap: Partial<Record<RawQu
     '=t': '=',
 };
 
-export const rawQueryOperatorToPluralApiQueryOperatorMap: Partial<Record<RawQueryOperator, FilterOperator>> = {
+export const rawQueryOperatorToPluralApiQueryOperatorMap: Partial<Record<RawQueryOperator, ApiFilterOperator>> = {
     '': 'contain_in',
     '!': 'not_contain_in',
     '=': 'in',

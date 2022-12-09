@@ -18,7 +18,7 @@ import { convertDatetimeQueryStoreFilterToFilters } from '@/query/helper';
 import type {
     ConsoleFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
 } from '@/query/type';
-import type { Filter, FilterOperator } from '@/space-connector/type';
+import type { Filter, ApiFilterOperator } from '@/space-connector/type';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -97,7 +97,7 @@ const filterToApiQueryFilter = (_filters: ConsoleFilter[], timezone = 'UTC') => 
 
                 /* plural case */
                 if (rawQueryOperatorToPluralApiQueryOperatorMap[op]) {
-                    filter.push({ k: f.k, v: value, o: rawQueryOperatorToPluralApiQueryOperatorMap[op] as FilterOperator });
+                    filter.push({ k: f.k, v: value, o: rawQueryOperatorToPluralApiQueryOperatorMap[op] as ApiFilterOperator });
                 } else {
                     value.forEach((v) => {
                         filter.push({ k: f.k as string, v, o: rawQueryOperatorToApiQueryOperatorMap[op] });

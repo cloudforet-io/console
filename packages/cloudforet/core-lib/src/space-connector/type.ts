@@ -49,7 +49,7 @@ export interface ServerListResponse<T> {
     total_count: number;
 }
 
-export type FilterOperator =
+export type ApiFilterOperator =
     | 'lt' | 'lte' | 'gt' | 'gte' | 'exists' | 'regex'
     | 'eq' | 'contain' | 'not' | 'not_contain'
     | 'in' | 'contain_in' | 'not_in' | 'not_contain_in' | 'regex_in'
@@ -59,7 +59,7 @@ export type FilterOperator =
 export interface Filter {
     k: string;
     v: any;
-    o: FilterOperator;
+    o: ApiFilterOperator;
 }
 
 export interface Sort {
