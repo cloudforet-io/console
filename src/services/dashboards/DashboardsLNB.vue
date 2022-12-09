@@ -56,47 +56,61 @@ export default defineComponent({
                 }
                 return result;
             }),
-            workSpaceMenuSet: computed<LNBItem[]>(() => ([
-                {
-                    type: 'item', id: 'Menu Item', label: 'Menu Item', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'work_01' } },
+            workSpaceMenuSet: computed<LNBItem[]>(() => store.state.dashboard.domainItems.map((d) => ({
+                type: 'item',
+                id: d.domain_dashboard_id,
+                label: d.name,
+                to: {
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    params: {
+                        dashboardId: d.domain_dashboard_id,
+                    },
                 },
-                {
-                    type: 'item', id: 'Budget Summary', label: 'Budget Summary', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'work_02' } },
+            }))),
+            projectMenuSet: computed<LNBItem[]>(() => store.state.dashboard.projectItems.map((d) => ({
+                type: 'item',
+                id: d.domain_project_id,
+                label: d.name,
+                to: {
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    params: {
+                        dashboardId: d.project_dashboard_id,
+                    },
                 },
-            ])),
-            projectMenuSet: computed<LNBItem[][]>(() => {
-                const result = [] as LNBItem[][];
-                const projects: LNBItem[][] = [
-                    [{
-                        type: 'title',
-                        label: 'Project_01',
-                        id: 'Project_01',
-                        foldable: true,
-                    },
-                    {
-                        type: 'item', id: 'Project_01_Dashboard', label: 'Project_01_Dashboard', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_01_1' } },
-                    },
-                    {
-                        type: 'item', id: 'Project_01_Dashboard2', label: 'Project_01_Dashboard2', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_01_2' } },
-                    }],
-                    [{
-                        type: 'title',
-                        label: 'Project_02',
-                        id: 'Project_02',
-                        foldable: true,
-                    },
-                    {
-                        type: 'item', id: 'Project_02_Dashboard', label: 'Project_02_Dashboard', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_02_1' } },
-                    },
-                    {
-                        type: 'item', id: 'Project_02_Dashboard2', label: 'Project_02_Dashboard2', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_02_2' } },
-                    }],
-                ];
-                projects.forEach((d) => {
-                    result.push(filterFavoriteItems(d));
-                });
-                return result;
-            }),
+            }))),
+            // projectMenuSet: computed<LNBItem[][]>(() => {
+            //     const result = [] as LNBItem[][];
+            //     const projects: LNBItem[][] = [
+            //         [{
+            //             type: 'title',
+            //             label: 'Project_01',
+            //             id: 'Project_01',
+            //             foldable: true,
+            //         },
+            //         {
+            //             type: 'item', id: 'Project_01_Dashboard', label: 'Project_01_Dashboard', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_01_1' } },
+            //         },
+            //         {
+            //             type: 'item', id: 'Project_01_Dashboard2', label: 'Project_01_Dashboard2', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_01_2' } },
+            //         }],
+            //         [{
+            //             type: 'title',
+            //             label: 'Project_02',
+            //             id: 'Project_02',
+            //             foldable: true,
+            //         },
+            //         {
+            //             type: 'item', id: 'Project_02_Dashboard', label: 'Project_02_Dashboard', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_02_1' } },
+            //         },
+            //         {
+            //             type: 'item', id: 'Project_02_Dashboard2', label: 'Project_02_Dashboard2', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_02_2' } },
+            //         }],
+            //     ];
+            //     projects.forEach((d) => {
+            //         result.push(filterFavoriteItems(d));
+            //     });
+            //     return result;
+            // }),
             menuSet: computed<LNBMenu[]>(() => [
                 {
                     type: 'item',

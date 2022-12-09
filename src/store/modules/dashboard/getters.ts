@@ -5,6 +5,11 @@ import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
 
 import type { DashboardItem, DashboardState } from '@/store/modules/dashboard/type';
 
+export const getDashboardCount: Getter<DashboardState, any> = (state): any => {
+    const domainItemCount = state.domainItemCount;
+    const projectItemCount = state.projectItemCount;
+    return domainItemCount + projectItemCount;
+};
 export const getDomainItems: Getter<DashboardState, any> = (state): any => getItems(state.domainItems ?? [], state.searchFilters, state.viewers);
 export const getProjectItems: Getter<DashboardState, any> = (state): any => getItems(state.projectItems ?? [], state.searchFilters, state.viewers);
 

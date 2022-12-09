@@ -10,21 +10,27 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 // TODO: implementation
 export const loadDomainDashboard: Action<DashboardState, any> = async ({ commit }): Promise<void> => {
     try {
-        const response = await SpaceConnector.clientV2.dashboard.domainDashboard.list();
-        commit('setDomainItems', response);
+        const { results, total_count } = await SpaceConnector.clientV2.dashboard.domainDashboard.list({});
+        if (results) {
+            commit('setDomainItems', results);
+            commit('setDomainItemCount', total_count);
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+export const loadProjectDashboard: Action<DashboardState, any> = async ({ commit }): Promise<void> => {
+    try {
+        const { results, total_count } = await SpaceConnector.clientV2.dashboard.projectDashboard.list({});
+        if (results) {
+            commit('setProcjetItems', results);
+            commit('setProjectItemCount', total_count);
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
 
-export const loadProjectDashboard: Action<DashboardState, any> = ({ commit }): void => {
-    try {
-        const response = {};
-        commit('setProjectItems', response);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
 
 export const setSearchFilters: Action<DashboardState, any> = ({ commit }, searchFilters: QueryStoreFilter[] = []): void => {
     commit('setSearchFilters', searchFilters);
