@@ -24,13 +24,7 @@
             </ul>
         </div>
         <div class="right-area">
-            <div v-if="!selectedWidgetConfigId"
-                 class="no-selected-wrapper"
-            >
-                <!--song-lang-->
-                <span class="title">{{ $t('No Selected Widget') }}</span>
-                <span class="text">Information of the widget selected in the left panel and configurable items are displayed.</span>
-            </div>
+            <dashboard-add-default-widget-right-area :widget-config-id="selectedWidgetConfigId" />
         </div>
     </div>
 </template>
@@ -43,12 +37,15 @@ import type { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/ty
 
 import { i18n } from '@/translations';
 
+import DashboardAddDefaultWidgetRightArea
+    from '@/services/dashboards/dashboard-customize/modules/DashboardAddDefaultWidgetRightArea.vue';
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
 import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/widget-config-list';
 
 export default {
     name: 'DashboardDefaultWidgetTab',
     components: {
+        DashboardAddDefaultWidgetRightArea,
         PLazyImg,
         PButtonTab,
     },
