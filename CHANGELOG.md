@@ -1,3 +1,10 @@
+# [1.1.0-beta.467](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.466...v1.1.0-beta.467) (2022-12-12)
+
+
+### Features
+
+* **board-item:** add tooltip case in overlay icon button ([#158](https://github.com/cloudforet-io/mirinae/issues/158)) ([6773523](https://github.com/cloudforet-io/mirinae/commit/6773523e6dc7687cab9a52431df9b8bb20e7ba0f))
+
 # [1.1.0-beta.466](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.465...v1.1.0-beta.466) (2022-12-12)
 
 
