@@ -46,6 +46,11 @@
                           @change="handlePage"
             />
         </div>
+        <delete-modal :header-title="deleteModalState.headerTitle"
+                      :visible.sync="deleteModalState.visible"
+                      :loading="deleteModalState.loading"
+                      @confirm="handleDeleteDashboardConfirm"
+        />
     </div>
 </template>
 
@@ -63,13 +68,19 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { QueryStoreFilterValue } from '@/query/type';
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { DashboardItem, ScopeType } from '@/store/modules/dashboard/type';
 import { SCOPE_TYPE } from '@/store/modules/dashboard/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
 const PAGE_SIZE = 10;
 
@@ -83,6 +94,7 @@ interface DashboardBoardListProps {
 export default defineComponent<DashboardBoardListProps>({
     name: 'DashboardBoardList',
     components: {
+        DeleteModal,
         PPagination,
         PLabel,
         FavoriteButton,
@@ -116,24 +128,54 @@ export default defineComponent<DashboardBoardListProps>({
                     }
                 ))),
         });
+        const deleteModalState = reactive({
+            headerTitle: i18n.t('Are you sure you want to delete dashboard?'),
+            visible: false,
+            loading: false,
+            selectedId: undefined,
+        });
 
+        const handleClickDeleteDashboard = (dashboardId) => {
+            deleteModalState.selectedId = dashboardId;
+            deleteModalState.visible = true;
+        };
+
+        const handleDeleteDashboardConfirm = async () => {
+            try {
+                deleteModalState.loading = true;
+                await SpaceConnector.clientV2.dashboard[`${state.dashboardScopeType}Dashboard`].delete({
+                    [`${state.dashboardScopeType}_dashboard_id`]: deleteModalState.selectedId,
+                });
+                // TODO: refactoring
+                await store.dispatch(`dashboard/load${state.dashboardScopeType === 'domain' ? 'Domain' : 'Project'}Dashboard`);
+                await SpaceRouter.router.replace({ name: COST_EXPLORER_ROUTE._NAME });
+            } catch (e) {
+                // song-lang
+                ErrorHandler.handleRequestError(e, 'Failed to delete dashboard');
+            } finally {
+                deleteModalState.loading = false;
+                deleteModalState.visible = false;
+                deleteModalState.selectedId = undefined;
+            }
+        };
+
+        /* song-lang */
         const convertBoardItemButtonSet = (dashboardId) => [
             {
                 iconName: 'ic_edit',
+                tooltipText: i18n.t('Edit'),
                 eventAction: () => console.log('edit!'),
             },
             {
                 iconName: 'ic_duplicate',
+                tooltipText: i18n.t('Clone'),
                 eventAction: () => console.log('dup!'),
             },
             {
                 iconName: 'ic_trashcan',
+                tooltipText: i18n.t('Delete'),
                 /* TODO: Implementation */
-                eventAction: async () => {
-                    await SpaceConnector.clientV2.dashboard[`${state.dashboardScopeType}Dashboard`].delete({
-                        [`${state.dashboardScopeType}_dashboard_id`]: dashboardId,
-                    });
-                },
+                eventAction: () => handleClickDeleteDashboard(dashboardId),
             },
         ];
 
@@ -152,8 +194,10 @@ export default defineComponent<DashboardBoardListProps>({
 
         return {
             ...toRefs(state),
+            deleteModalState,
             handleSetQuery,
             handlePage,
+            handleDeleteDashboardConfirm,
             FAVORITE_TYPE,
             SCOPE_TYPE,
             PAGE_SIZE,

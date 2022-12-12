@@ -69,7 +69,7 @@ export default defineComponent({
             }))),
             projectMenuSet: computed<LNBItem[]>(() => store.state.dashboard.projectItems.map((d) => ({
                 type: 'item',
-                id: d.domain_project_id,
+                id: d.project_dashboard_id,
                 label: d.name,
                 to: {
                     name: DASHBOARDS_ROUTE.DETAIL._NAME,
