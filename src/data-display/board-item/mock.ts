@@ -5,14 +5,17 @@ import type {
 export const standardIconActionSet: IconSet[] = [
     {
         iconName: 'ic_edit',
+        tooltipText: 'Edit',
         eventAction: () => {},
     },
     {
         iconName: 'ic_duplicate',
+        tooltipText: 'Duplicate',
         eventAction: () => {},
     },
     {
         iconName: 'ic_trashcan',
+        tooltipText: 'Delete',
         eventAction: () => {},
     },
 ];

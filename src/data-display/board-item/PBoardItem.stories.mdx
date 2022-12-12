@@ -146,11 +146,12 @@ and when you want a custom ui, use the `left-content` slot to replace it.<br/>
 
 ## Icon Button Sets
 
-The data type is object in array. The object follows the `IconAction` interface below. `iconName` is the name of the icon used in icons, and `ButtonEventHandler` is the event function to be bound to the icon button.<br/>
+The data type is object in array. The object follows the `IconAction` interface below. `iconName` is the name of the icon used in icons, `tooltipText` is a value that determines what content to display if a tooltip is optionally displayed, and `ButtonEventHandler` is the event function to be bound to the icon button.<br/>
 
 ```
 interface IconAction {
     iconName: string;
+    tooltipText?: string;
     eventAction: ButtonEventHandler;
 }
 ```

@@ -1,7 +1,11 @@
 <template>
-    <div class="p-board-item" :class="{'rounded': rounded}">
+    <div class="p-board-item"
+         :class="{'rounded': rounded}"
+    >
         <div class="content-area">
-            <div v-if="leftIcon" class="left-icon">
+            <div v-if="leftIcon"
+                 class="left-icon"
+            >
                 <slot name="left-content">
                     <p-i :name="leftIcon"
                          width="2.5rem"
@@ -12,16 +16,25 @@
             <div class="content">
                 <slot name="content" />
             </div>
-            <div v-if="iconSetList.length > 0" class="right-overlay-wrapper desktop">
+            <div v-if="iconSetList.length > 0"
+                 class="right-overlay-wrapper desktop"
+            >
                 <div class="overlay-contents">
-                    <p-icon-button v-for="(iconAction, index) in iconSetList"
-                                   :key="`${iconAction.iconName}-desktop-${index}`"
-                                   :name="iconAction.iconName"
-                                   @click.stop="iconAction.eventAction"
-                    />
+                    <p-tooltip v-for="(iconAction, index) in iconSetList"
+                               :key="`${iconAction.iconName}-desktop-${index}`"
+                               class="overlay-icon-button"
+                               :contents="iconAction.tooltipText"
+                               position="bottom"
+                    >
+                        <p-icon-button :name="iconAction.iconName"
+                                       @click.stop="iconAction.eventAction"
+                        />
+                    </p-tooltip>
                 </div>
             </div>
-            <div v-if="iconSetList.length > 0" class="right-overlay-wrapper tablet">
+            <div v-if="iconSetList.length > 0"
+                 class="right-overlay-wrapper tablet"
+            >
                 <div class="overlay-contents">
                     <p-select-dropdown v-if="iconSetList.length > 1"
                                        :items="iconSetList"
@@ -39,13 +52,20 @@
                             </div>
                         </template>
                     </p-select-dropdown>
-                    <p-icon-button v-else-if="iconSetList.length === 1"
-                                   :name="iconSetList[0].iconName"
-                                   @click.stop="iconSetList[0].eventAction"
-                    />
+                    <p-tooltip v-else-if="iconSetList.length === 1"
+                               class="overlay-icon-button"
+                               :contents="iconSetList[0].tooltipText"
+                               position="bottom"
+                    >
+                        <p-icon-button :name="iconSetList[0].iconName"
+                                       @click.stop="iconSetList[0].eventAction"
+                        />
+                    </p-tooltip>
                 </div>
             </div>
-            <div v-else class="right-overlay-wrapper">
+            <div v-else
+                 class="right-overlay-wrapper"
+            >
                 <slot name="custom-right-content" />
             </div>
         </div>
@@ -59,13 +79,16 @@ import {
 import type { PropType } from 'vue';
 
 import type { BoardItemProps, IconSet } from '@/data-display/board-item/type';
+import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import PI from '@/foundation/icons/PI.vue';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 
 export default defineComponent<BoardItemProps>({
     name: 'PBoardItem',
-    components: { PIconButton, PSelectDropdown, PI },
+    components: {
+        PTooltip, PIconButton, PSelectDropdown, PI,
+    },
     props: {
         leftIcon: {
             type: String,
@@ -124,6 +147,10 @@ export default defineComponent<BoardItemProps>({
             .overlay-contents {
                 @apply h-full w-full flex bg-blue-100;
                 padding: 1rem 0 1rem;
+
+                .overlay-icon-button {
+                    height: 2rem;
+                }
             }
         }
         .tablet {
