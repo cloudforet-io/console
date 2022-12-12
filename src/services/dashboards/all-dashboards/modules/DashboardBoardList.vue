@@ -67,7 +67,7 @@ import {
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { QueryStoreFilterValue } from '@/query/type';
+import type { ConsoleFilter } from '@/query/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -188,7 +188,7 @@ export default defineComponent<DashboardBoardListProps>({
         ];
 
         const labelQueryHelper = new QueryHelper();
-        const handleSetQuery = (selectedLabel: ConsoleFilterValue | ConsoleFilterValue[]) => {
+        const handleSetQuery = (selectedLabel: ConsoleFilter | ConsoleFilter[]) => {
             labelQueryHelper.setFilters(store.state.dashboard.searchFilters).addFilter({ k: 'label', o: '=', v: selectedLabel });
             store.dispatch('dashboard/setSearchFilters', labelQueryHelper.filters);
         };
