@@ -27,12 +27,27 @@
             <div class="description-text">
                 {{ $t('Displays the top list of 10 highest spending throughout the whole period of filtered date, aggregated by selected Group-By.') }}
             </div>
-            <div>
-                <p-json-schema-form v-if="widgetConfig?.widget_options_schema"
-                                    :schema="widgetConfig.widget_options_schema"
-                                    :form-data.sync="formData"
-                />
-            </div>
+            <p-json-schema-form v-if="widgetConfig?.widget_options_schema"
+                                :schema="widgetConfig.widget_options_schema"
+                                :form-data.sync="formData"
+                                class="widget-options-form"
+            >
+                <template #label-extra="{ propertyName }">
+                    <div class="inherit-toggle-button">
+                        <span class="text">Inherit</span>
+                        <p-toggle-button :value="inheritFormData[propertyName]"
+                                         @change="handleChangeInheritToggle(propertyName, ...arguments)"
+                        />
+                    </div>
+                </template>
+            </p-json-schema-form>
+            <p-button style-type="secondary"
+                      icon-left="ic_plus_bold"
+                      block
+            >
+                <!--song-lang-->
+                Add Options
+            </p-button>
         </div>
     </div>
 </template>
@@ -42,7 +57,7 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PJsonSchemaForm,
+    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PButton,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -59,6 +74,8 @@ export default defineComponent<Props>({
         PTextInput,
         PFieldGroup,
         PJsonSchemaForm,
+        PToggleButton,
+        PButton,
     },
     props: {
         widgetConfigId: {
@@ -75,6 +92,7 @@ export default defineComponent<Props>({
             nameRef: null as null | HTMLElement,
             widgetConfig: computed(() => (props.widgetConfigId ? CONSOLE_WIDGET_CONFIGS[props.widgetConfigId] : undefined)),
             formData: {},
+            inheritFormData: {},
         });
 
         const {
@@ -90,6 +108,11 @@ export default defineComponent<Props>({
             name(value: string) { return value.trim().length ? '' : i18n.t('Please enter name.'); },
         });
 
+        /* Event */
+        const handleChangeInheritToggle = (propertyName: string, { value }) => {
+            state.inheritFormData[propertyName] = value;
+        };
+
         /* Watcher */
 
         return {
@@ -98,6 +121,7 @@ export default defineComponent<Props>({
             setForm,
             invalidState,
             invalidTexts,
+            handleChangeInheritToggle,
         };
     },
 });
@@ -136,6 +160,31 @@ export default defineComponent<Props>({
             font-size: 0.875rem;
             font-weight: 400;
             padding: 0.75rem;
+        }
+
+        /* custom design-system component - p-field-group */
+        :deep(.widget-options-form) {
+            .form-label {
+                display: -webkit-box;
+                width: 100%;
+                justify-content: space-between;
+                align-content: center;
+            }
+            .input-form {
+                width: 100%;
+            }
+        }
+        .inherit-toggle-button {
+            @apply bg-gray-100 rounded;
+            line-height: 1.25;
+            padding: 0.25rem 0.5rem;
+            .text {
+                @apply text-gray-600;
+                font-weight: 400;
+                font-size: 12px;
+                letter-spacing: 0.02em;
+                padding-right: 0.375rem;
+            }
         }
     }
 }

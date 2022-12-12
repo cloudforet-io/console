@@ -1,5 +1,6 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
 import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 
 const costTrendWidgetConfig: WidgetConfig = {
     widget_config_id: 'costTrend',
@@ -27,8 +28,11 @@ const costTrendWidgetConfig: WidgetConfig = {
         type: 'object',
         properties: {
             group_by: {
+                title: 'Group By',
                 type: 'string',
                 enum: Object.values(GROUP_BY),
+                menuItems: Object.values(GROUP_BY_ITEM_MAP),
+                default: GROUP_BY.PROVIDER,
             },
         },
         required: ['group_by'],
