@@ -1,3 +1,10 @@
+# [1.1.0-beta.468](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.467...v1.1.0-beta.468) (2022-12-12)
+
+
+### Features
+
+* **p-select-dropdown:** add lg size ([#159](https://github.com/cloudforet-io/mirinae/issues/159)) ([cf1422f](https://github.com/cloudforet-io/mirinae/commit/cf1422f84c7c497bcb58872fca467e00d203f61e))
+
 # [1.1.0-beta.467](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.466...v1.1.0-beta.467) (2022-12-12)
 
 
