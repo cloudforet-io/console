@@ -2,7 +2,7 @@ import type { Action, Dispatch } from 'vuex';
 
 import dayjs from 'dayjs';
 
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -72,7 +72,7 @@ export const hideSignInErrorMessage = ({ commit }): void => {
     commit('setIsSignInFailed', false);
 };
 
-const fixedCheckNotificationFilter: QueryStoreFilter = { k: 'is_read', v: false, o: '=' };
+const fixedCheckNotificationFilter: ConsoleFilter = { k: 'is_read', v: false, o: '=' };
 const checkNotificationQueryHelper = new ApiQueryHelper().setCountOnly();
 export const checkNotification: Action<DisplayState, any> = async ({
     commit, state, rootState, rootGetters,

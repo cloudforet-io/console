@@ -16,9 +16,9 @@ import {
 } from '@/query/config';
 import { convertDatetimeQueryStoreFilterToFilters } from '@/query/helper';
 import type {
-    QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
+    ConsoleFilter, ConsoleFilterValue, RawQuery, ConsoleFilterOperator,
 } from '@/query/type';
-import type { Filter, FilterOperator } from '@/space-connector/type';
+import type { ApiFilter, ApiFilterOperator } from '@/space-connector/type';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -27,7 +27,7 @@ interface QueryTag extends Tag, QueryItem {}
 type ReferenceStore = Record<string, any>;
 
 const filterToQueryTag = (
-    filter: { k?: string; v: QueryStoreFilterValue; o?: RawQueryOperator },
+    filter: { k?: string; v: ConsoleFilterValue; o?: ConsoleFilterOperator },
     keyMap: Record<string, KeyItem>,
     referenceStore: ReferenceStore | undefined,
 ): QueryTag | null => {
@@ -67,13 +67,13 @@ const filterToQueryTag = (
         operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string] || filter.o || '' as OperatorType,
     };
 };
-const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') => {
-    let filter: Filter[] = [];
+const filterToApiQueryFilter = (_filters: ConsoleFilter[], timezone = 'UTC') => {
+    let filter: ApiFilter[] = [];
     const keyword: string[] = [];
 
     _filters.forEach((f) => {
         if (f.k) {
-            let op: RawQueryOperator;
+            let op: ConsoleFilterOperator;
             let value = f.v;
             /* null case */
             // TODO: remove checking string 'null' case. This is defense code for v1.10.4.2
@@ -97,7 +97,7 @@ const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') 
 
                 /* plural case */
                 if (rawQueryOperatorToPluralApiQueryOperatorMap[op]) {
-                    filter.push({ k: f.k, v: value, o: rawQueryOperatorToPluralApiQueryOperatorMap[op] as FilterOperator });
+                    filter.push({ k: f.k, v: value, o: rawQueryOperatorToPluralApiQueryOperatorMap[op] as ApiFilterOperator });
                 } else {
                     value.forEach((v) => {
                         filter.push({ k: f.k as string, v, o: rawQueryOperatorToApiQueryOperatorMap[op] });
@@ -126,9 +126,9 @@ export class QueryHelper {
 
     private _keyMap: Record<string, KeyItem> = {};
 
-    private _filters: QueryStoreFilter[] = [];
+    private _filters: ConsoleFilter[] = [];
 
-    private _orFilters: QueryStoreFilter[] = [];
+    private _orFilters: ConsoleFilter[] = [];
 
     private _timezone: string | undefined;
 
@@ -163,10 +163,10 @@ export class QueryHelper {
                 if (q.key && typeof q.key === 'object') {
                     const key = this._keyMap[q.key.name] || { ...q.key };
 
-                    let op: RawQueryOperator;
-                    if (key.dataType === 'datetime') op = `${q.operator}t` as RawQueryOperator;
+                    let op: ConsoleFilterOperator;
+                    if (key.dataType === 'datetime') op = `${q.operator}t` as ConsoleFilterOperator;
                     else if (q.value.name === null || q.value.name === undefined) op = q.operator?.startsWith('!') ? '!=' : '=';
-                    else op = q.operator ?? '' as RawQueryOperator;
+                    else op = q.operator ?? '' as ConsoleFilterOperator;
 
                     if (filterMap[key.name]) {
                         if (filterMap[key.name][op]) filterMap[key.name][op].push(q.value.name);
@@ -179,7 +179,7 @@ export class QueryHelper {
         });
         forEach(filterMap, (opMap, k) => {
             forEach(opMap, (v, o) => {
-                this._filters.push({ k, v, o: o as RawQueryOperator });
+                this._filters.push({ k, v, o: o as ConsoleFilterOperator });
             });
         });
         // this._filters.push({
@@ -218,12 +218,12 @@ export class QueryHelper {
         return this;
     }
 
-    setFilters(filters: QueryStoreFilter[]): this {
+    setFilters(filters: ConsoleFilter[]): this {
         this._filters = [...filters];
         return this;
     }
 
-    setOrFilters(orFilters: Required<QueryStoreFilter>[]): this {
+    setOrFilters(orFilters: Required<ConsoleFilter>[]): this {
         orFilters.forEach((f) => {
             if (f.k === undefined || f.o === undefined || f.o === '') {
                 throw new Error('QueryHelper: orFilter must have key and operator');
@@ -233,12 +233,12 @@ export class QueryHelper {
         return this;
     }
 
-    addFilter(...filters: QueryStoreFilter[]): this {
+    addFilter(...filters: ConsoleFilter[]): this {
         this._filters.push(...filters);
         return this;
     }
 
-    addOrFilter(...orFilters: Required<QueryStoreFilter>[]): this {
+    addOrFilter(...orFilters: Required<ConsoleFilter>[]): this {
         orFilters.forEach((f) => {
             if (f.k === undefined || f.o === undefined || f.o === '') {
                 throw new Error('QueryHelper: orFilter must have key and operator');
@@ -248,11 +248,11 @@ export class QueryHelper {
         return this;
     }
 
-    get filters(): QueryStoreFilter[] {
+    get filters(): ConsoleFilter[] {
         return [...this._filters];
     }
 
-    get orFilters(): QueryStoreFilter[] {
+    get orFilters(): ConsoleFilter[] {
         return [...this._orFilters];
     }
 

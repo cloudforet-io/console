@@ -1,13 +1,13 @@
 import type { OperatorType } from '@/component-util/query-search/type';
 
-export type RawQueryOperator = OperatorType | '<t' | '<=t' | '>t' | '>=t' | '=t';
+export type ConsoleFilterOperator = OperatorType | '<t' | '<=t' | '>t' | '>=t' | '=t';
 
-export type RawQuery = [any] | [any|null, string] | [any|null, string, RawQueryOperator];
+export type RawQuery = [any] | [any|null, string] | [any|null, string, ConsoleFilterOperator];
 
-export type QueryStoreFilterValue = number | string | boolean | null;
+export type ConsoleFilterValue = number | string | boolean | null;
 
-export type QueryStoreFilter = {
+export type ConsoleFilter = {
     k?: string;
-    v: QueryStoreFilterValue | QueryStoreFilterValue[];
-    o?: RawQueryOperator;
+    v: ConsoleFilterValue | ConsoleFilterValue[];
+    o?: ConsoleFilterOperator;
 };

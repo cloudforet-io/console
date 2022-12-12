@@ -141,7 +141,7 @@ import { forEach, orderBy, range } from 'lodash';
 
 import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -451,7 +451,7 @@ export default {
 
                 const summaryQueryHelper = new QueryHelper();
                 res.results.forEach((d) => {
-                    const filters: QueryStoreFilter[] = [];
+                    const filters: ConsoleFilter[] = [];
                     filters.push({
                         k: 'project_id', o: '=', v: props.projectId,
                     });

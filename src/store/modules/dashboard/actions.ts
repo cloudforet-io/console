@@ -1,6 +1,6 @@
 import type { Action } from 'vuex';
 
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { DashboardState } from '@/store/modules/dashboard/type';
@@ -32,7 +32,7 @@ export const loadProjectDashboard: Action<DashboardState, any> = async ({ commit
 };
 
 
-export const setSearchFilters: Action<DashboardState, any> = ({ commit }, searchFilters: QueryStoreFilter[] = []): void => {
+export const setSearchFilters: Action<DashboardState, any> = ({ commit }, searchFilters: ConsoleFilter[] = []): void => {
     commit('setSearchFilters', searchFilters);
 };
 

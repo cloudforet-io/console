@@ -3,7 +3,7 @@ import type { AsyncComponent } from 'vue';
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DynamicWidgetType } from '@spaceone/design-system/src/data-display/dynamic/dynamic-widget/type';
 
-import type { RawQueryOperator } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
 import type { Tags } from '@/models';
 
@@ -96,7 +96,7 @@ interface LegendOptions {
 interface WidgetFilter {
     k?: string;
     v: null|string|boolean|number;
-    o?: RawQueryOperator;
+    o?: ConsoleFilterOperator;
 }
 interface WidgetFiltersMap {
     [key: string]: WidgetFilter[]

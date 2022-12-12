@@ -49,17 +49,17 @@ export interface ServerListResponse<T> {
     total_count: number;
 }
 
-export type FilterOperator =
+export type ApiFilterOperator =
     | 'lt' | 'lte' | 'gt' | 'gte' | 'exists' | 'regex'
     | 'eq' | 'contain' | 'not' | 'not_contain'
     | 'in' | 'contain_in' | 'not_in' | 'not_contain_in' | 'regex_in'
     | 'datetime_lt' | 'datetime_lte' | 'datetime_gt' | 'datetime_gte'
     | 'timediff_lt' | 'timediff_lte' | 'timediff_gt' | 'timediff_gte';
 
-export interface Filter {
+export interface ApiFilter {
     k: string;
     v: any;
-    o: FilterOperator;
+    o: ApiFilterOperator;
 }
 
 export interface Sort {
@@ -68,8 +68,8 @@ export interface Sort {
 }
 
 export interface Query {
-    filter?: Array<Filter>;
-    filter_or?: Array<Filter>;
+    filter?: Array<ApiFilter>;
+    filter_or?: Array<ApiFilter>;
     page?: {
         start?: number;
         limit?: number;

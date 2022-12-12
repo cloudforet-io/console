@@ -11,7 +11,7 @@ import type {
     ValueItem,
 } from '@/component-util/query-search/type';
 import { SpaceConnector } from '@/space-connector';
-import type { Filter } from '@/space-connector/type';
+import type { ApiFilter } from '@/space-connector/type';
 
 type KeyTuple = [string, string|undefined, KeyDataType|undefined]; // name, label, dataType
 type KeyParam = Array<KeyTuple | string | KeyItemSet>;
@@ -77,7 +77,7 @@ const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, 
  * @param dataType
  * @param limit
  */
-export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: KeyDataType, filters?: Filter[], limit?: number): ValueHandler|undefined {
+export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: KeyDataType, filters?: ApiFilter[], limit?: number): ValueHandler|undefined {
     if (['datetime', 'boolean'].includes(dataType || '')) return undefined;
 
     const staticParam: any = {

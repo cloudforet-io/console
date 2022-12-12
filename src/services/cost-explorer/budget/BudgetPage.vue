@@ -38,7 +38,7 @@ import {
 } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
@@ -81,7 +81,7 @@ export default {
             SpaceRouter.router.push({ name });
         };
 
-        const handleUpdateFilters = (filters: QueryStoreFilter[]) => {
+        const handleUpdateFilters = (filters: ConsoleFilter[]) => {
             state.filters = filters;
             SpaceRouter.router.replace({
                 query: {

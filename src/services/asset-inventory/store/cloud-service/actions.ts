@@ -2,7 +2,7 @@ import type { Action } from 'vuex';
 
 import { isEmpty } from 'lodash';
 
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
 import type { CloudServiceCategory, CloudServiceFilterMap, Period } from '@/services/asset-inventory/cloud-service/type';
@@ -44,6 +44,6 @@ export const setSelectedRegions: Action<CloudServiceStoreState, any> = ({ state,
     commit('setAdditionalFilters', additionalFilters);
 };
 
-export const setSearchFilters: Action<CloudServiceStoreState, any> = ({ commit }, searchFilters: QueryStoreFilter[] = []) => {
+export const setSearchFilters: Action<CloudServiceStoreState, any> = ({ commit }, searchFilters: ConsoleFilter[] = []) => {
     commit('setSearchFilters', searchFilters);
 };
