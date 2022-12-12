@@ -1,3 +1,10 @@
+# [1.1.0-beta.469](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.468...v1.1.0-beta.469) (2022-12-12)
+
+
+### Bug Fixes
+
+* **p-json-schema-form:** add `label-extra` slot and use `menuItems` ([#160](https://github.com/cloudforet-io/mirinae/issues/160)) ([8512d98](https://github.com/cloudforet-io/mirinae/commit/8512d98e12c0edc260c0688eb3fa82fe1470bbe5))
+
 # [1.1.0-beta.468](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.467...v1.1.0-beta.468) (2022-12-12)
 
 
