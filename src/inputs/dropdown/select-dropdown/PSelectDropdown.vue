@@ -7,6 +7,7 @@
              disabled,
              'read-only': readOnly,
              active: proxyVisibleMenu && !readOnly,
+             [size] : true,
          }"
     >
         <p-icon-button v-if="styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
@@ -79,7 +80,7 @@ import {
     toRefs,
     nextTick, toRef,
 } from 'vue';
-import type { DirectiveFunction, SetupContext } from 'vue';
+import type { DirectiveFunction, SetupContext, PropType } from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components';
 import { groupBy, reduce } from 'lodash';
@@ -91,10 +92,10 @@ import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
-import type { SelectDropdownProps } from '@/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownProps, SelectDropdownSize } from '@/inputs/dropdown/select-dropdown/type';
 import {
     SELECT_DROPDOWN_STYLE_TYPE,
-    CONTEXT_MENU_POSITION,
+    CONTEXT_MENU_POSITION, SELECT_DROPDOWN_SIZE,
 } from '@/inputs/dropdown/select-dropdown/type';
 
 
@@ -169,6 +170,13 @@ export default defineComponent<SelectDropdownProps>({
         readOnly: {
             type: Boolean,
             default: false,
+        },
+        size: {
+            type: String as PropType<SelectDropdownSize>,
+            default: SELECT_DROPDOWN_SIZE.md,
+            validator(size: SelectDropdownSize) {
+                return Object.values(SELECT_DROPDOWN_SIZE).includes(size);
+            },
         },
     },
     setup(props, { emit, slots }: SetupContext) {
@@ -484,6 +492,18 @@ export default defineComponent<SelectDropdownProps>({
                     }
                 }
             }
+        }
+    }
+
+    /* size */
+    &.lg {
+        .dropdown-button {
+            font-size: 1rem;
+        }
+    }
+    &.md {
+        .dropdown-button {
+            font-size: 0.875rem;
         }
     }
 }

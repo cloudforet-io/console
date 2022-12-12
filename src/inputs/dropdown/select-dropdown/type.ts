@@ -13,8 +13,14 @@ export const SELECT_DROPDOWN_STYLE_TYPE = Object.freeze({
     SECONDARY_BUTTON: 'secondary-button',
 } as const);
 
+export const SELECT_DROPDOWN_SIZE = {
+    md: 'md',
+    lg: 'lg',
+} as const;
+
 export type CONTEXT_MENU_POSITION = typeof CONTEXT_MENU_POSITION[keyof typeof CONTEXT_MENU_POSITION];
 export type SELECT_DROPDOWN_STYLE_TYPE = typeof SELECT_DROPDOWN_STYLE_TYPE[keyof typeof SELECT_DROPDOWN_STYLE_TYPE];
+export type SelectDropdownSize = typeof SELECT_DROPDOWN_SIZE[keyof typeof SELECT_DROPDOWN_SIZE];
 
 export type SelectDropdownMenu = MenuItem;
 
@@ -32,4 +38,5 @@ export interface SelectDropdownProps {
     // context menu fixed style props
     useFixedMenuStyle?: boolean;
     visibleMenu?: boolean;
+    size?: SelectDropdownSize;
 }

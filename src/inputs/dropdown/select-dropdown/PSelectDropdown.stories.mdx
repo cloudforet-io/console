@@ -9,7 +9,10 @@ import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 
 import {getSelectDropdownArgTypes} from '@/inputs/dropdown/select-dropdown/story-helper';
 import {menuItems} from '@/inputs/context-menu/mock';
-import { BUTTON_STYLE } from '@/inputs/buttons/button/type.ts'; import { SELECT_DROPDOWN_STYLE_TYPE } from './type';
+import { BUTTON_STYLE } from '@/inputs/buttons/button/type.ts';
+import {
+    SELECT_DROPDOWN_SIZE, SELECT_DROPDOWN_STYLE_TYPE
+} from "@/inputs/dropdown/select-dropdown/type";
 
 <Meta title='Inputs/Dropdown/Select Dropdown' parameters={{
     design: {
@@ -166,6 +169,52 @@ export const Template = (args, { argTypes }) => ({
                 return {
                     menuItems,
                     styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Size
+
+<Canvas>
+    <Story name="Size">
+        {{
+            i18n,
+            components: { PSelectDropdown },
+            template: `
+                <table style="border-collapse: separate; border-spacing: 16px;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>default</th>
+                            <th>icon-button</th>
+                            <th>transparent</th>
+                            <th>primary-button</th>
+                            <th>secondary-button</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="size in sizes" :size="size">
+                            <th>{{size}}</th>
+                            <td v-for="styleType in styleTypes" :key="styleType">
+                                <p-select-dropdown :size="size" :items="menuItems" :styleType="styleType" style="margin: 0.5rem;"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            `,
+            setup() {
+                const state = reactive({
+                    sizes: Object.values(SELECT_DROPDOWN_SIZE)
+                })
+                return {
+                    ...toRefs(state),
+                    styleTypes: Object.values(SELECT_DROPDOWN_STYLE_TYPE),
+                    menuItems,
                 }
             }
         }}

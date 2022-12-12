@@ -3,7 +3,11 @@ import { camelCase } from 'lodash';
 
 import { menuItems } from '@/inputs/context-menu/mock';
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
-import { SELECT_DROPDOWN_STYLE_TYPE, CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
+import {
+    SELECT_DROPDOWN_STYLE_TYPE,
+    CONTEXT_MENU_POSITION,
+    SELECT_DROPDOWN_SIZE,
+} from '@/inputs/dropdown/select-dropdown/type';
 
 export const getSelectDropdownArgTypes = (): ArgTypes => {
     const contextMenuArgTypes = getContextMenuArgTypes();
@@ -183,6 +187,26 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
             control: {
                 type: 'select',
                 options: [undefined, ...Object.values(SELECT_DROPDOWN_STYLE_TYPE)],
+            },
+        },
+        size: {
+            name: 'size',
+            type: { name: 'string' },
+            description: `Select size. ${
+                [...Object.values(SELECT_DROPDOWN_SIZE)].map((d) => `\`${d}\``)} are available.`,
+            defaultValue: SELECT_DROPDOWN_SIZE.md,
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: SELECT_DROPDOWN_SIZE.md,
+                },
+            },
+            control: {
+                type: 'select',
+                options: [undefined, ...Object.values(SELECT_DROPDOWN_SIZE)],
             },
         },
         buttonIcon: {
