@@ -46,6 +46,11 @@
                           @change="handlePage"
             />
         </div>
+        <delete-modal :header-title="deleteModalState.headerTitle"
+                      :visible.sync="deleteModalState.visible"
+                      :loading="deleteModalState.loading"
+                      @confirm="handleDeleteDashboardConfirm"
+        />
     </div>
 </template>
 
@@ -62,13 +67,18 @@ import {
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ConsoleFilterValue } from '@/query/type';
+import type { ConsoleFilter } from '@/query/type';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { DashboardItem, ScopeType } from '@/store/modules/dashboard/type';
 import { SCOPE_TYPE } from '@/store/modules/dashboard/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 const PAGE_SIZE = 10;
@@ -83,6 +93,7 @@ interface DashboardBoardListProps {
 export default defineComponent<DashboardBoardListProps>({
     name: 'DashboardBoardList',
     components: {
+        DeleteModal,
         PPagination,
         PLabel,
         FavoriteButton,
@@ -117,28 +128,67 @@ export default defineComponent<DashboardBoardListProps>({
                 ))),
         });
 
+        /* song-lang */
+        const deleteModalState = reactive({
+            headerTitle: i18n.t('Are you sure you want to delete dashboard?'),
+            visible: false,
+            loading: false,
+            selectedId: undefined as string|undefined,
+        });
+
+        const handleClickDeleteDashboard = (dashboardId) => {
+            deleteModalState.selectedId = dashboardId;
+            deleteModalState.visible = true;
+        };
+
+        const handleDeleteDashboardConfirm = async () => {
+            try {
+                deleteModalState.loading = true;
+                if (state.dashboardScopeType === 'domain') {
+                    await SpaceConnector.clientV2.dashboard.domainDashboard.delete({
+                        domain_dashboard_id: deleteModalState.selectedId,
+                    });
+                    await store.dispatch('dashboard/loadDomainDashboard');
+                } else {
+                    await SpaceConnector.clientV2.dashboard.projectDashboard.delete({
+                        project_dashboard_id: deleteModalState.selectedId,
+                    });
+                    await store.dispatch('dashboard/loadProjectDashboard');
+                }
+                /* song-lang */
+                showSuccessMessage(i18n.t('Successed to delete dashboard'), '');
+            } catch (e) {
+                /* song-lang */
+                ErrorHandler.handleRequestError(e, i18n.t('Failed to delete dashboard'));
+            } finally {
+                deleteModalState.loading = false;
+                deleteModalState.visible = false;
+                deleteModalState.selectedId = undefined;
+            }
+        };
+
+        /* song-lang */
         const convertBoardItemButtonSet = (dashboardId) => [
             {
                 iconName: 'ic_edit',
+                tooltipText: i18n.t('Edit'),
                 eventAction: () => console.log('edit!'),
             },
             {
                 iconName: 'ic_duplicate',
+                tooltipText: i18n.t('Clone'),
                 eventAction: () => console.log('dup!'),
             },
             {
                 iconName: 'ic_trashcan',
+                tooltipText: i18n.t('Delete'),
                 /* TODO: Implementation */
-                eventAction: async () => {
-                    await SpaceConnector.clientV2.dashboard[`${state.dashboardScopeType}Dashboard`].delete({
-                        [`${state.dashboardScopeType}_dashboard_id`]: dashboardId,
-                    });
-                },
+                eventAction: () => handleClickDeleteDashboard(dashboardId),
             },
         ];
 
         const labelQueryHelper = new QueryHelper();
-        const handleSetQuery = (selectedLabel: ConsoleFilterValue | ConsoleFilterValue[]) => {
+        const handleSetQuery = (selectedLabel: ConsoleFilter | ConsoleFilter[]) => {
             labelQueryHelper.setFilters(store.state.dashboard.searchFilters).addFilter({ k: 'label', o: '=', v: selectedLabel });
             store.dispatch('dashboard/setSearchFilters', labelQueryHelper.filters);
         };
@@ -152,8 +202,10 @@ export default defineComponent<DashboardBoardListProps>({
 
         return {
             ...toRefs(state),
+            deleteModalState,
             handleSetQuery,
             handlePage,
+            handleDeleteDashboardConfirm,
             FAVORITE_TYPE,
             SCOPE_TYPE,
             PAGE_SIZE,
