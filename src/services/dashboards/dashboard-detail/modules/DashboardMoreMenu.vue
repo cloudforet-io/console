@@ -1,16 +1,11 @@
 <template>
-    <div>
+    <div class="dashboard-more-menu">
         <p-select-dropdown class="more-button"
                            :items="state.moreMenuItems"
                            style-type="icon-button"
                            button-icon="ic_more"
                            menu-position="left"
                            @select="handleSelectMoreMenu"
-        />
-        <dashboard-duplicate-modal
-            :visible.sync="state.duplicateModalVisible"
-            :dashboard="dashboard"
-            :manage-disabled="manageDisabled"
         />
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
@@ -33,23 +28,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import type { DashboardViewerType } from '@/services/dashboards/dashboard-create/type';
-import DashboardDuplicateModal
-    from '@/services/dashboards/dashboard-detail/modules/DashboardDuplicateModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 
-
-
-
 const MENU = Object.freeze({
-    DUPLICATE: 'duplicate',
     DELETE: 'delete',
     SET_HOME: 'setHome',
 } as const);
 
 const defaultMenuItems = computed(() => [
-    // song-lang
-    { name: MENU.DUPLICATE, label: 'Duplicate', disabled: false },
     // song-lang
     { name: MENU.DELETE, label: 'Delete', disabled: false },
     // song-lang
@@ -70,16 +57,16 @@ const state = reactive({
     moreMenuItems: computed(() => {
         const menuItems = cloneDeep(defaultMenuItems.value);
         if (state.homeDashboardId === props.dashboardId) {
+            menuItems[0].disabled = true;
             menuItems[1].disabled = true;
-            menuItems[2].disabled = true;
             return menuItems;
         }
         if (state.dashboardType === DASHBOARD_TYPE.PUBLIC && props.manageDisabled) {
             if (state.homeDashboardId === props.dashboardId) {
+                menuItems[0].disabled = true;
                 menuItems[1].disabled = true;
-                menuItems[2].disabled = true;
             }
-            menuItems[1].disabled = true;
+            menuItems[0].disabled = true;
             return menuItems;
         }
         return defaultMenuItems.value;
@@ -88,7 +75,6 @@ const state = reactive({
     // homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
     homeDashboardId: '',
     dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(props.dashboard, 'public_dashboard_id') ? DASHBOARD_TYPE.PUBLIC : DASHBOARD_TYPE.USER)),
-    duplicateModalVisible: false,
 });
 
 
@@ -103,8 +89,6 @@ const handleSelectMoreMenu = (item) => {
     if (item === MENU.SET_HOME && props.dashboardId) {
         // FIXME:: connect dashboardStore
         // costExplorerStore.dispatch('setHomeDashboard', props.dashboardId);
-    } else if (item === MENU.DUPLICATE) {
-        state.duplicateModalVisible = true;
     } else if (item === MENU.DELETE) {
         checkDeleteState.visible = true;
     }
@@ -134,3 +118,9 @@ const handleDeleteDashboardConfirm = async () => {
 };
 
 </script>
+
+<style lang="postcss" scoped>
+.p-select-dropdown {
+    height: 2rem;
+}
+</style>

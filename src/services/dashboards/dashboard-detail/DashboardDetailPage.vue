@@ -23,11 +23,12 @@
                     <dashboard-more-menu dashboard-id="dashboard-xxx"
                                          :dashboard="{ public_dashboard_id: 'dashboard-xxx' }"
                                          :manage-disabled="false"
+                                         dashboard-type="PUBLIC"
                     />
                 </span>
             </template>
             <template #extra>
-                <dashboard-control-buttons />
+                <dashboard-control-buttons @update:visible-clone-modal="handleVisibleCloneModal" />
             </template>
         </p-page-title>
         <div class="flex justify-between mt-4">
@@ -45,6 +46,7 @@
                                    :dashboard-name="state.dashboardName"
                                    @confirm="handleNameUpdate"
         />
+        <dashboard-clone-modal :visible.sync="state.cloneModalVisible" />
     </div>
 </template>
 
@@ -63,6 +65,7 @@ import { gray } from '@/styles/colors';
 
 import { DASHBOARD_VIEWER_PUBLIC } from '@/services/dashboards/dashboard-create/config';
 import type { DashboardViewerType } from '@/services/dashboards/dashboard-create/type';
+import DashboardCloneModal from '@/services/dashboards/dashboard-detail/modules/DashboardCloneModal.vue';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/DashboardMoreMenu.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
@@ -71,15 +74,17 @@ import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/mod
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 
+
 const PUBLIC_ICON_COLOR = gray[500];
 
-
+const LABEL_LIST_MOCK = [{ label: 'THIS' }, { label: 'LABELS ARE' }, { label: 'MOCK' }];
 const state = reactive({
     dashboardType: DASHBOARD_VIEWER_PUBLIC as DashboardViewerType,
     dashboardId: 'dashboard-idxxx',
     dashboardName: 'Dashboard XXX',
-    labelList: [] as Array<{label: string}>,
+    labelList: LABEL_LIST_MOCK as Array<{label: string}>,
     nameEditModalVisible: false,
+    cloneModalVisible: false,
 });
 
 const WIDGET_SIZE_MOCK = ['md', 'md', 'sm', 'md', 'lg', 'sm'];
@@ -97,6 +102,9 @@ const handleNameEditModal = () => {
 };
 const handleNameUpdate = (name: string) => {
     state.dashboardName = name;
+};
+const handleVisibleCloneModal = () => {
+    state.cloneModalVisible = true;
 };
 </script>
 
