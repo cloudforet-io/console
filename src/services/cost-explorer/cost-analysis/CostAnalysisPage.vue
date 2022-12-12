@@ -70,16 +70,16 @@ export default {
             costExplorerStore.commit('costAnalysis/setSelectedQueryId', queryId);
         };
 
-        const setQueryOptions = (options?: Partial<CostQuerySetOption>) => {
+        const setQueryOptions = (options?: CostQuerySetOption) => {
             if (options) costExplorerStore.dispatch('costAnalysis/setQueryOptions', options);
             else costExplorerStore.dispatch('costAnalysis/initCostAnalysisStoreState');
         };
 
-        const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): Partial<CostQuerySetOption> => ({
+        const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetOption => ({
             granularity: queryStringToString(urlQuery.granularity) as Granularity,
             stack: queryStringToBoolean(urlQuery.stack),
             group_by: queryStringToArray(urlQuery.group_by),
-            period: queryStringToObject(urlQuery.period),
+            period: queryStringToObject(urlQuery.period) ?? {},
             filters: queryStringToObject(urlQuery.filters),
         });
 
