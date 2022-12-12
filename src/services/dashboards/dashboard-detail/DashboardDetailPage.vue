@@ -18,6 +18,7 @@
                     <p-icon-button name="ic_edit-text"
                                    width="1.5rem"
                                    height="1.5rem"
+                                   @click="handleNameEditModal"
                     />
                     <dashboard-more-menu dashboard-id="dashboard-xxx"
                                          :dashboard="{ public_dashboard_id: 'dashboard-xxx' }"
@@ -39,6 +40,11 @@
             :widget-size-list="WIDGET_SIZE_MOCK"
             :widget-theme-option-list="WIDGET_THEME_OPTION_MOCK"
         />
+        <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
+                                   :dashboard-id="state.dashboardId"
+                                   :dashboard-name="state.dashboardName"
+                                   @confirm="handleNameUpdate"
+        />
     </div>
 </template>
 
@@ -59,6 +65,7 @@ import { DASHBOARD_VIEWER_PUBLIC } from '@/services/dashboards/dashboard-create/
 import type { DashboardViewerType } from '@/services/dashboards/dashboard-create/type';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/DashboardMoreMenu.vue';
+import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import DashboardRefresher from '@/services/dashboards/dashboard-detail/modules/DashboardRefresher.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
@@ -70,7 +77,9 @@ const PUBLIC_ICON_COLOR = gray[500];
 const state = reactive({
     dashboardType: DASHBOARD_VIEWER_PUBLIC as DashboardViewerType,
     dashboardId: 'dashboard-idxxx',
+    dashboardName: 'Dashboard XXX',
     labelList: [] as Array<{label: string}>,
+    nameEditModalVisible: false,
 });
 
 const WIDGET_SIZE_MOCK = ['md', 'md', 'sm', 'md', 'lg', 'sm'];
@@ -83,6 +92,12 @@ const WIDGET_THEME_OPTION_MOCK = [
     { inherit: true, inherit_count: undefined },
 ];
 
+const handleNameEditModal = () => {
+    state.nameEditModalVisible = true;
+};
+const handleNameUpdate = (name: string) => {
+    state.dashboardName = name;
+};
 </script>
 
 <style lang="postcss" scoped>
