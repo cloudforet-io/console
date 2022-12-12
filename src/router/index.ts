@@ -87,13 +87,19 @@ export class SpaceRouter {
         });
 
         SpaceRouter.router.afterEach((to) => {
-            if (config.get('GTAG_ID') !== 'DISABLED') GTag.setPageView(to);
-            if (SpaceRouter.router.app.$store.state.error.visibleAuthorizationError) { SpaceRouter.router.app.$store.commit('error/setVisibleAuthorizationError', false); }
-            const isDomainOwner = SpaceRouter.router.app.$store.getters['user/isDomainOwner'];
+            // set GTag
+            const gtagId = config.get('GTAG_ID');
+            if (!gtagId || gtagId !== 'DISABLED') GTag.setPageView(to);
+
+            const store = SpaceRouter.router.app?.$store;
+            if (!store) return;
+
+            if (store.state.error.visibleAuthorizationError) { store.commit('error/setVisibleAuthorizationError', false); }
+            const isDomainOwner = store.getters['user/isDomainOwner'];
             if (!isDomainOwner) {
                 const recent = getRecentConfig(to);
                 if (recent) {
-                    SpaceRouter.router.app.$store.dispatch('recent/addItem', {
+                    store.dispatch('recent/addItem', {
                         itemType: recent.itemType,
                         itemId: recent.itemId,
                     });
