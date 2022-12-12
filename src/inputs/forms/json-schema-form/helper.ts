@@ -109,6 +109,9 @@ export const getInputTypeBySchemaProperty = (schemaProperty: InnerJsonSchema): T
 export const getInputPlaceholderBySchemaProperty = (schemaProperty: InnerJsonSchema) => schemaProperty.examples?.[0] ?? '';
 
 export const getMenuItemsBySchemaProperty = (schemaProperty: InnerJsonSchema): SelectDropdownMenu[]|undefined => {
+    if (Array.isArray(schemaProperty.menuItems) && schemaProperty.menuItems.length) {
+        return schemaProperty.menuItems;
+    }
     if (Array.isArray(schemaProperty.enum)) {
         try {
             return schemaProperty.enum.map((d) => {

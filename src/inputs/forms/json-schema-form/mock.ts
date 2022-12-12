@@ -44,6 +44,18 @@ export const getDefaultSchema = () => ({
             default: '82',
             enum: ['82', '333', '232'],
         },
+        provider: {
+            title: 'Provider',
+            minLength: 1,
+            type: 'string',
+            default: 'aws',
+            enum: ['aws', 'google_cloud', 'azure'],
+            menuItems: [
+                { name: 'aws', label: 'AWS' },
+                { name: 'google_cloud', label: 'Google Cloud' },
+                { name: 'azure', label: 'Azure' },
+            ],
+        },
         age: {
             title: 'Age',
             type: 'number',
@@ -106,8 +118,8 @@ export const getDefaultSchema = () => ({
         },
 
     },
-    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails', 'colors'],
-    order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'age', 'phone', 'homepage', 'additional'],
+    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails', 'colors', 'provider'],
+    order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'provider', 'age', 'phone', 'homepage', 'additional'],
 });
 
 export const getDefaultFormData = () => ({

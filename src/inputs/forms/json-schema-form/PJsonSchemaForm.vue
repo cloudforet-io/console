@@ -29,6 +29,11 @@
                            :required="requiredList.includes(schemaProperty.propertyName)"
                            :invalid="getPropertyInvalidState(schemaProperty)"
             >
+                <template #label-extra>
+                    <slot name="label-extra"
+                          v-bind="schemaProperty"
+                    />
+                </template>
                 <template v-if="schemaProperty.markdown"
                           #help
                 >
@@ -52,6 +57,7 @@
                                         :value="rawFormData[schemaProperty.propertyName]"
                                         :disabled="schemaProperty.disabled"
                                         :invalid="invalid"
+                                        class="input-form"
                                         @update:value="handleUpdateFormValue(schemaProperty, ...arguments)"
                     />
                     <p-json-schema-form v-else-if="schemaProperty.componentName === 'PJsonSchemaForm'"
@@ -64,6 +70,8 @@
                                        :selected="rawFormData[schemaProperty.propertyName]"
                                        :items="schemaProperty.menuItems"
                                        :disabled="schemaProperty.disabled"
+                                       use-fixed-menu-style
+                                       class="input-form"
                                        @update:selected="handleUpdateFormValue(schemaProperty, ...arguments)"
                     />
                     <p-search-dropdown v-else-if="schemaProperty.componentName === 'PSearchDropdown'"
@@ -72,6 +80,7 @@
                                        multi-selectable
                                        use-fixed-menu-style
                                        :invalid="invalid"
+                                       class="input-form"
                                        @update:selected="handleUpdateFormValue(schemaProperty, ...arguments)"
                     />
                     <template v-else>
@@ -84,6 +93,7 @@
                                       :autocomplete="false"
                                       :disabled="schemaProperty.disabled"
                                       :multi-input="schemaProperty.multiInputMode"
+                                      class="input-form"
                                       @update:value="!schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, ...arguments)"
                                       @update:selected="schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, ...arguments)"
                         />
