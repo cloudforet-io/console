@@ -1,7 +1,7 @@
 <template>
     <div
         class="p-text-input"
-        :class="{block, focused: isFocused}"
+        :class="{block, focused: isFocused, [size]: true}"
     >
         <div ref="targetRef"
              class="input-container"
@@ -116,7 +116,8 @@ import PButton from '@/inputs/buttons/button/PButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import type { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
-import type { SelectedItem, TextInputHandler } from '@/inputs/input/type';
+import { INPUT_SIZE } from '@/inputs/input/type';
+import type { SelectedItem, TextInputHandler, InputSize } from '@/inputs/input/type';
 
 
 interface TextInputProps {
@@ -136,6 +137,7 @@ interface TextInputProps {
     exactMode: boolean;
     useAutoComplete: boolean;
     maskingMode: boolean;
+    size?: InputSize;
 }
 
 export default defineComponent<TextInputProps>({
@@ -158,6 +160,13 @@ export default defineComponent<TextInputProps>({
         value: {
             type: [String, Number],
             default: undefined,
+        },
+        size: {
+            type: String as PropType<InputSize>,
+            default: INPUT_SIZE.md,
+            validator(size: InputSize) {
+                return Object.values(INPUT_SIZE).includes(size);
+            },
         },
         disabled: {
             type: Boolean,
@@ -523,6 +532,20 @@ export default defineComponent<TextInputProps>({
         z-index: 1000;
         min-width: 100%;
         width: 100%;
+    }
+
+    @define-mixin size $input-height, $font-size, $line-height {
+        .input-container {
+            min-height: $input-height;
+            font-size: $font-size;
+            line-height: $line-height;
+        }
+    }
+    &.sm {
+        @mixin size 1.5rem, 0.75rem, 1.5rem;
+    }
+    &.md {
+        @mixin size 2rem, 0.875rem, 2rem;
     }
 }
 </style>

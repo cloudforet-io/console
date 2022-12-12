@@ -12,3 +12,10 @@ export interface SelectedItem {
 export interface TextInputHandler {
     (val: string, searchableItems: MenuItem[]): Promise<{results: MenuItem[]}>|{results: MenuItem[]}
 }
+
+export const INPUT_SIZE = {
+    sm: 'sm',
+    md: 'md',
+} as const;
+export type InputSize = typeof INPUT_SIZE[keyof typeof INPUT_SIZE];
+

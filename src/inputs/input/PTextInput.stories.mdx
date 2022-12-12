@@ -8,6 +8,7 @@ import {
     getTextInputArgTypes
 } from "@/inputs/input/story-helper";
 import {getTextInputMenu} from "@/inputs/input/mock";
+import {INPUT_SIZE} from "@/inputs/input/type";
 
 
 <Meta title='Inputs/Input' parameters={{
@@ -29,6 +30,7 @@ export const Template = (args, { argTypes }) => ({
                       :loading="loading"
                       :masking-mode="maskingMode"
                       :show-password="showPassword"
+                      :size="size"
         >
             <template v-if="inputRightSlot" #input-right>
                 <span v-html="inputRightSlot"></span>
@@ -389,6 +391,31 @@ export const Template = (args, { argTypes }) => ({
                 return {
                     ...toRefs(state),
                     handleUpdateCode,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Size
+<Canvas>
+    <Story name="Size" >
+        {{
+            components: { PTextInput },
+            template: `
+                <div  style="display:flex; flex-direction: column; row-gap: 1.5rem;">
+                    <p-text-input v-for="size in sizes" :key="size" :size="size" v-model="value" :placeholder="size" />
+                </div>
+            `,
+            setup() {
+                const state = reactive({
+                    sizes: Object.values(INPUT_SIZE)
+                })
+                return {
+                    ...toRefs(state)
                 }
             }
         }}

@@ -1,6 +1,7 @@
 import type { ArgTypes } from '@storybook/addons';
 
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
+import { INPUT_SIZE } from '@/inputs/input/type';
 
 const initContextMenuArgTypes = (): ArgTypes => {
     const contextMenuArgTypes = getContextMenuArgTypes();
@@ -281,6 +282,25 @@ export const getTextInputArgTypes = (): ArgTypes => {
             },
             control: {
                 type: 'boolean',
+            },
+        },
+        size: {
+            name: 'size',
+            type: { name: 'string' },
+            description: `TextInput size. ${Object.values(INPUT_SIZE)} are available.`,
+            defaultValue: INPUT_SIZE.md,
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: `"${INPUT_SIZE.md}"`,
+                },
+            },
+            control: {
+                type: 'select',
+                options: Object.values(INPUT_SIZE),
             },
         },
         // attrs
