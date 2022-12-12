@@ -1,3 +1,10 @@
+# [1.1.0-beta.466](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.465...v1.1.0-beta.466) (2022-12-12)
+
+
+### Features
+
+* **p-text-input:** add size props to textInput ([#157](https://github.com/cloudforet-io/mirinae/issues/157)) ([18139ba](https://github.com/cloudforet-io/mirinae/commit/18139ba4431d2c3c1ff1bd8d0540038fcb14bbb0))
+
 # [1.1.0-beta.465](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.464...v1.1.0-beta.465) (2022-12-09)
 
 
