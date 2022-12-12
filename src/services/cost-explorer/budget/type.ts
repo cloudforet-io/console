@@ -1,4 +1,4 @@
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { Tags, TimeStamp } from '@/models';
@@ -85,7 +85,7 @@ export interface BudgetUsageData {
 export type BudgetPageUrlQuery = Partial<Record<'filters', RouteQueryString>>;
 
 export interface BudgetPageQueryValue {
-	filters?: QueryStoreFilter[];
+	filters?: ConsoleFilter[];
 }
 
 export interface BudgetUsageRange {

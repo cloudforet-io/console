@@ -79,7 +79,7 @@ import type { Table } from 'pdfmake/interfaces';
 
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -228,7 +228,7 @@ export default {
                 query.period = objectToQueryString(_period);
             }
 
-            const filters: QueryStoreFilter[] = [];
+            const filters: ConsoleFilter[] = [];
             if (item.project_id) {
                 filters.push({ k: 'project_id', v: item.project_id, o: '=' });
             } else if (state.filters.project_id?.length) {

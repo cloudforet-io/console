@@ -4,7 +4,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { FILTER, GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type {
@@ -12,8 +12,8 @@ import type {
     CostQuerySetOption,
 } from '@/services/cost-explorer/type';
 
-export const getConvertedFilter = (filters: CostFiltersMap): QueryStoreFilter[] => {
-    const results: QueryStoreFilter[] = [];
+export const getConvertedFilter = (filters: CostFiltersMap): ConsoleFilter[] => {
+    const results: ConsoleFilter[] = [];
     Object.entries(filters).forEach(([category, filterItems]) => {
         const keys = [...new Set(filterItems.map((d) => d.k))];
         if (keys[0] === category) { // ex. provider
@@ -35,9 +35,9 @@ export const getConvertedFilter = (filters: CostFiltersMap): QueryStoreFilter[] 
     return results;
 };
 
-export const getConvertedBudgetFilter = (filters: CostFiltersMap): QueryStoreFilter[] => {
+export const getConvertedBudgetFilter = (filters: CostFiltersMap): ConsoleFilter[] => {
     // there's no tag filters in budget widgets
-    const results: QueryStoreFilter[] = [];
+    const results: ConsoleFilter[] = [];
     Object.entries(filters).forEach(([category, filterItems]) => {
         if ((category === FILTER.PROJECT || category === FILTER.PROJECT_GROUP)) {
             results.push({

@@ -9,7 +9,7 @@ import {
     makeReferenceValueHandler,
 } from '@/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@/component-util/query-search/type';
-import type { Filter } from '@/space-connector/type';
+import type { ApiFilter } from '@/space-connector/type';
 
 interface ExcelDataField {
     key: string;
@@ -33,7 +33,7 @@ interface QuerySearchProps {
  * @param schema
  * @param resourceType
  */
-export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema[], resourceType: string, filters?: Filter[]): Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> => {
+export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema[], resourceType: string, filters?: ApiFilter[]): Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> => {
     const querySearchProps: Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> = { keyItemSets: [], valueHandlerMap: {} };
 
     querySearchProps.keyItemSets = schema.map((s) => ({

@@ -1,4 +1,4 @@
-import type { RawQueryOperator } from '@/query/type';
+import type { ConsoleFilterOperator } from '@/query/type';
 
 import type { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 
@@ -10,7 +10,7 @@ export interface Period {
 export interface FilterItem {
     k: string | Filter;
     v: string;
-    o: RawQueryOperator;
+    o: ConsoleFilterOperator;
 }
 
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];

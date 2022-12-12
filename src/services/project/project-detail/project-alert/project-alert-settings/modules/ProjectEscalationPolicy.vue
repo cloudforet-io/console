@@ -73,7 +73,7 @@ import {
 import { get, filter } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -127,7 +127,7 @@ export default {
             repeatCount: computed(() => get(props.escalationPolicy, 'repeat_count')),
             projectChannels: [],
             escalationPolicyLink: computed(() => {
-                const filters: QueryStoreFilter[] = [];
+                const filters: ConsoleFilter[] = [];
                 filters.push({ k: 'escalation_policy_id', o: '=', v: get(props.escalationPolicy, 'escalation_policy_id') });
                 return {
                     name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,

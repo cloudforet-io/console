@@ -37,7 +37,7 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -90,7 +90,7 @@ export default {
         const getQuery = () => {
             const unit = props.period.includes('d') ? 'day' : 'hour';
             const apiQuery = new ApiQueryHelper().setPage(1, 10);
-            const filters: QueryStoreFilter[] = [];
+            const filters: ConsoleFilter[] = [];
             const currentTime = state.timezone === 'UTC' ? dayjs.utc(props.date) : dayjs.utc(props.date).tz(state.timezone);
             const start = currentTime.format('YYYY-MM-DD HH:00');
             const end = currentTime.add(1, unit).format('YYYY-MM-DD HH:00');

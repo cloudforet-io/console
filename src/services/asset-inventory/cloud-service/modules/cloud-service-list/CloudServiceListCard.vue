@@ -51,7 +51,7 @@ import type { Location } from 'vue-router';
 import { PLazyImg, PDivider } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { store } from '@/store';
 
@@ -65,7 +65,7 @@ import type { Period } from '@/services/cost-explorer/type';
 
 interface Props {
     item: any;
-    searchFilters: QueryStoreFilter[];
+    searchFilters: ConsoleFilter[];
     selectedRegions: string[];
     period?: Period;
 }

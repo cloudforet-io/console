@@ -18,7 +18,7 @@ import {
 } from 'vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { CURRENCY } from '@/store/modules/display/config';
 
@@ -76,7 +76,7 @@ export default defineComponent<WidgetProps>({
         const budgetQueryHelper = new QueryHelper();
         const state = reactive({
             widgetOptions: getWidgetOption(props.options, props.widgetId),
-            queryStoreFilters: computed<QueryStoreFilter[]>(() => getConvertedBudgetFilter(props.filters)),
+            queryStoreFilters: computed<ConsoleFilter[]>(() => getConvertedBudgetFilter(props.filters)),
             widgetLink: computed(() => {
                 if (props.printMode) return undefined;
                 return {

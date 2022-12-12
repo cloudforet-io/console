@@ -1,6 +1,6 @@
 import type { Mutation } from 'vuex';
 
-import type { QueryStoreFilter } from '@/query/type';
+import type { ConsoleFilter } from '@/query/type';
 
 import type { DashboardState } from './type';
 
@@ -18,7 +18,7 @@ export const setProjectItemCount: Mutation<DashboardState> = (state, count): voi
     state.projectItemCount = count;
 };
 
-export const setSearchFilters: Mutation<DashboardState> = (state, filters: QueryStoreFilter[]): void => {
+export const setSearchFilters: Mutation<DashboardState> = (state, filters: ConsoleFilter[]): void => {
     state.searchFilters = filters;
 };
 

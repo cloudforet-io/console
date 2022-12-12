@@ -1,14 +1,16 @@
 <template>
+    <!--    song-lang-->
     <p-button-modal :visible="proxyVisible"
-                    :header-title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.UPDATE_DASHBOARD')"
+                    :header-title="$t('Update Dashboard')"
                     :disabled="!isAllValid"
                     size="sm"
-                    class="cost-dashboard-update-modal"
+                    class="dashboard-name-edit-modal"
                     @confirm="handleConfirm"
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.DASHBOARD_NAME')"
+            <!--            song-lang-->
+            <p-field-group :label="$t('Dashboard Name')"
                            :invalid="invalidState.name"
                            :invalid-text="invalidTexts.name"
                            required
@@ -24,6 +26,7 @@
 
 <script lang="ts">
 
+import type { SetupContext } from 'vue';
 import {
     defineComponent,
     reactive, toRefs, watch,
@@ -31,12 +34,10 @@ import {
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+// import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
-
-import { costExplorerStore } from '@/services/cost-explorer/store';
 
 interface Props {
     visible: boolean;
@@ -44,7 +45,7 @@ interface Props {
     dashboardName: string;
 }
 export default defineComponent<Props>({
-    name: 'CostDashboardUpdateModal',
+    name: 'DashboardNameEditModal',
     components: {
         PButtonModal,
         PFieldGroup,
@@ -68,7 +69,7 @@ export default defineComponent<Props>({
             default: '',
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const {
             forms: {
                 name,
@@ -92,15 +93,16 @@ export default defineComponent<Props>({
         const updateDashboard = async () => {
             try {
                 if (props.dashboardId.startsWith('user')) {
-                    await SpaceConnector.client.costAnalysis.userDashboard.update({
-                        user_dashboard_id: props.dashboardId,
-                        name: name.value,
-                    });
+                    // TODO:: connect custom-dashboard update api
+                    // await SpaceConnector.client.costAnalysis.userDashboard.update({
+                    //     user_dashboard_id: props.dashboardId,
+                    //     name: name.value,
+                    // });
                 } else {
-                    await SpaceConnector.client.costAnalysis.publicDashboard.update({
-                        public_dashboard_id: props.dashboardId,
-                        name: name.value,
-                    });
+                    // await SpaceConnector.client.costAnalysis.publicDashboard.update({
+                    //     public_dashboard_id: props.dashboardId,
+                    //     name: name.value,
+                    // });
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -109,7 +111,7 @@ export default defineComponent<Props>({
 
         const handleConfirm = () => {
             updateDashboard();
-            costExplorerStore.dispatch('setDashboardList');
+            // costExplorerStore.dispatch('setDashboardList');
             emit('update:visible', false);
             emit('confirm', name.value);
         };
@@ -142,7 +144,7 @@ export default defineComponent<Props>({
 });
 </script>
 <style lang="postcss" scoped>
-.cost-dashboard-update-modal {
+.dashboard-name-edit-modal {
     .p-text-input {
         @apply w-full;
     }

@@ -97,7 +97,7 @@ import dayjs from 'dayjs';
 import numeral from 'numeral';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -211,7 +211,7 @@ export default {
         /* util */
         const regionFormatter = (val) => state.regions[val]?.name || val;
         const summaryLinkFormatter = (category) => {
-            const filters: QueryStoreFilter[] = [];
+            const filters: ConsoleFilter[] = [];
             const status = ['open'];
             if (category === EVENT_CATEGORY.scheduledChange) status.push('upcoming');
             filters.push({ k: 'data.event_type_category', o: '=', v: category });

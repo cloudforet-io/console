@@ -43,7 +43,7 @@ import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
 import { commaFormatter, isNotEmpty } from '@cloudforet/core-lib';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -63,7 +63,7 @@ import type {
 import type { Period } from '@/services/cost-explorer/type';
 
 interface Props {
-    queryStoreFilters: QueryStoreFilter[];
+    queryStoreFilters: ConsoleFilter[];
     period: Period;
     usageRange: BudgetUsageRange;
     printMode?: boolean;

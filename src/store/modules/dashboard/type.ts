@@ -1,4 +1,4 @@
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 export const VIEWERS_TYPE = {
     PUBLIC: 'PUBLIC',
@@ -17,7 +17,7 @@ export type ScopeType = typeof SCOPE_TYPE[keyof typeof SCOPE_TYPE];
 export interface DashboardState {
     domainItems: DomainDashboardItem[];
     projectItems: ProjectDashboardItem[];
-    searchFilters: QueryStoreFilter[];
+    searchFilters: ConsoleFilter[];
     viewers: string;
     scope: string;
     domainItemCount: number;

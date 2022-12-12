@@ -84,7 +84,7 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -170,10 +170,10 @@ export default {
             // asset inventory store
             selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
             period: computed(() => assetInventoryStore.state.cloudService.period),
-            searchFilters: computed<QueryStoreFilter[]>(() => assetInventoryStore.state.cloudService.searchFilters),
+            searchFilters: computed<ConsoleFilter[]>(() => assetInventoryStore.state.cloudService.searchFilters),
             selectedCategories: computed<CloudServiceCategory[]>(() => assetInventoryStore.getters['cloudService/selectedCategories']),
             selectedRegions: computed<string[]>(() => assetInventoryStore.getters['cloudService/selectedRegions']),
-            allFilters: computed<QueryStoreFilter[]>(() => assetInventoryStore.getters['cloudService/allFilters']),
+            allFilters: computed<ConsoleFilter[]>(() => assetInventoryStore.getters['cloudService/allFilters']),
             // list
             loading: true,
             items: undefined as any,

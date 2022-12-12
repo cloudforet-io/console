@@ -32,7 +32,7 @@ import {
 
 import dayjs from 'dayjs';
 
-import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -54,7 +54,7 @@ import type {
 import type { Period } from '@/services/cost-explorer/type';
 
 interface Props {
-    filters: QueryStoreFilter[];
+    filters: ConsoleFilter[];
 }
 
 export default defineComponent<Props>({
@@ -76,7 +76,7 @@ export default defineComponent<Props>({
             range: {} as BudgetUsageRange,
             pageStart: 1,
             pageLimit: 24,
-            queryStoreFilters: props.filters as QueryStoreFilter[],
+            queryStoreFilters: props.filters as ConsoleFilter[],
             period: {} as Period,
             // api request params
             sort: {
@@ -102,7 +102,7 @@ export default defineComponent<Props>({
             }),
         });
 
-        const setFilters = (filters: QueryStoreFilter[]) => {
+        const setFilters = (filters: ConsoleFilter[]) => {
             state.queryStoreFilters = filters;
             emit('update:filters', filters);
         };
@@ -144,7 +144,7 @@ export default defineComponent<Props>({
             listBudgets();
         };
 
-        const handleUpdateFilters = (filters: QueryStoreFilter[]) => {
+        const handleUpdateFilters = (filters: ConsoleFilter[]) => {
             setFilters(filters);
             listBudgets();
         };

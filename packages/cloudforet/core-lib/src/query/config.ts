@@ -1,8 +1,8 @@
 import type { OperatorType } from '@/component-util/query-search/type';
-import type { RawQueryOperator } from '@/query/type';
-import type { FilterOperator } from '@/space-connector/type';
+import type { ConsoleFilterOperator } from '@/query/type';
+import type { ApiFilterOperator } from '@/space-connector/type';
 
-export const rawQueryOperatorToApiQueryOperatorMap: Record<RawQueryOperator, FilterOperator> = {
+export const rawQueryOperatorToApiQueryOperatorMap: Record<ConsoleFilterOperator, ApiFilterOperator> = {
     '': 'contain',
     '!': 'not_contain',
     '=': 'eq',
@@ -21,7 +21,7 @@ export const rawQueryOperatorToApiQueryOperatorMap: Record<RawQueryOperator, Fil
     '=t': 'datetime_gt',
 };
 
-export const datetimeRawQueryOperatorToQueryTagOperatorMap: Partial<Record<RawQueryOperator, OperatorType>> = {
+export const datetimeRawQueryOperatorToQueryTagOperatorMap: Partial<Record<ConsoleFilterOperator, OperatorType>> = {
     '>t': '>',
     '>=t': '>=',
     '<t': '<',
@@ -29,7 +29,7 @@ export const datetimeRawQueryOperatorToQueryTagOperatorMap: Partial<Record<RawQu
     '=t': '=',
 };
 
-export const rawQueryOperatorToPluralApiQueryOperatorMap: Partial<Record<RawQueryOperator, FilterOperator>> = {
+export const rawQueryOperatorToPluralApiQueryOperatorMap: Partial<Record<ConsoleFilterOperator, ApiFilterOperator>> = {
     '': 'contain_in',
     '!': 'not_contain_in',
     '=': 'in',
@@ -37,7 +37,7 @@ export const rawQueryOperatorToPluralApiQueryOperatorMap: Partial<Record<RawQuer
     '~': 'regex_in',
 };
 
-// export const pluralRawQueryOperatorToSingularRawQueryOperatorMap: Partial<Record<RawQueryOperator, RawQueryOperator>> = {
+// export const pluralRawQueryOperatorToSingularRawQueryOperatorMap: Partial<Record<ConsoleFilterOperator, ConsoleFilterOperator>> = {
 //     '': '',
 //     '!': 'not_contain_in',
 //     '=': 'in',
