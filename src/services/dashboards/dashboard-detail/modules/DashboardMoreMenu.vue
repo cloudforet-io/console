@@ -31,18 +31,11 @@ import type { DashboardViewerType } from '@/services/dashboards/dashboard-create
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 
-const MENU = Object.freeze({
-    DELETE: 'delete',
-    SET_HOME: 'setHome',
-} as const);
-
-const defaultMenuItems = computed(() => [
-    // song-lang
-    { name: MENU.DELETE, label: 'Delete', disabled: false },
-    // song-lang
-    { name: MENU.SET_HOME, label: 'Set as Home Dashboard', disabled: false },
-]);
-
+type DefaultMenuItems = Array<{
+    name: typeof MENU.DELETE | typeof MENU.SET_HOME
+    label: string
+    disabled: boolean
+}>;
 
 interface DashboardMoreMenuProps {
     dashboardId: string;
@@ -51,22 +44,34 @@ interface DashboardMoreMenuProps {
     dashboard: any;
 }
 
+const MENU = Object.freeze({
+    DELETE: 'delete',
+    SET_HOME: 'setHome',
+} as const);
+
+const defaultMenuItems = computed<DefaultMenuItems>(() => [
+    // song-lang
+    { name: MENU.DELETE, label: 'Delete', disabled: false },
+    // song-lang
+    { name: MENU.SET_HOME, label: 'Set as Home Dashboard', disabled: false },
+]);
+
 const props = defineProps<DashboardMoreMenuProps>();
 
 const state = reactive({
     moreMenuItems: computed(() => {
         const menuItems = cloneDeep(defaultMenuItems.value);
         if (state.homeDashboardId === props.dashboardId) {
-            menuItems[0].disabled = true;
-            menuItems[1].disabled = true;
+            menuItems.find((d) => d.name === MENU.DELETE)!.disabled = true;
+            menuItems.find((d) => d.name === MENU.SET_HOME)!.disabled = true;
             return menuItems;
         }
         if (state.dashboardType === DASHBOARD_TYPE.PUBLIC && props.manageDisabled) {
             if (state.homeDashboardId === props.dashboardId) {
-                menuItems[0].disabled = true;
-                menuItems[1].disabled = true;
+                menuItems.find((d) => d.name === MENU.DELETE)!.disabled = true;
+                menuItems.find((d) => d.name === MENU.SET_HOME)!.disabled = true;
             }
-            menuItems[0].disabled = true;
+            menuItems.find((d) => d.name === MENU.DELETE)!.disabled = true;
             return menuItems;
         }
         return defaultMenuItems.value;
