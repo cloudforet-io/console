@@ -82,6 +82,7 @@ export default defineComponent<Props>({
         } = useFormValidator({
             name: '',
         }, {
+            // song-lang
             name(value: string) { return value.trim().length ? '' : 'Required Field'; },
         });
         const state = reactive({
