@@ -83,7 +83,7 @@ export default defineComponent<Props>({
         } = useFormValidator({
             name: '',
         }, {
-            name(value: string) { return value.trim().length ? '' : 'Required Field'; },
+            name(value: string) { return value.trim().length ? '' : 'Required Field'; }, // song-lang
         });
         const state = reactive({
             proxyVisible: props.visible,
