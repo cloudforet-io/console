@@ -1,3 +1,10 @@
+# [1.1.0-beta.472](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.471...v1.1.0-beta.472) (2022-12-13)
+
+
+### Bug Fixes
+
+* **button:** check if click event listener is empty ([#164](https://github.com/cloudforet-io/mirinae/issues/164)) ([d98eb3e](https://github.com/cloudforet-io/mirinae/commit/d98eb3e8431be8c751cdcda286d08badbb910105))
+
 # [1.1.0-beta.471](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.470...v1.1.0-beta.471) (2022-12-13)
 
 
