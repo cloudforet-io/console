@@ -69,9 +69,9 @@ export default defineComponent({
                 },
                 favoriteType: FAVORITE_TYPE.DASHBOARD,
             }))),
-            projectDashboardList: computed(() => store.state.dashboard.projectItems),
-            projectList: computed(() => store.state.reference.project.items),
-            projectMenuSet: computed<LNBMenu[]>(() => mashUpProjectGroup(state.projectList)),
+            projectDashboardList: computed<ProjectDashboardItem[]>(() => store.state.dashboard.projectItems),
+            projectItems: computed(() => store.state.reference.project.items),
+            projectMenuSet: computed<LNBMenu[]>(() => mashUpProjectGroup(state.projectDashboardList)),
             menuSet: computed<LNBMenu[]>(() => [
                 {
                     type: 'item',
@@ -89,20 +89,29 @@ export default defineComponent({
             ]),
         });
 
-        const mashUpProjectGroup = (dashboardList: ProjectDashboardItem[]): LNBMenu[] => {
+        const mashUpProjectGroup = (dashboardList: ProjectDashboardItem[] = []): LNBMenu[] => {
             const noGroupList = [] as ProjectDashboardItem[];
             const groupProjectDashboardMap = {} as Record<string, ProjectDashboardItem[]>;
+            // Since all lnbitem do not have groups, and even if they do have groups, they are not sorted.
+            // Items with groups are converted to map format, and if there are no groups, they are put in noGroupList.
             dashboardList.forEach((d) => {
-                if (state.projectList[d.project_id]) {
-                    if (groupProjectDashboardMap[state.projectList[d.project_id].data.groupInfo.name]) {
-                        groupProjectDashboardMap[state.projectList[d.project_id].data.groupInfo.name].push(d);
+                // With group
+                if (state.projectItems[d.project_id]) {
+                    if (groupProjectDashboardMap[state.projectItems[d.project_id].data.groupInfo.name]) {
+                        groupProjectDashboardMap[state.projectItems[d.project_id].data.groupInfo.name].push(d);
                     } else {
-                        groupProjectDashboardMap[state.projectList[d.project_id].data.groupInfo.name] = [d];
+                        groupProjectDashboardMap[state.projectItems[d.project_id].data.groupInfo.name] = [d];
                     }
                 }
+
+                // No-group
                 noGroupList.push(d);
             });
+
+            // Result to return
             const result = [] as LNBMenu[];
+
+            // The mapped group items are in the form of an array along with the title, and each item is mapped to LNBItem type and pushed to result.
             Object.keys(groupProjectDashboardMap).forEach((d) => {
                 result.push([
                     {
@@ -125,6 +134,8 @@ export default defineComponent({
                     })),
                 ]);
             });
+
+            // No-group items are mapped to LNBItem type and pushed to result.
             result.push(
                 ...noGroupList.map((board) => ({
                     type: MENU_ITEM_TYPE.ITEM,
@@ -139,6 +150,8 @@ export default defineComponent({
                     favoriteType: FAVORITE_TYPE.DASHBOARD,
                 })),
             );
+
+            // Return LNBMenu type as (LNBItem | LNBItem[])[]
             return result;
         };
 
