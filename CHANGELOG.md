@@ -1,3 +1,10 @@
+# [1.1.0-beta.470](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.469...v1.1.0-beta.470) (2022-12-13)
+
+
+### Bug Fixes
+
+* **p-lottie:** lottie hasn't been loaded ([#161](https://github.com/cloudforet-io/mirinae/issues/161)) ([a6b79a2](https://github.com/cloudforet-io/mirinae/commit/a6b79a27889027a469da7d179d7e92d35099e969))
+
 # [1.1.0-beta.469](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.468...v1.1.0-beta.469) (2022-12-12)
 
 
