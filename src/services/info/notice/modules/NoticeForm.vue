@@ -21,13 +21,13 @@
                 <p-radio :disabled="type === 'EDIT'"
                          :selected="isAllDomainSelected"
                          class="mr-4"
-                         @click="handleClickAllDomainRadio"
+                         @change="handleClickAllDomainRadio"
                 >
                     <span>{{ $t('INFO.NOTICE.FORM.ALL_DOMAINS') }}</span>
                 </p-radio>
                 <p-radio :disabled="type === 'EDIT'"
                          :selected="!isAllDomainSelected"
-                         @click="handleClickSelectDomainRadio"
+                         @change="handleClickSelectDomainRadio"
                 >
                     <span>{{ $t('INFO.NOTICE.FORM.SELECTED_DOMAIN') }}</span>
                 </p-radio>
