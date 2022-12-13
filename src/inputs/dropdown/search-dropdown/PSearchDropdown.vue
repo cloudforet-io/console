@@ -31,6 +31,9 @@
                      @click="onDeleteTag(proxySelected[0], 0)"
                 />
             </div>
+            <slot name="selected-extra"
+                  v-bind="{items: proxySelected}"
+            />
             <template v-if="multiSelectable && proxySelected.length"
                       #left
             >
