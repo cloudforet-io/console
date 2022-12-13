@@ -1,18 +1,21 @@
 <template>
     <div class="p-lottie">
-        <div ref="lottieRef" :style="{
-            height: height || `${size}rem`,
-            width: width || `${size}rem`,
-        }"
+        <div ref="lottieRef"
+             :style="{
+                 height: height || `${size}rem`,
+                 width: width || `${size}rem`,
+             }"
         />
     </div>
 </template>
 <script lang="ts">
+import type { WatchStopHandle } from 'vue';
 import {
     defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 
 import lottie from 'lottie-web';
+import type { AnimationItem } from 'lottie-web';
 
 import type { LottieProps } from '@/foundation/lottie/type';
 
@@ -58,12 +61,11 @@ export default defineComponent<LottieProps>({
     },
     setup(props: LottieProps) {
         const state = reactive({
-            animation: null as any,
-            lottieRef: null as any,
+            animation: null as null|AnimationItem,
+            lottieRef: null as null|HTMLDivElement,
             uuid: Math.floor(Math.random() * Date.now()).toString(),
         });
 
-        let stopWatch: any;
 
         const loadLottie = async () => {
             if (!state.lottieRef) return;
@@ -77,11 +79,12 @@ export default defineComponent<LottieProps>({
                     renderer: 'svg',
                     loop: true,
                     autoplay: true,
-                    animationData: lottieFile,
+                    animationData: lottieFile.default,
                 });
             }
         };
 
+        let stopWatch: WatchStopHandle;
         onMounted(async () => {
             stopWatch = watch(() => props.name, async (after) => {
                 if (after) await loadLottie();
