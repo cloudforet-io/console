@@ -1,10 +1,10 @@
 <template>
     <!--    song-lang-->
     <p-button-modal :visible="proxyVisible"
-                    header-title="Duplicate Dashboard"
+                    header-title="Clone Dashboard"
                     size="sm"
                     :disabled="!isAllValid"
-                    class="dashboard-duplicate-modal"
+                    class="dashboard-clone-modal"
                     @confirm="handleConfirm"
                     @update:visible="handleUpdateVisible"
     >
@@ -89,7 +89,7 @@ const visibilityList = [
     },
 ];
 export default defineComponent<Props>({
-    name: 'DashboardDuplicateModal',
+    name: 'DashboardCloneModal',
     components: {
         PButtonModal,
         PRadio,
@@ -187,13 +187,13 @@ export default defineComponent<Props>({
 
         const handleConfirm = async () => {
             if (!isAllValid) return;
-            const duplicatedDashboardId = visibility.value === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
+            const clonedDashboardId = visibility.value === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
             // TODO:: connect dashboard store
             // await costExplorerStore.dispatch('setDashboardList');
-            if (duplicatedDashboardId) {
+            if (clonedDashboardId) {
                 await SpaceRouter.router.push({
                     name: DASHBOARDS_ROUTE._NAME,
-                    params: { dashboardId: duplicatedDashboardId },
+                    params: { dashboardId: clonedDashboardId },
                 });
             }
             emit('update:visible', false);
@@ -224,7 +224,7 @@ export default defineComponent<Props>({
 });
 </script>
 <style lang="postcss" scoped>
-.dashboard-duplicate-modal {
+.dashboard-clone-modal {
     .radio-group {
         @apply inline-block;
         margin-bottom: 0.625rem;

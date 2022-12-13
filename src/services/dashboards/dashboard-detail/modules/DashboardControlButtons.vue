@@ -16,6 +16,7 @@
         <!--        song-lang-->
         <p-button icon-left="ic_duplicate"
                   style-type="tertiary"
+                  @click="handleVisibleCloneModal"
         >
             Clone
         </p-button>
@@ -26,6 +27,12 @@
 import { PButton } from '@spaceone/design-system';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+
+const emit = defineEmits(['update:visible-clone-modal']);
+
+const handleVisibleCloneModal = () => {
+    emit('update:visible-clone-modal');
+};
 </script>
 
 <style lang="postcss">
