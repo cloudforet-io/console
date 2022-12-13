@@ -290,7 +290,7 @@ export default {
         margin-left: 1rem;
         margin-right: 0.5rem;
         &.inactivated {
-            @apply text-gray-300;
+            @apply text-gray-900;
         }
     }
 }
