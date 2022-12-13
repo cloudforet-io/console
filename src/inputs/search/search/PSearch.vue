@@ -273,6 +273,7 @@ export default defineComponent<SearchProps>({
             hideMenu();
         };
         const handleDelete = () => {
+            if (props.disabled) return;
             emit('delete', props.value);
             emit('update:value', '');
         };
