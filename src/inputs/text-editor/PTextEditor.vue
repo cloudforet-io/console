@@ -142,7 +142,7 @@ export default defineComponent<Props>({
         };
 
         const forceFold = (cmInstance) => {
-            if (props.folded && cmInstance && props.code) {
+            if (props.folded && cmInstance && props.code && cmInstance.foldCode) {
                 cmInstance.operation(() => {
                     for (let l = cmInstance.firstLine() + 1;
                         l <= cmInstance.lastLine(); ++l) {
@@ -204,7 +204,7 @@ export default defineComponent<Props>({
             state.cmInstance = editor;
         };
 
-        watch([() => state.textareaRef, () => props.code, () => props.disableAutoReformat], async ([textareaRef, code]) => {
+        watch([() => state.textareaRef, () => props.code, () => props.disableAutoReformat], ([textareaRef, code]) => {
             if (!textareaRef) return;
             if (!state.cmInstance) init(textareaRef);
 

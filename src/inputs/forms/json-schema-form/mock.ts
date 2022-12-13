@@ -78,13 +78,26 @@ export const getDefaultSchema = () => ({
         },
         colors: {
             description: 'Favorite Colors',
-            title: 'Favorite Colors',
+            title: 'Favorite Colors (non-strict select)',
             type: 'array',
-            prefixItems: [
-                { type: 'string' },
-                { enum: ['red', 'blue', 'gold', 'purple', 'gray'] },
+            items: [
+                {
+                    enum: ['red', 'blue', 'gold', 'purple', 'gray'],
+                },
+                {
+                    type: 'string',
+                },
             ],
-            default: ['gray', 'blue'],
+            default: ['gray', 'blue', 'hello!'],
+        },
+        foods: {
+            description: 'Favorite Foods',
+            title: 'Favorite Foods (strict select)',
+            type: 'array',
+            items: {
+                enum: ['hamburger', 'pizza', 'kimchi', 'bulgogi', 'bibimbob'],
+            },
+            default: ['bulgogi', 'kimchi', 'hello!!!'],
         },
         homepage: {
             type: 'string',
@@ -119,7 +132,7 @@ export const getDefaultSchema = () => ({
 
     },
     required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails', 'colors', 'provider'],
-    order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'provider', 'age', 'phone', 'homepage', 'additional'],
+    order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'provider', 'age', 'phone', 'homepage', 'additional', 'colors', 'foods'],
 });
 
 export const getDefaultFormData = () => ({
