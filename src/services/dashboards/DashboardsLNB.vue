@@ -47,7 +47,7 @@ export default defineComponent({
             showFavoriteOnly: false,
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId)),
             favoriteItemMap: computed(() => {
-                const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.MENU];
+                const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.DASHBOARD];
                 const result: Record<string, FavoriteConfig> = {};
                 if (stateName) {
                     store.state.favorite[stateName]?.forEach((d) => {
@@ -66,6 +66,7 @@ export default defineComponent({
                         dashboardId: d.domain_dashboard_id,
                     },
                 },
+                favoriteType: FAVORITE_TYPE.DASHBOARD,
             }))),
             projectMenuSet: computed<LNBItem[]>(() => store.state.dashboard.projectItems.map((d) => ({
                 type: 'item',
@@ -77,6 +78,7 @@ export default defineComponent({
                         dashboardId: d.project_dashboard_id,
                     },
                 },
+                favoriteType: FAVORITE_TYPE.DASHBOARD,
             }))),
             // projectMenuSet: computed<LNBItem[][]>(() => {
             //     const result = [] as LNBItem[][];
