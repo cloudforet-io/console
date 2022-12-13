@@ -1,3 +1,10 @@
+# [1.1.0-beta.471](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.470...v1.1.0-beta.471) (2022-12-13)
+
+
+### Bug Fixes
+
+* **p-search-dropdown:** add `selected-extra` slot ([#162](https://github.com/cloudforet-io/mirinae/issues/162)) ([07197a7](https://github.com/cloudforet-io/mirinae/commit/07197a782a99ce553930262da43ef9a449ca9ffe))
+
 # [1.1.0-beta.470](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.469...v1.1.0-beta.470) (2022-12-13)
 
 
