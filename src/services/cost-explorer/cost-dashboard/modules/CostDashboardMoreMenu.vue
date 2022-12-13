@@ -80,12 +80,14 @@ export default {
             moreMenuItems: computed(() => {
                 const menuItems = cloneDeep(defaultMenuItems.value);
                 if (state.homeDashboardId === props.dashboardId) {
+                    // below find() never be undefined
                     menuItems.find((d) => d.name === MENU.DELETE)!.disabled = true;
                     menuItems.find((d) => d.name === MENU.SET_HOME)!.disabled = true;
                     return menuItems;
                 }
                 if (state.dashboardType === DASHBOARD_TYPE.PUBLIC && props.manageDisabled) {
                     if (state.homeDashboardId === props.dashboardId) {
+                        // below find() never be undefined
                         menuItems.find((d) => d.name === MENU.DELETE)!.disabled = true;
                         menuItems.find((d) => d.name === MENU.SET_HOME)!.disabled = true;
                     }
