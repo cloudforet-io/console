@@ -44,7 +44,7 @@
                     <p-text-input v-model.trim="inputText"
                                   :invalid="invalid"
                                   block
-                                  @keyup.enter="confirm()"
+                                  @keyup.enter="handleConfirm"
                     />
                 </p-field-group>
             </div>
