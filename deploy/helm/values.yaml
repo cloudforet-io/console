@@ -16,8 +16,8 @@ imagePullPolicy: IfNotPresent
 production_json:
     CONSOLE_API:
         ENDPOINT: "<console-api endpoint>"
-    GTAG_ID: "<google analytics - tag id>"
-    GTM_ID: "<google analytics - tag manager id>"
+    GTAG_ID: "DISABLED"
+    GTM_ID: "DISABLED"
     DOMAIN_NAME:
     DOMAIN_NAME_REF: hostname
     AMCHARTS_LICENSE:
