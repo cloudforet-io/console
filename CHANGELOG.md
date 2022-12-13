@@ -1,3 +1,10 @@
+# [1.1.0-beta.474](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.473...v1.1.0-beta.474) (2022-12-13)
+
+
+### Bug Fixes
+
+* **json-schema-form:** use items instead of prefixItems ([#167](https://github.com/cloudforet-io/mirinae/issues/167)) ([88c388a](https://github.com/cloudforet-io/mirinae/commit/88c388a0cf5467522b4be71f0c24de0bbfa41e13))
+
 # [1.1.0-beta.473](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.472...v1.1.0-beta.473) (2022-12-13)
 
 
