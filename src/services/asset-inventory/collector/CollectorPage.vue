@@ -8,7 +8,10 @@
         >
             <template #extra>
                 <router-link :to="{name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }">
-                    <p-button style-type="tertiary">
+                    <!-- TODO: remove click binding after upgrade mirinae version. This is defense code for 1.10.4.6 -->
+                    <p-button style-type="tertiary"
+                              @click="() => {}"
+                    >
                         {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE') }}
                     </p-button>
                 </router-link>
