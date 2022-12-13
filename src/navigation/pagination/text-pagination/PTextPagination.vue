@@ -4,13 +4,14 @@
                        name="ic_arrow_left"
                        color="inherit transparent"
                        :disabled="thisPage === 1"
-                       @click="update(thisPage-1)"
+                       @click="update(thisPage - 1)"
         />
         <div v-if="showPageNumber"
              class="page-number"
         >
             <div class="page-number-text">
-                <span class="this-page">{{ thisPage }}</span><span v-if="allPage"> / {{ allPage }}</span>
+                <span class="this-page">{{ thisPage }}</span>
+                <span v-if="allPage"> / {{ allPage }}</span>
             </div>
         </div>
 
@@ -18,11 +19,12 @@
                        name="ic_arrow_right"
                        color="inherit transparent"
                        :disabled="thisPage === allPage || disableNextPage"
-                       @click="update(thisPage+1)"
+                       @click="update(thisPage + 1)"
         />
     </nav>
 </template>
 <script lang="ts">
+import type { SetupContext } from 'vue';
 import { watch } from 'vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
@@ -51,11 +53,11 @@ export default {
         },
         disableNextPage: {
             type: Boolean,
-            default: true,
+            default: false,
         },
     },
-    setup(props, { emit }) {
-        const update = (page) => {
+    setup(props, { emit }: SetupContext) {
+        const update = (page: number) => {
             emit('update:thisPage', page);
             emit('pageChange', page);
         };
