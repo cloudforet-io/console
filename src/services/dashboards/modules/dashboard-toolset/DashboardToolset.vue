@@ -14,7 +14,13 @@ import DashboardDateRangeBadge from '@/services/dashboards/modules/dashboard-too
 </script>
 
 <style scoped>
+.dashboard-toolset {
+    display: flex;
+    align-items: center;
+}
+
 .dashboard-date-range-badge {
     margin-right: 0.5rem;
+    height: 1.25rem;
 }
 </style>
