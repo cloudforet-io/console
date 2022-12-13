@@ -45,5 +45,6 @@ export interface DomainDashboardItem extends DashboardItem {
 }
 export interface ProjectDashboardItem extends DashboardItem {
     project_dashboard_id: string;
+    project_id: string;
 }
 

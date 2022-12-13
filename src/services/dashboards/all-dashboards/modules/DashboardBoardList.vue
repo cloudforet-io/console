@@ -68,6 +68,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ConsoleFilter } from '@/query/type';
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -80,6 +81,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const PAGE_SIZE = 10;
 
@@ -172,7 +175,12 @@ export default defineComponent<DashboardBoardListProps>({
             {
                 iconName: 'ic_edit',
                 tooltipText: i18n.t('Edit'),
-                eventAction: () => console.log('edit!'),
+                eventAction: () => {
+                    SpaceRouter.router.push({
+                        name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                        params: { id: dashboardId },
+                    });
+                },
             },
             {
                 iconName: 'ic_duplicate',

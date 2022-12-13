@@ -26,6 +26,7 @@ import { PIconButton } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { ProjectDashboardItem } from '@/store/modules/dashboard/type';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 
@@ -68,51 +69,9 @@ export default defineComponent({
                 },
                 favoriteType: FAVORITE_TYPE.DASHBOARD,
             }))),
-            projectMenuSet: computed<LNBItem[]>(() => store.state.dashboard.projectItems.map((d) => ({
-                type: 'item',
-                id: d.project_dashboard_id,
-                label: d.name,
-                to: {
-                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
-                    params: {
-                        dashboardId: d.project_dashboard_id,
-                    },
-                },
-                favoriteType: FAVORITE_TYPE.DASHBOARD,
-            }))),
-            // projectMenuSet: computed<LNBItem[][]>(() => {
-            //     const result = [] as LNBItem[][];
-            //     const projects: LNBItem[][] = [
-            //         [{
-            //             type: 'title',
-            //             label: 'Project_01',
-            //             id: 'Project_01',
-            //             foldable: true,
-            //         },
-            //         {
-            //             type: 'item', id: 'Project_01_Dashboard', label: 'Project_01_Dashboard', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_01_1' } },
-            //         },
-            //         {
-            //             type: 'item', id: 'Project_01_Dashboard2', label: 'Project_01_Dashboard2', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_01_2' } },
-            //         }],
-            //         [{
-            //             type: 'title',
-            //             label: 'Project_02',
-            //             id: 'Project_02',
-            //             foldable: true,
-            //         },
-            //         {
-            //             type: 'item', id: 'Project_02_Dashboard', label: 'Project_02_Dashboard', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_02_1' } },
-            //         },
-            //         {
-            //             type: 'item', id: 'Project_02_Dashboard2', label: 'Project_02_Dashboard2', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_02_2' } },
-            //         }],
-            //     ];
-            //     projects.forEach((d) => {
-            //         result.push(filterFavoriteItems(d));
-            //     });
-            //     return result;
-            // }),
+            projectDashboardList: computed(() => store.state.dashboard.projectItems),
+            projectList: computed(() => store.state.reference.project.items),
+            projectMenuSet: computed<LNBMenu[]>(() => mashUpProjectGroup(state.projectList)),
             menuSet: computed<LNBMenu[]>(() => [
                 {
                     type: 'item',
@@ -130,9 +89,68 @@ export default defineComponent({
             ]),
         });
 
-        const filterFavoriteItems = (menuItems: LNBItem[] = []) => {
+        const mashUpProjectGroup = (dashboardList: ProjectDashboardItem[]): LNBMenu[] => {
+            const noGroupList = [] as ProjectDashboardItem[];
+            const groupProjectDashboardMap = {} as Record<string, ProjectDashboardItem[]>;
+            dashboardList.forEach((d) => {
+                if (state.projectList[d.project_id]) {
+                    if (groupProjectDashboardMap[state.projectList[d.project_id].data.groupInfo.name]) {
+                        groupProjectDashboardMap[state.projectList[d.project_id].data.groupInfo.name].push(d);
+                    } else {
+                        groupProjectDashboardMap[state.projectList[d.project_id].data.groupInfo.name] = [d];
+                    }
+                }
+                noGroupList.push(d);
+            });
+            const result = [] as LNBMenu[];
+            Object.keys(groupProjectDashboardMap).forEach((d) => {
+                result.push([
+                    {
+                        type: MENU_ITEM_TYPE.TITLE,
+                        label: d,
+                        id: d,
+                        foldable: true,
+                    },
+                    ...groupProjectDashboardMap[d].map((board) => ({
+                        type: MENU_ITEM_TYPE.ITEM,
+                        id: board.project_dashboard_id,
+                        label: board.name,
+                        to: {
+                            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                            params: {
+                                dashboardId: board.project_dashboard_id,
+                            },
+                        },
+                        favoriteType: FAVORITE_TYPE.DASHBOARD,
+                    })),
+                ]);
+            });
+            result.push(
+                ...noGroupList.map((board) => ({
+                    type: MENU_ITEM_TYPE.ITEM,
+                    id: board.project_dashboard_id,
+                    label: board.name,
+                    to: {
+                        name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                        params: {
+                            dashboardId: board.project_dashboard_id,
+                        },
+                    },
+                    favoriteType: FAVORITE_TYPE.DASHBOARD,
+                })),
+            );
+            return result;
+        };
+
+        const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
             if (!state.showFavoriteOnly) return menuItems;
-            return menuItems.filter((d) => (d.id && state.favoriteItemMap[d.id]) || d.type !== MENU_ITEM_TYPE.ITEM);
+            const result = [] as LNBMenu[];
+            menuItems.forEach((d) => {
+                if (Array.isArray(d)) {
+                    result.push(d.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM));
+                } else if ((d.id && state.favoriteItemMap[d.id]) || d.type !== MENU_ITEM_TYPE.ITEM) result.push(d);
+            });
+            return result;
         };
 
         return {
