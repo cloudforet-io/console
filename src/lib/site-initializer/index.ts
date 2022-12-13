@@ -52,7 +52,6 @@ const init = async () => {
     const domainName = await initDomain(store, config);
 
     if (domainName) {
-        initRouter(domainName);
         initI18n();
         initDayjs();
         initQueryHelper();
@@ -60,6 +59,7 @@ const init = async () => {
         initGtm(config);
         initAmcharts(config);
         initAmcharts5(config);
+        initRouter(domainName);
         initErrorHandler(store);
         initRequestIdleCallback();
         await checkSsoAccessToken(store);

@@ -8,7 +8,6 @@ import { ERROR_ROUTE } from '@/router/error-routes';
 
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
-import config from '@/lib/config';
 import { GTag } from '@/lib/gtag';
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 
@@ -87,9 +86,8 @@ export class SpaceRouter {
         });
 
         SpaceRouter.router.afterEach((to) => {
-            // set GTag
-            const gtagId = config.get('GTAG_ID');
-            if (!gtagId || gtagId !== 'DISABLED') GTag.setPageView(to);
+            // set target page as GTag page view
+            if (GTag.gtag) GTag.setPageView(to);
 
             const store = SpaceRouter.router.app?.$store;
             if (!store) return;

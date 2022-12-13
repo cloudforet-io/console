@@ -11,9 +11,12 @@ export class GTag {
     private static _gtag: VueGtagType|null;
 
     constructor() {
-        const gtagId: string = config.get('GTAG_ID') || 'DISABLED';
-        console.debug('initGtag', gtagId);
-        if (gtagId === 'DISABLED') return;
+        const gtagId: string = config.get('GTAG_ID');
+        if (!gtagId || gtagId === 'DISABLED') {
+            console.log('GTG ID is not given.');
+            GTag._gtag = null;
+            return;
+        }
 
         Vue.use(VueGtag, {
             config: { id: gtagId },
