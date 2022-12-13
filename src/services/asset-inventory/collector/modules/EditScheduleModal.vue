@@ -24,6 +24,7 @@
                                    :menu="timezones"
                                    class="timezone"
                                    use-fixed-menu-style
+                                   disabled
                                    @update:selected="changeTimezone"
                 />
             </p-field-group>
