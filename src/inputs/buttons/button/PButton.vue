@@ -13,23 +13,30 @@
                    ...$listeners,
                    click: (event) => {
                        if (!disabled && !loading) {
+                           if (!$listeners.click) return;
+
                            if (typeof $listeners.click === 'function') $listeners.click(event);
-                           else $listeners.click.forEach(func => func(event));
+                           else if(Array.isArray($listeners.click)) $listeners.click.forEach(func => func(event));
+                           else console.error(new Error(`[p-button] Wrong type of click listener: ${typeof $listeners.click}`))
                        }
                    }
                }"
     >
-        <p-spinner v-if="loading" :size="loadingIconSize" />
+        <p-spinner v-if="loading"
+                   :size="loadingIconSize"
+        />
         <p-i v-if="iconLeft"
              :name="iconLeft"
-             :width="iconSize" :height="iconSize"
+             :width="iconSize"
+             :height="iconSize"
              color="inherit"
              class="icon left"
         />
         <slot name="default" />
         <p-i v-if="iconRight"
              :name="iconRight"
-             :width="iconSize" :height="iconSize"
+             :width="iconSize"
+             :height="iconSize"
              color="inherit"
              class="icon right"
         />
