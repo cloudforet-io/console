@@ -1,3 +1,15 @@
+# [1.1.0-beta.473](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.472...v1.1.0-beta.473) (2022-12-13)
+
+
+### Bug Fixes
+
+* **p-text-pagination:** next pagination does not working ([#166](https://github.com/cloudforet-io/mirinae/issues/166)) ([51dff23](https://github.com/cloudforet-io/mirinae/commit/51dff23380a5574e3addc9be831a62245457da1a))
+
+
+### Features
+
+* **p-search:** disable delete button when `disabled` ([#165](https://github.com/cloudforet-io/mirinae/issues/165)) ([e356f2c](https://github.com/cloudforet-io/mirinae/commit/e356f2cf9c64089ec1e113767d674ac2b5ac4649))
+
 # [1.1.0-beta.472](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.471...v1.1.0-beta.472) (2022-12-13)
 
 
