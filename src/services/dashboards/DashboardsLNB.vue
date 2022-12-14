@@ -96,14 +96,15 @@ export default defineComponent({
             // Items with groups are converted to map format, and if there are no groups, they are put in noGroupList.
             dashboardList.forEach((d) => {
                 // With group
-                if (state.projectItems[d.project_id]) {
-                    if (groupProjectDashboardMap[state.projectItems[d.project_id].data.groupInfo.name]) {
-                        groupProjectDashboardMap[state.projectItems[d.project_id].data.groupInfo.name].push(d);
-                    } else {
-                        groupProjectDashboardMap[state.projectItems[d.project_id].data.groupInfo.name] = [d];
-                    }
+                const groupId: string|undefined = state.projectItems[d.project_id]?.data.groupInfo.name;
+                if (groupId) {
+                   if (groupProjectDashboardMap[groupId]) {
+                      groupProjectDashboardMap[groupId].push(d);
+                  } else {
+                      groupProjectDashboardMap[groupId] = [d];
+                  }
                 }
-
+               
                 // No-group
                 noGroupList.push(d);
             });
