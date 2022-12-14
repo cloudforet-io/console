@@ -73,16 +73,28 @@
                                        use-fixed-menu-style
                                        class="input-form"
                                        @update:selected="handleUpdateFormValue(schemaProperty, ...arguments)"
-                    />
+                    >
+                        <template #default="{ item }">
+                            <slot name="dropdown-extra"
+                                  v-bind="{...schemaProperty, selectedItem: item }"
+                            />
+                        </template>
+                    </p-select-dropdown>
                     <p-search-dropdown v-else-if="schemaProperty.componentName === 'PSearchDropdown'"
                                        :menu="schemaProperty.menuItems"
                                        :selected="rawFormData[schemaProperty.propertyName]"
-                                       multi-selectable
+                                       :multi-selectable="schemaProperty.multiInputMode"
                                        use-fixed-menu-style
                                        :invalid="invalid"
                                        class="input-form"
                                        @update:selected="handleUpdateFormValue(schemaProperty, ...arguments)"
-                    />
+                    >
+                        <template #selected-extra="{ items }">
+                            <slot name="dropdown-extra"
+                                  v-bind="{...schemaProperty, selectedItems: items}"
+                            />
+                        </template>
+                    </p-search-dropdown>
                     <template v-else>
                         <p-text-input :value="schemaProperty.multiInputMode ? undefined : rawFormData[schemaProperty.propertyName]"
                                       :selected="schemaProperty.multiInputMode ? rawFormData[schemaProperty.propertyName] : undefined"
@@ -125,7 +137,7 @@ import { addCustomFormats, addCustomKeywords } from '@/inputs/forms/json-schema-
 import {
     getComponentNameBySchemaProperty,
     getInputPlaceholderBySchemaProperty,
-    getInputTypeBySchemaProperty, getMenuItemsBySchemaProperty,
+    getInputTypeBySchemaProperty, getMenuItemsBySchemaProperty, getMultiInputMode,
     initFormDataWithSchema, initJsonInputDataWithSchema, initRefinedFormData, refineObjectByProperties,
     refineValueByProperty,
 } from '@/inputs/forms/json-schema-form/helper';
@@ -208,7 +220,7 @@ export default defineComponent<JsonSchemaFormProps>({
                             inputType: getInputTypeBySchemaProperty(schemaProperty),
                             inputPlaceholder: getInputPlaceholderBySchemaProperty(schemaProperty),
                             menuItems: getMenuItemsBySchemaProperty(schemaProperty),
-                            multiInputMode: schemaProperty.type === 'array',
+                            multiInputMode: getMultiInputMode(schemaProperty),
                         };
                         return refined;
                     }).sort((a, b) => {

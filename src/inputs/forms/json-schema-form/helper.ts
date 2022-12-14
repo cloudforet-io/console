@@ -153,3 +153,8 @@ export const getMenuItemsBySchemaProperty = (schemaProperty: InnerJsonSchema): S
     }
     return undefined;
 };
+
+export const getMultiInputMode = (schemaProperty: InnerJsonSchema): boolean => {
+    if (schemaProperty.type !== 'array') return false;
+    return schemaProperty?.maxItems !== 1;
+};

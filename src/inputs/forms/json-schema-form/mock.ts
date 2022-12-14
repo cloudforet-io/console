@@ -92,12 +92,22 @@ export const getDefaultSchema = () => ({
         },
         foods: {
             description: 'Favorite Foods',
-            title: 'Favorite Foods (strict select)',
+            title: 'Favorite Foods (strict select / multi select)',
             type: 'array',
             items: {
                 enum: ['hamburger', 'pizza', 'kimchi', 'bulgogi', 'bibimbob'],
             },
             default: ['bulgogi', 'kimchi', 'hello!!!'],
+        },
+        food: {
+            description: 'Favorite Food',
+            title: 'Favorite Food (strict select / single select)',
+            type: 'array',
+            items: {
+                enum: ['hamburger', 'pizza', 'kimchi', 'bulgogi', 'bibimbob'],
+            },
+            default: ['bulgogi'],
+            maxItems: 1,
         },
         homepage: {
             type: 'string',
@@ -132,7 +142,7 @@ export const getDefaultSchema = () => ({
 
     },
     required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails', 'colors', 'provider'],
-    order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'provider', 'age', 'phone', 'homepage', 'additional', 'colors', 'foods'],
+    order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'provider', 'age', 'phone', 'homepage', 'additional', 'colors', 'foods', 'food'],
 });
 
 export const getDefaultFormData = () => ({
