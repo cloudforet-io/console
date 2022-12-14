@@ -1,3 +1,10 @@
+# [1.1.0-beta.475](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.474...v1.1.0-beta.475) (2022-12-14)
+
+
+### Bug Fixes
+
+* **p-json-schema-form:** add slots for dropdown components ([#163](https://github.com/cloudforet-io/mirinae/issues/163)) ([1a4d3de](https://github.com/cloudforet-io/mirinae/commit/1a4d3de04f777117b88664146e622a3e9ac66615))
+
 # [1.1.0-beta.474](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.473...v1.1.0-beta.474) (2022-12-13)
 
 
