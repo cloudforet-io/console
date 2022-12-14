@@ -90,23 +90,22 @@ export default defineComponent({
         });
 
         const mashUpProjectGroup = (dashboardList: ProjectDashboardItem[] = []): LNBMenu[] => {
-            const noGroupList = [] as ProjectDashboardItem[];
-            const groupProjectDashboardMap = {} as Record<string, ProjectDashboardItem[]>;
+            const dashboardItemsWithoutGroup = [] as ProjectDashboardItem[];
+            const dashboardItemsWithGroup = {} as Record<string, ProjectDashboardItem[]>;
             // Since all lnbitem do not have groups, and even if they do have groups, they are not sorted.
             // Items with groups are converted to map format, and if there are no groups, they are put in noGroupList.
             dashboardList.forEach((d) => {
                 // With group
                 const groupId: string|undefined = state.projectItems[d.project_id]?.data.groupInfo.name;
                 if (groupId) {
-                   if (groupProjectDashboardMap[groupId]) {
-                      groupProjectDashboardMap[groupId].push(d);
-                  } else {
-                      groupProjectDashboardMap[groupId] = [d];
-                  }
+                    if (dashboardItemsWithGroup[groupId]) {
+                        dashboardItemsWithGroup[groupId].push(d);
+                    } else {
+                        dashboardItemsWithGroup[groupId] = [d];
+                    }
                 }
-               
                 // No-group
-                noGroupList.push(d);
+                dashboardItemsWithoutGroup.push(d);
             });
 
             // Result to return
@@ -121,7 +120,7 @@ export default defineComponent({
                         id: d,
                         foldable: true,
                     },
-                    ...groupProjectDashboardMap[d].map((board) => ({
+                    ...dashboardItemsWithGroup[d].map((board) => ({
                         type: MENU_ITEM_TYPE.ITEM,
                         id: board.project_dashboard_id,
                         label: board.name,
@@ -138,7 +137,7 @@ export default defineComponent({
 
             // No-group items are mapped to LNBItem type and pushed to result.
             result.push(
-                ...noGroupList.map((board) => ({
+                ...dashboardItemsWithoutGroup.map((board) => ({
                     type: MENU_ITEM_TYPE.ITEM,
                     id: board.project_dashboard_id,
                     label: board.name,
