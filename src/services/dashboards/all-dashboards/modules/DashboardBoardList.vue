@@ -124,6 +124,7 @@ export default defineComponent<DashboardBoardListProps>({
         },
     },
     setup(props) {
+        /* song-lang */
         const state = reactive({
             thisPage: 1,
             dashboardScopeType: computed(() => (props.scopeType === SCOPE_TYPE.DOMAIN ? 'domain' : 'project')),
