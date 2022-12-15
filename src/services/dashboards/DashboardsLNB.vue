@@ -112,7 +112,7 @@ export default defineComponent({
             const result = [] as LNBMenu[];
 
             // The mapped group items are in the form of an array along with the title, and each item is mapped to LNBItem type and pushed to result.
-            Object.keys(groupProjectDashboardMap).forEach((d) => {
+            Object.keys(dashboardItemsWithGroup).forEach((d) => {
                 result.push([
                     {
                         type: MENU_ITEM_TYPE.TITLE,
