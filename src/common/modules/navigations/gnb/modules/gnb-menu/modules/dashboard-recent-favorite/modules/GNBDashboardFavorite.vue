@@ -143,6 +143,7 @@ export default {
                 },
                 set: (value) => {
                     state.favoriteOrderList = value.map((favorite) => favorite.itemId);
+                    isOverflown();
                     setFavoriteOrderList();
                 },
             }),
@@ -213,7 +214,8 @@ export default {
                 store.dispatch('dashboard/loadProjectDashboard'),
             ]);
             state.loading = false;
-            nextTick(() => emit('update:is-overflown', isOverflown()));
+            await nextTick();
+            emit('update:is-overflown', isOverflown());
         })();
 
         return {
