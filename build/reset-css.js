@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const postcss = require('postcss');
 
-const postcssConfig = require('../postcss.config');
+const postcssConfig = require('../postcss.config.cjs');
 
 console.log('processing...');
 
