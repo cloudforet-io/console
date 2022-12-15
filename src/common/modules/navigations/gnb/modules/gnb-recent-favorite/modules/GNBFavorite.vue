@@ -251,9 +251,6 @@ export default {
         (async () => {
             state.loading = true;
             await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
-                store.dispatch('reference/cloudServiceType/load'),
                 store.dispatch('favorite/load', FAVORITE_TYPE.MENU),
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
