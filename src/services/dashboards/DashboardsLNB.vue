@@ -43,6 +43,7 @@ export default defineComponent({
     name: 'DashboardsLNB',
     components: { LNB, PIconButton },
     setup() {
+        /* song-lang */
         const state = reactive({
             loading: true,
             showFavoriteOnly: false,
@@ -82,9 +83,9 @@ export default defineComponent({
                 },
                 { type: 'divider' },
                 { type: 'favorite-only' },
-                { type: 'top-title', label: 'Workspace' },
+                { type: 'top-title', label: i18n.t('Entire Workspace') },
                 ...filterFavoriteItems(state.workSpaceMenuSet),
-                { type: 'top-title', label: 'Project' },
+                { type: 'top-title', label: i18n.t('Single Project') },
                 ...filterFavoriteItems(state.projectMenuSet),
             ]),
         });
@@ -165,6 +166,13 @@ export default defineComponent({
             });
             return result;
         };
+
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('dashboard/loadProjectDashboard'),
+                store.dispatch('dashboard/loadDomainDashboard'),
+            ]);
+        })();
 
         return {
             ...toRefs(state),
