@@ -20,9 +20,14 @@
                     </div>
                     <span class="board-item-title">{{ board.name }}</span>
                 </div>
-                <p class="board-item-description">
-                    What item I fill in this area?
-                </p>
+                <div class="board-item-description">
+                    <span>{{ board.user_id }}</span>
+                    <p-i name="ic_divider-dot"
+                         width="0.125rem"
+                         height="0.125rem"
+                    />
+                    <span>{{ dashboardScopeTypeForView }}</span>
+                </div>
                 <div class="label-wrapper">
                     <p-label :class="{'viewers-label': true, 'private-label': board.viewers === 'PRIVATE'}"
                              :text="board.viewers === 'PUBLIC' ? 'Public' : 'Private'"
@@ -61,7 +66,7 @@ import {
 } from 'vue';
 
 import {
-    PBoard, PFieldTitle, PLabel, PPagination,
+    PBoard, PFieldTitle, PI, PLabel, PPagination,
 } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -96,6 +101,7 @@ interface DashboardBoardListProps {
 export default defineComponent<DashboardBoardListProps>({
     name: 'DashboardBoardList',
     components: {
+        PI,
         DeleteModal,
         PPagination,
         PLabel,
@@ -118,9 +124,11 @@ export default defineComponent<DashboardBoardListProps>({
         },
     },
     setup(props) {
+        /* song-lang */
         const state = reactive({
             thisPage: 1,
             dashboardScopeType: computed(() => (props.scopeType === SCOPE_TYPE.DOMAIN ? 'domain' : 'project')),
+            dashboardScopeTypeForView: computed(() => (props.scopeType === SCOPE_TYPE.DOMAIN ? i18n.t('Workspace') : i18n.t('Project'))),
             dashboardListByBoardSets: computed(() => props.dashboardList
                 .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
                 .map((d) => (
@@ -252,6 +260,8 @@ export default defineComponent<DashboardBoardListProps>({
             }
         }
         .board-item-description {
+            @apply flex items-center;
+            gap: 0.5rem;
             font-size: 0.75rem;
             line-height: 1.25;
             color: gray;

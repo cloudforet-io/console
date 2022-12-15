@@ -148,8 +148,6 @@ export default {
             };
 
             /* TODO: init states from url query */
-            store.dispatch('dashboard/loadDomainDashboard');
-            store.dispatch('dashboard/loadProjectDashboard');
             store.dispatch('dashboard/setSelectedViewers', useQueryValue.viewers);
             store.dispatch('dashboard/setSelectedScope', useQueryValue.scope);
             store.dispatch('dashboard/setSearchFilters', searchQueryHelper.filters);
