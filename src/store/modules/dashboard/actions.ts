@@ -23,7 +23,7 @@ export const loadProjectDashboard: Action<DashboardState, any> = async ({ commit
     try {
         const { results, total_count } = await SpaceConnector.clientV2.dashboard.projectDashboard.list({});
         if (results) {
-            commit('setProcjetItems', results);
+            commit('setProjectItems', results);
             commit('setProjectItemCount', total_count);
         }
     } catch (e) {
