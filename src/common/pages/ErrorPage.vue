@@ -2,7 +2,7 @@
     <section class="page-wrapper">
         <article class="error-contents">
             <img class="error-img"
-                 src="@/assets/images/error/error-octos.gif"
+                 src="/images/error-octos.gif"
             >
             <h2 class="error-code">
                 404
