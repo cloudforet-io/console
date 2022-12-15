@@ -91,7 +91,7 @@
                     >
                         <template #selected-extra="{ items }">
                             <slot name="dropdown-extra"
-                                  v-bind="{...schemaProperty, selectedItems: items}"
+                                  v-bind="{...schemaProperty, selectedItem: items}"
                             />
                         </template>
                     </p-search-dropdown>
