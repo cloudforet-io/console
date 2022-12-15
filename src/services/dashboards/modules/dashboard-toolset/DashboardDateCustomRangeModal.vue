@@ -54,8 +54,8 @@ import dayjs from 'dayjs';
 
 import { i18n } from '@/translations';
 
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import type { Period } from '@/services/cost-explorer/type';
+import { GRANULARITY } from '@/services/dashboards/config';
+import type { Period } from '@/services/dashboards/type';
 
 interface CustomRangeModalSettings {
     helpTextFrom?: TranslateResult | undefined;
