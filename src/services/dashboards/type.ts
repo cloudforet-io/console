@@ -1,6 +1,10 @@
 import type { Tags } from '@/models';
 
+import type { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
+
+export type DashboardScope = keyof typeof DASHBOARD_SCOPE;
+export type DashboardViewer = keyof typeof DASHBOARD_VIEWER;
 
 type DomainDashboardScope = 'DOMAIN'|'USER'; // DOMAIN: Viewer is Public, USER: Viewer is Private
 type ProjectDashboardScope = 'PROJECT'|'USER';

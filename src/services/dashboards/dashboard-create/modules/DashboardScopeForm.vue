@@ -5,20 +5,20 @@
             <p-panel-top title="Dashboard Scope" />
             <div class="dashboard-scope-wrapper">
                 <p-radio-group direction="vertical">
-                    <p-radio :selected="isEntireScope"
-                             @change="handleSelectScope(DASHBOARD_SCOPE_ENTIRE)"
+                    <p-radio :selected="isDomainScope"
+                             @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
                     >
                         <!--                    song-lang-->
                         Entire Workspaces
                     </p-radio>
-                    <p-radio :selected="!isEntireScope"
-                             @change="handleSelectScope(DASHBOARD_SCOPE_SINGLE)"
+                    <p-radio :selected="!isDomainScope"
+                             @change="handleSelectScope(DASHBOARD_SCOPE.PROJECT)"
                     >
                         <!--                    song-lang-->
                         Single Project
                     </p-radio>
                 </p-radio-group>
-                <project-select-dropdown v-show="!isEntireScope"
+                <project-select-dropdown v-show="!isDomainScope"
                                          project-selectable
                                          @select="handleSelectProjects"
                 />
@@ -39,8 +39,8 @@ import { store } from '@/store';
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { DASHBOARD_SCOPE_ENTIRE, DASHBOARD_SCOPE_SINGLE } from '@/services/dashboards/dashboard-create/config';
-import type { DashboardScope } from '@/services/dashboards/dashboard-create/type';
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
+import type { DashboardScope } from '@/services/dashboards/type';
 import type { ProjectItemResp } from '@/services/project/type';
 
 export default defineComponent({
@@ -54,11 +54,11 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            isEntireScope: true,
+            isDomainScope: true,
         });
 
         const handleSelectScope = (scopeType: DashboardScope) => {
-            state.isEntireScope = scopeType === DASHBOARD_SCOPE_ENTIRE;
+            state.isDomainScope = scopeType === DASHBOARD_SCOPE.DOMAIN;
             emit('update:dashboardScope', scopeType);
         };
 
@@ -76,8 +76,7 @@ export default defineComponent({
             ...toRefs(state),
             handleSelectScope,
             handleSelectProjects,
-            DASHBOARD_SCOPE_ENTIRE,
-            DASHBOARD_SCOPE_SINGLE,
+            DASHBOARD_SCOPE,
         };
     },
 });

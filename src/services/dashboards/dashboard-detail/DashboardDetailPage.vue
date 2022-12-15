@@ -57,14 +57,15 @@ import {
     PDivider, PI, PIconButton, PPageTitle,
 } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import { gray } from '@/styles/colors';
 
-import { DASHBOARD_VIEWER_PUBLIC } from '@/services/dashboards/dashboard-create/config';
-import type { DashboardViewerType } from '@/services/dashboards/dashboard-create/type';
+import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import DashboardCloneModal from '@/services/dashboards/dashboard-detail/modules/DashboardCloneModal.vue';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/DashboardMoreMenu.vue';
@@ -73,13 +74,22 @@ import DashboardRefresher from '@/services/dashboards/dashboard-detail/modules/D
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
+import type { DashboardScope, DashboardViewer } from '@/services/dashboards/type';
 
 
 const PUBLIC_ICON_COLOR = gray[500];
 
+interface Props {
+    dashboardScope: DashboardScope;
+    dashboardId: string;
+}
+
+// eslint-disable-next-line no-unused-vars,@typescript-eslint/no-unused-vars
+const props = defineProps<Props>();
+
 const LABEL_LIST_MOCK = [{ label: 'THIS' }, { label: 'LABELS ARE' }, { label: 'MOCK' }];
 const state = reactive({
-    dashboardType: DASHBOARD_VIEWER_PUBLIC as DashboardViewerType,
+    dashboardType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
     dashboardId: 'dashboard-idxxx',
     dashboardName: 'Dashboard XXX',
     labelList: LABEL_LIST_MOCK as Array<{label: string}>,
@@ -106,6 +116,11 @@ const handleNameUpdate = (name: string) => {
 const handleVisibleCloneModal = () => {
     state.cloneModalVisible = true;
 };
+
+// INIT
+(async () => {
+    SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: 'project-dash-5f7dc1d3bb43' });
+})();
 </script>
 
 <style lang="postcss" scoped>
