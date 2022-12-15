@@ -66,7 +66,6 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { gray } from '@/styles/colors';
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import DashboardCloneModal from '@/services/dashboards/dashboard-detail/modules/DashboardCloneModal.vue';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/DashboardMoreMenu.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
@@ -74,6 +73,7 @@ import DashboardRefresher from '@/services/dashboards/dashboard-detail/modules/D
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
+import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
 import type { DashboardScope, DashboardViewer } from '@/services/dashboards/type';
 
 
