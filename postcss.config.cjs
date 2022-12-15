@@ -1,7 +1,7 @@
 module.exports = {
     parser: 'postcss-comment',
     plugins: [
-        require('tailwindcss'),
+        require('tailwindcss')({ config: 'tailwind.config.cjs' }),
         require('autoprefixer'),
         require('postcss-easy-import'),
         require('postcss-import'),
@@ -11,7 +11,7 @@ module.exports = {
         require('postcss-nested'),
         require('postcss-simple-vars')({
             variables() {
-                return require('./src/styles/variables');
+                return require('./src/styles/variables.cjs');
             },
         }),
         require('postcss-preset-env')

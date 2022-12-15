@@ -3,10 +3,8 @@
   "version": "1.16.0",
   "description": "Cloudforet Console Core Library",
   "scripts": {
-    "build": "npm run babel && npm run tsc",
-    "build:watch": "rimraf dist & concurrently \"npm run babel:watch\"  \"npm run tsc:watch\"",
-    "babel": "babel src --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
-    "babel:watch": "babel src --watch --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
+    "build": "npm run tsc",
+    "build:watch": "rimraf dist && npm run tsc:watch",
     "tsc": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "tsc:watch": "tsc-watch --project . --outDir ./dist --onSuccess \"tsc-alias -w\"",
     "eslint": "eslint --ext .js,.ts src",
