@@ -6,6 +6,7 @@ const basePieWidgetConfig: WidgetConfig = {
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/_base/base-pie/BasePieWidget.vue'),
     }),
+    base_configs: [{ config_id: 'dashboardCommon' }],
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.BASE_PIE.DESC',
@@ -18,14 +19,16 @@ const basePieWidgetConfig: WidgetConfig = {
     },
     sizes: ['md', 'full'],
     widget_options_schema: {
-        type: 'object',
-        properties: {
-            group_by: {
-                type: 'string',
-                enum: Object.values(GROUP_BY),
+        schema: {
+            type: 'object',
+            properties: {
+                group_by: {
+                    type: 'string',
+                    enum: Object.values(GROUP_BY),
+                },
             },
+            required: ['group_by'],
         },
-        required: ['group_by'],
     },
 };
 
