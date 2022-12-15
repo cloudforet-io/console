@@ -4,7 +4,9 @@
                :active-tab.sync="activeTab"
         >
             <template #favorite>
-                <g-n-b-dashboard-favorite @close="hideMenu" />
+                <g-n-b-dashboard-favorite @close="hideMenu"
+                                          @update:is-overflown="handleOverflown"
+                />
             </template>
             <template #recent>
                 <g-n-b-dashboard-recent :visible="activeTab === 'recent'" />
@@ -22,7 +24,9 @@
                                         :is-new="subMenu.isNew"
                         />
                     </div>
-                    <div class="gradient-box" />
+                    <div v-if="isOverflown"
+                         class="gradient-box"
+                    />
                 </div>
             </template>
         </p-tab>
@@ -75,11 +79,16 @@ export default defineComponent({
                     to: { name: DASHBOARDS_ROUTE.CREATE._NAME },
                 },
             ] as DisplayMenu[],
+            isOverflown: false,
         });
         const hideMenu = () => { emit('close'); };
+        const handleOverflown = (isOverflown: boolean) => {
+            state.isOverflown = isOverflown;
+        };
         return {
             ...toRefs(state),
             hideMenu,
+            handleOverflown,
         };
     },
 });
