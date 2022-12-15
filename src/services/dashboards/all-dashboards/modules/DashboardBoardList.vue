@@ -24,9 +24,9 @@
                     What item I fill in this area?
                 </p>
                 <div class="label-wrapper">
-                    <p-label :class="{'viewers-label': true, 'private-label': board.viewers === 'PRIVATE'}"
-                             :text="board.viewers === 'PUBLIC' ? 'Public' : 'Private'"
-                             :left-icon="board.viewers === 'PUBLIC' ? 'ic_public' : 'ic_private'"
+                    <p-label :class="{'viewers-label': true, 'private-label': board.viewers === DASHBOARD_VIEWER.PRIVATE}"
+                             :text="board.viewers === DASHBOARD_VIEWER.PUBLIC ? 'Public' : 'Private'"
+                             :left-icon="board.viewers === DASHBOARD_VIEWER.PUBLIC ? 'ic_public' : 'ic_private'"
                     />
                     <p-label v-for="(label, idx) in board.labels"
                              :key="`${board.name}-label-${idx}`"
@@ -72,8 +72,7 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { DashboardModel, ScopeType } from '@/store/modules/dashboard/type';
-import { SCOPE_TYPE } from '@/store/modules/dashboard/type';
+import type { DashboardModel } from '@/store/modules/dashboard/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -82,12 +81,14 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
+import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import type { DashboardScope } from '@/services/dashboards/type';
 
 const PAGE_SIZE = 10;
 
 interface DashboardBoardListProps {
-    scopeType: ScopeType;
+    scopeType: DashboardScope;
     fieldTitle: string;
     // TODO: implementation
     dashboardList: DashboardModel[];
@@ -105,7 +106,7 @@ export default defineComponent<DashboardBoardListProps>({
     },
     props: {
         scopeType: {
-            type: String as PropType<ScopeType>,
+            type: String as PropType<DashboardScope>,
             default: undefined,
         },
         fieldTitle: {
@@ -120,7 +121,7 @@ export default defineComponent<DashboardBoardListProps>({
     setup(props) {
         const state = reactive({
             thisPage: 1,
-            dashboardScopeType: computed(() => (props.scopeType === SCOPE_TYPE.DOMAIN ? 'domain' : 'project')),
+            dashboardScopeType: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? 'domain' : 'project')),
             dashboardListByBoardSets: computed(() => props.dashboardList
                 .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
                 .map((d) => (
@@ -215,7 +216,8 @@ export default defineComponent<DashboardBoardListProps>({
             handlePage,
             handleDeleteDashboardConfirm,
             FAVORITE_TYPE,
-            SCOPE_TYPE,
+            DASHBOARD_SCOPE,
+            DASHBOARD_VIEWER,
             PAGE_SIZE,
         };
     },

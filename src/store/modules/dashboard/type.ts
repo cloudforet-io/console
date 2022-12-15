@@ -1,18 +1,6 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-export const VIEWERS_TYPE = {
-    PUBLIC: 'PUBLIC',
-    PRIVATE: 'PRIVATE',
-} as const;
-
-export type ViewersType = typeof VIEWERS_TYPE[keyof typeof VIEWERS_TYPE];
-
-export const SCOPE_TYPE = {
-    DOMAIN: 'DOMAIN',
-    PROJECT: 'PROJECT',
-} as const;
-
-export type ScopeType = typeof SCOPE_TYPE[keyof typeof SCOPE_TYPE];
+import type { DashboardViewer } from '@/services/dashboards/type';
 
 export interface DashboardState {
     domainItems: DomainDashboardModel[];
@@ -26,7 +14,7 @@ export interface DashboardState {
 
 export interface DashboardModel {
     name: string;
-    viewers: ViewersType;
+    viewers: DashboardViewer;
     version: number;
     layouts: any[];
     dashboard_options: any;
