@@ -44,3 +44,9 @@ export interface ProjectDashboardInfo extends DashboardConfig {
 }
 
 export type DashboardInfo = DomainDashboardInfo | ProjectDashboardInfo;
+
+
+export interface Period {
+    start?: string;
+    end?: string;
+}
