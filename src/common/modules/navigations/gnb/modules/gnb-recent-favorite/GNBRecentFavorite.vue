@@ -46,6 +46,7 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import GNBFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/modules/GNBFavorite.vue';
@@ -94,6 +95,15 @@ export default defineComponent<Props>({
         const handleRecentFavoriteButtonClick = () => {
             setVisible(!props.visible);
         };
+
+        /* Init */
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/projectGroup/load'),
+                store.dispatch('reference/cloudServiceType/load'),
+            ]);
+        })();
 
         return {
             ...toRefs(state),

@@ -1,7 +1,5 @@
 <template>
-    <div class="gnb-toolset"
-         @click.stop
-    >
+    <div class="gnb-toolset">
         <g-n-b-search v-if="!isDomainOwner"
                       :visible="openedMenu === 'search'"
                       @update:visible="updateOpenedMenu('search', $event)"

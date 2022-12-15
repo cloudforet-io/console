@@ -144,15 +144,6 @@ export default defineComponent({
             emit('close');
         };
 
-        /* Init */
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
-                store.dispatch('reference/cloudServiceType/load'),
-            ]);
-        })();
-
         /* Watcher */
         watch(() => props.visible, async (visible) => {
             if (visible) {
