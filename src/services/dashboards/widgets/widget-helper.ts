@@ -18,7 +18,7 @@ const getMergedBaseWidgetConfig = (configs: BaseConfigInfo[]): Partial<WidgetCon
         ...configs.map((configInfo) => {
             const baseConfigId = configInfo.config_id;
             if (!baseConfigId) {
-                throw new Error('There is no widget_config_id in base widget');
+                throw new Error('There is no config_id in base config info.');
             }
 
             if (baseWidgetConfigCacheMap.has(baseConfigId)) {
