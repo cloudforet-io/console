@@ -7,7 +7,6 @@ import type { DashboardState } from '@/store/modules/dashboard/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-// TODO: implementation
 export const loadDomainDashboard: Action<DashboardState, any> = async ({ commit }): Promise<void> => {
     try {
         const { results, total_count } = await SpaceConnector.clientV2.dashboard.domainDashboard.list({});
@@ -30,7 +29,6 @@ export const loadProjectDashboard: Action<DashboardState, any> = async ({ commit
         ErrorHandler.handleError(e);
     }
 };
-
 
 export const setSearchFilters: Action<DashboardState, any> = ({ commit }, searchFilters: ConsoleFilter[] = []): void => {
     commit('setSearchFilters', searchFilters);

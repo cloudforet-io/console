@@ -26,6 +26,7 @@ import { PIconButton } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { ProjectDashboardModel } from '@/store/modules/dashboard/type';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 
@@ -47,7 +48,7 @@ export default defineComponent({
             showFavoriteOnly: false,
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId)),
             favoriteItemMap: computed(() => {
-                const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.MENU];
+                const stateName = FAVORITE_TYPE_TO_STATE_NAME[FAVORITE_TYPE.DASHBOARD];
                 const result: Record<string, FavoriteConfig> = {};
                 if (stateName) {
                     store.state.favorite[stateName]?.forEach((d) => {
@@ -66,51 +67,11 @@ export default defineComponent({
                         dashboardId: d.domain_dashboard_id,
                     },
                 },
+                favoriteType: FAVORITE_TYPE.DASHBOARD,
             }))),
-            projectMenuSet: computed<LNBItem[]>(() => store.state.dashboard.projectItems.map((d) => ({
-                type: 'item',
-                id: d.project_dashboard_id,
-                label: d.name,
-                to: {
-                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
-                    params: {
-                        dashboardId: d.project_dashboard_id,
-                    },
-                },
-            }))),
-            // projectMenuSet: computed<LNBItem[][]>(() => {
-            //     const result = [] as LNBItem[][];
-            //     const projects: LNBItem[][] = [
-            //         [{
-            //             type: 'title',
-            //             label: 'Project_01',
-            //             id: 'Project_01',
-            //             foldable: true,
-            //         },
-            //         {
-            //             type: 'item', id: 'Project_01_Dashboard', label: 'Project_01_Dashboard', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_01_1' } },
-            //         },
-            //         {
-            //             type: 'item', id: 'Project_01_Dashboard2', label: 'Project_01_Dashboard2', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_01_2' } },
-            //         }],
-            //         [{
-            //             type: 'title',
-            //             label: 'Project_02',
-            //             id: 'Project_02',
-            //             foldable: true,
-            //         },
-            //         {
-            //             type: 'item', id: 'Project_02_Dashboard', label: 'Project_02_Dashboard', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_02_1' } },
-            //         },
-            //         {
-            //             type: 'item', id: 'Project_02_Dashboard2', label: 'Project_02_Dashboard2', to: { name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: 'project_02_2' } },
-            //         }],
-            //     ];
-            //     projects.forEach((d) => {
-            //         result.push(filterFavoriteItems(d));
-            //     });
-            //     return result;
-            // }),
+            projectDashboardList: computed<ProjectDashboardModel[]>(() => store.state.dashboard.projectItems),
+            projectItems: computed(() => store.state.reference.project.items),
+            projectMenuSet: computed<LNBMenu[]>(() => mashUpProjectGroup(state.projectDashboardList)),
             menuSet: computed<LNBMenu[]>(() => [
                 {
                     type: 'item',
@@ -128,9 +89,81 @@ export default defineComponent({
             ]),
         });
 
-        const filterFavoriteItems = (menuItems: LNBItem[] = []) => {
+        const mashUpProjectGroup = (dashboardList: ProjectDashboardModel[] = []): LNBMenu[] => {
+            const dashboardItemsWithoutGroup = [] as ProjectDashboardModel[];
+            const dashboardItemsWithGroup = {} as Record<string, ProjectDashboardModel[]>;
+            // Since all lnbitem do not have groups, and even if they do have groups, they are not sorted.
+            // Items with groups are converted to map format, and if there are no groups, they are put in noGroupList.
+            dashboardList.forEach((d) => {
+                // With group
+                const groupId: string|undefined = state.projectItems[d.project_id]?.data.groupInfo.name;
+                if (groupId) {
+                    if (dashboardItemsWithGroup[groupId]) {
+                        dashboardItemsWithGroup[groupId].push(d);
+                    } else {
+                        dashboardItemsWithGroup[groupId] = [d];
+                    }
+                }
+                // No-group
+                dashboardItemsWithoutGroup.push(d);
+            });
+
+            // Result to return
+            const result = [] as LNBMenu[];
+
+            // The mapped group items are in the form of an array along with the title, and each item is mapped to LNBItem type and pushed to result.
+            Object.keys(dashboardItemsWithGroup).forEach((d) => {
+                result.push([
+                    {
+                        type: MENU_ITEM_TYPE.TITLE,
+                        label: d,
+                        id: d,
+                        foldable: true,
+                    },
+                    ...dashboardItemsWithGroup[d].map((board) => ({
+                        type: MENU_ITEM_TYPE.ITEM,
+                        id: board.project_dashboard_id,
+                        label: board.name,
+                        to: {
+                            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                            params: {
+                                dashboardId: board.project_dashboard_id,
+                            },
+                        },
+                        favoriteType: FAVORITE_TYPE.DASHBOARD,
+                    })),
+                ]);
+            });
+
+            // No-group items are mapped to LNBItem type and pushed to result.
+            result.push(
+                ...dashboardItemsWithoutGroup.map((board) => ({
+                    type: MENU_ITEM_TYPE.ITEM,
+                    id: board.project_dashboard_id,
+                    label: board.name,
+                    to: {
+                        name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                        params: {
+                            dashboardId: board.project_dashboard_id,
+                        },
+                    },
+                    favoriteType: FAVORITE_TYPE.DASHBOARD,
+                })),
+            );
+
+            // Return LNBMenu type as (LNBItem | LNBItem[])[]
+            return result;
+        };
+
+        const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
             if (!state.showFavoriteOnly) return menuItems;
-            return menuItems.filter((d) => (d.id && state.favoriteItemMap[d.id]) || d.type !== MENU_ITEM_TYPE.ITEM);
+            const result = [] as LNBMenu[];
+            menuItems.forEach((d) => {
+                if (Array.isArray(d)) {
+                    result.push(d.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM));
+                } else if ((d.id && state.favoriteItemMap[d.id]) || d.type !== MENU_ITEM_TYPE.ITEM) result.push(d);
+            });
+            return result;
         };
 
         return {

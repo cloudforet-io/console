@@ -68,10 +68,11 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ConsoleFilter } from '@/query/type';
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { DashboardItem, ScopeType } from '@/store/modules/dashboard/type';
+import type { DashboardModel, ScopeType } from '@/store/modules/dashboard/type';
 import { SCOPE_TYPE } from '@/store/modules/dashboard/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -81,13 +82,15 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+
 const PAGE_SIZE = 10;
 
 interface DashboardBoardListProps {
     scopeType: ScopeType;
     fieldTitle: string;
     // TODO: implementation
-    dashboardList: DashboardItem[];
+    dashboardList: DashboardModel[];
 }
 
 export default defineComponent<DashboardBoardListProps>({
@@ -110,7 +113,7 @@ export default defineComponent<DashboardBoardListProps>({
             default: undefined,
         },
         dashboardList: {
-            type: Array as PropType<DashboardItem[]>,
+            type: Array as PropType<DashboardModel[]>,
             default: () => [],
         },
     },
@@ -172,7 +175,12 @@ export default defineComponent<DashboardBoardListProps>({
             {
                 iconName: 'ic_edit',
                 tooltipText: i18n.t('Edit'),
-                eventAction: () => console.log('edit!'),
+                eventAction: () => {
+                    SpaceRouter.router.push({
+                        name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                        params: { id: dashboardId },
+                    });
+                },
             },
             {
                 iconName: 'ic_duplicate',
