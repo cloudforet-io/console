@@ -1,3 +1,10 @@
+# [1.1.0-beta.476](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.475...v1.1.0-beta.476) (2022-12-15)
+
+
+### Bug Fixes
+
+* **json-schema-form:** fix minor bug ([#171](https://github.com/cloudforet-io/mirinae/issues/171)) ([bb286a0](https://github.com/cloudforet-io/mirinae/commit/bb286a0cbd650c6972ce3797053ad88afb75212d))
+
 # [1.1.0-beta.475](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.474...v1.1.0-beta.475) (2022-12-14)
 
 
