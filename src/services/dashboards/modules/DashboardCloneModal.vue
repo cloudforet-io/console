@@ -134,7 +134,6 @@ export default defineComponent<Props>({
         const state = reactive({
             proxyVisible: props.visible,
             filteredVisibilityList: computed(() => (props.manageDisabled ? visibilityList.filter((item) => item.name === DASHBOARD_PRIVACY_TYPE.USER) : visibilityList)),
-            includesFilter: false,
         });
 
         const handleUpdateVisible = (visible) => {
@@ -155,7 +154,6 @@ export default defineComponent<Props>({
         //     custom_layouts: await getCustomLayouts(),
         //     period_type: props.dashboard.period_type as PeriodType ?? PERIOD_TYPE.AUTO,
         //     period: props.dashboard.period,
-        //     default_filter: state.includesFilter ? props.dashboard.default_filter : {},
         // });
 
         const createPublicDashboard = async (): Promise<string|undefined> => {
