@@ -19,12 +19,8 @@
                               @input="setForm('name', $event)"
                 />
             </p-field-group>
-            <p-check-box v-model="includesFilter">
-                <!--                song-lang-->
-                Include Applied Filter from selected dashboard
-            </p-check-box>
             <!--            song-lang-->
-            <p-field-group label="Dashboard Visibility"
+            <p-field-group label="Viewers"
                            :invalid="invalidState.visibility"
                            :invalid-text="invalidTexts.visibility"
                            required
@@ -53,7 +49,7 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PCheckBox, PFieldGroup, PRadio, PTextInput,
+    PButtonModal, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -80,12 +76,12 @@ const visibilityList = [
     {
         name: DASHBOARD_PRIVACY_TYPE.USER,
         // song-lang
-        label: 'My Dashboard (Private)',
+        label: 'Private (Only you)',
     },
     {
         name: DASHBOARD_PRIVACY_TYPE.PUBLIC,
         // song-lang
-        label: 'Public (Public To All Members Who Has ‘View‘ Access.)',
+        label: 'Public (Anyone who has \'view\' access to \'dashboards\')',
     },
 ];
 export default defineComponent<Props>({
@@ -95,7 +91,6 @@ export default defineComponent<Props>({
         PRadio,
         PFieldGroup,
         PTextInput,
-        PCheckBox,
     },
     model: {
         prop: 'visible',
@@ -139,7 +134,6 @@ export default defineComponent<Props>({
         const state = reactive({
             proxyVisible: props.visible,
             filteredVisibilityList: computed(() => (props.manageDisabled ? visibilityList.filter((item) => item.name === DASHBOARD_PRIVACY_TYPE.USER) : visibilityList)),
-            includesFilter: false,
         });
 
         const handleUpdateVisible = (visible) => {
@@ -160,7 +154,6 @@ export default defineComponent<Props>({
         //     custom_layouts: await getCustomLayouts(),
         //     period_type: props.dashboard.period_type as PeriodType ?? PERIOD_TYPE.AUTO,
         //     period: props.dashboard.period,
-        //     default_filter: state.includesFilter ? props.dashboard.default_filter : {},
         // });
 
         const createPublicDashboard = async (): Promise<string|undefined> => {
@@ -200,7 +193,7 @@ export default defineComponent<Props>({
         };
 
         const init = () => {
-            initForm('name', `Copy - ${props.dashboard.name}`);
+            initForm('name', `Clone - ${props.dashboard.name}`);
             initForm('visibility', '');
         };
 
