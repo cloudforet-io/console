@@ -26,7 +26,7 @@ import { PIconButton } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProjectDashboardItem } from '@/store/modules/dashboard/type';
+import type { ProjectDashboardModel } from '@/store/modules/dashboard/type';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 
@@ -69,7 +69,7 @@ export default defineComponent({
                 },
                 favoriteType: FAVORITE_TYPE.DASHBOARD,
             }))),
-            projectDashboardList: computed<ProjectDashboardItem[]>(() => store.state.dashboard.projectItems),
+            projectDashboardList: computed<ProjectDashboardModel[]>(() => store.state.dashboard.projectItems),
             projectItems: computed(() => store.state.reference.project.items),
             projectMenuSet: computed<LNBMenu[]>(() => mashUpProjectGroup(state.projectDashboardList)),
             menuSet: computed<LNBMenu[]>(() => [
@@ -89,9 +89,9 @@ export default defineComponent({
             ]),
         });
 
-        const mashUpProjectGroup = (dashboardList: ProjectDashboardItem[] = []): LNBMenu[] => {
-            const dashboardItemsWithoutGroup = [] as ProjectDashboardItem[];
-            const dashboardItemsWithGroup = {} as Record<string, ProjectDashboardItem[]>;
+        const mashUpProjectGroup = (dashboardList: ProjectDashboardModel[] = []): LNBMenu[] => {
+            const dashboardItemsWithoutGroup = [] as ProjectDashboardModel[];
+            const dashboardItemsWithGroup = {} as Record<string, ProjectDashboardModel[]>;
             // Since all lnbitem do not have groups, and even if they do have groups, they are not sorted.
             // Items with groups are converted to map format, and if there are no groups, they are put in noGroupList.
             dashboardList.forEach((d) => {

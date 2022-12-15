@@ -72,7 +72,7 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { DashboardItem, ScopeType } from '@/store/modules/dashboard/type';
+import type { DashboardModel, ScopeType } from '@/store/modules/dashboard/type';
 import { SCOPE_TYPE } from '@/store/modules/dashboard/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -90,7 +90,7 @@ interface DashboardBoardListProps {
     scopeType: ScopeType;
     fieldTitle: string;
     // TODO: implementation
-    dashboardList: DashboardItem[];
+    dashboardList: DashboardModel[];
 }
 
 export default defineComponent<DashboardBoardListProps>({
@@ -113,7 +113,7 @@ export default defineComponent<DashboardBoardListProps>({
             default: undefined,
         },
         dashboardList: {
-            type: Array as PropType<DashboardItem[]>,
+            type: Array as PropType<DashboardModel[]>,
             default: () => [],
         },
     },

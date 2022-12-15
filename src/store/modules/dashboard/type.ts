@@ -15,8 +15,8 @@ export const SCOPE_TYPE = {
 export type ScopeType = typeof SCOPE_TYPE[keyof typeof SCOPE_TYPE];
 
 export interface DashboardState {
-    domainItems: DomainDashboardItem[];
-    projectItems: ProjectDashboardItem[];
+    domainItems: DomainDashboardModel[];
+    projectItems: ProjectDashboardModel[];
     searchFilters: ConsoleFilter[];
     viewers: string;
     scope: string;
@@ -24,7 +24,7 @@ export interface DashboardState {
     projectItemCount: number;
 }
 
-export interface DashboardItem {
+export interface DashboardModel {
     name: string;
     viewers: ViewersType;
     version: number;
@@ -40,10 +40,10 @@ export interface DashboardItem {
     updated_at: string;
 }
 
-export interface DomainDashboardItem extends DashboardItem {
+export interface DomainDashboardModel extends DashboardModel {
     domain_dashboard_id: string;
 }
-export interface ProjectDashboardItem extends DashboardItem {
+export interface ProjectDashboardModel extends DashboardModel {
     project_dashboard_id: string;
     project_id: string;
 }

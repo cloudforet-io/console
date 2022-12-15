@@ -3,7 +3,7 @@ import type { Getter } from 'vuex';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { DashboardItem, DashboardState } from '@/store/modules/dashboard/type';
+import type { DashboardModel, DashboardState } from '@/store/modules/dashboard/type';
 
 export const getDashboardCount: Getter<DashboardState, any> = (state): any => {
     const domainItemCount = state.domainItemCount;
@@ -13,7 +13,7 @@ export const getDashboardCount: Getter<DashboardState, any> = (state): any => {
 export const getDomainItems: Getter<DashboardState, any> = (state): any => getItems(state.domainItems ?? [], state.searchFilters, state.viewers);
 export const getProjectItems: Getter<DashboardState, any> = (state): any => getItems(state.projectItems ?? [], state.searchFilters, state.viewers);
 
-const getItems = (items: DashboardItem[], filters: ConsoleFilter[], viewers: string): DashboardItem[] => {
+const getItems = (items: DashboardModel[], filters: ConsoleFilter[], viewers: string): DashboardModel[] => {
     let result = items;
     if (viewers && viewers !== 'ALL') {
         result = result.filter((d) => d.viewers === viewers);
