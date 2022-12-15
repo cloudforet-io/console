@@ -5,32 +5,62 @@ import {
 } from 'lodash';
 
 import type {
+    BaseConfigInfo,
     GroupBy, WidgetConfig,
 } from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widgets/type';
 import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/widget-config-list';
 
-const widgetConfigCacheMap: Record<string, WidgetConfig> = {};
+const baseWidgetConfigCacheMap = new Map<string, Partial<WidgetConfig>>();
+const getMergedBaseWidgetConfig = (configs: BaseConfigInfo[]): Partial<WidgetConfig> => {
+    const mergedBaseConfig = merge(
+        {},
+        ...configs.map((configInfo) => {
+            const baseConfigId = configInfo.config_id;
+            if (!baseConfigId) {
+                throw new Error('There is no config_id in base config info.');
+            }
+
+            if (baseWidgetConfigCacheMap.has(baseConfigId)) {
+                return baseWidgetConfigCacheMap.get(baseConfigId) as Partial<WidgetConfig>;
+            }
+
+            const baseConfig = BASE_WIDGET_CONFIGS[baseConfigId];
+            if (!baseConfig) {
+                throw new Error(`No matching base widget configuration found. ${baseConfigId} does not exist.`);
+            }
+
+            const childConfigs = baseConfig.base_configs;
+            if (!childConfigs) {
+                baseWidgetConfigCacheMap.set(baseConfigId, baseConfig);
+                return baseConfig;
+            }
+
+            return getMergedBaseWidgetConfig(childConfigs);
+        }),
+    );
+
+    return mergedBaseConfig;
+};
+
+const consoleWidgetConfigCacheMap = new Map<string, WidgetConfig>();
 export const getWidgetConfig = (widgetConfigId: string): WidgetConfig => {
-    if (widgetConfigCacheMap[widgetConfigId]) return widgetConfigCacheMap[widgetConfigId];
+    if (consoleWidgetConfigCacheMap.has(widgetConfigId)) return consoleWidgetConfigCacheMap.get(widgetConfigId) as WidgetConfig;
 
     const config = CONSOLE_WIDGET_CONFIGS[widgetConfigId] as WidgetConfig;
     if (!config?.base_configs) {
-        widgetConfigCacheMap[widgetConfigId] = config;
+        consoleWidgetConfigCacheMap.set(widgetConfigId, config);
         return config;
     }
 
     const baseWidgetConfigs = config.base_configs;
-    widgetConfigCacheMap[widgetConfigId] = merge(
+    const mergedConfig = merge(
         {},
-        ...baseWidgetConfigs.map(({ config_id: baseConfigId }) => {
-            const baseConfig = BASE_WIDGET_CONFIGS[baseConfigId];
-            if (!baseConfig) throw new Error(`No matching base widget configuration found. ${baseConfigId} does not exist.`);
-            return baseConfig;
-        }),
+        getMergedBaseWidgetConfig(baseWidgetConfigs),
         config,
     );
-    return widgetConfigCacheMap[widgetConfigId];
+    consoleWidgetConfigCacheMap.set(widgetConfigId, mergedConfig);
+    return consoleWidgetConfigCacheMap.get(widgetConfigId) as WidgetConfig;
 };
 
 export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {

@@ -1,6 +1,7 @@
 import type { AsyncComponent } from 'vue';
 
 import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
 import type { DynamicWidgetType } from '@spaceone/design-system/src/data-display/dynamic/dynamic-widget/type';
 
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
@@ -55,7 +56,7 @@ export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
 export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 type WidgetScope = 'DOMAIN'|'WORKSPACE'|'PROJECT';
 
-interface BaseConfigInfo {
+export interface BaseConfigInfo {
     config_id: string;
     version?: string;
 }
@@ -79,7 +80,13 @@ export interface WidgetConfig {
 
     sizes: WidgetSize[];
     widget_options?: WidgetOptions;
-    widget_options_schema?: object;
+    widget_options_schema?: WidgetOptionsSchema;
+}
+
+export interface WidgetOptionsSchema {
+    default_properties?: string[];
+    inheritable_properties?: string[];
+    schema: JsonSchema
 }
 
 type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
@@ -99,7 +106,12 @@ interface WidgetFilter {
     o?: ConsoleFilterOperator;
 }
 interface WidgetFiltersMap {
-    [key: string]: WidgetFilter[]
+    provider?: WidgetFilter[];
+    project_id?: WidgetFilter[];
+    service_account_id?: WidgetFilter[];
+    user_id?: WidgetFilter[];
+    cloud_service_type_id?: WidgetFilter[];
+    region_code?: WidgetFilter[];
 }
 export interface WidgetOptions {
     date_range?: DateRange;
@@ -109,7 +121,7 @@ export interface WidgetOptions {
     stacked?: boolean;
     legend_options?: LegendOptions;
     chart_type?: ChartType;
-    filter?: WidgetFiltersMap[];
+    // filter?: WidgetFiltersMap[];
     dynamic_widget_type?: DynamicWidgetType;
     name_options?: DynamicField;
     value_options?: DynamicField;
@@ -117,6 +129,7 @@ export interface WidgetOptions {
         enabled?: boolean;
         type: 'cost-usage'|'days';
     };
+    filters?: WidgetFiltersMap;
 }
 
 export interface DashboardLayoutWidgetInfo {
