@@ -1,7 +1,7 @@
 import type { AsyncComponent } from 'vue';
 
 import {
-    keyBy, merge, sortBy, values,
+    keyBy, merge, mergeWith, sortBy, values,
 } from 'lodash';
 
 import type {
@@ -11,9 +11,13 @@ import type {
 import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widgets/type';
 import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/widget-config-list';
 
+const mergeCustomizer = (val1, val2) => {
+    if (Array.isArray(val1)) return val1.concat(val2);
+    return undefined;
+};
 const baseWidgetConfigCacheMap = new Map<string, Partial<WidgetConfig>>();
 const getMergedBaseWidgetConfig = (configs: BaseConfigInfo[]): Partial<WidgetConfig> => {
-    const mergedBaseConfig = merge(
+    const mergedBaseConfig = mergeWith(
         {},
         ...configs.map((configInfo) => {
             const baseConfigId = configInfo.config_id;
@@ -38,6 +42,7 @@ const getMergedBaseWidgetConfig = (configs: BaseConfigInfo[]): Partial<WidgetCon
 
             return getMergedBaseWidgetConfig(childConfigs);
         }),
+        mergeCustomizer,
     );
 
     return mergedBaseConfig;
