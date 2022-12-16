@@ -10,7 +10,6 @@ import awsDataTransferCostTrend from '@/services/dashboards/widgets/aws-data-tra
 import budgetStatus from '@/services/dashboards/widgets/budget-status/widget-config';
 import budgetUsageSummary from '@/services/dashboards/widgets/budget-usage-summary/widget-config';
 import budgetUsageWithForecast from '@/services/dashboards/widgets/budget-usage-with-forecast/widget-config';
-import costAnalysisQuery from '@/services/dashboards/widgets/cost-analysis-query/widget-config';
 import costByRegion from '@/services/dashboards/widgets/cost-by-region/widget-config';
 import costDonut from '@/services/dashboards/widgets/cost-donut/widget-config';
 import costMap from '@/services/dashboards/widgets/cost-map/widget-config';
@@ -52,7 +51,7 @@ export const CONSOLE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {
     budgetStatus,
     budgetUsageWithForecast,
     costPie,
-    costAnalysisQuery,
+    // costAnalysisQuery,
 };
 
 export const BASE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {

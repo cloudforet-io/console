@@ -4,7 +4,7 @@ import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 
 const costTrendWidgetConfig: WidgetConfig = {
     widget_config_id: 'costTrend',
-    base_configs: [{ config_id: 'baseTrend' }],
+    base_configs: [{ config_id: 'dashboardCommon' }, { config_id: 'baseTrend' }],
     title: 'Cost Trend',
     labels: ['Cost'],
     description: {
@@ -25,17 +25,18 @@ const costTrendWidgetConfig: WidgetConfig = {
         },
     },
     widget_options_schema: {
-        type: 'object',
-        properties: {
-            group_by: {
-                title: 'Group By',
-                type: 'string',
-                enum: Object.values(GROUP_BY),
-                menuItems: Object.values(GROUP_BY_ITEM_MAP),
-                default: GROUP_BY.PROVIDER,
+        schema: {
+            type: 'object',
+            properties: {
+                group_by: {
+                    title: 'Group By',
+                    type: 'string',
+                    enum: Object.values(GROUP_BY),
+                    menuItems: Object.values(GROUP_BY_ITEM_MAP),
+                },
             },
+            required: ['group_by'],
         },
-        required: ['group_by'],
     },
 };
 
