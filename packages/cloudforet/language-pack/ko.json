@@ -801,6 +801,11 @@
 				"ROLE_DOMAIN_ADMIN": "도메인 관리자",
 				"ROLE_ROOT_ADMIN": "Root 관리자"
 			},
+			"DASHBOARDS": {
+				"CREATE_DASHBOARDS": "",
+				"NO_ITEMS": "",
+				"VIEW_ALL": ""
+			},
 			"FAVORITES": {
 				"ALL_CLOUD_SERVICES": "모든 클라우드 서비스",
 				"ALL_MENU": "모든 메뉴",
@@ -1103,6 +1108,12 @@
 		}
 	},
 	"DASHBOARDS": {
+		"LNB": {
+			"ENTIRE_WORKSPACE": "",
+			"ONLY_FAVORITE": "",
+			"SINGLE_PROJECT": "",
+			"VIEW_ALL": ""
+		},
 		"WIDGET": {
 			"MONTHLY_COST": {
 				"DESC": ""

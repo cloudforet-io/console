@@ -801,6 +801,11 @@
 				"ROLE_DOMAIN_ADMIN": "Domain Admin",
 				"ROLE_ROOT_ADMIN": "Root Admin"
 			},
+			"DASHBOARDS": {
+				"CREATE_DASHBOARDS": "Create New Dashboard",
+				"NO_ITEMS": "No items",
+				"VIEW_ALL": "View All Dashboards"
+			},
 			"FAVORITES": {
 				"ALL_CLOUD_SERVICES": "All Cloud Services",
 				"ALL_MENU": "All Menu",
@@ -1103,6 +1108,12 @@
 		}
 	},
 	"DASHBOARDS": {
+		"LNB": {
+			"ENTIRE_WORKSPACE": "Entire Workspace",
+			"ONLY_FAVORITE": "Show favorites only",
+			"SINGLE_PROJECT": "Single Project",
+			"VIEW_ALL": "View All Dashboards"
+		},
 		"WIDGET": {
 			"MONTHLY_COST": {
 				"DESC": ""

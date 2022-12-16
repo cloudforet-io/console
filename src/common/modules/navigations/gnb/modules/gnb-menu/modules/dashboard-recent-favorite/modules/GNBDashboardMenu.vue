@@ -71,11 +71,11 @@ export default defineComponent({
             activeTab: 'favorite',
             subMenuList: [
                 {
-                    label: 'View All Dashboards', // song-lang
+                    label: i18n.t('COMMON.GNB.DASHBOARDS.VIEW_ALL'),
                     to: { name: DASHBOARDS_ROUTE.ALL._NAME },
                 },
                 {
-                    label: 'Create New Dashboard', // song-lang
+                    label: i18n.t('COMMON.GNB.DASHBOARDS.CREATE_DASHBOARDS'),
                     to: { name: DASHBOARDS_ROUTE.CREATE._NAME },
                 },
             ] as DisplayMenu[],

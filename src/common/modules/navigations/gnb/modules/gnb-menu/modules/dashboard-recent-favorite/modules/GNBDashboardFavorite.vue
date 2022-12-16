@@ -35,8 +35,7 @@
                          src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
                     >
                     <p class="text">
-                        <!--song-lang-->
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_ITEMS') }}
+                        {{ $t('COMMON.GNB.DASHBOARDS.NO_ITEMS') }}
                     </p>
                 </div>
             </template>

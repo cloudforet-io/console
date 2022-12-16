@@ -801,6 +801,11 @@
 				"ROLE_DOMAIN_ADMIN": "ドメイン管理者",
 				"ROLE_ROOT_ADMIN": "ルート管理者"
 			},
+			"DASHBOARDS": {
+				"CREATE_DASHBOARDS": "",
+				"NO_ITEMS": "",
+				"VIEW_ALL": ""
+			},
 			"FAVORITES": {
 				"ALL_CLOUD_SERVICES": "すべてのクラウドサービス",
 				"ALL_MENU": "すべてのメニュー",
@@ -1103,6 +1108,12 @@
 		}
 	},
 	"DASHBOARDS": {
+		"LNB": {
+			"ENTIRE_WORKSPACE": "",
+			"ONLY_FAVORITE": "",
+			"SINGLE_PROJECT": "",
+			"VIEW_ALL": ""
+		},
 		"WIDGET": {
 			"MONTHLY_COST": {
 				"DESC": ""
