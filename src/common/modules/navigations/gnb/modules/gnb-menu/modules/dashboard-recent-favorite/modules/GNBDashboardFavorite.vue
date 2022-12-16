@@ -1,28 +1,34 @@
 <template>
-    <div class="gnb-dashboard-favorite">
+    <div ref="favoriteRef"
+         class="gnb-dashboard-favorite"
+    >
         <p-data-loader :data="sortedFavoriteList"
                        :loading="loading"
                        class="gnb-dashboard-favorite-context"
                        :class="{ loading }"
         >
-            <draggable v-model="sortedFavoriteList">
-                <div v-for="(item, index) in sortedFavoriteList"
-                     :key="`favorite-${item.label}-${index}`"
-                     @click="hideMenu"
+            <div ref="listContainerRef">
+                <draggable
+                    v-model="sortedFavoriteList"
                 >
-                    <g-n-b-sub-menu :label="item.label"
-                                    :is-draggable="true"
-                                    :to="dashboardRouteFormatter(item.itemId)"
+                    <div v-for="(item, index) in sortedFavoriteList"
+                         :key="`favorite-${item.label}-${index}`"
+                         @click="hideMenu"
                     >
-                        <template #extra-mark>
-                            <favorite-button :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                             :item-id="item.itemId"
-                                             scale="0.65"
-                            />
-                        </template>
-                    </g-n-b-sub-menu>
-                </div>
-            </draggable>
+                        <g-n-b-sub-menu :label="item.label"
+                                        :is-draggable="true"
+                                        :to="dashboardRouteFormatter(item.itemId)"
+                        >
+                            <template #extra-mark>
+                                <favorite-button :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                                 :item-id="item.itemId"
+                                                 scale="0.65"
+                                />
+                            </template>
+                        </g-n-b-sub-menu>
+                    </div>
+                </draggable>
+            </div>
             <template #no-data>
                 <div class="no-data">
                     <img class="img"
@@ -41,7 +47,7 @@
 <script lang="ts">
 import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs,
+    computed, nextTick, reactive, toRefs,
 } from 'vue';
 import draggable from 'vuedraggable';
 
@@ -52,6 +58,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
+import type { DomainDashboardModel, ProjectDashboardModel } from '@/store/modules/dashboard/type';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -67,7 +74,7 @@ import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 const FAVORITE_LIMIT = 5;
 
-interface TempDashboardModel {
+interface DashboardListModel {
     name: string;
     dashboardId: string;
 }
@@ -82,19 +89,29 @@ export default {
     },
     props: {},
     setup(props, { emit }: SetupContext) {
+        const storeState = reactive({
+            domainItems: computed<DomainDashboardModel[]>(() => store.state.dashboard.domainItems),
+            projectItems: computed<ProjectDashboardModel[]>(() => store.state.dashboard.projectItems),
+        });
         const state = reactive({
             loading: true,
             favoriteDashboardIdList: computed<FavoriteItem[]>(() => store.state.favorite.dashboardItems),
-            dashboardList: [ // load from dashboard api
-                { name: 'dashboard1', dashboardId: '1' },
-                { name: 'dashboard2', dashboardId: '2' },
-                { name: 'dashboard3', dashboardId: '3' },
-                { name: 'dashboard4', dashboardId: '4' },
-                { name: 'dashboard5', dashboardId: '5' },
-                { name: 'dashboard6', dashboardId: '6' },
-                { name: 'dashboard7dashboard7dashboard7dashboard7dashboard7dashboard7dashboard7', dashboardId: '7' },
-                { name: 'dashboard8', dashboardId: '8' },
-            ] as TempDashboardModel[],
+            dashboardList: computed<DashboardListModel[]>(() => {
+                const dashboardList: DashboardListModel[] = [];
+                storeState.domainItems.forEach((domainItem) => {
+                    dashboardList.push({
+                        name: domainItem.name,
+                        dashboardId: domainItem.domain_dashboard_id,
+                    });
+                });
+                storeState.projectItems.forEach((projectItem) => {
+                    dashboardList.push({
+                        name: projectItem.name,
+                        dashboardId: projectItem.project_dashboard_id,
+                    });
+                });
+                return dashboardList;
+            }),
             favoriteDashboardList: computed<FavoriteItem[]>(() => {
                 const favoriteList: FavoriteItem[] = [];
                 state.dashboardList.forEach((dashboard) => {
@@ -126,9 +143,12 @@ export default {
                 },
                 set: (value) => {
                     state.favoriteOrderList = value.map((favorite) => favorite.itemId);
+                    isOverflown();
                     setFavoriteOrderList();
                 },
             }),
+            listContainerRef: null as HTMLElement | null,
+            favoriteRef: null as HTMLElement | null,
         });
 
         const hideMenu = () => { emit('close'); };
@@ -177,14 +197,25 @@ export default {
                 state.loading = false;
             }
         };
+
+        const isOverflown = () => {
+            if (state.listContainerRef && state.favoriteRef) {
+                return (state.favoriteRef?.clientHeight < state.listContainerRef?.scrollHeight);
+            } return false;
+        };
+
         /* Init */
         (async () => {
             state.loading = true;
             await Promise.allSettled([
                 getFavoriteOrderList(),
                 store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
+                store.dispatch('dashboard/loadDomainDashboard'),
+                store.dispatch('dashboard/loadProjectDashboard'),
             ]);
             state.loading = false;
+            await nextTick();
+            emit('update:is-overflown', isOverflown());
         })();
 
         return {
@@ -202,7 +233,7 @@ export default {
 <style lang="postcss" scoped>
 .gnb-dashboard-favorite {
     .gnb-dashboard-favorite-context {
-        max-height: 85vh;
+        max-height: calc(85vh - 9rem);
         overflow-y: scroll;
     }
 
@@ -212,8 +243,6 @@ export default {
             height: 15rem;
         }
         .data-loader-container {
-            max-height: calc(100vh - $gnb-height - 3.75rem);
-            overflow-y: auto;
             padding: 0.5rem;
         }
     }
