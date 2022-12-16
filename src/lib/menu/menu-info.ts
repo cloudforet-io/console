@@ -91,14 +91,14 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.ADMINISTRATION_POLICY',
         needPermissionByRole: true,
     },
-    [MENU_ID.ADMINISTRATION_SETTINGS]: {
-        translationId: 'MENU.ADDITIONAL_SETTINGS',
-        needPermissionByRole: true,
-    },
-    [MENU_ID.ADMINISTRATION_PROVIDER]: {
-        translationId: 'MENU.PROVIDER',
-        needPermissionByRole: true,
-    },
+    // [MENU_ID.ADMINISTRATION_SETTINGS]: {
+    //     translationId: 'MENU.ADDITIONAL_SETTINGS',
+    //     needPermissionByRole: true,
+    // },
+    // [MENU_ID.ADMINISTRATION_PROVIDER]: {
+    //     translationId: 'MENU.PROVIDER',
+    //     needPermissionByRole: true,
+    // },
     [MENU_ID.MY_PAGE]: {
         translationId: 'MENU.MY_PAGE',
         icon: 'ic_identity',
