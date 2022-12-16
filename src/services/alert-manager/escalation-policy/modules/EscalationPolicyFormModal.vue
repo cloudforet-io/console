@@ -42,7 +42,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
-import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
+import { ACTION } from '@/services/alert-manager/lib/config';
 import type { EscalationPolicyFormModel } from '@/services/alert-manager/type';
 
 export default {
@@ -114,7 +114,6 @@ export default {
 
         return {
             ...toRefs(state),
-            SCOPE,
             ACTION,
             onClickPolicyConfirm,
             onChangeInputModel,

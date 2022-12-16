@@ -27,6 +27,7 @@ export const SCOPE = {
     DOMAIN: 'DOMAIN',
     PROJECT: 'PROJECT',
 } as const;
+export type ScopeType = typeof SCOPE[keyof typeof SCOPE];
 
 export enum FINISH_CONDITION {
     acknowledged = 'ACKNOWLEDGED',
