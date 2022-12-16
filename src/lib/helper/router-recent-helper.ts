@@ -14,7 +14,6 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     /* DASHBOARD */
     if (to.name === DASHBOARDS_ROUTE.DETAIL._NAME) {
         const dashboardId = to?.params?.dashboardId;
-        console.log('dashboardId', dashboardId);
         if (!dashboardId) return undefined;
         return { itemType: RECENT_TYPE.DASHBOARD, itemId: dashboardId };
     }
