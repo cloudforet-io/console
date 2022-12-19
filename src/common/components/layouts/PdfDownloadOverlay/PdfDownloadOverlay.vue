@@ -204,60 +204,71 @@ export default defineComponent<Props>({
         };
 
         const applyTableHeaderStyle = (data: TableCell[][]): TableCell[][] => {
-            let tableData = data;
-            if (tableData[0]) {
-                tableData[0] = tableData[0].map((item) => ({
-                    text: item,
-                    style: 'tableHeader',
-                }));
-                // check if no items
-                if (!tableData[1]) {
-                    const colsLength = tableData[0].length;
-                    const emptyCell = {
-                        text: 'No Items', rowSpan: EMPTY_ROW_COUNT, colSpan: colsLength, alignment: 'center', style: 'noDataRow',
-                    };
-                    // add first row
-                    tableData.push(tableData[0].map((_, i) => {
-                        if (i === 0) return emptyCell;
-                        return '';
+            try {
+                let tableData = data;
+                if (tableData[0]) {
+                    tableData[0] = tableData[0].map((item) => ({
+                        text: item,
+                        style: 'tableHeader',
                     }));
-                    // add blank rows
-                    const fakeRows = new Array(EMPTY_ROW_COUNT - 1).fill(new Array(colsLength).fill(''));
-                    tableData = tableData.concat(fakeRows);
+                    // check if no items
+                    if (!tableData[1]) {
+                        const colsLength = tableData[0].length;
+                        const emptyCell = {
+                            text: 'No Items', rowSpan: EMPTY_ROW_COUNT, colSpan: colsLength, alignment: 'center', style: 'noDataRow',
+                        };
+                        // add first row
+                        tableData.push(tableData[0].map((_, i) => {
+                            if (i === 0) return emptyCell;
+                            return '';
+                        }));
+                        // add blank rows
+                        const fakeRows = new Array(EMPTY_ROW_COUNT - 1).fill(new Array(colsLength).fill(''));
+                        tableData = tableData.concat(fakeRows);
+                    }
                 }
+                return tableData;
+            } catch (e) {
+                console.error(e);
+                return [[]];
             }
-            return tableData;
         };
 
         const createContentWithItem = async ({ element, type, tableData }: Item): Promise<Content> => {
-            if (type === 'data-table' && tableData) {
-                if (!tableData.body) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
-                const tableBody = applyTableHeaderStyle(tableData.body);
+            try {
+                if (type === 'data-table' && tableData) {
+                    if (!tableData.body) throw Error('[PdfDownloadOverlay] data-table type item must have data.');
+                    const tableBody = applyTableHeaderStyle(tableData.body);
 
-                return tableData.body.length ? {
-                    pageBreak: 'before',
-                    table: {
-                        headerRows: 1,
-                        widths: tableData.widths,
-                        body: tableBody,
-                    },
-                    fillColor: white,
-                    margin: [0, 4],
-                    layout: 'DataTable',
-                } : {} as Content;
-            }
+                    return tableData.body.length ? {
+                        pageBreak: 'before',
+                        table: {
+                            headerRows: 1,
+                            widths: tableData.widths,
+                            body: tableBody,
+                        },
+                        fillColor: white,
+                        margin: [0, 4],
+                        layout: 'DataTable',
+                    } : {} as Content;
+                }
 
-            // 'image' is default type
-            if (!element) throw Error('[PdfDownloadOverlay] image type item must have element.');
-            const imageUrl = await toPng(element);
-            if (!imageUrl.split(':')[1]?.split(',')[1]) {
-                return {} as Content;
+                // 'image' is default type
+                if (!element) throw Error('[PdfDownloadOverlay] image type item must have element.');
+                console.log('element', element);
+                const imageUrl = await toPng(element);
+                if (!imageUrl.split(':')[1]?.split(',')[1]) {
+                    return {} as Content;
+                }
+                return {
+                    image: imageUrl,
+                    width: state.paperSizeInfo.width - (PAGE_PADDING * 2),
+                    style: 'imageRowWrapper',
+                };
+            } catch (e) {
+                console.error(e);
+                return '';
             }
-            return {
-                image: imageUrl,
-                width: state.paperSizeInfo.width - (PAGE_PADDING * 2),
-                style: 'imageRowWrapper',
-            };
         };
 
         const makeTableLayouts = () => ({
