@@ -118,6 +118,9 @@ export default {
 
                 &.selected {
                     @apply border border-blue-600;
+                    .card-header {
+                        @apply text-blue-600;
+                    }
                 }
                 .card-header {
                     @apply flex items-center flex-grow;
