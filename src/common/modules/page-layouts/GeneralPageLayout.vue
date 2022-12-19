@@ -48,6 +48,7 @@ export default {
     setup(props) {
         return {
             copiable: computed(() => {
+                // eslint-disable-next-line no-unsafe-optional-chaining
                 const last = props.breadcrumbs?.[props.breadcrumbs?.length - 1];
                 return last?.copiable;
             }),

@@ -80,34 +80,42 @@ type Forms<T> = {
 };
 
 type Validators<T> = {
+    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: Validator
 };
 
 type ValueSetters<T> = {
+    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: (val: T[K]) => void
 };
 
 type InvalidTexts<T> = {
+    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: ComputedRef<TranslateResult>
 };
 
 type InvalidState<T> = {
+    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: ComputedRef<ValidationResult|undefined>
 };
 
 type ValidationResults<T> = {
+    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: ComputedRef<ValidationResult>
 };
 
 type Resets<T> = {
+    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: () => void
 };
 
 type Validates<T> = {
+    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: () => void
 };
 
 type ImmediateMap<T> = {
+    // eslint-disable-next-line no-unused-vars
     [K in keyof T]: boolean
 };
 
