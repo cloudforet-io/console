@@ -116,7 +116,7 @@ export default {
             legends: [] as Legend[],
             chartData: [] as Array<XYChartData|PieChartData>,
             chart: null as XYChart | PieChart | null,
-            queryRef: null as null|HTMLElement,
+            queryRef: null as null|Vue,
             chartRef: null as null|HTMLElement,
         });
 
@@ -173,7 +173,13 @@ export default {
             }
         };
         const handleChartRendered = () => {
-            if (state.chartRef && state.queryRef) emit('rendered', [state.queryRef, state.chartRef]);
+            if (state.chartRef && state.queryRef?.$el) {
+                const elements: Element[] = [
+                    state.queryRef.$el,
+                    state.chartRef,
+                ];
+                emit('rendered', elements);
+            }
         };
 
         watch([() => state.granularity, () => state.period, () => state.primaryGroupBy, () => state.filters], ([granularity, period, groupBy]) => {
