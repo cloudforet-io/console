@@ -1,3 +1,11 @@
+# [1.1.0-beta.477](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.476...v1.1.0-beta.477) (2022-12-19)
+
+
+### Reverts
+
+* Revert "build(deps): bump minimatch from 3.0.4 to 3.1.2 (#174)" (#179) ([40862e2](https://github.com/cloudforet-io/mirinae/commit/40862e2ff0b59961e4597c14e11bedbf3f8ab207)), closes [#174](https://github.com/cloudforet-io/mirinae/issues/174) [#179](https://github.com/cloudforet-io/mirinae/issues/179)
+* Revert "build(deps): bump jsdom from 16.4.0 to 16.7.0 (#176)" (#178) ([04efe37](https://github.com/cloudforet-io/mirinae/commit/04efe37f6cd61f85318959c9236807610ea96303)), closes [#176](https://github.com/cloudforet-io/mirinae/issues/176) [#178](https://github.com/cloudforet-io/mirinae/issues/178)
+
 # [1.1.0-beta.476](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.475...v1.1.0-beta.476) (2022-12-15)
 
 
