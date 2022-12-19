@@ -244,28 +244,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-@define-mixin data-box-theme $bg-color, $color {
-    color: $color;
-    background-color: $bg-color;
-    border: 1px solid $color;
-    &:hover {
-        text-decoration: underline;
-    }
-    &.error .text {
-        color: $color;
-    }
-}
-
-@define-mixin legend-theme $bg-color, $border-color, $text-color {
-    .box {
-        background-color: $bg-color;
-        border: 1px solid $border-color;
-    }
-    .text {
-        color: $text-color;
-    }
-}
-
 .simplified-trusted-advisor {
     min-height: 18.75rem;
 }
@@ -291,14 +269,20 @@ export default {
         width: 45%;
         .box {
             text-align: center;
+            &:hover {
+                text-decoration: underline;
+            }
             &.error {
-                @mixin data-box-theme theme('colors.coral.100'), theme('colors.red.500');
+                @apply bg-coral-100 border border-red-500 text-red-500;
+                .text {
+                    @apply text-red-500;
+                }
             }
             &.warning {
-                @mixin data-box-theme theme('colors.yellow.100'), theme('colors.yellow.500');
+                @apply bg-yellow-100 border border-yellow-500 text-yellow-500;
             }
             &.ok {
-                @mixin data-box-theme theme('colors.green.100'), theme('colors.green.500');
+                @apply bg-green-100 border border-green-500 text-green-500;
             }
         }
         .text {
@@ -312,13 +296,28 @@ export default {
         display: flex;
         padding: 0.25rem 0;
         &.error {
-            @mixin legend-theme theme('colors.coral.100'), theme('colors.red.500'), theme('colors.red.500');
+            .box {
+                @apply bg-coral-100 border border-red-500;
+            }
+            .text {
+                @apply text-red-500;
+            }
         }
         &.warning {
-            @mixin legend-theme theme('colors.yellow.100'), theme('colors.yellow.500');
+            .box {
+                @apply bg-yellow-100 border border-yellow-500;
+            }
+            .text {
+                @apply text-yellow-500;
+            }
         }
         &.ok {
-            @mixin legend-theme theme('colors.green.100'), theme('colors.green.500');
+            .box {
+                @apply bg-green-100 border border-green-500;
+            }
+            .text {
+                @apply text-green-500;
+            }
         }
         .box {
             @apply border rounded-xs;
