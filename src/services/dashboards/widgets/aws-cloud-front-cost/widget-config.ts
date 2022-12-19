@@ -10,7 +10,7 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.AWS_CLOUD_FRONT_COST.DESC',
-        preview_image: 'xxx.png',
+        preview_image: 'widget-img_awsCloudFrontCost--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {

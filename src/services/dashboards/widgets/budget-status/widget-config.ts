@@ -10,7 +10,7 @@ const budgetStatusWidgetConfig: WidgetConfig = {
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.BUDGET_STATUS.DESC',
-        preview_image: 'xxx.png',
+        preview_image: 'widget-img_budgetStatus--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {

@@ -9,7 +9,7 @@ const costTrendWidgetConfig: WidgetConfig = {
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.COST_TREND.DESC',
-        preview_image: 'xxx.png',
+        preview_image: 'widget-img_costTrend--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {

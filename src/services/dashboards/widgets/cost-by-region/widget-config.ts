@@ -10,7 +10,7 @@ const costByRegionWidgetConfig: WidgetConfig = {
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.COST_BY_REGION.DESC',
-        preview_image: 'xxx.png',
+        preview_image: 'widget-img_costByRegion--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {

@@ -9,7 +9,7 @@ const costMapWidgetConfig: WidgetConfig = {
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.COST_MAP.DESC',
-        preview_image: 'xxx.png',
+        preview_image: 'widget-img_costMap--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {

@@ -8,7 +8,7 @@ const costTrendStackedWidgetConfig: WidgetConfig = {
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.COST_TREND_STACKED.DESC',
-        preview_image: 'xxx.png',
+        preview_image: 'widget-img_costTrendStacked--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {
