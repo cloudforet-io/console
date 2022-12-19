@@ -1,14 +1,12 @@
 <template>
     <section>
         <p-pane-layout>
-            <!--            song-lang-->
-            <p-panel-top title="Start From" />
+            <p-panel-top :title="$t('DASHBOARDS.CREATE.LABEL_START_FROM')" />
             <div class="dashboard-template-wrapper">
                 <div class="dashboard-template-container">
                     <div class="card-container">
                         <span class="card-wrapper-title">
-                            <!--                        song-lang-->
-                            Default Template
+                            {{ $t('DASHBOARDS.CREATE.LABEL_DEFAULT_TEMPLATE') }}
                         </span>
                         <div class="card-wrapper">
                             <!--                            FIXME:: waiting for NEW card component-->
@@ -38,8 +36,7 @@
                     </div>
                     <div class="card-container">
                         <span class="card-wrapper-title">
-                            <!--                        song-lang-->
-                            Existing Dashboard
+                            {{ $t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
                         </span>
                         <div class="card-wrapper">
                             <!--                            FIXME:: waiting for NEW card component-->

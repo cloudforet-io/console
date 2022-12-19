@@ -1,9 +1,8 @@
 <template>
     <div class="dashboard-create-page">
-        <!--        song-lang-->
         <p-page-title
             child
-            title="Create New Dashboard"
+            :title="$t('DASHBOARDS.CREATE.TITLE')"
             @goBack="$router.go(-1)"
         />
         <section class="dashboard-create-form-container">
@@ -18,16 +17,14 @@
                       size="lg"
                       @click="$router.go(-1)"
             >
-                <!--                song-lang-->
-                Cancel
+                {{ $t('DASHBOARDS.CREATE.CANCEL') }}
             </p-button>
             <p-button style-type="primary"
                       size="lg"
                       :disabled="!isAllValid"
                       @click="handleClickCreate"
             >
-                <!--                song-lang-->
-                Create
+                {{ $t('DASHBOARDS.CREATE.CREATE') }}
             </p-button>
         </div>
     </div>
@@ -37,6 +34,8 @@
 import { reactive, toRefs } from 'vue';
 
 import { PPageTitle, PButton } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -71,12 +70,10 @@ export default {
             dashboardTemplate: '',
             dashboardProject: undefined as ProjectItemResp|undefined,
         }, {
-            // song-lang
-            dashboardTemplate(value: boolean) { return !value ? 'Please Select Template' : ''; },
+            dashboardTemplate(value: boolean) { return !value ? i18n.t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : ''; },
             dashboardProject(value: ProjectItemResp|undefined) {
                 return !value && state.dashboardScope === DASHBOARD_SCOPE.PROJECT
-                    // song-lang
-                    ? 'Please Select Project' : '';
+                    ? i18n.t('DASHBOARDS.CREATE.VALIDATION_PROJECT') : '';
             },
         });
 

@@ -1,7 +1,6 @@
 <template>
-    <!--    song-lang-->
     <p-button-modal
-        :header-title="$t('Custom Range')"
+        :header-title="$t('DASHBOARDS.FORM.CUSTOM_DATE_TITLE')"
         centered
         size="sm"
         fade
@@ -11,9 +10,8 @@
         @confirm="handleConfirm"
     >
         <template #body>
-            <!--            song-lang-->
             <p-field-group class="period-select"
-                           :label="$t('FROM')"
+                           :label="$t('DASHBOARDS.FORM.CUSTOM_DATE_FROM')"
                            :help-text="settingsByGranularity.helpTextFrom"
                            required
             >
@@ -25,9 +23,8 @@
                                    :max-date="fromDate.maxDate"
                 />
             </p-field-group>
-            <!--            song-lang-->
             <p-field-group class="period-select"
-                           :label="$t('TO')"
+                           :label="$t('DASHBOARDS.FORM.CUSTOM_DATE_TO')"
                            :help-text="settingsByGranularity.helpTextTo"
                            required
             >
@@ -138,18 +135,15 @@ export default {
                 if (!props.granularity) return {};
                 const customRangeModalSettingsByGranularity = {
                     [GRANULARITY.ACCUMULATED]: {
-                        // song-lang
-                        helpTextFrom: i18n.t('Up to last 12 months'),
+                        helpTextFrom: i18n.t('DASHBOARDS.FORM.DATE_HELP_TEXT_ACCUMULATED'),
                         dateType: DATA_TYPE.yearToMonth,
                     },
                     [GRANULARITY.DAILY]: {
-                        // song-lang
-                        helpTextTo: i18n.t('Up to 31 days'),
+                        helpTextTo: i18n.t('DASHBOARDS.FORM.DATE_HELP_TEXT_DAILY'),
                         dateType: DATA_TYPE.yearToDate,
                     },
                     [GRANULARITY.MONTHLY]: {
-                        // song-lang
-                        helpTextFrom: i18n.t('Up to last 12 months'),
+                        helpTextFrom: i18n.t('DASHBOARDS.FORM.DATE_HELP_TEXT_MONTHLY'),
                         dateType: DATA_TYPE.yearToMonth,
                     },
                 };

@@ -75,16 +75,16 @@ export default defineComponent({
             menuSet: computed<LNBMenu[]>(() => [
                 {
                     type: 'item',
-                    label: i18n.t('DASHBOARDS.LNB.VIEW_ALL'),
+                    label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
                     id: MENU_ID.DASHBOARDS,
                     foldable: false,
                     to: { name: DASHBOARDS_ROUTE.ALL._NAME },
                 },
                 { type: 'divider' },
                 { type: 'favorite-only' },
-                { type: 'top-title', label: i18n.t('DASHBOARDS.LNB.ENTIRE_WORKSPACE') },
+                { type: 'top-title', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE') },
                 ...filterFavoriteItems(state.workSpaceMenuSet),
-                { type: 'top-title', label: i18n.t('DASHBOARDS.LNB.SINGLE_PROJECT') },
+                { type: 'top-title', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT') },
                 ...filterFavoriteItems(state.projectMenuSet),
             ]),
         });

@@ -55,17 +55,16 @@ export default defineComponent({
     name: 'AllDashboardsSelectFilter',
     components: { PSelectStatus, PSelectDropdown, PDivider },
     setup() {
-        /* song-lang */
         const state = reactive({
             viewerFilterList: computed(() => [
-                { label: i18n.t('All'), name: VIEWERS_TYPE.ALL },
-                { label: i18n.t('Pubilc'), name: VIEWERS_TYPE.PUBLIC },
-                { label: i18n.t('Private'), name: VIEWERS_TYPE.PRIVATE },
+                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: VIEWERS_TYPE.ALL },
+                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_PUBLIC'), name: VIEWERS_TYPE.PUBLIC },
+                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_PRIVATE'), name: VIEWERS_TYPE.PRIVATE },
             ]),
             scopeFilterList: computed(() => [
-                { label: i18n.t('All'), name: SCOPE_TYPE.ALL },
-                { label: i18n.t('Entire Workspace'), name: SCOPE_TYPE.DOMAIN },
-                { label: i18n.t('Single Project'), name: SCOPE_TYPE.PROJECT },
+                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: SCOPE_TYPE.ALL },
+                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ENTIRE_WORKSPACE'), name: SCOPE_TYPE.DOMAIN },
+                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_SINGLE_PROJECT'), name: SCOPE_TYPE.PROJECT },
             ]),
             viewersStatus: computed(() => store.state.dashboard.viewers),
             scopeStatus: computed(() => store.state.dashboard.scope),

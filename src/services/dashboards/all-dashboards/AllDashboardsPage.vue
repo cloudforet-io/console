@@ -1,6 +1,6 @@
 <template>
     <div class="all-dashboards-page">
-        <p-page-title :title="'Dashboards'"
+        <p-page-title :title="$t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARDS_TITLE')"
                       use-total-count
                       :total-count="dashboardTotalCount"
         >
@@ -9,8 +9,7 @@
                           icon-left="ic_plus"
                           @click="handleCreateDashboard"
                 >
-                    <!--song lang-->
-                    {{ $t('Create') }}
+                    {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREAT') }}
                 </p-button>
             </template>
         </p-page-title>
@@ -30,18 +29,16 @@
         <div v-if="projectDashboardList.length || workspaceDashboardList.length"
              class="dashboard-list-wrapper"
         >
-            <!--song-lang-->
             <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.PROJECT && workspaceDashboardList.length > 0"
                                   :scope-type="SCOPE_TYPE.DOMAIN"
                                   class="dashboard-list"
-                                  :field-title="'Entire Workspace'"
+                                  :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE')"
                                   :dashboard-list="workspaceDashboardList"
             />
-            <!--song-lang-->
             <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.DOMAIN && projectDashboardList.length > 0"
                                   :scope-type="SCOPE_TYPE.PROJECT"
                                   class="dashboard-list"
-                                  :field-title="'Single Project'"
+                                  :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT')"
                                   :dashboard-list="projectDashboardList"
             />
         </div>
@@ -52,13 +49,12 @@
                  src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
             >
             <p-empty class="empty-text">
-                {{ $t('Create a dashboard to get insights at a glance.') }}
+                {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
             </p-empty>
             <p-button icon-left="ic_plus"
                       @click="handleCreateDashboard"
             >
-                <!--song lang-->
-                {{ $t('Create New Dashboard') }}
+                {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREAT_NEW_DASHBOARD') }}
             </p-button>
         </div>
     </div>

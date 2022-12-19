@@ -1,7 +1,6 @@
 <template>
-    <!--song-lang-->
     <p-button-modal :visible.sync="proxyVisible"
-                    :header-title="$t('Add New Widget')"
+                    :header-title="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TITLE')"
                     size="lg"
                     class="dashboard-add-widget-modal"
     >
@@ -53,8 +52,8 @@ export default defineComponent<Props>({
         });
         const tabState = reactive({
             tabs: computed<TabItem[]>(() => ([
-                { name: 'default-widget', label: i18n.t('Default') }, // song-lang
-                // { name: 'custom-widget', label: i18n.t('Custom') }, // song-lang
+                { name: 'default-widget', label: i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_DEFAULT') },
+                // { name: 'custom-widget', label: i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_CUSTOM') },
             ])),
             activeTab: 'default-widget',
         });

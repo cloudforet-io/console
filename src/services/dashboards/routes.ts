@@ -27,8 +27,7 @@ const dashboardsRoute: RouteConfig = {
                 {
                     path: 'all',
                     name: DASHBOARDS_ROUTE.ALL._NAME,
-                    // song lang
-                    meta: { lnbVisible: true, translationId: 'DASHBOARDS.ALL' },
+                    meta: { lnbVisible: true, translationId: 'DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL' },
                     component: AllDashboardsPage,
                 },
                 {

@@ -1,7 +1,6 @@
 <template>
-    <!--    song-lang-->
     <p-button-modal :visible="proxyVisible"
-                    :header-title="$t('Update Dashboard')"
+                    :header-title="$t('DASHBOARDS.FORM.UPDATE_TITLE')"
                     :disabled="!isAllValid"
                     size="sm"
                     class="dashboard-name-edit-modal"
@@ -9,8 +8,7 @@
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <!--            song-lang-->
-            <p-field-group :label="$t('Dashboard Name')"
+            <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_DASHBOARD_NAME')"
                            :invalid="invalidState.name"
                            :invalid-text="invalidTexts.name"
                            required
@@ -35,6 +33,8 @@ import {
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 // import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -83,8 +83,7 @@ export default defineComponent<Props>({
         } = useFormValidator({
             name: '',
         }, {
-            // song-lang
-            name(value: string) { return value.trim().length ? '' : 'Required Field'; },
+            name(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
         });
         const state = reactive({
             proxyVisible: props.visible,

@@ -1,8 +1,7 @@
 <template>
     <section>
         <p-pane-layout>
-            <!--            song-lang-->
-            <p-panel-top title="Viewers" />
+            <p-panel-top :title="$t('DASHBOARDS.CREATE.LABEL_VIEWERS')" />
             <div class="dashboard-viewers-wrapper">
                 <p-radio-group direction="vertical">
                     <div>
@@ -10,12 +9,10 @@
                             :selected="isPublicViewer"
                             @change="handleSelectViewer(DASHBOARD_VIEWER.PUBLIC)"
                         >
-                            <!--                    song-lang-->
-                            Public
+                            {{ $t('DASHBOARDS.CREATE.PUBLIC') }}
                         </p-radio>
                         <p class="viewer-description">
-                            <!--                            song-lang-->
-                            Anyone who has 'view' access in this workspace
+                            {{ $t('DASHBOARDS.CREATE.PUBLIC_DESC') }}
                         </p>
                     </div>
                     <div>
@@ -23,12 +20,10 @@
                             :selected="!isPublicViewer"
                             @change="handleSelectViewer(DASHBOARD_VIEWER.PRIVATE)"
                         >
-                            <!--                    song-lang-->
-                            Private
+                            {{ $t('DASHBOARDS.CREATE.PRIVATE') }}
                         </p-radio>
                         <p class="viewer-description">
-                            <!--                            song-lang-->
-                            Only you
+                            {{ $t('DASHBOARDS.CREATE.PRIVATE_DESC') }}
                         </p>
                     </div>
                 </p-radio-group>

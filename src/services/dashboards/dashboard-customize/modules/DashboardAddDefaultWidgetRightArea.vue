@@ -3,20 +3,17 @@
         <div v-if="!widgetConfigId"
              class="no-selected-wrapper"
         >
-            <!--song-lang-->
-            <span class="title">{{ $t('No Selected Widget') }}</span>
-            <span class="text">{{ $t('Information of the widget selected in the left panel and configurable items are displayed.') }}</span>
+            <span class="title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED') }}</span>
+            <span class="text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED_HELP_TEXT') }}</span>
         </div>
         <div v-else
              class="form-wrapper"
         >
-            <!--song-lang-->
-            <p-field-group :label="$t('Name')"
+            <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
                            :invalid="invalidState.name"
                            :invalid-text="invalidTexts.name"
                            required
             >
-                <!--song-lang-->
                 <p-text-input :value="name"
                               :invalid="invalidState.name"
                               :placeholder="widgetConfig?.title"
@@ -25,7 +22,7 @@
                 />
             </p-field-group>
             <div class="description-text">
-                {{ $t('Displays the top list of 10 highest spending throughout the whole period of filtered date, aggregated by selected Group-By.') }}
+                {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NAME_DESC') }}
             </div>
             <p-json-schema-form v-if="widgetConfig?.widget_options_schema"
                                 :schema="widgetConfig.widget_options_schema"
@@ -45,8 +42,7 @@
                       icon-left="ic_plus_bold"
                       block
             >
-                <!--song-lang-->
-                Add Options
+                {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD_OPTIONS') }}
             </p-button>
         </div>
     </div>
@@ -105,7 +101,7 @@ export default defineComponent<Props>({
         } = useFormValidator({
             name: '',
         }, {
-            name(value: string) { return value.trim().length ? '' : i18n.t('Please enter name.'); },
+            name(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.VALIDATION_NAME'); },
         });
 
         /* Event */

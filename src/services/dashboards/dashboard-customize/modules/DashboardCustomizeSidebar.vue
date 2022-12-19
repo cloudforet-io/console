@@ -1,8 +1,7 @@
 <template>
     <div>
         <portal to="info-title">
-            <!--song-lang-->
-            <span class="sidebar-title">Customize Dashboard</span> <br>
+            <span class="sidebar-title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.SIDEBAR_TITLE') }}</span> <br>
         </portal>
         <portal to="info-contents">
             <div class="sidebar-contents">
@@ -10,15 +9,13 @@
                     <p-toggle-button :value="enableDateRange"
                                      sync
                     />
-                    <!--song-lang-->
-                    <span>Date range Selector</span>
+                    <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_DATE') }}</span>
                 </div>
                 <div class="selector-wrapper">
                     <p-toggle-button :value="enableCurrency"
                                      sync
                     />
-                    <!--song-lang-->
-                    <span>Currency Selector</span>
+                    <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY') }}</span>
                 </div>
                 <p-divider class="divider" />
                 <p-button style-type="tertiary"
@@ -28,8 +25,7 @@
                           class="add-button"
                           @click="handleClickAddWidget"
                 >
-                    <!--song-lang-->
-                    Add Widget
+                    {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD') }}
                 </p-button>
                 <draggable class="draggable-wrapper"
                            ghost-class="ghost"

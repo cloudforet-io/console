@@ -1108,16 +1108,164 @@
 		}
 	},
 	"DASHBOARDS": {
-		"LNB": {
+		"ALL_DASHBOARDS": {
+			"CREAT": "Create",
+			"CREAT_NEW_DASHBOARD": "Create New Dashboard",
+			"DASHBOARDS_TITLE": "Dashboards",
 			"ENTIRE_WORKSPACE": "Entire Workspace",
-			"ONLY_FAVORITE": "Show favorites only",
+			"FILTER_ALL": "All",
+			"FILTER_ENTIRE_WORKSPACE": "Entire Workspace",
+			"FILTER_PRIVATE": "Private",
+			"FILTER_PUBLIC": "Pubilc",
+			"FILTER_SINGLE_PROJECT": "Single Project",
+			"HELP_TEXT_CREATE": "Create a dashboard to get insights at a glance.",
 			"SINGLE_PROJECT": "Single Project",
+			"TOOLTIP_CLONE": "Clone",
+			"TOOLTIP_DELETE": "Delete",
+			"TOOLTIP_EDIT": "Edit",
 			"VIEW_ALL": "View All Dashboards"
 		},
+		"CREATE": {
+			"CANCEL": "Cancel",
+			"CREATE": "Create",
+			"ENTIRE_WORKSPACES": "Entire Workspaces",
+			"LABEL_DEFAULT_TEMPLATE": "Default Template",
+			"LABEL_EXISTING_DASHBOARD": "Existing Dashboard",
+			"LABEL_SCOPE": "Dashboard Scope",
+			"LABEL_START_FROM": "Start From",
+			"LABEL_VIEWERS": "Viewers",
+			"PRIVATE": "Private",
+			"PRIVATE_DESC": "Only you",
+			"PUBLIC": "Public",
+			"PUBLIC_DESC": "Anyone who has 'view' access in this workspace",
+			"SINGLE_PROJECT": "Single Project",
+			"TITLE": "Create New Dashboard",
+			"VALIDATION_PROJECT": "Please Select Project",
+			"VALIDATION_TEMPLATE": "Please Select Template"
+		},
+		"CUSTOMIZE": {
+			"ADD_LABEL": "Click + button to add dashboard's label",
+			"ADD_WIDGET": {
+				"ADD": "Add Widget",
+				"ADD_OPTIONS": "Add Options",
+				"LABEL_CURRENCY": "Currency Selector",
+				"LABEL_DATE": "Date range Selector",
+				"LABEL_NAME": "Name",
+				"NAME_DESC": "Displays the top list of 10 highest spending throughout the whole period of filtered date, aggregated by selected Group-By.",
+				"NO_SELECTED": "No Selected Widget",
+				"NO_SELECTED_HELP_TEXT": "Information of the widget selected in the left panel and configurable items are displayed.",
+				"SIDEBAR_TITLE": "Customize Dashboard",
+				"TAB_ALERT": "Alert",
+				"TAB_ALL": "All",
+				"TAB_ASSET": "Asset",
+				"TAB_COST": "Cost",
+				"TAB_CUSTOM": "Custom",
+				"TAB_DEFAULT": "Default",
+				"TITLE": "Add New Widget",
+				"VALIDATION_NAME": "Please enter name."
+			},
+			"REFRESH_INTERVAL_10M": "10m",
+			"REFRESH_INTERVAL_15S": "15s",
+			"REFRESH_INTERVAL_1H": "1h",
+			"REFRESH_INTERVAL_1M": "1m",
+			"REFRESH_INTERVAL_30M": "30m",
+			"REFRESH_INTERVAL_30S": "30s",
+			"REFRESH_INTERVAL_5M": "5m",
+			"REFRESH_OFF": "off"
+		},
+		"DETAIL": {
+			"AUTO": "Auto",
+			"CLONE": "Clone",
+			"CURRENT_MONTH": "Current month",
+			"CUSTOM": "Custom",
+			"CUSTOMIZE": "Customize",
+			"DEFAULT": "Default",
+			"DELETE": "Delete",
+			"EXPORT": "Export",
+			"PERIOD_CUSTOM": "Custom",
+			"PERIOD_LAST_14_DAYS": "Last 14 days",
+			"PERIOD_LAST_3_MONTHS": "Last 3 months",
+			"PERIOD_LAST_6_MONTHS": "Last 6 months",
+			"PERIOD_LAST_7_DAYS": "Last 7 days",
+			"PERIOD_LAST_MONTH": "Last month",
+			"PERIOD_THIS_MONTH": "This month",
+			"REFRESH": "Auto Refresh",
+			"SET_HOME": "Set as Home Dashboard"
+		},
+		"FORM": {
+			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",
+			"ALT_E_DELETE_DASHBOARD": "Failed to delete dashboard",
+			"ALT_S_DELETE_DASHBOARD": "Success to delete dashboard",
+			"CLONE_TITLE": "Clone Dashboard",
+			"CUSTOM_DATE_FROM": "FROM",
+			"CUSTOM_DATE_TITLE": "Custom Range",
+			"CUSTOM_DATE_TO": "TO",
+			"DATE_HELP_TEXT_ACCUMULATED": "Up to last 12 months",
+			"DATE_HELP_TEXT_DAILY": "Up to 31 days",
+			"DATE_HELP_TEXT_MONTHLY": "Up to last 12 months",
+			"DELETE_TITLE": "Are you sure you want to delete dashboard?",
+			"LABEL_DASHBOARD_NAME": "Dashboard Name",
+			"LABEL_PRIVATE": "Private (Only you)",
+			"LABEL_PUBLIC": "Public (Anyone who has 'view' access to 'dashboards')",
+			"LABEL_VIEWERS": "Viewers",
+			"REQUIRED": "Required Field",
+			"UPDATE_TITLE": "Update Dashboard"
+		},
+		"LNB": {
+			"ONLY_FAVORITE": "Show favorites only"
+		},
 		"WIDGET": {
+			"AWS_CLOUD_FRONT_COST": {
+				"DESC": "Displays the data usage and costs from AWS CloudFront for the selected period, aggregated by 'Group By' option. "
+			},
+			"AWS_DATA_TRANSFER_BY_REGION": {
+				"DESC": "Displays the data usage and costs by Region from AWS Data-Transfer for the selected period."
+			},
+			"AWS_DATA_TRANSFER_COST_TREND": {
+				"DESC": "Displays AWS Data-Transfer cost trend during the selected period. "
+			},
+			"BUDGET_STATUS": {
+				"DESC": "Displays the top 200 highest budget usage during the selected period."
+			},
+			"BUDGET_USAGE_SUMMARY": {
+				"AVAILABLE": "available",
+				"BUDGETS": "budgets",
+				"DESC": "Displays an overview of the total budget consumption along with total cost, budget, and usage rate.",
+				"TOTAL_SPENT": "Total spent"
+			},
+			"BUDGET_USAGE_WITH_FORECAST": {
+				"DESC": "Displays the project-wise budget usage during the selected period, along with shortage forecast. "
+			},
+			"COST_BY_REGION": {
+				"DESC": "Displays the total costs by Region for the selected period. "
+			},
+			"COST_DONUT": {
+				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group By' option. "
+			},
+			"COST_MAP": {
+				"DESC": "Displays proportions of total costs that allow you to compare 10-15 top highest spending for the selected period, aggregated by 'Group By' option."
+			},
+			"COST_PIE": {
+				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group By' option. "
+			},
+			"COST_TREND": {
+				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group By' option. "
+			},
+			"COST_TREND_STACKED": {
+				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group By' option. "
+			},
+			"DATE_PAST_7_DAYS": "Past 7 days",
+			"DATE_TODAY": "Today",
+			"DETAILS": "Details",
+			"EDIT_WIDGET": "Edit Widget",
+			"ERROR_MSG": "There is an error from an incompatibility dashboard's variables and widget options.",
+			"ERROR_TITLE": "Unable to load",
 			"MONTHLY_COST": {
-				"DESC": ""
-			}
+				"CURRENT_MONTH": "Current month",
+				"DESC": "Displays the amount spent between start and end date of the most recent month along with the comparison to prior month for the same period.",
+				"PREVIOUS_MONTH": "Previous month"
+			},
+			"NO_DATA": "No Data"
 		}
 	},
 	"IAM": {

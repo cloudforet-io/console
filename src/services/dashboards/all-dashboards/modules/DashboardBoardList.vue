@@ -125,7 +125,6 @@ export default defineComponent<DashboardBoardListProps>({
         },
     },
     setup(props) {
-        /* song-lang */
         const state = reactive({
             thisPage: 1,
             dashboardScopeType: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? 'domain' : 'project')),
@@ -139,9 +138,8 @@ export default defineComponent<DashboardBoardListProps>({
                 ))),
         });
 
-        /* song-lang */
         const deleteModalState = reactive({
-            headerTitle: i18n.t('Are you sure you want to delete dashboard?'),
+            headerTitle: i18n.t('DASHBOARDS.FORM.DELETE_TITLE'),
             visible: false,
             loading: false,
             selectedId: undefined as string|undefined,
@@ -166,11 +164,9 @@ export default defineComponent<DashboardBoardListProps>({
                     });
                     await store.dispatch('dashboard/loadProjectDashboard');
                 }
-                /* song-lang */
-                showSuccessMessage(i18n.t('Successed to delete dashboard'), '');
+                showSuccessMessage(i18n.t('DASHBOARDS.FORM.ALT_S_DELETE_DASHBOARD'), '');
             } catch (e) {
-                /* song-lang */
-                ErrorHandler.handleRequestError(e, i18n.t('Failed to delete dashboard'));
+                ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
             } finally {
                 deleteModalState.loading = false;
                 deleteModalState.visible = false;
@@ -178,11 +174,10 @@ export default defineComponent<DashboardBoardListProps>({
             }
         };
 
-        /* song-lang */
         const convertBoardItemButtonSet = (dashboardId) => [
             {
                 iconName: 'ic_edit',
-                tooltipText: i18n.t('Edit'),
+                tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
                 eventAction: () => {
                     SpaceRouter.router.push({
                         name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
@@ -192,12 +187,12 @@ export default defineComponent<DashboardBoardListProps>({
             },
             {
                 iconName: 'ic_duplicate',
-                tooltipText: i18n.t('Clone'),
+                tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
                 eventAction: () => console.log('dup!'),
             },
             {
                 iconName: 'ic_trashcan',
-                tooltipText: i18n.t('Delete'),
+                tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
                 /* TODO: Implementation */
                 eventAction: () => handleClickDeleteDashboard(dashboardId),
             },

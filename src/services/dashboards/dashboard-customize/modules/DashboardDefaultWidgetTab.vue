@@ -56,11 +56,10 @@ export default {
         });
         const tabState = reactive({
             tabs: computed<TabItem[]>(() => [
-                // song-lang
-                { name: 'all', label: `${i18n.t('All')} (${getWidgetConfigsByLabel('all').length})` },
-                { name: 'Cost', label: `${i18n.t('Cost')} (${getWidgetConfigsByLabel('Cost').length})` },
-                { name: 'Asset', label: `${i18n.t('Asset')} (${getWidgetConfigsByLabel('Asset').length})` },
-                { name: 'Alert', label: `${i18n.t('Alert')} (${getWidgetConfigsByLabel('Alert').length})` },
+                { name: 'all', label: `${i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_ALL')} (${getWidgetConfigsByLabel('all').length})` },
+                { name: 'Cost', label: `${i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_COST')} (${getWidgetConfigsByLabel('Cost').length})` },
+                { name: 'Asset', label: `${i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_ASSET')} (${getWidgetConfigsByLabel('Asset').length})` },
+                { name: 'Alert', label: `${i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_ALERT')} (${getWidgetConfigsByLabel('Alert').length})` },
             ]),
             activeTab: 'all',
         });

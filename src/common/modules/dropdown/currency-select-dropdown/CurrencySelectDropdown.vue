@@ -45,6 +45,7 @@ import { PSelectDropdown, PBadge } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
@@ -76,8 +77,7 @@ export default {
                 type: 'item',
                 name: currency,
                 label: `${CURRENCY_SYMBOL[currency]}${currency}`,
-                // song-lang
-                badge: currency === props.defaultCurrency ? 'Default' : '',
+                badge: currency === props.defaultCurrency ? i18n.t('DASHBOARDS.DETAIL.DEFAULT') : '',
             }))),
         });
 

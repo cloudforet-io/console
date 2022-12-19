@@ -1108,16 +1108,164 @@
 		}
 	},
 	"DASHBOARDS": {
-		"LNB": {
+		"ALL_DASHBOARDS": {
+			"CREAT": "",
+			"CREAT_NEW_DASHBOARD": "",
+			"DASHBOARDS_TITLE": "",
 			"ENTIRE_WORKSPACE": "",
-			"ONLY_FAVORITE": "",
+			"FILTER_ALL": "",
+			"FILTER_ENTIRE_WORKSPACE": "",
+			"FILTER_PRIVATE": "",
+			"FILTER_PUBLIC": "",
+			"FILTER_SINGLE_PROJECT": "",
+			"HELP_TEXT_CREATE": "",
 			"SINGLE_PROJECT": "",
+			"TOOLTIP_CLONE": "",
+			"TOOLTIP_DELETE": "",
+			"TOOLTIP_EDIT": "",
 			"VIEW_ALL": ""
 		},
+		"CREATE": {
+			"CANCEL": "",
+			"CREATE": "",
+			"ENTIRE_WORKSPACES": "",
+			"LABEL_DEFAULT_TEMPLATE": "",
+			"LABEL_EXISTING_DASHBOARD": "",
+			"LABEL_SCOPE": "",
+			"LABEL_START_FROM": "",
+			"LABEL_VIEWERS": "",
+			"PRIVATE": "",
+			"PRIVATE_DESC": "",
+			"PUBLIC": "",
+			"PUBLIC_DESC": "",
+			"SINGLE_PROJECT": "",
+			"TITLE": "",
+			"VALIDATION_PROJECT": "",
+			"VALIDATION_TEMPLATE": ""
+		},
+		"CUSTOMIZE": {
+			"ADD_LABEL": "",
+			"ADD_WIDGET": {
+				"ADD": "",
+				"ADD_OPTIONS": "",
+				"LABEL_CURRENCY": "",
+				"LABEL_DATE": "",
+				"LABEL_NAME": "",
+				"NAME_DESC": "",
+				"NO_SELECTED": "",
+				"NO_SELECTED_HELP_TEXT": "",
+				"SIDEBAR_TITLE": "",
+				"TAB_ALERT": "",
+				"TAB_ALL": "",
+				"TAB_ASSET": "",
+				"TAB_COST": "",
+				"TAB_CUSTOM": "",
+				"TAB_DEFAULT": "",
+				"TITLE": "",
+				"VALIDATION_NAME": ""
+			},
+			"REFRESH_INTERVAL_10M": "",
+			"REFRESH_INTERVAL_15S": "",
+			"REFRESH_INTERVAL_1H": "",
+			"REFRESH_INTERVAL_1M": "",
+			"REFRESH_INTERVAL_30M": "",
+			"REFRESH_INTERVAL_30S": "",
+			"REFRESH_INTERVAL_5M": "",
+			"REFRESH_OFF": ""
+		},
+		"DETAIL": {
+			"AUTO": "",
+			"CLONE": "",
+			"CURRENT_MONTH": "",
+			"CUSTOM": "",
+			"CUSTOMIZE": "",
+			"DEFAULT": "",
+			"DELETE": "",
+			"EXPORT": "",
+			"PERIOD_CUSTOM": "",
+			"PERIOD_LAST_14_DAYS": "",
+			"PERIOD_LAST_3_MONTHS": "",
+			"PERIOD_LAST_6_MONTHS": "",
+			"PERIOD_LAST_7_DAYS": "",
+			"PERIOD_LAST_MONTH": "",
+			"PERIOD_THIS_MONTH": "",
+			"REFRESH": "",
+			"SET_HOME": ""
+		},
+		"FORM": {
+			"ALT_E_CREATE_DASHBOARD": "",
+			"ALT_E_DELETE_DASHBOARD": "",
+			"ALT_S_DELETE_DASHBOARD": "",
+			"CLONE_TITLE": "",
+			"CUSTOM_DATE_FROM": "",
+			"CUSTOM_DATE_TITLE": "",
+			"CUSTOM_DATE_TO": "",
+			"DATE_HELP_TEXT_ACCUMULATED": "",
+			"DATE_HELP_TEXT_DAILY": "",
+			"DATE_HELP_TEXT_MONTHLY": "",
+			"DELETE_TITLE": "",
+			"LABEL_DASHBOARD_NAME": "",
+			"LABEL_PRIVATE": "",
+			"LABEL_PUBLIC": "",
+			"LABEL_VIEWERS": "",
+			"REQUIRED": "",
+			"UPDATE_TITLE": ""
+		},
+		"LNB": {
+			"ONLY_FAVORITE": ""
+		},
 		"WIDGET": {
-			"MONTHLY_COST": {
+			"AWS_CLOUD_FRONT_COST": {
 				"DESC": ""
-			}
+			},
+			"AWS_DATA_TRANSFER_BY_REGION": {
+				"DESC": ""
+			},
+			"AWS_DATA_TRANSFER_COST_TREND": {
+				"DESC": ""
+			},
+			"BUDGET_STATUS": {
+				"DESC": ""
+			},
+			"BUDGET_USAGE_SUMMARY": {
+				"AVAILABLE": "",
+				"BUDGETS": "",
+				"DESC": "",
+				"TOTAL_SPENT": ""
+			},
+			"BUDGET_USAGE_WITH_FORECAST": {
+				"DESC": ""
+			},
+			"COST_BY_REGION": {
+				"DESC": ""
+			},
+			"COST_DONUT": {
+				"DESC": ""
+			},
+			"COST_MAP": {
+				"DESC": ""
+			},
+			"COST_PIE": {
+				"DESC": ""
+			},
+			"COST_TREND": {
+				"DESC": ""
+			},
+			"COST_TREND_STACKED": {
+				"DESC": ""
+			},
+			"DATE_PAST_7_DAYS": "",
+			"DATE_TODAY": "",
+			"DETAILS": "",
+			"EDIT_WIDGET": "",
+			"ERROR_MSG": "",
+			"ERROR_TITLE": "",
+			"MONTHLY_COST": {
+				"CURRENT_MONTH": "",
+				"DESC": "",
+				"PREVIOUS_MONTH": ""
+			},
+			"NO_DATA": ""
 		}
 	},
 	"IAM": {

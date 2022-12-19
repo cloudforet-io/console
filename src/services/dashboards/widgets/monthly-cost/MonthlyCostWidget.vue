@@ -6,8 +6,7 @@
         <div class="monthly-cost">
             <div class="cost">
                 <p class="cost-label">
-                    <!-- song-lang -->
-                    Current month
+                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.CURRENT_MONTH') }}
                 </p>
                 <div class="cost-value">
                     {{ currencyMoneyFormatter(state.currentMonthlyCost, state.options.currency) }}
@@ -32,8 +31,7 @@
             <p-divider />
             <div class="cost">
                 <p class="cost-label">
-                    <!-- song-lang -->
-                    Previous month
+                    {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.PREVIOUS_MONTH') }}
                 </p>
                 <div class="cost-value">
                     {{ currencyMoneyFormatter(state.previousMonthlyCost, state.options.currency) }}
