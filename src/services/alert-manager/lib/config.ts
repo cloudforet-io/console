@@ -23,10 +23,11 @@ export const ALERT_ACTION = {
 } as const;
 export type AlertAction = typeof ALERT_ACTION[keyof typeof ALERT_ACTION];
 
-export enum SCOPE {
-    global = 'GLOBAL',
-    project = 'PROJECT',
-}
+export const SCOPE = {
+    DOMAIN: 'DOMAIN',
+    PROJECT: 'PROJECT',
+} as const;
+export type ScopeType = typeof SCOPE[keyof typeof SCOPE];
 
 export enum FINISH_CONDITION {
     acknowledged = 'ACKNOWLEDGED',

@@ -56,6 +56,10 @@
                       :loading="deleteModalState.loading"
                       @confirm="handleDeleteDashboardConfirm"
         />
+        <dashboard-clone-modal :visible.sync="cloneModalState.visible"
+                               :dashboard="cloneModalState.dashboardConfig"
+                               @update:visible="handleUpdateCloneModal"
+        />
     </div>
 </template>
 
@@ -87,8 +91,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/services/dashboards/config';
+import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
-import type { DashboardScope } from '@/services/dashboards/type';
+import type { DashboardScope, DashboardConfig } from '@/services/dashboards/type';
 
 const PAGE_SIZE = 10;
 
@@ -102,6 +107,7 @@ interface DashboardBoardListProps {
 export default defineComponent<DashboardBoardListProps>({
     name: 'DashboardBoardList',
     components: {
+        DashboardCloneModal,
         PI,
         DeleteModal,
         PPagination,
@@ -128,12 +134,13 @@ export default defineComponent<DashboardBoardListProps>({
         const state = reactive({
             thisPage: 1,
             dashboardScopeType: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? 'domain' : 'project')),
+            dashboardScopeTypeForView: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? 'Workspace' : 'Project')),
             dashboardListByBoardSets: computed(() => props.dashboardList
                 .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
                 .map((d) => (
                     {
                         ...d,
-                        iconButtonSets: convertBoardItemButtonSet(d[`${state.dashboardScopeType}_dashboard_id`]),
+                        iconButtonSets: convertBoardItemButtonSet(d),
                     }
                 ))),
         });
@@ -144,6 +151,53 @@ export default defineComponent<DashboardBoardListProps>({
             loading: false,
             selectedId: undefined as string|undefined,
         });
+
+        const cloneModalState = reactive({
+            visible: false,
+            dashboardConfig: {} as DashboardConfig,
+        });
+
+        /* song-lang */
+        const convertBoardItemButtonSet = (dashboardItem) => [
+            {
+                iconName: 'ic_edit',
+                tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
+                eventAction: () => {
+                    SpaceRouter.router.push({
+                        name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                        params: { dashboardId: dashboardItem[`${state.dashboardScopeType}_dashboard_id`] },
+                    });
+                },
+            },
+            {
+                iconName: 'ic_duplicate',
+                tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
+                eventAction: () => {
+                    cloneModalState.visible = true;
+                    cloneModalState.dashboardConfig = {
+                        name: dashboardItem.name,
+                        layouts: dashboardItem.layouts,
+                        dashboard_options: dashboardItem.dashboard_options,
+                        settings: dashboardItem.settings,
+                        dashboard_options_schema: dashboardItem.dashboard_options_schema,
+                        labels: dashboardItem.labels,
+                    };
+                    console.log(cloneModalState.dashboardConfig);
+                },
+            },
+            {
+                iconName: 'ic_trashcan',
+                tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
+                /* TODO: Implementation */
+                eventAction: () => handleClickDeleteDashboard(dashboardItem[`${state.dashboardScopeType}_dashboard_id`]),
+            },
+        ];
+
+        /* EVENT */
+        const handleUpdateCloneModal = (visible) => {
+            if (visible) return;
+            cloneModalState.dashboardConfig = {} as DashboardConfig;
+        };
 
         const handleClickDeleteDashboard = (dashboardId) => {
             deleteModalState.selectedId = dashboardId;
@@ -174,30 +228,6 @@ export default defineComponent<DashboardBoardListProps>({
             }
         };
 
-        const convertBoardItemButtonSet = (dashboardId) => [
-            {
-                iconName: 'ic_edit',
-                tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
-                eventAction: () => {
-                    SpaceRouter.router.push({
-                        name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-                        params: { id: dashboardId },
-                    });
-                },
-            },
-            {
-                iconName: 'ic_duplicate',
-                tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
-                eventAction: () => console.log('dup!'),
-            },
-            {
-                iconName: 'ic_trashcan',
-                tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
-                /* TODO: Implementation */
-                eventAction: () => handleClickDeleteDashboard(dashboardId),
-            },
-        ];
-
         const labelQueryHelper = new QueryHelper();
         const handleSetQuery = (selectedLabel: ConsoleFilter | ConsoleFilter[]) => {
             labelQueryHelper.setFilters(store.state.dashboard.searchFilters).addFilter({ k: 'label', o: '=', v: selectedLabel });
@@ -214,9 +244,11 @@ export default defineComponent<DashboardBoardListProps>({
         return {
             ...toRefs(state),
             deleteModalState,
+            cloneModalState,
             handleSetQuery,
             handlePage,
             handleDeleteDashboardConfirm,
+            handleUpdateCloneModal,
             FAVORITE_TYPE,
             DASHBOARD_SCOPE,
             DASHBOARD_VIEWER,

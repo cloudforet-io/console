@@ -8,7 +8,9 @@ import type {
 } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { flatten, forEach } from 'lodash';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilterOperator, ConsoleFilterValue, ConsoleFilter } from '@cloudforet/core-lib/query/type';
+
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
@@ -147,12 +149,30 @@ export const useQueryTags = ({ keyItemSets, referenceStore }: Options) => {
         state.queryTags = queryTags;
     };
 
+    const queryHelper = new QueryHelper();
+    const setURLQueryStringFilters = (rawQueryStrings: undefined|string|(string|null)[]) => {
+        queryHelper.setFiltersAsRawQueryString(rawQueryStrings);
+        setFilters(queryHelper.filters);
+    };
+
+
+    const getFilters = () => state.filters;
+
+    const getQueryTags = () => state.queryTags;
+
+    const getURLQueryStringFilters = () => queryHelper.setFilters(state.filters).rawQueryStrings;
+
     return {
         keyItemSets: computed(() => state.keyItemSets),
-        filters: computed(() => state.filters),
-        queryTags: computed(() => state.queryTags),
+        filters: computed<ConsoleFilter[]>(() => state.filters),
+        queryTags: computed<QueryTag[]>(() => state.queryTags),
+        urlQueryStringFilters: computed<string>(() => ''),
         setKeyItemSets,
         setFilters,
+        getFilters,
         setQueryTags,
+        getQueryTags,
+        setURLQueryStringFilters,
+        getURLQueryStringFilters,
     };
 };

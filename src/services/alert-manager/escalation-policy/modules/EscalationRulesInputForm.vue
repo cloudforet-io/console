@@ -10,7 +10,7 @@
             <span class="col-rule">
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RULE') }}
             </span>
-            <p-anchor v-if="scope === SCOPE.project && projectId"
+            <p-anchor v-if="scope === SCOPE.PROJECT && projectId"
                       class="link-text"
                       :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATIONS_SETTINGS')"
                       :to="{ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: { id: projectId } }"

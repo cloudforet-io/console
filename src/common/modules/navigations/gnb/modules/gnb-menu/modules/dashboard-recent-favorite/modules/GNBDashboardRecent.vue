@@ -5,20 +5,25 @@
                        :class="{ loading: loading && !recentDashboardItems.length }"
         >
             <div class="gnb-dashboard-recent-list">
-                <g-n-b-sub-menu v-for="(item) in recentDashboardItems"
-                                :key="`recent-${item.label}-${item.name}`"
-                                class="dashboard-recent-item"
-                                :label="item.label"
-                                :to="dashboardRouteFormatter(item.name)"
-                >
-                    <template #extra-mark>
-                        <favorite-button class="favorite-button"
-                                         :item-id="item.name"
-                                         :favorite-type="item.itemType"
-                                         scale="0.65"
-                        />
-                    </template>
-                </g-n-b-sub-menu>
+                <div @click="hideMenu">
+                    <g-n-b-sub-menu v-for="(item) in recentDashboardItems"
+                                    :key="`recent-${item.label}-${item.itemId}`"
+                                    class="dashboard-recent-item"
+                                    :label="item.label"
+                                    :to="dashboardRouteFormatter(item.itemId)"
+                                    @mouseenter.native="hoveredItem = item.itemId"
+                                    @mouseleave.native="hoveredItem = ''"
+                    >
+                        <template #extra-mark>
+                            <favorite-button class="favorite-button"
+                                             :item-id="item.itemId"
+                                             :favorite-type="item.itemType"
+                                             :visible-active-case-only="!getIsHovered(item.itemId)"
+                                             scale="0.65"
+                            />
+                        </template>
+                    </g-n-b-sub-menu>
+                </div>
             </div>
             <template #no-data>
                 <div class="no-data">
@@ -36,13 +41,13 @@
 
 <script lang="ts">
 
+import type { PropType, SetupContext } from 'vue';
 import {
     computed,
-    defineComponent, reactive, toRefs,
+    defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-import { sortBy } from 'lodash';
 
 import { store } from '@/store';
 
@@ -54,11 +59,15 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
+import type {
+    GNBDashboardMenuItem,
+} from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/type';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 interface Props {
     visible: boolean;
+    dashboardList: GNBDashboardMenuItem[];
 }
 
 export default defineComponent<Props>({
@@ -73,55 +82,59 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
+        dashboardList: {
+            type: Array as PropType<GNBDashboardMenuItem[]>,
+            default: () => ([]),
+        },
     },
-    setup() {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
             loading: false,
-            // load from dashboard api
-            dashboardList: [
-                { name: 'dashboard1', dashboardId: '1' },
-                { name: 'dashboard2', dashboardId: '2' },
-                { name: 'dashboard3', dashboardId: '3' },
-                { name: 'dashboard4', dashboardId: '4' },
-                { name: 'dashboard5', dashboardId: '5' },
-                { name: 'dashboard6', dashboardId: '6' },
-                { name: 'dashboard7', dashboardId: '7' },
-                { name: 'dashboard8', dashboardId: '8' },
-            ],
             recents: computed<RecentConfig[]>(() => store.state.recent.dashboardItems),
             recentDashboardItems: computed<RecentItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
                 const recentItemList = [] as RecentItem[];
                 state.recents.forEach((recent) => {
-                    state.dashboardList.forEach((dashboard) => {
+                    props.dashboardList.forEach((dashboard) => {
                         if (recent.itemId === dashboard.dashboardId) {
                             recentItemList.push({
                                 itemId: dashboard.dashboardId,
                                 label: dashboard.name,
-                                name: dashboard.name,
+                                name: dashboard.dashboardId,
                                 itemType: RECENT_TYPE.DASHBOARD,
                                 updatedAt: recent.updatedAt,
                             });
                         }
                     });
                 });
-                return isUserAccessible ? sortBy(recentItemList, (recent) => recent.updatedAt).reverse() : [];
+                return isUserAccessible ? recentItemList : [];
             }),
+            hoveredItem: '',
         });
 
         const dashboardRouteFormatter = (id) => ({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: { dashboardId: id },
         });
-        /* Init */
-        (async () => {
-            state.loading = true;
-            await store.dispatch('recent/load', { type: RECENT_TYPE.DASHBOARD });
-            state.loading = false;
-        })();
+        const getIsHovered = (itemId: string):boolean => !!(state.hoveredItem && state.hoveredItem === itemId);
+        const hideMenu = () => {
+            emit('close');
+        };
+
+        /* Watcher */
+        watch(() => props.visible, async (visible) => {
+            if (visible) {
+                state.loading = true;
+                await store.dispatch('recent/load', { itemType: RECENT_TYPE.DASHBOARD });
+                state.loading = false;
+            }
+        }, { immediate: true });
+
         return {
             ...toRefs(state),
             dashboardRouteFormatter,
+            getIsHovered,
+            hideMenu,
         };
     },
 });
@@ -145,14 +158,6 @@ export default defineComponent<Props>({
         max-height: unset;
         .dashboard-recent-item {
             width: 100%;
-            .favorite-button {
-                visibility: hidden;
-            }
-            &:hover {
-                .favorite-button {
-                    visibility: visible;
-                }
-            }
         }
     }
 

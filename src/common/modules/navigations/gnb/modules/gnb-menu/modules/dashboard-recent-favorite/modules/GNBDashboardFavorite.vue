@@ -44,9 +44,9 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
-    computed, nextTick, reactive, toRefs,
+    computed, defineComponent, nextTick, reactive, toRefs,
 } from 'vue';
 import draggable from 'vuedraggable';
 
@@ -57,13 +57,15 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import type { DomainDashboardModel, ProjectDashboardModel } from '@/store/modules/dashboard/type';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
+import type {
+    GNBDashboardMenuItem,
+} from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/type';
 import type { SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 
@@ -71,14 +73,11 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-const FAVORITE_LIMIT = 5;
-
-interface DashboardListModel {
-    name: string;
-    dashboardId: string;
+interface Props {
+    dashboardList: GNBDashboardMenuItem[];
 }
 
-export default {
+export default defineComponent<Props>({
     name: 'GNBDashboardFavorite',
     components: {
         FavoriteButton,
@@ -86,34 +85,19 @@ export default {
         PDataLoader,
         draggable,
     },
-    props: {},
+    props: {
+        dashboardList: {
+            type: Array as PropType<GNBDashboardMenuItem[]>,
+            default: () => ([]),
+        },
+    },
     setup(props, { emit }: SetupContext) {
-        const storeState = reactive({
-            domainItems: computed<DomainDashboardModel[]>(() => store.state.dashboard.domainItems),
-            projectItems: computed<ProjectDashboardModel[]>(() => store.state.dashboard.projectItems),
-        });
         const state = reactive({
             loading: true,
             favoriteDashboardIdList: computed<FavoriteItem[]>(() => store.state.favorite.dashboardItems),
-            dashboardList: computed<DashboardListModel[]>(() => {
-                const dashboardList: DashboardListModel[] = [];
-                storeState.domainItems.forEach((domainItem) => {
-                    dashboardList.push({
-                        name: domainItem.name,
-                        dashboardId: domainItem.domain_dashboard_id,
-                    });
-                });
-                storeState.projectItems.forEach((projectItem) => {
-                    dashboardList.push({
-                        name: projectItem.name,
-                        dashboardId: projectItem.project_dashboard_id,
-                    });
-                });
-                return dashboardList;
-            }),
             favoriteDashboardList: computed<FavoriteItem[]>(() => {
                 const favoriteList: FavoriteItem[] = [];
-                state.dashboardList.forEach((dashboard) => {
+                props.dashboardList.forEach((dashboard) => {
                     const isFavoriteDashboard = !!(state.favoriteDashboardIdList ?? []).filter((d) => dashboard.dashboardId === d.itemId).length;
                     if (isFavoriteDashboard) {
                         favoriteList.push({
@@ -206,12 +190,7 @@ export default {
         /* Init */
         (async () => {
             state.loading = true;
-            await Promise.allSettled([
-                getFavoriteOrderList(),
-                store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
-                store.dispatch('dashboard/loadDomainDashboard'),
-                store.dispatch('dashboard/loadProjectDashboard'),
-            ]);
+            await getFavoriteOrderList();
             state.loading = false;
             await nextTick();
             emit('update:is-overflown', isOverflown());
@@ -220,14 +199,13 @@ export default {
         return {
             ...toRefs(state),
             FAVORITE_TYPE,
-            FAVORITE_LIMIT,
             handleClickMenuButton,
             handleSelect,
             dashboardRouteFormatter,
             hideMenu,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .gnb-dashboard-favorite {

@@ -25,10 +25,10 @@
                 />
             </span>
 
-            <div v-if="isOpened && hasCustomMenu"
+            <div v-show="isOpened && hasCustomMenu"
                  class="custom-menu-wrapper"
             >
-                <g-n-b-dashboard-menu v-if="menuId === MENU_ID.DASHBOARDS"
+                <g-n-b-dashboard-menu v-show="menuId === MENU_ID.DASHBOARDS"
                                       @close="hideMenu"
                 />
             </div>

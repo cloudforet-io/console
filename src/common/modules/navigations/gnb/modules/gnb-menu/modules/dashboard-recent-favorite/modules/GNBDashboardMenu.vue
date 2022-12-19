@@ -4,12 +4,16 @@
                :active-tab.sync="activeTab"
         >
             <template #favorite>
-                <g-n-b-dashboard-favorite @close="hideMenu"
+                <g-n-b-dashboard-favorite :dashboard-list="dashboardList"
+                                          @close="hideMenu"
                                           @update:is-overflown="handleOverflown"
                 />
             </template>
             <template #recent>
-                <g-n-b-dashboard-recent :visible="activeTab === 'recent'" />
+                <g-n-b-dashboard-recent :visible="activeTab === 'recent'"
+                                        :dashboard-list="dashboardList"
+                                        @close="hideMenu"
+                />
             </template>
             <template #footer>
                 <div class="footer-wrapper">
@@ -42,17 +46,25 @@ import {
 import { PTab } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { DomainDashboardModel, ProjectDashboardModel } from '@/store/modules/dashboard/type';
 import type { DisplayMenu } from '@/store/modules/display/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardFavorite
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardFavorite.vue';
 import GNBDashboardRecent
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardRecent.vue';
+import type {
+    GNBDashboardMenuItem,
+} from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/type';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+
+
 
 export default defineComponent({
     name: 'GNBDashboardMenu',
@@ -63,6 +75,10 @@ export default defineComponent({
         GNBSubMenu,
     },
     setup(props, { emit }: SetupContext) {
+        const storeState = reactive({
+            domainItems: computed<DomainDashboardModel[]>(() => store.state.dashboard.domainItems),
+            projectItems: computed<ProjectDashboardModel[]>(() => store.state.dashboard.projectItems),
+        });
         const state = reactive({
             tabs: computed(() => ([
                 { label: i18n.t('COMMON.GNB.FAVORITES.FAVORITES'), name: 'favorite', keepAlive: true },
@@ -80,11 +96,38 @@ export default defineComponent({
                 },
             ] as DisplayMenu[],
             isOverflown: false,
+            dashboardList: computed<GNBDashboardMenuItem[]>(() => {
+                const dashboardList: GNBDashboardMenuItem[] = [];
+                storeState.domainItems.forEach((domainItem) => {
+                    dashboardList.push({
+                        name: domainItem.name,
+                        dashboardId: domainItem.domain_dashboard_id,
+                    });
+                });
+                storeState.projectItems.forEach((projectItem) => {
+                    dashboardList.push({
+                        name: projectItem.name,
+                        dashboardId: projectItem.project_dashboard_id,
+                    });
+                });
+                return dashboardList;
+            }),
         });
-        const hideMenu = () => { emit('close'); };
+        const hideMenu = () => {
+            emit('close');
+        };
         const handleOverflown = (isOverflown: boolean) => {
             state.isOverflown = isOverflown;
         };
+
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
+                store.dispatch('dashboard/loadDomainDashboard'),
+                store.dispatch('dashboard/loadProjectDashboard'),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
             hideMenu,

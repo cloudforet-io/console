@@ -52,7 +52,7 @@
                     <p-button class="text-button"
                               style-type="tertiary"
                               size="sm"
-                              :disabled="!hasManagePermission || escalationPolicy.scope === SCOPE.global"
+                              :disabled="!hasManagePermission || escalationPolicy.scope === SCOPE.DOMAIN"
                               @click="onClickUpdateEscalationPolicy"
                     >
                         {{ $t('PROJECT.DETAIL.ALERT.UPDATE') }}
