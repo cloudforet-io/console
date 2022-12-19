@@ -9,7 +9,7 @@ export type DashboardViewer = keyof typeof DASHBOARD_VIEWER;
 type DomainDashboardScope = 'DOMAIN'|'USER'; // DOMAIN: Viewer is Public, USER: Viewer is Private
 type ProjectDashboardScope = 'PROJECT'|'USER';
 
-interface DashboardConfig {
+export interface DashboardConfig {
     name: string;
     layouts: DashboardLayoutWidgetInfo[][];
     dashboard_options: object,
