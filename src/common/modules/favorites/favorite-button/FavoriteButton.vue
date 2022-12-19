@@ -90,6 +90,7 @@ export default defineComponent<FavoriteButtonProps>({
         };
 
         let stopWatch: WatchStopHandle;
+        // eslint-disable-next-line prefer-const
         stopWatch = watch([() => state.hasLoaded, () => state.isLoading], async ([hasLoaded, isLoading]) => {
             if (hasLoaded) {
                 if (stopWatch) stopWatch();

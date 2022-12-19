@@ -255,7 +255,6 @@ export default defineComponent<Props>({
 
                 // 'image' is default type
                 if (!element) throw Error('[PdfDownloadOverlay] image type item must have element.');
-                console.log('element', element);
                 const imageUrl = await toPng(element);
                 if (!imageUrl.split(':')[1]?.split(',')[1]) {
                     return {} as Content;
