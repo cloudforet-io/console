@@ -33,6 +33,8 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { i18n } from '@/translations';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -82,8 +84,7 @@ export default defineComponent<Props>({
         } = useFormValidator({
             name: '',
         }, {
-            // song-lang
-            name(value: string) { return value.trim().length ? '' : 'Required Field'; },
+            name(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
         });
         const state = reactive({
             proxyVisible: props.visible,

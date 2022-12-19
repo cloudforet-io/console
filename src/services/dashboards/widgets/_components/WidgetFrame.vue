@@ -16,18 +16,16 @@
                  class="error-container"
             >
                 <div class="error-title">
-                    <span>{{ $t('Unable to load') }}</span>
+                    <span>{{ $t('DASHBOARDS.WIDGET.ERROR_TITLE') }}</span>
                 </div>
-                <!--song-lang-->
                 <span class="error-message">
-                    {{ $t("There is an error from an incompatibility dashboard's variables and widget options.") }}
+                    {{ $t("DASHBOARDS.WIDGET.ERROR_MSG") }}
                 </span>
                 <p-button class="edit-button"
                           style-type="tertiary"
                           @click="handleEditButtonClick"
                 >
-                    <!--song-lang-->
-                    {{ $t('Edit Widget') }}
+                    {{ $t('DASHBOARDS.WIDGET.EDIT_WIDGET') }}
                 </p-button>
             </div>
         </div>
@@ -230,8 +228,8 @@ export default defineComponent<Props>({
                 if (start && !end) {
                     const today = dayjs();
                     const diff = today.diff(start, 'day', true);
-                    if (diff < 1) return i18n.t('Today'); // song-lang
-                    if (diff >= 6 && diff < 7) return i18n.t('Past 7 days'); // song-lang
+                    if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
+                    if (diff >= 6 && diff < 7) return i18n.t('DASHBOARDS.WIDGET.DATE_PAST_7_DAYS');
                     return i18nDayjs.value(start).from(today.subtract(1, 'day'));
                 }
                 return undefined;

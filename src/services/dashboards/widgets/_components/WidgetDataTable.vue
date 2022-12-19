@@ -53,8 +53,7 @@
                                  class="no-data-wrapper"
                                  :colspan="fields.length"
                         >
-                            <!--song-lang-->
-                            {{ $t('No Data') }}
+                            {{ $t('DASHBOARDS.WIDGET.NO_DATA') }}
                         </p-empty>
                         <slot v-else
                               name="body"
@@ -118,7 +117,7 @@
                                             </span>
                                             <template v-if="field?.detailOptions?.enabled">
                                                 <p-popover position="bottom">
-                                                    <span class="detail">Details</span><!--song-lang-->
+                                                    <span class="detail">{{ $t('DASHBOARDS.WIDGET.DETAILS') }}</span>
                                                     <template #content>
                                                         <div class="popover-content">
                                                             <slot :name="`detail-${field.name}`"

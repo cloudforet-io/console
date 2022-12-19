@@ -43,7 +43,6 @@ export default defineComponent({
     name: 'DashboardsLNB',
     components: { LNB, PIconButton },
     setup() {
-        /* song-lang */
         const state = reactive({
             loading: true,
             showFavoriteOnly: false,
@@ -76,16 +75,16 @@ export default defineComponent({
             menuSet: computed<LNBMenu[]>(() => [
                 {
                     type: 'item',
-                    label: 'View All Dashboards', // song-lang
+                    label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
                     id: MENU_ID.DASHBOARDS,
                     foldable: false,
                     to: { name: DASHBOARDS_ROUTE.ALL._NAME },
                 },
                 { type: 'divider' },
                 { type: 'favorite-only' },
-                { type: 'top-title', label: i18n.t('Entire Workspace') },
+                { type: 'top-title', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE') },
                 ...filterFavoriteItems(state.workSpaceMenuSet),
-                { type: 'top-title', label: i18n.t('Single Project') },
+                { type: 'top-title', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT') },
                 ...filterFavoriteItems(state.projectMenuSet),
             ]),
         });

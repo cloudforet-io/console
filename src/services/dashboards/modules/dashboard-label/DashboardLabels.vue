@@ -21,11 +21,10 @@
                       v-model="state.inputText"
         />
 
-        <!--            song-lang-->
         <span v-if="!state.inputMode && !state.labelList.length && props.editable"
               class="dashboard-labels-add-info"
         >
-            Click + button to add dashboard's label
+            {{ $t('DASHBOARDS.CUSTOMIZE.ADD_LABEL') }}
         </span>
     </div>
 </template>

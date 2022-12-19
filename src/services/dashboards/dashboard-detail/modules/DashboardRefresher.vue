@@ -1,11 +1,10 @@
 <template>
     <div class="dashboard-refresher">
-        <!--song-lang-->
-        <span class="label">{{ $t('Auto Refresh') }}: {{ interval }}</span><p-icon-button class="icon-button"
-                                                                                          name="ic_renew"
-                                                                                          style-type="tertiary"
-                                                                                          shape="square"
-                                                                                          :animation="loading ? 'reserve-spin' : undefined"
+        <span class="label">{{ $t('DASHBOARDS.DETAIL.REFRESH') }}: {{ interval }}</span><p-icon-button class="icon-button"
+                                                                                                       name="ic_renew"
+                                                                                                       style-type="tertiary"
+                                                                                                       shape="square"
+                                                                                                       :animation="loading ? 'reserve-spin' : undefined"
         />
     </div>
 </template>

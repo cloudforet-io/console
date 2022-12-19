@@ -76,14 +76,14 @@ export default defineComponent<Props>({
         const state = reactive({
             interval: props.defaultInterval,
             intervalList: computed<{label: TranslateResult; value: RefreshInterval}[]>(() => [
-                { label: i18n.t('off'), value: 'off' }, // song-lang
-                { label: i18n.t('15s'), value: '15s' }, // song-lang
-                { label: i18n.t('30s'), value: '30s' }, // song-lang
-                { label: i18n.t('1m'), value: '1m' }, // song-lang
-                { label: i18n.t('5m'), value: '5m' }, // song-lang
-                { label: i18n.t('10m'), value: '10m' }, // song-lang
-                { label: i18n.t('30m'), value: '30m' }, // song-lang
-                { label: i18n.t('1h'), value: '1h' }, // song-lang
+                { label: i18n.t('REFRESH_OFF'), value: 'off' },
+                { label: i18n.t('REFRESH_INTERVAL_15S'), value: '15s' },
+                { label: i18n.t('REFRESH_INTERVAL_30S'), value: '30s' },
+                { label: i18n.t('REFRESH_INTERVAL_1M'), value: '1m' },
+                { label: i18n.t('REFRESH_INTERVAL_5M'), value: '5m' },
+                { label: i18n.t('REFRESH_INTERVAL_10M'), value: '10m' },
+                { label: i18n.t('REFRESH_INTERVAL_30M'), value: '30m' },
+                { label: i18n.t('REFRESH_INTERVAL_1H'), value: '1h' },
             ]),
             intervalItems: computed<MenuItem[]>(() => state.intervalList.map((interval) => ({
                 type: 'item',

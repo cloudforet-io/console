@@ -33,6 +33,8 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
+import { i18n } from '@/translations';
+
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -77,45 +79,44 @@ export default defineComponent({
         const state = reactive({
             proxyDateRange: useProxyValue('dateRange', props, emit),
             periodItems: computed<PeriodItem[]>(() => ([
-                // song-lang TODO: add translations to each labels
                 {
                     name: 'last7days',
-                    label: 'Last 7 days',
+                    label: i18n.t('DASHBOARDS.DETAIL.PERIOD_LAST_7_DAYS'),
                     start: today.subtract(6, 'day'),
                     end: today,
                     enabled: [GRANULARITY.DAILY, GRANULARITY.ACCUMULATED],
                 },
                 {
                     name: 'last14days',
-                    label: 'Last 14 days',
+                    label: i18n.t('DASHBOARDS.DETAIL.PERIOD_LAST_14_DAYS'),
                     start: today.subtract(13, 'day'),
                     end: today,
                     enabled: [GRANULARITY.DAILY, GRANULARITY.ACCUMULATED],
                 },
                 {
                     name: 'thisMonth',
-                    label: 'This month',
+                    label: i18n.t('DASHBOARDS.DETAIL.PERIOD_THIS_MONTH'),
                     start: today.startOf('month'),
                     end: today.endOf('month'),
                     enabled: [GRANULARITY.DAILY, GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
                 },
                 {
                     name: 'lastMonth',
-                    label: 'Last month',
+                    label: i18n.t('DASHBOARDS.DETAIL.PERIOD_LAST_MONTH'),
                     start: today.subtract(1, 'month').startOf('month'),
                     end: today.subtract(1, 'month').endOf('month'),
                     enabled: [GRANULARITY.DAILY, GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
                 },
                 {
                     name: 'last3Month',
-                    label: 'Last 3 months',
+                    label: i18n.t('DASHBOARDS.DETAIL.PERIOD_LAST_3_MONTHS'),
                     start: today.subtract(2, 'month').startOf('month'),
                     end: today.endOf('month'),
                     enabled: [GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
                 },
                 {
                     name: 'last6Month',
-                    label: 'Last 6 months',
+                    label: i18n.t('DASHBOARDS.DETAIL.PERIOD_LAST_6_MONTHS'),
                     start: today.subtract(5, 'month').startOf('month'),
                     end: today.endOf('month'),
                     enabled: [GRANULARITY.MONTHLY, GRANULARITY.ACCUMULATED],
@@ -131,8 +132,7 @@ export default defineComponent({
                     {
                         type: 'item',
                         name: 'custom',
-                        // song-lang
-                        label: 'Custom',
+                        label: i18n.t('DASHBOARDS.DETAIL.PERIOD_CUSTOM'),
                     },
                 ];
             }),

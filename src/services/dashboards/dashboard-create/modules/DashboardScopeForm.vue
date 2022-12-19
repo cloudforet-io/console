@@ -1,21 +1,18 @@
 <template>
     <section>
         <p-pane-layout>
-            <!--            song-lang-->
-            <p-panel-top title="Dashboard Scope" />
+            <p-panel-top :title="$t('DASHBOARDS.CREATE.LABEL_SCOPE')" />
             <div class="dashboard-scope-wrapper">
                 <p-radio-group direction="vertical">
                     <p-radio :selected="isDomainScope"
                              @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
                     >
-                        <!--                    song-lang-->
-                        Entire Workspaces
+                        {{ $t('DASHBOARDS.CREATE.ENTIRE_WORKSPACES') }}
                     </p-radio>
                     <p-radio :selected="!isDomainScope"
                              @change="handleSelectScope(DASHBOARD_SCOPE.PROJECT)"
                     >
-                        <!--                    song-lang-->
-                        Single Project
+                        {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}
                     </p-radio>
                 </p-radio-group>
                 <project-select-dropdown v-show="!isDomainScope"

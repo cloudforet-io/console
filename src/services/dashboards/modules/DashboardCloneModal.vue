@@ -1,7 +1,6 @@
 <template>
-    <!--    song-lang-->
     <p-button-modal :visible="proxyVisible"
-                    header-title="Clone Dashboard"
+                    :header-title="$t('DASHBOARDS.FORM.CLONE_TITLE')"
                     size="sm"
                     :disabled="!isAllValid"
                     class="dashboard-clone-modal"
@@ -9,7 +8,7 @@
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <p-field-group label="Dashboard Name"
+            <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_DASHBOARD_NAME')"
                            :invalid="invalidState.name"
                            :invalid-text="invalidTexts.name"
                            required
@@ -19,8 +18,7 @@
                               @input="setForm('name', $event)"
                 />
             </p-field-group>
-            <!--            song-lang-->
-            <p-field-group label="Viewers"
+            <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_VIEWERS')"
                            :invalid="invalidState.visibility"
                            :invalid-text="invalidTexts.visibility"
                            required
@@ -53,6 +51,7 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -75,13 +74,11 @@ interface Props {
 const visibilityList = [
     {
         name: DASHBOARD_PRIVACY_TYPE.USER,
-        // song-lang
-        label: 'Private (Only you)',
+        label: i18n.t('DASHBOARDS.FORM.LABEL_PRIVATE'),
     },
     {
         name: DASHBOARD_PRIVACY_TYPE.PUBLIC,
-        // song-lang
-        label: 'Public (Anyone who has \'view\' access to \'dashboards\')',
+        label: i18n.t('DASHBOARDS.FORM.LABEL_PUBLIC'),
     },
 ];
 export default defineComponent<Props>({
@@ -126,10 +123,8 @@ export default defineComponent<Props>({
             name: '',
             visibility: '',
         }, {
-            // song-lang
-            name(value: string) { return value.trim().length ? '' : 'Required Field'; },
-            // song-lang
-            visibility(value: DashboardPrivacyType) { return value.length ? '' : 'Required Field'; },
+            name(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
+            visibility(value: DashboardPrivacyType) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
         });
         const state = reactive({
             proxyVisible: props.visible,
@@ -161,8 +156,7 @@ export default defineComponent<Props>({
                 // const res = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
                 // return res.public_dashboard_id;
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, 'Failed to create dashboard');
+                ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
             }
             return undefined;
         };
@@ -172,8 +166,7 @@ export default defineComponent<Props>({
                 // const res = await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
                 // return res.user_dashboard_id;
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, 'Failed to create dashboard');
+                ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
             }
             return undefined;
         };

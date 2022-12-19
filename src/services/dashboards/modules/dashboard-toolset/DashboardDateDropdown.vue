@@ -50,6 +50,8 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
+import { i18n } from '@/translations';
+
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { Period } from '@/services/cost-explorer/type';
@@ -82,18 +84,15 @@ export default defineComponent({
                 {
                     type: 'item',
                     name: 'current',
-                    // song-lang
-                    label: 'Current month',
-                    // song-lang
-                    badge: 'Auto',
+                    label: i18n.t('DASHBOARDS.DETAIL.CURRENT_MONTH'),
+                    badge: i18n.t('DASHBOARDS.DETAIL.AUTO'),
                 },
                 ...state.getMonthMenuItem,
                 { type: 'divider' },
                 {
                     type: 'item',
                     name: 'custom',
-                    // song-lang
-                    label: 'Custom',
+                    label: i18n.t('DASHBOARDS.DETAIL.CUSTOM'),
                 },
             ])),
             selectedMonthMenuIndex: 0,

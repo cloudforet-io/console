@@ -49,8 +49,7 @@
                      :key="`${idx}-${getUUID()}`"
                      class="favorite-only-wrapper"
                 >
-                    <!--song-lang-->
-                    <span>{{ $t('Show favorites only') }}</span>
+                    <span>{{ $t('DASHBOARDS.LNB.ONLY_FAVORITE') }}</span>
                     <p-toggle-button :value="proxyShowFavoriteOnly"
                                      sync
                                      @change="handleFavoriteToggle"

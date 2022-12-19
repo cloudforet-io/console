@@ -17,11 +17,13 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import VueI18n from 'vue-i18n';
 
 import { PSelectDropdown } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
 import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -30,10 +32,11 @@ import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/conf
 import type { DashboardViewerType } from '@/services/dashboards/dashboard-create/type';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
+import TranslateResult = VueI18n.TranslateResult;
 
 type DefaultMenuItems = Array<{
     name: typeof MENU.DELETE | typeof MENU.SET_HOME
-    label: string
+    label: TranslateResult
     disabled: boolean
 }>;
 
@@ -50,10 +53,8 @@ const MENU = Object.freeze({
 } as const);
 
 const defaultMenuItems = computed<DefaultMenuItems>(() => [
-    // song-lang
-    { name: MENU.DELETE, label: 'Delete', disabled: false },
-    // song-lang
-    { name: MENU.SET_HOME, label: 'Set as Home Dashboard', disabled: false },
+    { name: MENU.DELETE, label: i18n.t('DASHBOARDS.DETAIL.DELETE'), disabled: false },
+    { name: MENU.SET_HOME, label: i18n.t('DASHBOARDS.DETAIL.SET_HOME'), disabled: false },
 ]);
 
 const props = defineProps<DashboardMoreMenuProps>();
@@ -87,8 +88,7 @@ const state = reactive({
 
 const checkDeleteState = reactive({
     visible: false,
-    // song-lang
-    headerTitle: 'Are you sure you want to delete dashboard?',
+    headerTitle: i18n.t('DASHBOARDS.FORM.DELETE_TITLE'),
     loading: false,
 });
 
@@ -116,8 +116,7 @@ const handleDeleteDashboardConfirm = async () => {
         // await costExplorerStore.dispatch('setDashboardList');
         await SpaceRouter.router.replace({ name: DASHBOARDS_ROUTE._NAME });
     } catch (e) {
-        // song-lang
-        ErrorHandler.handleRequestError(e, 'Failed to delete dashboard');
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
     } finally {
         checkDeleteState.loading = false;
         checkDeleteState.visible = false;

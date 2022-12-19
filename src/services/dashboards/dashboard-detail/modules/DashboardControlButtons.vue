@@ -1,24 +1,21 @@
 <template>
     <div class="dashboard-control-buttons">
-        <!--        song-lang-->
         <p-button icon-left="ic_decorate"
                   style-type="tertiary"
                   @click="$router.push({ name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME })"
         >
-            Customize
+            {{ $t('DASHBOARDS.DETAIL.CUSTOMIZE') }}
         </p-button>
-        <!--        song-lang-->
         <p-button icon-left="ic_download"
                   style-type="tertiary"
         >
-            Export
+            {{ $t('DASHBOARDS.DETAIL.EXPORT') }}
         </p-button>
-        <!--        song-lang-->
         <p-button icon-left="ic_duplicate"
                   style-type="tertiary"
                   @click="handleVisibleCloneModal"
         >
-            Clone
+            {{ $t('DASHBOARDS.DETAIL.CLONE') }}
         </p-button>
     </div>
 </template>

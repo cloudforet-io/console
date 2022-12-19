@@ -7,28 +7,24 @@
         <div class="budget-usage-summary">
             <div class="budget">
                 <p class="budget-label">
-                    <!-- song-lang -->
-                    Total spent
+                    {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_SPENT') }}
                 </p>
                 <div class="budget-value">
                     {{ currencyMoneyFormatter(state.totalSpent, state.options.currency) }}
                 </div>
                 <div class="budget-info">
-                    <!-- song-lang -->
-                    {{ state.budgetCount }} budgets
+                    {{ state.budgetCount }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETS') }}
                 </div>
             </div>
             <div class="budget">
                 <p class="budget-label">
-                    <!-- song-lang -->
-                    Total budget
+                    {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_SPENT') }}
                 </p>
                 <div class="budget-value">
                     {{ currencyMoneyFormatter(state.totalBudget, state.options.currency) }}
                 </div>
                 <div class="budget-info">
-                    <!-- song-lang -->
-                    {{ currencyMoneyFormatter(state.leftBudgetRate, state.options.currency) }} available
+                    {{ currencyMoneyFormatter(state.leftBudgetRate, state.options.currency) }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE') }}
                 </div>
             </div>
             <div class="chart-wrapper">
