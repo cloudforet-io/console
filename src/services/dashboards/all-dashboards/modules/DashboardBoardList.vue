@@ -159,42 +159,6 @@ export default defineComponent<DashboardBoardListProps>({
             dashboardConfig: {} as DashboardConfig,
         });
 
-        const handleUpdateCloneModal = (visible) => {
-            if (visible) return;
-            cloneModalState.dashboardConfig = {} as DashboardConfig;
-        };
-
-        const handleClickDeleteDashboard = (dashboardId) => {
-            deleteModalState.selectedId = dashboardId;
-            deleteModalState.visible = true;
-        };
-
-        const handleDeleteDashboardConfirm = async () => {
-            try {
-                deleteModalState.loading = true;
-                if (state.dashboardScopeType === 'domain') {
-                    await SpaceConnector.clientV2.dashboard.domainDashboard.delete({
-                        domain_dashboard_id: deleteModalState.selectedId,
-                    });
-                    await store.dispatch('dashboard/loadDomainDashboard');
-                } else {
-                    await SpaceConnector.clientV2.dashboard.projectDashboard.delete({
-                        project_dashboard_id: deleteModalState.selectedId,
-                    });
-                    await store.dispatch('dashboard/loadProjectDashboard');
-                }
-                /* song-lang */
-                showSuccessMessage(i18n.t('Successed to delete dashboard'), '');
-            } catch (e) {
-                /* song-lang */
-                ErrorHandler.handleRequestError(e, i18n.t('Failed to delete dashboard'));
-            } finally {
-                deleteModalState.loading = false;
-                deleteModalState.visible = false;
-                deleteModalState.selectedId = undefined;
-            }
-        };
-
         /* song-lang */
         const convertBoardItemButtonSet = (dashboardItem) => [
             {
@@ -230,6 +194,43 @@ export default defineComponent<DashboardBoardListProps>({
                 eventAction: () => handleClickDeleteDashboard(dashboardItem[`${state.dashboardScopeType}_dashboard_id`]),
             },
         ];
+
+        /* EVENT */
+        const handleUpdateCloneModal = (visible) => {
+            if (visible) return;
+            cloneModalState.dashboardConfig = {} as DashboardConfig;
+        };
+
+        const handleClickDeleteDashboard = (dashboardId) => {
+            deleteModalState.selectedId = dashboardId;
+            deleteModalState.visible = true;
+        };
+
+        const handleDeleteDashboardConfirm = async () => {
+            try {
+                deleteModalState.loading = true;
+                if (state.dashboardScopeType === 'domain') {
+                    await SpaceConnector.clientV2.dashboard.domainDashboard.delete({
+                        domain_dashboard_id: deleteModalState.selectedId,
+                    });
+                    await store.dispatch('dashboard/loadDomainDashboard');
+                } else {
+                    await SpaceConnector.clientV2.dashboard.projectDashboard.delete({
+                        project_dashboard_id: deleteModalState.selectedId,
+                    });
+                    await store.dispatch('dashboard/loadProjectDashboard');
+                }
+                /* song-lang */
+                showSuccessMessage(i18n.t('Successed to delete dashboard'), '');
+            } catch (e) {
+                /* song-lang */
+                ErrorHandler.handleRequestError(e, i18n.t('Failed to delete dashboard'));
+            } finally {
+                deleteModalState.loading = false;
+                deleteModalState.visible = false;
+                deleteModalState.selectedId = undefined;
+            }
+        };
 
         const labelQueryHelper = new QueryHelper();
         const handleSetQuery = (selectedLabel: ConsoleFilter | ConsoleFilter[]) => {
