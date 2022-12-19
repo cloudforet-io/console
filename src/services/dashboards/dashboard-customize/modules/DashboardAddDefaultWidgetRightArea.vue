@@ -83,8 +83,11 @@ import {
     PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PButton, PContextMenu,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import { useContextMenuFixedStyle } from '@spaceone/design-system/src/hooks';
 import type { JsonSchema } from '@spaceone/design-system/src/inputs/forms/json-schema-form/type';
+import type { Entries } from 'framework-utils';
 import { cloneDeep, isEmpty } from 'lodash';
 
 import { store } from '@/store';
@@ -99,6 +102,9 @@ import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import type { WidgetOptionsSchema } from '@/services/dashboards/widgets/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 
@@ -144,6 +150,7 @@ export default defineComponent<Props>({
     },
     setup(props) {
         const storeState = reactive({
+            loading: true,
             provider: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             project_id: computed(() => store.getters['reference/projectItems']),
             service_account_id: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
@@ -153,14 +160,7 @@ export default defineComponent<Props>({
         });
         const state = reactive({
             widgetConfig: computed(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
-            widgetOptionsJsonSchema: computed(() => {
-                if (!state.widgetConfig?.widget_options_schema?.schema) return {};
-                return getRefinedJsonSchema(
-                    state.widgetConfig.widget_options_schema.schema,
-                    state.selectedOptions,
-                    state.inheritItemMap,
-                );
-            }),
+            widgetOptionsJsonSchema: {} as JsonSchema,
             requiredProperties: computed<string[]>(() => state.widgetConfig?.widget_options_schema?.schema?.required ?? []),
             nonInheritableProperties: computed<string[]>(() => state.widgetConfig?.widget_options_schema?.non_inheritable_properties || []),
             //
@@ -205,52 +205,63 @@ export default defineComponent<Props>({
         });
 
         /* Util */
-        const isSelected = (selectedItem) => {
+        const isSelected = (selectedItem: SelectDropdownMenu | SearchDropdownMenuItem[]): boolean => {
             if (Array.isArray(selectedItem)) return !!selectedItem.length;
             return selectedItem && !isEmpty(selectedItem);
         };
-        const getRefinedJsonSchema = (originalJsonSchema: JsonSchema, selectedOptions, inheritItemMap) => {
-            const _jsonSchema = cloneDeep(originalJsonSchema);
-            const refinedJsonSchema: Partial<JsonSchema> = {
+        const refineJsonSchemaProperties = (propertyName: string, propertySchema: JsonSchema['properties'], isInherit = false): JsonSchema['properties'] => {
+            // 1. if (inherit === true) return dashboard variables
+            if (isInherit) {
+                return {
+                    title: propertySchema.title,
+                    ...SAMPLE_DASHBOARD_VARIABLES_SCHEMA, // TODO: temp data
+                };
+            }
+            // 2. if (propertyName === group_by) return groupBy data (not store data!)
+            const _propertyName = propertyName.replace('filters.', '');
+            if (_propertyName === 'group_by') {
+                return {
+                    ...propertySchema,
+                    enum: Object.values(GROUP_BY),
+                    menuItems: Object.values(GROUP_BY_ITEM_MAP),
+                };
+            }
+            // 3. return store data
+            const storeData: ReferenceItem = storeState[_propertyName];
+            let menuItems: MenuItem[] = [];
+            if (storeData && !isEmpty(storeData)) {
+                menuItems = Object.values(storeData).map((d) => ({
+                    name: d.key, label: d.label,
+                }));
+            }
+            let refinedJsonSchemaProperties: JsonSchema['properties'];
+            if (propertySchema.type === 'array') {
+                refinedJsonSchemaProperties = {
+                    ...propertySchema,
+                    items: { enum: Object.keys(storeData) },
+                    menuItems,
+                };
+            } else {
+                refinedJsonSchemaProperties = {
+                    ...propertySchema,
+                    enum: Object.keys(storeData),
+                    menuItems,
+                };
+            }
+            return refinedJsonSchemaProperties;
+        };
+        const initJsonSchema = (widgetOptionsSchema: WidgetOptionsSchema): JsonSchema => {
+            const defaultProperties = widgetOptionsSchema?.default_properties ?? [];
+            const _jsonSchema = cloneDeep(widgetOptionsSchema.schema);
+            const refinedJsonSchema = {
                 type: 'object',
                 properties: {},
-                required: state.requiredProperties,
-            };
-            Object.entries(_jsonSchema.properties).forEach(([propertyName, propertySchema]) => {
-                if (!state.requiredProperties.includes(propertyName) && !selectedOptions.find((d) => d.name === propertyName)) {
-                    return;
-                }
-                if (inheritItemMap[propertyName]) {
-                    refinedJsonSchema.properties[propertyName] = {
-                        title: (propertySchema as JsonSchema).title,
-                        ...SAMPLE_DASHBOARD_VARIABLES_SCHEMA, // TODO: temp data
-                    };
-                } else {
-                    const refinedPropertyName = propertyName.replace('filters.', '');
-                    const storeData: ReferenceItem = storeState[refinedPropertyName];
-                    if (refinedPropertyName === 'group_by') {
-                        refinedJsonSchema.properties[refinedPropertyName] = propertySchema;
-                        return;
-                    }
-                    const menuItems = Object.values(storeData).map((d) => ({
-                        name: d.key, label: d.label,
-                    }));
-                    if ((propertySchema as JsonSchema).type === 'array') {
-                        refinedJsonSchema.properties[propertyName] = {
-                            ...propertySchema as object,
-                            items: { enum: Object.keys(storeData) },
-                            menuItems,
-                            default: [],
-                        };
-                    } else {
-                        refinedJsonSchema.properties[propertyName] = {
-                            ...propertySchema as object,
-                            enum: Object.keys(storeData),
-                            menuItems,
-                            default: undefined,
-                        };
-                    }
-                }
+                required: _jsonSchema?.required ?? [],
+            } as JsonSchema;
+            const _propertyMap = Object.entries(_jsonSchema.properties) as Entries<JsonSchema>;
+            _propertyMap.forEach(([propertyName, propertySchema]) => {
+                if (!defaultProperties.includes(propertyName)) return;
+                refinedJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema);
             });
             return refinedJsonSchema;
         };
@@ -260,22 +271,39 @@ export default defineComponent<Props>({
             state.addOptionsMenuVisible = false;
         };
         const handleChangeInheritToggle = (propertyName: string, { value }) => {
-            // init form
-            state.formData[propertyName] = undefined;
-            // update inherit data
-            const _inheritItemMap = cloneDeep(state.inheritItemMap);
-            _inheritItemMap[propertyName] = value;
-            state.inheritItemMap = _inheritItemMap;
+            // init form data
+            const _formData = cloneDeep(state.formData);
+            _formData[propertyName] = undefined;
+            state.formData = _formData;
+            // update inherit data and json schema
+            const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
+            state.inheritItemMap[propertyName] = value;
+            // refine json schema of property
+            const propertySchema = cloneDeep(state.widgetConfig?.widget_options_schema.schema)?.properties[propertyName];
+            _widgetOptionsJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema, value);
+            state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
+        };
+        const handleSelectOption = (item) => {
+            const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
+            const propertyName = item.name;
+            if (state.selectedOptions.find((d) => d.name === propertyName)) {
+                // add property schema
+                const propertySchema = cloneDeep(state.widgetConfig?.widget_options_schema.schema)?.properties[propertyName];
+                _widgetOptionsJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema);
+            } else {
+                // delete property schema
+                delete _widgetOptionsJsonSchema.properties[propertyName];
+            }
+            state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
+            hideOptionsMenu();
         };
         const handleClickAddOptions = () => {
             state.addOptionsMenuVisible = true;
         };
-        const handleSelectOption = () => {
-            hideOptionsMenu();
-        };
 
         /* Init */
         (async () => {
+            storeState.loading = true;
             await Promise.allSettled([
                 store.dispatch('reference/provider/load'),
                 store.dispatch('reference/project/load'),
@@ -284,13 +312,17 @@ export default defineComponent<Props>({
                 store.dispatch('reference/region/load'),
                 store.dispatch('reference/user/load'),
             ]);
+            storeState.loading = false;
         })();
 
         /* Watcher */
-        watch(() => state.widgetConfig, (widgetConfig) => {
+        watch([() => state.widgetConfig, () => storeState.loading], ([widgetConfig, storeLoading]) => {
             if (widgetConfig) {
                 const defaultProperties = widgetConfig.widget_options_schema?.default_properties ?? [];
                 state.selectedOptions = state.optionsMenuItems.filter((d) => !state.requiredProperties.includes(d.name) && defaultProperties.includes(d.name));
+                if (!storeLoading) {
+                    state.widgetOptionsJsonSchema = initJsonSchema(widgetConfig.widget_options_schema);
+                }
             }
         });
 
