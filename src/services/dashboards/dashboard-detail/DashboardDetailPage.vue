@@ -66,6 +66,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { gray } from '@/styles/colors';
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
+import type { DashboardScope, DashboardViewer } from '@/services/dashboards/config';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/DashboardMoreMenu.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
@@ -74,7 +75,6 @@ import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/mod
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
-import type { DashboardScope, DashboardViewer } from '@/services/dashboards/type';
 
 
 const PUBLIC_ICON_COLOR = gray[500];

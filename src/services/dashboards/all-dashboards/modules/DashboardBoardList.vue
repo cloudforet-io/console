@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard-board-list">
         <p-field-title class="p-field-title">
-            <template>
+            <template #default>
                 <span>{{ fieldTitle }}</span>
                 <span class="board-count">({{ dashboardList.length }})</span>
             </template>
@@ -76,12 +76,10 @@ import {
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ConsoleFilter } from '@/query/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { DashboardModel } from '@/store/modules/dashboard/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -91,9 +89,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/services/dashboards/config';
+import type { DashboardScope, DashboardConfig } from '@/services/dashboards/config';
+import type { DashboardModel } from '@/services/dashboards/model';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
-import type { DashboardScope, DashboardConfig } from '@/services/dashboards/type';
 
 const PAGE_SIZE = 10;
 
@@ -154,7 +153,7 @@ export default defineComponent<DashboardBoardListProps>({
 
         const cloneModalState = reactive({
             visible: false,
-            dashboardConfig: {} as DashboardConfig,
+            dashboardConfig: null as DashboardConfig|null,
         });
 
         /* song-lang */
@@ -177,12 +176,12 @@ export default defineComponent<DashboardBoardListProps>({
                     cloneModalState.dashboardConfig = {
                         name: dashboardItem.name,
                         layouts: dashboardItem.layouts,
-                        dashboard_options: dashboardItem.dashboard_options,
+                        dashboard_variables: dashboardItem.dashboard_variables,
                         settings: dashboardItem.settings,
-                        dashboard_options_schema: dashboardItem.dashboard_options_schema,
+                        dashboard_variables_schema: dashboardItem.dashboard_variables_schema,
                         labels: dashboardItem.labels,
+                        version: dashboardItem.version,
                     };
-                    console.log(cloneModalState.dashboardConfig);
                 },
             },
             {
@@ -229,8 +228,9 @@ export default defineComponent<DashboardBoardListProps>({
         };
 
         const labelQueryHelper = new QueryHelper();
-        const handleSetQuery = (selectedLabel: ConsoleFilter | ConsoleFilter[]) => {
-            labelQueryHelper.setFilters(store.state.dashboard.searchFilters).addFilter({ k: 'label', o: '=', v: selectedLabel });
+        const handleSetQuery = (selectedLabel: string | string[]) => {
+            labelQueryHelper.setFilters(store.state.dashboard.searchFilters)
+                .addFilter({ k: 'label', o: '=', v: selectedLabel });
             store.dispatch('dashboard/setSearchFilters', labelQueryHelper.filters);
         };
         const handlePage = (page: number) => {

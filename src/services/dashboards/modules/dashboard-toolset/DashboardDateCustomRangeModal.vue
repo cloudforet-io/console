@@ -52,7 +52,7 @@ import dayjs from 'dayjs';
 import { i18n } from '@/translations';
 
 import { GRANULARITY } from '@/services/dashboards/config';
-import type { Period } from '@/services/dashboards/type';
+import type { DateRange } from '@/services/dashboards/config';
 
 interface CustomRangeModalSettings {
     helpTextFrom?: TranslateResult | undefined;
@@ -152,7 +152,7 @@ export default {
         });
         const handleConfirm = () => {
             state.proxyVisible = false;
-            const period: Period = {};
+            const period: DateRange = {};
             if (props.granularity === GRANULARITY.DAILY) {
                 period.start = state.startDate[0];
                 period.end = state.endDate[0];

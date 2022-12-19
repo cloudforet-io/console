@@ -43,10 +43,10 @@ import {
     DASHBOARD_SCOPE,
     DASHBOARD_VIEWER,
 } from '@/services/dashboards/config';
+import type { DashboardScope, DashboardViewer } from '@/services/dashboards/config';
 import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/dashboard-create/modules/DashboardViewerForm.vue';
-import type { DashboardScope, DashboardViewer } from '@/services/dashboards/type';
 import type { ProjectItemResp } from '@/services/project/type';
 
 export default {

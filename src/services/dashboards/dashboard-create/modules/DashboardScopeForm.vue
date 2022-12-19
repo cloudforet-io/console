@@ -37,7 +37,7 @@ import { store } from '@/store';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
-import type { DashboardScope } from '@/services/dashboards/type';
+import type { DashboardScope } from '@/services/dashboards/config';
 import type { ProjectItemResp } from '@/services/project/type';
 
 export default defineComponent({
