@@ -9,7 +9,7 @@ const monthlyCostWidgetConfig: WidgetConfig = {
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.MONTHLY_COST.DESC',
-        preview_image: 'tn--Month-to-Date_Spend.png',
+        preview_image: 'widget-img_monthlyCost--thumbnail.png',
     },
     scopes: ['DOMAIN', 'PROJECT', 'WORKSPACE'],
     theme: {

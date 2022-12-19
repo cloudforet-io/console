@@ -9,7 +9,7 @@ const budgetUsageSummaryConfig: WidgetConfig = {
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.DESC',
-        preview_image: 'xxx.png',
+        preview_image: 'widget-img_budgetUsageSummary--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {

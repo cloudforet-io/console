@@ -10,7 +10,7 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.AWS_DATA_TRANSFER_BY_REGION.DESC',
-        preview_image: 'xxx.png',
+        preview_image: 'widget-img_awsDataTransferByRegion--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {

@@ -8,7 +8,7 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.AWS_DATA_TRANSFER_COST_TREND.DESC',
-        preview_image: 'xxx.png',
+        preview_image: 'widget-img_awsDataTransferCostTrend--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {

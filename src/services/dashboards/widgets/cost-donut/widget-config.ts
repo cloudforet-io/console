@@ -4,6 +4,10 @@ const costDonutWidgetConfig: Partial<WidgetConfig> = {
     widget_config_id: 'costDonut',
     title: 'Cost Donut',
     base_configs: [{ config_id: 'basePie' }],
+    description: {
+        translation_id: 'DASHBOARDS.WIDGET.COST_DONUT.DESC',
+        preview_image: 'widget-img_costDonut--thumbnail.png',
+    },
     widget_options: {
         chart_type: 'DONUT',
     },
