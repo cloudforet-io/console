@@ -5,8 +5,8 @@ import type { Tags, TimeStamp } from '@/models';
 import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type {
-    FINISH_CONDITION, SCOPE,
-    AlertState, AlertUrgency, AlertSeverity, AlertStateFilter, AssignedState,
+    ScopeType,
+    FINISH_CONDITION, AlertState, AlertUrgency, AlertSeverity, AlertStateFilter, AssignedState,
 } from '@/services/alert-manager/lib/config';
 
 export interface Rule {
@@ -17,7 +17,7 @@ export interface Rule {
 export interface EscalationPolicyFormModel {
     name: string;
     rules: Rule[];
-    scope: SCOPE.global | SCOPE.project;
+    scope: ScopeType;
     finish_condition: FINISH_CONDITION.acknowledged | FINISH_CONDITION.resolved;
     repeat_count: number;
     project_id?: string;

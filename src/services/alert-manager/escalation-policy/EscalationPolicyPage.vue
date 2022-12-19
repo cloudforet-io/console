@@ -157,7 +157,7 @@ export default {
                     type: 'item',
                     name: 'default',
                     label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.SET_AS_DEFAULT'),
-                    disabled: state.selectedItem?.scope === SCOPE.project,
+                    disabled: state.selectedItem?.scope === SCOPE.PROJECT,
                 },
             ])),
             escalationPolicies: [],

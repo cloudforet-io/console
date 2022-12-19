@@ -99,7 +99,7 @@ export default {
                 RESOLVED: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.RESOLVED'),
             })),
             scopes: computed(() => ({
-                GLOBAL: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.GLOBAL'),
+                DOMAIN: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.GLOBAL'),
                 PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.PROJECT'),
             })),
             fields: [

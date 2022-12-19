@@ -24,7 +24,7 @@
                              :value="inputModel.scope"
                              @change="onChangeScope(item.value)"
                     >
-                        <span class="radio-label">{{ item.label }}</span>
+                        {{ item.label }}
                     </p-radio>
                 </div>
             </template>
@@ -33,7 +33,7 @@
                       class="scope-text"
                 >
                     <span>{{ scopeLabels[inputModel.scope] || inputModel.scope }}</span>
-                    <span v-if="inputModel.scope === SCOPE.project">
+                    <span v-if="inputModel.scope === SCOPE.PROJECT">
                         (<p-anchor :to="referenceRouter(inputModel.project_id,{ resource_type: 'identity.Project' })"
                                    :text="projects[inputModel.project_id] ? projects[inputModel.project_id].label : inputModel.project_id"
                                    highlight
@@ -42,7 +42,7 @@
                 </span>
             </template>
         </p-field-group>
-        <p-field-group v-if="showScope && inputModel.scope === SCOPE.project && mode === ACTION.create"
+        <p-field-group v-if="showScope && inputModel.scope === SCOPE.PROJECT && mode === ACTION.create"
                        class="project-field"
                        required
                        :invalid="!isProjectValid"
@@ -160,7 +160,7 @@ export default {
             //
             inputModel: {
                 name: undefined as undefined | string,
-                scope: SCOPE.global,
+                scope: SCOPE.DOMAIN,
                 rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }],
                 finish_condition: FINISH_CONDITION.acknowledged,
                 repeat_count: DEFAULT_REPEAT_COUNT,
@@ -181,21 +181,21 @@ export default {
             isProjectValid: computed(() => !state.projectInvalidText),
             projectInvalidText: computed(() => {
                 if (!state.showValidation) return undefined;
-                if (state.inputModel.scope === SCOPE.global) return undefined;
+                if (state.inputModel.scope === SCOPE.DOMAIN) return undefined;
                 if (!state.inputModel.project_id) {
                     return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_REQUIRED');
                 }
                 return undefined;
             }),
             scopeLabels: computed(() => ({
-                [SCOPE.global]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'),
-                [SCOPE.project]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
+                [SCOPE.DOMAIN]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'),
+                [SCOPE.PROJECT]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
             })),
             scopes: computed(() => [
                 {
-                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'), value: SCOPE.global,
+                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'), value: SCOPE.DOMAIN,
                 }, {
-                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: SCOPE.project,
+                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: SCOPE.PROJECT,
                 },
             ]),
             finishConditions: computed(() => [
@@ -211,7 +211,7 @@ export default {
         const initInputModel = () => {
             if (props.mode === ACTION.create) {
                 state.inputModel.name = undefined;
-                state.inputModel.scope = SCOPE.global;
+                state.inputModel.scope = SCOPE.DOMAIN;
                 state.inputModel.rules = [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }];
                 state.inputModel.finish_condition = FINISH_CONDITION.acknowledged;
                 state.inputModel.project_id = props.projectId;
@@ -231,7 +231,7 @@ export default {
         };
         const onChangeScope = (value) => {
             state.inputModel.scope = value;
-            if (value === SCOPE.global) state.inputModel.project_id = undefined;
+            if (value === SCOPE.DOMAIN) state.inputModel.project_id = undefined;
         };
         const onChangeFinishCondition = (value) => {
             state.inputModel.finish_condition = value;

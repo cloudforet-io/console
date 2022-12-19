@@ -22,6 +22,6 @@ export const alertStateBadgeStyleTypeFormatter = (alertState) => {
 };
 
 export const alertScopeBadgeStyleTypeFormatter = (scope) => {
-    if (scope === SCOPE.global) return 'green200';
+    if (scope === SCOPE.DOMAIN) return 'green200';
     return 'primary3';
 };
