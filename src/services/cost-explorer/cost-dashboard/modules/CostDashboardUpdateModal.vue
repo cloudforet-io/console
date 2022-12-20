@@ -104,13 +104,14 @@ export default defineComponent<Props>({
                     });
                 }
             } catch (e) {
-                ErrorHandler.handleError(e);
+                // song-lang
+                ErrorHandler.handleRequestError(e, 'Failed to update cost dashboard name');
             }
         };
 
-        const handleConfirm = () => {
-            updateDashboard();
-            costExplorerStore.dispatch('setDashboardList');
+        const handleConfirm = async () => {
+            await updateDashboard();
+            await costExplorerStore.dispatch('setDashboardList');
             emit('update:visible', false);
             emit('confirm', name.value);
         };
