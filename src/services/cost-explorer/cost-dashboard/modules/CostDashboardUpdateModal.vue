@@ -35,8 +35,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -104,13 +102,10 @@ export default defineComponent<Props>({
                         public_dashboard_id: props.dashboardId,
                         name: name.value,
                     });
-                    // song-lang
-                    showSuccessMessage('Successfully updated cost dashboard name', '');
                 }
             } catch (e) {
                 // song-lang
-                showSuccessMessage('Failed to update cost dashboard name', '');
-                ErrorHandler.handleError(e);
+                ErrorHandler.handleRequestError(e, 'Failed to update cost dashboard name');
             }
         };
 
