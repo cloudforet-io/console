@@ -22,7 +22,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import {
-    defineComponent, reactive, toRefs, ref, onMounted, watch, onUnmounted,
+    defineComponent, reactive, toRefs, ref, onMounted, watch, onBeforeUnmount,
 } from 'vue';
 
 import {
@@ -108,7 +108,7 @@ export default defineComponent({
             observeInstance.observe(containerRef?.value as Element);
         });
 
-        onUnmounted(() => {
+        onBeforeUnmount(() => {
             observeInstance.unobserve(containerRef?.value as Element);
         });
 
