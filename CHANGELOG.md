@@ -1,3 +1,10 @@
+# [1.1.0-beta.479](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.478...v1.1.0-beta.479) (2022-12-20)
+
+
+### Features
+
+* **font-size:** add font size with line-height and letter-spacing ([#181](https://github.com/cloudforet-io/mirinae/issues/181)) ([9deca23](https://github.com/cloudforet-io/mirinae/commit/9deca23fa0eb28009fe15491e8c0a049b5b3aca9))
+
 # [1.1.0-beta.478](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.477...v1.1.0-beta.478) (2022-12-20)
 
 
