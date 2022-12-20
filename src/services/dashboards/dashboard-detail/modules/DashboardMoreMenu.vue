@@ -29,7 +29,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
-import type { DashboardViewerType } from '@/services/dashboards/dashboard-create/type';
+import type { DashboardViewer } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 import TranslateResult = VueI18n.TranslateResult;
@@ -42,7 +42,7 @@ type DefaultMenuItems = Array<{
 
 interface DashboardMoreMenuProps {
     dashboardId: string;
-    dashboardType: DashboardViewerType;
+    dashboardType: DashboardViewer;
     manageDisabled: boolean;
     dashboard: any;
 }

@@ -41,7 +41,7 @@ import {
 } from '@spaceone/design-system';
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import type { DashboardViewer } from '@/services/dashboards/model';
+import type { DashboardViewer } from '@/services/dashboards/config';
 
 export default {
     name: 'DashboardViewerForm',
