@@ -1,3 +1,10 @@
+# [1.1.0-beta.480](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.479...v1.1.0-beta.480) (2022-12-20)
+
+
+### Features
+
+* **context-menu:** add bottom slot ([#183](https://github.com/cloudforet-io/mirinae/issues/183)) ([daefca1](https://github.com/cloudforet-io/mirinae/commit/daefca1d7c5b55f1f370f85309d5b19e2153e253))
+
 # [1.1.0-beta.479](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.478...v1.1.0-beta.479) (2022-12-20)
 
 
