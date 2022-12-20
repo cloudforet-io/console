@@ -87,6 +87,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: stretch;
+    overflow-y: scroll;
 
     .header {
         @apply flex justify-between;
