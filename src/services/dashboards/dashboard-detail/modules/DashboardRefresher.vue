@@ -5,38 +5,58 @@
                                                                                                        style-type="tertiary"
                                                                                                        shape="square"
                                                                                                        :animation="loading ? 'reserve-spin' : undefined"
+                                                                                                       @click="handleRefresh"
         />
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { defineProps, defineEmits, watch } from 'vue';
 
 import { PIconButton } from '@spaceone/design-system';
 
 import type { RefreshInterval } from '@/services/dashboards/config';
-import { refreshInterval } from '@/services/dashboards/config';
+import { refreshInterval, refreshIntervalMap } from '@/services/dashboards/config';
 
 interface Props {
     interval: RefreshInterval;
-    loading: boolean;
+    loading?: boolean;
 }
 
-export default defineComponent<Props>({
-    name: 'DashboardRefresher',
-    components: { PIconButton },
-    props: {
-        interval: {
-            type: String as PropType<RefreshInterval>,
-            default: refreshInterval[0],
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-    },
+const props = withDefaults(defineProps<Props>(), {
+    interval: refreshInterval[0],
+    loading: false,
 });
+const emit = defineEmits(['refresh']);
+
+let intervalFunction;
+
+const executeInterval = () => {
+    if (refreshInterval.includes(props.interval)) {
+        intervalFunction = setInterval(() => {
+            if (props.loading) {
+                clearInterval(intervalFunction);
+            } else {
+                emit('refresh');
+            }
+        }, refreshIntervalMap[props.interval]);
+    }
+};
+
+watch(() => props.loading, (loading) => {
+    if (loading) {
+        clearInterval(intervalFunction);
+    } else {
+        executeInterval();
+    }
+});
+
+executeInterval();
+
+const handleRefresh = () => {
+    emit('refresh');
+};
+
 </script>
 
 <style scoped lang="postcss">

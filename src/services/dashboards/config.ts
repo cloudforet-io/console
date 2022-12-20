@@ -4,6 +4,16 @@ export const refreshInterval = ['off', '15s', '30s', '1m', '5m', '10m', '30m', '
 
 export type RefreshInterval = typeof refreshInterval[number];
 
+export const refreshIntervalMap = {
+    off: 0,
+    '15s': 15000,
+    '30s': 30000,
+    '1m': 60000,
+    '5m': 300000,
+    '10m': 600000,
+    '30m': 1800000,
+    '1h': 3600000,
+};
 
 export const DASHBOARD_SCOPE = {
     DOMAIN: 'DOMAIN',

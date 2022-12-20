@@ -36,10 +36,15 @@
             <dashboard-toolset />
         </div>
         <p-divider />
-        <dashboard-refresher loading />
+        <dashboard-refresher :interval="state.refreshInterval"
+                             :loading="state.loading"
+                             @refresh="handleRefresh"
+        />
         <dashboard-widget-container
+            ref="widgetContainerRef"
             :widget-size-list="WIDGET_SIZE_MOCK"
             :widget-theme-option-list="WIDGET_THEME_OPTION_MOCK"
+            :loading.sync="state.loading"
         />
         <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
                                    :dashboard-id="props.dashboardId"
@@ -51,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive, ref, computed } from 'vue';
 
 import {
     PDivider, PI, PIconButton, PPageTitle,
@@ -78,6 +83,7 @@ import type { DomainDashboardModel, ProjectDashboardModel } from '@/services/das
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
+import costPieWidgetConfig from '@/services/dashboards/widgets/cost-pie/widget-config';
 
 
 const PUBLIC_ICON_COLOR = gray[500];
@@ -95,11 +101,16 @@ const state = reactive({
     labelList: [] as Array<string>,
     nameEditModalVisible: false,
     cloneModalVisible: false,
+    refreshInterval: '15s',
+    loading: false,
 });
 const isProjectDashboard = Boolean(props.dashboardId.startsWith('project'));
 
-const WIDGET_SIZE_MOCK = ['md', 'md', 'sm', 'md', 'lg', 'sm'];
+const widgetContainerRef = ref<any>(null);
+
+const WIDGET_SIZE_MOCK = ['lg', 'lg', 'lg', 'lg', 'lg', 'lg'];
 const WIDGET_THEME_OPTION_MOCK = [
+    costPieWidgetConfig,
     { inherit: true, inherit_count: 3 },
     { inherit: true, inherit_count: undefined },
     { inherit: false, inherit_count: undefined },
@@ -116,6 +127,9 @@ const handleNameUpdate = (name: string) => {
 };
 const handleVisibleCloneModal = () => {
     state.cloneModalVisible = true;
+};
+const handleRefresh = () => {
+    widgetContainerRef.value?.refreshAllWidget();
 };
 
 const getDashboardData = async () => {
