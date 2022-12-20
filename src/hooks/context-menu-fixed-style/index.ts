@@ -72,7 +72,7 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu }: Sta
         } else {
             const height = targetRects.top - 12;
             contextMenuStyle.maxHeight = `${height < 0 ? 0 : height}px`;
-            if (state.useFixedMenuStyle) contextMenuStyle.bottom = `${targetRects.top}px`;
+            if (state.useFixedMenuStyle) contextMenuStyle.bottom = `calc(100vh - ${targetRects.top}px)`;
             else contextMenuStyle.bottom = `${targetRects.height}px`;
         }
 
