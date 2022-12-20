@@ -55,6 +55,9 @@ export interface DashboardConfig {
     dashboard_variables_schema: DashboardVariablesSchema;
     labels: string[];
     version: string;
+    description?: {
+        preview_image?: string;
+    }
 }
 
 // variables schema
@@ -72,3 +75,4 @@ export interface DashboardVariablesSchema {
     };
     order: string[];
 }
+
