@@ -104,8 +104,12 @@ export default defineComponent<Props>({
                         public_dashboard_id: props.dashboardId,
                         name: name.value,
                     });
+                    // song-lang
+                    showSuccessMessage('Successfully updated cost dashboard name', '');
                 }
             } catch (e) {
+                // song-lang
+                showSuccessMessage('Failed to update cost dashboard name', '');
                 ErrorHandler.handleError(e);
             }
         };
@@ -115,9 +119,6 @@ export default defineComponent<Props>({
             costExplorerStore.dispatch('setDashboardList');
             emit('update:visible', false);
             emit('confirm', name.value);
-
-            // song-lang
-            showSuccessMessage('Successfully updated cost dashboard name', '');
         };
 
         const handleUpdateVisible = (visible) => {

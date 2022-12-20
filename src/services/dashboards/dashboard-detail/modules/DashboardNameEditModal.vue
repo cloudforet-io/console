@@ -109,7 +109,11 @@ export default defineComponent<Props>({
                         name: name.value,
                     });
                 }
+                // song-lang
+                showSuccessMessage('Successfully updated dashboard name', '');
             } catch (e) {
+                // song-lang
+                showSuccessMessage('Failed to update dashboard name', '');
                 ErrorHandler.handleError(e);
             }
         };
@@ -127,9 +131,6 @@ export default defineComponent<Props>({
             loadDashboard();
             emit('update:visible', false);
             emit('confirm', name.value);
-
-            // song-lang
-            showSuccessMessage('Successfully updated dashboard name', '');
         };
 
         const handleUpdateVisible = (visible) => {
