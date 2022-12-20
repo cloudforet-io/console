@@ -199,7 +199,7 @@ export default defineComponent<Props>({
         }
 
         .context-divider {
-            margin: 0.875rem -0.75rem 1rem;
+            margin: 0.875rem 0 1rem;
         }
 
         .matched-character {

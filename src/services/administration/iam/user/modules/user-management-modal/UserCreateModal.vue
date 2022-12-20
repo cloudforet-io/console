@@ -86,7 +86,9 @@
                 <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')"
                                class="input-form"
                 >
-                    <p-select-dropdown v-model="formState.domainRole"
+                    <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
+                    <p-select-dropdown :key="formState.activeTab"
+                                       v-model="formState.domainRole"
                                        :items="formState.domainRoleItem"
                                        :disabled="formState.domainRoleItem.length < 2 || isSameId"
                                        use-fixed-menu-style
@@ -556,6 +558,7 @@ export default {
 .user-form-modal {
     .auth-type-tab {
         margin-bottom: 1.5rem;
+        overflow-y: hidden;
     }
 
     .p-search-dropdown {
@@ -571,12 +574,6 @@ export default {
             font-size: 0.75rem;
             line-height: 1.3;
             padding: 0.25rem 0.5rem;
-        }
-        .p-context-menu {
-            .p-search-dropdown__item-label {
-                @apply truncate;
-                width: 100%;
-            }
         }
     }
     .id-input-form {
