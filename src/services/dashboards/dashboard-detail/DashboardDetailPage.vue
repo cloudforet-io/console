@@ -68,12 +68,12 @@ import { gray } from '@/styles/colors';
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardScope, DashboardViewer } from '@/services/dashboards/config';
-import type { DashboardDetailDataModel } from '@/services/dashboards/dashboard-detail/lib/type';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/DashboardMoreMenu.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import DashboardRefresher from '@/services/dashboards/dashboard-detail/modules/DashboardRefresher.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
+import type { ProjectDashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
@@ -122,7 +122,7 @@ const handleVisibleCloneModal = () => {
 // INIT
 (async () => {
     try {
-        const result: DashboardDetailDataModel = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: 'project-dash-eb13f8b042f9' });
+        const result: ProjectDashboardModel = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: 'project-dash-eb13f8b042f9' });
         state.labelList = result.labels;
     } catch (e) {
         ErrorHandler.handleError(e);
