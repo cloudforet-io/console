@@ -21,7 +21,6 @@
                     {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
                 </p-button>
             </div>
-            <slot name="help-text" />
             <p-text-button v-if="showClearSelection && multiSelectable"
                            class="clear-all-wrapper"
                            style-type="highlight"
@@ -81,14 +80,26 @@
                          :class="{disabled: item.disabled}"
                     >
                         <p-button :disabled="item.disabled"
-                                  size="sm"
-                                  style-type="tertiary"
+                                  size="md"
+                                  style-type="secondary"
                                   :block="true"
                                   :icon-left="item.icon"
                                   @click="$emit('click-button', item, index, $event)"
                         >
                             {{ item.label }}
                         </p-button>
+                    </div>
+                    <div v-else-if="item.type === 'showMore'"
+                         :key="`show-more-${index}`"
+                         class="context-show-more"
+                    >
+                        <p-text-button style-type="highlight"
+                                       size="sm"
+                                       icon-right="ic_arrow_bottom"
+                                       @click="$emit('click-show-more', item, index, $event)"
+                        >
+                            {{ item.label ? item.label : $t('COMPONENT.CONTEXT_MENU.SHOW_MORE') }}
+                        </p-text-button>
                     </div>
                 </template>
             </slot>
@@ -330,13 +341,16 @@ export default defineComponent<ContextMenuProps>({
         border-top-style: solid;
     }
     > .context-button {
-        padding: 0.5rem 0.5rem 0.75rem 0.5rem;
+        padding: 0.5rem;
 
         @media (hover: hover) {
             &:hover:not(.disabled) {
                 @apply bg-blue-100;
             }
         }
+    }
+    > .context-show-more {
+        padding: 0.5rem;
     }
     > .bottom-slot-area {
         padding: 0.5rem;

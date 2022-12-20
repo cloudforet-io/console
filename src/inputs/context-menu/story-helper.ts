@@ -11,7 +11,6 @@ export const contextMenuSlots: [string, string][] = [
     // eslint-disable-next-line max-len
     ['item-text-list', 'A slot used when customizing each menu item whose type is \'item\' type with default style applied. This leads directly to the text-list slot of ContextMenuItem. This works only when the highlightTerm is given.'],
     ['header-{item.name}', 'A slot that replaces the inner area of a menu item whose type is \'header\' with a specific name.'],
-    ['help-text', 'A slot used when you want to put additional information on the top.'],
 ];
 
 const contextMenuEvents: [string, string][] = [
@@ -23,7 +22,8 @@ const contextMenuEvents: [string, string][] = [
     ['keyup:down:end', 'This event is emitted when a menu item is tracked through the arrow down key, and the down key is pressed at the last menu item.'],
     ['keyup:esc', 'This event is emitted when a esc key is pressed.'],
     ['click-button', 'This event is emitted when the button(in the item whose type is button) is clicked. As arguments, item, index and click event will be passed.'],
-    ['click-done', 'This event is emitted when the done-button(in multi-selectable case) is clicked.'],
+    ['click-done', 'This event is emitted when the done-button(in multi-selectable & show-select-header case) is clicked.'],
+    ['click-show-more', 'This event is emitted when the show-more-button is clicked.'],
 ];
 
 const getArgTypes = (category: string, info: [string, string][]) => {

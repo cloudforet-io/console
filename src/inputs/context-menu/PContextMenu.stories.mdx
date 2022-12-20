@@ -60,7 +60,7 @@ Context Menu's `menu` props is an `array` of `MenuItem`.
 |-|-|-|
 |name|The key of the corresponding item. must be UNIQUE.|`string`|
 |label|Value to be displayed|`string`|
-|type|The type of item |`['divider', 'header', 'item', 'button']`|
+|type|The type of item |`['divider', 'header', 'item', 'button', 'showMore']`|
 |disabled|Whether to disable the selection|`boolean`|
 |link|A value given when it is necessary to move to a specific link when pressed. In this case, the corresponding item is displayed as a tag.|`string`|
 |target|When the link property is assigned to the corresponding item, it is bound to the a tag attribute together. |`string`|
@@ -80,6 +80,7 @@ Each `MenuItem` has the following type to represent it:
 |divider| Divider. This type is designated when you want to display a divider line. For this type, you don't need any of the `MenuItem` properties.|
 |header|Use it when you want to group items among related items and display the category of items. Not selectable, Not focusable.|
 |button|Button. Useful with icon property. 'click-button' event will be emitted when the button is clicked.|
+|showMore|Show more button. 'click-show-more' event will be emitted when the button is clicked.|
 
 <br/>
 
@@ -174,9 +175,8 @@ Each `MenuItem` has the following type to represent it:
 
 ## Slots
 
-Context Menu have 8 slots:
-
 <Description markdown={`
+Context Menu have ${contextMenuSlots.length} slots:
 |Slot|Description|
 |-|-|
 ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join('\n')}
@@ -354,31 +354,6 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
                 })
                 return {...toRefs((state))}
             }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-
-### Help Text Slot
-
-<Canvas>
-    <Story name="Help Text Slot" args={{menu: menuItems}}>
-        {{
-            props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu },
-            template: `
-        <div class="flex h-full flex-col">
-            <div class="mt-4">
-                <p-context-menu :menu="menu">
-                    <template #help-text>This is help text slot.</template>
-                </p-context-menu>
-            </div>
-        </div>
-<!--<div>-->
-`,
         }}
     </Story>
 </Canvas>

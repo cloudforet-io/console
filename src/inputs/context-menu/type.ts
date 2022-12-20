@@ -5,6 +5,7 @@ export const CONTEXT_MENU_TYPE = {
     header: 'header',
     item: 'item',
     button: 'button',
+    showMore: 'showMore',
 } as const;
 
 export type ContextMenuType = typeof CONTEXT_MENU_TYPE[keyof typeof CONTEXT_MENU_TYPE];

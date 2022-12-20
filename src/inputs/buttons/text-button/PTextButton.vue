@@ -11,22 +11,26 @@
                 click: (event) => {
                     if (!disabled && !loading) {
                         if (typeof $listeners.click === 'function') $listeners.click(event);
-                        else $listeners.click.forEach(func => func(event));
+                        if (Array.isArray($listeners.click)) $listeners.click.forEach(func => func(event));
                     }
                 }
             }"
     >
-        <p-spinner v-if="loading" :size="loadingIconSize" />
+        <p-spinner v-if="loading"
+                   :size="loadingIconSize"
+        />
         <p-i v-if="iconLeft"
              :name="iconLeft"
-             :width="iconSize" :height="iconSize"
+             :width="iconSize"
+             :height="iconSize"
              color="inherit"
              class="icon left"
         />
         <slot name="default" />
         <p-i v-if="iconRight"
              :name="iconRight"
-             :width="iconSize" :height="iconSize"
+             :width="iconSize"
+             :height="iconSize"
              color="inherit"
              class="icon right"
         />

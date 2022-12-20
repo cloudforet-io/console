@@ -32,6 +32,9 @@ export const menuItems: MenuItem[] = [
     {
         label: 'Hello', name: 'hello',
     },
+    {
+        type: 'showMore', name: 'helloShowMore',
+    },
 ];
 export const longMenuItems: MenuItem[] = [
     {
