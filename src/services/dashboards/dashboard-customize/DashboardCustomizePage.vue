@@ -25,10 +25,10 @@ import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/Da
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
 
 const state = reactive({
-    labelList: [] as Array<{label: string}>,
+    labelList: [] as Array<string>,
 });
 
-const handleUpdateLabelList = (labelList: Array<{label: string}>) => {
+const handleUpdateLabelList = (labelList: Array<string>) => {
     state.labelList = labelList;
 };
 </script>

@@ -5,7 +5,7 @@
          @keydown.enter="handlePushLabel"
     >
         <p-label
-            v-for="({ label }, index) in state.labelList"
+            v-for="(label, index) in state.labelList"
             :key="`dashboard-label-${index}`"
             :text="label"
             :deletable="props.editable"
@@ -32,24 +32,26 @@
 <script setup lang="ts">
 // this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PIconButton, PLabel, PTextInput } from '@spaceone/design-system';
 
 
 interface Props {
-    labelList: Array<{label: string}>;
+    labelList: Array<string>;
     editable?: boolean;
 }
 const props = defineProps<Props>();
 const emit = defineEmits(['update:labelList']);
 
 const state = reactive({
-    labelList: [...props.labelList],
+    labelList: computed<Array<string>>({
+        get: () => props.labelList,
+        set(val: Array<string>) { emit('update:labelList', val); },
+    }),
     inputMode: false,
     inputText: '',
 });
-
 
 const handleClickPlus = () => {
     state.inputMode = true;
@@ -59,7 +61,7 @@ const handleEscape = () => {
     state.inputText = '';
 };
 const handlePushLabel = () => {
-    state.labelList.push({ label: state.inputText });
+    state.labelList.push(state.inputText);
     state.inputText = '';
     emit('update:labelList', state.labelList);
 };

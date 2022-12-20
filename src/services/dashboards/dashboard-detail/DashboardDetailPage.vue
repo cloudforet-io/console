@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard-detail-page">
         <p-page-title title="Project_title">
-            <template v-if="state.dashboardType === DASHBOARD_VIEWER_PUBLIC"
+            <template v-if="state.dashboardType === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
                 <p-i name="ic_public"
@@ -61,6 +61,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import { gray } from '@/styles/colors';
@@ -72,6 +73,7 @@ import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/Da
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import DashboardRefresher from '@/services/dashboards/dashboard-detail/modules/DashboardRefresher.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
+import type { ProjectDashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
@@ -80,19 +82,19 @@ import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneMod
 const PUBLIC_ICON_COLOR = gray[500];
 
 interface Props {
-    dashboardScope: DashboardScope;
-    dashboardId: string;
+    // below props are required, but temporarily
+    dashboardScope?: DashboardScope;
+    dashboardId?: string;
 }
 
 // eslint-disable-next-line no-unused-vars,@typescript-eslint/no-unused-vars
 const props = defineProps<Props>();
 
-const LABEL_LIST_MOCK = [{ label: 'THIS' }, { label: 'LABELS ARE' }, { label: 'MOCK' }];
 const state = reactive({
     dashboardType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
     dashboardId: 'dashboard-idxxx',
     dashboardName: 'Dashboard XXX',
-    labelList: LABEL_LIST_MOCK as Array<{label: string}>,
+    labelList: [] as Array<string>,
     nameEditModalVisible: false,
     cloneModalVisible: false,
 });
@@ -119,7 +121,12 @@ const handleVisibleCloneModal = () => {
 
 // INIT
 (async () => {
-    SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: 'project-dash-5f7dc1d3bb43' });
+    try {
+        const result: ProjectDashboardModel = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: 'project-dash-eb13f8b042f9' });
+        state.labelList = result.labels;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 })();
 </script>
 
