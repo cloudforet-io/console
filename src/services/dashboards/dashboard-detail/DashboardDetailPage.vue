@@ -74,7 +74,7 @@ import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/Da
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import DashboardRefresher from '@/services/dashboards/dashboard-detail/modules/DashboardRefresher.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
-import type { ProjectDashboardModel } from '@/services/dashboards/model';
+import type { DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
@@ -120,7 +120,7 @@ const handleVisibleCloneModal = () => {
 
 const getDashboardData = async () => {
     try {
-        let result: ProjectDashboardModel;
+        let result: ProjectDashboardModel|DomainDashboardModel;
         if (isProjectDashboard) {
             result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
         } else {
