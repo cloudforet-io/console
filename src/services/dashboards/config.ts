@@ -22,10 +22,10 @@ export const GRANULARITY = {
 } as const;
 
 export const VARIABLE_SELECTION_TYPES = ['SINGLE', 'MULTI'] as const;
-type VariableSelectionType = typeof VARIABLE_SELECTION_TYPES[number];
+export type VariableSelectionType = typeof VARIABLE_SELECTION_TYPES[number];
 
 export const VARIABLE_TYPES = ['MANAGED', 'CUSTOM'] as const;
-type VariableType = typeof VARIABLE_TYPES[number];
+export type VariableType = typeof VARIABLE_TYPES[number];
 
 export type DashboardScope = keyof typeof DASHBOARD_SCOPE;
 export type DashboardViewer = keyof typeof DASHBOARD_VIEWER;
