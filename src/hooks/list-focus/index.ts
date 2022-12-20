@@ -20,7 +20,7 @@ export function useListFocus<T>(items: ComputedRef<T[]>, groupId: string, predic
 
     /* functions */
     const getItemId = (idx: number) => `${groupId}-${idx}-${uuid}`;
-    const focus = (position): number|undefined => {
+    const focus = (position?: number): number|undefined => {
         const idx = position === -1 ? state.focusableIndices[state.focusableIndices.length - 1] : state.focusableIndices[position || 0];
         const el = document.getElementById(getItemId(idx));
         if (el) {

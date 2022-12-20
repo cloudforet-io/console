@@ -2,17 +2,19 @@ import type { ArgTypes } from '@storybook/addons';
 
 import { getContextMenuItemArgTypes } from '@/inputs/context-menu/context-menu-item/story-helper';
 
-const slots: [string, string][] = [
-    ['no-data-format', '`no-data` slot with default style applied'],
+export const contextMenuSlots: [string, string][] = [
+    ['menu', 'A slot that replaces the whole context menu. It\'s useful when you want to use context menu\'s container style, no data & loading container only.'],
+    ['items', 'A slot that replaces the area for menu items. This is useful when you want to directly combine and use context menu items in a compound component way.'],
+    ['bottom', 'A slot that replaces the bottom area of the context menu.'],
+    ['no-data-format', 'A slot that replaces the inner area of the no-data container. It replaces style of the entire corresponding slot area.'],
+    ['item--format', 'A slot used when customizing each menu item whose type is \'item\' type with default style applied. This leads directly to the default slot of ContextMenuItem.'],
     // eslint-disable-next-line max-len
-    ['menu', 'This is a slot that allows you to customize a menu, and it is useful when you want to use only the functions of the context menu, but use it completely differently from the basic style.'],
-    ['item--format', 'Slot used when customizing all menu items whose type is \'item\' with default style applied'],
-    ['item-text-list', 'Slot used when customizing all menu items whose type is \'item\' with default style applied. This works only when the highlightTerm is given.'],
-    ['header-<item.name>', 'Slot used when customizing a specific menu item whose type is \'header\''],
-    ['help-text', 'Slot used when you want to put additional information on the top'],
+    ['item-text-list', 'A slot used when customizing each menu item whose type is \'item\' type with default style applied. This leads directly to the text-list slot of ContextMenuItem. This works only when the highlightTerm is given.'],
+    ['header-{item.name}', 'A slot that replaces the inner area of a menu item whose type is \'header\' with a specific name.'],
+    ['help-text', 'A slot used when you want to put additional information on the top.'],
 ];
 
-const events: [string, string][] = [
+const contextMenuEvents: [string, string][] = [
     ['<item.name>:select', 'This event is emitted when a specific item is selected. As arguments, index and click event are passed. This event will be deprecated, so don\'t use it.'],
     ['select', 'This event is emitted when a specific item is selected. As arguments, item name and index are passed'],
     ['focus', 'This event is emitted when item is focused. As arguments, index of item is passed'],
@@ -196,7 +198,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
-        ...getArgTypes('slots', slots),
-        ...getArgTypes('events', events),
+        ...getArgTypes('slots', contextMenuSlots),
+        ...getArgTypes('events', contextMenuEvents),
     };
 };

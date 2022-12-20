@@ -1,4 +1,4 @@
-import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { Meta, Canvas, Story, ArgsTable, Description } from '@storybook/addon-docs/blocks';
 import { reactive, toRefs, watch } from 'vue';
 
 import PContextMenu from './PContextMenu.vue';
@@ -7,7 +7,7 @@ import PI from '@/foundation/icons/PI.vue';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 import PTextEditor from "@/inputs/text-editor/PTextEditor";
 
-import {getContextMenuArgTypes} from '@/inputs/context-menu/story-helper';
+import {contextMenuSlots, getContextMenuArgTypes} from '@/inputs/context-menu/story-helper';
 import {menuItems, longMenuItems} from '@/inputs/context-menu/mock';
 
 
@@ -170,15 +170,15 @@ Each `MenuItem` has the following type to represent it:
 <br/>
 <br/>
 
-## Slot Cases
+## Slots
 
-Context Menu have 3 types fot slots:
+Context Menu have 8 slots:
 
-|Slot Type|Description|Slots|
-|-|-|-|
-|Full replacement with style|A slot that replaces the inner area of the style of the entire corresponding slot area.|`no-data-format`, `item--format`|
-|Specific replacement|A slot that replaces the specific corresponding slot area.|`header-<item.name>`|
-|Additional|A slot for additional information.|`help-text`|
+<Description markdown={`
+|Slot|Description|
+|-|-|
+${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join('\n')}
+`}/>
 
 <br/>
 
@@ -360,10 +360,10 @@ Context Menu have 3 types fot slots:
 <br/>
 
 
-### Help Text Slots
+### Help Text Slot
 
 <Canvas>
-    <Story name="Help Text Slots" args={{menu: menuItems}}>
+    <Story name="Help Text Slot" args={{menu: menuItems}}>
         {{
             props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu },
@@ -372,6 +372,30 @@ Context Menu have 3 types fot slots:
             <div class="mt-4">
                 <p-context-menu :menu="menu">
                     <template #help-text>This is help text slot.</template>
+                </p-context-menu>
+            </div>
+        </div>
+<!--<div>-->
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Bottom Slot
+
+<Canvas>
+    <Story name="Bottom Slot" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <div class="flex h-full flex-col">
+            <div class="mt-4">
+                <p-context-menu :menu="menu">
+                    <template #bottom><div class="border border-coral-300">This is bottom slot.</div></template>
                 </p-context-menu>
             </div>
         </div>
