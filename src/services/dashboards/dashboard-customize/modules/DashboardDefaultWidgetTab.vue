@@ -24,7 +24,15 @@
             </ul>
         </div>
         <div class="right-area">
-            <dashboard-add-default-widget-right-area :widget-config-id="selectedWidgetConfigId" />
+            <div v-if="!selectedWidgetConfigId"
+                 class="no-selected-wrapper"
+            >
+                <span class="title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED') }}</span>
+                <span class="text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED_HELP_TEXT') }}</span>
+            </div>
+            <dashboard-add-default-widget-right-area v-else
+                                                     :widget-config-id="selectedWidgetConfigId"
+            />
         </div>
     </div>
 </template>

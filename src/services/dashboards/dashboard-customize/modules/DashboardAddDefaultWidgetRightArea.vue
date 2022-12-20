@@ -1,74 +1,64 @@
 <template>
     <div class="dashboard-add-default-widget-right-area">
-        <div v-if="!widgetConfigId"
-             class="no-selected-wrapper"
+        <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
+                       :invalid="invalidState.name"
+                       :invalid-text="invalidTexts.name"
+                       required
         >
-            <span class="title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED') }}</span>
-            <span class="text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED_HELP_TEXT') }}</span>
+            <p-text-input :value="name"
+                          :invalid="invalidState.name"
+                          :placeholder="widgetConfig?.title"
+                          class="input"
+                          @input="setForm('name', $event)"
+            />
+        </p-field-group>
+        <div class="description-text">
+            {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NAME_DESC') }}
         </div>
-        <div v-else
-             class="form-wrapper"
+        <p-json-schema-form v-if="widgetOptionsJsonSchema"
+                            :schema="widgetOptionsJsonSchema"
+                            :form-data.sync="formData"
+                            class="widget-options-form"
         >
-            <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
-                           :invalid="invalidState.name"
-                           :invalid-text="invalidTexts.name"
-                           required
-            >
-                <p-text-input :value="name"
-                              :invalid="invalidState.name"
-                              :placeholder="widgetConfig?.title"
-                              class="input"
-                              @input="setForm('name', $event)"
-                />
-            </p-field-group>
-            <div class="description-text">
-                {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NAME_DESC') }}
-            </div>
-            <p-json-schema-form v-if="widgetOptionsJsonSchema"
-                                :schema="widgetOptionsJsonSchema"
-                                :form-data.sync="formData"
-                                class="widget-options-form"
-            >
-                <template #label-extra="{ propertyName }">
-                    <div v-if="!nonInheritableProperties.includes(propertyName)"
-                         class="inherit-toggle-button"
-                    >
-                        <span class="text"
-                              :class="{inherit: inheritItemMap[propertyName]}"
-                        >{{ $t('inherit') }}</span><!--song-lang-->
-                        <p-toggle-button :value="inheritItemMap[propertyName]"
-                                         @change="handleChangeInheritToggle(propertyName, ...arguments)"
-                        />
-                    </div>
-                </template>
-                <template #dropdown-extra="{ propertyName, selectedItem }">
-                    <div v-if="isSelected(selectedItem) && inheritItemMap[propertyName]">
-                        <span>{{ selectedItem.label }}</span>
-                        <span class="suffix-text">{{ $t('from dashboard') }}</span><!--song-lang-->
-                    </div>
-                </template>
-            </p-json-schema-form>
-            <div v-click-outside="hideOptionsMenu"
-                 class="add-options-wrapper"
-            >
-                <p-button ref="targetRef"
-                          style-type="secondary"
-                          icon-left="ic_plus_bold"
-                          block
-                          @click="handleClickAddOptions"
+            <template #label-extra="{ propertyName }">
+                <div v-if="!nonInheritableProperties.includes(propertyName)"
+                     class="inherit-toggle-button"
                 >
-                    {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD_OPTIONS') }}
-                </p-button>
-                <p-context-menu v-show="addOptionsMenuVisible"
-                                ref="menuRef"
-                                :menu="optionsMenuItems"
-                                :selected.sync="selectedOptions"
-                                :style="{...contextMenuStyle}"
-                                multi-selectable
-                                item-height-fixed
-                                @select="handleSelectOption"
-                />
-            </div>
+                    <span class="text"
+                          :class="{inherit: inheritItemMap[propertyName]}"
+                    >{{ $t('inherit') }}</span><!--song-lang-->
+                    <p-toggle-button :value="inheritItemMap[propertyName]"
+                                     @change="handleChangeInheritToggle(propertyName, ...arguments)"
+                    />
+                </div>
+            </template>
+            <template #dropdown-extra="{ propertyName, selectedItem }">
+                <div v-if="isSelected(selectedItem) && inheritItemMap[propertyName]">
+                    <span>{{ selectedItem.label }}</span>
+                    <span class="suffix-text">{{ $t('from dashboard') }}</span><!--song-lang-->
+                </div>
+            </template>
+        </p-json-schema-form>
+        <div v-click-outside="hideOptionsMenu"
+             class="add-options-wrapper"
+        >
+            <p-button ref="targetRef"
+                      style-type="secondary"
+                      icon-left="ic_plus_bold"
+                      block
+                      @click="handleClickAddOptions"
+            >
+                {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD_OPTIONS') }}
+            </p-button>
+            <p-context-menu v-show="addOptionsMenuVisible"
+                            ref="menuRef"
+                            :menu="optionsMenuItems"
+                            :selected.sync="selectedOptions"
+                            :style="{...contextMenuStyle}"
+                            multi-selectable
+                            item-height-fixed
+                            @select="handleSelectOption"
+            />
         </div>
     </div>
 </template>
@@ -87,7 +77,6 @@ import type { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/in
 import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
 import { useContextMenuFixedStyle } from '@spaceone/design-system/src/hooks';
 import type { JsonSchema } from '@spaceone/design-system/src/inputs/forms/json-schema-form/type';
-import type { Entries } from 'framework-utils';
 import { cloneDeep, isEmpty } from 'lodash';
 
 import { store } from '@/store';
@@ -103,8 +92,6 @@ import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { WidgetOptionsSchema } from '@/services/dashboards/widgets/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/config';
-import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 
@@ -345,81 +332,64 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .dashboard-add-default-widget-right-area {
+    @apply flex flex-col overflow-hidden;
     height: 100%;
-    .no-selected-wrapper {
-        @apply flex flex-col justify-center items-center;
-        height: 100%;
+    gap: 1rem;
+    overflow: auto;
+    .p-field-group {
+        margin: 0;
+        .input {
+            width: 100%;
+        }
+    }
+    .description-text {
+        @apply bg-gray-100 text-gray-600 rounded-md;
         font-size: 0.875rem;
-        text-align: center;
-        .title {
-            @apply text-primary-2;
-            padding-bottom: 0.75rem;
+        font-weight: 400;
+        padding: 0.75rem;
+    }
+
+    /* custom design-system component - p-field-group */
+    :deep(.widget-options-form) {
+        .field-title-box {
+            pointer-events: none;
+        }
+        .form-label {
+            display: -webkit-box;
+            width: 100%;
+            justify-content: space-between;
+            align-content: center;
+        }
+        .input-form {
+            width: 100%;
+        }
+    }
+    .suffix-text {
+        @apply text-gray-500;
+        padding-left: 0.25rem;
+    }
+    .inherit-toggle-button {
+        @apply bg-gray-100 rounded;
+        line-height: 1.25;
+        padding: 0.25rem 0.5rem;
+        .toggle-button {
+            pointer-events: auto;
         }
         .text {
-            @apply text-gray-600;
+            @apply text-gray-300;
+            font-weight: 400;
+            font-size: 0.75rem;
+            letter-spacing: 0.02em;
+            padding-right: 0.375rem;
+            &.inherit {
+                @apply text-gray-600;
+            }
         }
     }
 
-    .form-wrapper {
-        @apply flex flex-col overflow-hidden;
-        gap: 1rem;
-        height: 100%;
-        overflow: auto;
-        .p-field-group {
-            margin: 0;
-            .input {
-                width: 100%;
-            }
-        }
-        .description-text {
-            @apply bg-gray-100 text-gray-600 rounded-md;
-            font-size: 0.875rem;
-            font-weight: 400;
-            padding: 0.75rem;
-        }
-
-        /* custom design-system component - p-field-group */
-        :deep(.widget-options-form) {
-            .field-title-box {
-                pointer-events: none;
-            }
-            .form-label {
-                display: -webkit-box;
-                width: 100%;
-                justify-content: space-between;
-                align-content: center;
-            }
-            .input-form {
-                width: 100%;
-            }
-        }
-        .suffix-text {
-            @apply text-gray-500;
-            padding-left: 0.25rem;
-        }
-        .inherit-toggle-button {
-            @apply bg-gray-100 rounded;
-            line-height: 1.25;
-            padding: 0.25rem 0.5rem;
-            .toggle-button {
-                pointer-events: auto;
-            }
-            .text {
-                @apply text-gray-300;
-                font-weight: 400;
-                font-size: 0.75rem;
-                letter-spacing: 0.02em;
-                padding-right: 0.375rem;
-                &.inherit {
-                    @apply text-gray-600;
-                }
-            }
-        }
-
-        .add-options-wrapper {
-            position: relative;
-            display: inline-block;
-        }
+    .add-options-wrapper {
+        position: relative;
+        display: inline-block;
     }
 }
 </style>
