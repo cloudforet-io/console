@@ -615,6 +615,55 @@ It works only in multi select case.
 <br/>
 <br/>
 
+## Searchable
+
+<Canvas>
+    <Story name="Searchable" height={'18rem'}>
+        {{
+            components: { PContextMenu},
+            template: `
+<div>
+    <p-context-menu :menu="menu" searchable :highlight-term="searchTerm"
+        :loading="loading"
+        @update-search-input="handleUpdateSearchInput"
+    />
+</div>
+`,
+            setup() {
+                const headerItem = {type: 'header', label: 'Names', name: 'names-header'};
+                const allItems = [headerItem, ...getContextMenuItems()]
+                const state = reactive({
+                    menu: allItems,
+                    loading: false,
+                    searchTerm: ''
+                });
+                const handleUpdateSearchInput = async (value) => {
+                    state.loading = true;
+                    state.menu = await new Promise(resolve => {
+                        setTimeout(() => {
+                            const regex = new RegExp(value, 'i');
+                            resolve(allItems.filter(item => {
+                                // check only item type
+                                if (!item.type || item.type === 'item') return regex.test(item.label)
+                                return true;
+                            }))
+                        }, 200)
+                    })
+                    state.searchTerm = value;
+                    state.loading = false;
+                }
+                return {
+                    ...toRefs(state),
+                    handleUpdateSearchInput
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Playground
 
 <Canvas>
