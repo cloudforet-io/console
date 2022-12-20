@@ -12,7 +12,7 @@ import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widget
 import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/widget-config-list';
 
 const mergeCustomizer = (val1, val2) => {
-    if (Array.isArray(val1)) return val1.concat(val2);
+    if (Array.isArray(val1)) return [...new Set(val1.concat(val2))];
     return undefined;
 };
 const baseWidgetConfigCacheMap = new Map<string, Partial<WidgetConfig>>();
@@ -59,10 +59,11 @@ export const getWidgetConfig = (widgetConfigId: string): WidgetConfig => {
     }
 
     const baseWidgetConfigs = config.base_configs;
-    const mergedConfig = merge(
+    const mergedConfig = mergeWith(
         {},
         getMergedBaseWidgetConfig(baseWidgetConfigs),
         config,
+        mergeCustomizer,
     );
     consoleWidgetConfigCacheMap.set(widgetConfigId, mergedConfig);
     return consoleWidgetConfigCacheMap.get(widgetConfigId) as WidgetConfig;

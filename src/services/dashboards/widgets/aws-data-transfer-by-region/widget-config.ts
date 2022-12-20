@@ -1,5 +1,12 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
 import { CHART_TYPE, GRANULARITY } from '@/services/dashboards/widgets/config';
+import { excludePropertiesFromDashboardCommonWidgetConfig } from '@/services/dashboards/widgets/widget-options-schema-helper';
+
+const {
+    default_properties,
+    inheritable_properties,
+    schema,
+} = excludePropertiesFromDashboardCommonWidgetConfig(['filters.provider']);
 
 const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsDataTransferByRegion',
@@ -27,6 +34,16 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
         selector_options: {
             enabled: true,
             type: 'cost-usage',
+        },
+    },
+    widget_options_schema: {
+        default_properties,
+        inheritable_properties,
+        schema: {
+            type: 'object',
+            properties: {
+                ...schema.properties,
+            },
         },
     },
 };

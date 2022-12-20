@@ -1,7 +1,10 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 
 const costMapWidgetConfig: WidgetConfig = {
     widget_config_id: 'costMap',
+    base_configs: [{ config_id: 'dashboardCommon' }],
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/cost-map/CostMapWidget.vue'),
     }),
@@ -18,7 +21,19 @@ const costMapWidgetConfig: WidgetConfig = {
     },
     sizes: ['md', 'full'],
     widget_options_schema: {
-        group_by: ['project'],
+        default_properties: ['group_by'],
+        schema: {
+            type: 'object',
+            properties: {
+                group_by: {
+                    title: 'Group By',
+                    type: 'string',
+                    enum: Object.values(GROUP_BY),
+                    menuItems: Object.values(GROUP_BY_ITEM_MAP),
+                },
+            },
+            required: ['group_by'],
+        },
     },
 };
 

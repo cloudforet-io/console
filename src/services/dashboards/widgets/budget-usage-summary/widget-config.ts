@@ -2,6 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/config';
 
 const budgetUsageSummaryConfig: WidgetConfig = {
     widget_config_id: 'budgetUsageSummary',
+    base_configs: [{ config_id: 'dashboardCommon' }],
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/budget-usage-summary/BudgetUsageSummaryWidget.vue'),
     }),

@@ -115,6 +115,7 @@ const SAMPLE_DASHBOARD_VARIABLES_SCHEMA = {
     default: undefined,
 };
 export default defineComponent<Props>({
+    name: 'DashboardAddDefaultWidgetRightArea',
     components: {
         PContextMenu,
         PTextInput,
@@ -203,17 +204,12 @@ export default defineComponent<Props>({
                 return {
                     title: propertySchema.title,
                     ...SAMPLE_DASHBOARD_VARIABLES_SCHEMA, // TODO: temp data
+                    default: undefined,
                 };
             }
             // 2. if (propertyName === group_by) return groupBy data (not store data!)
             const _propertyName = propertyName.replace('filters.', '');
-            if (_propertyName === 'group_by') {
-                return {
-                    ...propertySchema,
-                    enum: Object.values(GROUP_BY),
-                    menuItems: Object.values(GROUP_BY_ITEM_MAP),
-                };
-            }
+            if (_propertyName === 'group_by') return propertySchema;
             // 3. return store data
             const storeData: ReferenceItem = storeState[_propertyName];
             let menuItems: MenuItem[] = [];
@@ -240,13 +236,14 @@ export default defineComponent<Props>({
         };
         const initJsonSchema = (widgetOptionsSchema: WidgetOptionsSchema): JsonSchema => {
             const defaultProperties = widgetOptionsSchema?.default_properties ?? [];
-            const _jsonSchema = cloneDeep(widgetOptionsSchema.schema);
+            const _jsonSchema = cloneDeep(widgetOptionsSchema?.schema);
             const refinedJsonSchema = {
                 type: 'object',
                 properties: {},
                 required: _jsonSchema?.required ?? [],
             } as JsonSchema;
-            const _propertyMap = Object.entries(_jsonSchema.properties) as Entries<JsonSchema>;
+            if (!_jsonSchema?.properties) return refinedJsonSchema;
+            const _propertyMap = Object.entries(_jsonSchema.properties);
             _propertyMap.forEach(([propertyName, propertySchema]) => {
                 if (!defaultProperties.includes(propertyName)) return;
                 refinedJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema);

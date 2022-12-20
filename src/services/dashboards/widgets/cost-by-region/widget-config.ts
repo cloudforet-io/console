@@ -3,6 +3,7 @@ import { CHART_TYPE, GRANULARITY } from '@/services/dashboards/widgets/config';
 
 const costByRegionWidgetConfig: WidgetConfig = {
     widget_config_id: 'costByRegion',
+    base_configs: [{ config_id: 'dashboardCommon' }],
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/cost-by-region/CostByRegion.vue'),
     }),

@@ -3,13 +3,17 @@ import { describe, expect, it } from 'vitest';
 import basePieWidgetConfig from '@/services/dashboards/widgets/_base/base-pie/widget-config';
 import baseTrendWidgetConfig from '@/services/dashboards/widgets/_base/base-trend/widget-config';
 import dashboardCommonWidgetConfig from '@/services/dashboards/widgets/_base/dashboard-common/widget-config';
+import costMapWidgetConfig from '@/services/dashboards/widgets/cost-map/widget-config';
 import costPieWidgetConfig from '@/services/dashboards/widgets/cost-pie/widget-config';
 import costTrendWidgetConfig from '@/services/dashboards/widgets/cost-trend/widget-config';
+import monthlyCostWidgetConfig from '@/services/dashboards/widgets/monthly-cost/widget-config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 const costPieConfigId = costPieWidgetConfig.widget_config_id;
 const basePieConfigId = basePieWidgetConfig.widget_config_id;
 const costTrendConfigId = costTrendWidgetConfig.widget_config_id;
+const monthlyCostWidgetConfigId = monthlyCostWidgetConfig.widget_config_id;
+const costMapWidgetConfigId = costMapWidgetConfig.widget_config_id;
 const dashboardCommonConfigId = dashboardCommonWidgetConfig.widget_config_id;
 const dashboardCommonSchema = dashboardCommonWidgetConfig.widget_options_schema?.schema;
 const costPieSchema = costPieWidgetConfig.widget_options_schema?.schema;
@@ -41,6 +45,18 @@ describe('[Widget Helper] getWidgetConfig', () => {
         expect(baseTrendWidgetConfig?.widget_options_schema?.default_properties).toMatchObject(['group_by']);
         const mergedBaseTrendConfig = getWidgetConfig(costTrendConfigId);
         expect(mergedBaseTrendConfig?.widget_options_schema?.default_properties).toEqual(expect.arrayContaining([
+            'group_by', 'filters.provider', 'filters.project_id', 'filters.service_account_id',
+        ]));
+    });
+    it('test MonthlyCostWidget', () => {
+        const mergedMonthlyCostWidgetConfig = getWidgetConfig(monthlyCostWidgetConfigId);
+        expect(mergedMonthlyCostWidgetConfig?.widget_options_schema?.default_properties).toEqual(expect.arrayContaining([
+            'filters.provider', 'filters.project_id', 'filters.service_account_id',
+        ]));
+    });
+    it('test CostMapWidget', () => {
+        const mergedCostMapWidgetConfig = getWidgetConfig(costMapWidgetConfigId);
+        expect(mergedCostMapWidgetConfig?.widget_options_schema?.default_properties).toEqual(expect.arrayContaining([
             'group_by', 'filters.provider', 'filters.project_id', 'filters.service_account_id',
         ]));
     });
