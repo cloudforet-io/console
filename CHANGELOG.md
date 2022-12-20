@@ -1,3 +1,10 @@
+# [1.1.0-beta.482](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.481...v1.1.0-beta.482) (2022-12-20)
+
+
+### Features
+
+* **context-menu:** add showSelectHeader and showClearSelection props ([#185](https://github.com/cloudforet-io/mirinae/issues/185)) ([72dafa1](https://github.com/cloudforet-io/mirinae/commit/72dafa125649048bd25e2f223ceec04a5c16dd1b))
+
 # [1.1.0-beta.481](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.480...v1.1.0-beta.481) (2022-12-20)
 
 
