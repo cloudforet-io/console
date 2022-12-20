@@ -22,15 +22,19 @@ import VueI18n from 'vue-i18n';
 import { PSelectDropdown } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { DASHBOARD_TYPE } from '@/services/cost-explorer/cost-dashboard/lib/config';
+import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardViewer } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -42,9 +46,8 @@ type DefaultMenuItems = Array<{
 
 interface DashboardMoreMenuProps {
     dashboardId: string;
-    dashboardType: DashboardViewer;
+    dashboardViewer: DashboardViewer;
     manageDisabled: boolean;
-    dashboard: any;
 }
 
 const MENU = Object.freeze({
@@ -68,7 +71,7 @@ const state = reactive({
             menuItems.find((d) => d.name === MENU.SET_HOME)!.disabled = true;
             return menuItems;
         }
-        if (state.dashboardType === DASHBOARD_TYPE.PUBLIC && props.manageDisabled) {
+        if (state.dashboardViewer === DASHBOARD_VIEWER.PUBLIC && props.manageDisabled) {
             if (state.homeDashboardId === props.dashboardId) {
                 // below find() never be undefined
                 menuItems.find((d) => d.name === MENU.DELETE)!.disabled = true;
@@ -82,9 +85,9 @@ const state = reactive({
     // FIXME:: connect dashboardStore
     // homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
     homeDashboardId: '',
-    dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(props.dashboard, 'public_dashboard_id') ? DASHBOARD_TYPE.PUBLIC : DASHBOARD_TYPE.USER)),
+    dashboardViewer: computed<DashboardViewer>(() => props.dashboardViewer),
 });
-
+const isProjectDashboard = Boolean(props.dashboardId.startsWith('project'));
 
 const checkDeleteState = reactive({
     visible: false,
@@ -104,17 +107,18 @@ const handleSelectMoreMenu = (item) => {
 const handleDeleteDashboardConfirm = async () => {
     try {
         checkDeleteState.loading = true;
-        if (props.dashboardId?.startsWith('user')) {
-            // await SpaceConnector.client.costAnalysis.userDashboard.delete({
-            //     user_dashboard_id: props.dashboardId,
-            // });
+        if (isProjectDashboard) {
+            await SpaceConnector.clientV2.dashboard.projectDashboard.delete({
+                project_dashboard_id: props.dashboardId,
+            });
+            await store.dispatch('dashboard/loadProjectDashboard');
         } else {
-            // await SpaceConnector.client.costAnalysis.publicDashboard.delete({
-            //     public_dashboard_id: props.dashboardId,
-            // });
+            await SpaceConnector.clientV2.dashboard.domainDashboard.delete({
+                domain_dashboard_id: props.dashboardId,
+            });
+            await store.dispatch('dashboard/loadDomainDashboard');
         }
-        // await costExplorerStore.dispatch('setDashboardList');
-        await SpaceRouter.router.replace({ name: DASHBOARDS_ROUTE._NAME });
+        await SpaceRouter.router.replace({ name: DASHBOARDS_ROUTE.ALL._NAME });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
     } finally {
