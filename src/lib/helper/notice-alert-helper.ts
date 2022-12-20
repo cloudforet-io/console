@@ -1,9 +1,10 @@
 import Vue from 'vue';
 
+
 /** * @function
  *   @name showErrorMessage
+ *   @param errorTitle
  *   @param error
- *   @param root
  *   @returns
  */
 export const showErrorMessage = (errorTitle, error) => {
@@ -11,7 +12,7 @@ export const showErrorMessage = (errorTitle, error) => {
     if (error.message) errorMsg = error.message;
     else if (error.response) { errorMsg = error.response.data.error.message; } else { errorMsg = error; }
     if (Vue) {
-        (Vue as any).notify({
+        Vue.notify({
             group: 'toastTopCenter',
             type: 'alert',
             title: errorTitle,
@@ -21,17 +22,17 @@ export const showErrorMessage = (errorTitle, error) => {
         });
     }
 };
+
+
 /** * @function
  *   @name showSuccessMessage
  *   @param successTitle
  *   @param successMessage
- *   @param root
  *   @returns
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const showSuccessMessage = (successTitle, successMessage) => {
     if (Vue) {
-        (Vue as any).notify({
+        Vue.notify({
             group: 'toastTopCenter',
             type: 'success',
             title: successTitle,
@@ -42,7 +43,13 @@ export const showSuccessMessage = (successTitle, successMessage) => {
     }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+/** * @function
+ *   @name showLoadingMessage
+ *   @param loadingTitle
+ *   @param loadingMessage
+ *   @returns
+ */
 export const showLoadingMessage = (loadingTitle, loadingMessage) => {
     if (Vue) {
         (Vue as any).notify({
@@ -56,10 +63,14 @@ export const showLoadingMessage = (loadingTitle, loadingMessage) => {
     }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const hideLoadingMessage = (root?) => {
+
+/** * @function
+ *   @name hideLoadingMessage
+ *   @returns
+ */
+export const hideLoadingMessage = () => {
     if (Vue) {
-        (Vue as any).notify({
+        Vue.notify({
             group: 'toastTopCenter',
             clean: true,
         });
