@@ -11,7 +11,10 @@ import type { Tags } from '@/models';
 import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
+import type { DateRange as DashboardDateRange } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
+
+export type DateRange = DashboardDateRange;
 
 export const WIDGET_SIZE = {
     sm: 'sm',
@@ -90,10 +93,7 @@ export interface WidgetOptionsSchema {
 }
 
 type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
-export interface DateRange {
-    start?: string;
-    end?: string;
-}
+
 
 interface LegendOptions {
     enabled?: boolean;
