@@ -319,8 +319,6 @@ export default defineComponent<ContextMenuProps>({
     > .menu-container {
         min-height: inherit;
         max-height: inherit;
-        min-width: inherit;
-        max-width: inherit;
         overflow-y: auto;
         > .selected-list-wrapper {
             @apply border-b border-gray-200;
