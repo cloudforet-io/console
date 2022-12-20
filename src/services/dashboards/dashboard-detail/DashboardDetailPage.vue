@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard-detail-page">
         <p-page-title :title="state.dashboardName">
-            <template v-if="state.dashboardType === DASHBOARD_VIEWER.PUBLIC"
+            <template v-if="state.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
                 <p-i name="ic_public"
@@ -18,12 +18,12 @@
                     <p-icon-button name="ic_edit-text"
                                    width="1.5rem"
                                    height="1.5rem"
+                                   :disabled="!state.hasManagePermission && state.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    @click="handleNameEditModal"
                     />
-                    <dashboard-more-menu dashboard-id="dashboard-xxx"
-                                         :dashboard="{ public_dashboard_id: 'dashboard-xxx' }"
-                                         :manage-disabled="false"
-                                         dashboard-type="PUBLIC"
+                    <dashboard-more-menu :dashboard-id="state.dashboardId"
+                                         :manage-disabled="!state.hasManagePermission"
+                                         :dashboard-viewer="state.dashboardViewer"
                     />
                 </span>
             </template>
@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PDivider, PI, PIconButton, PPageTitle,
@@ -62,18 +62,19 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import { gray } from '@/styles/colors';
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import type { DashboardScope, DashboardViewer } from '@/services/dashboards/config';
+import type { DashboardViewer } from '@/services/dashboards/config';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/DashboardMoreMenu.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import DashboardRefresher from '@/services/dashboards/dashboard-detail/modules/DashboardRefresher.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
-import type { ProjectDashboardModel } from '@/services/dashboards/model';
+import type { DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
@@ -82,22 +83,20 @@ import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneMod
 const PUBLIC_ICON_COLOR = gray[500];
 
 interface Props {
-    // below props are required, but temporarily
-    dashboardScope?: DashboardScope;
-    dashboardId?: string;
+    dashboardId: string;
 }
-
-// eslint-disable-next-line no-unused-vars,@typescript-eslint/no-unused-vars
 const props = defineProps<Props>();
 
 const state = reactive({
-    dashboardType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
-    dashboardId: '',
+    hasManagePermission: useManagePermissionState(),
+    dashboardId: computed<string>(() => props.dashboardId),
+    dashboardViewer: DASHBOARD_VIEWER.PRIVATE as DashboardViewer,
     dashboardName: 'Dashboard',
     labelList: [] as Array<string>,
     nameEditModalVisible: false,
     cloneModalVisible: false,
 });
+const isProjectDashboard = Boolean(props.dashboardId.startsWith('project'));
 
 const WIDGET_SIZE_MOCK = ['md', 'md', 'sm', 'md', 'lg', 'sm'];
 const WIDGET_THEME_OPTION_MOCK = [
@@ -119,15 +118,25 @@ const handleVisibleCloneModal = () => {
     state.cloneModalVisible = true;
 };
 
-// INIT
-(async () => {
+const getDashboardData = async () => {
     try {
-        const result: ProjectDashboardModel = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: 'project-dash-eb13f8b042f9' });
+        let result: ProjectDashboardModel|DomainDashboardModel;
+        if (isProjectDashboard) {
+            result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
+        } else {
+            result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ project_dashboard_id: props.dashboardId });
+        }
         state.labelList = result.labels;
         state.dashboardName = result.name;
+        state.dashboardViewer = result.viewers;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
+};
+
+// INIT
+(async () => {
+    await getDashboardData();
 })();
 </script>
 
