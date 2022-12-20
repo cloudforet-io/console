@@ -1,3 +1,10 @@
+# [1.1.0-beta.483](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.482...v1.1.0-beta.483) (2022-12-20)
+
+
+### Features
+
+* **context-menu:** add showMore type & add click-show-more event & update button type style & remove help-text slot ([#186](https://github.com/cloudforet-io/mirinae/issues/186)) ([a692d78](https://github.com/cloudforet-io/mirinae/commit/a692d78f9853bfb7bb2b87dd7b5f3b8cfecd5525))
+
 # [1.1.0-beta.482](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.481...v1.1.0-beta.482) (2022-12-20)
 
 
