@@ -61,7 +61,7 @@
 <script lang="ts">
 import type { PropType, DirectiveFunction } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs, toRef,
 } from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components';
@@ -152,28 +152,28 @@ export default defineComponent<SearchProps>({
         },
     },
     setup(props, { emit, listeners }) {
-        const {
-            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
-        } = useContextMenuFixedStyle({
-            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
-            visibleMenu: computed(() => props.visibleMenu),
-        });
-        const contextMenuFixedStyleState = reactive({
-            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
-        });
         const state = reactive({
+            proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
             proxyIsFocused: useProxyValue('isFocused', props, emit),
             handlerLoading: false,
             placeholderText: computed<TranslateResult>(() => {
                 if (props.placeholder === undefined) return i18n.t('COMPONENT.SEARCH.PLACEHOLDER');
                 return props.placeholder;
             }),
-            isAutoMode: computed(() => props.visibleMenu === undefined),
             filteredMenu: [] as MenuItem[],
             searchableItems: computed<MenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),
             bindingMenu: computed<SearchDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
             proxyValue: useProxyValue('value', props, emit),
             menuRef: null,
+        });
+        const {
+            targetRef, targetElement, contextMenuStyle,
+        } = useContextMenuFixedStyle({
+            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+            visibleMenu: toRef(state, 'proxyVisibleMenu'),
+        });
+        const contextMenuFixedStyleState = reactive({
+            targetRef, targetElement, contextMenuStyle,
         });
         const defaultHandler = (inputText: string, list: MenuItem[]) => {
             let results: MenuItem[] = [...list];
@@ -211,11 +211,11 @@ export default defineComponent<SearchProps>({
         }, 300);
 
         const showMenu = () => {
-            if (state.isAutoMode) contextMenuFixedStyleState.proxyVisibleMenu = true;
+            state.proxyVisibleMenu = true;
             emit('show-menu');
         };
         const hideMenu = () => {
-            if (state.isAutoMode) contextMenuFixedStyleState.proxyVisibleMenu = false;
+            state.proxyVisibleMenu = false;
             emit('hide-menu');
         };
         const focusMenu = () => {
@@ -293,6 +293,7 @@ export default defineComponent<SearchProps>({
 
 <style lang="postcss">
 .p-search {
+    position: relative;
     .input-container {
         @apply flex items-center border border-gray-300 bg-white text-gray-900 px-2 w-full rounded;
         height: auto;
@@ -353,6 +354,14 @@ export default defineComponent<SearchProps>({
         .left-icon {
             @apply text-gray-300 mr-1;
         }
+    }
+    .p-context-menu {
+        @apply font-normal;
+        position: absolute;
+        margin-top: -1px;
+        z-index: 1000;
+        min-width: 100%;
+        width: 100%;
     }
 }
 </style>
