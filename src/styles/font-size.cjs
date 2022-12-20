@@ -20,7 +20,7 @@ const fontSize = {
     xs: '0.625rem',
 }
 
-const semanticFont = {
+const semanticFontSize = {
     'display-2xl': [fontSize["6xl"], {lineHeight: lineHeight.short, letterSpacing: letterSpacing.tight}],
     'display-xl': [fontSize["5xl"], {lineHeight: lineHeight.short, letterSpacing: letterSpacing.tight}],
     'display-lg': [fontSize["4xl"], {lineHeight: lineHeight.short}],
@@ -29,8 +29,8 @@ const semanticFont = {
     'label-xl': [fontSize["xl"], {lineHeight: lineHeight.short}],
     'label-lg': [fontSize["lg"], {lineHeight: lineHeight.short}],
     'label-md': [fontSize["md"], {lineHeight: lineHeight.short}],
-    'label-sm': [fontSize["sm"], {lineHeight: lineHeight.long, letterSpacing: letterSpacing.wide,}],
-    'label-xs': [fontSize["sm"], {lineHeight: lineHeight.long, letterSpacing: letterSpacing.wide,}],
+    'label-sm': [fontSize["sm"], {lineHeight: lineHeight.short, letterSpacing: letterSpacing.wide,}],
+    'label-xs': [fontSize["sm"], {lineHeight: lineHeight.short, letterSpacing: letterSpacing.wide,}],
     'paragraph-lg': [fontSize["lg"], {lineHeight: lineHeight.long}],
     'paragraph-md': [fontSize["md"], {lineHeight: lineHeight.long}],
     'paragraph-sm': [fontSize["sm"], {lineHeight: lineHeight.long}],
@@ -42,5 +42,5 @@ module.exports = {
     lineHeight,
     letterSpacing,
     fontSize,
-    semanticFont,
+    semanticFontSize,
 }

@@ -1,5 +1,5 @@
 import { Meta, Canvas, Story } from '@storybook/addon-docs/blocks';
-const semanticFontSize = require('@/styles/font-size.cjs');
+const semanticFont = require('@/styles/font-size.cjs');
 
 <Meta title='Foundation/Styles/Typography' parameters={{
     design: {
@@ -114,7 +114,7 @@ Font Size is used in combination with line-height and letter-spacing to ensure d
             `,
             setup() {
                 return {
-                    fontSizesObj: semanticFontSize.semanticFont
+                    fontSizesObj: semanticFont.semanticFontSize
                 }
             }
         }}
@@ -146,7 +146,7 @@ Font Size is used in combination with line-height and letter-spacing to ensure d
             `,
             setup() {
                 return {
-                    lineHeightObj: semanticFontSize.lineHeight,
+                    lineHeightObj: semanticFont.lineHeight,
                 }
             }
         }}
@@ -178,7 +178,7 @@ Font Size is used in combination with line-height and letter-spacing to ensure d
             `,
             setup() {
                 return {
-                    letterSpacingObj: semanticFontSize.letterSpacing,
+                    letterSpacingObj: semanticFont.letterSpacing,
                 }
             }
         }}
