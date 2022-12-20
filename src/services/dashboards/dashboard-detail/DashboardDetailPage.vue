@@ -92,7 +92,7 @@ const props = defineProps<Props>();
 
 const state = reactive({
     dashboardType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
-    dashboardId: 'dashboard-idxxx',
+    dashboardId: '',
     dashboardName: 'Dashboard',
     labelList: [] as Array<string>,
     nameEditModalVisible: false,
