@@ -121,9 +121,9 @@ export default defineComponent<Props>({
             }
         };
 
-        const handleConfirm = () => {
-            updateDashboard();
-            loadDashboard();
+        const handleConfirm = async () => {
+            await updateDashboard();
+            await loadDashboard();
             emit('update:visible', false);
             emit('confirm', name.value);
         };

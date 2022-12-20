@@ -109,9 +109,9 @@ export default defineComponent<Props>({
             }
         };
 
-        const handleConfirm = () => {
-            updateDashboard();
-            costExplorerStore.dispatch('setDashboardList');
+        const handleConfirm = async () => {
+            await updateDashboard();
+            await costExplorerStore.dispatch('setDashboardList');
             emit('update:visible', false);
             emit('confirm', name.value);
         };
