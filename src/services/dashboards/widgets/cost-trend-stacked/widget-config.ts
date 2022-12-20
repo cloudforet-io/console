@@ -1,9 +1,10 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
 import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 
 const costTrendStackedWidgetConfig: WidgetConfig = {
     widget_config_id: 'costTrendStacked',
-    base_configs: [{ config_id: 'baseTrend' }],
+    base_configs: [{ config_id: 'dashboardCommon' }, { config_id: 'baseTrend' }],
     title: 'Cost Trend Stacked',
     labels: ['Cost'],
     description: {
@@ -24,14 +25,18 @@ const costTrendStackedWidgetConfig: WidgetConfig = {
         },
     },
     widget_options_schema: {
-        type: 'object',
-        properties: {
-            group_by: {
-                type: 'string',
-                enum: Object.values(GROUP_BY),
+        schema: {
+            type: 'object',
+            properties: {
+                group_by: {
+                    title: 'Group By',
+                    type: 'string',
+                    enum: Object.values(GROUP_BY),
+                    menuItems: Object.values(GROUP_BY_ITEM_MAP),
+                },
             },
+            required: ['group_by'],
         },
-        required: ['group_by'],
     },
 };
 

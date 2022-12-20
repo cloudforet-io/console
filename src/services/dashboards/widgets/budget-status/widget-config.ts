@@ -3,6 +3,7 @@ import { CHART_TYPE } from '@/services/dashboards/widgets/config';
 
 const budgetStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetStatus',
+    base_configs: [{ config_id: 'dashboardCommon' }],
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/budget-status/BudgetStatusWidget.vue'),
     }),
