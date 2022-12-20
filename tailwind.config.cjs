@@ -97,6 +97,7 @@ module.exports = {
             'label-md': semanticFont.semanticFontSize["label-md"],
             'label-sm': semanticFont.semanticFontSize["label-sm"],
             'label-xs': semanticFont.semanticFontSize["label-xs"],
+            'paragraph-lg': semanticFont.semanticFontSize["paragraph-lg"],
             'paragraph-md': semanticFont.semanticFontSize["paragraph-md"],
             'paragraph-sm': semanticFont.semanticFontSize["paragraph-sm"],
             'code-lg': semanticFont.semanticFontSize["code-lg"],
