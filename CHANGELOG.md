@@ -1,3 +1,10 @@
+# [1.1.0-beta.478](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.477...v1.1.0-beta.478) (2022-12-20)
+
+
+### Bug Fixes
+
+* **p-search:** fix contextMenu position bug ([#180](https://github.com/cloudforet-io/mirinae/issues/180)) ([a31f878](https://github.com/cloudforet-io/mirinae/commit/a31f878cb4ed8805308224fffae84a53f1b464e7))
+
 # [1.1.0-beta.477](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.476...v1.1.0-beta.477) (2022-12-19)
 
 
