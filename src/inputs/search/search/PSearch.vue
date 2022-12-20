@@ -1,13 +1,13 @@
 <template>
     <div v-click-outside="hideMenu"
          class="p-search"
-         :class="{ focused: proxyIsFocused }"
+         :class="{ focused }"
     >
         <div ref="targetRef"
              class="input-container"
-             :class="{ focused: proxyIsFocused, invalid, disabled }"
+             :class="{ focused, invalid, disabled }"
         >
-            <p-i v-if="!disableIcon && !proxyIsFocused && !value && !readonly"
+            <p-i v-if="!disableIcon && !focused && !value && !readonly"
                  class="left-icon"
                  name="ic_search"
                  color="inherit"
@@ -19,7 +19,7 @@
                 <slot name="default"
                       v-bind="{ value, placeholder: placeholderText }"
                 >
-                    <input v-focus.lazy="proxyIsFocused"
+                    <input ref="inputRef"
                            v-bind="$attrs"
                            :value="value"
                            :placeholder="placeholderText"
@@ -46,7 +46,8 @@
                 </div>
             </slot>
         </div>
-        <p-context-menu v-show="proxyVisibleMenu && useAutoComplete"
+        <p-context-menu v-if="useAutoComplete"
+                        v-show="proxyVisibleMenu"
                         ref="menuRef"
                         :menu="bindingMenu"
                         :highlight-term="proxyValue"
@@ -61,29 +62,29 @@
 <script lang="ts">
 import type { PropType, DirectiveFunction } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs, toRef,
+    computed, defineComponent, reactive, toRefs, toRef, watch,
 } from 'vue';
 
 import { vOnClickOutside } from '@vueuse/components';
+import { useFocus } from '@vueuse/core';
 import { debounce } from 'lodash';
-import { focus } from 'vue-focus';
 import type { TranslateResult } from 'vue-i18n';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
-import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import type { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
 import type { SearchProps } from '@/inputs/search/search/type';
 import { i18n } from '@/translations';
 import { makeByPassListeners } from '@/util/composition-helpers';
 
+const PContextMenu = import('@/inputs/context-menu/PContextMenu.vue');
 
 export default defineComponent<SearchProps>({
     name: 'PSearch',
     components: { PI, PContextMenu },
     i18n,
-    directives: { focus, clickOutside: vOnClickOutside as DirectiveFunction },
+    directives: { clickOutside: vOnClickOutside as DirectiveFunction },
     model: {
         prop: 'value',
         event: 'update:value',
@@ -154,7 +155,7 @@ export default defineComponent<SearchProps>({
     setup(props, { emit, listeners }) {
         const state = reactive({
             proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
-            proxyIsFocused: useProxyValue('isFocused', props, emit),
+            inputRef: null as null|HTMLElement,
             handlerLoading: false,
             placeholderText: computed<TranslateResult>(() => {
                 if (props.placeholder === undefined) return i18n.t('COMPONENT.SEARCH.PLACEHOLDER');
@@ -166,6 +167,9 @@ export default defineComponent<SearchProps>({
             proxyValue: useProxyValue('value', props, emit),
             menuRef: null,
         });
+
+        const { focused } = useFocus(toRef(state, 'inputRef'));
+
         const {
             targetRef, targetElement, contextMenuStyle,
         } = useContextMenuFixedStyle({
@@ -224,11 +228,8 @@ export default defineComponent<SearchProps>({
 
             if (state.menuRef) state.menuRef.focus();
         };
-        const blurSearch = () => {
-            state.proxyIsFocused = false;
-        };
         const allFocusOut = () => {
-            blurSearch();
+            focused.value = false;
             hideMenu();
         };
         /* event */
@@ -241,11 +242,11 @@ export default defineComponent<SearchProps>({
                 makeByPassListeners(listeners, 'input', e.target.value, e);
             },
             blur(e) {
-                state.proxyIsFocused = false;
+                focused.value = false;
                 makeByPassListeners(listeners, 'blur', e);
             },
             focus(e) {
-                state.proxyIsFocused = true;
+                focused.value = true;
                 makeByPassListeners(listeners, 'focus', e);
             },
             keyup(e) {
@@ -278,8 +279,16 @@ export default defineComponent<SearchProps>({
             emit('update:value', '');
         };
 
+        watch(() => props.isFocused, (isFocused) => {
+            if (typeof isFocused === 'boolean') focused.value = isFocused;
+        }, { immediate: true });
+        watch(focused, (_focused) => {
+            emit('update:isFocused', _focused);
+        });
+
         return {
             ...toRefs(state),
+            focused,
             ...toRefs(contextMenuFixedStyleState),
             inputListeners,
             hideMenu,
