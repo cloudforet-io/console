@@ -45,9 +45,9 @@ const props = defineProps<Props>();
 const emit = defineEmits(['update:labelList']);
 
 const state = reactive({
-    labelList: computed({
+    labelList: computed<Array<string>>({
         get: () => props.labelList,
-        set(val) { emit('update:labelList', val); },
+        set(val: Array<string>) { emit('update:labelList', val); },
     }),
     inputMode: false,
     inputText: '',
