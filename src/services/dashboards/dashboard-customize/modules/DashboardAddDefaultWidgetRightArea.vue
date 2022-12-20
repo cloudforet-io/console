@@ -57,6 +57,7 @@
                             :style="{...contextMenuStyle}"
                             multi-selectable
                             item-height-fixed
+                            show-select-header
                             @select="handleSelectOption"
             />
         </div>
