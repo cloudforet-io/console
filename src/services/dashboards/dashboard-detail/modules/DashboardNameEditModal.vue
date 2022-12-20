@@ -32,9 +32,12 @@ import {
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-// import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -62,10 +65,12 @@ export default defineComponent<Props>({
         },
         dashboardId: {
             type: String,
+            required: true,
             default: '',
         },
         dashboardName: {
             type: String,
+            required: true,
             default: '',
         },
     },
@@ -89,30 +94,42 @@ export default defineComponent<Props>({
             proxyVisible: props.visible,
         });
 
+        const isProjectDashboard = Boolean(props.dashboardId?.startsWith('project'));
+
         const updateDashboard = async () => {
             try {
-                if (props.dashboardId.startsWith('user')) {
-                    // TODO:: connect custom-dashboard update api
-                    // await SpaceConnector.client.costAnalysis.userDashboard.update({
-                    //     user_dashboard_id: props.dashboardId,
-                    //     name: name.value,
-                    // });
+                if (isProjectDashboard) {
+                    await SpaceConnector.clientV2.dashboard.projectDashboard.update({
+                        project_dashboard_id: props.dashboardId,
+                        name: name.value,
+                    });
                 } else {
-                    // await SpaceConnector.client.costAnalysis.publicDashboard.update({
-                    //     public_dashboard_id: props.dashboardId,
-                    //     name: name.value,
-                    // });
+                    await SpaceConnector.clientV2.dashboard.domainDashboard.update({
+                        domain_dashboard_id: props.dashboardId,
+                        name: name.value,
+                    });
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         };
 
+        const loadDashboard = async () => {
+            if (isProjectDashboard) {
+                await store.dispatch('dashboard/loadProjectDashboard');
+            } else {
+                await store.dispatch('dashboard/loadDomainDashboard');
+            }
+        };
+
         const handleConfirm = () => {
             updateDashboard();
-            // costExplorerStore.dispatch('setDashboardList');
+            loadDashboard();
             emit('update:visible', false);
             emit('confirm', name.value);
+
+            // song-lang
+            showSuccessMessage('Successfully updated dashboard name', '');
         };
 
         const handleUpdateVisible = (visible) => {

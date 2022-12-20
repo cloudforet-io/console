@@ -45,6 +45,7 @@ const dashboardsRoute: RouteConfig = {
                     path: ':dashboardId?',
                     name: DASHBOARDS_ROUTE.DETAIL._NAME,
                     meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
+                    props: true,
                     component: DashboardDetailPage,
                 },
                 {

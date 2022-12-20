@@ -35,6 +35,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -113,6 +115,9 @@ export default defineComponent<Props>({
             costExplorerStore.dispatch('setDashboardList');
             emit('update:visible', false);
             emit('confirm', name.value);
+
+            // song-lang
+            showSuccessMessage('Successfully updated cost dashboard name', '');
         };
 
         const handleUpdateVisible = (visible) => {

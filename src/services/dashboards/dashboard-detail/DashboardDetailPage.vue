@@ -1,6 +1,6 @@
 <template>
     <div class="dashboard-detail-page">
-        <p-page-title title="Project_title">
+        <p-page-title :title="state.dashboardName">
             <template v-if="state.dashboardType === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
@@ -42,7 +42,7 @@
             :widget-theme-option-list="WIDGET_THEME_OPTION_MOCK"
         />
         <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
-                                   :dashboard-id="state.dashboardId"
+                                   :dashboard-id="props.dashboardId"
                                    :dashboard-name="state.dashboardName"
                                    @confirm="handleNameUpdate"
         />
@@ -93,7 +93,7 @@ const props = defineProps<Props>();
 const state = reactive({
     dashboardType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
     dashboardId: 'dashboard-idxxx',
-    dashboardName: 'Dashboard XXX',
+    dashboardName: 'Dashboard',
     labelList: [] as Array<string>,
     nameEditModalVisible: false,
     cloneModalVisible: false,
@@ -124,6 +124,7 @@ const handleVisibleCloneModal = () => {
     try {
         const result: ProjectDashboardModel = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: 'project-dash-eb13f8b042f9' });
         state.labelList = result.labels;
+        state.dashboardName = result.name;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
