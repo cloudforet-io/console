@@ -1,3 +1,10 @@
+# [1.1.0-beta.481](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.480...v1.1.0-beta.481) (2022-12-20)
+
+
+### Bug Fixes
+
+* **font-size:** add text-paragraph-lg to font-size ([#184](https://github.com/cloudforet-io/mirinae/issues/184)) ([3460f6e](https://github.com/cloudforet-io/mirinae/commit/3460f6e2ba67951ffd011768d867bba44086d34b))
+
 # [1.1.0-beta.480](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.479...v1.1.0-beta.480) (2022-12-20)
 
 
