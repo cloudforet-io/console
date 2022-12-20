@@ -77,6 +77,7 @@
                         :strict-select-mode="strictSelectMode"
                         :selected.sync="proxySelected"
                         :multi-selectable="multiSelectable"
+                        :show-select-header="multiSelectable"
                         :show-radio-icon="searchDropdownType === SEARCH_DROPDOWN_TYPE.radioButton"
                         :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
                         :class="searchDropdownType"

@@ -29,4 +29,6 @@ export interface ContextMenuProps {
     itemHeightFixed?: boolean;
     highlightTerm?: string;
     noSelectIndication?: boolean;
+    showSelectHeader?: boolean;
+    showClearSelection?: boolean;
 }

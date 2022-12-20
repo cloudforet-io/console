@@ -198,6 +198,42 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
+        showSelectHeader: {
+            name: 'showSelectHeader',
+            type: { name: 'boolean' },
+            description: 'Whether to activate the selection header that is activated when the value of multiSelectable is true.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
+        showClearSelection: {
+            name: 'showClearSelection',
+            type: { name: 'boolean' },
+            description: 'Whether to enable a button to deselect all selected items. It is activated when the value of multiSelectable is true.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         ...getArgTypes('slots', contextMenuSlots),
         ...getArgTypes('events', contextMenuEvents),
     };

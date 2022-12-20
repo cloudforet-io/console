@@ -34,6 +34,8 @@ export const Template = (args, { argTypes }) => ({
             :item-height-fixed="itemHeightFixed"
             :highlight-term="highlightTerm"
             :no-select-indication="noSelectIndication"
+            :show-select-header="showSelectHeader"
+            :show-clear-selection="showClearSelection"
         />
     </div>
     `,
@@ -535,6 +537,46 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
 
 <br/>
 <br/>
+
+## Show Selection Header
+
+It works only in multi select case.
+
+<Canvas>
+    <Story name="Show Selection Header" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu" show-select-header multi-selectable />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Show Clear Selection
+
+It works only in multi select case.
+
+<Canvas>
+    <Story name="Show Clear Selection" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu" show-clear-selection multi-selectable />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Playground
 

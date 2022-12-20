@@ -6,12 +6,12 @@
               name="menu"
               v-bind="{...$props}"
         >
-            <div v-if="multiSelectable"
+            <div v-if="showSelectHeader && multiSelectable"
                  class="selected-list-wrapper"
             >
                 <div>
                     <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
-                    <span class="pl-2">({{ selectedCountInFilteredMenu }} / {{ menuItemLength }})</span>
+                    <span class="pl-2">({{ selectedCount }})</span>
                 </div>
                 <p-button size="sm"
                           style-type="primary"
@@ -22,17 +22,14 @@
                 </p-button>
             </div>
             <slot name="help-text" />
-            <div v-if="multiSelectable"
-                 class="select-all-wrapper"
-                 @click.stop="onClickSelectAll"
+            <p-text-button v-if="showClearSelection && multiSelectable"
+                           class="clear-all-wrapper"
+                           style-type="highlight"
+                           size="sm"
+                           @click.stop="handleClickClearSelection"
             >
-                <p-i :name="isAllSelected ? 'ic_checkbox--checked' : 'ic_checkbox'"
-                     class="select-marker"
-                     width="1em"
-                     height="1em"
-                />
-                <span>{{ $t('COMPONENT.CONTEXT_MENU.SELECT_ALL') }}</span>
-            </div>
+                {{ $t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }} ({{ selectedCount }})
+            </p-text-button>
             <slot name="items">
                 <template v-for="(item, index) in menu">
                     <p-context-menu-item v-if="item.type === undefined || item.type === 'item'"
@@ -95,7 +92,11 @@
                     </div>
                 </template>
             </slot>
-            <slot name="bottom" />
+            <div v-if="$slots.bottom"
+                 class="bottom-slot-area"
+            >
+                <slot name="bottom" />
+            </div>
         </slot>
         <div v-show="menu.length === 0"
              class="no-data"
@@ -122,10 +123,10 @@ import {
 } from 'vue';
 
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
-import PI from '@/foundation/icons/PI.vue';
 import { useListFocus } from '@/hooks/list-focus';
 import { useProxyValue } from '@/hooks/proxy-state';
 import PButton from '@/inputs/buttons/button/PButton.vue';
+import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
 import PContextMenuItem from '@/inputs/context-menu/context-menu-item/PContextMenuItem.vue';
 import type { ContextMenuProps, MenuItem } from '@/inputs/context-menu/type';
 import { i18n } from '@/translations';
@@ -142,9 +143,9 @@ const FOCUS_GROUP_ID = 'context-item';
 export default defineComponent<ContextMenuProps>({
     name: 'PContextMenu',
     components: {
+        PTextButton,
         PSpinner,
         PContextMenuItem,
-        PI,
         PButton,
     },
     i18n,
@@ -185,6 +186,14 @@ export default defineComponent<ContextMenuProps>({
             type: Boolean,
             default: false,
         },
+        showSelectHeader: {
+            type: Boolean,
+            default: false,
+        },
+        showClearSelection: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -197,10 +206,10 @@ export default defineComponent<ContextMenuProps>({
                 return selectedMap;
             }),
             selectableMenuItems: computed(() => props.menu.filter((d) => !d.disabled && (d.type === undefined || d.type === 'item'))),
-            isAllSelected: computed(() => state.selectableMenuItems.length
-                    && state.selectableMenuItems.length === state.proxySelected.length
-                && state.proxySelected.every((item) => state.selectableMenuItems.find((selected) => selected.name === item.name))),
-            selectedCountInFilteredMenu: computed(() => state.selectableMenuItems.filter((d) => state.selectedNameMap[d.name] !== undefined).length),
+            selectedCount: computed(() => {
+                if (props.strictSelectMode) return state.selectableMenuItems.filter((d) => state.selectedNameMap[d.name] !== undefined).length;
+                return state.proxySelected.length;
+            }),
             menuItemLength: computed(() => props.menu.filter((d) => d.type === undefined || d.type === 'item').length),
         });
 
@@ -251,12 +260,8 @@ export default defineComponent<ContextMenuProps>({
             emit('keyup:esc', e);
             blur();
         };
-        const onClickSelectAll = () => {
-            if (state.isAllSelected) {
-                state.proxySelected = [];
-            } else {
-                state.proxySelected = state.selectableMenuItems.filter((d) => d.type === undefined || d.type === 'item');
-            }
+        const handleClickClearSelection = () => {
+            state.proxySelected = [];
         };
 
         watch(() => state.proxySelected, (proxySelected) => {
@@ -278,7 +283,7 @@ export default defineComponent<ContextMenuProps>({
             onKeyUp,
             focus,
             onClickEsc,
-            onClickSelectAll,
+            handleClickClearSelection,
             getItemId,
         };
     },
@@ -306,17 +311,8 @@ export default defineComponent<ContextMenuProps>({
         line-height: 1.5;
         padding: 0.5rem;
     }
-    > .select-all-wrapper {
-        @apply font-semibold;
-        padding: 0 0.5rem;
-        font-size: 0.875rem;
-        line-height: 2rem;
-        vertical-align: middle;
-        cursor: pointer;
-        > .select-marker {
-            font-size: 1.25rem;
-            margin-right: 0.25rem;
-        }
+    > .clear-all-wrapper {
+        padding: 0.5rem 0.5rem 0.25rem 0.5rem;
     }
     > .context-header {
         @apply text-gray-500;
@@ -341,6 +337,9 @@ export default defineComponent<ContextMenuProps>({
                 @apply bg-blue-100;
             }
         }
+    }
+    > .bottom-slot-area {
+        padding: 0.5rem;
     }
 
     > .loader-wrapper {
