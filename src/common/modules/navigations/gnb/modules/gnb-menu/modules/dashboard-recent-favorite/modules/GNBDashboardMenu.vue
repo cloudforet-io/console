@@ -49,7 +49,6 @@ import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/t
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { DomainDashboardModel, ProjectDashboardModel } from '@/store/modules/dashboard/type';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -62,6 +61,7 @@ import type {
     GNBDashboardMenuItem,
 } from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/type';
 
+import type { DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 
