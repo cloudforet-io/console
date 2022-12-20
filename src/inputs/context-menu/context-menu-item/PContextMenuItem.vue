@@ -8,26 +8,38 @@
         <p-i v-if="selectIcon"
              class="select-marker"
              :name="selectIcon"
-             width="1em" height="1em"
+             width="1em"
+             height="1em"
         />
-        <span class="label-wrapper" :class="{ellipsis}">
+        <span class="label-wrapper"
+              :class="{ellipsis}"
+        >
             <p-text-highlighting v-if="highlightTerm && !$slots.default"
-                                 :text="label" :term="highlightTerm"
+                                 :text="label"
+                                 :term="highlightTerm"
                                  class="text"
                                  style-type="secondary"
             >
                 <template #default="textHighlightingSlotProps">
-                    <slot name="text-list" v-bind="{...textHighlightingSlotProps, ...$props}" />
+                    <slot name="text-list"
+                          v-bind="{...textHighlightingSlotProps, ...$props}"
+                    />
                 </template>
             </p-text-highlighting>
-            <span v-else class="text">
-                <slot name="default" v-bind="$props">
+            <span v-else
+                  class="text"
+            >
+                <slot name="default"
+                      v-bind="$props"
+                >
                     {{ label }}
                 </slot>
             </span>
-            <p-i v-if="link" name="ic_external-link"
+            <p-i v-if="link"
+                 name="ic_external-link"
                  class="external-link-icon"
-                 width="0.875rem" height="0.875rem"
+                 width="0.875rem"
+                 height="0.875rem"
             />
         </span>
     </component>
@@ -145,11 +157,9 @@ export default defineComponent<ContextMenuItemProps>({
 
 <style lang="postcss">
 .p-context-menu-item {
-    @apply text-gray-900;
+    @apply text-gray-900 text-label-md;
     display: flex;
     padding: 0.5rem;
-    line-height: 1.25;
-    font-size: 0.875rem;
     cursor: pointer;
     &:not(.disabled) {
         &:hover, &:focus {

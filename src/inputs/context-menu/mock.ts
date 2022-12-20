@@ -56,3 +56,8 @@ export const longMenuItems: MenuItem[] = [
         label: faker.lorem.sentence(30), name: 'google', link: 'https://www.google.com', target: '_blank',
     },
 ];
+
+export const getContextMenuItems = () => {
+    const items: MenuItem[] = faker.datatype.array(10).map(() => ({ name: faker.datatype.uuid(), label: faker.name.firstName() }));
+    return items;
+};

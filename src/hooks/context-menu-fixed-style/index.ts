@@ -52,7 +52,7 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu }: Sta
         const targetRects: DOMRect = contextMenuFixedStyleState.targetElement?.getBoundingClientRect();
 
         const contextMenuStyle: Partial<CSSStyleDeclaration> = {
-            overflowY: 'auto',
+            // overflowY: 'auto',
             height: 'auto',
             minHeight: '32px',
         };
