@@ -1,6 +1,5 @@
 import { Meta, Canvas, Story } from '@storybook/addon-docs/blocks';
-
-
+const semanticFontSize = require('@/styles/font-size.cjs');
 
 <Meta title='Foundation/Styles/Typography' parameters={{
     design: {
@@ -26,19 +25,55 @@ export const Template = (args, { argTypes }) => ({
 
 
 # Typography
+
 <br/>
 <br/>
 
-## Basic
+## Typefaces
+|Scope|Font Type|
+|-|-|
+|English / Number|Noto Sans|
+|Korean|Noto Sans KR|
+|Code|Inconsolata|
+<br/>
+<br/>
 
+## Font Weight
 <Canvas>
-    <Story name="Basic">
+    <Story name="Font Weight">
         {{
-            components: { },
             template: `
-                <div class="h-full w-full overflow p-8 flex flex-col gap-2">
-                    <p>English/Number - Noto Sans</p>
-                </div>
+<table style="border-collapse: separate; border-spacing: 16px; text-align: left;">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Font Weight</th>
+            <th>Example</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>font-bold</td>
+            <td>700</td>
+            <td class="font-bold">ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</td>
+        </tr>
+        <tr>
+            <td>font-semi-bold</td>
+            <td>600</td>
+            <td class="font-bold">ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</td>
+        </tr>
+        <tr>
+            <td>font-medium</td>
+            <td>500</td>
+            <td class="font-medium">ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</td>
+        </tr>
+        <tr>
+            <td>font-normal</td>
+            <td>400</td>
+            <td class="font-normal">ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</td>
+        </tr>
+    </tbody>
+</table>
             `,
             setup() {
                 return {}
@@ -50,21 +85,101 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Font Weight
-
+## Font Size
+Font Size is used in combination with line-height and letter-spacing to ensure design consistency. When requested, declare line-height and letter-spacing separately. Otherwise, the default value is automatically applied.
 <Canvas>
-    <Story name="Font Weight">
+    <Story name="Font Size">
         {{
-            components: { },
             template: `
-                <div class="h-full w-full overflow p-8 flex flex-col gap-2">
-                    <p class="font-normal">[regular|400] ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</p>
-                    <p class="font-medium">[medium|500] ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</p>
-                    <p class="font-bold">[bold|700] ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12345678910</p>
-                </div>
+<table style="width: 100%; overflow: auto; border-collapse: separate; border-spacing: 20px; text-align: left;">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th style="width: 100px;">Size</th>
+            <th>Line Height</th>
+            <th>Letter Spacing</th>
+            <th>Example</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for=" (fontSize, name) in fontSizesObj">
+            <td>text-{{name}}</td>
+            <td>{{fontSize[0]}}</td>
+            <td>{{fontSize[1].lineHeight}}</td>
+            <td>{{fontSize[1].letterSpacing}}</td>
+            <td :class="'text-'+ name">{{name}}</td>
+        </tr>
+    </tbody>
+</table>
             `,
             setup() {
-                return {}
+                return {
+                    fontSizesObj: semanticFontSize.semanticFont
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Line Height
+<Canvas>
+    <Story name="Line Height">
+        {{
+            template: `
+<table style="border-collapse: separate; border-spacing: 16px; text-align: left;">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Line Height</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="(lineHeight, name) in lineHeightObj">
+            <td >tracking-{{name}}</td>
+            <td> {{lineHeight}}</td>
+        </tr>
+    </tbody>
+</table>
+            `,
+            setup() {
+                return {
+                    lineHeightObj: semanticFontSize.lineHeight,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Letter Spacing
+<Canvas>
+    <Story name="Letter Spacing">
+        {{
+            template: `
+<table style="border-collapse: separate; border-spacing: 16px; text-align: left;">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Letter Spacing</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="(letterSpacing, name) in letterSpacingObj">
+            <td >leading-{{name}}</td>
+            <td> {{letterSpacing}}</td>
+        </tr>
+    </tbody>
+</table>
+            `,
+            setup() {
+                return {
+                    letterSpacingObj: semanticFontSize.letterSpacing,
+                }
             }
         }}
     </Story>

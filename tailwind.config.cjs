@@ -3,6 +3,7 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 const plugin = require('tailwindcss/plugin');
 const colors = require('./src/styles/colors.cjs').tailwindColors;
 const screens = require('./src/styles/screens.cjs');
+const semanticFontSize = require('./src/styles/font-size.cjs');
 
 const rawSize = Array(32)
     .fill('')
@@ -83,6 +84,23 @@ module.exports = {
             tablet: { max: `${screens.tablet.max}px` },
             laptop: { max: `${screens.laptop.max}px` },
             desktop: { max: `${screens.desktop.max}px` },
+        },
+        fontSize: {
+            ...semanticFontSize.fontSize,
+            'display-2xl': semanticFontSize.semanticFont["display-2xl"],
+            'display-xl': semanticFontSize.semanticFont["display-xl"],
+            'display-lg': semanticFontSize.semanticFont["display-lg"],
+            'display-md': semanticFontSize.semanticFont["display-md"],
+            'display-sm': semanticFontSize.semanticFont["display-sm"],
+            'label-xl': semanticFontSize.semanticFont["label-xl"],
+            'label-lg': semanticFontSize.semanticFont["label-lg"],
+            'label-md': semanticFontSize.semanticFont["label-md"],
+            'label-sm': semanticFontSize.semanticFont["label-sm"],
+            'label-xs': semanticFontSize.semanticFont["label-xs"],
+            'paragraph-md': semanticFontSize.semanticFont["paragraph-md"],
+            'paragraph-sm': semanticFontSize.semanticFont["paragraph-sm"],
+            'code-lg': semanticFontSize.semanticFont["code-lg"],
+            'code-md': semanticFontSize.semanticFont["code-md"],
         },
     },
     variants: ['responsive', 'important', 'hover'],
