@@ -37,6 +37,7 @@ export const Template = (args, { argTypes }) => ({
             :form-data.sync="proxyFormData"
             :language="$i18n.locale"
             :validation-mode="validationMode"
+            :reset-on-schema-change="resetOnSchemaChange"
         />
     `,
     setup(props) {

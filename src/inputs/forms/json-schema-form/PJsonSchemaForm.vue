@@ -196,6 +196,10 @@ export default defineComponent<JsonSchemaFormProps>({
             type: Boolean,
             default: true,
         },
+        resetOnSchemaChange: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const ajv = new Ajv({
@@ -321,7 +325,7 @@ export default defineComponent<JsonSchemaFormProps>({
         /* Watchers */
         watch(() => props.schema, () => {
             state.contextKey = Math.floor(Math.random() * Date.now());
-            reset();
+            if (props.resetOnSchemaChange) reset();
         });
         watch(() => props.formData, (formData) => {
             if (formData === state.refinedFormData) return;

@@ -34,4 +34,5 @@ export interface JsonSchemaFormProps {
     language?: SupportLanguage;
     validationMode?: ValidationMode; // default: input
     isRoot?: boolean;
+    resetOnSchemaChange?: boolean;
 }

@@ -114,6 +114,24 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
+    resetOnSchemaChange: {
+        name: 'resetOnSchemaChange',
+        type: { name: 'boolean' },
+        description: 'Whether to reset validation state and input occurred state when schema prop is changed.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     // events
     onChange: {
         name: 'change',
