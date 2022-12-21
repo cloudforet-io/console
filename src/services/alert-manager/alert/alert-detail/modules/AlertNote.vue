@@ -29,7 +29,7 @@
                         <p-select-dropdown style-type="icon-button"
                                            button-icon="ic_more"
                                            :items="menuItems"
-                                           menu-position="left"
+                                           menu-position="right"
                                            :disabled="manageDisabled"
                                            @select="handleSelect(data.note_id)"
                         />
@@ -215,12 +215,6 @@ export default {
         overflow-y: scroll;
     }
 
-    /* custom design-system component - p-select-dropdown */
-    :deep(.p-select-dropdown) {
-        .p-context-menu {
-            right: 0;
-        }
-    }
     .title-wrapper {
         display: flex;
         align-items: center;

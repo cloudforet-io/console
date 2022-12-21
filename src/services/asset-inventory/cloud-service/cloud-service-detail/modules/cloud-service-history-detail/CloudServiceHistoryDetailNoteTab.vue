@@ -225,13 +225,6 @@ export default {
         display: flex;
         align-items: center;
         justify-content: space-between;
-
-        /* custom design-system component - p-select-dropdown */
-        :deep(.p-select-dropdown) {
-            .p-context-menu {
-                right: 0;
-            }
-        }
     }
     .note-content {
         white-space: pre-line;

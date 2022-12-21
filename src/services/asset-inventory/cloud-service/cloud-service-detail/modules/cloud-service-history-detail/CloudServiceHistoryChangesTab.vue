@@ -165,16 +165,21 @@ export default defineComponent({
         .cloud-service-history-changes-key-nav {
             width: 20%;
 
-            /* custom design-system component - p-context-menu */
-            :deep(.p-context-menu) {
-                .item-row {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    .text {
-                        @apply truncate;
-                        width: 90%;
-                    }
+            .item-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .text {
+                    @apply truncate;
+                    width: 90%;
+                }
+            }
+
+            .p-context-menu {
+                height: 100%;
+                border: none;
+                & span {
+                    border-radius: 0.25rem;
                 }
             }
 
@@ -190,14 +195,6 @@ export default defineComponent({
                 .body {
                     height: calc(100% - 2.25rem);
                     border-bottom-right-radius: 0;
-                }
-                .p-context-menu {
-                    height: 100%;
-                    border: none;
-                    max-height: unset;
-                    & span {
-                        border-radius: 0.25rem;
-                    }
                 }
             }
             .p-i-ic_plus {
