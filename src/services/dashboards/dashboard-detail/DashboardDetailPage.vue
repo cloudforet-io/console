@@ -92,7 +92,6 @@ import DashboardLabels from '@/services/dashboards/modules/dashboard-label/Dashb
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
-import costPieWidgetConfig from '@/services/dashboards/widgets/cost-pie/widget-config';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
 
@@ -107,7 +106,7 @@ const state = reactive({
     hasManagePermission: useManagePermissionState(),
     dashboardConfig: DASHBOARD_TEMPLATES.monthlyCostSummary, // TODO: should be changed to api data
     dashboardViewer: computed<DashboardViewer>(() => state.dashboardConfig?.viewer ?? DASHBOARD_VIEWER.PRIVATE),
-    dashboardName: computed<string>(() => state.dashboardConfig?.name ?? ''),
+    dashboardName: '',
     labelList: computed<string[]>(() => state.dashboardConfig?.labels ?? []),
     dashboardWidgetLayouts: computed<DashboardLayoutWidgetInfo[][]>(() => state.dashboardConfig?.layouts ?? []),
     //
@@ -152,6 +151,7 @@ const getDashboardData = async () => {
             result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ project_dashboard_id: props.dashboardId });
         }
         state.dashboardConfig = result;
+        state.dashboardName = result.name;
     } catch (e) {
         // state.dashboardConfig = {}; // TODO: temporarily disabled
         ErrorHandler.handleError(e);
