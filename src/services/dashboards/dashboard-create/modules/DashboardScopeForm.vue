@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section class="dashboard-scope-form">
         <p-pane-layout>
             <p-panel-top :title="$t('DASHBOARDS.CREATE.LABEL_SCOPE')" />
             <div class="dashboard-scope-wrapper">
@@ -80,14 +80,24 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-.dashboard-scope-wrapper {
-    .p-radio-group {
-        display: grid;
-        grid-gap: 0.875rem;
+.dashboard-scope-form {
+    .dashboard-scope-wrapper {
+        .p-radio-group {
+            display: grid;
+            grid-gap: 0.875rem;
+        }
+        .project-select-dropdown {
+            max-width: 30rem;
+            width: 50%;
+            margin: 0.375rem 0 0 1.125rem;
+        }
+
+        @screen tablet {
+            .project-select-dropdown {
+                width: 100%;
+            }
+        }
+        margin: 0.5rem 1rem 2.25rem;
     }
-    .project-select-dropdown {
-        margin: 0.375rem 0 0 1.125rem;
-    }
-    margin: 0.5rem 1rem 2.25rem;
 }
 </style>
