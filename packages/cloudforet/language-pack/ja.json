@@ -684,6 +684,17 @@
 				"TOTAL_COST": "トータルコスト",
 				"UPDATE_DASHBOARD": "ダッシュボードの更新"
 			},
+			"HOME": {
+				"COST_ANALYSIS_DESC": "",
+				"COST_BUDGET_DESC": "",
+				"COST_DASHBOARD": "",
+				"COST_DASHBOARD_DESC": "",
+				"ENABLE_BUTTON": "",
+				"LEARN_MORE": "",
+				"MORE_INFO": "",
+				"TITLE": "",
+				"TOPIC_DESC": ""
+			},
 			"MAIN": {
 				"ALT_E_EDIT_FILTER": "フィルタの更新に失敗しました",
 				"ALT_S_EDIT_FILTER": "フィルターが正常に適用",
