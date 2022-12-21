@@ -1,3 +1,15 @@
+# [1.1.0-beta.486](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.485...v1.1.0-beta.486) (2022-12-21)
+
+
+### Bug Fixes
+
+* **search:** make work two way binding of isFocused prop ([bfd3c08](https://github.com/cloudforet-io/mirinae/commit/bfd3c08f1b8e6e80822fe2f19f7009b8c875cbba))
+
+
+### Features
+
+* **context-menu:** add searchable prop & update-search-input event ([7e2e8ff](https://github.com/cloudforet-io/mirinae/commit/7e2e8ffcdaae29af53e8a3b0f164d7c5893a61d2))
+
 # [1.1.0-beta.485](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.484...v1.1.0-beta.485) (2022-12-21)
 
 
