@@ -87,7 +87,7 @@ import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
-import type { DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
+import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
@@ -104,11 +104,11 @@ const props = defineProps<Props>();
 
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
-    dashboardConfig: DASHBOARD_TEMPLATES.monthlyCostSummary, // TODO: should be changed to api data
-    dashboardViewer: computed<DashboardViewer>(() => state.dashboardConfig?.viewer ?? DASHBOARD_VIEWER.PRIVATE),
+    dashboardInfo: DASHBOARD_TEMPLATES.monthlyCostSummary as DashboardModel, // TODO: should be changed to api data
+    dashboardViewer: computed<DashboardViewer>(() => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE),
     dashboardName: '',
-    labelList: computed<string[]>(() => state.dashboardConfig?.labels ?? []),
-    dashboardWidgetLayouts: computed<DashboardLayoutWidgetInfo[][]>(() => state.dashboardConfig?.layouts ?? []),
+    labelList: computed<string[]>(() => state.dashboardInfo?.labels ?? []),
+    dashboardWidgetLayouts: computed<DashboardLayoutWidgetInfo[][]>(() => state.dashboardInfo?.layouts ?? []),
     //
     nameEditModalVisible: false,
     deleteModalVisible: false,
@@ -150,10 +150,10 @@ const getDashboardData = async () => {
         } else {
             result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ project_dashboard_id: props.dashboardId });
         }
-        state.dashboardConfig = result;
+        state.dashboardInfo = result;
         state.dashboardName = result.name;
     } catch (e) {
-        // state.dashboardConfig = {}; // TODO: temporarily disabled
+        // state.dashboardInfo = {}; // TODO: temporarily disabled
         ErrorHandler.handleError(e);
     }
 };
