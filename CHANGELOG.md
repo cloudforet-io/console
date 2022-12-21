@@ -1,3 +1,10 @@
+# [1.1.0-beta.487](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.486...v1.1.0-beta.487) (2022-12-21)
+
+
+### Bug Fixes
+
+* **font-size:** add fontSize defaultTheme ([#191](https://github.com/cloudforet-io/mirinae/issues/191)) ([d0b75ba](https://github.com/cloudforet-io/mirinae/commit/d0b75babfb92aff2fa34af98e24ef58a16a5ce12))
+
 # [1.1.0-beta.486](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.485...v1.1.0-beta.486) (2022-12-21)
 
 
