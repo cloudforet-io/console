@@ -1,3 +1,12 @@
+# [1.1.0-beta.484](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.483...v1.1.0-beta.484) (2022-12-21)
+
+
+### Bug Fixes
+
+* **context-menu:** do not inherit min width, max width ([2b30a02](https://github.com/cloudforet-io/mirinae/commit/2b30a02112d3e7d99c8b9c56c3e93220c1c372c8))
+* **select-dropdown:** unset opposite position style ([50d9dae](https://github.com/cloudforet-io/mirinae/commit/50d9dae0ebeac0b576fec1dfe71f89d5241a5f7c))
+* **use-context-menu-fixed-style:** fix bug bottom fix case ([a92913a](https://github.com/cloudforet-io/mirinae/commit/a92913a112e87423fe452059c0d1cae5227d631d))
+
 # [1.1.0-beta.483](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.482...v1.1.0-beta.483) (2022-12-20)
 
 
