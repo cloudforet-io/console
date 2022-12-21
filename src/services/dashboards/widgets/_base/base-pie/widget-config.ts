@@ -6,7 +6,6 @@ const basePieWidgetConfig: WidgetConfig = {
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/_base/base-pie/BasePieWidget.vue'),
     }),
-    base_configs: [{ config_id: 'dashboardCommon' }],
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.BASE_PIE.DESC',
