@@ -9,7 +9,7 @@
             <dashboard-toolset />
         </div>
         <p-divider />
-        <dashboard-refresh-dropdown :interval.sync="state.refreshInterval"
+        <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
                                     refresh-disabled
         />
         <dashboard-customize-sidebar />

@@ -9,8 +9,8 @@
                        @click="handleRefresh"
         />
         <p-select-dropdown class="currency-select-dropdown"
-                           :items="intervalItems"
-                           :selected="interval"
+                           :items="intervalOptionItems"
+                           :selected="intervalOptionProxy"
                            :read-only="loading"
                            :class="{ loading }"
                            menu-position="right"
@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
@@ -33,13 +33,13 @@ import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { RefreshInterval } from '@/services/dashboards/config';
-import { refreshIntervalList, REFRESH_INTERVAL_OPTIONS_MAP } from '@/services/dashboards/config';
+import type { RefreshIntervalOption } from '@/services/dashboards/config';
+import { refreshIntervalOptionList, REFRESH_INTERVAL_OPTIONS_MAP } from '@/services/dashboards/config';
 
 interface Props {
     readOnly: boolean;
     refreshDisabled: boolean;
-    interval: RefreshInterval;
+    intervalOption: RefreshIntervalOption;
     loading: boolean;
 }
 
@@ -58,19 +58,19 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-        interval: {
-            type: String as PropType<RefreshInterval>,
-            default: refreshIntervalList[0],
+        intervalOption: {
+            type: String as PropType<RefreshIntervalOption>,
+            default: refreshIntervalOptionList[0],
         },
         loading: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const state = reactive({
-            interval: useProxyValue('interval', props, emit),
-            intervalList: computed<{label: TranslateResult; value: RefreshInterval}[]>(() => [
+            intervalOptionProxy: useProxyValue('intervalOption', props, emit),
+            intervalOptionList: computed<{label: TranslateResult; value: RefreshIntervalOption}[]>(() => [
                 { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_OFF'), value: 'off' },
                 { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_15S'), value: '15s' },
                 { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_30S'), value: '30s' },
@@ -80,7 +80,7 @@ export default defineComponent<Props>({
                 { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_30M'), value: '30m' },
                 { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_1H'), value: '1h' },
             ]),
-            intervalItems: computed<MenuItem[]>(() => state.intervalList.map((interval) => ({
+            intervalOptionItems: computed<MenuItem[]>(() => state.intervalOptionList.map((interval) => ({
                 type: 'item',
                 name: interval.value,
                 label: interval.label,
@@ -93,7 +93,8 @@ export default defineComponent<Props>({
         let intervalFunction: NodeJS.Timeout | null;
 
         const executeInterval = () => {
-            if (refreshIntervalList.includes(props.interval) && !intervalFunction) {
+            console.log('interval!');
+            if (refreshIntervalOptionList.includes(props.intervalOption) && !intervalFunction) {
                 intervalFunction = setInterval(() => {
                     if (props.loading) {
                         if (intervalFunction) {
@@ -103,7 +104,7 @@ export default defineComponent<Props>({
                     } else {
                         emit('refresh');
                     }
-                }, REFRESH_INTERVAL_OPTIONS_MAP[props.interval]);
+                }, REFRESH_INTERVAL_OPTIONS_MAP[props.intervalOption]);
             }
         };
 

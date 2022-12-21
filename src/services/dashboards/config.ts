@@ -11,9 +11,9 @@ export const REFRESH_INTERVAL_OPTIONS_MAP = {
     '1h': 3600000,
 } as const;
 
-export type RefreshInterval = keyof typeof REFRESH_INTERVAL_OPTIONS_MAP;
+export type RefreshIntervalOption = keyof typeof REFRESH_INTERVAL_OPTIONS_MAP;
 
-export const refreshIntervalList = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP) as RefreshInterval[];
+export const refreshIntervalOptionList = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP) as RefreshIntervalOption[];
 
 
 export const DASHBOARD_SCOPE = {

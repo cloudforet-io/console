@@ -38,7 +38,7 @@
         <p-divider class="divider" />
         <div class="filter-box">
             <div>filters</div>
-            <dashboard-refresh-dropdown :interval.sync="state.refreshInterval"
+            <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
                                         :loading="state.loading"
                                         @refresh="handleRefresh"
             />
