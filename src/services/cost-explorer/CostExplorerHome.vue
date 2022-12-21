@@ -34,7 +34,7 @@
         </div>
         <p-pane-layout class="sub-menu-list">
             <div v-for="(submenu, index) in SERVICE_CONTENTS.sub_menu"
-                 :key="`${submenu}-${index}}`"
+                 :key="`${submenu}-${index}`"
                  class="sub-menu-card"
             >
                 <div class="sub-menu-contents">
@@ -65,11 +65,6 @@
 import { PAnchor, PButton, PPaneLayout } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
-
-import { registerServiceStore } from '@/common/composables/register-service-store';
-
-import { costExplorerStore, costExplorerStoreModule } from '@/services/cost-explorer/store';
-import type { CostExplorerState } from '@/services/cost-explorer/store/type';
 
 const SERVICE_CONTENTS = {
     service_name: i18n.t('MENU.COST_EXPLORER'),
@@ -115,8 +110,6 @@ export default {
         PButton,
     },
     setup() {
-        registerServiceStore<CostExplorerState>('costExplorer', costExplorerStoreModule, costExplorerStore);
-
         return {
             SERVICE_CONTENTS,
         };
