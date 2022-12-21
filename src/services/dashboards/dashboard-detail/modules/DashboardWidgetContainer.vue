@@ -7,9 +7,12 @@
             :key="`widget-row-${rowIndex}`"
             class="dashboard-widget-row"
         >
-            <widget-frame
+            <a-w-s-cloud-front-cost
                 v-for="(width, colIndex) in row"
+                ref="widgetRef"
                 :key="`widget-row-${rowIndex}-${colIndex}`"
+                :widget-key="`widget-row-${rowIndex}-${colIndex}`"
+                widget-config-id="awsCloudFrontCost"
                 :width="width"
                 :is-full="containerWidth === width"
                 :widget-index="widgetIndexList[rowIndex][colIndex]"
@@ -20,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
     defineComponent, reactive, toRefs, ref, onMounted, watch, onBeforeUnmount,
 } from 'vue';
@@ -32,7 +35,7 @@ import {
 import { widgetThemeAssigner } from '@/services/dashboards/dashboard-detail/lib/theme-helper';
 import type { WidgetThemeAssignedList, WidgetThemeOption } from '@/services/dashboards/dashboard-detail/lib/type';
 import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import AWSCloudFrontCost from '@/services/dashboards/widgets/aws-cloud-front-cost/AWSCloudFrontCost.vue';
 import type { WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 
@@ -40,7 +43,7 @@ import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 export default defineComponent({
     name: 'DashboardWidgetContainer',
     components: {
-        WidgetFrame,
+        AWSCloudFrontCost,
     },
     props: {
         widgetSizeList: {
@@ -52,7 +55,7 @@ export default defineComponent({
             default: () => ([]),
         },
     },
-    setup(props) {
+    setup(props, { emit, expose }: SetupContext) {
         const state = reactive({
             // width
             containerWidth: WIDGET_CONTAINER_MIN_WIDTH,
@@ -61,8 +64,9 @@ export default defineComponent({
             widgetIndexList: [] as Array<Array<number>>,
             // theme
             widgetThemeList: [] as WidgetThemeAssignedList,
+            widgetRef: [] as Array<InstanceType<typeof AWSCloudFrontCost>>,
         });
-        const containerRef = ref<Element|null>(null);
+        const containerRef = ref<HTMLElement|null>(null);
 
 
         const refineContainerWidth = (containerWidth: number|undefined): number => {
@@ -125,6 +129,18 @@ export default defineComponent({
             state.widgetThemeList = widgetThemeAssigner(props.widgetThemeOptionList);
         }, { immediate: true });
 
+        const refreshAllWidget = async () => {
+            const promises: (()=>void)[] = [];
+            state.widgetRef.forEach((d:any) => {
+                promises.push(d?.refreshWidget());
+            });
+            emit('update:loading', true);
+            await Promise.allSettled(promises);
+            emit('update:loading', false);
+        };
+        expose({
+            refreshAllWidget,
+        });
         return {
             containerRef,
             ...toRefs(state),

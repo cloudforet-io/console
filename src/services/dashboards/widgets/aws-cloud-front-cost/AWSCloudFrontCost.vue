@@ -70,9 +70,9 @@ const CATEGORY_FIELD_NAME = GROUP_BY.PROJECT;
 const props = defineProps<WidgetProps>();
 const chartContext = ref<HTMLElement|null>(null);
 const {
-    createXYVerticalChart, createXYColumnSeries, setChartColors, createLegend,
-    createTooltip, setXYSharedTooltipText,
-    disposeRoot, refreshRoot,
+    createXYVerticalChart, createXYColumnSeries, createLegend,
+    createTooltip, setXYSharedTooltipText, disposeRoot, refreshRoot,
+    // setChartColors,
 } = useAmcharts5(chartContext);
 
 const state = reactive({
@@ -96,7 +96,8 @@ const fetchData = async () => new Promise((resolve) => {
 
 const drawChart = (chartData) => {
     const { chart, xAxis, yAxis } = createXYVerticalChart();
-    setChartColors(chart, state.colorSet);
+    // TODO: Temporary annotation processing for refresh implementation
+    // setChartColors(chart, state.colorSet);
     yAxis.set('categoryField', CATEGORY_FIELD_NAME);
     yAxis.data.setAll(cloneDeep(chartData));
     // legend
@@ -152,7 +153,7 @@ useWidgetLifecycle({
     initWidget, disposeWidget: disposeRoot,
 });
 
-defineExpose({
+defineExpose<{refreshWidget:() => Promise<void>}>({
     refreshWidget,
 });
 </script>
