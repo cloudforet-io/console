@@ -9,9 +9,12 @@ import StylelintPlugin from 'vite-plugin-stylelint';
 export default defineConfig({
     build: {
         lib: {
-            entry: path.resolve(__dirname, './src/index.ts'),
+            entry: {
+                mirinae: path.resolve(__dirname, './src/index.ts'),
+                hooks: path.resolve(__dirname, './src/hooks/index.ts'),
+            },
             name: 'Mirinae',
-            fileName: 'mirinae',
+            fileName: (format, entryName) => `${entryName}.mjs`,
             formats: ['es'],
         },
         rollupOptions: {
