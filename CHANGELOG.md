@@ -1,3 +1,10 @@
+# [1.1.0-beta.488](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.487...v1.1.0-beta.488) (2022-12-21)
+
+
+### Features
+
+* build and export hooks ([f25d1e8](https://github.com/cloudforet-io/mirinae/commit/f25d1e896b2fb891a1e4b7d692c5faf7e94ecaf9))
+
 # [1.1.0-beta.487](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.486...v1.1.0-beta.487) (2022-12-21)
 
 
