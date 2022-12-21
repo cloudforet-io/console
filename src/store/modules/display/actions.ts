@@ -102,7 +102,6 @@ export const checkNotification: Action<DisplayState, any> = async ({
             );
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 32000));
         const { total_count } = await SpaceConnector.client.notification.notification.list({
             query: checkNotificationQueryHelper.data,
         });
