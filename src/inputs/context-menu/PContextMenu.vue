@@ -22,6 +22,16 @@
                         {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
                     </p-button>
                 </div>
+                <div v-if="searchable"
+                     class="search-wrapper"
+                >
+                    <p-search :value="searchText"
+                              :is-focused.sync="isFocusedOnSearch"
+                              @update:value="handleUpdateSearchText"
+                              @keydown.up.native="onKeyUp()"
+                              @keydown.down.native="onKeyDown()"
+                    />
+                </div>
                 <p-text-button v-if="showClearSelection && multiSelectable"
                                class="clear-all-wrapper"
                                style-type="highlight"
@@ -143,6 +153,7 @@ import PButton from '@/inputs/buttons/button/PButton.vue';
 import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
 import PContextMenuItem from '@/inputs/context-menu/context-menu-item/PContextMenuItem.vue';
 import type { ContextMenuProps, MenuItem } from '@/inputs/context-menu/type';
+import PSearch from '@/inputs/search/search/PSearch.vue';
 import { i18n } from '@/translations';
 
 
@@ -157,6 +168,7 @@ const FOCUS_GROUP_ID = 'context-item';
 export default defineComponent<ContextMenuProps>({
     name: 'PContextMenu',
     components: {
+        PSearch,
         PTextButton,
         PSpinner,
         PContextMenuItem,
@@ -208,9 +220,15 @@ export default defineComponent<ContextMenuProps>({
             type: Boolean,
             default: false,
         },
+        searchable: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
+            searchText: '',
+            isFocusedOnSearch: false,
             proxySelected: useProxyValue<MenuItem[]>('selected', props, emit),
             selectedNameMap: computed<Record<string, number>>(() => {
                 const selectedMap = {};
@@ -243,11 +261,30 @@ export default defineComponent<ContextMenuProps>({
         };
 
         /* event */
-        const onKeyUp = (idx: number) => {
+        const onKeyUp = (idx?: number) => {
+            // this case is from search element
+            if (idx === undefined) {
+                if (props.searchable) state.isFocusedOnSearch = false;
+                emit('keyup:up:end');
+                return;
+            }
+
+            // event from context menu item
             const focusedIdx = handleMoveUp(idx);
-            if (focusedIdx === undefined) emit('keyup:up:end');
+            if (focusedIdx === undefined) {
+                // if no items for focus left, focus on search element in searchable case.
+                if (props.searchable) state.isFocusedOnSearch = true;
+                else emit('keyup:up:end');
+            }
         };
-        const onKeyDown = (idx) => {
+        const onKeyDown = (idx?: number) => {
+            // this case is from search element
+            if (idx === undefined) {
+                if (props.searchable) focus(0);
+                return;
+            }
+
+            // event from context menu item
             const focusedIdx = handleMoveDown(idx);
             if (focusedIdx === undefined) emit('keyup:down:end');
         };
@@ -277,6 +314,10 @@ export default defineComponent<ContextMenuProps>({
         const handleClickClearSelection = () => {
             state.proxySelected = [];
         };
+        const handleUpdateSearchText = async (value: string) => {
+            state.searchText = value;
+            emit('update-search-input', value);
+        };
 
         watch(() => state.proxySelected, (proxySelected) => {
             if (!proxySelected.length) return;
@@ -299,6 +340,7 @@ export default defineComponent<ContextMenuProps>({
             onClickEsc,
             handleClickClearSelection,
             getItemId,
+            handleUpdateSearchText,
         };
     },
 });
@@ -326,6 +368,9 @@ export default defineComponent<ContextMenuProps>({
             justify-content: space-between;
             font-size: 0.875rem;
             line-height: 1.5;
+            padding: 0.5rem;
+        }
+        > .search-wrapper {
             padding: 0.5rem;
         }
         > .clear-all-wrapper {

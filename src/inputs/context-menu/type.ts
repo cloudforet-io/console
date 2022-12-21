@@ -32,4 +32,5 @@ export interface ContextMenuProps {
     noSelectIndication?: boolean;
     showSelectHeader?: boolean;
     showClearSelection?: boolean;
+    searchable?: boolean;
 }

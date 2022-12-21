@@ -24,6 +24,7 @@ const contextMenuEvents: [string, string][] = [
     ['click-button', 'This event is emitted when the button(in the item whose type is button) is clicked. As arguments, item, index and click event will be passed.'],
     ['click-done', 'This event is emitted when the done-button(in multi-selectable & show-select-header case) is clicked.'],
     ['click-show-more', 'This event is emitted when the show-more-button is clicked.'],
+    ['update-search-input', 'This event is emitted when the input value of search component(in searchable case) is updated.'],
 ];
 
 const getArgTypes = (category: string, info: [string, string][]) => {
@@ -220,6 +221,24 @@ export const getContextMenuArgTypes = (): ArgTypes => {
             name: 'showClearSelection',
             type: { name: 'boolean' },
             description: 'Whether to enable a button to deselect all selected items. It is activated when the value of multiSelectable is true.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
+        searchable: {
+            name: 'searchable',
+            type: { name: 'boolean' },
+            description: 'Whether to enable search or not.',
             defaultValue: false,
             table: {
                 type: {

@@ -44,8 +44,9 @@ export function useListFocus<T>(items: ComputedRef<T[]>, groupId: string, predic
         }
         return blur();
     };
-    const handleMoveDown = (idx): number|undefined => {
+    const handleMoveDown = (idx: number): number|undefined => {
         const pos = state.focusableIndices.indexOf(idx) + 1;
+
         if (pos !== state.focusableIndices.length) {
             return focus(pos);
         }
