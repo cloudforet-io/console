@@ -1,3 +1,10 @@
+# [1.1.0-beta.485](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.484...v1.1.0-beta.485) (2022-12-21)
+
+
+### Bug Fixes
+
+* **p-json-schema-form:** add `resetOnSchemaChange` props ([#189](https://github.com/cloudforet-io/mirinae/issues/189)) ([af01d33](https://github.com/cloudforet-io/mirinae/commit/af01d3358eb128914e28384e5581927ebc4b1a9c))
+
 # [1.1.0-beta.484](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.483...v1.1.0-beta.484) (2022-12-21)
 
 
