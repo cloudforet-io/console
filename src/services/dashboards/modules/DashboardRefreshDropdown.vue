@@ -6,7 +6,7 @@
                        shape="square"
                        :disabled="customizeMode || loading"
                        :animation="loading ? 'reserve-spin' : undefined"
-                       @click="handleImmediateRefresh"
+                       @click="handleRefresh"
         />
         <p-select-dropdown class="currency-select-dropdown"
                            :items="intervalItems"
@@ -24,7 +24,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -33,13 +33,15 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 
 import { i18n } from '@/translations';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 import type { RefreshInterval } from '@/services/dashboards/config';
-import { refreshInterval } from '@/services/dashboards/config';
+import { refreshInterval, refreshIntervalMap } from '@/services/dashboards/config';
 
 interface Props {
     readOnly: boolean;
     filled: boolean;
-    defaultInterval: RefreshInterval;
+    interval: RefreshInterval;
     customizeMode: boolean;
     loading: boolean;
 }
@@ -59,7 +61,7 @@ export default defineComponent<Props>({
             type: Boolean,
             default: true,
         },
-        defaultInterval: {
+        interval: {
             type: String as PropType<RefreshInterval>,
             default: refreshInterval[0],
         },
@@ -74,16 +76,16 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }) {
         const state = reactive({
-            interval: props.defaultInterval,
+            interval: useProxyValue('interval', props, emit),
             intervalList: computed<{label: TranslateResult; value: RefreshInterval}[]>(() => [
-                { label: i18n.t('REFRESH_OFF'), value: 'off' },
-                { label: i18n.t('REFRESH_INTERVAL_15S'), value: '15s' },
-                { label: i18n.t('REFRESH_INTERVAL_30S'), value: '30s' },
-                { label: i18n.t('REFRESH_INTERVAL_1M'), value: '1m' },
-                { label: i18n.t('REFRESH_INTERVAL_5M'), value: '5m' },
-                { label: i18n.t('REFRESH_INTERVAL_10M'), value: '10m' },
-                { label: i18n.t('REFRESH_INTERVAL_30M'), value: '30m' },
-                { label: i18n.t('REFRESH_INTERVAL_1H'), value: '1h' },
+                { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_OFF'), value: 'off' },
+                { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_15S'), value: '15s' },
+                { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_30S'), value: '30s' },
+                { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_1M'), value: '1m' },
+                { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_5M'), value: '5m' },
+                { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_10M'), value: '10m' },
+                { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_30M'), value: '30m' },
+                { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_1H'), value: '1h' },
             ]),
             intervalItems: computed<MenuItem[]>(() => state.intervalList.map((interval) => ({
                 type: 'item',
@@ -92,18 +94,41 @@ export default defineComponent<Props>({
             }))),
         });
 
-        // Todo: After the dashboard refresh function is completed, decide whether to include the above two functions inside the component.
         const handleSelectInterval = (interval) => {
-            emit('update', interval);
+            state.interval = interval;
         };
-        const handleImmediateRefresh = () => {
-            emit('immediate-refresh');
+        let intervalFunction;
+
+        const executeInterval = () => {
+            if (refreshInterval.includes(props.interval)) {
+                intervalFunction = setInterval(() => {
+                    if (props.loading) {
+                        clearInterval(intervalFunction);
+                    } else {
+                        emit('refresh');
+                    }
+                }, refreshIntervalMap[props.interval]);
+            }
+        };
+
+        watch(() => props.loading, (loading) => {
+            if (loading) {
+                clearInterval(intervalFunction);
+            } else {
+                executeInterval();
+            }
+        });
+
+        executeInterval();
+
+        const handleRefresh = () => {
+            emit('refresh');
         };
 
         return {
             ...toRefs(state),
             handleSelectInterval,
-            handleImmediateRefresh,
+            handleRefresh,
         };
     },
 });
