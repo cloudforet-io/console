@@ -35,6 +35,8 @@ import { reactive, toRefs } from 'vue';
 
 import { PPageTitle, PButton } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -84,12 +86,16 @@ export default {
 
         const handleClickCreate = () => {
             const dashboardCreateParams = {
-                dashboardScope: state.dashboardScope,
-                dashboardProject: state.dashboardScope === DASHBOARD_SCOPE.DOMAIN ? '' : dashboardProject.value,
-                dashboardTemplate: dashboardTemplate.value,
-                dashboardViewerType: state.dashboardViewerType,
+                name: 'name??????',
+                viewers: state.dashboardViewerType,
             };
-            console.log(dashboardCreateParams);
+
+            if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) {
+                SpaceConnector.clientV2.dashboard.projectDashboard.create({
+                    ...dashboardCreateParams,
+                    project_id: dashboardProject.value?.id ?? '',
+                });
+            } else SpaceConnector.clientV2.dashboard.domainDashboard.create(dashboardCreateParams);
         };
 
         return {
