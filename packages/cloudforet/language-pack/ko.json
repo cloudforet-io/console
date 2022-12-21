@@ -684,6 +684,17 @@
 				"TOTAL_COST": "총 비용",
 				"UPDATE_DASHBOARD": "대시보드 이름 변경"
 			},
+			"HOME": {
+				"COST_ANALYSIS_DESC": "",
+				"COST_BUDGET_DESC": "",
+				"COST_DASHBOARD": "",
+				"COST_DASHBOARD_DESC": "",
+				"ENABLE_BUTTON": "",
+				"LEARN_MORE": "",
+				"MORE_INFO": "",
+				"TITLE": "",
+				"TOPIC_DESC": ""
+			},
 			"MAIN": {
 				"ALT_E_EDIT_FILTER": "필터 수정 실패",
 				"ALT_S_EDIT_FILTER": "필터 적용 완료",

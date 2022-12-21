@@ -684,6 +684,17 @@
 				"TOTAL_COST": "Total Cost",
 				"UPDATE_DASHBOARD": "Update Dashboard"
 			},
+			"HOME": {
+				"COST_ANALYSIS_DESC": "Visualize your costs with various widgets and \n allocate spend across your organization.",
+				"COST_BUDGET_DESC": "Track your costs, usage, and coverage with \n custom budgets.",
+				"COST_DASHBOARD": "Cost Dashboard",
+				"COST_DASHBOARD_DESC": "Explore granular cost breakdowns across all of \n your cloud resources.",
+				"ENABLE_BUTTON": "Enable Cost Explorer",
+				"LEARN_MORE": "Learn more",
+				"MORE_INFO": "More information",
+				"TITLE": "Analyze your costs easily and optimize resources",
+				"TOPIC_DESC": "View your billing details thoroughly and \n optimize resources based on cost data analyzed."
+			},
 			"MAIN": {
 				"ALT_E_EDIT_FILTER": "Failed to Update Filter",
 				"ALT_S_EDIT_FILTER": "Filter applied successfully",
