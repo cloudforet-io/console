@@ -1,7 +1,7 @@
 <template>
     <widget-frame :title="state.title"
                   :size="state.size"
-                  :width="704"
+                  :width="props.width"
                   class="aws-data-transfer-by-region"
     >
         <template #header-right>

@@ -1,7 +1,7 @@
 <template>
     <widget-frame :title="state.title"
                   :size="state.size"
-                  :width="384"
+                  :width="props.width"
                   class="budget-status-widget"
     >
         <p-data-loader :loading="state.loading"
@@ -154,7 +154,7 @@ defineExpose({
         padding: 0 1.5rem 1.5rem 1.5rem;
         .waffle-chart {
             display: flex;
-            height: 90%;
+            height: 85%;
             gap: 0.25rem;
             .status-col-wrapper {
                 display: grid;

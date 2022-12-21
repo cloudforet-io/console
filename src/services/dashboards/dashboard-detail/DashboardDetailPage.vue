@@ -12,7 +12,7 @@
             </template>
             <template #title-right-extra>
                 <span class="dashboard-title-icon-buttons-wrapper">
-                    <favorite-button :item-id="state.dashboardId"
+                    <favorite-button :item-id="props.dashboardId"
                                      :favorite-type="FAVORITE_TYPE.DASHBOARD"
                     />
                     <p-icon-button name="ic_edit-text"
@@ -48,8 +48,7 @@
         </div>
         <dashboard-widget-container
             ref="widgetContainerRef"
-            :widget-size-list="WIDGET_SIZE_MOCK"
-            :widget-theme-option-list="WIDGET_THEME_OPTION_MOCK"
+            :dashboard-widget-layouts="state.dashboardWidgetLayouts"
             :loading.sync="state.loading"
         />
         <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
@@ -87,12 +86,13 @@ import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modu
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
-import type { DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
+import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
-import costPieWidgetConfig from '@/services/dashboards/widgets/cost-pie/widget-config';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
 
 const PUBLIC_ICON_COLOR = gray[500];
@@ -104,10 +104,12 @@ const props = defineProps<Props>();
 
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
-    dashboardId: computed<string>(() => props.dashboardId),
-    dashboardViewer: DASHBOARD_VIEWER.PRIVATE as DashboardViewer,
-    dashboardName: 'Dashboard',
-    labelList: [] as Array<string>,
+    dashboardInfo: DASHBOARD_TEMPLATES.monthlyCostSummary as DashboardModel, // TODO: should be changed to api data
+    dashboardViewer: computed<DashboardViewer>(() => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE),
+    dashboardName: '',
+    labelList: computed<string[]>(() => state.dashboardInfo?.labels ?? []),
+    dashboardWidgetLayouts: computed<DashboardLayoutWidgetInfo[][]>(() => state.dashboardInfo?.layouts ?? []),
+    //
     nameEditModalVisible: false,
     deleteModalVisible: false,
     cloneModalVisible: false,
@@ -118,18 +120,6 @@ const isProjectDashboard = Boolean(props.dashboardId.startsWith('project'));
 
 const widgetContainerRef = ref<any>(null);
 
-const WIDGET_SIZE_MOCK = ['lg', 'lg', 'lg', 'lg', 'lg', 'lg'];
-const WIDGET_THEME_OPTION_MOCK = [
-    costPieWidgetConfig,
-    { inherit: true, inherit_count: 3 },
-    { inherit: true, inherit_count: undefined },
-    { inherit: false, inherit_count: undefined },
-    { inherit: true, inherit_count: undefined },
-    { inherit: true, inherit_count: undefined },
-    { inherit: true, inherit_count: undefined },
-];
-
-// name edit
 const handleVisibleNameEditModal = () => {
     state.nameEditModalVisible = true;
 };
@@ -160,10 +150,10 @@ const getDashboardData = async () => {
         } else {
             result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ project_dashboard_id: props.dashboardId });
         }
-        state.labelList = result.labels;
+        state.dashboardInfo = result;
         state.dashboardName = result.name;
-        state.dashboardViewer = result.viewers;
     } catch (e) {
+        // state.dashboardInfo = {}; // TODO: temporarily disabled
         ErrorHandler.handleError(e);
     }
 };

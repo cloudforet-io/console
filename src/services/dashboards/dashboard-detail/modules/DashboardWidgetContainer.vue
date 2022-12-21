@@ -2,56 +2,58 @@
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <div
-            v-for="(row, rowIndex) in widgetWidthList"
-            :key="`widget-row-${rowIndex}`"
-            class="dashboard-widget-row"
-        >
-            <a-w-s-cloud-front-cost
-                v-for="(width, colIndex) in row"
-                ref="widgetRef"
-                :key="`widget-row-${rowIndex}-${colIndex}`"
-                :widget-key="`widget-row-${rowIndex}-${colIndex}`"
-                widget-config-id="awsCloudFrontCost"
-                :width="width"
-                :is-full="containerWidth === width"
-                :widget-index="widgetIndexList[rowIndex][colIndex]"
-                @click-expand-icon="handleExpand"
+        <template v-for="(width, idx) in widgetWidthList">
+            <component :is="getWidgetComponent(widgetInfoList[idx].widget_name)"
+                       v-if="widgetInfoList[idx]"
+                       :key="`widget-${widgetInfoList[idx].widget_name}-${idx}`"
+                       ref="widgetRef"
+                       :widget-config-id="widgetInfoList[idx].widget_name"
+                       :widget-key="widgetInfoList[idx].widget_name"
+                       :title="widgetInfoList[idx].title"
+                       :options="widgetInfoList[idx].widget_options"
+                       :inherit-options="{
+                           currency: { enabled: true },
+                           date_range: { enabled: true },
+                       }"
+                       :size="widgetSizeList[idx]"
+                       :width="width"
+                       :theme="widgetThemeList[idx]"
+                       @click-expand-icon="handleExpand"
             />
-        </div>
+        </template>
     </div>
 </template>
 
 <script lang="ts">
 import type { PropType, SetupContext } from 'vue';
 import {
-    defineComponent, reactive, toRefs, ref, onMounted, watch, onBeforeUnmount,
+    defineComponent, reactive, toRefs, ref, onMounted, watch, onBeforeUnmount, computed,
 } from 'vue';
 
+import { flattenDeep } from 'lodash';
+
 import {
-    WIDGET_CONTAINER_MAX_WIDTH,
-    WIDGET_CONTAINER_MIN_WIDTH,
+    WIDGET_CONTAINER_MAX_WIDTH, WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
 import { widgetThemeAssigner } from '@/services/dashboards/dashboard-detail/lib/theme-helper';
-import type { WidgetThemeAssignedList, WidgetThemeOption } from '@/services/dashboards/dashboard-detail/lib/type';
 import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
 import AWSCloudFrontCost from '@/services/dashboards/widgets/aws-cloud-front-cost/AWSCloudFrontCost.vue';
-import type { WidgetSize } from '@/services/dashboards/widgets/config';
+import type { WidgetSize, DashboardLayoutWidgetInfo, WidgetConfig } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
+import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
-
-export default defineComponent({
+interface Props {
+    dashboardWidgetLayouts: DashboardLayoutWidgetInfo[][];
+}
+export default defineComponent<Props>({
     name: 'DashboardWidgetContainer',
     components: {
         AWSCloudFrontCost,
     },
     props: {
-        widgetSizeList: {
-            type: Array as PropType<Array<WidgetSize>>,
-            default: () => ([]),
-        },
-        widgetThemeOptionList: {
-            type: Array as PropType<Array<WidgetThemeOption>>,
+        dashboardWidgetLayouts: {
+            type: Array as PropType<DashboardLayoutWidgetInfo[][]>,
             default: () => ([]),
         },
     },
@@ -59,16 +61,24 @@ export default defineComponent({
         const state = reactive({
             // width
             containerWidth: WIDGET_CONTAINER_MIN_WIDTH,
-            widgetSizeList: props.widgetSizeList,
-            widgetWidthList: [] as Array<Array<number>>,
-            widgetIndexList: [] as Array<Array<number>>,
+            widgetSizeList: [] as WidgetSize[],
+            widgetWidthList: computed<number[]>(() => flattenDeep(widgetWidthAssigner(state.widgetSizeList, refineContainerWidth(state.containerWidth)))),
             // theme
-            widgetThemeList: [] as WidgetThemeAssignedList,
+            widgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => flattenDeep(props.dashboardWidgetLayouts)),
+            widgetThemeList: computed<Array<WidgetTheme | undefined>>(() => {
+                const widgetThemeOptions: Array<WidgetConfig['theme']> = [];
+                const _widgetLayouts = flattenDeep(props.dashboardWidgetLayouts);
+                _widgetLayouts.forEach((widget) => {
+                    const widgetConfig = getWidgetConfig(widget.widget_name);
+                    widgetThemeOptions.push(widgetConfig.theme);
+                });
+                return widgetThemeAssigner(widgetThemeOptions);
+            }),
             widgetRef: [] as Array<InstanceType<typeof AWSCloudFrontCost>>,
         });
         const containerRef = ref<HTMLElement|null>(null);
 
-
+        /* Util */
         const refineContainerWidth = (containerWidth: number|undefined): number => {
             if (!containerWidth || containerWidth < WIDGET_CONTAINER_MIN_WIDTH) return WIDGET_CONTAINER_MIN_WIDTH;
             if (containerWidth > WIDGET_CONTAINER_MAX_WIDTH) return WIDGET_CONTAINER_MAX_WIDTH;
@@ -88,10 +98,9 @@ export default defineComponent({
         const handleExpand = (type: 'expand'|'collapse', widgetIndex: number): void => {
             const _widgetSizeList = [...state.widgetSizeList];
             if (type === 'expand') _widgetSizeList[widgetIndex] = WIDGET_SIZE.full;
-            if (type === 'collapse') _widgetSizeList[widgetIndex] = props.widgetSizeList[widgetIndex];
+            if (type === 'collapse') _widgetSizeList[widgetIndex] = state.widgetSizeList[widgetIndex];
             state.widgetSizeList = [..._widgetSizeList];
         };
-
 
         let timer: undefined|number;
         const handleResizeObserve = () => {
@@ -105,29 +114,22 @@ export default defineComponent({
         };
 
         const observeInstance = new ResizeObserver(handleResizeObserve);
-
         onMounted(() => {
             // INIT containerWidth
             state.containerWidth = refineContainerWidth(containerRef.value?.clientWidth);
             observeInstance.observe(containerRef?.value as Element);
         });
-
         onBeforeUnmount(() => {
             observeInstance.unobserve(containerRef?.value as Element);
         });
 
-        // for width realignment
-        watch([() => state.containerWidth, () => state.widgetSizeList], ([containerWidth, widgetSizeList]) => {
-            state.widgetWidthList = widgetWidthAssigner(widgetSizeList, refineContainerWidth(containerWidth));
-
-            let widgetIndex = -1;
-            state.widgetIndexList = state.widgetWidthList.map((d) => d.map(() => { widgetIndex += 1; return widgetIndex; }));
-        });
-
-        // for theme align
-        watch(() => state.widgetSizeList, () => {
-            state.widgetThemeList = widgetThemeAssigner(props.widgetThemeOptionList);
+        watch(() => props.dashboardWidgetLayouts, (dashboardWidgetLayouts) => {
+            const widgetLayouts: DashboardLayoutWidgetInfo[] = flattenDeep(dashboardWidgetLayouts);
+            state.widgetSizeList = widgetLayouts.map((widget) => widget.size);
         }, { immediate: true });
+        watch(() => state.containerWidth, (containerWidth) => {
+            state.widgetWidthList = widgetWidthAssigner(state.widgetSizeList, refineContainerWidth(containerWidth));
+        });
 
         const refreshAllWidget = async () => {
             const promises: (()=>void)[] = [];
@@ -145,6 +147,7 @@ export default defineComponent({
             containerRef,
             ...toRefs(state),
             handleExpand,
+            getWidgetComponent,
         };
     },
 });
@@ -154,11 +157,8 @@ export default defineComponent({
 .dashboard-widget-container {
     min-width: 320px;
     max-width: 1840px;
-    display: grid;
-    gap: 16px;
-    .dashboard-widget-row {
-        display: flex;
-        gap: 16px;
-    }
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 </style>
