@@ -34,7 +34,7 @@ import { i18n } from '@/translations';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type { RefreshInterval } from '@/services/dashboards/config';
-import { refreshInterval, refreshIntervalMap } from '@/services/dashboards/config';
+import { refreshIntervalList, REFRESH_INTERVAL_OPTIONS_MAP } from '@/services/dashboards/config';
 
 interface Props {
     readOnly: boolean;
@@ -60,7 +60,7 @@ export default defineComponent<Props>({
         },
         interval: {
             type: String as PropType<RefreshInterval>,
-            default: refreshInterval[0],
+            default: refreshIntervalList[0],
         },
         loading: {
             type: Boolean,
@@ -90,23 +90,29 @@ export default defineComponent<Props>({
         const handleSelectInterval = (interval) => {
             state.interval = interval;
         };
-        let intervalFunction;
+        let intervalFunction: NodeJS.Timeout | null;
 
         const executeInterval = () => {
-            if (refreshInterval.includes(props.interval)) {
+            if (refreshIntervalList.includes(props.interval) && !intervalFunction) {
                 intervalFunction = setInterval(() => {
                     if (props.loading) {
-                        clearInterval(intervalFunction);
+                        if (intervalFunction) {
+                            clearInterval(intervalFunction);
+                            intervalFunction = null;
+                        }
                     } else {
                         emit('refresh');
                     }
-                }, refreshIntervalMap[props.interval]);
+                }, REFRESH_INTERVAL_OPTIONS_MAP[props.interval]);
             }
         };
 
         watch(() => props.loading, (loading) => {
             if (loading) {
-                clearInterval(intervalFunction);
+                if (intervalFunction) {
+                    clearInterval(intervalFunction);
+                    intervalFunction = null;
+                }
             } else {
                 executeInterval();
             }
