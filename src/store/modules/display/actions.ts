@@ -72,12 +72,16 @@ export const hideSignInErrorMessage = ({ commit }): void => {
     commit('setIsSignInFailed', false);
 };
 
+let isNotificationListApiPending = false;
 const fixedCheckNotificationFilter: ConsoleFilter = { k: 'is_read', v: false, o: '=' };
 const checkNotificationQueryHelper = new ApiQueryHelper().setCountOnly();
 export const checkNotification: Action<DisplayState, any> = async ({
     commit, state, rootState, rootGetters,
 }): Promise<void> => {
     try {
+        if (isNotificationListApiPending) return;
+
+        isNotificationListApiPending = true;
         const currentTime = dayjs();
 
         checkNotificationQueryHelper.setFilters([
@@ -102,6 +106,7 @@ export const checkNotification: Action<DisplayState, any> = async ({
         const { total_count } = await SpaceConnector.client.notification.notification.list({
             query: checkNotificationQueryHelper.data,
         });
+        isNotificationListApiPending = false;
 
         if (state.uncheckedNotificationCount !== total_count) commit('setUncheckedNotificationCount', total_count);
     } catch (e) {
