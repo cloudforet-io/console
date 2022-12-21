@@ -13,6 +13,7 @@ const costDonutWidgetConfig: Partial<WidgetConfig> = {
     widget_options: {
         chart_type: 'DONUT',
     },
+    sizes: ['sm', 'full'],
     widget_options_schema: {
         default_properties: ['group_by'],
         schema: {
