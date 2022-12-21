@@ -19,11 +19,14 @@
                                    width="1.5rem"
                                    height="1.5rem"
                                    :disabled="!state.hasManagePermission && state.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
-                                   @click="handleNameEditModal"
+                                   class="ml-1"
+                                   @click="handleVisibleNameEditModal"
                     />
-                    <dashboard-more-menu :dashboard-id="state.dashboardId"
-                                         :manage-disabled="!state.hasManagePermission"
-                                         :dashboard-viewer="state.dashboardViewer"
+                    <p-icon-button name="ic_trashcan"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   :disabled="!state.hasManagePermission && state.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   @click="handleVisibleDeleteModal"
                     />
                 </span>
             </template>
@@ -51,6 +54,9 @@
                                    :dashboard-name="state.dashboardName"
                                    @confirm="handleNameUpdate"
         />
+        <dashboard-delete-modal :visible.sync="state.deleteModalVisible"
+                                :dashboard-id="props.dashboardId"
+        />
         <dashboard-clone-modal :visible.sync="state.cloneModalVisible" />
     </div>
 </template>
@@ -75,7 +81,7 @@ import { gray } from '@/styles/colors';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardViewer } from '@/services/dashboards/config';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
-import DashboardMoreMenu from '@/services/dashboards/dashboard-detail/modules/DashboardMoreMenu.vue';
+import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import DashboardRefresher from '@/services/dashboards/dashboard-detail/modules/DashboardRefresher.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
@@ -100,6 +106,7 @@ const state = reactive({
     dashboardName: 'Dashboard',
     labelList: [] as Array<string>,
     nameEditModalVisible: false,
+    deleteModalVisible: false,
     cloneModalVisible: false,
     refreshInterval: '15s',
     loading: false,
@@ -119,15 +126,25 @@ const WIDGET_THEME_OPTION_MOCK = [
     { inherit: true, inherit_count: undefined },
 ];
 
-const handleNameEditModal = () => {
+// name edit
+const handleVisibleNameEditModal = () => {
     state.nameEditModalVisible = true;
 };
 const handleNameUpdate = (name: string) => {
     state.dashboardName = name;
 };
+
+// delete dashboard
+const handleVisibleDeleteModal = () => {
+    state.deleteModalVisible = true;
+};
+
+// clone dashboard
 const handleVisibleCloneModal = () => {
     state.cloneModalVisible = true;
 };
+
+// else
 const handleRefresh = () => {
     widgetContainerRef.value?.refreshAllWidget();
 };
