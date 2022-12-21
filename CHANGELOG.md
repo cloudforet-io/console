@@ -1,3 +1,10 @@
+# [1.1.0-beta.490](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.489...v1.1.0-beta.490) (2022-12-21)
+
+
+### Bug Fixes
+
+* missing icon files ([#193](https://github.com/cloudforet-io/mirinae/issues/193)) ([8631754](https://github.com/cloudforet-io/mirinae/commit/86317540bc7c88ad6bafcb978032eb47edf0f1cc))
+
 # [1.1.0-beta.489](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.488...v1.1.0-beta.489) (2022-12-21)
 
 
