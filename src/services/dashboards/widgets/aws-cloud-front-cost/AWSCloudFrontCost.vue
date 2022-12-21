@@ -153,7 +153,7 @@ useWidgetLifecycle({
     initWidget, disposeWidget: disposeRoot,
 });
 
-defineExpose<{refreshWidget:() => void}>({
+defineExpose<{refreshWidget:() => Promise<void>}>({
     refreshWidget,
 });
 </script>
