@@ -9,7 +9,9 @@
             <dashboard-toolset />
         </div>
         <p-divider />
-        <dashboard-refresh-dropdown filled />
+        <dashboard-refresh-dropdown :interval.sync="state.refreshInterval"
+                                    refresh-disabled
+        />
         <dashboard-customize-sidebar />
     </div>
 </template>
@@ -26,6 +28,7 @@ import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRef
 
 const state = reactive({
     labelList: [] as Array<string>,
+    refreshInterval: undefined,
 });
 
 const handleUpdateLabelList = (labelList: Array<string>) => {

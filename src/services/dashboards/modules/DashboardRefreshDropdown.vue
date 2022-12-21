@@ -4,7 +4,7 @@
                        name="ic_renew"
                        style-type="tertiary"
                        shape="square"
-                       :disabled="customizeMode || loading"
+                       :disabled="refreshDisabled || loading"
                        :animation="loading ? 'reserve-spin' : undefined"
                        @click="handleRefresh"
         />
@@ -12,12 +12,10 @@
                            :items="intervalItems"
                            :selected="interval"
                            :read-only="loading"
-                           :class="{ loading, unfilled: !filled }"
+                           :class="{ loading }"
                            menu-position="right"
                            @select="handleSelectInterval"
-        >
-            <span v-if="!filled" />
-        </p-select-dropdown>
+        />
     </div>
 </template>
 
@@ -40,9 +38,8 @@ import { refreshInterval, refreshIntervalMap } from '@/services/dashboards/confi
 
 interface Props {
     readOnly: boolean;
-    filled: boolean;
+    refreshDisabled: boolean;
     interval: RefreshInterval;
-    customizeMode: boolean;
     loading: boolean;
 }
 
@@ -57,17 +54,13 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-        filled: {
+        refreshDisabled: {
             type: Boolean,
-            default: true,
+            default: false,
         },
         interval: {
             type: String as PropType<RefreshInterval>,
             default: refreshInterval[0],
-        },
-        customizeMode: {
-            type: Boolean,
-            default: false,
         },
         loading: {
             type: Boolean,
@@ -160,11 +153,6 @@ export default defineComponent<Props>({
         }
         .p-context-menu {
             min-width: 6.5rem;
-        }
-        &.unfilled {
-            .dropdown-button {
-                padding-left: 0.25rem;
-            }
         }
         &.loading {
             .dropdown-button {
