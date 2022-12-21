@@ -1,3 +1,10 @@
+# [1.1.0-beta.489](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.488...v1.1.0-beta.489) (2022-12-21)
+
+
+### Features
+
+* update icon ([#192](https://github.com/cloudforet-io/mirinae/issues/192)) ([494e4bf](https://github.com/cloudforet-io/mirinae/commit/494e4bf70db4e271183faf95c7875fb83ccce8f7))
+
 # [1.1.0-beta.488](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.487...v1.1.0-beta.488) (2022-12-21)
 
 
