@@ -34,15 +34,18 @@
                 <dashboard-control-buttons @update:visible-clone-modal="handleVisibleCloneModal" />
             </template>
         </p-page-title>
-        <div class="flex justify-between mt-4">
+        <div class="filter-box">
             <dashboard-labels :label-list="state.labelList" />
             <dashboard-toolset />
         </div>
-        <p-divider />
-        <dashboard-refresher :interval="state.refreshInterval"
-                             :loading="state.loading"
-                             @refresh="handleRefresh"
-        />
+        <p-divider class="divider" />
+        <div class="filter-box">
+            <div>filters</div>
+            <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
+                                        :loading="state.loading"
+                                        @refresh="handleRefresh"
+            />
+        </div>
         <dashboard-widget-container
             ref="widgetContainerRef"
             :widget-size-list="WIDGET_SIZE_MOCK"
@@ -83,12 +86,12 @@ import type { DashboardViewer } from '@/services/dashboards/config';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
-import DashboardRefresher from '@/services/dashboards/dashboard-detail/modules/DashboardRefresher.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import type { DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
+import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
 import costPieWidgetConfig from '@/services/dashboards/widgets/cost-pie/widget-config';
 
 
@@ -177,5 +180,11 @@ const getDashboardData = async () => {
     gap: 0.5rem;
     align-items: center;
     margin-left: 0.25rem;
+}
+.divider {
+    @apply mt-4 mb-6;
+}
+.filter-box {
+    @apply flex justify-between items-center mb-4;
 }
 </style>

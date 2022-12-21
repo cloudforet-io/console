@@ -1,10 +1,6 @@
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
-export const refreshInterval = ['off', '15s', '30s', '1m', '5m', '10m', '30m', '1h'];
-
-export type RefreshInterval = typeof refreshInterval[number];
-
-export const refreshIntervalMap = {
+export const REFRESH_INTERVAL_OPTIONS_MAP = {
     off: 0,
     '15s': 15000,
     '30s': 30000,
@@ -13,7 +9,12 @@ export const refreshIntervalMap = {
     '10m': 600000,
     '30m': 1800000,
     '1h': 3600000,
-};
+} as const;
+
+export type RefreshIntervalOption = keyof typeof REFRESH_INTERVAL_OPTIONS_MAP;
+
+export const refreshIntervalOptionList = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP) as RefreshIntervalOption[];
+
 
 export const DASHBOARD_SCOPE = {
     DOMAIN: 'DOMAIN',
