@@ -412,6 +412,7 @@ export const Template = (args, { argTypes }) => ({
             `,
             setup() {
                 const state = reactive({
+                    value: '',
                     sizes: Object.values(INPUT_SIZE)
                 })
                 return {

@@ -1,14 +1,17 @@
 import { Meta, Canvas, Story, ArgsTable, Description } from '@storybook/addon-docs/blocks';
 import { reactive, toRefs, watch } from 'vue';
+import {debounce} from "lodash";
+import { faker } from '@faker-js/faker';
 
 import PContextMenu from './PContextMenu.vue';
 import PEmpty from '@/data-display/empty/PEmpty';
 import PI from '@/foundation/icons/PI.vue';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
+import PButton from "@/inputs/buttons/button/PButton.vue";
 import PTextEditor from "@/inputs/text-editor/PTextEditor";
 
 import {contextMenuSlots, getContextMenuArgTypes} from '@/inputs/context-menu/story-helper';
-import {menuItems, longMenuItems} from '@/inputs/context-menu/mock';
+import {menuItems, longMenuItems, getContextMenuItems} from '@/inputs/context-menu/mock';
 
 
 <Meta title='Inputs/Context Menu' parameters={{
@@ -176,7 +179,7 @@ Each `MenuItem` has the following type to represent it:
 ## Slots
 
 <Description markdown={`
-Context Menu have ${contextMenuSlots.length} slots:
+Context Menu have ${contextMenuSlots.length} slots: \n
 |Slot|Description|
 |-|-|
 ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join('\n')}
@@ -552,6 +555,65 @@ It works only in multi select case.
 <br/>
 <br/>
 
+## Show More
+
+<Canvas>
+    <Story name="Show More" height={'18rem'}>
+        {{
+            components: { PContextMenu, PButton, PToggleButton},
+            template: `
+<div>
+    <div class="mb-4 flex gap-4 items-center">
+        <p-button style-type="secondary" @click="handleClickReset" >Reset</p-button>
+        <div>
+            Next items exist: <p-toggle-button :value="hasMore" @change="hasMore = !hasMore"/>
+        </div>
+    </div>
+    <p-context-menu :menu="menu" show-clear-selection multi-selectable
+        :loading="loading"
+        @click-show-more="handleClickShowMore"
+    />
+</div>
+`,
+    setup() {
+        const headerItem = {type: 'header', label: 'Names', name: 'names-header'};
+        const showMoreItem = {type: 'showMore', name: 'show-more'};
+        const state = reactive({
+            menu: [headerItem, ...getContextMenuItems(), showMoreItem],
+            loading: false,
+            hasMore: true
+        });
+        const handleClickReset = () => {
+         state.menu = [headerItem, ...getContextMenuItems(), showMoreItem]
+        }
+        const handleClickShowMore = async () => {
+            state.loading = true;
+            state.menu = await new Promise(resolve => {
+                setTimeout(() => {
+                    let items = state.menu;
+                    // remove show more item
+                    items.pop();
+                    // add menu items
+                    items = items.concat(getContextMenuItems());
+                    // append show more item if next items exist
+                    if (state.hasMore) items.push(showMoreItem);
+                    resolve(items)
+                }, 1000)
+            })
+            state.loading = false;
+        }
+        return {
+            ...toRefs(state),
+            handleClickReset,
+            handleClickShowMore
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 ## Playground
 

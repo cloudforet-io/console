@@ -371,8 +371,10 @@ export default defineComponent<SelectDropdownProps>({
         width: auto;
         &.left {
             left: 0;
+            right: unset;
         }
         &.right {
+            left: unset;
             right: 0;
         }
     }
