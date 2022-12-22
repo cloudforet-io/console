@@ -5,6 +5,7 @@ import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 const costPieWidgetConfig: Partial<WidgetConfig> = {
     widget_config_id: 'costPie',
     title: 'Cost Pie',
+    labels: ['Cost'],
     base_configs: [{ config_id: 'dashboardCommon' }, { config_id: 'basePie' }],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.COST_PIE.DESC',
