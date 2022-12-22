@@ -54,7 +54,7 @@
     "highlight.js": "^11.5.1",
     "html-to-image": "^1.9.0",
     "js-yaml": "^4.1.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^3.1.2",
     "keycloak-js": "^10.0.2",
     "lodash": "^4.17.21",
