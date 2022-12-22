@@ -1,24 +1,19 @@
 <template>
-    <div class="project-search">
-        <p-autocomplete-search v-model="searchText"
-                               theme="secondary"
-                               :placeholder="groupId ? $t('PROJECT.LANDING.PLACE_HOLDER_PROJECT') : $t('PROJECT.LANDING.PLACE_HOLDER_EXAMPLE')"
-                               :disable-icon="!!groupId"
-                               :menu="menu"
-                               :loading="loading"
-                               :visible-menu.sync="visibleMenu"
-                               :is-focused.sync="isFocused"
-                               disable-handler
-                               :exact-mode="false"
-                               @delete="onDeleteAll"
-                               @input="onInput"
-                               @search="onSearch"
-                               @select-menu="onMenuSelect"
-                               @mousedown.stop="onInput()"
-                               @hide-menu="hideMenu"
-                               @keydown.delete="onDeletePrefix"
+    <div v-click-outside="hideMenu"
+         class="project-search"
+    >
+        <p-search v-model="searchText"
+                  :placeholder="groupId ? $t('PROJECT.LANDING.PLACE_HOLDER_PROJECT') : $t('PROJECT.LANDING.PLACE_HOLDER_EXAMPLE')"
+                  :disable-icon="!!groupId"
+                  @delete="onDeleteAll"
+                  @input="onInput"
+                  @search="onSearch"
+                  @keydown.delete.native="onDeletePrefix"
+                  @mousedown.stop.native="handleMousedownSearch"
+                  @keydown.esc.native="hideMenu"
+                  @keydown.down.native="focusMenu"
         >
-            <template #search-left>
+            <template #left>
                 <div v-if="groupId"
                      class="prefix-tag"
                      :class="{active: isFocused || visibleMenu}"
@@ -26,7 +21,16 @@
                     <span class="text">{{ groupName }}</span>
                 </div>
             </template>
-            <template #menu-item--format="{item}">
+        </p-search>
+        <p-context-menu v-show="visibleMenu"
+                        ref="menuRef"
+                        :menu="menu"
+                        :selected="selected"
+                        :loading="loading"
+                        :is-focused.sync="isFocused"
+                        @select="onMenuSelect"
+        >
+            <template #item--format="{item}">
                 <p-i :name="item.icon"
                      height="1rem"
                      width="1rem"
@@ -37,7 +41,7 @@
                                      style-type="secondary"
                 />
             </template>
-            <template #menu-header-more="{item}">
+            <template #header-more="{item}">
                 <div class="show-more"
                      @click.stop="onShowMore(item)"
                 >
@@ -49,19 +53,21 @@
                     <span class="text">{{ $t('PROJECT.LANDING.PLACE_HOLDER_SHOW_MORE') }}</span>
                 </div>
             </template>
-        </p-autocomplete-search>
+        </p-context-menu>
     </div>
 </template>
 
 <script lang="ts">
 
+import { vOnClickOutside } from '@vueuse/components';
+import type { DirectiveFunction } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PAutocompleteSearch, PI, PTextHighlighting,
+    PContextMenu, PI, PSearch, PTextHighlighting,
 } from '@spaceone/design-system';
 import type { MenuItem as ContextMenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { debounce } from 'lodash';
@@ -126,14 +132,19 @@ const makeMenuItems = (...args: MenuOption[]): MenuItem[] => {
 export default {
     name: 'ProjectSearch',
     components: {
+        PContextMenu,
+        PSearch,
         PI,
-        PAutocompleteSearch,
         PTextHighlighting,
+    },
+    directives: {
+        clickOutside: vOnClickOutside as DirectiveFunction,
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
+            menuRef: null as null|Vue,
             groupId: computed(() => store.getters['service/project/groupId']),
             groupName: computed(() => store.getters['service/project/groupName']),
             searchText: '' as string,
@@ -172,6 +183,10 @@ export default {
                     icon: 'ic_tree_project',
                 });
                 return makeMenuItems(...menuOptions);
+            }),
+            selected: computed(() => {
+                if (!state.groupId) return [];
+                return [{ name: state.groupId }];
             }),
             visibleMenu: false,
             isFocused: true,
@@ -246,7 +261,6 @@ export default {
         const hideMenu = () => { state.visibleMenu = false; };
 
         const onInput = debounce(async () => {
-            if (!state.visibleMenu) showMenu();
             await listItems();
         }, 300);
 
@@ -254,7 +268,7 @@ export default {
             if (state.visibleMenu) await listItems();
         });
 
-        const commitSearchContext = (groupId?: string, searchText?: string, hide = true) => {
+        const commitSearchContext = (groupId?: string, searchText?: string) => {
             let val = searchText;
             if (typeof searchText === 'string') val = searchText.trim();
             if (!val) val = '';
@@ -266,19 +280,19 @@ export default {
             if (store.state['service/project/searchText'] !== val) {
                 store.commit('service/project/setSearchText', val);
             }
-
-            if (hide) hideMenu();
-            state.isFocused = false;
         };
 
         const onSearch = (text: string) => {
             commitSearchContext(state.groupId, text);
+            hideMenu();
+            state.isFocused = false;
         };
 
         const onMenuSelect = (item: MenuItem) => {
             if (item.dataType === 'PROJECT_GROUP') {
                 state.searchText = '';
-                commitSearchContext(item.name, '', false);
+                commitSearchContext(item.name, '');
+                state.isFocused = false;
                 state.projectGroupStart = 1;
                 listProjectGroups();
                 state.isFocused = true;
@@ -304,7 +318,7 @@ export default {
         };
 
         const onDeleteAll = () => {
-            // commitSearchContext();
+            onInput();
         };
 
         if (vm.$route.query.search) {
@@ -312,18 +326,30 @@ export default {
             store.commit('service/project/setSearchText', vm.$route.query.search as string);
         }
 
+        const focusMenu = () => {
+            if (state.menuRef) state.menuRef.focus();
+        };
+
+        const handleMousedownSearch = () => {
+            if (!state.visibleMenu) {
+                showMenu();
+                onInput();
+            }
+        };
+
         return {
             ...toRefs(state),
             onInput,
             onSearch,
             commitSearchContext,
-            showMenu,
             hideMenu,
             onMenuSelect,
             getMatchText,
             onShowMore,
             onDeletePrefix,
             onDeleteAll,
+            focusMenu,
+            handleMousedownSearch,
         };
     },
 };
@@ -333,9 +359,10 @@ export default {
 .project-search {
     @apply w-full;
     padding: 0 0.75rem;
+    position: relative;
 
-    /* custom design-system component - p-autocomplete-search */
-    :deep(.p-autocomplete-search) {
+    /* custom design-system component - p-search */
+    :deep(.p-search) {
         .p-search {
             overflow-x: hidden;
             overflow-y: hidden;
@@ -343,6 +370,14 @@ export default {
                 min-width: 0;
             }
         }
+    }
+    .p-context-menu {
+        @apply font-normal;
+        position: absolute;
+        margin-top: -1px;
+        z-index: 1000;
+        min-width: calc(100% - 1.5rem);
+        width: calc(100% - 1.5rem);
     }
     .prefix-tag {
         @apply bg-gray-200 rounded-xs px-2 text-xs mr-2 inline-flex items-center flex-shrink-0;
