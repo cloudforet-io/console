@@ -1,3 +1,10 @@
+# [1.1.0-beta.493](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.492...v1.1.0-beta.493) (2022-12-22)
+
+
+### Features
+
+* **use-context-menu-controller:** update focusOnContextMenu ([#196](https://github.com/cloudforet-io/mirinae/issues/196)) ([9b58f5c](https://github.com/cloudforet-io/mirinae/commit/9b58f5c299bd139f395ce93746342056eed38b12))
+
 # [1.1.0-beta.492](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.491...v1.1.0-beta.492) (2022-12-22)
 
 
