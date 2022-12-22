@@ -17,25 +17,27 @@ const costAnalysisQueryWidgetConfig: WidgetConfig = {
     },
     sizes: ['xl', 'full'],
     widget_options_schema: {
-        type: 'object',
-        properties: {
-            group_by: {
-                type: 'string',
-                enum: Object.values(GROUP_BY),
+        schema: {
+            type: 'object',
+            properties: {
+                group_by: {
+                    type: 'string',
+                    enum: Object.values(GROUP_BY),
+                },
+                granularity: {
+                    type: 'string',
+                    enum: Object.values(GRANULARITY),
+                },
+                chart_type: {
+                    type: 'string',
+                    enum: Object.values(CHART_TYPE),
+                },
+                stacked: {
+                    type: 'boolean',
+                },
             },
-            granularity: {
-                type: 'string',
-                enum: Object.values(GRANULARITY),
-            },
-            chart_type: {
-                type: 'string',
-                enum: Object.values(CHART_TYPE),
-            },
-            stacked: {
-                type: 'boolean',
-            },
+            required: ['group_by', 'granularity', 'chart_type'],
         },
-        required: ['group_by', 'granularity', 'chart_type'],
     },
 };
 
