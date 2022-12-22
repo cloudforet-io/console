@@ -36,7 +36,7 @@
         </p-page-title>
         <div class="filter-box">
             <dashboard-labels :label-list="state.labelList" />
-            <dashboard-toolset />
+            <dashboard-toolset @update:date-range="handleUpdateDateRange" />
         </div>
         <p-divider class="divider" />
         <div class="filter-box">
@@ -121,6 +121,7 @@ const state = reactive({
 
 const widgetContainerRef = ref<any>(null);
 
+// name edit
 const handleVisibleNameEditModal = () => {
     state.nameEditModalVisible = true;
 };
@@ -136,6 +137,11 @@ const handleVisibleDeleteModal = () => {
 // clone dashboard
 const handleVisibleCloneModal = () => {
     state.cloneModalVisible = true;
+};
+
+// date range
+const handleUpdateDateRange = () => {
+    // TODO:: implementation & give dateRange for URL parameters
 };
 
 // else
