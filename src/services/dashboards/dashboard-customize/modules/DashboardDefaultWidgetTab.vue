@@ -145,7 +145,13 @@ export default {
                     /* custom design-system component - p-lazy-img */
                     :deep(.preview-img) {
                         .img-container {
-                            width: auto;
+                            display: flex;
+                            justify-content: center;
+                            width: 100%;
+
+                            img {
+                                width: auto !important;
+                            }
                         }
                     }
                 }
