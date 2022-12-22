@@ -60,8 +60,6 @@ const mockLoadComposableInApp = (getOptions: () => Partial<UseContextMenuControl
     return { result, error, wrapper };
 };
 
-const menuItems: MenuItem[] = [{ name: 'a', label: 'A' }, { name: 'b', label: 'B' }, { name: 'c', label: 'C' }];
-
 describe('Context Menu Controller', () => {
     describe('useContextMenuController()', () => {
         it('should emit error if targetRef, contextMenu are not given.', () => {
@@ -121,7 +119,7 @@ describe('Context Menu Controller', () => {
                 targetRef: ref<HTMLElement|null>(null),
                 contextMenuRef: ref<typeof PContextMenu|null>(null),
                 visibleMenu: ref(true),
-                menu: ref(menuItems),
+                menu: ref([{ name: 'a', label: 'A' }, { name: 'b', label: 'B' }, { name: 'c', label: 'C' }]),
             }));
             const { focusOnContextMenu } = result as UseContextMenuControllerReturns;
             it('focusOnContextMenu() should focus on context menu element.', async () => {
@@ -129,6 +127,31 @@ describe('Context Menu Controller', () => {
                 focusOnContextMenu();
                 await Vue.nextTick();
                 expect(document.activeElement?.id).toBeTruthy();
+            });
+        });
+
+        describe('Reorder menu items based on selection: ', () => {
+            const menuItems: MenuItem[] = [{ name: 'a', label: 'A' }, { name: 'b', label: 'B' }, { name: 'c', label: 'C' }];
+            const { result } = mockLoadComposableInApp(() => ({
+                targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<typeof PContextMenu|null>(null),
+                visibleMenu: ref(true),
+                useReorderBySelection: true,
+                menu: ref(menuItems),
+            }));
+            const { reorderMenuBySelection } = result as UseContextMenuControllerReturns;
+            it('reorderMenuBySelection() should do nothing if there is no selected item.', async () => {
+                const newMenuItems = reorderMenuBySelection([]);
+                const originMenuNames = menuItems.map((item) => item.name).join(',');
+                const newItemsNames = newMenuItems.map((item) => item.name).join(',');
+                expect(originMenuNames).toBe(newItemsNames);
+            });
+            it('reorderMenuBySelection() should place the selected items at the front.', async () => {
+                const selected: MenuItem[] = [{ name: 'b', label: 'B' }];
+                const newMenuItems = reorderMenuBySelection(selected);
+                const newItemsNames = newMenuItems.map((item) => item.name).join(',');
+                const expected = 'b,selection-divider,a,c';
+                expect(newItemsNames).toBe(expected);
             });
         });
     });
