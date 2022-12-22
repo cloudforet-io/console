@@ -101,8 +101,8 @@ export default defineComponent({
         });
 
         const setSelectedDateRange = (start, end) => {
-            const _start = dayjs.utc(start.name).startOf('month').format('YYYY-MM-DD');
-            const _end = dayjs.utc(end.name).endOf('month').format('YYYY-MM-DD');
+            const _start = dayjs.utc(start).startOf('month').format('YYYY-MM-DD');
+            const _end = dayjs.utc(end).endOf('month').format('YYYY-MM-DD');
             state.selectedDateRange = { start: _start, end: _end };
         };
 
@@ -111,7 +111,7 @@ export default defineComponent({
             state.selectedMonthMenuIndex = selectedIndex;
             if (state.monthMenuItems[selectedIndex].name === 'custom') state.customRangeModalVisible = true;
             else {
-                setSelectedDateRange(state.monthMenuItems[selectedIndex], state.monthMenuItems[selectedIndex]);
+                setSelectedDateRange(state.monthMenuItems[selectedIndex].name, state.monthMenuItems[selectedIndex].name);
                 emit('update:date-range', state.selectedDateRange);
             }
         };
