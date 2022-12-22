@@ -194,10 +194,11 @@ const handleSelectSelectorType = (selected: string) => {
 };
 
 useWidgetLifecycle({
-    initWidget, disposeWidget: disposeRoot,
+    disposeWidget: disposeRoot,
 });
 
 defineExpose({
+    initWidget,
     refreshWidget,
 });
 </script>
