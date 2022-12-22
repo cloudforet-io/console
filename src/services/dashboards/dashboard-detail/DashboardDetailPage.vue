@@ -36,7 +36,7 @@
         </p-page-title>
         <div class="filter-box">
             <dashboard-labels :label-list="state.labelList" />
-            <dashboard-toolset @update:date-range="handleUpdateDateRange" />
+            <dashboard-toolset :date-range.sync="state.dateRange" />
         </div>
         <p-divider class="divider" />
         <div class="filter-box">
@@ -71,6 +71,7 @@ import {
 import {
     PDivider, PI, PIconButton, PPageTitle,
 } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -83,7 +84,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { gray } from '@/styles/colors';
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import type { DashboardViewer } from '@/services/dashboards/config';
+import type { DashboardViewer, DateRange } from '@/services/dashboards/config';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
@@ -111,6 +112,10 @@ const state = reactive({
     isProjectDashboard: computed<boolean>(() => Boolean(props.dashboardId.startsWith('project'))),
     labelList: computed<string[]>(() => state.dashboardInfo?.labels ?? []),
     dashboardWidgetLayouts: computed<DashboardLayoutWidgetInfo[][]>(() => state.dashboardInfo?.layouts ?? []),
+    dateRange: {
+        start: dayjs.utc().format('YYYY-MM-01'),
+        end: dayjs.utc().format('YYYY-MM-DD'),
+    } as DateRange,
     //
     nameEditModalVisible: false,
     deleteModalVisible: false,
@@ -139,10 +144,6 @@ const handleVisibleCloneModal = () => {
     state.cloneModalVisible = true;
 };
 
-// date range
-const handleUpdateDateRange = () => {
-    // TODO:: implementation & give dateRange for URL parameters
-};
 
 // else
 const handleRefresh = () => {
@@ -160,6 +161,7 @@ const getDashboardData = async () => {
         }
         // state.dashboardInfo = result; // TODO: should be changed to api data
         state.dashboardName = result.name;
+        if (Object.keys(result.settings.date_range).length) state.dateRange = result.settings.date_range;
     } catch (e) {
         // state.dashboardInfo = {}; // TODO: temporarily disabled
         ErrorHandler.handleError(e);

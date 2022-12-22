@@ -67,7 +67,6 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const { i18nDayjs } = useI18nDayjs();
-
         const state = reactive({
             getMonthMenuItem: computed(() => {
                 const monthData: MenuItem[] = [];
@@ -105,11 +104,18 @@ export default defineComponent({
             const _end = dayjs.utc(end).endOf('month').format('YYYY-MM-DD');
             state.selectedDateRange = { start: _start, end: _end };
         };
-
+        const setCurrentMonthDateRange = () => {
+            const _start = dayjs.utc().format('YYYY-MM-01');
+            const _end = dayjs.utc().format('YYYY-MM-DD');
+            state.selectedDateRange = { start: _start, end: _end };
+        };
 
         const handleSelectMonthMenuItem = (selectedIndex: number) => {
             state.selectedMonthMenuIndex = selectedIndex;
-            if (state.monthMenuItems[selectedIndex].name === 'custom') state.customRangeModalVisible = true;
+            if (state.monthMenuItems[selectedIndex].name === 'current') {
+                setCurrentMonthDateRange();
+                emit('update:date-range', state.selectedDateRange);
+            } else if (state.monthMenuItems[selectedIndex].name === 'custom') state.customRangeModalVisible = true;
             else {
                 setSelectedDateRange(state.monthMenuItems[selectedIndex].name, state.monthMenuItems[selectedIndex].name);
                 emit('update:date-range', state.selectedDateRange);
