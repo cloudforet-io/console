@@ -1,3 +1,10 @@
+# [1.1.0-beta.492](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.491...v1.1.0-beta.492) (2022-12-22)
+
+
+### Features
+
+* **use-context-menu-controller:** add new composable ([#195](https://github.com/cloudforet-io/mirinae/issues/195)) ([5fc36fb](https://github.com/cloudforet-io/mirinae/commit/5fc36fbe205c0247361d941b45a58d2afb30fe16))
+
 # [1.1.0-beta.491](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.490...v1.1.0-beta.491) (2022-12-22)
 
 
