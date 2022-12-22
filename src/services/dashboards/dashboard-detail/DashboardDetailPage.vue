@@ -40,7 +40,14 @@
         </div>
         <p-divider class="divider" />
         <div class="filter-box">
-            <div>filters</div>
+            <div>
+                <p-button icon-left="ic_plus"
+                          style-type="highlight"
+                          @click="handlerOpenOverlay"
+                >
+                    {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
+                </p-button>
+            </div>
             <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
                                         :loading="state.loading"
                                         @refresh="handleRefresh"
@@ -60,17 +67,26 @@
                                 :dashboard-id="props.dashboardId"
         />
         <dashboard-clone-modal :visible.sync="state.cloneModalVisible" />
+        <transition name="slide-up">
+            <dashboard-manage-variable-overlay v-if="testState.showOverlay" />
+        </transition>
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue';
+import type Vue from 'vue';
+import {
+    reactive, ref, computed, getCurrentInstance,
+} from 'vue';
 
 import {
+    PButton,
     PDivider, PI, PIconButton, PPageTitle,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { SpaceRouter } from '@/router';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -82,6 +98,8 @@ import { gray } from '@/styles/colors';
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardViewer } from '@/services/dashboards/config';
+import DashboardManageVariableOverlay
+    from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
@@ -94,7 +112,7 @@ import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneMod
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
-
+const MANAGE_VARIABLES_HASH_NAME = 'manage-variables';
 const PUBLIC_ICON_COLOR = gray[500];
 
 interface Props {
@@ -116,6 +134,15 @@ const state = reactive({
     refreshInterval: '15s',
     loading: false,
 });
+
+const vm = getCurrentInstance()?.proxy as Vue;
+const testState = reactive({
+    showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
+});
+
+const handlerOpenOverlay = () => {
+    SpaceRouter.router.push({ hash: MANAGE_VARIABLES_HASH_NAME });
+};
 const isProjectDashboard = Boolean(props.dashboardId.startsWith('project'));
 
 const widgetContainerRef = ref<any>(null);
@@ -176,5 +203,17 @@ const getDashboardData = async () => {
 }
 .filter-box {
     @apply flex justify-between items-center mb-4;
+}
+
+/* transition */
+.slide-up-enter-active {
+    transition: all 0.3s ease;
+}
+.slide-up-leave-active {
+    transition: all 0.3s ease-out;
+}
+.slide-up-enter, .slide-up-leave-to {
+    transform: translateY(100px);
+    opacity: 0;
 }
 </style>
