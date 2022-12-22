@@ -12,7 +12,7 @@
         <div>
             <p-button icon-left="ic_plus"
                       style-type="highlight"
-                      @click="handlerOpenOverlay"
+                      @click="handleOpenOverlay"
             >
                 {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
             </p-button>
@@ -51,7 +51,7 @@ const variableState = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
 });
 
-const handlerOpenOverlay = () => {
+const handleOpenOverlay = () => {
     SpaceRouter.router.push({ hash: MANAGE_VARIABLES_HASH_NAME });
 };
 
