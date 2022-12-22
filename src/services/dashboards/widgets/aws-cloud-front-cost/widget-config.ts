@@ -26,7 +26,7 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
         inherit_count: 3,
     },
     sizes: ['lg', 'full'],
-    widget_options: {
+    options: {
         group_by: GROUP_BY.PROJECT,
         legend_options: {
             enabled: true,
@@ -37,7 +37,7 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
             type: 'cost-usage',
         },
     },
-    widget_options_schema: {
+    options_schema: {
         default_properties,
         inheritable_properties,
         schema: {

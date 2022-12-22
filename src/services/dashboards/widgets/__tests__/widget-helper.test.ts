@@ -15,8 +15,8 @@ const costTrendConfigId = costTrendWidgetConfig.widget_config_id;
 const monthlyCostWidgetConfigId = monthlyCostWidgetConfig.widget_config_id;
 const costMapWidgetConfigId = costMapWidgetConfig.widget_config_id;
 const dashboardCommonConfigId = dashboardCommonWidgetConfig.widget_config_id;
-const dashboardCommonSchema = dashboardCommonWidgetConfig.widget_options_schema?.schema;
-const costPieSchema = costPieWidgetConfig.widget_options_schema?.schema;
+const dashboardCommonSchema = dashboardCommonWidgetConfig.options_schema?.schema;
+const costPieSchema = costPieWidgetConfig.options_schema?.schema;
 
 describe('[Widget Helper] getWidgetConfig', () => {
     it('Get console widget config by config id', () => {
@@ -33,30 +33,30 @@ describe('[Widget Helper] getWidgetConfig', () => {
         expect(basePieConfig).toBeFalsy();
     });
     it('Merge configs by base configs', () => {
-        if (!dashboardCommonSchema) throw new Error('Can not test. widget_options_schema is not in dashboard common widget config.');
+        if (!dashboardCommonSchema) throw new Error('Can not test. options_schema is not in dashboard common widget config.');
         expect(dashboardCommonSchema.properties['filters.provider']).toBeTruthy();
         expect(costPieSchema?.properties?.['filters.provider']).toBeFalsy();
 
         if (!costPieConfigId) throw new Error('Can not test. No widget config id in costPieConfigId');
         const mergedCostPieConfig = getWidgetConfig(costPieConfigId);
-        expect(mergedCostPieConfig.widget_options_schema?.schema?.properties['filters.provider']).toBeTruthy();
+        expect(mergedCostPieConfig.options_schema?.schema?.properties['filters.provider']).toBeTruthy();
     });
     it('Merge default_properties of base trend config', () => {
-        expect(baseTrendWidgetConfig?.widget_options_schema?.default_properties).toMatchObject(['group_by']);
+        expect(baseTrendWidgetConfig?.options_schema?.default_properties).toMatchObject(['group_by']);
         const mergedBaseTrendConfig = getWidgetConfig(costTrendConfigId);
-        expect(mergedBaseTrendConfig?.widget_options_schema?.default_properties).toEqual(expect.arrayContaining([
+        expect(mergedBaseTrendConfig?.options_schema?.default_properties).toEqual(expect.arrayContaining([
             'group_by', 'filters.provider', 'filters.project_id', 'filters.service_account_id',
         ]));
     });
     it('test MonthlyCostWidget', () => {
         const mergedMonthlyCostWidgetConfig = getWidgetConfig(monthlyCostWidgetConfigId);
-        expect(mergedMonthlyCostWidgetConfig?.widget_options_schema?.default_properties).toEqual(expect.arrayContaining([
+        expect(mergedMonthlyCostWidgetConfig?.options_schema?.default_properties).toEqual(expect.arrayContaining([
             'filters.provider', 'filters.project_id', 'filters.service_account_id',
         ]));
     });
     it('test CostMapWidget', () => {
         const mergedCostMapWidgetConfig = getWidgetConfig(costMapWidgetConfigId);
-        expect(mergedCostMapWidgetConfig?.widget_options_schema?.default_properties).toEqual(expect.arrayContaining([
+        expect(mergedCostMapWidgetConfig?.options_schema?.default_properties).toEqual(expect.arrayContaining([
             'group_by', 'filters.provider', 'filters.project_id', 'filters.service_account_id',
         ]));
     });

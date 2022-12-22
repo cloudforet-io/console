@@ -22,7 +22,7 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
         inherit_count: 3,
     },
     sizes: ['lg', 'full'],
-    widget_options: {
+    options: {
         chart_type: CHART_TYPE.LINE,
         granularity: GRANULARITY.MONTHLY,
         legend_options: {
@@ -34,7 +34,7 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
             type: 'cost-usage',
         },
     },
-    widget_options_schema: {
+    options_schema: {
         default_properties,
         inheritable_properties,
         schema: {

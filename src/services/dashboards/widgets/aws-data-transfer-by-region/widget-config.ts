@@ -24,7 +24,7 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
         inherit: true,
     },
     sizes: ['lg', 'full'],
-    widget_options: {
+    options: {
         granularity: GRANULARITY.ACCUMULATED,
         chart_type: CHART_TYPE.MAP,
         legend_options: {
@@ -36,7 +36,7 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
             type: 'cost-usage',
         },
     },
-    widget_options_schema: {
+    options_schema: {
         default_properties,
         inheritable_properties,
         schema: {

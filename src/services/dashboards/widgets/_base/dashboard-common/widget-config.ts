@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/config';
 
 const dashboardCommonWidgetConfig: Partial<WidgetConfig> = {
     widget_config_id: 'dashboardCommon',
-    widget_options_schema: {
+    options_schema: {
         default_properties: ['filters.provider', 'filters.project_id', 'filters.service_account_id'],
         inheritable_properties: [
             'filters.provider',

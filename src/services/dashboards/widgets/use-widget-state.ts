@@ -56,7 +56,7 @@ export function useWidgetState<Data = any>(
         widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(props.widgetConfigId)),
         title: computed<string>(() => props.title ?? state.widgetConfig.title),
         options: computed<WidgetOptions>(() => getRefinedOptions(
-            state.widgetConfig.widget_options,
+            state.widgetConfig.options,
             props.options,
             props.inheritOptions,
             props.dashboardOptions,

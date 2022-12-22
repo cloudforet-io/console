@@ -82,8 +82,8 @@ export interface WidgetConfig {
     };
 
     sizes: WidgetSize[];
-    widget_options?: WidgetOptions;
-    widget_options_schema?: WidgetOptionsSchema;
+    options?: WidgetOptions;
+    options_schema?: WidgetOptionsSchema;
 }
 
 export interface WidgetOptionsSchema {

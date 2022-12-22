@@ -150,15 +150,15 @@ export default defineComponent<Props>({
         const state = reactive({
             widgetConfig: computed(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
             widgetOptionsJsonSchema: {} as JsonSchema,
-            requiredProperties: computed<string[]>(() => state.widgetConfig?.widget_options_schema?.schema?.required ?? []),
-            nonInheritableProperties: computed<string[]>(() => state.widgetConfig?.widget_options_schema?.non_inheritable_properties || []),
+            requiredProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.schema?.required ?? []),
+            nonInheritableProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.non_inheritable_properties || []),
             //
             formData: {},
             inheritItemMap: {} as {[propertyName: string]: boolean},
             addOptionsMenuVisible: false,
             optionsMenuItems: computed<MenuItem[]>(() => {
                 const menuItems: MenuItem[] = [];
-                const schemaProperties = state.widgetConfig?.widget_options_schema?.schema.properties;
+                const schemaProperties = state.widgetConfig?.options_schema?.schema.properties;
                 if (isEmpty(schemaProperties)) return [];
                 Object.entries(schemaProperties).forEach(([key, val]) => {
                     if (!state.requiredProperties.includes(key)) {
@@ -264,7 +264,7 @@ export default defineComponent<Props>({
             const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
             state.inheritItemMap[propertyName] = value;
             // refine json schema of property
-            const propertySchema = cloneDeep(state.widgetConfig?.widget_options_schema.schema)?.properties[propertyName];
+            const propertySchema = cloneDeep(state.widgetConfig?.options_schema.schema)?.properties[propertyName];
             _widgetOptionsJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema, value);
             state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
         };
@@ -273,7 +273,7 @@ export default defineComponent<Props>({
             const propertyName = item.name;
             if (state.selectedOptions.find((d) => d.name === propertyName)) {
                 // add property schema
-                const propertySchema = cloneDeep(state.widgetConfig?.widget_options_schema.schema)?.properties[propertyName];
+                const propertySchema = cloneDeep(state.widgetConfig?.options_schema.schema)?.properties[propertyName];
                 _widgetOptionsJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema);
             } else {
                 // delete property schema
@@ -303,10 +303,10 @@ export default defineComponent<Props>({
         /* Watcher */
         watch([() => state.widgetConfig, () => storeState.loading], ([widgetConfig, storeLoading]) => {
             if (widgetConfig) {
-                const defaultProperties = widgetConfig.widget_options_schema?.default_properties ?? [];
+                const defaultProperties = widgetConfig.options_schema?.default_properties ?? [];
                 state.selectedOptions = state.optionsMenuItems.filter((d) => !state.requiredProperties.includes(d.name) && defaultProperties.includes(d.name));
                 if (!storeLoading) {
-                    state.widgetOptionsJsonSchema = initJsonSchema(widgetConfig.widget_options_schema);
+                    state.widgetOptionsJsonSchema = initJsonSchema(widgetConfig.options_schema);
                 }
             }
         });

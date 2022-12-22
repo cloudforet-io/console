@@ -17,11 +17,11 @@ const baseTrendWidgetConfig: WidgetConfig = {
         inherit: true,
     },
     sizes: ['lg', 'full'],
-    widget_options: {
+    options: {
         granularity: 'MONTHLY',
         group_by: GROUP_BY.PROVIDER,
     },
-    widget_options_schema: {
+    options_schema: {
         default_properties: ['group_by'],
         schema: {
             type: 'object',
