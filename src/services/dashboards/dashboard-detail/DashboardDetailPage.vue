@@ -94,7 +94,6 @@ import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneMod
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
-
 const PUBLIC_ICON_COLOR = gray[500];
 
 interface Props {

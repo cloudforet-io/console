@@ -50,10 +50,10 @@
         </p-field-group>
         <div class="button-wrapper">
             <p-button style-type="tertiary">
-                {{ 'DASHBOARDS.CUSTOMIZE.VARIABLES.CANCEL' }}
+                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.CANCEL') }}
             </p-button>
             <p-button>
-                {{ 'DASHBOARDS.CUSTOMIZE.VARIABLES.SAVE' }}
+                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.SAVE') }}
             </p-button>
         </div>
     </div>
@@ -68,7 +68,7 @@ import {
 } from '@spaceone/design-system';
 
 export default defineComponent({
-    name: 'DashboardManageVariableOverlay',
+    name: 'DashboardManageVariableForm',
     components: {
         PButton,
         PFieldGroup,
