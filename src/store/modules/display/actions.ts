@@ -1,5 +1,8 @@
 import type { Action, Dispatch } from 'vuex';
 
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
+import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import type { QueryStoreFilter } from '@cloudforet/core-lib/query/type';
@@ -72,64 +75,105 @@ export const hideSignInErrorMessage = ({ commit }): void => {
     commit('setIsSignInFailed', false);
 };
 
+/* Check notification */
+const DEBUG_MODE = false;
+const debugCheckNotification = DEBUG_MODE ? console.debug : () => {};
+
 const fixedCheckNotificationFilter: QueryStoreFilter = { k: 'is_read', v: false, o: '=' };
 const checkNotificationQueryHelper = new ApiQueryHelper().setCountOnly();
+const getNotificationListParam = (userId: string, currentTime: Dayjs, lastCheckedTime: string) => {
+    checkNotificationQueryHelper.setFilters([
+        fixedCheckNotificationFilter,
+        { k: 'created_at', v: currentTime.format('YYYY-MM-DD HH:mm:ss'), o: '<=t' },
+        { k: 'user_id', v: userId, o: '=' },
+    ]);
+
+    const minimumCheckTime = currentTime.subtract(7, 'day');
+
+    if (lastCheckedTime && dayjs(lastCheckedTime).isAfter(minimumCheckTime)) {
+        checkNotificationQueryHelper.addFilter(
+            { k: 'created_at', v: lastCheckedTime, o: '>t' },
+        );
+    } else {
+        checkNotificationQueryHelper.addFilter(
+            { k: 'created_at', v: minimumCheckTime.format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
+        );
+    }
+
+    return {
+        query: checkNotificationQueryHelper.data,
+    };
+};
+
+let notificationListApiToken: CancelTokenSource | undefined;
 export const checkNotification: Action<DisplayState, any> = async ({
-    commit, state, rootState, rootGetters,
+    commit, state, rootState, rootGetters, dispatch,
 }): Promise<void> => {
+    if (notificationListApiToken) {
+        debugCheckNotification('[CHECK NOTI]', ' pending...');
+        return;
+    }
     try {
+        debugCheckNotification('[CHECK NOTI]', ' start');
+        notificationListApiToken = axios.CancelToken.source();
+
         const currentTime = dayjs();
-
-        checkNotificationQueryHelper.setFilters([
-            fixedCheckNotificationFilter,
-            { k: 'created_at', v: currentTime.format('YYYY-MM-DD HH:mm:ss'), o: '<=t' },
-            { k: 'user_id', v: rootState.user.userId, o: '=' },
-        ]);
-
-        const lastCheckedTime = rootGetters['settings/getItem']('last_checked_notification', '/gnb');
-        const minimumCheckTime = currentTime.subtract(7, 'day');
-
-        if (lastCheckedTime && dayjs(lastCheckedTime).isAfter(minimumCheckTime)) {
-            checkNotificationQueryHelper.addFilter(
-                { k: 'created_at', v: lastCheckedTime, o: '>t' },
-            );
-        } else {
-            checkNotificationQueryHelper.addFilter(
-                { k: 'created_at', v: minimumCheckTime.format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
-            );
-        }
-
-        const { total_count } = await SpaceConnector.client.notification.notification.list({
-            query: checkNotificationQueryHelper.data,
+        const param = getNotificationListParam(
+            rootState.user.userId,
+            currentTime,
+            rootGetters['settings/getItem']('last_checked_notification', '/gnb'),
+        );
+        debugCheckNotification('[NOTI QUERY.FILTER]', param.query.filter);
+        const { total_count } = await SpaceConnector.client.notification.notification.list(param, {
+            cancelToken: notificationListApiToken.token,
         });
 
         if (state.uncheckedNotificationCount !== total_count) commit('setUncheckedNotificationCount', total_count);
-    } catch (e) {
-        ErrorHandler.handleError(e);
+
+        const lastCheckedTime = currentTime.format('YYYY-MM-DD HH:mm:ss');
+        dispatch('settings/setItem', {
+            key: 'last_checked_notification',
+            value: lastCheckedTime,
+            path: '/gnb',
+        }, { root: true });
+
+        commit('setUncheckedNotificationCount', 0);
+    } catch (e: any) {
+        if (!axios.isCancel(e.axiosError)) {
+            ErrorHandler.handleError(e);
+        }
+    } finally {
+        notificationListApiToken = undefined;
+        debugCheckNotification('[CHECK NOTI]', ' finished');
     }
 };
 
 let checkNotificationInterval: undefined|ReturnType<typeof setTimeout>;
-export const stopCheckNotification: Action<DisplayState, any> = ({ commit, dispatch }): void => {
-    const lastCheckedTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
-    dispatch('settings/setItem', {
-        key: 'last_checked_notification',
-        value: lastCheckedTime,
-        path: '/gnb',
-    }, { root: true });
-
-    commit('setUncheckedNotificationCount', 0);
+export const stopCheckNotification: Action<DisplayState, any> = (): void => {
+    if (notificationListApiToken) {
+        debugCheckNotification('[NOTI API]', 'canceled');
+        notificationListApiToken.cancel();
+        notificationListApiToken = undefined;
+    }
 
     if (checkNotificationInterval) {
+        debugCheckNotification('[NOTI INTERVAL]', 'stopped');
         clearInterval(checkNotificationInterval);
         checkNotificationInterval = undefined;
     }
 };
 
 export const startCheckNotification: Action<DisplayState, any> = ({ dispatch }): void => {
+    if (notificationListApiToken) {
+        debugCheckNotification('[NOTI API]', 'previous canceled');
+        notificationListApiToken.cancel();
+        notificationListApiToken = undefined;
+    }
     if (checkNotificationInterval) {
+        debugCheckNotification('[NOTI INTERVAL]', 'previous stopped');
         clearInterval(checkNotificationInterval);
     } else {
+        debugCheckNotification('[NOTI INTERVAL]', 'start');
         dispatch('checkNotification');
     }
 
@@ -160,6 +204,7 @@ const getCurrencyRates = async (): Promise<CurrencyRates> => {
     }
 };
 
+/* Currency */
 interface CurrencyRatesStoredData {
     rates: CurrencyRates;
     timestamp: number;

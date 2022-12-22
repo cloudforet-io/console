@@ -106,6 +106,8 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PDataLoader, PButtonModal, PI, PAnchor, PDefinitionTable, PButton,
 } from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
@@ -242,17 +244,29 @@ export default {
         };
         const notificationApiHelper = new ApiQueryHelper();
         initApiHelper(notificationApiHelper);
+        let listNotificationApiToken: CancelTokenSource | undefined;
         const listNotifications = async () => {
+            if (listNotificationApiToken) {
+                listNotificationApiToken.cancel();
+                listNotificationApiToken = undefined;
+            }
+
             state.loading = true;
+            listNotificationApiToken = axios.CancelToken.source();
             try {
                 const { results, total_count } = await SpaceConnector.client.notification.notification.list({
                     query: notificationApiHelper.data,
+                }, {
+                    cancelToken: listNotificationApiToken.token,
                 });
+                listNotificationApiToken = undefined;
                 state.proxyCount = total_count;
                 state.items = state.items.concat(convertNotificationItem(results));
                 await setReadNotifications(results);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
+            } catch (e: any) {
+                if (!axios.isCancel(e.axiosError)) {
+                    ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
+                }
             } finally {
                 state.loading = false;
             }
@@ -327,7 +341,11 @@ export default {
         /* Watcher */
         watch(() => props.visible, (visible) => {
             if (visible) init();
-        });
+            else if (listNotificationApiToken) {
+                listNotificationApiToken.cancel();
+                listNotificationApiToken = undefined;
+            }
+        }, { immediate: true });
 
         onMounted(() => {
             useInfiniteScroll(state.notificationItemsRef, () => {
@@ -353,6 +371,7 @@ export default {
     @apply bg-white;
     display: flex;
     flex-direction: column;
+    min-height: 13rem;
 
     /* custom design-system component - p-data-loader */
     :deep(.p-data-loader) {
