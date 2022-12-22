@@ -67,9 +67,7 @@
                                 :dashboard-id="props.dashboardId"
         />
         <dashboard-clone-modal :visible.sync="state.cloneModalVisible" />
-        <transition name="slide-up">
-            <dashboard-manage-variable-overlay v-if="testState.showOverlay" />
-        </transition>
+        <dashboard-manage-variable-overlay :visible="variableState.showOverlay" />
     </div>
 </template>
 
@@ -136,7 +134,7 @@ const state = reactive({
 });
 
 const vm = getCurrentInstance()?.proxy as Vue;
-const testState = reactive({
+const variableState = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
 });
 

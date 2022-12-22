@@ -1,89 +1,89 @@
 <template>
-    <div class="dashboard-manage-variable-overay">
-        <p-pane-layout class="page-wrapper">
-            <p-page-title :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
-                          child
-                          @goBack="$router.go(-1)"
-            />
-            <div class="content-wrapper">
-                <p-panel-top :use-total-count="overlayState.contentStatus === 'LIST'"
-                             :total-count="1"
-                >
-                    <template #default>
-                        {{ overlayState.titleSet[overlayState.contentStatus] }}
-                    </template>
-                    <template #extra>
-                        <div class="add-button-wrapper">
-                            <p-button v-if="overlayState.contentStatus === 'LIST'"
-                                      icon-left="ic_plus"
-                                      @click="handleChangeAddContent"
-                            >
-                                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD') }}
-                            </p-button>
-                            <p-button v-else-if="overlayState.contentStatus === 'EDIT'"
-                                      icon-left="ic_trashcan"
-                                      style-type="negative-secondary"
-                                      @click="handleOpenDeleteModal"
-                            >
-                                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE') }}
-                            </p-button>
-                        </div>
-                    </template>
-                </p-panel-top>
-                <div v-if="overlayState.contentStatus === 'LIST'"
-                     class="list-wrapper"
-                >
-                    <div class="variable-select-filter">
-                        <span class="filter-header">{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_TITLE') }}</span>
-                        <p-select-status v-for="(type, idx) in variableFilterList"
-                                         :key="`variable-type-${idx}`"
-                                         :selected="selectedVariableType"
-                                         :value="type.name"
-                                         @change="handleSelectType"
+    <overlay-page-layout :visible="visible"
+                         class="dashboard-manage-variable-overay"
+    >
+        <p-page-title :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
+                      child
+                      @goBack="$router.go(-1)"
+        />
+        <div class="content-wrapper">
+            <p-panel-top :use-total-count="overlayState.contentStatus === 'LIST'"
+                         :total-count="1"
+            >
+                <template #default>
+                    {{ overlayState.titleSet[overlayState.contentStatus] }}
+                </template>
+                <template #extra>
+                    <div class="add-button-wrapper">
+                        <p-button v-if="overlayState.contentStatus === 'LIST'"
+                                  icon-left="ic_plus"
+                                  @click="handleChangeAddContent"
                         >
-                            {{ type.label }}
-                        </p-select-status>
+                            {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD') }}
+                        </p-button>
+                        <p-button v-else-if="overlayState.contentStatus === 'EDIT'"
+                                  icon-left="ic_trashcan"
+                                  style-type="negative-secondary"
+                                  @click="handleOpenDeleteModal"
+                        >
+                            {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE') }}
+                        </p-button>
                     </div>
-                    <p-data-table :items="[]"
-                                  :fields="variableFields"
+                </template>
+            </p-panel-top>
+            <div v-if="overlayState.contentStatus === 'LIST'"
+                 class="list-wrapper"
+            >
+                <div class="variable-select-filter">
+                    <span class="filter-header">{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_TITLE') }}</span>
+                    <p-select-status v-for="(type, idx) in variableFilterList"
+                                     :key="`variable-type-${idx}`"
+                                     :selected="selectedVariableType"
+                                     :value="type.name"
+                                     @change="handleSelectType"
                     >
-                        <template #col-variable_type-formvariableItemsat="{ value }">
-                            <p-badge :style-type="variableTypeBadgeStyleFormatter(value)">
-                                {{ variableType[value] }}
-                            </p-badge>
-                        </template>
-                        <template #col-use-format="{ value }">
-                            <p-toggle-button :value="value"
-                                             sync
-                            />
-                        </template>
-                        <template #col-edit-format>
-                            <button class="manage-button"
-                                    @click="handleEditVariable"
-                            >
-                                <p-i name="ic_edit" />
-                                <span>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.EDIT') }}</span>
-                            </button>
-                        </template>
-                        <template #col-delete-format>
-                            <button class="manage-button"
-                                    @click="handleDeleteVariable"
-                            >
-                                <p-i name="ic_trashcan" />
-                                <span>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE') }}</span>
-                            </button>
-                        </template>
-                    </p-data-table>
+                        {{ type.label }}
+                    </p-select-status>
                 </div>
-                <dashboard-manage-variable-form v-else />
+                <p-data-table :items="[]"
+                              :fields="variableFields"
+                >
+                    <template #col-variable_type-formvariableItemsat="{ value }">
+                        <p-badge :style-type="variableTypeBadgeStyleFormatter(value)">
+                            {{ variableType[value] }}
+                        </p-badge>
+                    </template>
+                    <template #col-use-format="{ value }">
+                        <p-toggle-button :value="value"
+                                         sync
+                        />
+                    </template>
+                    <template #col-edit-format>
+                        <button class="manage-button"
+                                @click="handleEditVariable"
+                        >
+                            <p-i name="ic_edit" />
+                            <span>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.EDIT') }}</span>
+                        </button>
+                    </template>
+                    <template #col-delete-format>
+                        <button class="manage-button"
+                                @click="handleDeleteVariable"
+                        >
+                            <p-i name="ic_trashcan" />
+                            <span>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE') }}</span>
+                        </button>
+                    </template>
+                </p-data-table>
             </div>
-        </p-pane-layout>
+            <dashboard-manage-variable-form v-else />
+        </div>
         <delete-modal :header-title="deleteModalState.headerTitle"
                       :visible.sync="deleteModalState.visible"
                       :loading="deleteModalState.loading"
                       @confirm="handleDeleteVariable"
         />
-    </div>
+    </overlay-page-layout>
 </template>
 
 <script lang="ts">
@@ -95,7 +95,6 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PDataTable,
-    PPaneLayout,
     PPanelTop,
     PButton,
     PBadge,
@@ -108,6 +107,7 @@ import {
 import { i18n } from '@/translations';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.vue';
 
 import type { VariableType } from '@/services/dashboards/config';
 import DashboardManageVariableForm from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/modules/DashboardManageVariableForm.vue';
@@ -117,9 +117,9 @@ type OverlayStatus = 'LIST' | 'ADD' | 'EDIT';
 export default defineComponent({
     name: 'DashboardManageVariableOverlay',
     components: {
+        OverlayPageLayout,
         DeleteModal,
         PDataTable,
-        PPaneLayout,
         PPanelTop,
         PButton,
         PBadge,
@@ -128,6 +128,12 @@ export default defineComponent({
         PPageTitle,
         PSelectStatus,
         DashboardManageVariableForm,
+    },
+    props: {
+        visible: {
+            default: undefined,
+            type: Boolean,
+        },
     },
     setup() {
         const state = reactive({
@@ -214,43 +220,24 @@ export default defineComponent({
 <style lang="postcss" scoped>
 .dashboard-manage-variable-overay {
     @apply bg-gray-100;
-    position: fixed;
-    display: flex;
-    width: 100%;
-    height: 100%;
-    top: $gnb-height;
-    left: 0;
-    flex-direction: column;
-    z-index: 99;
 
-    /* transition: opacity 0.3s ease; */
-    max-height: 100%;
-    min-height: 100%;
-    max-width: 100vw;
+    .content-wrapper {
+        @apply relative bg-white border border-gray-200 rounded-md ;
 
-    .page-wrapper {
-        @apply bg-gray-100;
-        width: 100%;
-        padding: 1.5rem;
+        .add-button-wrapper {
+            @apply flex justify-end;
+        }
+        .list-wrapper {
+            .variable-select-filter {
+                @apply flex items-center;
+                height: 2.875rem;
+                gap: 1rem;
+                padding: 0.75rem 1rem;
 
-        .content-wrapper {
-            @apply relative bg-white border border-gray-200 rounded-md ;
-
-            .add-button-wrapper {
-                @apply flex justify-end;
-            }
-            .list-wrapper {
-                .variable-select-filter {
-                    @apply flex items-center;
-                    height: 2.875rem;
-                    gap: 1rem;
-                    padding: 0.75rem 1rem;
-
-                    .filter-header {
-                        @apply text-gray-500;
-                        font-size: 0.875rem;
-                        line-height: 1.25;
-                    }
+                .filter-header {
+                    @apply text-gray-500;
+                    font-size: 0.875rem;
+                    line-height: 1.25;
                 }
             }
         }
