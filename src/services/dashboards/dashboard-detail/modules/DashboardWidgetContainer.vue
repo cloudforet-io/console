@@ -113,7 +113,7 @@ export default defineComponent<Props>({
             if (isIntersecting) {
                 state.initiatedWidgetMap[target.id] = true;
                 const targetWidgetRef = state.widgetRef.filter((d) => d.$el.id === target.id)[0];
-                targetWidgetRef.initWidget();
+                if (typeof targetWidgetRef.initWidget === 'function') targetWidgetRef.initWidget();
             }
         };
 
@@ -149,7 +149,7 @@ export default defineComponent<Props>({
         const refreshAllWidget = async () => {
             const promises: (()=>void)[] = [];
             state.widgetRef.forEach((d:any) => {
-                if (typeof d?.refreshWidget === 'function') promises.push(d?.refreshWidget());
+                if (typeof d?.refreshWidget === 'function' && state.initiatedWidgetMap[d.$el.id]) promises.push(d?.refreshWidget());
             });
             emit('update:loading', true);
             await Promise.allSettled(promises);

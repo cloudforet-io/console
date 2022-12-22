@@ -64,7 +64,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue';
+import {
+    reactive, ref, computed, watch,
+} from 'vue';
 
 import {
     PDivider, PI, PIconButton, PPageTitle,
@@ -103,7 +105,7 @@ const props = defineProps<Props>();
 
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
-    dashboardInfo: DASHBOARD_TEMPLATES.monthlyCostSummary as DashboardModel, // TODO: should be changed to api data
+    dashboardInfo: {} as DashboardModel,
     dashboardViewer: computed<DashboardViewer>(() => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE),
     dashboardName: '',
     isProjectDashboard: computed<boolean>(() => Boolean(props.dashboardId.startsWith('project'))),
@@ -143,13 +145,14 @@ const handleRefresh = () => {
 
 const getDashboardData = async () => {
     try {
+        state.dashboardInfo = DASHBOARD_TEMPLATES.monthlyCostSummary; // TODO: should be changed to api data
         let result: ProjectDashboardModel|DomainDashboardModel;
         if (state.isProjectDashboard) {
             result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
         } else {
             result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: props.dashboardId });
         }
-        state.dashboardInfo = result;
+        // state.dashboardInfo = result; // TODO: should be changed to api data
         state.dashboardName = result.name;
     } catch (e) {
         // state.dashboardInfo = {}; // TODO: temporarily disabled
@@ -157,10 +160,9 @@ const getDashboardData = async () => {
     }
 };
 
-// INIT
-(async () => {
-    await getDashboardData();
-})();
+watch(() => props.dashboardId, (dashboardId) => {
+    if (dashboardId) getDashboardData();
+}, { immediate: true });
 </script>
 
 <style lang="postcss" scoped>

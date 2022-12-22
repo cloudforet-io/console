@@ -20,7 +20,11 @@
                                     class="preview-img"
                                     height="4.75rem"
                                     width="100%"
-                        />
+                        >
+                            <template #error>
+                                <img src="/images/widgets/widget-img_default--thumbnail.png">
+                            </template>
+                        </p-lazy-img>
                     </div>
                 </li>
             </ul>
