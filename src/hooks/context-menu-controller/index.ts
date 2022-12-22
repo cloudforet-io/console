@@ -2,6 +2,7 @@ import type { ComputedRef, Ref } from 'vue';
 import type Vue from 'vue';
 import { reactive, toRef } from 'vue';
 
+import type { PContextMenu } from '@/components';
 import { useContextMenuFixedStyle } from '@/hooks';
 import type { MenuItem } from '@/inputs/context-menu/type';
 
@@ -9,7 +10,7 @@ export interface UseContextMenuControllerOptions {
     useFixedStyle?: boolean;
     visibleMenu?: Ref<boolean>|boolean;
     targetRef: Ref<HTMLElement|Vue|null>;
-    contextMenuRef: Ref<Vue|null>;
+    contextMenuRef: Ref<typeof PContextMenu|null>;
     menu?: Ref<MenuItem[]>|ComputedRef<MenuItem[]>;
     useReorderBySelection?: boolean;
 }
@@ -19,13 +20,11 @@ export interface UseContextMenuControllerReturns {
     hideContextMenu: { (): void };
     showContextMenu: { (): void };
     focusOnContextMenu: FocusOnContextMenu;
-    focusOutFromContextMenu: FocusOutFromContextMenu;
     reorderMenuBySelection: ReorderMenuBySelection;
     fixedMenuStyle?: Ref<Partial<CSSStyleDeclaration>>;
 }
 
 interface FocusOnContextMenu { (position?: number): void }
-interface FocusOutFromContextMenu { (): void }
 interface ReorderMenuBySelection { (selected: MenuItem[]): MenuItem[] }
 
 export const useContextMenuController = ({
@@ -60,12 +59,8 @@ export const useContextMenuController = ({
         state.visibleMenu = false;
     };
 
-    // TODO
-    const focusOnContextMenu: FocusOnContextMenu = () => {
-    };
-
-    // TODO
-    const focusOutFromContextMenu: FocusOutFromContextMenu = () => {
+    const focusOnContextMenu: FocusOnContextMenu = async (position?: number) => {
+        if (state.contextMenuRef) state.contextMenuRef.focus(position);
     };
 
     // TODO
@@ -77,7 +72,6 @@ export const useContextMenuController = ({
         showContextMenu,
         hideContextMenu,
         focusOnContextMenu,
-        focusOutFromContextMenu,
         reorderMenuBySelection,
         fixedMenuStyle,
     };

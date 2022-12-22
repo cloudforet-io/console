@@ -11,7 +11,8 @@
 
 
 ### Checklist
-- [ ] Updated Storybook documents
+- [ ] Updated Storybook documents for component
+- [ ] Wrote test codes for composable, utils and etc.
 - [ ] Tested with console(if usages are changed) 
 
 ### Description

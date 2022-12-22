@@ -4,12 +4,17 @@ import Vue, { defineComponent, ref } from 'vue';
 import type { UseContextMenuControllerOptions, UseContextMenuControllerReturns } from '@/hooks/context-menu-controller';
 import { useContextMenuController } from '@/hooks/context-menu-controller';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import type { MenuItem } from '@/inputs/context-menu/type';
 
 const localVue = createLocalVue();
 
 const mockLoadComposableInApp = (getOptions: () => Partial<UseContextMenuControllerOptions>) => {
     let result: UseContextMenuControllerReturns|undefined;
     let error;
+    const div = document.createElement('div');
+    div.id = 'root';
+    document.body.appendChild(div);
+
     const mockComponent = defineComponent({
         components: {
             PContextMenu,
@@ -24,14 +29,16 @@ const mockLoadComposableInApp = (getOptions: () => Partial<UseContextMenuControl
 
             const targetRef = options.targetRef;
             const contextMenuRef = options.contextMenuRef;
-            const visibleMenu = options.visibleMenu;
-            const fixedMenuStyle = options.fixedMenuStyle;
+            const visibleMenu = result?.visibleMenu;
+            const fixedMenuStyle = result?.fixedMenuStyle;
+            const menu = options.menu;
 
             return {
                 targetRef,
                 contextMenuRef,
                 visibleMenu,
                 fixedMenuStyle,
+                menu,
             };
         },
         template: `
@@ -40,14 +47,20 @@ const mockLoadComposableInApp = (getOptions: () => Partial<UseContextMenuControl
                 <p-context-menu v-show="visibleMenu" 
                                 ref="contextMenuRef"
                                 id="menu"
+                                :menu="menu"
                                 :style="fixedMenuStyle"
                 />
             </div>
         `,
     });
-    const wrapper = mount(mockComponent as any, { localVue });
+    const wrapper = mount(mockComponent, {
+        localVue,
+        attachTo: '#root', // this is for testing focus status
+    });
     return { result, error, wrapper };
 };
+
+const menuItems: MenuItem[] = [{ name: 'a', label: 'A' }, { name: 'b', label: 'B' }, { name: 'c', label: 'C' }];
 
 describe('Context Menu Controller', () => {
     describe('useContextMenuController()', () => {
@@ -59,7 +72,7 @@ describe('Context Menu Controller', () => {
         it('should emit error if useReorderBySelection is given but menu is not given.', () => {
             const { result, error } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
-                contextMenuRef: ref<Vue|null>(null),
+                contextMenuRef: ref<typeof PContextMenu|null>(null),
                 useReorderBySelection: true,
             }));
             expect(error).toBeTruthy();
@@ -67,39 +80,55 @@ describe('Context Menu Controller', () => {
         });
     });
 
-    describe('useContextMenuController() returns: ', () => {
-        const { result, wrapper } = mockLoadComposableInApp(() => ({
-            targetRef: ref<HTMLElement|null>(null),
-            contextMenuRef: ref<Vue|null>(null),
-            visibleMenu: ref(false),
-            useReorderBySelection: true,
-            menu: ref([]),
-            useFixedStyle: true,
-        }));
-        // const contextMenuRef = wrapper.findComponent({ ref: 'contextMenuRef' });
-        // expect(contextMenuRef).toBeTruthy();
-        const { showContextMenu, hideContextMenu, fixedMenuStyle } = result as UseContextMenuControllerReturns;
-        const contextMenuElement = wrapper.find('#menu');
-
-        describe('showContextMenu()', () => {
-            it('should make menu visible.', async () => {
+    describe('Features: ', () => {
+        describe('Control menu visibility: ', () => {
+            const { result, wrapper } = mockLoadComposableInApp(() => ({
+                targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<typeof PContextMenu|null>(null),
+                visibleMenu: ref(false),
+            }));
+            const { showContextMenu, hideContextMenu } = result as UseContextMenuControllerReturns;
+            const contextMenuElement = wrapper.find('#menu');
+            it('showContextMenu() should make menu visible.', async () => {
                 expect(contextMenuElement?.isVisible()).toBeFalsy();
                 showContextMenu();
                 await Vue.nextTick();
                 expect(contextMenuElement?.isVisible()).toBeTruthy();
             });
-        });
-        describe('hideContextMenu()', () => {
-            it('should hide menu.', async () => {
+            it('hideContextMenu() should hide menu.', async () => {
                 hideContextMenu();
                 await Vue.nextTick();
                 expect(contextMenuElement?.isVisible()).toBeFalsy();
             });
         });
 
-        describe('fixedMenuStyle', () => {
-            it('should exist if useFixedStyle option is true.', async () => {
+
+        describe('Get fixed context menu style: ', () => {
+            const { result } = mockLoadComposableInApp(() => ({
+                targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<typeof PContextMenu|null>(null),
+                visibleMenu: ref(true),
+                useFixedStyle: true,
+            }));
+            const { fixedMenuStyle } = result as UseContextMenuControllerReturns;
+            it('fixedMenuStyle should be exist if useFixedStyle option is true.', () => {
                 expect(fixedMenuStyle).toBeTruthy();
+            });
+        });
+
+        describe('Control focusing on menu: ', () => {
+            const { result } = mockLoadComposableInApp(() => ({
+                targetRef: ref<HTMLElement|null>(null),
+                contextMenuRef: ref<typeof PContextMenu|null>(null),
+                visibleMenu: ref(true),
+                menu: ref(menuItems),
+            }));
+            const { focusOnContextMenu } = result as UseContextMenuControllerReturns;
+            it('focusOnContextMenu() should focus on context menu element.', async () => {
+                expect(document.activeElement?.id).toBeFalsy();
+                focusOnContextMenu();
+                await Vue.nextTick();
+                expect(document.activeElement?.id).toBeTruthy();
             });
         });
     });
