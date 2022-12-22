@@ -60,7 +60,6 @@ import { indigo, red, yellow } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 
@@ -138,11 +137,8 @@ const getTooltipText = (rowIdx, colIdx) => {
     return `${state.data[index].budgetName} (${percentage})`;
 };
 
-useWidgetLifecycle({
-    initWidget,
-});
-
 defineExpose({
+    initWidget,
     refreshWidget,
 });
 </script>

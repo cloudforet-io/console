@@ -165,10 +165,11 @@ const initWidget = async () => {
 };
 
 useWidgetLifecycle({
-    initWidget, disposeWidget: disposeRoot,
+    disposeWidget: disposeRoot,
 });
 
 defineExpose({
+    initWidget,
     refreshWidget: initWidget,
 });
 </script>

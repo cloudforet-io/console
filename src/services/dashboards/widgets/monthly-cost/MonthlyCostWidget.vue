@@ -208,10 +208,11 @@ const refreshWidget = async () => {
 };
 
 useWidgetLifecycle({
-    initWidget, disposeWidget: disposeRoot,
+    disposeWidget: disposeRoot,
 });
 
 defineExpose({
+    initWidget,
     refreshWidget,
 });
 </script>

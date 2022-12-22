@@ -150,12 +150,16 @@ const handleSelectSelectorType = (selected: string) => {
 };
 
 useWidgetLifecycle({
-    initWidget, disposeWidget: disposeRoot,
+    disposeWidget: disposeRoot,
 });
 
-defineExpose<{refreshWidget:() => Promise<void>}>({
-    refreshWidget,
-});
+defineExpose<{
+    initWidget:() => Promise<void>,
+    refreshWidget:() => Promise<void>
+        }>({
+            initWidget,
+            refreshWidget,
+        });
 </script>
 <style lang="postcss" scoped>
 .aws-cloud-front-cost {
