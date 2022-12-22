@@ -1,6 +1,6 @@
 <template>
     <div class="dashboard-control-buttons">
-        <p-button icon-left="dashboard-customize.svg"
+        <p-button icon-left="dashboard-customize"
                   style-type="tertiary"
                   @click="$router.push({ name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME })"
         >
