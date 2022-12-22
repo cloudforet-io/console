@@ -18,7 +18,7 @@ const costByRegionWidgetConfig: WidgetConfig = {
         inherit: false,
     },
     sizes: ['lg', 'full'],
-    widget_options: {
+    options: {
         granularity: GRANULARITY.ACCUMULATED,
         chart_type: CHART_TYPE.MAP,
         legend_options: {

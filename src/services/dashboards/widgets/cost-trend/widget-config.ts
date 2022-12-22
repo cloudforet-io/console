@@ -16,7 +16,7 @@ const costTrendWidgetConfig: WidgetConfig = {
         inherit: true,
     },
     sizes: ['lg', 'full'],
-    widget_options: {
+    options: {
         granularity: 'MONTHLY',
         chart_type: CHART_TYPE.LINE,
         legend_options: {
@@ -24,7 +24,7 @@ const costTrendWidgetConfig: WidgetConfig = {
             show_at: 'table',
         },
     },
-    widget_options_schema: {
+    options_schema: {
         schema: {
             type: 'object',
             properties: {

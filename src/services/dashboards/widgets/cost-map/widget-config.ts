@@ -20,7 +20,7 @@ const costMapWidgetConfig: WidgetConfig = {
         inherit_count: 1,
     },
     sizes: ['md', 'full'],
-    widget_options_schema: {
+    options_schema: {
         default_properties: ['group_by'],
         schema: {
             type: 'object',

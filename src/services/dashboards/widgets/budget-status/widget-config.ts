@@ -18,7 +18,7 @@ const budgetStatusWidgetConfig: WidgetConfig = {
         inherit: false,
     },
     sizes: ['sm'],
-    widget_options: {
+    options: {
         chart_type: CHART_TYPE.WAFFLE,
     },
 };

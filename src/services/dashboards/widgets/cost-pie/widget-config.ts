@@ -10,10 +10,10 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
         translation_id: 'DASHBOARDS.WIDGET.COST_PIE.DESC',
         preview_image: 'widget-img_costPie--thumbnail.png',
     },
-    widget_options: {
+    options: {
         chart_type: 'PIE',
     },
-    widget_options_schema: {
+    options_schema: {
         default_properties: ['group_by'],
         schema: {
             type: 'object',

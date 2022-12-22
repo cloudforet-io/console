@@ -17,7 +17,7 @@ const basePieWidgetConfig: WidgetConfig = {
         inherit_count: 1,
     },
     sizes: ['md', 'full'],
-    widget_options_schema: {
+    options_schema: {
         schema: {
             type: 'object',
             properties: {

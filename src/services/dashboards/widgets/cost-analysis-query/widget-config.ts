@@ -16,7 +16,7 @@ const costAnalysisQueryWidgetConfig: WidgetConfig = {
         inherit: true,
     },
     sizes: ['xl', 'full'],
-    widget_options_schema: {
+    options_schema: {
         schema: {
             type: 'object',
             properties: {

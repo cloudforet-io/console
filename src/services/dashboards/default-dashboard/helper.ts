@@ -8,7 +8,7 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: string[]): Dashboar
         const widgetInfo: DashboardLayoutWidgetInfo = {
             widget_name: widgetConfig.widget_config_id,
             title: widgetConfig.title ?? widgetConfig.widget_config_id,
-            widget_options: widgetConfig.widget_options ?? {},
+            widget_options: widgetConfig.options ?? {},
             size: widgetConfig.sizes[0],
             version: '1',
             inherit_options: {},

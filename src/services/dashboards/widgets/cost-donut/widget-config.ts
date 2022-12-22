@@ -10,11 +10,11 @@ const costDonutWidgetConfig: Partial<WidgetConfig> = {
         translation_id: 'DASHBOARDS.WIDGET.COST_DONUT.DESC',
         preview_image: 'widget-img_costDonut--thumbnail.png',
     },
-    widget_options: {
+    options: {
         chart_type: 'DONUT',
     },
     sizes: ['sm', 'full'],
-    widget_options_schema: {
+    options_schema: {
         default_properties: ['group_by'],
         schema: {
             type: 'object',
