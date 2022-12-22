@@ -9,27 +9,51 @@
             <dashboard-toolset />
         </div>
         <p-divider />
-        <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
-                                    refresh-disabled
-        />
+        <div>
+            <p-button icon-left="ic_plus"
+                      style-type="highlight"
+                      @click="handlerOpenOverlay"
+            >
+                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
+            </p-button>
+            <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
+                                        refresh-disabled
+            />
+        </div>
         <dashboard-customize-sidebar />
+        <dashboard-manage-variable-overlay :visible="variableState.showOverlay" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import type Vue from 'vue';
+import { computed, getCurrentInstance, reactive } from 'vue';
 
-import { PDivider } from '@spaceone/design-system';
+import { PButton, PDivider } from '@spaceone/design-system';
 
+import { SpaceRouter } from '@/router';
+
+import DashboardManageVariableOverlay
+    from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
 
+const MANAGE_VARIABLES_HASH_NAME = 'manage-variables';
+
 const state = reactive({
     labelList: [] as Array<string>,
     refreshInterval: undefined,
 });
+const vm = getCurrentInstance()?.proxy as Vue;
+const variableState = reactive({
+    showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
+});
+
+const handlerOpenOverlay = () => {
+    SpaceRouter.router.push({ hash: MANAGE_VARIABLES_HASH_NAME });
+};
 
 const handleUpdateLabelList = (labelList: Array<string>) => {
     state.labelList = labelList;

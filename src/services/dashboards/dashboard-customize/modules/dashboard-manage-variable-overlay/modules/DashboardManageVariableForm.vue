@@ -68,7 +68,7 @@ import {
 } from '@spaceone/design-system';
 
 export default defineComponent({
-    name: 'DashboardManageVariableOverlay',
+    name: 'DashboardManageVariableForm',
     components: {
         PButton,
         PFieldGroup,
