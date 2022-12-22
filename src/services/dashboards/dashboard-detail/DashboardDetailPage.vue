@@ -107,6 +107,7 @@ const state = reactive({
     dashboardInfo: DASHBOARD_TEMPLATES.monthlyCostSummary as DashboardModel, // TODO: should be changed to api data
     dashboardViewer: computed<DashboardViewer>(() => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE),
     dashboardName: '',
+    isProjectDashboard: computed<boolean>(() => Boolean(props.dashboardId.startsWith('project'))),
     labelList: computed<string[]>(() => state.dashboardInfo?.labels ?? []),
     dashboardWidgetLayouts: computed<DashboardLayoutWidgetInfo[][]>(() => state.dashboardInfo?.layouts ?? []),
     //
@@ -116,7 +117,6 @@ const state = reactive({
     refreshInterval: '15s',
     loading: false,
 });
-const isProjectDashboard = Boolean(props.dashboardId.startsWith('project'));
 
 const widgetContainerRef = ref<any>(null);
 
@@ -145,10 +145,10 @@ const handleRefresh = () => {
 const getDashboardData = async () => {
     try {
         let result: ProjectDashboardModel|DomainDashboardModel;
-        if (isProjectDashboard) {
+        if (state.isProjectDashboard) {
             result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
         } else {
-            result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ project_dashboard_id: props.dashboardId });
+            result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: props.dashboardId });
         }
         state.dashboardInfo = result;
         state.dashboardName = result.name;

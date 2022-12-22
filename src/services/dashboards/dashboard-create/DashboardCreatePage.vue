@@ -35,8 +35,12 @@ import { reactive, toRefs } from 'vue';
 
 import { PPageTitle, PButton } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import {
@@ -47,6 +51,7 @@ import type { DashboardScope, DashboardViewer } from '@/services/dashboards/conf
 import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/dashboard-create/modules/DashboardViewerForm.vue';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import type { ProjectItemResp } from '@/services/project/type';
 
 export default {
@@ -82,14 +87,29 @@ export default {
             dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
         });
 
-        const handleClickCreate = () => {
+        const handleClickCreate = async () => {
             const dashboardCreateParams = {
-                dashboardScope: state.dashboardScope,
-                dashboardProject: state.dashboardScope === DASHBOARD_SCOPE.DOMAIN ? '' : dashboardProject.value,
-                dashboardTemplate: dashboardTemplate.value,
-                dashboardViewerType: state.dashboardViewerType,
+                // TODO:: connect real name after bind templates
+                name: `${state.dashboardScope} ${state.dashboardViewerType} dashboard - ${(Math.random().toString().slice(3, 6))}`,
+                viewers: state.dashboardViewerType,
             };
-            console.log(dashboardCreateParams);
+
+            try {
+                let dashboardId = '';
+                if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) {
+                    const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
+                        ...dashboardCreateParams,
+                        project_id: dashboardProject.value?.id ?? '',
+                    });
+                    dashboardId = result.project_dashboard_id;
+                } else {
+                    const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(dashboardCreateParams);
+                    dashboardId = result.domain_dashboard_id;
+                }
+                await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId } });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
         };
 
         return {
