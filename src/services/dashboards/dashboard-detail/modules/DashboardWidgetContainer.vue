@@ -111,7 +111,7 @@ export default defineComponent<Props>({
         const handleIntersectionObserver = ([{ isIntersecting, target }]) => {
             if (state.initiatedWidgetMap[target.id]) return;
             if (isIntersecting) {
-                state.initiatedWidgetMap[target.id] = isIntersecting;
+                state.initiatedWidgetMap[target.id] = true;
                 const targetWidgetRef = state.widgetRef.filter((d) => d.$el.id === target.id)[0];
                 targetWidgetRef.initWidget();
             }
