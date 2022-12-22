@@ -176,9 +176,9 @@ export default defineComponent<DashboardBoardListProps>({
                     cloneModalState.dashboardConfig = {
                         name: dashboardItem.name,
                         layouts: dashboardItem.layouts,
-                        dashboard_variables: dashboardItem.dashboard_variables,
                         settings: dashboardItem.settings,
-                        dashboard_variables_schema: dashboardItem.dashboard_variables_schema,
+                        variables: dashboardItem.variables,
+                        variables_schema: dashboardItem.variables_schema,
                         labels: dashboardItem.labels,
                         version: dashboardItem.version,
                     };

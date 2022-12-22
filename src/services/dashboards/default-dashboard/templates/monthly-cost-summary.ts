@@ -32,11 +32,11 @@ export const monthlyCostSummaryDashboard: DashboardConfig = {
             enabled: true,
         },
     },
-    dashboard_variables_schema: {
+    variables_schema: {
         properties: {},
         order: [],
     },
-    dashboard_variables: {},
+    variables: {},
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList),
     ],

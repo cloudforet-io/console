@@ -61,9 +61,9 @@ interface DashboardSettings {
 export interface DashboardConfig {
     name: string;
     layouts: DashboardLayoutWidgetInfo[][];
-    dashboard_variables: DashboardVariables;
     settings: DashboardSettings;
-    dashboard_variables_schema: DashboardVariablesSchema;
+    variables: DashboardVariables;
+    variables_schema: DashboardVariablesSchema;
     labels: string[];
     version: string;
     description?: {
