@@ -15,7 +15,8 @@ export interface ContextMenuFixedStyleProps {
 
 interface StateArgs {
     useFixedMenuStyle?: ComputedRef<boolean|undefined> | boolean;
-    visibleMenu: Ref<boolean | undefined>;
+    visibleMenu: Ref<boolean|undefined>;
+    targetRef?: Ref<Vue|HTMLElement|null>;
 }
 
 const isScrollable = (ele: Element) => {
@@ -32,16 +33,16 @@ const getScrollableParent = (ele?: Element|null): Element => {
     return isScrollable(ele) ? ele : getScrollableParent(ele.parentElement);
 };
 
-export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu }: StateArgs) => {
+export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu, targetRef }: StateArgs) => {
     const state = reactive({
         useFixedMenuStyle,
         visibleMenu,
     });
 
     const contextMenuFixedStyleState = reactive({
-        targetRef: null as Vue|Element|null,
+        targetRef: targetRef ?? null,
         targetElement: computed<Element|null>(() => (contextMenuFixedStyleState.targetRef as Vue)?.$el ?? contextMenuFixedStyleState.targetRef),
-        contextMenuStyle: {},
+        contextMenuStyle: {} as Partial<CSSStyleDeclaration>,
     });
 
     const hideMenu = throttle(() => {

@@ -52,7 +52,6 @@ import {
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import PI from '@/foundation/icons/PI.vue';
-import PLottie from '@/foundation/lottie/PLottie.vue';
 import type { ButtonProps, ButtonSize } from '@/inputs/buttons/button/type';
 import { BUTTON_SIZE, BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
@@ -70,7 +69,6 @@ const LOADING_SIZE: Record<ButtonSize, string> = {
 export default defineComponent<ButtonProps>({
     name: 'PButton',
     components: {
-        PLottie,
         PI,
         PSpinner,
     },

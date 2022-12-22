@@ -15,7 +15,7 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "types": ["webpack-env", "@types/jest", "jest"],
+    "types": ["webpack-env", "vitest/globals"],
     "paths": {
       "@/*": ["src/*"]
     },
@@ -26,7 +26,6 @@
     "node_modules",
     "src/assets",
     "dist",
-    ".out",
-    "**/__tests__/**/*.ts"
+    ".out"
   ]
 }

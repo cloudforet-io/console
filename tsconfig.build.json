@@ -18,12 +18,12 @@
     "outDir": "dist/src",
     "declaration": true,
     "emitDeclarationOnly": true,
-    "types": ["webpack-env", "@types/jest"],
+    "types": ["webpack-env", "vitest/globals"],
     "paths": {
       "@/*": ["src/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"],
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "src/**/*.stories.ts",  "src/**/story-helper.ts", "src/**/mock.ts"]
+  "exclude": ["node_modules", "src/**/*.stories.ts",  "src/**/story-helper.ts", "src/**/mock.ts", "**/__tests__/**/*.ts"]
 }

@@ -6,7 +6,10 @@ import copy from 'rollup-plugin-copy';
 import { defineConfig } from 'vite';
 import StylelintPlugin from 'vite-plugin-stylelint';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+    optimizeDeps: {
+        exclude: mode === 'test' ? ['vue'] : [],
+    },
     build: {
         lib: {
             entry: {
@@ -56,4 +59,4 @@ export default defineConfig({
             '@': path.resolve(__dirname, './src'),
         },
     },
-});
+}));
