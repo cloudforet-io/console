@@ -11,16 +11,16 @@
                 <p-skeleton height="100%" />
             </template>
             <div class="waffle-chart">
-                <div v-for="colIdx in state.colRange"
+                <div v-for="colIdx in range(0, 20)"
                      :key="`status-col-${colIdx}`"
                      class="status-col-wrapper"
                 >
-                    <template v-for="rowIdx in state.rowRange">
-                        <div v-if="!!state.data[colIdx * 10 + rowIdx]"
+                    <template v-for="rowIdx in range(0, 10)">
+                        <div v-if="!!state.data?.[colIdx * 10 + rowIdx]"
                              :key="`status-box-${colIdx}-${rowIdx}`"
                              v-tooltip.bottom="getTooltipText(rowIdx, colIdx)"
                              class="box status-box"
-                             :style="{ 'background-color': state.data[colIdx * 10 + rowIdx]?.color }"
+                             :style="{ 'background-color': state.data?.[colIdx * 10 + rowIdx]?.color }"
                         />
                         <div v-else
                              :key="`status-box-${colIdx}-${rowIdx}`"
@@ -66,8 +66,6 @@ import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 const props = defineProps<WidgetProps>();
 const state = reactive({
     ...toRefs(useWidgetState(props)),
-    colRange: range(0, 20),
-    rowRange: range(0, 10),
     legends: computed(() => ([
         { label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.OVERSPENT'), color: red[400] },
         { label: '90-100%', color: yellow[500] },
