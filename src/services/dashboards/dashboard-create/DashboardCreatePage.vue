@@ -86,7 +86,8 @@ export default {
 
         const handleClickCreate = () => {
             const dashboardCreateParams = {
-                name: 'name??????',
+                // TODO:: connect real name after bind templates
+                name: `${state.dashboardScope} ${state.dashboardViewerType} dashboard - ${(Math.random().toString().slice(3, 6))}`,
                 viewers: state.dashboardViewerType,
             };
 
