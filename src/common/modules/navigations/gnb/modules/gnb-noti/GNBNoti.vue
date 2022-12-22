@@ -113,10 +113,10 @@ export default defineComponent<Props>({
             }
         };
         const showNotiMenu = () => {
-            setVisible(true);
+            if (!props.visible) setVisible(true);
         };
         const hideNotiMenu = () => {
-            setVisible(false);
+            if (props.visible) setVisible(false);
         };
 
         /* Api */
@@ -131,6 +131,14 @@ export default defineComponent<Props>({
             userId: computed(() => store.state.user.userId),
         });
 
+        const handleBrowserVisibilityChange = () => {
+            if (document.hidden) {
+                store.dispatch('display/stopCheckNotification');
+            } else {
+                store.dispatch('display/startCheckNotification');
+            }
+        };
+
         /* Event */
         const handleNotiButtonClick = () => {
             if (state.isNoRoleUser) return;
@@ -139,11 +147,13 @@ export default defineComponent<Props>({
 
         onMounted(() => {
             store.dispatch('display/startCheckNotification');
+            document.addEventListener('visibilitychange', handleBrowserVisibilityChange, false);
             fetchNoticeReadState();
             fetchNoticeCount();
         });
         onUnmounted(() => {
             store.dispatch('display/stopCheckNotification');
+            document.removeEventListener('visibilitychange', handleBrowserVisibilityChange, false);
         });
 
         watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
