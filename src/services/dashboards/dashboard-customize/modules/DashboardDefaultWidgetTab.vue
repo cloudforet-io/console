@@ -16,8 +16,10 @@
                         {{ widget.title }}
                     </div>
                     <div class="card-content">
-                        <p-lazy-img :src="widget.description?.preview_image"
+                        <p-lazy-img :src="`/images/widgets/${widget.description?.preview_image}`"
+                                    class="preview-img"
                                     height="4.75rem"
+                                    width="100%"
                         />
                     </div>
                 </li>
@@ -139,6 +141,13 @@ export default {
                 .card-content {
                     @apply flex justify-center items-center bg-gray-100;
                     height: 5.875rem;
+
+                    /* custom design-system component - p-lazy-img */
+                    :deep(.preview-img) {
+                        .img-container {
+                            width: auto;
+                        }
+                    }
                 }
             }
         }
