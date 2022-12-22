@@ -1,3 +1,10 @@
+# [1.1.0-beta.491](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.490...v1.1.0-beta.491) (2022-12-22)
+
+
+### Features
+
+* **use-context-menu-fixed-style:** update arg options to get targetRef ([#194](https://github.com/cloudforet-io/mirinae/issues/194)) ([b3c4ae8](https://github.com/cloudforet-io/mirinae/commit/b3c4ae86f55564b0a383d29314fe17be753007a4))
+
 # [1.1.0-beta.490](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.489...v1.1.0-beta.490) (2022-12-21)
 
 
