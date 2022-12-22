@@ -2296,7 +2296,7 @@
 		}
 	},
 	"PAGE_SCHEMA": {
-		"ACCOUNT_ID": "アカウントID",
+		"ACCOUNT": "アカウントID",
 		"BASE_INFO": "基本情報",
 		"BIOS_RELEASED_AT": "BIOS配布日時",
 		"BIOS_VERSION": "BIOSバージョン",
@@ -2318,7 +2318,6 @@
 		"HYPER_THREADING": "ハイパースレッディング",
 		"ID": "ユーザ名",
 		"LAST_COLLECTED_AT": "最終収集日",
-		"MANAGEMENT_STATE": "管理状態",
 		"MANUFACTURER": "メーカー",
 		"MEMORY": "メモリ",
 		"MEMORY_COUNT": "メモリ数",

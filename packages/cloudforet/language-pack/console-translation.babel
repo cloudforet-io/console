@@ -40947,7 +40947,7 @@
                 <name>PAGE_SCHEMA</name>
                 <children>
                     <concept_node>
-                        <name>ACCOUNT_ID</name>
+                        <name>ACCOUNT</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
@@ -41352,27 +41352,6 @@
                     </concept_node>
                     <concept_node>
                         <name>LAST_COLLECTED_AT</name>
-                        <definition_loaded>false</definition_loaded>
-                        <description/>
-                        <comment/>
-                        <default_text/>
-                        <translations>
-                            <translation>
-                                <language>en-US</language>
-                                <approved>true</approved>
-                            </translation>
-                            <translation>
-                                <language>ja-JP</language>
-                                <approved>true</approved>
-                            </translation>
-                            <translation>
-                                <language>ko-KR</language>
-                                <approved>true</approved>
-                            </translation>
-                        </translations>
-                    </concept_node>
-                    <concept_node>
-                        <name>MANAGEMENT_STATE</name>
                         <definition_loaded>false</definition_loaded>
                         <description/>
                         <comment/>
