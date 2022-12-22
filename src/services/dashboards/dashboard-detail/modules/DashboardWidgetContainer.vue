@@ -149,7 +149,7 @@ export default defineComponent<Props>({
         const refreshAllWidget = async () => {
             const promises: (()=>void)[] = [];
             state.widgetRef.forEach((d:any) => {
-                promises.push(d?.refreshWidget());
+                if (typeof d?.refreshWidget === 'function') promises.push(d?.refreshWidget());
             });
             emit('update:loading', true);
             await Promise.allSettled(promises);
