@@ -5,8 +5,10 @@
         <template v-for="(width, idx) in widgetWidthList">
             <component :is="getWidgetComponent(widgetInfoList[idx].widget_name)"
                        v-if="widgetInfoList[idx]"
+                       :id="widgetInfoList[idx].widget_name"
                        :key="`widget-${widgetInfoList[idx].widget_name}-${idx}`"
                        ref="widgetRef"
+                       v-intersection-observer="handleIntersectionObserver"
                        :widget-config-id="widgetInfoList[idx].widget_name"
                        :widget-key="widgetInfoList[idx].widget_name"
                        :title="widgetInfoList[idx].title"
@@ -25,7 +27,8 @@
 </template>
 
 <script lang="ts">
-import type { PropType, SetupContext } from 'vue';
+import { vIntersectionObserver } from '@vueuse/components';
+import type { DirectiveFunction, PropType, SetupContext } from 'vue';
 import {
     defineComponent, reactive, toRefs, ref, onMounted, watch, onBeforeUnmount, computed,
 } from 'vue';
@@ -51,6 +54,9 @@ export default defineComponent<Props>({
     components: {
         AWSCloudFrontCost,
     },
+    directives: {
+        intersectionObserver: vIntersectionObserver as DirectiveFunction,
+    },
     props: {
         dashboardWidgetLayouts: {
             type: Array as PropType<DashboardLayoutWidgetInfo[][]>,
@@ -75,6 +81,7 @@ export default defineComponent<Props>({
                 return widgetThemeAssigner(widgetThemeOptions);
             }),
             widgetRef: [] as Array<InstanceType<typeof AWSCloudFrontCost>>,
+            initiatedWidgetMap: {} as {[widgetName: string]: boolean},
         });
         const containerRef = ref<HTMLElement|null>(null);
 
@@ -100,6 +107,14 @@ export default defineComponent<Props>({
             if (type === 'expand') _widgetSizeList[widgetIndex] = WIDGET_SIZE.full;
             if (type === 'collapse') _widgetSizeList[widgetIndex] = state.widgetSizeList[widgetIndex];
             state.widgetSizeList = [..._widgetSizeList];
+        };
+        const handleIntersectionObserver = ([{ isIntersecting, target }]) => {
+            if (state.initiatedWidgetMap[target.id]) return;
+            if (isIntersecting) {
+                state.initiatedWidgetMap[target.id] = isIntersecting;
+                const targetWidgetRef = state.widgetRef.filter((d) => d.$el.id === target.id)[0];
+                targetWidgetRef.initWidget();
+            }
         };
 
         let timer: undefined|number;
@@ -148,6 +163,7 @@ export default defineComponent<Props>({
             ...toRefs(state),
             handleExpand,
             getWidgetComponent,
+            handleIntersectionObserver,
         };
     },
 });
