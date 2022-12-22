@@ -2,20 +2,17 @@
     <div
         class="manage-wrapper"
     >
-        <!--song-lang-->
-        <p-field-group :label="$t('Name')"
+        <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_NAME')"
                        required
         >
             <p-text-input v-model="name" />
         </p-field-group>
-        <!--song-lang-->
-        <p-field-group :label="$t('Selection Type')"
+        <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_SELECTION_TYPE')"
                        required
         >
             <p-select-dropdown />
         </p-field-group>
-        <!--song-lang-->
-        <p-field-group :label="$t('Options')"
+        <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_OPTIONS')"
                        required
         >
             <div class="options-wrapper">
@@ -23,8 +20,7 @@
                           icon-left="ic_plus"
                           style-type="secondary"
                 >
-                    <!--song-lang-->
-                    {{ $t('Add') }}
+                    {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD_OPTIONS') }}
                 </p-button>
                 <draggable :list="options"
                            class="draggable-wrapper"
@@ -39,10 +35,9 @@
                              width="1rem"
                              height="1rem"
                         />
-                        <!--song-lang-->
                         <p-text-input class="option-input"
                                       :value="option.label"
-                                      :placeholder="$t('Input data source')"
+                                      :placeholder="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.PLACEHOLDER_OPTIONS')"
                         />
                         <div class="option-delete-area">
                             <p-icon-button v-if="options.length > 1"
@@ -55,12 +50,10 @@
         </p-field-group>
         <div class="button-wrapper">
             <p-button style-type="tertiary">
-                <!--song-lang-->
-                {{ 'Cancel' }}
+                {{ 'DASHBOARDS.CUSTOMIZE.VARIABLES.CANCEL' }}
             </p-button>
             <p-button>
-                <!--song-lang-->
-                {{ 'Save' }}
+                {{ 'DASHBOARDS.CUSTOMIZE.VARIABLES.SAVE' }}
             </p-button>
         </div>
     </div>

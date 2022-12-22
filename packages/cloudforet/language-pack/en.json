@@ -1182,7 +1182,28 @@
 			"REFRESH_INTERVAL_30M": "30m",
 			"REFRESH_INTERVAL_30S": "30s",
 			"REFRESH_INTERVAL_5M": "5m",
-			"REFRESH_OFF": "off"
+			"REFRESH_OFF": "off",
+			"VARIABLES": {
+				"ADD": "Add Variable",
+				"ADD_OPTIONS": "Add",
+				"CANCEL": "Cancel",
+				"DELETE": "Delete",
+				"DELETE_TITLE": "Are you sure you want to cancel this variable?",
+				"EDIT": "Edit",
+				"FILTER_ALL": "All",
+				"FILTER_CUSTOM": "Custom",
+				"FILTER_MANAGED": "Managed",
+				"FILTER_TITLE": "Variable Type",
+				"LABEL_NAME": "Name",
+				"LABEL_OPTIONS": "Options",
+				"LABEL_SELECTION_TYPE": "Selection Type",
+				"MORE": "More",
+				"PLACEHOLDER_OPTIONS": "Input data source",
+				"SAVE": "Save",
+				"SUB_TITLE": "Variables",
+				"SUB_TITLE_EDIT": "Edit Variable",
+				"TITLE": "Manage Variables"
+			}
 		},
 		"DETAIL": {
 			"AUTO": "Auto",

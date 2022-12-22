@@ -1182,7 +1182,28 @@
 			"REFRESH_INTERVAL_30M": "",
 			"REFRESH_INTERVAL_30S": "",
 			"REFRESH_INTERVAL_5M": "",
-			"REFRESH_OFF": ""
+			"REFRESH_OFF": "",
+			"VARIABLES": {
+				"ADD": "",
+				"ADD_OPTIONS": "",
+				"CANCEL": "",
+				"DELETE": "",
+				"DELETE_TITLE": "",
+				"EDIT": "",
+				"FILTER_ALL": "",
+				"FILTER_CUSTOM": "",
+				"FILTER_MANAGED": "",
+				"FILTER_TITLE": "",
+				"LABEL_NAME": "",
+				"LABEL_OPTIONS": "",
+				"LABEL_SELECTION_TYPE": "",
+				"MORE": "",
+				"PLACEHOLDER_OPTIONS": "",
+				"SAVE": "",
+				"SUB_TITLE": "",
+				"SUB_TITLE_EDIT": "",
+				"TITLE": ""
+			}
 		},
 		"DETAIL": {
 			"AUTO": "",

@@ -1,8 +1,7 @@
 <template>
     <div class="dashboard-manage-variable-overay">
         <p-pane-layout class="page-wrapper">
-            <!--song-lang-->
-            <p-page-title :title="$t('Manage Variables')"
+            <p-page-title :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
                           child
                           @goBack="$router.go(-1)"
             />
@@ -19,16 +18,14 @@
                                       icon-left="ic_plus"
                                       @click="handleChangeAddContent"
                             >
-                                <!-- song-lang -->
-                                {{ $t('Add Variables') }}
+                                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD') }}
                             </p-button>
                             <p-button v-else-if="overlayState.contentStatus === 'EDIT'"
                                       icon-left="ic_trashcan"
                                       style-type="negative-secondary"
                                       @click="handleOpenDeleteModal"
                             >
-                                <!-- song-lang -->
-                                {{ $t('Delete') }}
+                                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE') }}
                             </p-button>
                         </div>
                     </template>
@@ -37,7 +34,7 @@
                      class="list-wrapper"
                 >
                     <div class="variable-select-filter">
-                        <span class="filter-header">{{ $t('Variable Type') }}</span>
+                        <span class="filter-header">{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_TITLE') }}</span>
                         <p-select-status v-for="(type, idx) in variableFilterList"
                                          :key="`variable-type-${idx}`"
                                          :selected="selectedVariableType"
@@ -65,8 +62,7 @@
                                     @click="handleEditVariable"
                             >
                                 <p-i name="ic_edit" />
-                                <!--song-lang-->
-                                <span>{{ $t('Edit') }}</span>
+                                <span>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.EDIT') }}</span>
                             </button>
                         </template>
                         <template #col-delete-format>
@@ -74,8 +70,7 @@
                                     @click="handleDeleteVariable"
                             >
                                 <p-i name="ic_trashcan" />
-                                <!--song-lang-->
-                                <span>{{ $t('Delete') }}</span>
+                                <span>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE') }}</span>
                             </button>
                         </template>
                     </p-data-table>
@@ -136,12 +131,11 @@ export default defineComponent({
     },
     setup() {
         const state = reactive({
-            // song-lang
             // TODO: implementation
             variableFilterList: computed(() => [
-                { label: i18n.t('All'), name: 'ALL' },
-                { label: i18n.t('Managed'), name: 'MANAGED' },
-                { label: i18n.t('Custom'), name: 'CUSTOM' },
+                { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_ALL'), name: 'ALL' },
+                { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'), name: 'MANAGED' },
+                { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'), name: 'CUSTOM' },
             ]),
             selectedVariableType: 'ALL',
             variableFields: [
@@ -154,26 +148,25 @@ export default defineComponent({
                 { name: 'delete', label: ' ' },
             ],
             selectionType: computed(() => ({
-                SINGLE_SELECT: i18n.t('Single '),
+                SINGLE: i18n.t('Single '),
+                MULTI: i18n.t('Multi'),
             })),
             variableType: computed(() => ({
-                MANAGED: i18n.t('Managed'),
-                CUSTOM: i18n.t('Custom'),
+                MANAGED: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
+                CUSTOM: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
             })),
         });
         const overlayState = reactive({
-            contentStatus: 'EDIT' as OverlayStatus,
-            // song-lang
+            contentStatus: 'LIST' as OverlayStatus,
             titleSet: computed<Record<OverlayStatus, TranslateResult>>(() => ({
-                LIST: i18n.t('Variables'),
-                ADD: i18n.t('Add Variable'),
-                EDIT: i18n.t('Edit Variable'),
+                LIST: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SUB_TITLE'),
+                ADD: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD'),
+                EDIT: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SUB_TITLE_EDIT'),
             })),
         });
 
         const deleteModalState = reactive({
-            // song-lang
-            headerTitle: i18n.t('Are you sure you want to cancel this variable?'),
+            headerTitle: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE_TITLE'),
             visible: false,
             loading: false,
         });
