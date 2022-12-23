@@ -27,14 +27,14 @@ import {
     defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
-import { color } from '@amcharts/amcharts5';
+// import { color } from '@amcharts/amcharts5';
 import { PDataLoader } from '@spaceone/design-system';
 import { random, range } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setTreemapLabelText } from '@/common/composables/amcharts5/tree-map-helper';
 
-import { palette } from '@/styles/colors';
+// import { palette } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
@@ -42,7 +42,7 @@ import { GROUP_BY } from '@/services/dashboards/widgets/config';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
-import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
+// import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
 
 const SAMPLE_RAW_DATA = [{
     name: 'Root',
@@ -61,6 +61,7 @@ const props = defineProps<WidgetProps>();
 const chartContext = ref<HTMLElement | null>(null);
 const {
     createTreeMapSeries,
+    setChartColors,
     createTooltip, setTreemapTooltipText,
     disposeRoot, refreshRoot,
 } = useAmcharts5(chartContext);
@@ -91,18 +92,19 @@ const drawChart = (chartData) => {
         strokeWidth: 1,
     });
 
+    setChartColors(series, state.colorSet);
     // Todo: add gradient background color
-    const themeColorName: WidgetTheme = props.theme ? props.theme : 'violet';
-    series.rectangles.template.adapters.add('fill', (value, target) => {
-        const dataItem = target.dataItem;
-        if (dataItem?.dataContext?.[VALUE_FIELD_NAME] === 'Root') {
-            return color(palette.white);
-        }
-        if (dataItem?.dataContext?.[CATEGORY_FIELD_NAME]) {
-            return color(palette[themeColorName][400]);
-        }
-        return color(palette[themeColorName][400]);
-    });
+    // const themeColorName: WidgetTheme = props.theme ? props.theme : 'violet';
+    // series.rectangles.template.adapters.add('fill', (value, target) => {
+    //     const dataItem = target.dataItem;
+    //     if (dataItem?.dataContext?.[VALUE_FIELD_NAME] === 'Root') {
+    //         return color(palette.white);
+    //     }
+    //     if (dataItem?.dataContext?.[CATEGORY_FIELD_NAME]) {
+    //         return color(palette[themeColorName][400]);
+    //     }
+    //     return color(palette[themeColorName][400]);
+    // });
 
     const tooltip = createTooltip();
     series.set('tooltip', tooltip);
