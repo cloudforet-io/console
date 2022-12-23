@@ -93,7 +93,6 @@ export default defineComponent<Props>({
         let intervalFunction: NodeJS.Timeout | null;
 
         const executeInterval = () => {
-            console.log('interval!');
             if (refreshIntervalOptionList.includes(props.intervalOption) && !intervalFunction) {
                 intervalFunction = setInterval(() => {
                     if (props.loading) {

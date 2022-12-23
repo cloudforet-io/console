@@ -1,5 +1,6 @@
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
+
 export const REFRESH_INTERVAL_OPTIONS_MAP = {
     off: 0,
     '15s': 15000,
@@ -10,20 +11,22 @@ export const REFRESH_INTERVAL_OPTIONS_MAP = {
     '30m': 1800000,
     '1h': 3600000,
 } as const;
-
 export type RefreshIntervalOption = keyof typeof REFRESH_INTERVAL_OPTIONS_MAP;
 
 export const refreshIntervalOptionList = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP) as RefreshIntervalOption[];
-
 
 export const DASHBOARD_SCOPE = {
     DOMAIN: 'DOMAIN',
     PROJECT: 'PROJECT',
 };
+export type DashboardScope = keyof typeof DASHBOARD_SCOPE;
+
 export const DASHBOARD_VIEWER = {
     PUBLIC: 'PUBLIC',
     PRIVATE: 'PRIVATE',
 };
+export type DashboardViewer = keyof typeof DASHBOARD_VIEWER;
+
 
 export const GRANULARITY = {
     ACCUMULATED: 'ACCUMULATED',
@@ -32,22 +35,14 @@ export const GRANULARITY = {
     YEARLY: 'YEARLY',
 } as const;
 
-export const VARIABLE_SELECTION_TYPES = ['SINGLE', 'MULTI'] as const;
-export type VariableSelectionType = typeof VARIABLE_SELECTION_TYPES[number];
-
-export const VARIABLE_TYPES = ['MANAGED', 'CUSTOM'] as const;
-export type VariableType = typeof VARIABLE_TYPES[number];
-
-export type DashboardScope = keyof typeof DASHBOARD_SCOPE;
-export type DashboardViewer = keyof typeof DASHBOARD_VIEWER;
-
 export interface DateRange {
     start?: string;
     end?: string;
 }
 
-type DashboardVariables = Record<string, any|any[]>;
 
+
+// dashboard configs
 interface DashboardSettings {
     date_range: {
         enabled: boolean;
@@ -70,6 +65,19 @@ export interface DashboardConfig {
         preview_image?: string;
     }
 }
+
+
+
+// variables
+type DashboardVariables = Record<string, any|any[]>;
+
+export const VARIABLE_SELECTION_TYPES = ['SINGLE', 'MULTI'] as const;
+export type VariableSelectionType = typeof VARIABLE_SELECTION_TYPES[number];
+
+export const VARIABLE_TYPES = ['MANAGED', 'CUSTOM'] as const;
+export type VariableType = typeof VARIABLE_TYPES[number];
+
+
 
 // variables schema
 export interface DashboardVariableSchemaProperty {

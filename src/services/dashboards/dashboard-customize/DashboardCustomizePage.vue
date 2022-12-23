@@ -6,7 +6,7 @@
                               :label-list="state.labelList"
                               @update:labelList="handleUpdateLabelList"
             />
-            <dashboard-toolset />
+            <dashboard-toolset :date-range.sync="state.dateRange" />
         </div>
         <p-divider />
         <div>
@@ -30,9 +30,11 @@ import type Vue from 'vue';
 import { computed, getCurrentInstance, reactive } from 'vue';
 
 import { PButton, PDivider } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 
 import { SpaceRouter } from '@/router';
 
+import type { DateRange } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
@@ -45,6 +47,10 @@ const MANAGE_VARIABLES_HASH_NAME = 'manage-variables';
 const state = reactive({
     labelList: [] as Array<string>,
     refreshInterval: undefined,
+    dateRange: {
+        start: dayjs.utc().format('YYYY-MM-01'),
+        end: dayjs.utc().format('YYYY-MM-DD'),
+    } as DateRange,
 });
 const vm = getCurrentInstance()?.proxy as Vue;
 const variableState = reactive({
