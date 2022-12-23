@@ -1159,6 +1159,8 @@
 			"ADD_WIDGET": {
 				"ADD": "",
 				"ADD_OPTIONS": "",
+				"FROM_DASHBOARD": "",
+				"INHERIT": "",
 				"LABEL_CURRENCY": "",
 				"LABEL_DATE": "",
 				"LABEL_NAME": "",
@@ -1227,6 +1229,7 @@
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "",
 			"ALT_E_DELETE_DASHBOARD": "",
+			"ALT_E_EDIT_NAME": "",
 			"ALT_S_DELETE_DASHBOARD": "",
 			"CLONE_TITLE": "",
 			"CUSTOM_DATE_FROM": "",
@@ -2296,7 +2299,7 @@
 		}
 	},
 	"PAGE_SCHEMA": {
-		"ACCOUNT_ID": "계정",
+		"ACCOUNT": "어카운트",
 		"BASE_INFO": "기본 정보",
 		"BIOS_RELEASED_AT": "바이오스 배포 일시",
 		"BIOS_VERSION": "바이오스 버전",
@@ -2318,7 +2321,6 @@
 		"HYPER_THREADING": "하이퍼 스레딩",
 		"ID": "아이디",
 		"LAST_COLLECTED_AT": "마지막 수집 날짜",
-		"MANAGEMENT_STATE": "관리 상태",
 		"MANUFACTURER": "제조사",
 		"MEMORY": "메모리",
 		"MEMORY_COUNT": "메모리 개수",

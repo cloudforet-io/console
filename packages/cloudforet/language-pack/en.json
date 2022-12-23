@@ -1159,6 +1159,8 @@
 			"ADD_WIDGET": {
 				"ADD": "Add Widget",
 				"ADD_OPTIONS": "Add Options",
+				"FROM_DASHBOARD": "from dashboard",
+				"INHERIT": "inherit",
 				"LABEL_CURRENCY": "Currency Selector",
 				"LABEL_DATE": "Date range Selector",
 				"LABEL_NAME": "Name",
@@ -1227,6 +1229,7 @@
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",
 			"ALT_E_DELETE_DASHBOARD": "Failed to delete dashboard",
+			"ALT_E_EDIT_NAME": "Failed to update dashboard name",
 			"ALT_S_DELETE_DASHBOARD": "Success to delete dashboard",
 			"CLONE_TITLE": "Clone Dashboard",
 			"CUSTOM_DATE_FROM": "FROM",
@@ -2296,7 +2299,7 @@
 		}
 	},
 	"PAGE_SCHEMA": {
-		"ACCOUNT_ID": "Account ID",
+		"ACCOUNT": "Account ID",
 		"BASE_INFO": "Base Information",
 		"BIOS_RELEASED_AT": "Bios Released",
 		"BIOS_VERSION": "Bios Version",
@@ -2318,7 +2321,6 @@
 		"HYPER_THREADING": "Hyper-threading",
 		"ID": "ID",
 		"LAST_COLLECTED_AT": "Last Collected",
-		"MANAGEMENT_STATE": "Management State",
 		"MANUFACTURER": "Manufacturer",
 		"MEMORY": "Memory",
 		"MEMORY_COUNT": "Memory Count",

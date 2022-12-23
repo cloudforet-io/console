@@ -26,7 +26,7 @@
                 >
                     <span class="text"
                           :class="{inherit: inheritItemMap[propertyName]}"
-                    >{{ $t('inherit') }}</span><!--song-lang-->
+                    >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                     <p-toggle-button :value="inheritItemMap[propertyName]"
                                      @change="handleChangeInheritToggle(propertyName, ...arguments)"
                     />
@@ -35,7 +35,7 @@
             <template #dropdown-extra="{ propertyName, selectedItem }">
                 <div v-if="isSelected(selectedItem) && inheritItemMap[propertyName]">
                     <span>{{ selectedItem.label }}</span>
-                    <span class="suffix-text">{{ $t('from dashboard') }}</span><!--song-lang-->
+                    <span class="suffix-text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
                 </div>
             </template>
         </p-json-schema-form>
