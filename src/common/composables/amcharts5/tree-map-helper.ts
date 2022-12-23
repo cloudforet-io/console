@@ -28,7 +28,7 @@ export const setTreemapTooltipText = (series: am5hierarchy.Treemap, tooltip: am5
     const valueFieldName = series.get('valueField') || '';
 
     tooltip.label.adapters.add('text', (_, target) => {
-        let value = target.dataItem?.dataContext?.[valueFieldName];
+        let value = target.dataItem?.dataContext?.[valueFieldName] || '-';
         if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
         return `{${categoryFieldName}}: [bold]${value}[/] ({valuePercentTotal.formatNumber("0.00")}%)`;
     });
