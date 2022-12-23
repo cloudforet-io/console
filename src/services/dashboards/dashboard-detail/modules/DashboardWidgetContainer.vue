@@ -158,6 +158,9 @@ export default defineComponent<Props>({
         expose({
             refreshAllWidget,
         });
+        onMounted(() => {
+            emit('rendered', state.widgetRef);
+        });
         return {
             containerRef,
             ...toRefs(state),
