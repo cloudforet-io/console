@@ -1,3 +1,4 @@
+<!--This component is temporary code for the pdf converting test. -->
 <template>
     <div ref="dashboardRef"
          class="dashboard-detail-preview"
