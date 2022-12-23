@@ -5,6 +5,7 @@ import {
 
 import * as am5 from '@amcharts/amcharts5';
 import type { Root } from '@amcharts/amcharts5';
+import type * as am5hierarchy from '@amcharts/amcharts5/hierarchy';
 import type * as am5map from '@amcharts/amcharts5/map';
 import * as am5percent from '@amcharts/amcharts5/percent';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
@@ -19,6 +20,7 @@ import { createMapChart, createMapPointSeries, createMapPolygonSeries } from '@/
 import {
     createDonutChart, createPieChart, createPieSeries, setPieTooltipText,
 } from '@/common/composables/amcharts5/pie-chart-helper';
+import { createTreeMapSeries, setTreemapTooltipText, setTreemapLabelText } from '@/common/composables/amcharts5/tree-map-helper';
 import type { ChartContext } from '@/common/composables/amcharts5/type';
 import {
     createXYCategoryChart, createXYDateChart, createXYLineSeries, createXYColumnSeries,
@@ -60,7 +62,7 @@ export const useAmcharts5 = (
         if (state.root) state.root.container.children.clear();
     };
 
-    const setChartColors = (chart: am5.SerialChart, colors: string[]) => {
+    const setChartColors = (chart, colors: string[]) => {
         const am5ColorSet = colors.map((color) => am5.color(color));
         if (chart instanceof am5percent.PieChart) {
             chart.series.getIndex(0)?.get('colors')?.set('colors', am5ColorSet);
@@ -128,6 +130,10 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return createMapPointSeries(state.root as Root, settings);
         },
+        createTreeMapSeries: (settings?: am5hierarchy.ITreemapSettings): am5hierarchy.Treemap => {
+            if (!state.root) throw new Error('No root');
+            return createTreeMapSeries(state.root as Root, settings);
+        },
         //
         createTooltip: (settings?: am5.ITooltipSettings): am5.Tooltip => {
             if (!state.root) throw new Error('No root');
@@ -152,6 +158,8 @@ export const useAmcharts5 = (
         setXYSharedTooltipText,
         setXYSingleTooltipText,
         setPieTooltipText,
+        setTreemapTooltipText,
+        setTreemapLabelText,
         setChartColors,
         toggleSeries,
     };
