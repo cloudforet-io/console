@@ -15,7 +15,7 @@
                       style-type="tertiary"
                       @click="$emit('click', $event)"
             >
-                PDF
+                {{ title }}
             </p-button>
             <template #content>
                 <i18n class="popover-content"
@@ -45,14 +45,16 @@
                       style-type="tertiary"
                       @click="$emit('click', $event)"
             >
-                PDF
+                {{ title }}
             </p-button>
         </template>
     </span>
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { PPopover, PIconButton, PButton } from '@spaceone/design-system';
 
@@ -74,6 +76,10 @@ export default defineComponent<Props>({
         iconOnly: {
             type: Boolean,
             default: false,
+        },
+        title: {
+            type: String as PropType<string|TranslateResult>,
+            default: 'PDF',
         },
     },
     setup() {
