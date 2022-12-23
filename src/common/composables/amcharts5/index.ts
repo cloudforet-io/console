@@ -62,11 +62,13 @@ export const useAmcharts5 = (
         if (state.root) state.root.container.children.clear();
     };
 
-    const setChartColors = (chart, colors: string[]) => {
+    const setChartColors = (chart: am5.SerialChart | am5hierarchy.Treemap, colors: string[]) => {
         const am5ColorSet = colors.map((color) => am5.color(color));
         if (chart instanceof am5percent.PieChart) {
             chart.series.getIndex(0)?.get('colors')?.set('colors', am5ColorSet);
         } else {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             chart.get('colors')?.set('colors', am5ColorSet);
         }
     };
