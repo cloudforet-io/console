@@ -1159,6 +1159,8 @@
 			"ADD_WIDGET": {
 				"ADD": "",
 				"ADD_OPTIONS": "",
+				"FROM_DASHBOARD": "",
+				"INHERIT": "",
 				"LABEL_CURRENCY": "",
 				"LABEL_DATE": "",
 				"LABEL_NAME": "",
@@ -1227,6 +1229,7 @@
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "",
 			"ALT_E_DELETE_DASHBOARD": "",
+			"ALT_E_EDIT_NAME": "",
 			"ALT_S_DELETE_DASHBOARD": "",
 			"CLONE_TITLE": "",
 			"CUSTOM_DATE_FROM": "",
