@@ -31,7 +31,9 @@
                 </span>
             </template>
             <template #extra>
-                <dashboard-control-buttons @update:visible-clone-modal="handleVisibleCloneModal" />
+                <dashboard-control-buttons :dashboard-name="state.dashboardName"
+                                           @update:visible-clone-modal="handleVisibleCloneModal"
+                />
             </template>
         </p-page-title>
         <div class="filter-box">

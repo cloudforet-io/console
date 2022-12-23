@@ -6,30 +6,67 @@
         >
             {{ $t('DASHBOARDS.DETAIL.CUSTOMIZE') }}
         </p-button>
-        <p-button icon-left="ic_download"
-                  style-type="tertiary"
-        >
-            {{ $t('DASHBOARDS.DETAIL.EXPORT') }}
-        </p-button>
+        <pdf-download-button :title="$t('DASHBOARDS.DETAIL.EXPORT')"
+                             @click="handleVisiblePdfDownloadOverlay"
+        />
         <p-button icon-left="ic_duplicate"
                   style-type="tertiary"
                   @click="handleVisibleCloneModal"
         >
             {{ $t('DASHBOARDS.DETAIL.CLONE') }}
         </p-button>
+        <pdf-download-overlay v-model="state.visiblePdfDownload"
+                              :items="state.previewItems"
+                              :file-name="state.pdfFileName"
+        >
+            <dashboard-detail-preview v-if="params?.dashboardId"
+                                      :dashboard-id="params?.dashboardId"
+                                      @rendered="handlePreviewRendered"
+            />
+        </pdf-download-overlay>
     </div>
 </template>
 
 <script setup lang="ts">
-import { PButton } from '@spaceone/design-system';
+import { computed, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
+import { PButton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
+import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
+import PdfDownloadOverlay from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
+
+import DashboardDetailPreview from '@/services/dashboards/dashboard-detail/modules/DashboardDetailPreview.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
-const emit = defineEmits(['update:visible-clone-modal']);
+const emit = defineEmits(['update:visible-clone-modal', 'update:visible-pdf-download-overlay']);
 
 const handleVisibleCloneModal = () => {
     emit('update:visible-clone-modal');
 };
+
+const props = defineProps<{
+    dashboardName?: string;
+}>();
+
+const { params } = useRoute();
+
+const state = reactive({
+    visiblePdfDownload: false,
+    previewItems: [] as Item[],
+    pdfFileName: computed<string>(() => `${props.dashboardName ?? 'Cost_Dashboard'}_${dayjs().format('YYYYMMDD')}`),
+});
+
+const handlePreviewRendered = (elements) => {
+    state.previewItems = elements.map((element) => ({ element: (element?.$el ?? element), type: 'image' } as Item));
+};
+
+const handleVisiblePdfDownloadOverlay = () => {
+    state.visiblePdfDownload = true;
+};
+
 </script>
 
 <style lang="postcss">

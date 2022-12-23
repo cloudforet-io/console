@@ -146,6 +146,7 @@ export default defineComponent<Props>({
             state.widgetWidthList = widgetWidthAssigner(state.widgetSizeList, refineContainerWidth(containerWidth));
         });
 
+        // for PDF export - start
         const refreshAllWidget = async () => {
             const promises: (()=>void)[] = [];
             state.widgetRef.forEach((d:any) => {
@@ -158,6 +159,11 @@ export default defineComponent<Props>({
         expose({
             refreshAllWidget,
         });
+        onMounted(() => {
+            emit('rendered', state.widgetRef);
+        });
+        // for PDF export - end
+
         return {
             containerRef,
             ...toRefs(state),
