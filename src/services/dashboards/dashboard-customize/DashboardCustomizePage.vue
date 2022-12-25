@@ -10,6 +10,7 @@
         </div>
         <p-divider />
         <div>
+            <dashboard-variable-dropdown />
             <p-button icon-left="ic_plus"
                       style-type="highlight"
                       @click="handleOpenOverlay"
@@ -38,6 +39,7 @@ import type { DateRange } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
+import DashboardVariableDropdown from '@/services/dashboards/dashboard-customize/modules/DashboardVariableDropdown.vue';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
