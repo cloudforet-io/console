@@ -6,13 +6,13 @@
         <portal to="widget-contents">
             <div class="sidebar-contents">
                 <div class="selector-wrapper">
-                    <p-toggle-button :value="enableDateRange"
+                    <p-toggle-button :value="state.enableDateRange"
                                      sync
                     />
                     <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_DATE') }}</span>
                 </div>
                 <div class="selector-wrapper">
-                    <p-toggle-button :value="enableCurrency"
+                    <p-toggle-button :value="state.enableCurrency"
                                      sync
                     />
                     <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY') }}</span>
@@ -29,29 +29,29 @@
                 </p-button>
                 <draggable class="draggable-wrapper"
                            ghost-class="ghost"
-                           :list="sampleWidgets"
+                           :list="state.proxyWidgetInfoList"
                 >
-                    <div v-for="(widget, idx) in sampleWidgets"
-                         :key="`drag-item-${widget.name}-${idx}`"
+                    <div v-for="(widget, idx) in state.proxyWidgetInfoList"
+                         :key="`drag-item-${widget.widget_name}-${idx}`"
                          class="draggable-item"
                     >
                         <p-i name="ic_drag-handle--slim"
                              width="1rem"
                              height="1rem"
                         />
-                        <span class="text">{{ widget.label }}</span>
+                        <span class="text">{{ widget.title }}</span>
                     </div>
                 </draggable>
             </div>
         </portal>
-        <dashboard-add-widget-modal :visible.sync="addWidgetModalVisible" />
+        <dashboard-add-widget-modal :visible.sync="state.addWidgetModalVisible" />
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    onMounted,
-    onUnmounted, reactive, toRefs,
+    defineEmits,
+    onMounted, onUnmounted, reactive,
 } from 'vue';
 import draggable from 'vuedraggable';
 
@@ -61,52 +61,35 @@ import {
 
 import { store } from '@/store';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 import DashboardAddWidgetModal from '@/services/dashboards/dashboard-customize/modules/DashboardAddWidgetModal.vue';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
-export default {
-    name: 'DashboardCustomizeSidebar',
-    components: {
-        DashboardAddWidgetModal,
-        PI,
-        PButton,
-        PDivider,
-        PToggleButton,
-        draggable,
-    },
-    setup() {
-        const state = reactive({
-            enableDateRange: true,
-            enableCurrency: true,
-            sampleWidgets: [ // TODO: sample data
-                { name: 'widget1', label: 'Monthly Cost' },
-                { name: 'widget2', label: 'Budget Usage Summary' },
-                { name: 'widget3', label: 'Budget Usage' },
-                { name: 'widget4', label: 'Cost by Project' },
-                { name: 'widget5', label: 'Budget Status' },
-                { name: 'widget6', label: 'Cost Trend by Provider Cost Trend by Provider' },
-                { name: 'widget7', label: 'Month-to-Date Spend' },
-            ],
-            addWidgetModalVisible: false,
-        });
+interface Props {
+    widgetInfoList: DashboardLayoutWidgetInfo[];
+}
 
-        /* Event */
-        const handleClickAddWidget = () => {
-            state.addWidgetModalVisible = true;
-        };
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: string, value: string): void }>();
+const state = reactive({
+    enableDateRange: true,
+    enableCurrency: true,
+    proxyWidgetInfoList: useProxyValue('widgetInfoList', props, emit),
+    addWidgetModalVisible: false,
+});
 
-        onMounted(() => {
-            store.dispatch('display/showWidget');
-        });
-        onUnmounted(() => {
-            store.dispatch('display/hideSidebar');
-        });
-
-        return {
-            ...toRefs(state),
-            handleClickAddWidget,
-        };
-    },
+/* Event */
+const handleClickAddWidget = () => {
+    state.addWidgetModalVisible = true;
 };
+
+onMounted(() => {
+    store.dispatch('display/showWidget');
+});
+onUnmounted(() => {
+    store.dispatch('display/hideSidebar');
+});
 </script>
 
 <style lang="postcss" scoped>

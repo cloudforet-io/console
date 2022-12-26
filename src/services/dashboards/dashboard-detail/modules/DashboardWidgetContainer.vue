@@ -47,7 +47,7 @@ import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
 import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 interface Props {
-    dashboardWidgetLayouts: DashboardLayoutWidgetInfo[][];
+    widgetInfoList: DashboardLayoutWidgetInfo[];
 }
 export default defineComponent<Props>({
     name: 'DashboardWidgetContainer',
@@ -58,8 +58,8 @@ export default defineComponent<Props>({
         intersectionObserver: vIntersectionObserver as DirectiveFunction,
     },
     props: {
-        dashboardWidgetLayouts: {
-            type: Array as PropType<DashboardLayoutWidgetInfo[][]>,
+        widgetInfoList: {
+            type: Array as PropType<DashboardLayoutWidgetInfo[]>,
             default: () => ([]),
         },
     },
@@ -70,11 +70,9 @@ export default defineComponent<Props>({
             widgetSizeList: [] as WidgetSize[],
             widgetWidthList: computed<number[]>(() => flattenDeep(widgetWidthAssigner(state.widgetSizeList, refineContainerWidth(state.containerWidth)))),
             // theme
-            widgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => flattenDeep(props.dashboardWidgetLayouts)),
             widgetThemeList: computed<Array<WidgetTheme | undefined>>(() => {
                 const widgetThemeOptions: Array<WidgetConfig['theme']> = [];
-                const _widgetLayouts = flattenDeep(props.dashboardWidgetLayouts);
-                _widgetLayouts.forEach((widget) => {
+                props.widgetInfoList.forEach((widget) => {
                     const widgetConfig = getWidgetConfig(widget.widget_name);
                     widgetThemeOptions.push(widgetConfig.theme);
                 });
@@ -138,13 +136,9 @@ export default defineComponent<Props>({
             observeInstance.unobserve(containerRef?.value as Element);
         });
 
-        watch(() => props.dashboardWidgetLayouts, (dashboardWidgetLayouts) => {
-            const widgetLayouts: DashboardLayoutWidgetInfo[] = flattenDeep(dashboardWidgetLayouts);
-            state.widgetSizeList = widgetLayouts.map((widget) => widget.size);
-        }, { immediate: true });
-        watch(() => state.containerWidth, (containerWidth) => {
-            state.widgetWidthList = widgetWidthAssigner(state.widgetSizeList, refineContainerWidth(containerWidth));
-        });
+        watch(() => props.widgetInfoList, (widgetInfoList) => {
+            state.widgetSizeList = widgetInfoList.map((widget) => widget.size);
+        }, { immediate: true, deep: true });
 
         // for PDF export - start
         const refreshAllWidget = async () => {
@@ -167,8 +161,8 @@ export default defineComponent<Props>({
         return {
             containerRef,
             ...toRefs(state),
-            handleExpand,
             getWidgetComponent,
+            handleExpand,
             handleIntersectionObserver,
         };
     },

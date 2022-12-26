@@ -30,10 +30,10 @@
         </div>
         <dashboard-widget-container
             ref="widgetContainerRef"
-            :dashboard-widget-layouts="state.dashboardWidgetLayouts"
+            :widget-info-list="state.dashboardWidgetInfoList"
             :loading.sync="state.loading"
         />
-        <dashboard-customize-sidebar />
+        <dashboard-customize-sidebar :widget-info-list.sync="state.dashboardWidgetInfoList" />
         <dashboard-manage-variable-overlay :visible="variableState.showOverlay" />
     </div>
 </template>
@@ -46,6 +46,7 @@ import {
 
 import { PButton, PDivider } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import { flattenDeep } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
@@ -78,9 +79,9 @@ const state = reactive({
         start: dayjs.utc().format('YYYY-MM-01'),
         end: dayjs.utc().format('YYYY-MM-DD'),
     } as DateRange,
-    isProjectDashboard: computed<boolean>(() => Boolean(props.dashboardId.startsWith('project'))),
+    isProjectDashboard: computed<boolean>(() => props.dashboardId.startsWith('project')),
     dashboardInfo: {} as DashboardModel,
-    dashboardWidgetLayouts: computed<DashboardLayoutWidgetInfo[][]>(() => state.dashboardInfo?.layouts ?? []),
+    dashboardWidgetInfoList: [] as DashboardLayoutWidgetInfo[],
 });
 const vm = getCurrentInstance()?.proxy as Vue;
 const variableState = reactive({
@@ -91,6 +92,7 @@ const variableState = reactive({
 const getDashboardData = async () => {
     try {
         state.dashboardInfo = DASHBOARD_TEMPLATES.monthlyCostSummary; // TODO: should be changed to api data
+        state.dashboardWidgetInfoList = flattenDeep(state.dashboardInfo?.layouts ?? []);
         // let result: ProjectDashboardModel|DomainDashboardModel;
         // if (state.isProjectDashboard) {
         //     result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
