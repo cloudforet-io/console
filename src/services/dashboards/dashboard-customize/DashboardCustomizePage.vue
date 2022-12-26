@@ -11,14 +11,12 @@
         <p-divider />
         <div class="dashboard-selectors">
             <div class="variable-selector-wrapper">
-                <dashboard-variable-dropdown variable-name="Project" />
-                <dashboard-variable-dropdown variable-name="Project" />
-                <p-button icon-left="ic_plus"
-                          style-type="highlight"
-                          @click="handleOpenOverlay"
-                >
-                    {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
-                </p-button>
+                <variable-selector-dropdown variable-name="Project" />
+                <variable-selector-dropdown variable-name="Project" />
+                <variable-more-button-dropdown :variable-map="variableState.variableProperties"
+                                               :variable-order="variableState.order"
+                                               @select="handleSelectVariableUse"
+                />
             </div>
             <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
                                         refresh-disabled
@@ -43,19 +41,19 @@ import {
     computed, getCurrentInstance, onMounted, reactive,
 } from 'vue';
 
-import { PButton, PDivider } from '@spaceone/design-system';
+import { PDivider } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { flattenDeep } from 'lodash';
 
-import { SpaceRouter } from '@/router';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange } from '@/services/dashboards/config';
+import type { DateRange, DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
-import DashboardVariableDropdown from '@/services/dashboards/dashboard-customize/modules/DashboardVariableDropdown.vue';
+import VariableMoreButtonDropdown from '@/services/dashboards/dashboard-customize/modules/VariableMoreButtonDropdown.vue';
+import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
 import type { DashboardModel } from '@/services/dashboards/model';
@@ -67,8 +65,6 @@ import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/co
 interface Props {
     dashboardId: string;
 }
-
-const MANAGE_VARIABLES_HASH_NAME = 'manage-variables';
 
 const props = defineProps<Props>();
 const state = reactive({
@@ -85,6 +81,51 @@ const state = reactive({
 const vm = getCurrentInstance()?.proxy as Vue;
 const variableState = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
+    variableProperties: {
+        project: {
+            variable_type: 'MANAGED',
+            use: true,
+            selection_type: 'MULTI',
+            options: ['test1', 'test2', 'test3', 'test4'],
+            name: 'Project',
+        },
+        serviceAccount: {
+            variable_type: 'MANAGED',
+            use: true,
+            selection_type: 'SINGLE',
+            options: ['test1', 'test2', 'test3', 'test4'],
+            name: 'Service Account',
+        },
+        provider: {
+            variable_type: 'MANAGED',
+            use: true,
+            selection_type: 'MULTI',
+            options: ['test1', 'test2', 'test3', 'test4'],
+            name: 'Provider',
+        },
+        user: {
+            variable_type: 'MANAGED',
+            use: false,
+            selection_type: 'MULTI',
+            options: ['test1', 'test2', 'test3', 'test4'],
+            name: 'User',
+        },
+        region: {
+            variable_type: 'MANAGED',
+            use: false,
+            selection_type: 'MULTI',
+            options: ['test1', 'test2', 'test3', 'test4'],
+            name: 'Region',
+        },
+        node: {
+            variable_type: 'CUSTOM',
+            use: false,
+            selection_type: 'SINGLE',
+            options: ['test1', 'test2', 'test3', 'test4'],
+            name: 'Node',
+        },
+    } as {[key: string]: DashboardVariableSchemaProperty },
+    order: ['project', 'provider', 'serviceAccount', 'region', 'user', 'node'],
 });
 
 /* Api */
@@ -107,11 +148,12 @@ const getDashboardData = async () => {
 };
 
 /* Event */
-const handleOpenOverlay = () => {
-    SpaceRouter.router.push({ hash: MANAGE_VARIABLES_HASH_NAME });
-};
+
 const handleUpdateLabelList = (labelList: Array<string>) => {
     state.labelList = labelList;
+};
+const handleSelectVariableUse = (variables: {[key: string]: DashboardVariableSchemaProperty }) => {
+    variableState.variableProperties = variables;
 };
 
 onMounted(() => {
