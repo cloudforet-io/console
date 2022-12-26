@@ -42,6 +42,18 @@
                         <span class="text">{{ widget.title }}</span>
                     </div>
                 </draggable>
+                <div class="footer-wrapper">
+                    <p-button style-type="transparent"
+                              @click="handleClickCancelButton"
+                    >
+                        {{ $t('DASHBOARDS.CUSTOMIZE.CANCEL') }}
+                    </p-button>
+                    <p-button style-type="primary"
+                              @click="handleClickSaveButton"
+                    >
+                        {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
+                    </p-button>
+                </div>
             </div>
         </portal>
         <dashboard-add-widget-modal :visible.sync="state.addWidgetModalVisible" />
@@ -59,15 +71,18 @@ import {
     PButton, PDivider, PI, PToggleButton,
 } from '@spaceone/design-system';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardAddWidgetModal from '@/services/dashboards/dashboard-customize/modules/DashboardAddWidgetModal.vue';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
 interface Props {
     widgetInfoList: DashboardLayoutWidgetInfo[];
+    dashboardId: string;
 }
 
 const props = defineProps<Props>();
@@ -82,6 +97,12 @@ const state = reactive({
 /* Event */
 const handleClickAddWidget = () => {
     state.addWidgetModalVisible = true;
+};
+const handleClickCancelButton = () => {
+    SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: props.dashboardId } });
+};
+const handleClickSaveButton = () => {
+    // TODO: save dashboard info
 };
 
 onMounted(() => {
@@ -99,7 +120,9 @@ onUnmounted(() => {
     line-height: 125%;
 }
 
+$sidebar-md: 25%;
 .sidebar-contents {
+    position: relative;
     gap: 1.5625rem;
     font-size: 0.875rem;
     line-height: 125%;
@@ -136,6 +159,18 @@ onUnmounted(() => {
         }
         .ghost {
             @apply bg-blue-200;
+        }
+    }
+    .footer-wrapper {
+        @apply grid grid-cols-12 border-t border-gray-200;
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        width: $(sidebar-md);
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        button {
+            @apply col-span-6;
         }
     }
 }
