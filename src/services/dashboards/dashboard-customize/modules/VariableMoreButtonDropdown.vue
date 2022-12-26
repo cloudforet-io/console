@@ -34,6 +34,7 @@ import {
 
 import { PButton, PContextMenu } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { cloneDeep } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
@@ -78,7 +79,7 @@ const handleClickButton = () => {
 };
 const handleVariableSelect = (item: MenuItem) => {
     if (!item.name) return;
-    const result = { ...props.variableMap } as DashboardVariablesSchema['properties'];
+    const result = cloneDeep(props.variableMap) as DashboardVariablesSchema['properties'];
     if (props.variableMap[item.name]) {
         result[item.name].use = !result[item.name].use;
     }
