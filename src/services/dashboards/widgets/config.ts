@@ -164,4 +164,5 @@ export interface WidgetProps {
     theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
     widgetKey: string; // unique widget key to identify widgets in layout
     currencyRates?: CurrencyRates;
+    editMode?: boolean;
 }

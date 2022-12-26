@@ -20,6 +20,7 @@
                        :size="widgetSizeList[idx]"
                        :width="width"
                        :theme="widgetThemeList[idx]"
+                       :edit-mode="editMode"
                        @click-expand-icon="handleExpand"
             />
         </template>
@@ -48,6 +49,7 @@ import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widge
 
 interface Props {
     widgetInfoList: DashboardLayoutWidgetInfo[];
+    editMode?: boolean;
 }
 export default defineComponent<Props>({
     name: 'DashboardWidgetContainer',
@@ -61,6 +63,10 @@ export default defineComponent<Props>({
         widgetInfoList: {
             type: Array as PropType<DashboardLayoutWidgetInfo[]>,
             default: () => ([]),
+        },
+        editMode: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit, expose }: SetupContext) {
@@ -138,6 +144,7 @@ export default defineComponent<Props>({
 
         watch(() => props.widgetInfoList, (widgetInfoList) => {
             state.widgetSizeList = widgetInfoList.map((widget) => widget.size);
+            state.initiatedWidgetMap = {};
         }, { immediate: true, deep: true });
 
         // for PDF export - start

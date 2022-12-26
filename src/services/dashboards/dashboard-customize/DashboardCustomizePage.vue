@@ -32,6 +32,7 @@
             ref="widgetContainerRef"
             :widget-info-list="state.dashboardWidgetInfoList"
             :loading.sync="state.loading"
+            :edit-mode="true"
         />
         <dashboard-customize-sidebar :widget-info-list.sync="state.dashboardWidgetInfoList" />
         <dashboard-manage-variable-overlay :visible="variableState.showOverlay" />
