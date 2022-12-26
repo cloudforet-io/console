@@ -32,6 +32,7 @@
         />
         <dashboard-customize-sidebar :widget-info-list.sync="state.dashboardWidgetInfoList"
                                      :dashboard-id="props.dashboardId"
+                                     @save="handleSave"
         />
         <dashboard-manage-variable-overlay :visible="variableState.showOverlay" />
     </div>
@@ -47,11 +48,14 @@ import { PButton, PDivider } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { flattenDeep } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { SpaceRouter } from '@/router';
+import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange } from '@/services/dashboards/config';
+import type { DateRange, DashboardConfig } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
@@ -62,6 +66,7 @@ import type { DashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
 interface Props {
@@ -105,6 +110,42 @@ const getDashboardData = async () => {
         ErrorHandler.handleError(e);
     }
 };
+const updateDashboardData = async () => {
+    try {
+        const param: Partial<DashboardConfig> = {
+            layouts: [state.dashboardWidgetInfoList],
+            // TODO: add other params
+            // name:
+            // settings: {
+            //     date_range: {
+            //         enabled: true,
+            //         start: '',
+            //         end: '',
+            //     },
+            //     currency: {
+            //         enabled: true,
+            //         value: 'USD',
+            //     },
+            // },
+            // variables:
+            // variables_schema:
+        };
+        if (state.isProjectDashboard) {
+            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
+                project_dashboard_id: props.dashboardId,
+                ...param,
+            });
+        } else {
+            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
+                domain_dashboard_id: props.dashboardId,
+                ...param,
+            });
+        }
+        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: props.dashboardId } });
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
+    }
+};
 
 /* Event */
 const handleOpenOverlay = () => {
@@ -112,6 +153,9 @@ const handleOpenOverlay = () => {
 };
 const handleUpdateLabelList = (labelList: Array<string>) => {
     state.labelList = labelList;
+};
+const handleSave = async () => {
+    await updateDashboardData();
 };
 
 onMounted(() => {
