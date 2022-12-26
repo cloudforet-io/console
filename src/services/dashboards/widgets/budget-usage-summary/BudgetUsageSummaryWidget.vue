@@ -61,7 +61,7 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import type { createPieChart } from '@/common/composables/amcharts5/pie-chart-helper';
 
-import { gray, green } from '@/styles/colors';
+import { gray } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
@@ -77,9 +77,6 @@ const SAMPLE_RAW_DATA = {
             limit: 3000, // total budget
             usd_cost: 1500, // spent budget
             usage: 60, // usage rate
-            pieSettings: {
-                fill: color(green[400]),
-            },
         },
         {
             budget_type: 'left_budget',
@@ -99,7 +96,7 @@ const props = defineProps<WidgetProps>();
 const chartContext = ref<HTMLElement|null>(null);
 const {
     createDonutChart, createPieSeries,
-    disposeRoot, refreshRoot,
+    disposeRoot, refreshRoot, setChartColors,
 } = useAmcharts5(chartContext);
 
 const state = reactive({
@@ -130,7 +127,7 @@ const drawChart = (chartData) => {
     };
     const series = createPieSeries(seriesSettings);
     chart.series.push(series);
-    // setChartColors(chart, state.colorSet);
+    setChartColors(chart, state.colorSet);
 
     series.labels.template.set('forceHidden', true);
     series.ticks.template.set('visible', false);
