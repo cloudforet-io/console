@@ -34,7 +34,9 @@
             :loading.sync="state.loading"
             :edit-mode="true"
         />
-        <dashboard-customize-sidebar :widget-info-list.sync="state.dashboardWidgetInfoList" />
+        <dashboard-customize-sidebar :widget-info-list.sync="state.dashboardWidgetInfoList"
+                                     :dashboard-id="props.dashboardId"
+        />
         <dashboard-manage-variable-overlay :visible="variableState.showOverlay" />
     </div>
 </template>

@@ -1177,6 +1177,7 @@
 				"TITLE": "",
 				"VALIDATION_NAME": ""
 			},
+			"CANCEL": "",
 			"REFRESH_INTERVAL_10M": "",
 			"REFRESH_INTERVAL_15S": "",
 			"REFRESH_INTERVAL_1H": "",
@@ -1185,6 +1186,7 @@
 			"REFRESH_INTERVAL_30S": "",
 			"REFRESH_INTERVAL_5M": "",
 			"REFRESH_OFF": "",
+			"SAVE": "",
 			"VARIABLES": {
 				"ADD": "",
 				"ADD_OPTIONS": "",
