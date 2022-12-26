@@ -1,6 +1,5 @@
 // base widgets
 import basePie from '@/services/dashboards/widgets/_base/base-pie/widget-config';
-import baseRegion from '@/services/dashboards/widgets/_base/base-region/widget-config';
 import baseTrend from '@/services/dashboards/widgets/_base/base-trend/widget-config';
 import dashboardCommon from '@/services/dashboards/widgets/_base/dashboard-common/widget-config';
 // console widgets
@@ -56,7 +55,6 @@ export const CONSOLE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {
 
 export const BASE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {
     baseTrend,
-    baseRegion,
     basePie,
     dashboardCommon,
 };
