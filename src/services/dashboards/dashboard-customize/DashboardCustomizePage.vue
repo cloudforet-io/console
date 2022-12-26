@@ -9,13 +9,21 @@
             <dashboard-toolset :date-range.sync="state.dateRange" />
         </div>
         <p-divider />
-        <div>
-            <p-button icon-left="ic_plus"
-                      style-type="highlight"
-                      @click="handleOpenOverlay"
-            >
-                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
-            </p-button>
+        <div class="dashboard-selectors">
+            <div class="variable-selector-wrapper">
+                <dashboard-variable-dropdown variable-name="Project" />
+                <dashboard-variable-dropdown variable-name="Project" />
+                <dashboard-variable-dropdown variable-name="Project" />
+                <dashboard-variable-dropdown variable-name="Project" />
+                <dashboard-variable-dropdown variable-name="Project" />
+                <dashboard-variable-dropdown variable-name="Project" />
+                <p-button icon-left="ic_plus"
+                          style-type="highlight"
+                          @click="handleOpenOverlay"
+                >
+                    {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
+                </p-button>
+            </div>
             <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
                                         refresh-disabled
             />
@@ -47,6 +55,7 @@ import type { DateRange } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
+import DashboardVariableDropdown from '@/services/dashboards/dashboard-customize/modules/DashboardVariableDropdown.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
 import type { DashboardModel } from '@/services/dashboards/model';
@@ -108,3 +117,18 @@ onMounted(() => {
     getDashboardData();
 });
 </script>
+
+<style lang="postcss" scoped>
+.dashboard-customize-page {
+
+    .dashboard-selectors {
+        @apply flex justify-between;
+
+        .variable-selector-wrapper {
+            @apply flex items-center flex-wrap;
+            gap: 0.5rem;
+            padding: 1.5rem 0 1.25rem;
+        }
+    }
+}
+</style>
