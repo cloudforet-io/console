@@ -1,9 +1,9 @@
 <template>
     <div>
-        <portal to="info-title">
+        <portal to="widget-title">
             <span class="sidebar-title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.SIDEBAR_TITLE') }}</span> <br>
         </portal>
-        <portal to="info-contents">
+        <portal to="widget-contents">
             <div class="sidebar-contents">
                 <div class="selector-wrapper">
                     <p-toggle-button :value="enableDateRange"
@@ -95,7 +95,7 @@ export default {
         };
 
         onMounted(() => {
-            store.dispatch('display/showInfo');
+            store.dispatch('display/showWidget');
         });
         onUnmounted(() => {
             store.dispatch('display/hideSidebar');

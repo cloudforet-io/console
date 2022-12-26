@@ -44,7 +44,7 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
         return {
             styleType: 'primary',
             disableButton: true,
-            size: 'sm',
+            size: 'md',
             disableScroll: false,
         };
     }
