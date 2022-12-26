@@ -3,7 +3,7 @@
          :class="{ admin: isDomainOwner }"
     >
         <div class="form-wrapper">
-            <div class="hidden xs:block">
+            <div class="block mobile:hidden">
                 <p class="title">
                     {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
                 </p>
@@ -12,7 +12,7 @@
                 </p>
             </div>
 
-            <div class="flex xs:hidden">
+            <div class="hidden mobile:flex">
                 <img v-if="ciLogoImage"
                      class="logo-character"
                      :src="ciLogoImage"
@@ -135,7 +135,7 @@ export default {
     flex-direction: column;
     flex-grow: 1;
     overflow-y: auto;
-    padding: 2rem;
+    padding: 2.5rem;
 
     &.admin {
         @apply bg-primary4;
@@ -148,7 +148,8 @@ export default {
     }
 
     .form-wrapper {
-        width: 15rem;
+        position: relative;
+        width: 100%;
         margin: auto 2.5rem;
         align-self: center;
 
@@ -158,8 +159,8 @@ export default {
         }
 
         .logo-character {
-            width: 5rem;
-            height: 5rem;
+            max-width: 6rem;
+            width: 25%;
             margin-bottom: calc((15rem / 3) / 2 - 0.5rem);
             margin-left: auto;
             margin-right: auto;
@@ -192,7 +193,6 @@ export default {
 
             @media screen and (width < 478px) {
                 position: absolute;
-                width: 15rem;
                 height: 3.5rem;
                 z-index: 1;
                 margin-top: -4rem;
@@ -205,6 +205,10 @@ export default {
             line-height: 1.4;
             cursor: pointer;
             margin-top: 5.5rem;
+
+            @screen mobile {
+                text-align: center;
+            }
 
             &:hover {
                 text-decoration: underline;

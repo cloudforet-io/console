@@ -171,8 +171,8 @@ export default {
 }
 
 .ci-wrapper {
+    @apply flex;
     position: fixed;
-    display: none;
     flex-flow: row;
     .logo-character {
         width: 56px;
@@ -186,8 +186,8 @@ export default {
         margin-top: 2.5rem;
     }
 
-    @screen xs {
-        display: flex;
+    @screen tablet {
+        @apply hidden;
     }
 }
 

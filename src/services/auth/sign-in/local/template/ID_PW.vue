@@ -173,6 +173,9 @@ export default defineComponent({
 .local-wrapper {
     margin: auto;
     width: 100%;
+    .p-field-group {
+        margin-bottom: 1.5rem;
+    }
     .input-label {
         @apply font-bold text-gray-900 mt-2;
         font-size: 0.875rem;
@@ -185,8 +188,7 @@ export default defineComponent({
         margin-top: 2.5rem;
     }
 
-    @media screen and (width < 478px) {
-        width: 15rem;
+    @screen mobile {
         .form {
             margin-top: 0.5rem;
         }

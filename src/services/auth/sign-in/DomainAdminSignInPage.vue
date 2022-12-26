@@ -156,11 +156,11 @@ export default {
 
 .ci-wrapper {
     position: fixed;
-    display: none;
+    display: flex;
     flex-flow: row;
 
-    @screen xs {
-        display: flex;
+    @screen mobile {
+        @apply hidden;
     }
 
     .logo-character {
