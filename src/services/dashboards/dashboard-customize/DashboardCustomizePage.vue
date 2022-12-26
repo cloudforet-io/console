@@ -53,7 +53,9 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange, DashboardConfig, DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import type {
+    DateRange, DashboardConfig, DashboardVariablesSchema,
+} from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
@@ -131,7 +133,7 @@ const variableState = reactive({
             options: ['test1', 'test2', 'test3', 'test4'],
             name: 'Node',
         },
-    } as {[key: string]: DashboardVariableSchemaProperty },
+    } as DashboardVariablesSchema['properties'],
     order: ['project', 'provider', 'serviceAccount', 'region', 'user', 'node'],
 });
 
@@ -195,7 +197,7 @@ const updateDashboardData = async () => {
 const handleUpdateLabelList = (labelList: Array<string>) => {
     state.labelList = labelList;
 };
-const handleSelectVariableUse = (variables: {[key: string]: DashboardVariableSchemaProperty }) => {
+const handleSelectVariableUse = (variables: DashboardVariablesSchema['properties']) => {
     variableState.variableProperties = variables;
 };
 const handleSave = async () => {

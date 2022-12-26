@@ -37,18 +37,18 @@ import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-m
 
 import { SpaceRouter } from '@/router';
 
-import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 
 interface Props {
-    variableMap: {[key: string]: DashboardVariableSchemaProperty };
+    variableMap: DashboardVariablesSchema['properties'];
     variableOrder: string[];
 }
 
 interface EventEmits {
     (e: string, value: string): void;
     (e: 'manage-more'): void;
-    (e: 'select', value: {[key: string]: DashboardVariableSchemaProperty }): void;
+    (e: 'select', value: DashboardVariablesSchema['properties']): void;
 }
 
 const props = defineProps<Props>();
@@ -58,12 +58,12 @@ const state = reactive({
     visibleMenu: false,
     variables: computed(() => {
         const properties = props.variableMap;
-        const result = [] as any[];
-        Object.keys(properties).forEach((d) => result.push({
+        const menuItems = [] as any[];
+        Object.keys(properties).forEach((d) => menuItems.push({
             name: d,
             label: properties[d].name,
         }));
-        return result;
+        return menuItems;
     }),
     order: computed(() => props.variableOrder),
     selected: [] as MenuItem[],
@@ -78,7 +78,7 @@ const handleClickButton = () => {
 };
 const handleVariableSelect = (item: MenuItem) => {
     if (!item.name) return;
-    const result = { ...props.variableMap } as {[key: string]: DashboardVariableSchemaProperty };
+    const result = { ...props.variableMap } as DashboardVariablesSchema['properties'];
     if (props.variableMap[item.name]) {
         result[item.name].use = !result[item.name].use;
     }
@@ -87,15 +87,15 @@ const handleVariableSelect = (item: MenuItem) => {
 
 onMounted(() => {
     const properties = props.variableMap;
-    const result = [] as MenuItem[];
+    const defaultSelected = [] as MenuItem[];
     Object.keys(properties).forEach((d) => {
         if (!properties[d].use) return;
-        result.push({
+        defaultSelected.push({
             name: d,
             label: properties[d].name,
         });
     });
-    state.selected = result;
+    state.selected = defaultSelected;
 });
 
 </script>
