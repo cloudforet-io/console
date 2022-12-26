@@ -86,7 +86,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{(e: string, value: string): void }>();
+const emit = defineEmits<{(e: string, value: string): void,
+    (e: 'save'): void,
+}>();
 const state = reactive({
     enableDateRange: true,
     enableCurrency: true,
@@ -102,7 +104,7 @@ const handleClickCancelButton = () => {
     SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: props.dashboardId } });
 };
 const handleClickSaveButton = () => {
-    // TODO: save dashboard info
+    emit('save');
 };
 
 onMounted(() => {

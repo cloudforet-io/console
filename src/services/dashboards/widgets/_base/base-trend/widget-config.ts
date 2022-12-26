@@ -7,11 +7,6 @@ const baseTrendWidgetConfig: WidgetConfig = {
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/_base/base-trend/BaseTrendWidget.vue'),
     }),
-    labels: ['Cost'],
-    description: {
-        translation_id: 'DASHBOARDS.WIDGET.BASE_TREND.DESC',
-        preview_image: 'xxx.png',
-    },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {
         inherit: true,
@@ -19,7 +14,6 @@ const baseTrendWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: 'MONTHLY',
-        group_by: GROUP_BY.PROVIDER,
     },
     options_schema: {
         default_properties: ['group_by'],
