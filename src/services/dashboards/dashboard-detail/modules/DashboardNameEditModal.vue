@@ -92,7 +92,7 @@ export default defineComponent<Props>({
             proxyVisible: props.visible,
         });
 
-        const isProjectDashboard = Boolean(props.dashboardId?.startsWith('project'));
+        const isProjectDashboard = props.dashboardId?.startsWith('project');
 
         const updateDashboard = async () => {
             try {

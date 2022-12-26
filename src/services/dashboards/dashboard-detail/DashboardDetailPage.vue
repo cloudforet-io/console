@@ -112,7 +112,7 @@ const state = reactive({
     dashboardInfo: {} as DashboardModel,
     dashboardViewer: computed<DashboardViewer>(() => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE),
     dashboardName: '',
-    isProjectDashboard: computed<boolean>(() => Boolean(props.dashboardId.startsWith('project'))),
+    isProjectDashboard: computed<boolean>(() => props.dashboardId.startsWith('project')),
     labelList: computed<string[]>(() => state.dashboardInfo?.labels ?? []),
     dashboardWidgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => flattenDeep(state.dashboardInfo?.layouts)),
     dateRange: {

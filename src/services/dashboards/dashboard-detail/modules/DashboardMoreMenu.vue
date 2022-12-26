@@ -87,7 +87,7 @@ const state = reactive({
     homeDashboardId: '',
     dashboardViewer: computed<DashboardViewer>(() => props.dashboardViewer),
 });
-const isProjectDashboard = Boolean(props.dashboardId.startsWith('project'));
+const isProjectDashboard = props.dashboardId.startsWith('project');
 
 const checkDeleteState = reactive({
     visible: false,
