@@ -2,13 +2,14 @@
     <div v-on-click-outside="hideContextMenu"
          class="dashboard-variable-dropdown"
     >
-        <div ref="targetRef"
-             class="dropdown-box"
-             :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
+        <button ref="targetRef"
+                class="dropdown-box"
+                :class="{ 'is-visible': state.visibleMenu, 'filled-value': state.selected.length }"
+                @click="showContextMenu"
         >
             <span class="variable-label">{{ variableName }}</span>
-            <div v-if="state.selected.length"
-                 class="selected-items"
+            <span v-if="state.selected.length"
+                  class="selected-items"
             >
                 <span class="item-for-display">{{ state.selected[0].label }}</span>
                 <p-badge v-if="state.selected.length > 1"
@@ -16,17 +17,24 @@
                 >
                     +{{ state.selected.length - 1 }}
                 </p-badge>
-            </div>
+            </span>
             <span />
-            <p-i :name="visibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                 :activated="visibleMenu"
+            <p-i :name="state.visibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                 :activated="state.visibleMenu"
                  color="inherit"
                  class="dropdown-icon"
             />
-        </div>
-        <p-context-menu v-show="visibleMenu"
+        </button>
+        <p-context-menu v-show="state.visibleMenu"
                         ref="contextMenuRef"
+                        searchable
+                        use-fixed-menu-style
                         :menu="state.menu"
+                        :selected="state.selected"
+                        :multi-selectable="state.selectionType === 'MULTI'"
+                        :show-radio-icon="state.selectionType === 'SINGLE'"
+                        :show-clear-selection="state.selectionType === 'MULTI'"
+                        @update-search-input="handleChangeContextMenuInput"
         />
     </div>
 </template>
@@ -34,21 +42,38 @@
 <script setup lang="ts">
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    reactive, ref,
+    computed,
+    reactive,
 } from 'vue';
 
 import { PBadge, PContextMenu, PI } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+
+import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 // import { useContextMenuController } from '@spaceone/design-system/src/hooks/context-menu-controller';
 
-const props = defineProps<{
+interface Props {
     variableName: string;
-    menu: MenuItem[];
-}>();
+    selected?: Array<MenuItem>;
+    variableSchema?: DashboardVariableSchemaProperty;
+}
+
+const props = defineProps<Props>();
 
 const state = reactive({
-    menu: props.menu ?? [] as MenuItem[],
-    selected: [
+    visibleMenu: false,
+    varialbeType: computed(() => props.variableSchema?.variable_type ?? 'MANAGED'),
+    selectionType: computed(() => props.variableSchema?.selection_type ?? 'SINGLE'),
+    searchText: '',
+    // TODO: Must be filtered by searchText & reordered by Fn in context menu controller
+    menu: [
+        { name: 'spaceone', label: 'SpaceONE Dev' },
+        { name: 'test1', label: 'Test-1' },
+        { name: 'test2', label: 'Test-2' },
+        { name: 'test3', label: 'Test-3' },
+        { name: 'test4', label: 'Test-4' },
+    ] as MenuItem[],
+    selected: props.selected ?? [
         { name: 'spaceone', label: 'SpaceONE Dev' },
         { name: 'spaceone', label: 'SpaceONE Dev' },
         { name: 'spaceone', label: 'SpaceONE Dev' },
@@ -67,16 +92,23 @@ const state = reactive({
 //     useReorderBySelection: true,
 //     useFixedStyle: true,
 // });
-const visibleMenu = ref(false);
 const hideContextMenu = () => {
-    console.log('hide menu');
+    state.visibleMenu = false;
+};
+const showContextMenu = (e: MouseEvent) => {
+    state.visibleMenu = !state.visibleMenu;
+    e.stopPropagation();
+};
+const handleChangeContextMenuInput = (value: string): void => {
+    state.searchText = value;
 };
 
 </script>
 
 <style lang="postcss" scoped>
 .dashboard-variable-dropdown {
-    @apply inline-block;
+    @apply inline-block relative;
+    max-width: 20rem;
 
     .dropdown-box {
         @apply flex items-center border border-solid border-gray-300 bg-white rounded-md;
@@ -100,11 +132,11 @@ const hideContextMenu = () => {
         &:hover {
             @apply border-blue-600 bg-blue-100;
         }
-        &.is-visible {
-            @apply border-blue-600;
-        }
         &.filled-value {
             @apply border-blue-400 bg-blue-200;
+            &.is-visible {
+                @apply border-blue-600;
+            }
         }
     }
 }

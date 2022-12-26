@@ -13,10 +13,6 @@
             <div class="variable-selector-wrapper">
                 <dashboard-variable-dropdown variable-name="Project" />
                 <dashboard-variable-dropdown variable-name="Project" />
-                <dashboard-variable-dropdown variable-name="Project" />
-                <dashboard-variable-dropdown variable-name="Project" />
-                <dashboard-variable-dropdown variable-name="Project" />
-                <dashboard-variable-dropdown variable-name="Project" />
                 <p-button icon-left="ic_plus"
                           style-type="highlight"
                           @click="handleOpenOverlay"
