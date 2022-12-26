@@ -2,7 +2,7 @@
     <div class="p-metric-chart">
         <div class="chart-title-wrapper">
             <p-tooltip
-                :contents="`${title}`"
+                :contents="title"
             >
                 <span class="chart-title">{{ title }}</span>
             </p-tooltip>

@@ -103,7 +103,7 @@ const {
 
 const state = reactive({
     ...toRefs(useWidgetState(props)),
-    chart: null as null|ReturnType<typeof createPieChart | typeof createDonutChart>,
+    chart: null as null|ReturnType<typeof createPieChart>,
     series: null as null|ReturnType<typeof createPieSeries>,
     chartData: computed(() => {
         if (!state.data) return [];
