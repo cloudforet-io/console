@@ -50,7 +50,7 @@
         </div>
         <dashboard-widget-container
             ref="widgetContainerRef"
-            :dashboard-widget-layouts="state.dashboardWidgetLayouts"
+            :widget-info-list="state.dashboardWidgetInfoList"
             :loading.sync="state.loading"
         />
         <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
@@ -74,6 +74,7 @@ import {
     PDivider, PI, PIconButton, PPageTitle,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import { flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -113,7 +114,7 @@ const state = reactive({
     dashboardName: '',
     isProjectDashboard: computed<boolean>(() => Boolean(props.dashboardId.startsWith('project'))),
     labelList: computed<string[]>(() => state.dashboardInfo?.labels ?? []),
-    dashboardWidgetLayouts: computed<DashboardLayoutWidgetInfo[][]>(() => state.dashboardInfo?.layouts ?? []),
+    dashboardWidgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => flattenDeep(state.dashboardInfo?.layouts)),
     dateRange: {
         start: dayjs.utc().format('YYYY-MM-01'),
         end: dayjs.utc().format('YYYY-MM-DD'),

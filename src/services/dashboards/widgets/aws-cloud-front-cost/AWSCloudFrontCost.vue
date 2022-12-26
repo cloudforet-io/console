@@ -2,6 +2,7 @@
     <widget-frame :title="state.title"
                   :size="state.size"
                   :width="props.width"
+                  :edit-mode="props.editMode"
                   class="aws-cloud-front-cost"
     >
         <template v-if="state.selectorItems.length"
