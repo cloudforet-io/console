@@ -65,7 +65,7 @@ const state = reactive({
     varialbeType: computed(() => props.variableSchema?.variable_type ?? 'MANAGED'),
     selectionType: computed(() => props.variableSchema?.selection_type ?? 'SINGLE'),
     searchText: '',
-    // Must be filtered by searchText & reordered by Fn in context menu controller
+    // TODO: Must be filtered by searchText & reordered by Fn in context menu controller
     menu: [
         { name: 'spaceone', label: 'SpaceONE Dev' },
         { name: 'test1', label: 'Test-1' },
