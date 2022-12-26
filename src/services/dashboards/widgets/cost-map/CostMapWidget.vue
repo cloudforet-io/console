@@ -2,6 +2,7 @@
     <widget-frame :title="state.title"
                   :size="state.size"
                   :width="props.width"
+                  :edit-mode="props.editMode"
                   :error-mode="false"
     >
         <div class="cost-map">

@@ -4,6 +4,7 @@
                   :width="props.width"
                   :date-range="state.options.date_range"
                   :currency="state.options.currency"
+                  :edit-mode="props.editMode"
     >
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"

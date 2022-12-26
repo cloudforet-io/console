@@ -2,6 +2,7 @@
     <widget-frame :title="state.title"
                   :size="state.size"
                   :width="props.width"
+                  :edit-mode="props.editMode"
                   class="budget-status-widget"
     >
         <p-data-loader :loading="state.loading"

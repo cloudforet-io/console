@@ -2,6 +2,7 @@
     <widget-frame :title="state.title"
                   :size="state.size"
                   :width="props.width"
+                  :edit-mode="props.editMode"
                   class="base-trend-widget"
     >
         <template v-if="state.selectorItems.length"

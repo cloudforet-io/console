@@ -2,6 +2,7 @@
     <widget-frame :title="state.title"
                   :size="state.size"
                   :width="props.width"
+                  :edit-mode="props.editMode"
                   class="cost-by-region"
     >
         <div class="content-wrapper">
