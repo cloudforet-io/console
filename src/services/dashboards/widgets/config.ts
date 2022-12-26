@@ -89,7 +89,7 @@ export interface WidgetConfig {
 export interface WidgetOptionsSchema {
     default_properties?: string[];
     inheritable_properties?: string[];
-    schema: JsonSchema
+    schema: JsonSchema | any;
 }
 
 type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
