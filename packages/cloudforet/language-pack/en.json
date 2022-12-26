@@ -1177,6 +1177,7 @@
 				"TITLE": "Add New Widget",
 				"VALIDATION_NAME": "Please enter name."
 			},
+			"CANCEL": "Cancel",
 			"REFRESH_INTERVAL_10M": "10m",
 			"REFRESH_INTERVAL_15S": "15s",
 			"REFRESH_INTERVAL_1H": "1h",
@@ -1185,6 +1186,7 @@
 			"REFRESH_INTERVAL_30S": "30s",
 			"REFRESH_INTERVAL_5M": "5m",
 			"REFRESH_OFF": "off",
+			"SAVE": "Save",
 			"VARIABLES": {
 				"ADD": "Add Variable",
 				"ADD_OPTIONS": "Add",
