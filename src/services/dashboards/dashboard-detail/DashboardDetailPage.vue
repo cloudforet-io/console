@@ -187,6 +187,6 @@ watch(() => props.dashboardId, (dashboardId) => {
     @apply mt-4 mb-6;
 }
 .filter-box {
-    @apply flex justify-between items-center mb-4;
+    @apply flex justify-between items-center mb-4 mt-5;
 }
 </style>

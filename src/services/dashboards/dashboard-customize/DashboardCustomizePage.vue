@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard-customize-page">
         CUSTOMIZE DASHBOARD
-        <div class="flex justify-between">
+        <div class="filters-box">
             <dashboard-labels editable
                               :label-list="state.labelList"
                               @update:labelList="handleUpdateLabelList"
@@ -211,6 +211,9 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .dashboard-customize-page {
+    .filters-box {
+        @apply flex justify-between mt-5;
+    }
 
     .dashboard-selectors {
         @apply flex justify-between;

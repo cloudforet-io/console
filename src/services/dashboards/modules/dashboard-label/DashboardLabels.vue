@@ -36,6 +36,8 @@ import { computed, reactive } from 'vue';
 
 import { PIconButton, PLabel, PTextInput } from '@spaceone/design-system';
 
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+
 
 interface Props {
     labelList: Array<string>;
@@ -61,6 +63,11 @@ const handleEscape = () => {
     state.inputText = '';
 };
 const handlePushLabel = () => {
+    if (state.labelList.find((d) => d === state.inputText)) {
+        // song-lang
+        showErrorMessage('Failed to add label', 'Duplicated label');
+        return;
+    }
     state.labelList.push(state.inputText);
     state.inputText = '';
     emit('update:labelList', state.labelList);
