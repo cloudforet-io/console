@@ -1,6 +1,8 @@
 <template>
     <div class="dashboard-customize-page">
-        CUSTOMIZE DASHBOARD
+        <dashboard-customize-page-name :name="state.dashboardName"
+                                       @update:name="handleUpdateDashboardName"
+        />
         <div class="filters-box">
             <dashboard-labels editable
                               :label-list="state.labelList"
@@ -59,6 +61,8 @@ import type {
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
+import DashboardCustomizePageName
+    from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizePageName.vue';
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
 import VariableMoreButtonDropdown from '@/services/dashboards/dashboard-customize/modules/VariableMoreButtonDropdown.vue';
 import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
@@ -159,7 +163,7 @@ const updateDashboardData = async () => {
         const param: Partial<DashboardConfig> = {
             layouts: [state.dashboardWidgetInfoList],
             // TODO: add other params
-            // name:
+            // name: state.dashboardName
             // settings: {
             //     date_range: {
             //         enabled: true,
@@ -192,6 +196,9 @@ const updateDashboardData = async () => {
 };
 
 /* Event */
+const handleUpdateDashboardName = (name: string) => {
+    state.dashboardName = name;
+};
 const handleUpdateLabelList = (labelList: Array<string>) => {
     state.labelList = labelList;
 };
