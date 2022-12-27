@@ -3,7 +3,7 @@ import type Vue from 'vue';
 import { reactive, toRef } from 'vue';
 
 import type { PContextMenu } from '@/components';
-import { useContextMenuFixedStyle } from '@/hooks';
+import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import type { MenuItem } from '@/inputs/context-menu/type';
 
 export interface UseContextMenuControllerOptions {
