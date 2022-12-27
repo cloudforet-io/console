@@ -28,14 +28,16 @@ import {
     defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
-// import { color } from '@amcharts/amcharts5';
+import { color } from '@amcharts/amcharts5';
 import { PDataLoader } from '@spaceone/design-system';
 import { random, range } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setTreemapLabelText } from '@/common/composables/amcharts5/tree-map-helper';
 
-// import { palette } from '@/styles/colors';
+import {
+    gray, palette, violet, white,
+} from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
@@ -43,7 +45,7 @@ import { GROUP_BY } from '@/services/dashboards/widgets/config';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
-// import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
 
 const SAMPLE_RAW_DATA = [{
     name: 'Root',
@@ -56,13 +58,21 @@ const SAMPLE_RAW_DATA = [{
 
 const VALUE_FIELD_NAME = 'value';
 const CATEGORY_FIELD_NAME = GROUP_BY.PROJECT;
+const COLOR_FIELD_NAME = 'background_color';
+const TEXT_COLOR_FIELD_NAME = 'font_color';
+
+interface CostTreeMapData {
+    project_id: string;
+    value: number;
+    background_color?: string;
+    font_color?: string;
+}
 
 const props = defineProps<WidgetProps>();
 
 const chartContext = ref<HTMLElement | null>(null);
 const {
     createTreeMapSeries,
-    setChartColors,
     createTooltip, setTreemapTooltipText,
     disposeRoot, refreshRoot,
 } = useAmcharts5(chartContext);
@@ -89,29 +99,51 @@ const drawChart = (chartData) => {
         nodePaddingInner: 4,
     };
     const series = createTreeMapSeries(seriesSettings);
-    series.rectangles.template.setAll({
-        strokeWidth: 1,
-    });
 
-    setChartColors(series, state.colorSet);
-    // Todo: add gradient background color
-    // const themeColorName: WidgetTheme = props.theme ? props.theme : 'violet';
-    // series.rectangles.template.adapters.add('fill', (value, target) => {
-    //     const dataItem = target.dataItem;
-    //     if (dataItem?.dataContext?.[VALUE_FIELD_NAME] === 'Root') {
-    //         return color(palette.white);
-    //     }
-    //     if (dataItem?.dataContext?.[CATEGORY_FIELD_NAME]) {
-    //         return color(palette[themeColorName][400]);
-    //     }
-    //     return color(palette[themeColorName][400]);
-    // });
+    const getConvertedChartData = (rawData): CostTreeMapData[] => {
+        const themeColorName: WidgetTheme = props.theme ? props.theme : 'violet';
+        const results: CostTreeMapData[] = [];
+        rawData.forEach((d, idx) => {
+            let backgroundColor = palette[themeColorName][200];
+            let fontColor;
+
+            switch (true) {
+            case [0].includes(idx):
+                backgroundColor = palette[themeColorName][700];
+                fontColor = white;
+                break;
+            case [1].includes(idx):
+                backgroundColor = palette[themeColorName][500];
+                break;
+            case [2].includes(idx):
+                backgroundColor = palette[themeColorName][400];
+                break;
+            case [3, 4, 5, 6, 7].includes(idx):
+                backgroundColor = palette[themeColorName][300];
+                break;
+            default:
+                backgroundColor = palette[themeColorName][200];
+                fontColor = gray[900];
+                break;
+            }
+
+            results.push({
+                ...d,
+                background_color: backgroundColor,
+                font_color: fontColor,
+            });
+        });
+        return results;
+    };
+    state.chartData[0].children = getConvertedChartData(chartData[0].children);
+    series.rectangles.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[COLOR_FIELD_NAME]);
 
     const tooltip = createTooltip();
     series.set('tooltip', tooltip);
     setTreemapTooltipText(series, tooltip, state.options.currency, props.currencyRates);
 
     setTreemapLabelText(series);
+    series.labels.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[TEXT_COLOR_FIELD_NAME]);
 
     series.data.setAll(chartData);
 };
@@ -150,7 +182,7 @@ defineExpose({
 .chart-wrapper {
     @apply relative;
     width: 100%;
-    height: 378px;
+    height: 354px;
 
     .chart {
         height: 100%;
