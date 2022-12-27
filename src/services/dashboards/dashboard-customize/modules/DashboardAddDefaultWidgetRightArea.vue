@@ -154,7 +154,7 @@ export default defineComponent<Props>({
             //
             schemaFormData: {},
             isSchemaFormValid: undefined,
-            isAllValid: computed(() => state.isSchemaFormValid && isAllValid),
+            isAllValid: computed(() => state.isSchemaFormValid && isAllValid.value),
             inheritItemMap: {} as {[propertyName: string]: boolean},
             addOptionsMenuVisible: false,
             optionsMenuItems: computed<MenuItem[]>(() => {

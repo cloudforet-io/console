@@ -38,8 +38,8 @@ export const useWidgetFormStore = defineStore('form', {
             const widgetFiltersMap: WidgetOptions['filters'] = {};
             const inheritOptions: InheritOptions = {};
             Object.entries(formData).forEach(([key, val]) => {
+                const _propertyName = key.replace('filters.', '');
                 if (inheritItemMap[key]) {
-                    const _propertyName = key.replace('filters.', '');
                     if (!val) return;
                     inheritOptions[_propertyName] = {
                         enabled: true,
@@ -48,16 +48,16 @@ export const useWidgetFormStore = defineStore('form', {
                         },
                     };
                 } else if (key.startsWith('filters.')) {
-                    widgetFiltersMap[key] = [];
+                    widgetFiltersMap[_propertyName] = [];
                     if (Array.isArray(val)) {
                         val.forEach((v) => {
-                            widgetFiltersMap[key].push({ k: key, v, o: '' });
+                            widgetFiltersMap[_propertyName].push({ k: _propertyName, v, o: '' });
                         });
                     } else {
-                        widgetFiltersMap[key].push({ k: key, v: val, o: '' });
+                        widgetFiltersMap[_propertyName].push({ k: _propertyName, v: val, o: '' });
                     }
                 } else {
-                    widgetOptions[key] = val;
+                    widgetOptions[_propertyName] = val;
                 }
             });
             widgetOptions.filters = widgetFiltersMap;
