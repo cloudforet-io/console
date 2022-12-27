@@ -61,7 +61,7 @@ const CATEGORY_FIELD_NAME = GROUP_BY.PROJECT;
 const COLOR_FIELD_NAME = 'background_color';
 const TEXT_COLOR_FIELD_NAME = 'font_color';
 
-interface CostTreeMapData {
+interface CostMapData {
     project_id: string;
     value: number;
     background_color?: string;
@@ -100,9 +100,9 @@ const drawChart = (chartData) => {
     };
     const series = createTreeMapSeries(seriesSettings);
 
-    const getConvertedChartData = (rawData): CostTreeMapData[] => {
+    const getConvertedChartData = (rawData): CostMapData[] => {
         const themeColorName: WidgetTheme = props.theme ? props.theme : 'violet';
-        const results: CostTreeMapData[] = [];
+        const results: CostMapData[] = [];
         rawData.forEach((d, idx) => {
             let backgroundColor = palette[themeColorName][200];
             let fontColor;
