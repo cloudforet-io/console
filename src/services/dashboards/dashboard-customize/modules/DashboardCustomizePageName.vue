@@ -21,18 +21,17 @@
 <script setup lang="ts">
 // Below directive is used. Do not remove!!!
 import { vOnClickOutside } from '@vueuse/components';
-import { computed, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 
 import { PPageTitle, PTextInput } from '@spaceone/design-system';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 const props = defineProps<{ name: string; }>();
-const emit = defineEmits(['update:name']);
+const emit = defineEmits<{(e: string, value: string): void}>();
 
 const state = reactive({
-    name: computed({
-        get: () => props.name,
-        set: (val: string) => emit('update:name', val),
-    }),
+    name: useProxyValue('name', props, emit),
     nameInput: props.name,
     editMode: false,
 });
