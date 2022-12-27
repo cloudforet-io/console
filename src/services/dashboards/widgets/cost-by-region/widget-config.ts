@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
-import { CHART_TYPE, GRANULARITY } from '@/services/dashboards/widgets/config';
+import { CHART_TYPE, GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/config';
 
 const costByRegionWidgetConfig: WidgetConfig = {
     widget_config_id: 'costByRegion',
@@ -20,6 +20,7 @@ const costByRegionWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.ACCUMULATED,
+        group_by: GROUP_BY.REGION,
         chart_type: CHART_TYPE.MAP,
         legend_options: {
             enabled: true,

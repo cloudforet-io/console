@@ -38,18 +38,18 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties,
-        inheritable_properties,
+        default_properties: ['group_by'].concat(default_properties ?? []),
+        inheritable_properties: ['group_by'].concat(inheritable_properties ?? []),
         schema: {
             type: 'object',
             properties: {
+                ...schema.properties,
                 group_by: {
                     title: 'Group By',
                     type: 'string',
                     enum: Object.values(GROUP_BY),
                     menuItems: Object.values(GROUP_BY_ITEM_MAP),
                 },
-                ...schema.properties,
             },
             required: ['group_by'],
         },
