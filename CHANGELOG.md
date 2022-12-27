@@ -1,3 +1,10 @@
+# [1.1.0-beta.496](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.495...v1.1.0-beta.496) (2022-12-27)
+
+
+### Features
+
+* **dynamic-field:** apply postfix and prefix ([#199](https://github.com/cloudforet-io/mirinae/issues/199)) ([1b4a9f9](https://github.com/cloudforet-io/mirinae/commit/1b4a9f97a93fa9f2e1f032ecaa68207be4fbbf31))
+
 # [1.1.0-beta.495](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.494...v1.1.0-beta.495) (2022-12-27)
 
 
