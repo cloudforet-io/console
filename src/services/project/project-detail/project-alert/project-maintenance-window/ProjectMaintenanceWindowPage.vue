@@ -85,7 +85,7 @@ import {
     PBadge, PButton,
     PPanelTop, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
-import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { makeDistinctValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search';

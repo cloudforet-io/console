@@ -133,8 +133,8 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PPaneLayout, PButton, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PSearchDropdown,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import type { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { SearchDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
 import { map } from 'lodash';
 
 import { store } from '@/store';

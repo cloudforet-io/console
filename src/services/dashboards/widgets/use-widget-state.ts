@@ -2,7 +2,7 @@ import {
     computed, reactive,
 } from 'vue';
 
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { merge } from 'lodash';
 
 import {

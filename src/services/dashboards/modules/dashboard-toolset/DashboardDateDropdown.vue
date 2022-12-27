@@ -46,7 +46,7 @@ import {
 } from 'vue';
 
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 

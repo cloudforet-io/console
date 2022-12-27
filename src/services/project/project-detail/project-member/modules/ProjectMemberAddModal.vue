@@ -121,8 +121,8 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PButtonModal, PFieldGroup, PBoxTab, PSearchDropdown, PTooltip, PI, PTextInput,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import type { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { SelectedItem as InputItem } from '@spaceone/design-system/types/inputs/input/type';
 import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

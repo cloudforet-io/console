@@ -99,7 +99,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PButton, PIconButton, PPageTitle, PSelectDropdown,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

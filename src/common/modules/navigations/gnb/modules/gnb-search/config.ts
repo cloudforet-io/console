@@ -1,4 +1,4 @@
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { RECENT_TYPE } from '@/store/modules/recent/type';

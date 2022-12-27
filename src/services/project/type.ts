@@ -1,4 +1,4 @@
-import type { TreeItem, Tree } from '@spaceone/design-system/dist/src/data-display/tree/type';
+import type { TreeItem, Tree } from '@spaceone/design-system/types/data-display/tree/type';
 
 import type { TimeStamp } from '@/models';
 

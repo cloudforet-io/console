@@ -65,8 +65,8 @@ import {
 import {
     PEmpty, PTab, PDataTable, PI, PBadge, PButton,
 } from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';

@@ -31,7 +31,7 @@ import {
 } from 'vue';
 
 import { PCheckBox, PI } from '@spaceone/design-system';
-import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';

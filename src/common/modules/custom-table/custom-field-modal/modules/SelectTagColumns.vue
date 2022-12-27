@@ -43,7 +43,7 @@ import type { Vue } from 'vue/types/vue';
 import {
     PAutocompleteSearch, PCheckBox, PTag,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';

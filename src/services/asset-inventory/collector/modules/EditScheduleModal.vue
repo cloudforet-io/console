@@ -116,7 +116,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PButtonModal, PSearchDropdown, PFieldGroup, PRadio, PButton, PTextInput, PI, PSelectDropdown,
 } from '@spaceone/design-system';
-import type { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+import type { SearchDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import {

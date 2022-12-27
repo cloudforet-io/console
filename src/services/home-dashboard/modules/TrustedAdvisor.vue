@@ -85,11 +85,11 @@ import {
 } from 'vue';
 
 import { PTextPagination, PI } from '@spaceone/design-system';
-import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import {
     find, forEach, range, size,
 } from 'lodash';
 
+import { getAllPage } from '@cloudforet/core-lib/component-util/pagination';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

@@ -1,7 +1,7 @@
 import type { Getter } from 'vuex';
 
-import type { DynamicFieldProps } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type';
-import type { EnumOptions } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicFieldProps } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type';
+import type { EnumOptions } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import { forEach } from 'lodash';
 
 import type { ProviderReferenceState } from '@/store/modules/reference/provider/type';

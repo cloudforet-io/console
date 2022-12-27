@@ -39,7 +39,7 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import { registerServiceStore } from '@/common/composables/register-service-store';

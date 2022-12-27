@@ -1,4 +1,4 @@
-import type { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+import type { SearchDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';

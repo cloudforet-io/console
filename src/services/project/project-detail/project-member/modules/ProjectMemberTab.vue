@@ -98,8 +98,8 @@ import {
     PTableCheckModal,
     PToolboxTable,
 } from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';

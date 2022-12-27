@@ -109,8 +109,8 @@ import {
     PSelectDropdown,
     PStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

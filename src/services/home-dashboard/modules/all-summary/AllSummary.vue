@@ -87,7 +87,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import {
     PBalloonTab, PSelectButton, PDataLoader, PSkeleton,
 } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
 

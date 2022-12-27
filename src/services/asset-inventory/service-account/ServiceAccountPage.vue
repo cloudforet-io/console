@@ -68,8 +68,8 @@ import {
 import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
-} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
-import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
+import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';

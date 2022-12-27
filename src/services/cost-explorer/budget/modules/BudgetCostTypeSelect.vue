@@ -42,7 +42,7 @@ import { PFieldGroup, PRadio, PSearchDropdown } from '@spaceone/design-system';
 import type {
     AutocompleteHandler,
     SearchDropdownMenuItem,
-} from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+} from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce } from 'lodash';

@@ -115,7 +115,7 @@ import {
     PPageTitle, PPagination, PButtonModal, PLazyImg, PI,
     PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { capitalize } from 'lodash';
 
 import { iso8601Formatter, durationFormatter, numberFormatter } from '@cloudforet/core-lib';

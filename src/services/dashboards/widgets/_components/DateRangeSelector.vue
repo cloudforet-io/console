@@ -29,7 +29,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 

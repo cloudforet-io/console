@@ -41,7 +41,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import bytes from 'bytes';
 import dayjs from 'dayjs';
 import { range } from 'lodash';

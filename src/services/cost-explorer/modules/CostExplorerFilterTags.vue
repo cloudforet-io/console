@@ -30,7 +30,7 @@ import {
 import {
     PEmpty, PTag,
 } from '@spaceone/design-system';
-import type { CategoryItem, KeyItem, ValueItem } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { CategoryItem, KeyItem, ValueItem } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import { cloneDeep } from 'lodash';
 
 import { store } from '@/store';

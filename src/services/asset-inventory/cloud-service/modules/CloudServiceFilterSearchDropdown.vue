@@ -47,7 +47,7 @@ import {
 } from '@spaceone/design-system';
 import type {
     SearchDropdownMenuItem,
-} from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
+} from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
 
 import { store } from '@/store';
 

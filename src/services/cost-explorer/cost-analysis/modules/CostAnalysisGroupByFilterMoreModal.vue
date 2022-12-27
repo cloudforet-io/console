@@ -46,8 +46,8 @@ import {
 import {
     PButtonModal, PSearchDropdown, PFieldGroup,
 } from '@spaceone/design-system';
-import type { AutocompleteHandler } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
-import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
+import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
+import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 

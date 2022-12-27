@@ -79,7 +79,7 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PAnchor, PBadge, PDataTable, PDefinitionTable, PPanelTop,
 } from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

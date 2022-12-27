@@ -83,7 +83,7 @@ import {
 import {
     PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree, PButton,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 

@@ -94,7 +94,7 @@ import type { PropType } from 'vue';
 import {
     PDataTable, PTextPagination, PStatus, PI,
 } from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
 import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 

@@ -1,8 +1,8 @@
 import type { AsyncComponent } from 'vue';
 
-import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
-import type { DynamicWidgetType } from '@spaceone/design-system/src/data-display/dynamic/dynamic-widget/type';
+import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicWidgetType } from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
+import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 

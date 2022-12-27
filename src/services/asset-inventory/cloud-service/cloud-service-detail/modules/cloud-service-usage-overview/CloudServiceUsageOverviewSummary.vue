@@ -42,7 +42,7 @@ import {
 } from 'vue';
 
 import { PDataLoader, PDynamicWidget, PSkeleton } from '@spaceone/design-system';
-import type { DynamicWidgetFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
+import type { DynamicWidgetFieldHandler } from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
 
 import { store } from '@/store';
 

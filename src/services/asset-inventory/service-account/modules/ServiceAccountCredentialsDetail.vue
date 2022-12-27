@@ -33,8 +33,8 @@ import {
 import {
     PDataLoader, PDynamicLayout, PButton,
 } from '@spaceone/design-system';
-import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
+import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
