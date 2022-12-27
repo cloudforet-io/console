@@ -63,7 +63,6 @@ import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize
 import VariableMoreButtonDropdown from '@/services/dashboards/dashboard-customize/modules/VariableMoreButtonDropdown.vue';
 import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
 import type { DashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
@@ -85,6 +84,7 @@ const state = reactive({
     } as DateRange,
     isProjectDashboard: computed<boolean>(() => props.dashboardId.startsWith('project')),
     dashboardInfo: {} as DashboardModel,
+    dashboardName: '',
     dashboardWidgetInfoList: [] as DashboardLayoutWidgetInfo[],
 });
 const vm = getCurrentInstance()?.proxy as Vue;
@@ -140,19 +140,18 @@ const variableState = reactive({
 /* Api */
 const getDashboardData = async () => {
     try {
-        state.dashboardInfo = DASHBOARD_TEMPLATES.monthlyCostSummary; // TODO: should be changed to api data
-        state.dashboardWidgetInfoList = flattenDeep(state.dashboardInfo?.layouts ?? []);
-        // let result: ProjectDashboardModel|DomainDashboardModel;
-        // if (state.isProjectDashboard) {
-        //     result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
-        // } else {
-        //     result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: props.dashboardId });
-        // }
-        // state.dashboardInfo = result;
-        // state.dashboardName = result.name;
+        let result: DashboardModel;
+        if (state.isProjectDashboard) {
+            result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
+        } else {
+            result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: props.dashboardId });
+        }
+        state.dashboardInfo = result;
+        state.dashboardWidgetInfoList = flattenDeep(result?.layouts ?? []);
+        state.dashboardName = result.name;
     } catch (e) {
-        // state.dashboardInfo = {}; // TODO: temporarily disabled
         ErrorHandler.handleError(e);
+        // await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
     }
 };
 const updateDashboardData = async () => {
@@ -193,7 +192,6 @@ const updateDashboardData = async () => {
 };
 
 /* Event */
-
 const handleUpdateLabelList = (labelList: Array<string>) => {
     state.labelList = labelList;
 };
