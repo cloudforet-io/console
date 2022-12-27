@@ -15,9 +15,8 @@
     "type": "git",
     "url": "git+https://github.com/spaceone-dev/console-core-lib.git"
   },
-  "author": "SpaceONE",
+  "author": "Cloudforet",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/spaceone-dev/console-core-lib#readme",
   "dependencies": {
     "axios": "^0.25.0",
     "axios-auth-refresh": "^3.2.2",
@@ -28,17 +27,9 @@
     "luxon": "^1.27.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.5",
-    "@babel/core": "^7.14.6",
-    "@babel/plugin-proposal-class-properties": "^7.14.5",
-    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-    "@babel/plugin-transform-runtime": "^7.14.5",
-    "@babel/preset-env": "^7.14.7",
-    "@babel/preset-typescript": "^7.14.5",
     "@types/bytes": "^3.1.1",
     "@types/luxon": "^1.27.0",
     "@types/node": "^16.11.6",
-    "babel-plugin-module-resolver": "^4.1.0",
     "concurrently": "^7.2.2",
     "cross-env": "^7.0.3",
     "rimraf": "^3.0.2",
@@ -46,17 +37,11 @@
     "tsc-watch": "^5.0.3"
   },
   "main": "./dist/index.js",
-  "type": "module",
   "typesVersions": {
     ">=3.1": {
       "*": [
         "./dist/*"
       ]
     }
-  },
-  "jest": {
-    "testPathIgnorePatterns": [
-      "dist"
-    ]
   }
 }
