@@ -34,6 +34,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import DashboardDefaultWidgetTab from '@/services/dashboards/dashboard-customize/modules/DashboardDefaultWidgetTab.vue';
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
+import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 
 interface Props {
@@ -54,10 +55,11 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const widgetFormStore = useWidgetFormStore();
-        const { isValid } = storeToRefs(widgetFormStore);
+        const {
+            isValid, widgetOptions, inheritOptions, widgetConfigId, widgetTitle,
+        } = storeToRefs(widgetFormStore);
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
-            dashboardLayoutWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => widgetFormStore.dashboardLayoutWidgetInfo),
         });
         const tabState = reactive({
             tabs: computed<TabItem[]>(() => ([
@@ -68,8 +70,18 @@ export default defineComponent<Props>({
         });
 
         const handleConfirm = () => {
-            // TODO: add api
-            // console.log('confirm!', name?.value, formData?.value);
+            if (!widgetConfigId?.value || !widgetTitle?.value) return;
+            const widgetConfig = getWidgetConfig(widgetConfigId.value);
+            const dashboardLayoutWidgetInfo: DashboardLayoutWidgetInfo = {
+                widget_name: widgetConfigId?.value,
+                title: widgetTitle?.value,
+                size: widgetConfig.sizes[0],
+                version: '1', // TODO: auto?
+                inherit_options: inheritOptions?.value ?? {},
+                widget_options: widgetOptions?.value ?? {},
+            };
+            emit('add-widget', dashboardLayoutWidgetInfo);
+            state.proxyVisible = false;
         };
 
         return {

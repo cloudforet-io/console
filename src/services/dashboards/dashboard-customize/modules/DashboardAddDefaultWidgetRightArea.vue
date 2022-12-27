@@ -262,7 +262,7 @@ export default defineComponent<Props>({
             // init form data
             const _formData = cloneDeep(state.schemaFormData);
             _formData[propertyName] = undefined;
-            state.formData = _formData;
+            state.schemaFormData = _formData;
             // update inherit data and json schema
             const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
             state.inheritItemMap[propertyName] = value;
@@ -293,7 +293,7 @@ export default defineComponent<Props>({
         };
         const handleInputName = (val) => {
             setForm('name', val);
-            widgetFormStore.setName(val);
+            widgetFormStore.setWidgetTitle(val);
         };
 
         /* Init */
@@ -326,7 +326,7 @@ export default defineComponent<Props>({
             }
         });
         watch(() => state.schemaFormData, (schemaFormData) => {
-            widgetFormStore.setFormData(schemaFormData);
+            widgetFormStore.setFormData(schemaFormData, state.inheritItemMap);
         });
         watch(() => state.isAllValid, (_isAllValid) => {
             widgetFormStore.setIsValid(_isAllValid);
