@@ -38,8 +38,8 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: ['group_by'].concat(default_properties ?? []),
-        inheritable_properties: ['group_by'].concat(inheritable_properties ?? []),
+        default_properties: [...new Set(['group_by'].concat(default_properties ?? []))],
+        inheritable_properties: [...new Set(['group_by'].concat(inheritable_properties ?? []))],
         schema: {
             type: 'object',
             properties: {
