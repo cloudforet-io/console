@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
-import { CHART_TYPE, GRANULARITY } from '@/services/dashboards/widgets/config';
+import { CHART_TYPE, GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/config';
 import { excludePropertiesFromDashboardCommonWidgetConfig } from '@/services/dashboards/widgets/widget-options-schema-helper';
 
 const {
@@ -26,6 +26,7 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.ACCUMULATED,
+        group_by: GROUP_BY.REGION,
         chart_type: CHART_TYPE.MAP,
         legend_options: {
             enabled: true,
