@@ -58,4 +58,7 @@ watch(() => props.name, (name) => {
 .title-area {
     cursor: pointer;
 }
+.title-area:hover {
+    text-decoration: underline;
+}
 </style>
