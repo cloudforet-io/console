@@ -3,6 +3,8 @@
                     :header-title="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TITLE')"
                     size="lg"
                     class="dashboard-add-widget-modal"
+                    :disabled="!isValid"
+                    @confirm="handleConfirm"
     >
         <template #body>
             <p-tab :tabs="tabState.tabs"
@@ -23,12 +25,17 @@ import {
 
 import { PButtonModal, PTab } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
+import { storeToRefs } from 'pinia';
 
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardDefaultWidgetTab from '@/services/dashboards/dashboard-customize/modules/DashboardDefaultWidgetTab.vue';
+import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
+import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
+
 
 interface Props {
     visible: boolean;
@@ -47,6 +54,10 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const widgetFormStore = useWidgetFormStore();
+        const {
+            isValid, widgetOptions, inheritOptions, widgetConfigId, widgetTitle,
+        } = storeToRefs(widgetFormStore);
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
         });
@@ -58,9 +69,26 @@ export default defineComponent<Props>({
             activeTab: 'default-widget',
         });
 
+        const handleConfirm = () => {
+            if (!widgetConfigId?.value || !widgetTitle?.value) return;
+            const widgetConfig = getWidgetConfig(widgetConfigId.value);
+            const dashboardLayoutWidgetInfo: DashboardLayoutWidgetInfo = {
+                widget_name: widgetConfigId?.value,
+                title: widgetTitle?.value,
+                size: widgetConfig.sizes[0],
+                version: '1', // TODO: auto?
+                inherit_options: inheritOptions?.value ?? {},
+                widget_options: widgetOptions?.value ?? {},
+            };
+            emit('add-widget', dashboardLayoutWidgetInfo);
+            state.proxyVisible = false;
+        };
+
         return {
             ...toRefs(state),
+            isValid,
             tabState,
+            handleConfirm,
         };
     },
 });

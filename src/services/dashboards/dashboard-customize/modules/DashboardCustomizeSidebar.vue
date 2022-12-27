@@ -56,7 +56,9 @@
                 </div>
             </div>
         </portal>
-        <dashboard-add-widget-modal :visible.sync="state.addWidgetModalVisible" />
+        <dashboard-add-widget-modal :visible.sync="state.addWidgetModalVisible"
+                                    @add-widget="handleAddWidget"
+        />
     </div>
 </template>
 
@@ -105,6 +107,9 @@ const handleClickCancelButton = () => {
 };
 const handleClickSaveButton = () => {
     emit('save');
+};
+const handleAddWidget = (newWidget: DashboardLayoutWidgetInfo) => {
+    state.proxyWidgetInfoList = state.proxyWidgetInfoList.concat([newWidget]);
 };
 
 onMounted(() => {
