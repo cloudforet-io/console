@@ -3,6 +3,8 @@
                     :header-title="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TITLE')"
                     size="lg"
                     class="dashboard-add-widget-modal"
+                    :disabled="!isValid"
+                    @confirm="handleConfirm"
     >
         <template #body>
             <p-tab :tabs="tabState.tabs"
@@ -23,12 +25,16 @@ import {
 
 import { PButtonModal, PTab } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
+import { storeToRefs } from 'pinia';
 
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardDefaultWidgetTab from '@/services/dashboards/dashboard-customize/modules/DashboardDefaultWidgetTab.vue';
+import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
+
 
 interface Props {
     visible: boolean;
@@ -47,8 +53,11 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const widgetFormStore = useWidgetFormStore();
+        const { isValid } = storeToRefs(widgetFormStore);
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
+            dashboardLayoutWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => widgetFormStore.dashboardLayoutWidgetInfo),
         });
         const tabState = reactive({
             tabs: computed<TabItem[]>(() => ([
@@ -58,9 +67,16 @@ export default defineComponent<Props>({
             activeTab: 'default-widget',
         });
 
+        const handleConfirm = () => {
+            // TODO: add api
+            // console.log('confirm!', name?.value, formData?.value);
+        };
+
         return {
             ...toRefs(state),
+            isValid,
             tabState,
+            handleConfirm,
         };
     },
 });

@@ -9,7 +9,7 @@
                           :invalid="invalidState.name"
                           :placeholder="widgetConfig?.title"
                           class="input"
-                          @input="setForm('name', $event)"
+                          @input="handleInputName"
             />
         </p-field-group>
         <div class="description-text">
@@ -17,8 +17,9 @@
         </div>
         <p-json-schema-form v-if="widgetOptionsJsonSchema"
                             :schema="widgetOptionsJsonSchema"
-                            :form-data.sync="formData"
+                            :form-data.sync="schemaFormData"
                             class="widget-options-form"
+                            @validate="handleFormValidate"
         >
             <template #label-extra="{ propertyName }">
                 <div v-if="!nonInheritableProperties.includes(propertyName)"
@@ -92,6 +93,7 @@ import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
 import type { WidgetOptionsSchema } from '@/services/dashboards/widgets/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
@@ -132,12 +134,9 @@ export default defineComponent<Props>({
             type: String,
             default: undefined,
         },
-        isValid: {
-            type: Boolean,
-            default: undefined,
-        },
     },
     setup(props) {
+        const widgetFormStore = useWidgetFormStore();
         const storeState = reactive({
             loading: true,
             provider: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -153,7 +152,9 @@ export default defineComponent<Props>({
             requiredProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.schema?.required ?? []),
             nonInheritableProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.non_inheritable_properties || []),
             //
-            formData: {},
+            schemaFormData: {},
+            isSchemaFormValid: undefined,
+            isAllValid: computed(() => state.isSchemaFormValid && isAllValid),
             inheritItemMap: {} as {[propertyName: string]: boolean},
             addOptionsMenuVisible: false,
             optionsMenuItems: computed<MenuItem[]>(() => {
@@ -177,6 +178,8 @@ export default defineComponent<Props>({
             setForm,
             invalidState,
             invalidTexts,
+            isAllValid,
+            resetAll,
         } = useFormValidator({
             name: '',
         }, {
@@ -257,7 +260,7 @@ export default defineComponent<Props>({
         };
         const handleChangeInheritToggle = (propertyName: string, { value }) => {
             // init form data
-            const _formData = cloneDeep(state.formData);
+            const _formData = cloneDeep(state.schemaFormData);
             _formData[propertyName] = undefined;
             state.formData = _formData;
             // update inherit data and json schema
@@ -285,6 +288,13 @@ export default defineComponent<Props>({
         const handleClickAddOptions = () => {
             state.addOptionsMenuVisible = true;
         };
+        const handleFormValidate = (isValid) => {
+            state.isSchemaFormValid = isValid;
+        };
+        const handleInputName = (val) => {
+            setForm('name', val);
+            widgetFormStore.setName(val);
+        };
 
         /* Init */
         (async () => {
@@ -301,6 +311,11 @@ export default defineComponent<Props>({
         })();
 
         /* Watcher */
+        watch(() => props.widgetConfigId, (widgetConfigId) => {
+            widgetFormStore.setWidgetConfigId(widgetConfigId);
+            state.schemaFormData = {};
+            resetAll();
+        }, { immediate: true });
         watch([() => state.widgetConfig, () => storeState.loading], ([widgetConfig, storeLoading]) => {
             if (widgetConfig) {
                 const defaultProperties = widgetConfig.options_schema?.default_properties ?? [];
@@ -309,6 +324,12 @@ export default defineComponent<Props>({
                     state.widgetOptionsJsonSchema = initJsonSchema(widgetConfig.options_schema);
                 }
             }
+        });
+        watch(() => state.schemaFormData, (schemaFormData) => {
+            widgetFormStore.setFormData(schemaFormData);
+        });
+        watch(() => state.isAllValid, (_isAllValid) => {
+            widgetFormStore.setIsValid(_isAllValid);
         });
 
         return {
@@ -323,6 +344,8 @@ export default defineComponent<Props>({
             handleClickAddOptions,
             handleSelectOption,
             hideOptionsMenu,
+            handleFormValidate,
+            handleInputName,
         };
     },
 });
