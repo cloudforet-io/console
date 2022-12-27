@@ -7,7 +7,7 @@
                        :class="{ 'print-mode': printMode }"
                        @select="handleSelectCurrency"
     >
-        <template v-if="defaultMode"
+        <template v-if="defaultCurrency"
                   #default="{ item }"
         >
             <span>
@@ -18,7 +18,7 @@
                 >{{ item.badge }}</p-badge>
             </span>
         </template>
-        <template v-if="defaultMode"
+        <template v-if="defaultCurrency"
                   #menu-item--format="{ item }"
         >
             <span>
@@ -50,6 +50,8 @@ import { i18n } from '@/translations';
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 export default {
     name: 'CurrencySelectDropdown',
     components: {
@@ -61,18 +63,18 @@ export default {
             type: Boolean,
             default: false,
         },
-        defaultMode: {
-            type: Boolean,
-            default: false,
-        },
         defaultCurrency: {
             type: String as PropType<Currency>,
-            default: CURRENCY.USD,
+            default: undefined,
+        },
+        currency: {
+            type: String as PropType<Currency>,
+            default: undefined,
         },
     },
     setup(props, { emit }) {
         const state = reactive({
-            currency: props.defaultMode ? props.defaultCurrency : computed(() => store.state.display.currency),
+            currency: props.currency || props.defaultCurrency || computed(() => store.state.display.currency),
             currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map((currency) => ({
                 type: 'item',
                 name: currency,
@@ -83,7 +85,7 @@ export default {
 
         const handleSelectCurrency = (currency: Currency) => {
             store.commit('display/setCurrency', currency);
-            emit('update', currency);
+            emit('update:currency', currency);
         };
 
         return {

@@ -49,7 +49,7 @@
                                required
                                inline
                 >
-                    <currency-select-dropdown @update="currency = $event" />
+                    <currency-select-dropdown @update:currency="currency = $event" />
                 </p-field-group>
                 <p-field-group label="Date Range"
                                required

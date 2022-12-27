@@ -8,12 +8,14 @@
                 <div class="selector-wrapper">
                     <p-toggle-button :value="state.enableDateRange"
                                      sync
+                                     @change="handleChangeDateRangeToggle"
                     />
                     <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_DATE') }}</span>
                 </div>
                 <div class="selector-wrapper">
                     <p-toggle-button :value="state.enableCurrency"
                                      sync
+                                     @change="handleChangeCurrencyToggle"
                     />
                     <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY') }}</span>
                 </div>
@@ -90,15 +92,23 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: string, value: string): void,
     (e: 'save'): void,
+    (e: 'change:dateRangeToggle', value: boolean): void,
+    (e: 'change:currencyToggle', value: boolean): void,
 }>();
 const state = reactive({
-    enableDateRange: true,
-    enableCurrency: true,
+    enableDateRange: useProxyValue('enableDateRange', props, emit),
+    enableCurrency: useProxyValue('enableCurrency', props, emit),
     proxyWidgetInfoList: useProxyValue('widgetInfoList', props, emit),
     addWidgetModalVisible: false,
 });
 
 /* Event */
+const handleChangeDateRangeToggle = () => {
+    state.enableDateRange = !state.enableDateRange;
+};
+const handleChangeCurrencyToggle = () => {
+    state.enableCurrency = !state.enableCurrency;
+};
 const handleClickAddWidget = () => {
     state.addWidgetModalVisible = true;
 };

@@ -8,7 +8,11 @@
                               :label-list="state.labelList"
                               @update:labelList="handleUpdateLabelList"
             />
-            <dashboard-toolset :date-range.sync="state.dateRange" />
+            <dashboard-toolset :date-range.sync="state.dateRange"
+                               :currency.sync="state.currency"
+                               :enable-date-range="state.enableDateRange"
+                               :enable-currency="state.enableCurrency"
+            />
         </div>
         <p-divider />
         <div class="dashboard-selectors">
@@ -32,6 +36,8 @@
         />
         <dashboard-customize-sidebar :widget-info-list.sync="state.dashboardWidgetInfoList"
                                      :dashboard-id="props.dashboardId"
+                                     :enable-date-range.sync="state.enableDateRange"
+                                     :enable-currency.sync="state.enableCurrency"
                                      @save="handleSave"
         />
         <dashboard-manage-variable-overlay :visible="variableState.showOverlay" />
@@ -52,6 +58,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
+
+import type { Currency } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/display/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -82,10 +91,13 @@ const props = defineProps<Props>();
 const state = reactive({
     labelList: [] as Array<string>,
     refreshInterval: undefined,
+    enableDateRange: false,
     dateRange: {
         start: dayjs.utc().format('YYYY-MM-01'),
         end: dayjs.utc().format('YYYY-MM-DD'),
     } as DateRange,
+    enableCurrency: false,
+    currency: CURRENCY.USD as Currency,
     isProjectDashboard: computed<boolean>(() => props.dashboardId.startsWith('project')),
     dashboardInfo: {} as DashboardModel,
     dashboardName: '',
@@ -153,6 +165,14 @@ const getDashboardData = async () => {
         state.dashboardInfo = result;
         state.dashboardWidgetInfoList = flattenDeep(result?.layouts ?? []);
         state.dashboardName = result.name;
+
+        state.enableCurrency = result.settings.currency.enabled;
+        state.currency = result.settings.currency?.value ?? CURRENCY.USD;
+        state.enableDateRange = result.settings.date_range.enabled;
+        state.dateRange = {
+            start: result.settings.date_range.start,
+            end: result.settings.date_range.end,
+        };
     } catch (e) {
         ErrorHandler.handleError(e);
         // await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
@@ -163,16 +183,16 @@ const updateDashboardData = async () => {
         const param: Partial<DashboardConfig> = {
             layouts: [state.dashboardWidgetInfoList],
             // TODO: add other params
-            // name: state.dashboardName
+            // name: state.dashboardName,
             // settings: {
             //     date_range: {
-            //         enabled: true,
-            //         start: '',
-            //         end: '',
+            //         enabled: state.enableDateRange,
+            //         start: state.dateRange.start,
+            //         end: state.dateRange.end,
             //     },
             //     currency: {
-            //         enabled: true,
-            //         value: 'USD',
+            //         enabled: state.enableCurrency,
+            //         value: state.currency,
             //     },
             // },
             // variables:
@@ -217,7 +237,7 @@ onMounted(() => {
 <style lang="postcss" scoped>
 .dashboard-customize-page {
     .filters-box {
-        @apply flex justify-between mt-5;
+        @apply flex justify-between mt-5 items-center;
     }
 
     .dashboard-selectors {

@@ -33,3 +33,9 @@ const state = reactive({
 const { i18nDayjs } = useI18nDayjs();
 const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
 </script>
+<style scoped lang="postcss">
+.dashboard-date-range-badge {
+    margin-right: 0.5rem;
+    height: 1.25rem;
+}
+</style>

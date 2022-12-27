@@ -38,7 +38,13 @@
         </p-page-title>
         <div class="filter-box">
             <dashboard-labels :label-list="state.labelList" />
-            <dashboard-toolset :date-range.sync="state.dateRange" />
+            <dashboard-toolset :enable-currency="state.enableCurrency"
+                               :currency.sync="state.currency"
+                               :enable-date-range="state.enableDateRange"
+                               :date-range.sync="state.dateRange"
+                               @update:dateRange="handleUpdateURLParam"
+                               @update:currency="handleUpdateURLParam"
+            />
         </div>
         <p-divider class="divider" />
         <div class="filter-box">
@@ -78,6 +84,8 @@ import { flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { Currency } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/display/config';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -93,7 +101,7 @@ import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
-import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
+import type { DashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
@@ -115,10 +123,13 @@ const state = reactive({
     isProjectDashboard: computed<boolean>(() => props.dashboardId.startsWith('project')),
     labelList: computed<string[]>(() => state.dashboardInfo?.labels ?? []),
     dashboardWidgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => flattenDeep(state.dashboardInfo?.layouts)),
+    enableDateRange: false,
     dateRange: {
         start: dayjs.utc().format('YYYY-MM-01'),
         end: dayjs.utc().format('YYYY-MM-DD'),
     } as DateRange,
+    enableCurrency: false,
+    currency: CURRENCY.USD as Currency,
     //
     nameEditModalVisible: false,
     deleteModalVisible: false,
@@ -152,11 +163,14 @@ const handleVisibleCloneModal = () => {
 const handleRefresh = () => {
     widgetContainerRef.value?.refreshAllWidget();
 };
+const handleUpdateURLParam = () => {
+    // TODO: write currency/dateRange data in url parameters
+};
 
 const getDashboardData = async () => {
     try {
         state.dashboardInfo = DASHBOARD_TEMPLATES.monthlyCostSummary; // TODO: should be changed to api data
-        let result: ProjectDashboardModel|DomainDashboardModel;
+        let result: DashboardModel;
         if (state.isProjectDashboard) {
             result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
         } else {
@@ -164,7 +178,11 @@ const getDashboardData = async () => {
         }
         // state.dashboardInfo = result; // TODO: should be changed to api data
         state.dashboardName = result.name;
-        if (Object.keys(result.settings.date_range).length) state.dateRange = result.settings.date_range;
+
+        state.enableCurrency = result.settings.currency.enabled;
+        state.currency = result.settings.currency?.value ?? CURRENCY.USD;
+        state.enableDateRange = result.settings.date_range.enabled;
+        state.dateRange = result.settings.date_range;
     } catch (e) {
         // state.dashboardInfo = {}; // TODO: temporarily disabled
         ErrorHandler.handleError(e);
