@@ -1,56 +1,70 @@
 import { defineStore } from 'pinia';
 
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
+import type { InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 
 interface State {
     widgetConfigId?: string;
-    name?: string;
+    widgetTitle?: string;
     isValid: boolean;
-    formData?: DashboardLayoutWidgetInfo;
+    inheritOptions?: InheritOptions;
+    widgetOptions?: WidgetOptions;
 }
 export const useWidgetFormStore = defineStore('form', {
     state: (): State => ({
         widgetConfigId: undefined,
-        name: undefined,
+        widgetTitle: undefined,
         isValid: false,
-        formData: undefined,
+        inheritOptions: undefined,
+        widgetOptions: undefined,
     }),
     actions: {
-        setWidgetConfigId(val?: string): void {
+        setWidgetConfigId(val?: string) {
             this.widgetConfigId = val;
         },
-        setName(val?: string): void {
-            this.name = val;
+        setWidgetTitle(val?: string) {
+            this.widgetTitle = val;
         },
-        setIsValid(val: boolean): void {
+        setIsValid(val: boolean) {
             this.isValid = val;
         },
-        setFormData(val?: DashboardLayoutWidgetInfo): void {
-            this.formData = val;
-        },
-    },
-    getters: {
-        dashboardLayoutWidgetInfo: (state): DashboardLayoutWidgetInfo|undefined => {
-            if (!state.widgetConfigId) return undefined;
-            const widgetConfig = getWidgetConfig(state.widgetConfigId);
-            return {
-                widget_name: widgetConfig.widget_config_id,
-                title: state.name,
-                widget_options: {
-                    ...widgetConfig.options,
-                    // group_by: 'provider'
-                },
-                size: widgetConfig.sizes[0],
-                version: '1', // 넣어야함??
-                inherit_options: {},
-                // inherit_options: {
-                //     group_by: {
-                //         enabled: true,
-                //     },
-                // },
+        setFormData(formData: any, inheritItemMap: Record<string, boolean>) {
+            if (!this.widgetConfigId) return;
+            const widgetConfig = getWidgetConfig(this.widgetConfigId);
+            const widgetOptions: WidgetOptions = {
+                ...widgetConfig.options,
             };
+            const widgetFiltersMap: WidgetOptions['filters'] = {};
+            const inheritOptions: InheritOptions = {};
+            Object.entries(formData).forEach(([key, val]) => {
+                if (inheritItemMap[key]) {
+                    const _propertyName = key.replace('filters.', '');
+                    if (!val) return;
+                    inheritOptions[_propertyName] = {
+                        enabled: true,
+                        variable_info: {
+                            key: val as string,
+                        },
+                    };
+                } else if (key.startsWith('filters.')) {
+                    widgetFiltersMap[key] = [];
+                    if (Array.isArray(val)) {
+                        val.forEach((v) => {
+                            widgetFiltersMap[key].push({ k: key, v, o: '' });
+                        });
+                    } else {
+                        widgetFiltersMap[key].push({ k: key, v: val, o: '' });
+                    }
+                } else {
+                    widgetOptions[key] = val;
+                }
+            });
+            widgetOptions.filters = widgetFiltersMap;
+
+            //
+            this.widgetOptions = widgetOptions;
+            this.inheritOptions = inheritOptions;
         },
     },
 });
