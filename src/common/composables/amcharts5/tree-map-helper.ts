@@ -7,8 +7,6 @@ import type { CurrencyRates } from '@/store/modules/display/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-import { white } from '@/styles/colors';
-
 export const createTreeMapSeries = (
     root: am5.Root,
     settings?: am5hierarchy.ITreemapSettings,
@@ -23,26 +21,29 @@ export const setTreemapTooltipText = (series: am5hierarchy.Treemap, tooltip: am5
     tooltip.label.setAll({
         fontSize: 14,
     });
-
-    const categoryFieldName = series.get('categoryField') || '';
     const valueFieldName = series.get('valueField') || '';
+    const colorFieldName = 'background_color';
 
     tooltip.label.adapters.add('text', (_, target) => {
+        const colorValue = target.dataItem?.dataContext?.[colorFieldName] || 'black';
         let value = target.dataItem?.dataContext?.[valueFieldName] || '-';
+
         if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
-        return `{${categoryFieldName}}: [bold]${value}[/] ({valuePercentTotal.formatNumber("0.00")}%)`;
+        return `[${colorValue}; fontSize: 10px]●[/] {category}: [bold]${value}[/] ({valuePercentTotal.formatNumber("0.00")}%)`;
     });
 };
 
-export const setTreemapLabelText = (series: am5hierarchy.Treemap): void => {
+export const setTreemapLabelText = (series: am5hierarchy.Treemap, settings?: am5hierarchy.ITreemapSettings): void => {
     series.labels.template.setAll({
-        fontSize: 14,
-        fill: color(white),
         text: '{category}',
         position: 'absolute',
         y: 15,
         dx: 8,
         width: new Percent(100),
+        maxWidth: 140,
+        oversizedBehavior: 'truncate',
         ellipsis: '...',
+        fontSize: 14,
+        ...settings,
     });
 };
