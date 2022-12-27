@@ -72,7 +72,7 @@ export default {
             }
         }
 
-        let sizeEl = h('span', data, formattedValue);
+        let sizeEl = h('span', data, `${props.options.prefix ?? ''}${formattedValue}${props.options.postfix ?? ''}`);
 
         if (props.options.link) {
             sizeEl = h(PAnchor, {

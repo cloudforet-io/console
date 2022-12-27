@@ -22,6 +22,7 @@ const makeTableFields = () => ([
         key: 'age',
         name: 'Age (text)',
         type: 'text',
+        options: { postfix: ' age' },
     },
     {
         key: 'job',

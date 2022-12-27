@@ -1,6 +1,10 @@
 <template>
     <span class="p-dynamic-field-more">
-        <p-dynamic-field type="text" :data="displayData" @click="handleClick" />
+        <p-dynamic-field type="text"
+                         :data="displayData"
+                         :options="nextOptions"
+                         @click="handleClick"
+        />
         <p-dynamic-layout v-if="isInitiated"
                           :type="SUPPORTED_TYPES.includes(layoutSchema.type) ? layoutSchema.type : SUPPORTED_TYPES[0]"
                           :name="layoutSchema.name"
@@ -22,7 +26,7 @@ import {
 } from 'vue';
 
 import type { MoreDynamicFieldProps, MoreTypeOptions } from '@/data-display/dynamic/dynamic-field/templates/more/type';
-import type { MoreOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { MoreOptions, CommonOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 
 const PDynamicLayout = () => import('@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue');
@@ -61,6 +65,12 @@ export default defineComponent<MoreDynamicFieldProps>({
             subData: computed(() => (props.options?.sub_key ? getValueByPath(props.data, props.options.sub_key) : props.data)),
             isInitiated: false,
             popupVisible: false,
+            nextOptions: computed<CommonOptions>(() => {
+                const options: Partial<MoreOptions> = { ...props.options };
+                delete options.layout;
+                delete options.sub_key;
+                return options as CommonOptions;
+            }),
         });
 
         const handleClick = () => {

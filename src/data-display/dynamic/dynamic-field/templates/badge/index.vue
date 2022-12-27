@@ -52,6 +52,7 @@ export default {
         let badgeEl = props.data ?? props.options.default;
         if (badgeEl === undefined || badgeEl === null) return undefined;
         if (typeof badgeEl === 'number') badgeEl = commaFormatter(badgeEl);
+        badgeEl = `${options.prefix ?? ''}${badgeEl}${options.postfix ?? ''}`;
 
         if (options.link) {
             badgeEl = [h(PAnchor, {

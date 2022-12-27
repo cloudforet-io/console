@@ -1,9 +1,14 @@
 <template>
     <span>
-        <p-anchor v-if="options.link" :href="options.link" target="_blank">
+        <p-anchor v-if="options.link"
+                  :href="options.link"
+                  target="_blank"
+        >
             <p-status v-bind="statusProps" />
         </p-anchor>
-        <p-status v-else v-bind="statusProps" />
+        <p-status v-else
+                  v-bind="statusProps"
+        />
     </span>
 </template>
 <script lang="ts">
@@ -54,7 +59,7 @@ export default defineComponent<StateDynamicFieldProps>({
                 icon: get(options, ['icon', 'image'], null),
                 iconColor: getColor(get(options, ['icon', 'color'], null)),
                 textColor: getColor(get(options, ['text_color'], null)),
-                text,
+                text: `${options.prefix ?? ''}${text}${options.postfix ?? ''}`,
             };
         });
 

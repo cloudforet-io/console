@@ -67,7 +67,7 @@ export default {
             }
         }
 
-        let datetimeEl = h('span', data, result);
+        let datetimeEl = h('span', data, `${options.prefix ?? ''}${result}${options.postfix ?? ''}`);
 
 
         if (options.link) {

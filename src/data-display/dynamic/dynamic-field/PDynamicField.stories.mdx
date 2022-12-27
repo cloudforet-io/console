@@ -218,6 +218,11 @@ It's options are the same with the common options.
                         type: 'text'
                     }
                 }" :data="'Text type with link in list(list will be deprecated)'.split(' ').map(d => ({ data: d}))"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold my-4 text-lg">postfix (%)</p>
+                <p-dynamic-field type="text" :options="{postfix: '%'}" data="70"></p-dynamic-field>
+                <p class="font-bold my-4 text-lg">prefix (-)</p>
+                <p-dynamic-field type="text" :options="{prefix: '-'}" data="70"></p-dynamic-field>
             </div>
     `,
         }}
@@ -264,6 +269,10 @@ interface BadgeOptions extends CommonOptions {
                 <br/><br/>
                 <p-dynamic-field type="badge" :options="{text_color: 'peacock.700', background_color: 'coral.300'}" data="Custom Colored badge type"></p-dynamic-field>
                 <br/><br/>
+                <p class="font-bold my-4 text-lg">postfix (%)</p>
+                <p-dynamic-field type="badge" :options="{postfix: '%'}" data="70"></p-dynamic-field>
+                <p class="font-bold my-4 text-lg">prefix (-)</p>
+                <p-dynamic-field type="badge" :options="{prefix: '-'}" data="70"></p-dynamic-field>
             </div>
     `,
         }}
@@ -304,6 +313,10 @@ interface DatetimeOptions extends CommonOptions {
                 <p class="font-bold text-lg">with timestamp source type</p><br/>
                 <p-dynamic-field type="datetime" :options="{source_type: 'timestamp', source_format: 'seconds'}" :data="{seconds: '1616034252', nanos: 345000000}"></p-dynamic-field>
                 <br/><br/>
+                <p class="font-bold my-4 text-lg">postfix ( - ISO8601)</p>
+                <p-dynamic-field type="datetime" :options="{source_type: 'iso8601', postfix: ' - ISO8601'}" :data="new Date().toISOString()"></p-dynamic-field>
+                <p class="font-bold my-4 text-lg">prefix (Time: )</p>
+                <p-dynamic-field type="datetime" :options="{source_type: 'iso8601', prefix: 'Time: '}" :data="new Date().toISOString()"></p-dynamic-field>
             </div>
     `,
         }}
@@ -327,6 +340,10 @@ It's options are the same with the common options.
                 <p class="font-bold text-lg">with link</p><br/>
                 <p-dynamic-field type="dict" :options="{link: 'https://www.google.com'}" :data="{a: 'aa', b: 'bb'}"></p-dynamic-field>
                 <br/><br/>
+                <p class="font-bold my-4 text-lg">postfix ( days)</p>
+                <p-dynamic-field type="dict" :options="{postfix: ' days', link: 'https://www.google.com'}" :data="{a: '111', b: '222'}"></p-dynamic-field>
+                <p class="font-bold my-4 text-lg">prefix (days: )</p>
+                <p-dynamic-field type="dict" :options="{prefix: 'days: '}" :data="{a: '111', b: '222'}"></p-dynamic-field>
             </div>
     `,
         }}
@@ -366,6 +383,10 @@ interface StateOptions extends CommonOptions {
                 <p class="font-bold text-lg">with icon color</p><br/>
                 <p-dynamic-field type="state" :options="{icon: {image: 'ic_stopping'}}" data="RUNNING"></p-dynamic-field>
                 <br/><br/>
+                <p class="font-bold my-4 text-lg">postfix ( state)</p>
+                <p-dynamic-field type="state" :options="{postfix: ' state', icon: {color: 'green.400'}}" data="RUNNING"></p-dynamic-field>
+                <p class="font-bold my-4 text-lg">prefix (state: )</p>
+                <p-dynamic-field type="state" :options="{prefix: 'state: ', icon: {color: 'green.400'}}" data="RUNNING"></p-dynamic-field>
             </div>
     `,
         }}
@@ -415,7 +436,8 @@ interface EnumOptions {
                             type: 'state',
                             options: {
                                 text_color: 'red.500',
-                                icon: { color: 'red.500' }
+                                icon: { color: 'red.500' },
+                                postfix: ' (this is postfix)'
                             }
                         },
                         PENDING: {
@@ -485,7 +507,7 @@ interface SizeOptions extends CommonOptions {
                 <p-dynamic-field type="size" :options="{source_unit: 'PB'}" :data="123456789"></p-dynamic-field><br/>
                 <br/>
                 <p class="font-bold text-lg">from kb to gb</p><br/>
-                <p-dynamic-field type="size" :options="{source_unit: 'KB', display_unit: 'GB'}" :data="123456789"></p-dynamic-field><br/>
+                <p-dynamic-field type="size" :options="{source_unit: 'KB', display_unit: 'GB', postfix: ' - this is postfix'}" :data="123456789"></p-dynamic-field><br/>
                 <br/>
             </div>
     `,
@@ -522,6 +544,7 @@ interface MoreOptions extends CommonOptions {
                                 }
                             }
                         },
+                        postfix: '(Jung)'
                      }" :data="{ id: 'j', name: 'sulmo', info: { weight: '83.5 kg', height: '179.3cm' } }"
                     :type-options="{ displayKey: 'name' }"
                 ></p-dynamic-field>
