@@ -100,8 +100,8 @@ const drawChart = (chartData) => {
     };
     const series = createTreeMapSeries(seriesSettings);
 
-    const getConvertedChartData = (rawData): CostMapData[] => {
-        const themeColorName: WidgetTheme = props.theme ? props.theme : 'violet';
+    const setColorData = (rawData): CostMapData[] => {
+        const themeColorName: WidgetTheme = props.theme || 'violet';
         const results: CostMapData[] = [];
         rawData.forEach((d, idx) => {
             let backgroundColor = palette[themeColorName][200];
@@ -135,7 +135,7 @@ const drawChart = (chartData) => {
         });
         return results;
     };
-    state.chartData[0].children = getConvertedChartData(chartData[0].children);
+    state.chartData[0].children = setColorData(chartData[0].children);
     series.rectangles.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[COLOR_FIELD_NAME]);
 
     const tooltip = createTooltip();
@@ -182,7 +182,7 @@ defineExpose({
 .chart-wrapper {
     @apply relative;
     width: 100%;
-    height: 354px;
+    height: 22.125rem;
 
     .chart {
         height: 100%;
