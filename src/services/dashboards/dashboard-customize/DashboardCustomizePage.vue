@@ -1,6 +1,8 @@
 <template>
     <div class="dashboard-customize-page">
-        CUSTOMIZE DASHBOARD
+        <dashboard-customize-page-title :title="state.dashboardTitle"
+                                        @update:title="handleUpdateTitle"
+        />
         <div class="filters-box">
             <dashboard-labels editable
                               :label-list="state.labelList"
@@ -59,6 +61,8 @@ import type {
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
+import DashboardCustomizePageTitle
+    from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizePageTitle.vue';
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
 import VariableMoreButtonDropdown from '@/services/dashboards/dashboard-customize/modules/VariableMoreButtonDropdown.vue';
 import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
@@ -140,15 +144,16 @@ const variableState = reactive({
 /* Api */
 const getDashboardData = async () => {
     try {
-        let result: DashboardModel;
-        if (state.isProjectDashboard) {
-            result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
-        } else {
-            result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: props.dashboardId });
-        }
-        state.dashboardInfo = result;
-        state.dashboardWidgetInfoList = flattenDeep(result?.layouts ?? []);
-        state.dashboardName = result.name;
+        state.dashboardInfo = DASHBOARD_TEMPLATES.monthlyCostSummary; // TODO: should be changed to api data
+        state.dashboardWidgetInfoList = flattenDeep(state.dashboardInfo?.layouts ?? []);
+        // let result: ProjectDashboardModel|DomainDashboardModel;
+        // if (state.isProjectDashboard) {
+        //     result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
+        // } else {
+        //     result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: props.dashboardId });
+        // }
+        // state.dashboardInfo = result;
+        // state.dashboardName = result.name;
     } catch (e) {
         ErrorHandler.handleError(e);
         // await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
@@ -159,7 +164,7 @@ const updateDashboardData = async () => {
         const param: Partial<DashboardConfig> = {
             layouts: [state.dashboardWidgetInfoList],
             // TODO: add other params
-            // name:
+            // name: state.dashboardTitle
             // settings: {
             //     date_range: {
             //         enabled: true,
@@ -192,6 +197,10 @@ const updateDashboardData = async () => {
 };
 
 /* Event */
+const handleUpdateTitle = (title: string) => {
+    console.log('page', title);
+    state.dashboardTitle = title;
+};
 const handleUpdateLabelList = (labelList: Array<string>) => {
     state.labelList = labelList;
 };
