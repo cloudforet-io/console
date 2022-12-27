@@ -1,3 +1,10 @@
+# [1.1.0-beta.495](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.494...v1.1.0-beta.495) (2022-12-27)
+
+
+### Bug Fixes
+
+* **context-menu-controller:** fix context-menu-controller hook import issue ([#198](https://github.com/cloudforet-io/mirinae/issues/198)) ([c750318](https://github.com/cloudforet-io/mirinae/commit/c750318948d9658511492ede558a8b39d16e0476))
+
 # [1.1.0-beta.494](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.493...v1.1.0-beta.494) (2022-12-22)
 
 
