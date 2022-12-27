@@ -78,7 +78,7 @@ const state = reactive({
 
 const emit = defineEmits(['rendered']);
 
-const isProjectDashboard = Boolean(props.dashboardId.startsWith('project'));
+const isProjectDashboard = props.dashboardId.startsWith('project');
 
 const getDashboardData = async () => {
     try {

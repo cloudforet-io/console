@@ -44,7 +44,7 @@ export default {
             proxyVisible: useProxyValue('visible', props, emit),
             loading: false,
         });
-        const isProjectDashboard = Boolean(props.dashboardId.startsWith('project'));
+        const isProjectDashboard = props.dashboardId.startsWith('project');
 
 
         const handleDeleteDashboardConfirm = async () => {
