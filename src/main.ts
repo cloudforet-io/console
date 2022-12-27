@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Fragment from 'vue-fragment';
 
 import SpaceDesignSystem from '@spaceone/design-system';
+import { PiniaVuePlugin, createPinia } from 'pinia';
 import PortalVue from 'portal-vue';
 import VTooltip from 'v-tooltip';
 
@@ -22,6 +23,7 @@ import '@spaceone/design-system/dist/style.css';
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 Vue.use(PortalVue);
+Vue.use(PiniaVuePlugin);
 
 directive(Vue);
 
@@ -44,5 +46,6 @@ Vue.config.productionTip = import.meta.env.DEV;
             App,
         },
         template: '<App/>',
+        pinia: createPinia(),
     });
 })();
