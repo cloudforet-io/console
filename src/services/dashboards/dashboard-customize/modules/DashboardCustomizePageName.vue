@@ -5,7 +5,7 @@
         <template #title>
             <p-text-input v-if="state.editMode"
                           v-on-click-outside="handleEscape"
-                          :value.sync="state.titleInput"
+                          :value.sync="state.nameInput"
                           @keydown.esc="handleEscape"
                           @keydown.enter="handleEnter"
             />
@@ -13,7 +13,7 @@
                   class="title-area"
                   @click="handleClickTitle"
             >
-                {{ state.title }}
+                {{ state.name }}
             </span>
         </template>
     </p-page-title>
@@ -25,15 +25,15 @@ import { computed, reactive, watch } from 'vue';
 
 import { PPageTitle, PTextInput } from '@spaceone/design-system';
 
-const props = defineProps<{ title: string; }>();
-const emit = defineEmits(['update:title']);
+const props = defineProps<{ name: string; }>();
+const emit = defineEmits(['update:name']);
 
 const state = reactive({
-    title: computed({
-        get: () => props.title,
-        set: (val: string) => emit('update:title', val),
+    name: computed({
+        get: () => props.name,
+        set: (val: string) => emit('update:name', val),
     }),
-    titleInput: props.title,
+    nameInput: props.name,
     editMode: false,
 });
 
@@ -42,15 +42,15 @@ const handleClickTitle = () => {
 };
 const handleEscape = () => {
     state.editMode = false;
-    state.titleInput = props.title;
+    state.nameInput = props.name;
 };
 const handleEnter = () => {
     state.editMode = false;
-    state.title = state.titleInput;
+    state.name = state.nameInput;
 };
 
-watch(() => props.title, (title) => {
-    state.titleInput = title;
+watch(() => props.name, (name) => {
+    state.nameInput = name;
 });
 </script>
 
