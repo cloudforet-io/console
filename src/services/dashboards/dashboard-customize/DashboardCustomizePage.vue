@@ -198,7 +198,6 @@ const updateDashboardData = async () => {
 
 /* Event */
 const handleUpdateTitle = (title: string) => {
-    console.log('page', title);
     state.dashboardTitle = title;
 };
 const handleUpdateLabelList = (labelList: Array<string>) => {

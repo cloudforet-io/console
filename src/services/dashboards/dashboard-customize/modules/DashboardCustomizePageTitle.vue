@@ -4,6 +4,7 @@
     >
         <template #title>
             <p-text-input v-if="state.editMode"
+                          v-on-click-outside="handleEscape"
                           :value.sync="state.titleInput"
                           @keydown.esc="handleEscape"
                           @keydown.enter="handleEnter"
@@ -18,6 +19,8 @@
     </p-page-title>
 </template>
 <script setup lang="ts">
+// Below directive is used. Do not remove!!!
+import { vOnClickOutside } from '@vueuse/components';
 import { computed, reactive, watch } from 'vue';
 
 import { PPageTitle, PTextInput } from '@spaceone/design-system';
