@@ -3,12 +3,14 @@
                   @goBack="$router.go(-1)"
     >
         <template #title>
-            <p-text-input v-if="state.editMode"
-                          v-on-click-outside="handleEscape"
-                          :value.sync="state.nameInput"
-                          @keydown.esc="handleEscape"
-                          @keydown.enter="handleEnter"
-            />
+            <input v-if="state.editMode"
+                   v-on-click-outside="handleEscape"
+                   class="name-input"
+                   :value="state.nameInput"
+                   @input="handleInput"
+                   @keydown.esc="handleEscape"
+                   @keydown.enter="handleEnter"
+            >
             <span v-else
                   class="title-area"
                   @click="handleClickTitle"
@@ -23,7 +25,7 @@
 import { vOnClickOutside } from '@vueuse/components';
 import { reactive, watch } from 'vue';
 
-import { PPageTitle, PTextInput } from '@spaceone/design-system';
+import { PPageTitle } from '@spaceone/design-system';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -38,6 +40,9 @@ const state = reactive({
 
 const handleClickTitle = () => {
     state.editMode = true;
+};
+const handleInput = (e: InputEvent) => {
+    state.nameInput = (e.target as HTMLInputElement).value;
 };
 const handleEscape = () => {
     state.editMode = false;
@@ -58,6 +63,11 @@ watch(() => props.name, (name) => {
     cursor: pointer;
 }
 .title-area:hover {
+    text-decoration: underline;
+}
+.name-input {
+    width: 60%;
+    max-width: 60%;
     text-decoration: underline;
 }
 </style>
