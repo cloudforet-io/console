@@ -40,7 +40,7 @@
             :loading.sync="state.loading"
             :edit-mode="true"
             :dashboard-variables="state.dashboardInfo.variables"
-            :dashboard-settings="state.dashboardInfo.settings"
+            :dashboard-settings="state.dashboardSettings"
         />
         <dashboard-customize-sidebar :widget-info-list.sync="state.dashboardWidgetInfoList"
                                      :dashboard-id="props.dashboardId"
@@ -188,7 +188,7 @@ const getDashboardData = async () => {
             date_range: {
                 enabled: result.settings.date_range.enabled,
                 start: result.settings.date_range.start,
-                end: result.settings.date_range.end,
+                end: result.settings.date_range.end ?? dayjs.utc().format('YYYY-MM-DD'),
             },
             currency: {
                 enabled: result.settings.currency.enabled,
