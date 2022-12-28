@@ -38,7 +38,7 @@
         />
         <cost-management-custom-range-modal v-if="customRangeModalVisible"
                                             :visible.sync="customRangeModalVisible"
-                                            :datetime-picker-data-type="DATA_TYPE.yearToMonth"
+                                            datetime-picker-data-type="yearToMonth"
                                             :granularity="GRANULARITY.MONTHLY"
                                             @confirm="handleCustomRangeModalConfirm"
         />
@@ -57,8 +57,7 @@ import {
 import {
     PBadge, PSelectDropdown, PCheckBox, PI, PTooltip,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
@@ -256,7 +255,6 @@ export default {
             handleSelectMonthMenuItem,
             handleCustomRangeModalConfirm,
             dateFormatter,
-            DATA_TYPE,
             GRANULARITY,
             handleSelectedFixDate,
         };

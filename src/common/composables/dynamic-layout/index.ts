@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { ComputedRef } from 'vue';
 
-import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItem, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';

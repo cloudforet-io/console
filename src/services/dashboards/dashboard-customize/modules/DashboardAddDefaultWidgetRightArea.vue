@@ -74,13 +74,12 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PButton, PContextMenu,
+    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PButton, PContextMenu, useContextMenuFixedStyle,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import type { SearchDropdownMenuItem } from '@spaceone/design-system/dist/src/inputs/dropdown/search-dropdown/type';
-import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
-import { useContextMenuFixedStyle } from '@spaceone/design-system/src/hooks';
-import type { JsonSchema } from '@spaceone/design-system/src/inputs/forms/json-schema-form/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { SearchDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
+import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { cloneDeep, isEmpty } from 'lodash';
 
 import { store } from '@/store';

@@ -63,7 +63,7 @@ import type { Vue } from 'vue/types/vue';
 import {
     PPaneLayout, PToolbox, PI, PDataLoader,
 } from '@spaceone/design-system';
-import type { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';

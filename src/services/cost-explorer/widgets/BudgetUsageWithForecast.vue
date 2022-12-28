@@ -54,7 +54,7 @@ import type { Vue } from 'vue/types/vue';
 import {
     PDataTable, PI, PProgressBar,
 } from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';

@@ -68,8 +68,8 @@ import type { PropType, SetupContext } from 'vue';
 import {
     PButtonModal, PFieldGroup, PSearchDropdown, PTextInput,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import type { SelectedItem as InputItem } from '@spaceone/design-system/dist/src/inputs/input/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { SelectedItem as InputItem } from '@spaceone/design-system/types/inputs/input/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 

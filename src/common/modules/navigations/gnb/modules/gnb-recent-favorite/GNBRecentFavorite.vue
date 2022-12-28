@@ -44,7 +44,7 @@ import type { DirectiveFunction, SetupContext } from 'vue';
 import {
     PI, PTab,
 } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

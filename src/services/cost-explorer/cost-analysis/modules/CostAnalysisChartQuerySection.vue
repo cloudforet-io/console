@@ -96,7 +96,7 @@ import {
 import {
     PButton, PIconButton, PSelectDropdown, PStatus, PDataLoader,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep, sum } from 'lodash';
 
 import { useProxyValue } from '@/common/composables/proxy-state';

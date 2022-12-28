@@ -98,7 +98,7 @@ import {
     PPageTitle, PCardItem,
     PButton, PBadge, PI, PDivider, PDataLoader,
 } from '@spaceone/design-system';
-import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { get, range } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';

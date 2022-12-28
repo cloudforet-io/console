@@ -32,7 +32,7 @@ import {
 } from 'vue';
 
 import { PButtonModal, PTab } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { i18n } from '@/translations';
 

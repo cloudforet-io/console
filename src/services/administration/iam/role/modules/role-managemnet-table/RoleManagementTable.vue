@@ -81,7 +81,7 @@ import {
     PToolboxTable, PSelectDropdown,
     PBadge, PButton, PI,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItem } from '@cloudforet/core-lib/component-util/query-search/type';

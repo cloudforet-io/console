@@ -77,7 +77,7 @@ import {
     PDataLoader, PDivider,
     PPagination, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
-import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

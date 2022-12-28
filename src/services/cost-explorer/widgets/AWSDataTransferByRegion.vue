@@ -52,7 +52,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import type { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import { PDataLoader } from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import bytes from 'bytes';
 import dayjs from 'dayjs';
 

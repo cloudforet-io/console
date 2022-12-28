@@ -66,7 +66,7 @@ import {
 import { PButton } from '@spaceone/design-system';
 import type {
     DataTableFieldType,
-} from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+} from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 

@@ -59,7 +59,7 @@ import {
 import VueI18n from 'vue-i18n';
 
 import { PFieldGroup, PSelectDropdown, PTextInput } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
 
 import { i18n } from '@/translations';

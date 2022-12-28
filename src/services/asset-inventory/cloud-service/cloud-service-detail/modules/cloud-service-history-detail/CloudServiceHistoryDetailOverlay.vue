@@ -102,7 +102,7 @@ import type { Vue } from 'vue/types/vue';
 import {
     PPaneLayout, PPageTitle, PTab, PCopyButton, PBadge, PDivider, PSpinner,
 } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 

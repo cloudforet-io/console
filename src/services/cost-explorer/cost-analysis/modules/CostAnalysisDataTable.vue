@@ -70,7 +70,7 @@ import type { Location } from 'vue-router';
 import {
     PAnchor, PI, PToolboxTable, PDataTable,
 } from '@spaceone/design-system';
-import type { DataTableFieldType } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';

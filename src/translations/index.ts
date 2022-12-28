@@ -2,9 +2,7 @@ import Vue from 'vue';
 import type { IVueI18n, LocaleMessageObject } from 'vue-i18n';
 import VueI18n from 'vue-i18n';
 
-import componentEN from '@spaceone/design-system/src/translations/language-pack/en.json';
-import componentJA from '@spaceone/design-system/src/translations/language-pack/ja.json';
-import componentKO from '@spaceone/design-system/src/translations/language-pack/ko.json';
+import { messages } from '@spaceone/design-system';
 
 import en from '@cloudforet/language-pack/en.json';
 import ja from '@cloudforet/language-pack/ja.json';
@@ -15,6 +13,10 @@ import { loadDayjsLocale } from '@/translations/vendors/dayjs';
 import { loadFonts } from '@/styles/fonts';
 
 Vue.use(VueI18n);
+
+const componentEN = messages.en;
+const componentJA = messages.jp;
+const componentKO = messages.ko;
 
 // simple recursive remove keys with empty value
 const removeEmpty = (obj: any): LocaleMessageObject => Object.keys(obj)

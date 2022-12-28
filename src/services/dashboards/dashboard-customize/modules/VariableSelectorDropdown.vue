@@ -1,7 +1,5 @@
 <template>
-    <div v-on-click-outside="hideContextMenu"
-         class="dashboard-variable-dropdown"
-    >
+    <div class="dashboard-variable-dropdown">
         <button ref="targetRef"
                 class="dropdown-box"
                 :class="{ 'is-visible': state.visibleMenu, 'filled-value': state.selected.length }"
@@ -40,17 +38,18 @@
 </template>
 
 <script setup lang="ts">
-import { vOnClickOutside } from '@vueuse/components';
+// import { vOnClickOutside } from '@vueuse/components';
 import {
     computed,
-    reactive,
+    reactive, ref,
 } from 'vue';
 
-import { PBadge, PContextMenu, PI } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import {
+    PBadge, PContextMenu, PI, useContextMenuController,
+} from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
-// import { useContextMenuController } from '@spaceone/design-system/src/hooks/context-menu-controller';
 
 interface Props {
     variableName: string;
@@ -79,22 +78,23 @@ const state = reactive({
         { name: 'spaceone', label: 'SpaceONE Dev' },
     ] as MenuItem[],
 });
-// const {
-//     visibleMenu,
-//     // showContextMenu,
-//     hideContextMenu,
-//     // focusOnContextMenu,
-//     // reorderMenuBySelection,
-//     // fixedMenuStyle,
-// } = useContextMenuController({
-//     targetRef: ref(null),
-//     contextMenuRef: ref(null),
-//     useReorderBySelection: true,
-//     useFixedStyle: true,
-// });
-const hideContextMenu = () => {
-    state.visibleMenu = false;
-};
+const {
+    visibleMenu,
+    // showContextMenu,
+    hideContextMenu,
+    // focusOnContextMenu,
+    // reorderMenuBySelection,
+    // fixedMenuStyle,
+} = useContextMenuController({
+    targetRef: ref(null),
+    contextMenuRef: ref(null),
+    useReorderBySelection: true,
+    useFixedStyle: true,
+    menu: ref([]),
+});
+// const hideContextMenu = () => {
+//     state.visibleMenu = false;
+// };
 const showContextMenu = (e: MouseEvent) => {
     state.visibleMenu = !state.visibleMenu;
     e.stopPropagation();

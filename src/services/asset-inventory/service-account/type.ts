@@ -1,4 +1,4 @@
-import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
+import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
 import type { Tags, TimeStamp } from '@/models';
 

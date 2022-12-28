@@ -1,9 +1,9 @@
-import type { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     SearchKeyOptions,
     SearchSchema,
     SearchDataType,
-} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 export interface Reference {
     // eslint-disable-next-line camelcase

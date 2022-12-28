@@ -225,8 +225,8 @@ import {
     PHorizontalLayout, PSelectDropdown, PLazyImg, PPageTitle, PDataTable, PQuerySearchTable,
     PTab, PTableCheckModal, PButton, PStatus, PI, PEmpty,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';

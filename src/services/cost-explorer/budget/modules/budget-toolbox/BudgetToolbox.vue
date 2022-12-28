@@ -60,9 +60,9 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
-import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
-import type { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import dayjs from 'dayjs';
 
 import {

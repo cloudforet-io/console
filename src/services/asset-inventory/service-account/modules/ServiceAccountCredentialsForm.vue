@@ -127,9 +127,9 @@ import {
 import {
     PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PAnchor, PCopyButton, PI,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenu } from '@spaceone/design-system/dist/src/inputs/dropdown/select-dropdown/type';
-import type { JsonSchema } from '@spaceone/design-system/dist/src/inputs/forms/json-schema-form/type';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

@@ -101,8 +101,8 @@ import {
 import {
     PButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PLottie, PPanelTop,
 } from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import type { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { debounce, get } from 'lodash';
 

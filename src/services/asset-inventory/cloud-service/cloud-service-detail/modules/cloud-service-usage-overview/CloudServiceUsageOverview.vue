@@ -41,7 +41,7 @@ import {
 } from '@spaceone/design-system';
 import type {
     DynamicWidgetSchema,
-} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
+} from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';

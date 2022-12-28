@@ -75,9 +75,9 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PButtonTab, PDynamicLayout, PPanelTop, PSelectStatus, PDataLoader,
 } from '@spaceone/design-system';
-import type { DynamicLayoutEventListener } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
-import type { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { DynamicLayoutEventListener } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
+import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 

@@ -22,7 +22,7 @@ import {
 } from 'vue';
 
 import { PPanelTop, PTab } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { i18n } from '@/translations';
 

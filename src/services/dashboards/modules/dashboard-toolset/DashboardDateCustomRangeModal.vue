@@ -46,7 +46,7 @@ import { computed, reactive, toRefs } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
-import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
+import type { DATA_TYPE } from '@spaceone/design-system/types/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
 
 import { i18n } from '@/translations';
@@ -79,7 +79,7 @@ export default {
         },
         datetimePickerDataType: {
             type: String,
-            default: DATA_TYPE.yearToDate,
+            default: 'yearToDate',
         },
         granularity: {
             type: String,
@@ -94,7 +94,7 @@ export default {
             }),
             invalid: computed(() => {
                 if (!state.startDate.length || !state.endDate.length) return true;
-                const timeUnit = props.datetimePickerDataType === DATA_TYPE.yearToDate ? 'day' : 'month';
+                const timeUnit = props.datetimePickerDataType === 'yearToDate' ? 'day' : 'month';
                 const startDate = dayjs.utc(state.startDate[0]);
                 const endDate = dayjs.utc(state.endDate[0]);
                 return startDate.isAfter(endDate, timeUnit) || endDate.diff(startDate, 'year') >= 1;
@@ -136,15 +136,15 @@ export default {
                 const customRangeModalSettingsByGranularity = {
                     [GRANULARITY.ACCUMULATED]: {
                         helpTextFrom: i18n.t('DASHBOARDS.FORM.DATE_HELP_TEXT_ACCUMULATED'),
-                        dateType: DATA_TYPE.yearToMonth,
+                        dateType: 'yearToMonth',
                     },
                     [GRANULARITY.DAILY]: {
                         helpTextTo: i18n.t('DASHBOARDS.FORM.DATE_HELP_TEXT_DAILY'),
-                        dateType: DATA_TYPE.yearToDate,
+                        dateType: 'yearToDate',
                     },
                     [GRANULARITY.MONTHLY]: {
                         helpTextFrom: i18n.t('DASHBOARDS.FORM.DATE_HELP_TEXT_MONTHLY'),
-                        dateType: DATA_TYPE.yearToMonth,
+                        dateType: 'yearToMonth',
                     },
                 };
                 return customRangeModalSettingsByGranularity[props.granularity];

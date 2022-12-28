@@ -22,7 +22,7 @@
                                 >
                                     <span class="th-contents"
                                           :class="{
-                                              [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                              [field?.textAlign || 'left']: true,
                                               'has-icon': field.tooltipText,
                                           }"
                                     >
@@ -69,7 +69,7 @@
                                     :key="`td-${widgetKey}-${rowIndex}-${colIndex}`"
                                     :class="{
                                         'has-width': !!field.width,
-                                        [field?.textAlign || DATA_TABLE_CELL_TEXT_ALIGN.left]: true,
+                                        [field?.textAlign || 'left']: true,
                                         [size]: true,
                                         'link-item': field?.link,
                                         'detail-item': field?.detailOptions?.enabled,
@@ -159,7 +159,6 @@ import type { PropType } from 'vue';
 import {
     PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
 } from '@spaceone/design-system';
-import { DATA_TABLE_CELL_TEXT_ALIGN } from '@spaceone/design-system/src/data-display/tables/data-table/config';
 import bytes from 'bytes';
 import { get } from 'lodash';
 
@@ -379,7 +378,6 @@ export default defineComponent<Props>({
             getColSlotProps,
             getValue,
             getHandler,
-            DATA_TABLE_CELL_TEXT_ALIGN,
             gray,
         };
     },

@@ -64,8 +64,8 @@ import {
 import type {
     DynamicWidgetFieldHandler,
     DynamicWidgetSchema,
-} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-widget/type';
-import type { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+} from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
+import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
