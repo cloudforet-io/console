@@ -64,45 +64,6 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Style
-
-<Canvas>
-    <Story name="Outlined">
-        {{
-            components:{ PIconButton },
-            template: `
-<table>
-    <tr>
-        <td>tertiary</td>
-        <td><p-icon-button style-type="tertiary" style="margin: 0.5rem" name="ic_refresh" /></td>
-    </tr>
-    <tr>
-        <td>transparent</td>
-        <td><p-icon-button style-type="transparent" style="margin: 0.5rem" name="ic_refresh" /></td>
-    </tr>
-    <tr>
-        <td>negative-secondary</td>
-        <td><p-icon-button style-type="negative-secondary" style="margin: 0.5rem" name="ic_refresh" /></td>
-    </tr>
-    <tr>
-        <td>negative-transparent</td>
-        <td><p-icon-button style-type="negative-transparent" style="margin: 0.5rem" name="ic_refresh" /></td>
-    </tr>
-</table>`,
-            setup() {
-                const state = reactive({
-                    buttonStyles: Object.values(ICON_BUTTON_STYLE_TYPE),
-                })
-                return {
-                    ...toRefs(state),
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
 
 ## Shape
 <Canvas>
@@ -112,24 +73,12 @@ export const Template = (args, { argTypes }) => ({
             template: `
 <table>
     <tr>
-        <td>tertiary</td>
-        <td><p-icon-button style-type="tertiary" style="margin: 0.5rem" name="ic_refresh" /></td>
+        <td>circle</td>
         <td><p-icon-button style-type="tertiary" style="margin: 0.5rem" name="ic_refresh" shape="circle" /></td>
     </tr>
     <tr>
-        <td>transparent</td>
-        <td><p-icon-button style-type="transparent" style="margin: 0.5rem" name="ic_refresh" /></td>
-        <td><p-icon-button style-type="transparent" style="margin: 0.5rem" name="ic_refresh" shape="circle" /></td>
-    </tr>
-    <tr>
-        <td>negative-secondary</td>
-        <td><p-icon-button style-type="negative-secondary" style="margin: 0.5rem" name="ic_refresh" /></td>
-        <td><p-icon-button style-type="negative-secondary" style="margin: 0.5rem" name="ic_refresh" shape="circle" /></td>
-    </tr>
-    <tr>
-        <td>negative-transparent</td>
-        <td><p-icon-button style-type="negative-transparent" style="margin: 0.5rem" name="ic_refresh" /></td>
-        <td><p-icon-button style-type="negative-transparent" style="margin: 0.5rem" name="ic_refresh" shape="circle" /></td>
+        <td>square</td>
+        <td><p-icon-button style-type="tertiary" style="margin: 0.5rem" name="ic_refresh" shape="square" /></td>
     </tr>
 </table>`,
         }}
