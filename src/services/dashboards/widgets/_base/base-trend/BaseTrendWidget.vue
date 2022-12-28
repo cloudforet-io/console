@@ -17,7 +17,7 @@
         </template>
         <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
-                           :loading="state.chartLoading"
+                           :loading="state.loading"
                            :data="state.chartData"
                            loader-type="skeleton"
                            show-data-from-scratch
@@ -28,9 +28,9 @@
             </p-data-loader>
         </div>
 
-        <widget-data-table :loading="state.tableLoading"
+        <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
-                           :items="state.tableData"
+                           :items="state.data"
                            :currency="state.currency"
                            :currency-rates="props.currencyRates"
         />
@@ -63,6 +63,8 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lif
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
+// eslint-disable-next-line import/no-cycle
+import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-helper';
 
 const DATE_FORMAT = 'yyyy-MM';
 const DATE_FIELD_NAME = 'date';
@@ -83,15 +85,12 @@ const state = reactive({
         const groupBy = state.groupBy;
         return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;
     }),
-    chartLoading: true,
-    chartData: [] as XYChartData[],
+    chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data, state.groupBy)),
     chartType: computed(() => state.options.chart_type ?? CHART_TYPE.LINE),
     chartLabels: computed(() => {
-        if (!state.tableData) return [];
-        return state.tableData.map((d) => d[state.groupBy]);
+        if (!state.data) return [];
+        return state.data.map((d) => d[state.groupBy]);
     }),
-    tableLoading: true,
-    tableData: [],
     tableFields: computed(() => [
         { label: state.groupByLabel, name: state.groupBy },
     ]),
@@ -101,73 +100,35 @@ const state = reactive({
         const start = dayjs.utc(end).subtract(range, 'month').format('YYYY-MM');
         return { start, end };
     }),
-    apiDefaultParam: computed(() => ({
-        granularity: state.widgetConfig.options?.granularity ?? GRANULARITY.MONTHLY,
-        group_by: [state.groupBy],
-        start: state.dateRange.start,
-        end: state.dateRange.end,
-        fields: {
-            usd_cost_sum: {
-                key: 'usd_cost',
-                operator: 'sum',
-            },
-        },
-        sort: [{ key: 'date', desc: false }],
-    })),
 });
 
-/* Util */
-const getRefinedXYChartData = (results: HistoryDataModel['results']) => {
-    const chartData: XYChartData[] = [];
-    results.forEach((result) => {
-        const eachChartData: XYChartData = {
-            date: result.date,
-        };
-        result.usd_cost_sum.forEach((d) => {
-            eachChartData[d[state.groupBy]] = d.value;
-        });
-        chartData.push(eachChartData);
-    });
-    return chartData;
-};
-
 /* Api */
-const getChartData = async () => {
+const fetchData = async () => {
     try {
-        state.chartLoading = true;
-        const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
-            query: {
-                ...state.apiDefaultParam,
-                field_group: [state.groupBy],
-            },
-        });
-        state.chartData = getRefinedXYChartData(results);
-    } catch (e) {
-        state.chartData = [];
-        ErrorHandler.handleError(e);
-    } finally {
-        state.chartLoading = false;
-    }
-};
-const getTableData = async () => {
-    try {
-        state.tableLoading = true;
+        state.loading = true;
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
-                ...state.apiDefaultParam,
+                granularity: state.widgetConfig.options?.granularity ?? GRANULARITY.MONTHLY,
+                group_by: [state.groupBy],
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                fields: {
+                    usd_cost_sum: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
+                },
+                sort: [{ key: 'date', desc: false }],
                 field_group: ['date'],
             },
         });
-        state.tableData = results;
+        state.data = results;
     } catch (e) {
-        state.tableData = [];
+        state.data = [];
         ErrorHandler.handleError(e);
     } finally {
-        state.tableLoading = false;
+        state.loading = false;
     }
-};
-const fetchData = async () => {
-    await Promise.allSettled([getChartData(), getTableData()]);
 };
 
 /* Util */
