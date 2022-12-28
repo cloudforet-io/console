@@ -19,6 +19,7 @@
         />
         <p-text-input v-if="state.inputMode"
                       v-model="state.inputText"
+                      :invalid="state.inputTextInvalid"
         />
 
         <span v-if="!state.inputMode && !state.labelList.length && props.editable"
@@ -34,6 +35,7 @@
 import { vOnClickOutside } from '@vueuse/components';
 import { computed, reactive } from 'vue';
 
+import { Keyboard } from '@amcharts/amcharts4/core';
 import { PIconButton, PLabel, PTextInput } from '@spaceone/design-system';
 
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -53,6 +55,7 @@ const state = reactive({
     }),
     inputMode: false,
     inputText: '',
+    inputTextInvalid: false,
 });
 
 const handleClickPlus = () => {
@@ -62,10 +65,10 @@ const handleEscape = () => {
     state.inputMode = false;
     state.inputText = '';
 };
-const handlePushLabel = () => {
+const handlePushLabel = (e: KeyboardEvent) => {
+    if (e.isComposing || !state.inputText) return;
     if (state.labelList.find((d) => d === state.inputText)) {
-        // song-lang
-        showErrorMessage('Failed to add label', 'Duplicated label');
+        state.inputTextInvalid = true;
         return;
     }
     state.labelList.push(state.inputText);
