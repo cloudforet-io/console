@@ -1233,6 +1233,7 @@
 			"ALT_E_CREATE_DASHBOARD": "Failed to create dashboard",
 			"ALT_E_DELETE_DASHBOARD": "Failed to delete dashboard",
 			"ALT_E_EDIT_NAME": "Failed to update dashboard name",
+			"ALT_E_UPDATE_DASHBOARD_NAME": "Failed to update cost dashboard name",
 			"ALT_S_DELETE_DASHBOARD": "Success to delete dashboard",
 			"CLONE_TITLE": "Clone Dashboard",
 			"CUSTOM_DATE_FROM": "FROM",
@@ -1253,6 +1254,15 @@
 			"ONLY_FAVORITE": "Show favorites only"
 		},
 		"WIDGET": {
+			"ALERT_HISTORY": {
+				"DESC": "Alert History description"
+			},
+			"ALERT_STATUS_OVERVIEW": {
+				"DESC": "Displays the list of all alerts that have occurred, along with related projects and urgency."
+			},
+			"ASSET_SUMMARY_BY_REGIONS": {
+				"DESC": "Summarizes cloud service usage by region from cloud providers."
+			},
 			"AWS_CLOUD_FRONT_COST": {
 				"DESC": "Displays the data usage and costs from AWS CloudFront for the selected period, aggregated by 'Group By' option. "
 			},
@@ -1261,6 +1271,12 @@
 			},
 			"AWS_DATA_TRANSFER_COST_TREND": {
 				"DESC": "Displays AWS Data-Transfer cost trend during the selected period. "
+			},
+			"AWS_PERSONAL_HEALTH_DASHBOARD": {
+				"DESC": "Displays the status of specific operational issues that affect cloud service resources."
+			},
+			"AWS_TRUSTED_ADVISOR": {
+				"DESC": "Displays the inspection and analysis status of each project through AWS Trusted Advisor."
 			},
 			"BUDGET_STATUS": {
 				"DESC": "Displays the top 200 highest budget usage during the selected period."
@@ -1273,6 +1289,9 @@
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
 				"DESC": "Displays the project-wise budget usage during the selected period, along with shortage forecast. "
+			},
+			"CLOUD_ASSEST_SUMMARY": {
+				"DESC": "Displays the cost trend of cloud resources or the status of server, database, storage usage."
 			},
 			"COST_BY_REGION": {
 				"DESC": "Displays the total costs by Region for the selected period. "
@@ -1292,6 +1311,9 @@
 			"COST_TREND_STACKED": {
 				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group By' option. "
 			},
+			"DAILY_UPDATES": {
+				"DESC": "Displays the list of cloud resources created or deleted today. "
+			},
 			"DATE_PAST_7_DAYS": "Past 7 days",
 			"DATE_TODAY": "Today",
 			"DETAILS": "Details",
@@ -1303,7 +1325,16 @@
 				"DESC": "Displays the amount spent between start and end date of the most recent month along with the comparison to prior month for the same period.",
 				"PREVIOUS_MONTH": "Previous month"
 			},
-			"NO_DATA": "No Data"
+			"NO_DATA": "No Data",
+			"PROJECT_ACTIVITY_SUMMARY": {
+				"DESC": "Displays the status of each project's activities such as triggered, acknowledged, or healthy."
+			},
+			"PROJECT_HEALTH_BOARD": {
+				"DESC": "Displays the urgency of each project by recently occured alerts."
+			},
+			"TOP_RESOURCE_MANAGING_PROJECTS": {
+				"DESC": "Displays the top project list that used resources of compute, database, storage the most.   "
+			}
 		}
 	},
 	"IAM": {

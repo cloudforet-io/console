@@ -1233,6 +1233,7 @@
 			"ALT_E_CREATE_DASHBOARD": "",
 			"ALT_E_DELETE_DASHBOARD": "",
 			"ALT_E_EDIT_NAME": "",
+			"ALT_E_UPDATE_DASHBOARD_NAME": "",
 			"ALT_S_DELETE_DASHBOARD": "",
 			"CLONE_TITLE": "",
 			"CUSTOM_DATE_FROM": "",
@@ -1253,6 +1254,15 @@
 			"ONLY_FAVORITE": ""
 		},
 		"WIDGET": {
+			"ALERT_HISTORY": {
+				"DESC": ""
+			},
+			"ALERT_STATUS_OVERVIEW": {
+				"DESC": ""
+			},
+			"ASSET_SUMMARY_BY_REGIONS": {
+				"DESC": ""
+			},
 			"AWS_CLOUD_FRONT_COST": {
 				"DESC": ""
 			},
@@ -1260,6 +1270,12 @@
 				"DESC": ""
 			},
 			"AWS_DATA_TRANSFER_COST_TREND": {
+				"DESC": ""
+			},
+			"AWS_PERSONAL_HEALTH_DASHBOARD": {
+				"DESC": ""
+			},
+			"AWS_TRUSTED_ADVISOR": {
 				"DESC": ""
 			},
 			"BUDGET_STATUS": {
@@ -1272,6 +1288,9 @@
 				"TOTAL_SPENT": ""
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
+				"DESC": ""
+			},
+			"CLOUD_ASSEST_SUMMARY": {
 				"DESC": ""
 			},
 			"COST_BY_REGION": {
@@ -1292,6 +1311,9 @@
 			"COST_TREND_STACKED": {
 				"DESC": ""
 			},
+			"DAILY_UPDATES": {
+				"DESC": ""
+			},
 			"DATE_PAST_7_DAYS": "",
 			"DATE_TODAY": "",
 			"DETAILS": "",
@@ -1303,7 +1325,16 @@
 				"DESC": "",
 				"PREVIOUS_MONTH": ""
 			},
-			"NO_DATA": ""
+			"NO_DATA": "",
+			"PROJECT_ACTIVITY_SUMMARY": {
+				"DESC": ""
+			},
+			"PROJECT_HEALTH_BOARD": {
+				"DESC": ""
+			},
+			"TOP_RESOURCE_MANAGING_PROJECTS": {
+				"DESC": ""
+			}
 		}
 	},
 	"IAM": {
