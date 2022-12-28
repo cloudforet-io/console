@@ -175,15 +175,16 @@ const getDashboardData = async () => {
         };
     } catch (e) {
         ErrorHandler.handleError(e);
-        // await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
+        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
     }
 };
 const updateDashboardData = async () => {
     try {
         const param: Partial<DashboardConfig> = {
+            name: state.dashboardName,
             layouts: [state.dashboardWidgetInfoList],
+            labels: state.labelList,
             // TODO: add other params
-            // name: state.dashboardName,
             // settings: {
             //     date_range: {
             //         enabled: state.enableDateRange,

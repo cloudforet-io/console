@@ -84,6 +84,8 @@ import { flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { SpaceRouter } from '@/router';
+
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -100,12 +102,12 @@ import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modu
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
 import type { DashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
 const PUBLIC_ICON_COLOR = gray[500];
@@ -169,14 +171,13 @@ const handleUpdateURLParam = () => {
 
 const getDashboardData = async () => {
     try {
-        state.dashboardInfo = DASHBOARD_TEMPLATES.monthlyCostSummary; // TODO: should be changed to api data
         let result: DashboardModel;
         if (state.isProjectDashboard) {
             result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
         } else {
             result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: props.dashboardId });
         }
-        // state.dashboardInfo = result; // TODO: should be changed to api data
+        state.dashboardInfo = result;
         state.dashboardName = result.name;
 
         state.enableCurrency = result.settings.currency.enabled;
@@ -184,8 +185,8 @@ const getDashboardData = async () => {
         state.enableDateRange = result.settings.date_range.enabled;
         state.dateRange = result.settings.date_range;
     } catch (e) {
-        // state.dashboardInfo = {}; // TODO: temporarily disabled
         ErrorHandler.handleError(e);
+        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
     }
 };
 
