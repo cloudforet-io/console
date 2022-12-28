@@ -12,8 +12,10 @@
                           @input="handleInputName"
             />
         </p-field-group>
-        <div class="description-text">
-            {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NAME_DESC') }}
+        <div v-if="widgetConfig?.description?.translation_id"
+             class="description-text"
+        >
+            {{ $t(widgetConfig.description.translation_id) }}
         </div>
         <p-json-schema-form v-if="widgetOptionsJsonSchema"
                             :schema="widgetOptionsJsonSchema"
@@ -312,6 +314,7 @@ export default defineComponent<Props>({
 
         /* Watcher */
         watch(() => props.widgetConfigId, (widgetConfigId) => {
+            widgetFormStore.$reset();
             widgetFormStore.setWidgetConfigId(widgetConfigId);
             state.schemaFormData = {};
             resetAll();
@@ -327,7 +330,7 @@ export default defineComponent<Props>({
         });
         watch(() => state.schemaFormData, (schemaFormData) => {
             widgetFormStore.setFormData(schemaFormData, state.inheritItemMap);
-        });
+        }, { immediate: true });
         watch(() => state.isAllValid, (_isAllValid) => {
             widgetFormStore.setIsValid(_isAllValid);
         });
