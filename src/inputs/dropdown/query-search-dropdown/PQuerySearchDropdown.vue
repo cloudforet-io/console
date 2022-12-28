@@ -1,5 +1,7 @@
 <template>
-    <div v-click-outside="hideMenu" class="p-query-search-dropdown">
+    <div v-click-outside="hideMenu"
+         class="p-query-search-dropdown"
+    >
         <p-search ref="targetRef"
                   :class="{'no-menu': querySearchState.menu ? querySearchState.menu.length === 0 : false}"
                   :value="querySearchState.searchText"
@@ -8,16 +10,22 @@
                   :is-focused.sync="querySearchState.isFocused"
         >
             <template #default="scope">
-                <p-tag v-for="(selectedItem, index) in proxySelected" :key="`tag-box-${index}`"
+                <p-tag v-for="(selectedItem, index) in proxySelected"
+                       :key="`tag-box-${index}`"
                        :key-item="selectedItem.key"
                        :value-item="selectedItem.value"
                        @delete="onDeleteTag(selectedItem, index)"
                 />
                 <span class="input-set">
-                    <span v-for="(keyItem, idx) in querySearchState.selectedKeys" :key="idx" class="key-tag">
+                    <span v-for="(keyItem, idx) in querySearchState.selectedKeys"
+                          :key="idx"
+                          class="key-tag"
+                    >
                         {{ keyItem.label }}:
                     </span>
-                    <input ref="inputRef" v-focus.lazy="querySearchState.isFocused" class="input-element"
+                    <input ref="inputRef"
+                           v-focus.lazy="querySearchState.isFocused"
+                           class="input-element"
                            :value="querySearchState.searchText"
                            :placeholder="querySearchState.currentPlaceholder || scope.placeholder"
                            :type="querySearchState.inputElType"
@@ -36,13 +44,22 @@
             </template>
             <template #right="scope">
                 <div class="right">
-                    <span v-if="querySearchState.selectedKey || scope.value" class="delete-button" @click="onDeleteAll">
-                        <p-i class="icon" name="ic_delete" height="1rem"
+                    <span v-if="querySearchState.selectedKey || scope.value"
+                          class="delete-button"
+                          @click="onDeleteAll"
+                    >
+                        <p-i class="icon"
+                             name="ic_delete"
+                             height="1rem"
                              width="1rem"
                         />
                     </span>
-                    <span class="dropdown-button" :class="{'text-blue-600': querySearchState.isFocused}" @click="handleClickDropdownButton">
-                        <p-i class="icon" :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                    <span class="dropdown-button"
+                          :class="{'text-blue-600': querySearchState.isFocused}"
+                          @click="handleClickDropdownButton"
+                    >
+                        <p-i class="icon"
+                             :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                              color="inherit"
                         />
                     </span>
@@ -76,10 +93,10 @@ import {
 import { vOnClickOutside } from '@vueuse/components';
 import { focus as vFocus } from 'vue-focus';
 
+import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
 import { useQuerySearch } from '@/hooks/query-search';
-import { PTag } from '@/index';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { QuerySearchDropdownProps } from '@/inputs/dropdown/query-search-dropdown/type';
 import type { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
