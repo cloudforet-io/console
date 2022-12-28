@@ -45,7 +45,7 @@ export interface DateRange {
 
 
 // dashboard configs
-interface DashboardSettings {
+export interface DashboardSettings {
     date_range: {
         enabled: boolean;
     } & DateRange;

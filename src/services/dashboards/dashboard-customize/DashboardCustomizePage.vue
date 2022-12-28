@@ -8,10 +8,8 @@
                               :label-list="state.labelList"
                               @update:labelList="handleUpdateLabelList"
             />
-            <dashboard-toolset :date-range.sync="state.dateRange"
-                               :currency.sync="state.currency"
-                               :enable-date-range="state.enableDateRange"
-                               :enable-currency="state.enableCurrency"
+            <dashboard-toolset :date-range.sync="state.dashboardSettings.date_range"
+                               :currency.sync="state.dashboardSettings.currency"
             />
         </div>
         <p-divider />
@@ -41,11 +39,13 @@
             :widget-info-list="state.dashboardWidgetInfoList"
             :loading.sync="state.loading"
             :edit-mode="true"
+            :dashboard-variables="state.dashboardInfo.variables"
+            :dashboard-settings="state.dashboardInfo.settings"
         />
         <dashboard-customize-sidebar :widget-info-list.sync="state.dashboardWidgetInfoList"
                                      :dashboard-id="props.dashboardId"
-                                     :enable-date-range.sync="state.enableDateRange"
-                                     :enable-currency.sync="state.enableCurrency"
+                                     :enable-date-range.sync="state.dashboardSettings.date_range.enabled"
+                                     :enable-currency.sync="state.dashboardSettings.currency.enabled"
                                      @save="handleSave"
         />
         <dashboard-manage-variable-overlay :visible="variableState.showOverlay" />
@@ -73,7 +73,7 @@ import { CURRENCY } from '@/store/modules/display/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type {
-    DateRange, DashboardConfig, DashboardVariablesSchema,
+    DateRange, DashboardConfig, DashboardVariablesSchema, DashboardSettings,
 } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
@@ -99,17 +99,19 @@ const props = defineProps<Props>();
 const state = reactive({
     labelList: [] as Array<string>,
     refreshInterval: undefined,
-    enableDateRange: false,
-    dateRange: {
-        start: dayjs.utc().format('YYYY-MM-01'),
-        end: dayjs.utc().format('YYYY-MM-DD'),
-    } as DateRange,
-    enableCurrency: false,
-    currency: CURRENCY.USD as Currency,
     isProjectDashboard: computed<boolean>(() => props.dashboardId.startsWith('project')),
     dashboardInfo: {} as DashboardModel,
     dashboardName: '',
     dashboardWidgetInfoList: [] as DashboardLayoutWidgetInfo[],
+    dashboardSettings: {
+        date_range: {
+            start: dayjs.utc().format('YYYY-MM-01'),
+            end: dayjs.utc().format('YYYY-MM-DD'),
+        },
+        currency: {
+            value: CURRENCY.USD,
+        },
+    } as DashboardSettings,
 });
 const vm = getCurrentInstance()?.proxy as Vue;
 const variableState = reactive({
@@ -182,12 +184,16 @@ const getDashboardData = async () => {
         state.dashboardWidgetInfoList = flattenDeep(result?.layouts ?? []);
         state.dashboardName = result.name;
 
-        state.enableCurrency = result.settings.currency.enabled;
-        state.currency = result.settings.currency?.value ?? CURRENCY.USD;
-        state.enableDateRange = result.settings.date_range.enabled;
-        state.dateRange = {
-            start: result.settings.date_range.start,
-            end: result.settings.date_range.end,
+        state.dashboardSettings = {
+            date_range: {
+                enabled: result.settings.date_range.enabled,
+                start: result.settings.date_range.start,
+                end: result.settings.date_range.end,
+            },
+            currency: {
+                enabled: result.settings.currency.enabled,
+                value: result.settings.currency?.value ?? CURRENCY.USD,
+            },
         };
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -200,18 +206,8 @@ const updateDashboardData = async () => {
             name: state.dashboardName,
             layouts: [state.dashboardWidgetInfoList],
             labels: state.labelList,
+            settings: state.dashboardSettings,
             // TODO: add other params
-            // settings: {
-            //     date_range: {
-            //         enabled: state.enableDateRange,
-            //         start: state.dateRange.start,
-            //         end: state.dateRange.end,
-            //     },
-            //     currency: {
-            //         enabled: state.enableCurrency,
-            //         value: state.currency,
-            //     },
-            // },
             // variables:
             // variables_schema:
         };
