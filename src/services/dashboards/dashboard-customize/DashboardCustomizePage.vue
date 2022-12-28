@@ -188,7 +188,7 @@ const getDashboardData = async () => {
             date_range: {
                 enabled: result.settings.date_range.enabled,
                 start: result.settings.date_range.start,
-                end: result.settings.date_range.end ?? dayjs.utc().format('YYYY-MM-DD'),
+                end: result.settings.date_range.end,
             },
             currency: {
                 enabled: result.settings.currency.enabled,
