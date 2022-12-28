@@ -68,10 +68,8 @@ export interface DashboardConfig {
     }
 }
 
-
-
 // variables
-type DashboardVariables = Record<string, any|any[]>;
+type DashboardVariables = Record<string, string|string[]>;
 
 export const VARIABLE_SELECTION_TYPES = ['SINGLE', 'MULTI'] as const;
 export type VariableSelectionType = typeof VARIABLE_SELECTION_TYPES[number];
@@ -85,8 +83,8 @@ export type VariableType = typeof VARIABLE_TYPES[number];
 export interface DashboardVariableSchemaProperty {
     variable_type: VariableType;
     use?: boolean;
-    selection_type?: VariableSelectionType;
-    options?: any[];
+    selection_type: VariableSelectionType;
+    options: string[];
     name?: string; // for managed variables
     default_use?: boolean; // for managed variables. If property exists, ignore it. Otherwise, replace value of 'use'.
 }
