@@ -112,6 +112,7 @@ export const getSidebarArgTypes = (): ArgTypes => ({
         },
         control: null,
     },
+    // slot
     titleSlot: {
         name: 'title',
         description: 'Slot for title with HTML',
@@ -154,6 +155,21 @@ export const getSidebarArgTypes = (): ArgTypes => ({
             category: 'slots',
         },
     },
+    footerSlot: {
+        name: 'footer',
+        description: 'Slot for bottom of the content.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+    },
+    // event
     onClose: {
         name: 'close',
         description: 'Event emitted when the close button is clicked',

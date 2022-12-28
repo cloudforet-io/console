@@ -339,6 +339,40 @@ export const Playground = (args, {argTypes}) => {
 <br/>
 <br/>
 
+## Footer Slot
+
+<Canvas>
+    <Story name="Footer Slot">
+        {{
+            components: { PSidebar },
+            template: `
+            <div style="height: 500px;">
+                <p-sidebar :visible="true"
+                            title="Footer Sidebar"
+                            :hide-close-button="true"
+                            class="mt-4"
+                >
+                    <div class="bg-primary3 p-4 min-h-full flex justify-center items-center">
+                        Non-sidebar area
+                    </div>
+                    <template #sidebar>content</template>
+                    <template #footer>
+                        <div class="bg-gray-200">Footer Area</div>
+                    </template>
+                </p-sidebar>
+            </div>
+    <!--<div>-->`,
+            setup(props) {
+                return {
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Playground
 
 <Canvas>

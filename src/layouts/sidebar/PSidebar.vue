@@ -30,6 +30,9 @@
                         <slot name="sidebar" />
                     </div>
                 </div>
+                <span class="footer">
+                    <slot name="footer" />
+                </span>
             </div>
         </transition>
     </div>
@@ -160,6 +163,12 @@ export default defineComponent({
                 @apply text-secondary;
             }
         }
+        .footer {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+        }
     }
 
     &.primary {
@@ -200,12 +209,21 @@ export default defineComponent({
 
             &.sm {
                 width: $(sidebar-sm);
+                .footer {
+                    width: $(sidebar-sm);
+                }
             }
             &.md {
                 width: $(sidebar-md);
+                .footer {
+                    width: $(sidebar-md);
+                }
             }
             &.lg {
                 width: $(sidebar-lg);
+                .footer {
+                    width: $(sidebar-lg);
+                }
             }
         }
         .slide-fade-enter, .slide-fade-leave-to {
