@@ -202,9 +202,9 @@ watch(() => props.dashboardId, (dashboardId) => {
     margin-left: 0.25rem;
 }
 .divider {
-    @apply mt-4 mb-6;
+    @apply mb-6;
 }
 .filter-box {
-    @apply flex justify-between items-center mb-4 mt-5;
+    @apply flex justify-between items-start mt-5;
 }
 </style>

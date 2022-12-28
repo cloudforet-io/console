@@ -15,6 +15,7 @@
                        style-type="tertiary"
                        name="ic_plus_bold"
                        size="sm"
+                       shape="square"
                        @click="handleClickPlus"
         />
         <p-field-group
@@ -101,18 +102,29 @@ const handleDelete = (index: number) => {
 .dashboard-labels {
     display: flex;
     flex-flow: wrap;
-    align-items: center;
-    height: 100%;
     max-width: 50%;
+    min-height: 2.75rem;
 }
 .p-icon-button {
     margin-right: 0.25rem;
 }
 
 .dashboard-labels-add-info {
-    @apply text-gray-500 text-xs;
+    @apply text-gray-500 text-xs pt-1;
 }
-.p-text-input {
-    height: 1.5rem;
+
+.p-label {
+    margin-bottom: 0.375rem;
+}
+.p-field-group {
+    height: 2.75rem;
+    margin-bottom: 0;
+}
+
+/* custom design-system component - p-text-input */
+:deep(.p-text-input) {
+    .input-container {
+        min-height: 1.5rem;
+    }
 }
 </style>
