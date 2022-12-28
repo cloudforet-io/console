@@ -11,7 +11,7 @@ import type { Tags } from '@/models';
 import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
-import type { DateRange as DashboardDateRange } from '@/services/dashboards/config';
+import type { DashboardSettings, DashboardVariables, DateRange as DashboardDateRange } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
 
 export type DateRange = DashboardDateRange;
@@ -114,14 +114,11 @@ interface WidgetFiltersMap {
     region_code?: WidgetFilter[];
 }
 export interface WidgetOptions {
-    date_range?: DateRange;
-    currency?: Currency;
     group_by?: GroupBy;
     granularity?: Granularity;
     stacked?: boolean;
     legend_options?: LegendOptions;
     chart_type?: ChartType;
-    // filter?: WidgetFiltersMap[];
     dynamic_widget_type?: DynamicWidgetType;
     name_options?: DynamicField;
     value_options?: DynamicField;
@@ -161,7 +158,8 @@ export interface WidgetProps {
     title?: string;
     options?: WidgetOptions;
     inheritOptions?: InheritOptions;
-    dashboardOptions?: object;
+    dashboardVariables?: DashboardVariables;
+    dashboardSettings?: DashboardSettings;
     size?: WidgetSize;
     width?: number;
     theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet

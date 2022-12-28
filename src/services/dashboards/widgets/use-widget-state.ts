@@ -9,6 +9,7 @@ import {
     palette,
 } from '@/styles/colors';
 
+import type { DashboardVariables } from '@/services/dashboards/config';
 import type {
     WidgetConfig, WidgetOptions, WidgetSize,
     InheritOptions, WidgetProps,
@@ -21,14 +22,16 @@ const getRefinedOptions = (
     configOptions?: WidgetOptions,
     optionsData?: WidgetOptions,
     inheritOptions?: InheritOptions,
-    dashboardOptions?: object,
+    dashboardVariables?: DashboardVariables,
 ): WidgetOptions => {
     const mergedOptions = merge({}, configOptions, optionsData);
-    if (!inheritOptions || !dashboardOptions) return mergedOptions;
+    if (!inheritOptions || !dashboardVariables) return mergedOptions;
 
     const parentOptions = {};
     Object.keys(inheritOptions).forEach((key) => {
-        if (inheritOptions[key].enabled) parentOptions[key] = dashboardOptions[key];
+        if (inheritOptions[key].enabled && inheritOptions[key].variable_info?.key === key) {
+            parentOptions[key] = dashboardVariables[key];
+        }
     });
     return merge({}, mergedOptions, parentOptions);
 };
@@ -59,13 +62,14 @@ export function useWidgetState<Data = any>(
             state.widgetConfig.options,
             props.options,
             props.inheritOptions,
-            props.dashboardOptions,
+            props.dashboardVariables,
         )),
         size: computed<WidgetSize>(() => {
             if (state.widgetConfig.sizes.includes(props.size)) return props.size;
             return state.widgetConfig.sizes[0];
         }),
         loading: true,
+        settings: computed(() => props.dashboardSettings),
         data: null as Data|null,
         colorSet: computed(() => {
             if (!props.theme) return [];
