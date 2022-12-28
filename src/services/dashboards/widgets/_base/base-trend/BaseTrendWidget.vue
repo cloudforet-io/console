@@ -3,6 +3,8 @@
                   :size="state.size"
                   :width="props.width"
                   :edit-mode="props.editMode"
+                  :date-range="state.dateRange"
+                  :currency="state.settings.currency.value"
                   class="base-trend-widget"
     >
         <template v-if="state.selectorItems.length"
@@ -29,7 +31,7 @@
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
                            :items="state.chartData"
-                           :currency="state.options.currency"
+                           :currency="state.settings.currency.value"
                            :currency-rates="props.currencyRates"
         />
     </widget-frame>
@@ -41,15 +43,21 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 import { cloneDeep, random } from 'lodash';
 
-import { useAmcharts5 } from '@/common/composables/amcharts5';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { useAmcharts5 } from '@/common/composables/amcharts5';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type { DateRange } from '@/services/dashboards/config';
+import { GRANULARITY } from '@/services/dashboards/config';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
-import { GROUP_BY, CHART_TYPE } from '@/services/dashboards/widgets/config';
+import { GROUP_BY, CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widgets/type';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -120,14 +128,37 @@ const state = reactive({
     tableFields: computed(() => [ // TODO: fill date fields
         { label: state.groupByLabel, name: state.groupBy },
     ]),
+    dateRange: computed<DateRange>(() => {
+        const range = props.size === WIDGET_SIZE.full ? 12 : 4;
+        const end = state.settings.date_range.end;
+        const start = dayjs.utc(end).subtract(range, 'month').format('YYYY-MM');
+        return { start, end };
+    }),
 });
 
 /* Api */
-const fetchData = async () => new Promise((resolve) => {
-    setTimeout(() => {
-        resolve(SAMPLE_RAW_DATA.results);
-    }, 1000);
-});
+const fetchData = async () => {
+    try {
+        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+            query: {
+                granularity: state.widgetConfig.options?.granularity ?? GRANULARITY.MONTHLY,
+                group_by: [state.groupBy],
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                field_group: ['date'],
+                fields: {
+                    usd_cost_sum: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
+                },
+            },
+        });
+        // console.log(results);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
 
 /* Util */
 const drawChart = (chartData: XYChartData[]) => {

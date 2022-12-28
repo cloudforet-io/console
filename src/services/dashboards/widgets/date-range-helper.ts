@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import type { DateRange } from '@/services/dashboards/widgets/config';
+import type { DateRange } from '@/services/dashboards/config';
 
 export const getInitialDates = (): DateRange => {
     const start = dayjs.utc().startOf('month').format();

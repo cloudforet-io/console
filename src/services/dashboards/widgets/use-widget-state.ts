@@ -9,7 +9,7 @@ import {
     palette,
 } from '@/styles/colors';
 
-import type { DashboardVariables } from '@/services/dashboards/config';
+import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import type {
     WidgetConfig, WidgetOptions, WidgetSize,
     InheritOptions, WidgetProps,
@@ -69,7 +69,7 @@ export function useWidgetState<Data = any>(
             return state.widgetConfig.sizes[0];
         }),
         loading: true,
-        settings: computed(() => props.dashboardSettings),
+        settings: computed<DashboardSettings>(() => props.dashboardSettings),
         data: null as Data|null,
         colorSet: computed(() => {
             if (!props.theme) return [];

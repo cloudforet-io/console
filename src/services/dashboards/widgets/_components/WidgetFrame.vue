@@ -99,7 +99,8 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import { gray } from '@/styles/colors';
 
-import type { WidgetOptions, WidgetSize } from '@/services/dashboards/widgets/config';
+import type { DateRange } from '@/services/dashboards/config';
+import type { WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 
 
@@ -110,7 +111,7 @@ interface Props {
     widgetLink?: string;
     widgetRoute?: Route;
     widgetIndex: number;
-    dateRange?: WidgetOptions['date_range'];
+    dateRange?: DateRange;
     noData: boolean;
     printMode: boolean;
     selectedDates: string[];
@@ -165,7 +166,7 @@ export default defineComponent<Props>({
             default: undefined,
         },
         dateRange: {
-            type: Object as PropType<WidgetOptions['date_range']>,
+            type: Object as PropType<DateRange>,
             default: undefined,
         },
         noData: {
