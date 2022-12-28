@@ -104,8 +104,7 @@ export default defineComponent<Props>({
                     });
                 }
             } catch (e) {
-                // song-lang
-                ErrorHandler.handleRequestError(e, 'Failed to update cost dashboard name');
+                ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_UPDATE_DASHBOARD_NAME'));
             }
         };
 

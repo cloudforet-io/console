@@ -156,7 +156,6 @@ export default defineComponent<DashboardBoardListProps>({
             dashboardConfig: null as DashboardConfig|null,
         });
 
-        /* song-lang */
         const convertBoardItemButtonSet = (dashboardItem) => [
             {
                 iconName: 'ic_edit',
