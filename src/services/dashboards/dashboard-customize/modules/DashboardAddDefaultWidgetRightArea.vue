@@ -359,7 +359,7 @@ export default defineComponent<Props>({
     @apply flex flex-col overflow-hidden;
     height: 100%;
     gap: 1rem;
-    overflow: auto;
+    overflow-y: auto;
     .p-field-group {
         margin: 0;
         .input {
