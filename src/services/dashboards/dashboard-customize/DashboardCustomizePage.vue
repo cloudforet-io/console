@@ -15,12 +15,20 @@
         <p-divider />
         <div class="dashboard-selectors">
             <div class="variable-selector-wrapper">
-                <variable-selector-dropdown variable-name="Project" />
-                <variable-selector-dropdown variable-name="Project" />
-                <variable-more-button-dropdown :variable-map="variableState.variableProperties"
-                                               :variable-order="variableState.order"
-                                               @select="handleSelectVariableUse"
-                />
+                <!--                <template v-for="(name, idx) in variableState.order">-->
+                <!--                    <variable-selector-dropdown v-if="variableState.variableProperties[name].use"-->
+                <!--                                                :key="`${name}-${idx}`"-->
+                <!--                                                :variable-name="name"-->
+                <!--                                                :default-selected="variableState.variableData[name]"-->
+                <!--                                                :variable-options="variableState.variableProperties[name].options"-->
+                <!--                                                :selection-type="variableState.variableProperties[name].selection_type"-->
+                <!--                                                @change="handleVariableChange(name, $event)"-->
+                <!--                    />-->
+                <!--                </template>-->
+                <!--                <variable-more-button-dropdown :variable-map="variableState.variableProperties"-->
+                <!--                                               :variable-order="variableState.order"-->
+                <!--                                               @change="handleChangeVariableUse"-->
+                <!--                />-->
             </div>
             <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
                                         refresh-disabled
@@ -108,6 +116,14 @@ const state = reactive({
 const vm = getCurrentInstance()?.proxy as Vue;
 const variableState = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
+    variableData: {
+        project: ['test2', 'test3'],
+        // serviceAccount: 'test4', // undefined case
+        // provider: ['test1', 'test4'], // undefined case
+        user: ['test4'],
+        region: ['test3'],
+        node: 'test1',
+    },
     variableProperties: {
         project: {
             variable_type: 'MANAGED',
@@ -219,12 +235,16 @@ const handleUpdateDashboardName = (name: string) => {
 const handleUpdateLabelList = (labelList: Array<string>) => {
     state.labelList = labelList;
 };
-const handleSelectVariableUse = (variables: DashboardVariablesSchema['properties']) => {
-    variableState.variableProperties = variables;
-};
 const handleSave = async () => {
     await updateDashboardData();
 };
+// const handleChangeVariableUse = (variables: DashboardVariablesSchema['properties']) => {
+//     variableState.variableProperties = variables;
+// };
+// const handleVariableChange = (name: string, selected: string|string[]) => {
+//     variableState.variableData[name] = selected;
+//     console.log(variableState.variableData);
+// };
 
 onMounted(() => {
     getDashboardData();
@@ -233,15 +253,16 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .dashboard-customize-page {
+    @apply relative;
     .filters-box {
         @apply flex justify-between mt-4 items-start;
     }
 
     .dashboard-selectors {
-        @apply flex justify-between;
+        @apply relative flex justify-between z-10;
 
         .variable-selector-wrapper {
-            @apply flex items-center flex-wrap;
+            @apply relative flex items-center flex-wrap;
             gap: 0.5rem;
             padding: 1.5rem 0 1.25rem;
         }
