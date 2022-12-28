@@ -45,7 +45,7 @@ export interface DateRange {
 
 
 // dashboard configs
-interface DashboardSettings {
+export interface DashboardSettings {
     date_range: {
         enabled: boolean;
     } & DateRange;
@@ -71,7 +71,7 @@ export interface DashboardConfig {
 
 
 // variables
-type DashboardVariables = Record<string, any|any[]>;
+export type DashboardVariables = Record<string, any|any[]>;
 
 export const VARIABLE_SELECTION_TYPES = ['SINGLE', 'MULTI'] as const;
 export type VariableSelectionType = typeof VARIABLE_SELECTION_TYPES[number];

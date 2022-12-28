@@ -1,14 +1,16 @@
 <template>
     <div class="dashboard-toolset">
-        <dashboard-date-range-badge v-show="props.enableDateRange"
+        <dashboard-date-range-badge v-show="props.dateRange.enabled"
                                     :date-range="state.proxyDateRange"
         />
-        <dashboard-date-dropdown v-show="props.enableDateRange"
-                                 :date-range.sync="state.proxyDateRange"
+        <dashboard-date-dropdown v-show="props.dateRange.enabled"
+                                 :date-range="state.proxyDateRange"
+                                 @update:date-range="handleUpdateDateRange"
         />
-        <currency-select-dropdown v-show="props.enableCurrency"
+        <currency-select-dropdown v-show="props.currency.enabled"
                                   :default-currency="DEFAULT_CURRENCY"
-                                  :currency.sync="state.proxyCurrency"
+                                  :currency="state.proxyCurrency.value"
+                                  @update:currency="handleUpdateCurrency"
         />
     </div>
 </template>
@@ -22,17 +24,15 @@ import { CURRENCY } from '@/store/modules/display/config';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 
-import type { DateRange } from '@/services/dashboards/config';
+import type { DashboardSettings, DateRange } from '@/services/dashboards/config';
 import DashboardDateDropdown from '@/services/dashboards/modules/dashboard-toolset/DashboardDateDropdown.vue';
 import DashboardDateRangeBadge from '@/services/dashboards/modules/dashboard-toolset/DashboardDateRangeBadge.vue';
 
 const DEFAULT_CURRENCY = CURRENCY.USD;
 
 const props = defineProps<{
-    enableDateRange?: boolean,
-    dateRange: DateRange,
-    enableCurrency?: boolean,
-    currency: Currency
+    dateRange: DashboardSettings['date_range'];
+    currency: DashboardSettings['currency'];
 }>();
 const emit = defineEmits<{(e: string, value: string): void}>();
 
@@ -40,6 +40,20 @@ const state = reactive({
     proxyDateRange: useProxyValue('dateRange', props, emit),
     proxyCurrency: useProxyValue('currency', props, emit),
 });
+
+const handleUpdateDateRange = (dateRange) => {
+    state.proxyDateRange = {
+        ...state.proxyDateRange,
+        start: dateRange.start,
+        end: dateRange.end,
+    };
+};
+const handleUpdateCurrency = (currency) => {
+    state.proxyCurrency = {
+        ...state.proxyCurrency,
+        value: currency,
+    };
+};
 </script>
 
 <style scoped>
