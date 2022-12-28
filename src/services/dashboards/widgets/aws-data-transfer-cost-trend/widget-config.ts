@@ -12,6 +12,7 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsDataTransferCostTrend',
     title: 'AWS Data-Transfer Cost Trend',
     labels: ['Cost'],
+    base_configs: [{ config_id: 'baseTrend' }],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.AWS_DATA_TRANSFER_COST_TREND.DESC',
         preview_image: 'widget-img_awsDataTransferCostTrend--thumbnail.png',
