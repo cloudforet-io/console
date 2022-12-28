@@ -17,11 +17,17 @@
                        size="sm"
                        @click="handleClickPlus"
         />
-        <p-text-input v-if="state.inputMode"
-                      v-model="state.inputText"
-                      :invalid="state.inputTextInvalid"
-        />
-
+        <p-field-group
+            v-if="state.inputMode"
+            :invalid="invalidState.inputText"
+            :invalid-text="invalidTexts.inputText"
+        >
+            <p-text-input
+                :value="inputText"
+                :invalid="invalidState.inputText"
+                @input="setForm('inputText', $event)"
+            />
+        </p-field-group>
         <span v-if="!state.inputMode && !state.labelList.length && props.editable"
               class="dashboard-labels-add-info"
         >
@@ -33,12 +39,13 @@
 <script setup lang="ts">
 // this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
-import { Keyboard } from '@amcharts/amcharts4/core';
-import { PIconButton, PLabel, PTextInput } from '@spaceone/design-system';
+import {
+    PFieldGroup, PIconButton, PLabel, PTextInput,
+} from '@spaceone/design-system';
 
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { useFormValidator } from '@/common/composables/form-validator';
 
 
 interface Props {
@@ -48,14 +55,26 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(['update:labelList']);
 
+
+const {
+    forms: {
+        inputText,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
+    inputText: '',
+}, {
+    inputText(value: string) { return !state.labelList.find((d) => d === value) ? '' : 'Duplicated'; },
+});
+
 const state = reactive({
     labelList: computed<Array<string>>({
         get: () => props.labelList,
         set(val: Array<string>) { emit('update:labelList', val); },
     }),
     inputMode: false,
-    inputText: '',
-    inputTextInvalid: false,
 });
 
 const handleClickPlus = () => {
@@ -63,16 +82,12 @@ const handleClickPlus = () => {
 };
 const handleEscape = () => {
     state.inputMode = false;
-    state.inputText = '';
+    setForm('inputText', '');
 };
 const handlePushLabel = (e: KeyboardEvent) => {
-    if (e.isComposing || !state.inputText) return;
-    if (state.labelList.find((d) => d === state.inputText)) {
-        state.inputTextInvalid = true;
-        return;
-    }
-    state.labelList.push(state.inputText);
-    state.inputText = '';
+    if (e.isComposing || !inputText.value || invalidState.inputText) return;
+    state.labelList.push(inputText.value);
+    setForm('inputText', '');
     emit('update:labelList', state.labelList);
 };
 const handleDelete = (index: number) => {
