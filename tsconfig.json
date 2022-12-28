@@ -6,7 +6,7 @@
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "Node16",
     "allowJs": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

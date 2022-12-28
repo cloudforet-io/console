@@ -1,8 +1,8 @@
-import type { ComputedRef, Ref } from 'vue';
 import {
     computed, nextTick, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import type { ComputedRef, Ref } from 'vue';
+import type Vue from 'vue';
 
 import type { ResizeObserverEntry } from '@juggle/resize-observer';
 import { ResizeObserver } from '@juggle/resize-observer';
