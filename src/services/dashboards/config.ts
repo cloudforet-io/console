@@ -1,3 +1,5 @@
+import type { Currency } from '@/store/modules/display/config';
+
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
 
@@ -49,7 +51,7 @@ interface DashboardSettings {
     } & DateRange;
     currency: {
         enabled: boolean;
-        value?: string;
+        value?: Currency;
     }
 }
 
