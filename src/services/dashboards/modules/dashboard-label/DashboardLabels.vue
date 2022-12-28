@@ -15,12 +15,20 @@
                        style-type="tertiary"
                        name="ic_plus_bold"
                        size="sm"
+                       shape="square"
                        @click="handleClickPlus"
         />
-        <p-text-input v-if="state.inputMode"
-                      v-model="state.inputText"
-        />
-
+        <p-field-group
+            v-if="state.inputMode"
+            :invalid="invalidState.inputText"
+            :invalid-text="invalidTexts.inputText"
+        >
+            <p-text-input
+                :value="inputText"
+                :invalid="invalidState.inputText"
+                @input="setForm('inputText', $event)"
+            />
+        </p-field-group>
         <span v-if="!state.inputMode && !state.labelList.length && props.editable"
               class="dashboard-labels-add-info"
         >
@@ -32,11 +40,13 @@
 <script setup lang="ts">
 // this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
-import { PIconButton, PLabel, PTextInput } from '@spaceone/design-system';
+import {
+    PFieldGroup, PIconButton, PLabel, PTextInput,
+} from '@spaceone/design-system';
 
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { useFormValidator } from '@/common/composables/form-validator';
 
 
 interface Props {
@@ -46,13 +56,27 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(['update:labelList']);
 
+
+const {
+    forms: {
+        inputText,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
+    inputText: '',
+}, {
+    // song-lang
+    inputText(value: string) { return !state.labelList.find((d) => d === value) ? '' : 'Duplicated label'; },
+});
+
 const state = reactive({
     labelList: computed<Array<string>>({
         get: () => props.labelList,
         set(val: Array<string>) { emit('update:labelList', val); },
     }),
     inputMode: false,
-    inputText: '',
 });
 
 const handleClickPlus = () => {
@@ -60,16 +84,12 @@ const handleClickPlus = () => {
 };
 const handleEscape = () => {
     state.inputMode = false;
-    state.inputText = '';
+    setForm('inputText', '');
 };
-const handlePushLabel = () => {
-    if (state.labelList.find((d) => d === state.inputText)) {
-        // song-lang
-        showErrorMessage('Failed to add label', 'Duplicated label');
-        return;
-    }
-    state.labelList.push(state.inputText);
-    state.inputText = '';
+const handlePushLabel = (e: KeyboardEvent) => {
+    if (e.isComposing || !inputText.value || invalidState.inputText) return;
+    state.labelList.push(inputText.value);
+    setForm('inputText', '');
     emit('update:labelList', state.labelList);
 };
 const handleDelete = (index: number) => {
@@ -82,18 +102,29 @@ const handleDelete = (index: number) => {
 .dashboard-labels {
     display: flex;
     flex-flow: wrap;
-    align-items: center;
-    height: 100%;
     max-width: 50%;
+    min-height: 2.75rem;
 }
 .p-icon-button {
     margin-right: 0.25rem;
 }
 
 .dashboard-labels-add-info {
-    @apply text-gray-500 text-xs;
+    @apply text-gray-500 text-xs pt-1;
 }
-.p-text-input {
-    height: 1.5rem;
+
+.p-label {
+    margin-bottom: 0.375rem;
+}
+.p-field-group {
+    height: 2.75rem;
+    margin-bottom: 0;
+}
+
+/* custom design-system component - p-text-input */
+:deep(.p-text-input) {
+    .input-container {
+        min-height: 1.5rem;
+    }
 }
 </style>

@@ -238,7 +238,7 @@ onMounted(() => {
 <style lang="postcss" scoped>
 .dashboard-customize-page {
     .filters-box {
-        @apply flex justify-between mt-5 items-center;
+        @apply flex justify-between mt-4 items-start;
     }
 
     .dashboard-selectors {
