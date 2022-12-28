@@ -10,6 +10,9 @@ const {
 
 const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsDataTransferCostTrend',
+    widget_component: () => ({
+        component: import('@/services/dashboards/widgets/aws-data-transfer-cost-trend/AWSDataTransferCostTrend.vue'),
+    }),
     title: 'AWS Data-Transfer Cost Trend',
     labels: ['Cost'],
     description: {

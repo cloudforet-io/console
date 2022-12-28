@@ -3,27 +3,22 @@ import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/defaul
 import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/default-dashboard/helper';
 
 const widgetList = [
-    'monthlyCost',
-    'budgetUsageSummary',
-    'costMap',
-    'costTrend',
-    'costTrendStacked',
-    'costDonut',
-    'budgetStatus',
-    'costByRegion',
+    'awsDataTransferCostTrend',
+    'awsDataTransferByRegion',
+    'awsCloudFrontCost',
 ];
 
-export const monthlyCostSummaryDashboardPreview: DefaultDashboardPreviewConfig = {
-    name: 'Monthly Cost Summary',
+export const cdnTrafficCostDashboardPreview: DefaultDashboardPreviewConfig = {
+    name: 'CDN & Traffic Cost',
     labels: ['Cost'],
     version: '1',
     description: {
-        preview_image: './assets/icons/ic_dashboard-template_monthly-cost-summary.svg',
+        preview_image: './assets/icons/ic_dashboard-template_cdn-traffic-cost.svg',
     },
 };
 
-export const monthlyCostSummaryDashboard: DashboardConfig = {
-    ...monthlyCostSummaryDashboardPreview,
+export const cdnTrafficCostDashboard: DashboardConfig = {
+    ...cdnTrafficCostDashboardPreview,
     settings: {
         date_range: {
             enabled: true,
