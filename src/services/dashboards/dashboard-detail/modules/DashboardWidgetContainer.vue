@@ -17,6 +17,8 @@
                            currency: { enabled: true },
                            date_range: { enabled: true },
                        }"
+                       :dashboard-variables="dashboardVariables"
+                       :dashboard-settings="dashboardSettings"
                        :size="widgetSizeList[idx]"
                        :width="width"
                        :theme="widgetThemeList[idx]"
@@ -36,6 +38,7 @@ import {
 
 import { flattenDeep } from 'lodash';
 
+import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import {
     WIDGET_CONTAINER_MAX_WIDTH, WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
@@ -50,6 +53,8 @@ import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widge
 interface Props {
     widgetInfoList: DashboardLayoutWidgetInfo[];
     editMode?: boolean;
+    dashboardSettings: DashboardSettings;
+    dashboardVariables: DashboardVariables;
 }
 export default defineComponent<Props>({
     name: 'DashboardWidgetContainer',
@@ -67,6 +72,14 @@ export default defineComponent<Props>({
         editMode: {
             type: Boolean,
             default: false,
+        },
+        dashboardSettings: {
+            type: Object as PropType<DashboardSettings>,
+            default: () => ({}),
+        },
+        dashboardVariables: {
+            type: Object as PropType<DashboardVariables>,
+            default: () => ({}),
         },
     },
     setup(props, { emit, expose }: SetupContext) {
