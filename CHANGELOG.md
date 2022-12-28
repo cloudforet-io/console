@@ -1,3 +1,11 @@
+# [1.1.0-beta.498](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.497...v1.1.0-beta.498) (2022-12-28)
+
+
+### Bug Fixes
+
+* **query-search-dropdown:** fix wrong import ([#207](https://github.com/cloudforet-io/mirinae/issues/207)) ([b9f1f8a](https://github.com/cloudforet-io/mirinae/commit/b9f1f8aaa3fd37b526633803e48a54c5fa74ecb3))
+* **sidebar:** add `footer` slot ([#203](https://github.com/cloudforet-io/mirinae/issues/203)) ([9d22fec](https://github.com/cloudforet-io/mirinae/commit/9d22fecabde21c615e3b6e84fa4d1f94ec7aaa3e))
+
 # [1.1.0-beta.497](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.496...v1.1.0-beta.497) (2022-12-28)
 
 
