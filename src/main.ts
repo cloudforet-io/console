@@ -11,6 +11,7 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { resetStore } from '@/lib/reset-pinia-store';
 import { siteInit } from '@/lib/site-initializer';
 
 import App from './App.vue';
@@ -33,6 +34,9 @@ Vue.use(SpaceDesignSystem);
 
 Vue.config.productionTip = import.meta.env.DEV;
 
+const pinia = createPinia();
+pinia.use(resetStore);
+
 /** ********** INITIALIZE ************** */
 (async () => {
     await siteInit();
@@ -46,6 +50,6 @@ Vue.config.productionTip = import.meta.env.DEV;
             App,
         },
         template: '<App/>',
-        pinia: createPinia(),
+        pinia,
     });
 })();
