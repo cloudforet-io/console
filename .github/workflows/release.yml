@@ -41,7 +41,7 @@ jobs:
         run: npm run build && npm run css
 
       - name: Transpile
-        run: npm run tsc
+        run: npm run vue-tsc || npm run tsc-alias
 
       - name: Release
         env:

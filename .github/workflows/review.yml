@@ -52,3 +52,6 @@ jobs:
       run: |
         npm run build
 
+    - name: Transpile
+      run: npm run vue-tsc || npm run tsc-alias
+
