@@ -66,7 +66,8 @@ const {
 } = useFormValidator({
     inputText: '',
 }, {
-    inputText(value: string) { return !state.labelList.find((d) => d === value) ? '' : 'Duplicated'; },
+    // song-lang
+    inputText(value: string) { return !state.labelList.find((d) => d === value) ? '' : 'Duplicated label'; },
 });
 
 const state = reactive({
