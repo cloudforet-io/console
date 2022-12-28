@@ -8,13 +8,10 @@ import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
 import type { Tags } from '@/models';
 
-import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 
-import type { DashboardSettings, DashboardVariables, DateRange as DashboardDateRange } from '@/services/dashboards/config';
+import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
-
-export type DateRange = DashboardDateRange;
 
 export const WIDGET_SIZE = {
     sm: 'sm',
@@ -159,7 +156,7 @@ export interface WidgetProps {
     options?: WidgetOptions;
     inheritOptions?: InheritOptions;
     dashboardVariables?: DashboardVariables;
-    dashboardSettings?: DashboardSettings;
+    dashboardSettings: DashboardSettings;
     size?: WidgetSize;
     width?: number;
     theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet

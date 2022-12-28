@@ -86,8 +86,8 @@ import { CURRENCY } from '@/store/modules/display/config';
 
 import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 
+import type { DateRange } from '@/services/dashboards/config';
 import DateRangeSelector from '@/services/dashboards/widgets/_components/DateRangeSelector.vue';
-import type { DateRange } from '@/services/dashboards/widgets/config';
 import { WIDGET_THEMES } from '@/services/dashboards/widgets/view-config';
 import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 

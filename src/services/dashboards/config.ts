@@ -69,7 +69,7 @@ export interface DashboardConfig {
 }
 
 // variables
-type DashboardVariables = Record<string, string|string[]>;
+export type DashboardVariables = Record<string, string|string[]>;
 
 export const VARIABLE_SELECTION_TYPES = ['SINGLE', 'MULTI'] as const;
 export type VariableSelectionType = typeof VARIABLE_SELECTION_TYPES[number];

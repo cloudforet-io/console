@@ -38,8 +38,9 @@ import { i18n } from '@/translations';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import type { DateRange } from '@/services/dashboards/config';
 import CustomDateRangeModal from '@/services/dashboards/widgets/_components/CustomDateRangeModal.vue';
-import type { DateRange, Granularity } from '@/services/dashboards/widgets/config';
+import type { Granularity } from '@/services/dashboards/widgets/config';
 import { GRANULARITY } from '@/services/dashboards/widgets/config';
 import { getInitialDates } from '@/services/dashboards/widgets/date-range-helper';
 
