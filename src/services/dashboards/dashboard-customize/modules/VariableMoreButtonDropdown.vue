@@ -16,7 +16,7 @@
                         searchable
                         use-fixed-menu-style
                         :style="fixedMenuStyle"
-                        :menu="variables"
+                        :menu="reorderedMenu"
                         :selected.sync="selected"
                         multi-selectable
                         show-clear-selection
@@ -35,15 +35,14 @@
 </template>
 
 <script lang="ts" setup>
+// CAUTION: this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
 import {
     onMounted, reactive, toRefs, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep, forEach } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
@@ -81,14 +80,14 @@ const {
     hideContextMenu,
     showContextMenu,
     fixedMenuStyle,
-    reorderMenuBySelection,
-    menu,
+    reorderedMenu,
 } = useContextMenuController({
     targetRef,
     contextMenuRef,
     useReorderBySelection: true,
     useFixedStyle: true,
-    menu: variables,
+    originMenu: variables,
+    selected,
 });
 
 // event
@@ -99,17 +98,26 @@ const handleClickButton = () => {
     if (visibleMenu.value) {
         hideContextMenu();
     } else {
-        reorderMenuBySelection(selected.value);
-        showContextMenu();
+        showContextMenu(true); // update reorderedMenu automatically
     }
 };
 
 // After context menu is hidden, update selected variable's use.
-watch(() => visibleMenu.value, () => {
-    if (visibleMenu.value) return;
-    const properties = cloneDeep(props.variableMap) as DashboardVariablesSchema['properties'];
-    props.variableOrder.forEach((d) => {
-        properties[d].use = state.selected.some((item) => item.name === d);
+watch([visibleMenu, reorderedMenu], ([_visibleMenu, _reorderedMenu], prev) => {
+    if (_visibleMenu) {
+        return;
+    }
+
+    const [, prevReorderedMenu] = prev;
+    if (_reorderedMenu === prevReorderedMenu) {
+        return;
+    }
+
+    const properties = { ...props.variableMap };
+    selected.value.forEach((item) => {
+        if (!item.name) return;
+        if (!properties[item.name].use) return;
+        properties[item.name] = { ...props.variableMap[item.name], use: true };
     });
     emit('change', properties);
 });
