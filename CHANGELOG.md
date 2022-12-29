@@ -1,3 +1,10 @@
+# [1.1.0-beta.500](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.499...v1.1.0-beta.500) (2022-12-29)
+
+
+### Features
+
+* **use-context-menu-controller:** update reordering of menu feature ([#211](https://github.com/cloudforet-io/mirinae/issues/211)) ([74b2499](https://github.com/cloudforet-io/mirinae/commit/74b2499534b277e568cd9070a02ba6530a0cedb9))
+
 # [1.1.0-beta.499](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.498...v1.1.0-beta.499) (2022-12-29)
 
 
