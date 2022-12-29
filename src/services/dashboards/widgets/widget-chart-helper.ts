@@ -2,8 +2,12 @@ import {
     keyBy, merge, sortBy, values,
 } from 'lodash';
 
+import type { ReferenceMap } from '@/store/modules/reference/type';
+
 import type { GroupBy } from '@/services/dashboards/widgets/config';
-import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widgets/type';
+import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import type { HistoryDataModel, XYChartData, Legend } from '@/services/dashboards/widgets/type';
+
 
 const mergeByKey = (arrA, arrB, key) => {
     const merged = merge(keyBy(arrA, key), keyBy(arrB, key));
@@ -33,4 +37,39 @@ export const getRefinedXYChartData = (
         chartData = mergeByKey(chartData, refinedList, categoryKey);
     });
     return sortBy(chartData, categoryKey);
+};
+
+
+/**
+ * @name getLegends
+ * @description Extract legends from raw data.
+ */
+export const getLegends = (rawData: HistoryDataModel['results'], groupBy: GroupBy, referenceMap: ReferenceMap): Legend[] => {
+    if (!rawData || !groupBy || !referenceMap) return [];
+    const legends: Legend[] = [];
+    rawData.forEach((d) => {
+        let _name = d[groupBy];
+        let _label = d[groupBy];
+        if (groupBy === GROUP_BY.PROJECT_GROUP) {
+            _label = referenceMap.projectGroup[_name]?.label || _name;
+        } else if (groupBy === GROUP_BY.PROJECT) {
+            _label = referenceMap.projects[_name]?.label || _name;
+        } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
+            _label = referenceMap.serviceAccount[_name]?.label || _name;
+        } else if (groupBy === GROUP_BY.REGION) {
+            _label = referenceMap.region[_name]?.name || _name;
+        } else if (groupBy === GROUP_BY.PROVIDER) {
+            _label = referenceMap.provider[_name]?.name || _name;
+        }
+        if (!_name) {
+            _name = `no_${groupBy}`;
+            _label = 'Unknown';
+        }
+        legends.push({
+            name: _name,
+            label: _label,
+            disabled: false,
+        });
+    });
+    return legends;
 };

@@ -10,6 +10,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { SecretReferenceMap } from '@/store/modules/reference/secret/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+import type { ReferenceMap } from '@/store/modules/reference/type';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 
@@ -37,8 +38,9 @@ export const userItems: Getter<any, any> = (state): UserReferenceMap => state.us
 
 export const webhookItems: Getter<any, any> = (state): WebhookReferenceMap => state.webhook?.items ?? {};
 
-export const referenceMap: Getter<any, any> = (state, getters) => ({
+export const referenceMap: Getter<any, any> = (state, getters): ReferenceMap => ({
     projectGroup: getters.projectGroupItems,
+    project: getters.projectItems,
     protocol: getters.protocolItems,
     cloudServiceType: getters.cloudServiceTypeItems,
     collector: getters.collectorItems,

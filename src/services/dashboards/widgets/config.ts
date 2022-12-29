@@ -9,6 +9,7 @@ import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 import type { Tags } from '@/models';
 
 import type { CurrencyRates } from '@/store/modules/display/type';
+import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
@@ -163,4 +164,5 @@ export interface WidgetProps {
     widgetKey: string; // unique widget key to identify widgets in layout
     currencyRates?: CurrencyRates;
     editMode?: boolean;
+    referenceMap: ReferenceMap;
 }
