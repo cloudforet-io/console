@@ -58,3 +58,7 @@ export const TABLE_SIZE = {
 } as const;
 
 export type TableSize = typeof TABLE_SIZE[keyof typeof TABLE_SIZE];
+
+export interface WidgetTableData {
+    [fieldName: string]: string|number
+}
