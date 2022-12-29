@@ -30,8 +30,8 @@
                 </button>
             </span>
 
-            <p-i :name="state.visibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                 :activated="state.visibleMenu"
+            <p-i :name="visibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                 :activated="visibleMenu"
                  color="inherit"
                  class="dropdown-icon"
             />
