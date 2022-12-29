@@ -153,6 +153,7 @@ export default {
                 if (state.trimmedValue) {
                     return RegExp(state.trimmedValue, 'i');
                 }
+                // eslint-disable-next-line prefer-regex-literals
                 return RegExp(/./);
             }),
             projectGroupItems: [],
