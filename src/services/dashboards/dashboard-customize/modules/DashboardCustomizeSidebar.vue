@@ -191,6 +191,7 @@ onUnmounted(() => {
     }
 }
 </style>
+<!--style for p-sidebar outside of this module.-->
 <style lang="postcss">
 $footer-height: 57px;
 .p-sidebar .sidebar-wrapper {
