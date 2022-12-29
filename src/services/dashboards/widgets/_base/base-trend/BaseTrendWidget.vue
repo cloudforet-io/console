@@ -64,10 +64,8 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lif
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
-// eslint-disable-next-line import/no-cycle
-import {
-    getWidgetTableDateFields, getRefinedXYChartData,
-} from '@/services/dashboards/widgets/widget-helper';
+import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
+import { getWidgetTableDateFields } from '@/services/dashboards/widgets/widget-table-helper';
 
 const DATE_FORMAT = 'yyyy-MM';
 const DATE_FIELD_NAME = 'date';
