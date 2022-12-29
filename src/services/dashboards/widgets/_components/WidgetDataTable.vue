@@ -160,9 +160,8 @@ import {
     PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
-import { get } from 'lodash';
 
-import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, numberFormatter, getValueByPath } from '@cloudforet/core-lib';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
@@ -334,7 +333,7 @@ export default defineComponent<Props>({
         };
         const getValue = (item:string|number|object, field: Field):string|number => {
             if (typeof item === 'object') {
-                return textFormatter(get(item, field.name), field.textOptions);
+                return textFormatter(getValueByPath(item, field.name), field.textOptions);
             }
             return textFormatter(item, field.textOptions);
         };
