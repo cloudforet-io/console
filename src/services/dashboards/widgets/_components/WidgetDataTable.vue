@@ -175,16 +175,14 @@ import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import type {
-    Field, LegendConfig, TableSize,
+    Field, LegendConfig, TableSize, WidgetTableData,
 } from '@/services/dashboards/widgets/_components/type';
 import { TABLE_SIZE, UNIT_MAP } from '@/services/dashboards/widgets/_components/type';
-
-import { GROUP_BY } from '../config';
 
 interface Props {
     loading: boolean;
     fields: Field[];
-    items: any[];
+    items: WidgetTableData[];
     thisPage: number;
     showLegend?: boolean;
     showLegendIndex?: boolean;
@@ -360,7 +358,6 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            GROUP_BY,
             // getIndexNumber,
             getConvertedIndex,
             getLegendIconColor,
