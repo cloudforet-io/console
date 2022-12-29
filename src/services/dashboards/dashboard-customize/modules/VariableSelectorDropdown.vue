@@ -63,20 +63,9 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PBadge, PContextMenu, PI, useContextMenuController,
 } from '@spaceone/design-system';
-import type { ContextMenuType } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import type { VariableSelectionType } from '@/services/dashboards/config';
-
-// temporary
-interface MenuItem {
-    name?: string;
-    label?: string | TranslateResult;
-    type?: ContextMenuType;
-    disabled?: boolean;
-    link?: string;
-    target?: string;
-    icon?: string;
-}
 
 interface Props {
     variableName: string;
