@@ -38,6 +38,7 @@
         </button>
         <p-context-menu v-show="visibleMenu"
                         ref="contextMenuRef"
+                        class="options-menu"
                         searchable
                         use-fixed-menu-style
                         :style="fixedMenuStyle"
@@ -214,6 +215,19 @@ onMounted(() => {
             @apply border-blue-400 bg-blue-200;
             &.is-visible {
                 @apply border-blue-600;
+            }
+        }
+    }
+
+    /* custom design-system component - p-context-menu-item */
+    :deep(.options-menu) {
+
+        .p-context-menu-item {
+            &.selected {
+                @apply bg-white;
+            }
+            &:hover {
+                @apply bg-blue-200;
             }
         }
     }
