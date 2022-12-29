@@ -27,7 +27,7 @@ interface SizeOption {
 
 interface ReferenceOption {
     type: 'reference',
-    target: 'provider'|'projectGroup'|'project', // can be added more. these are just samples.
+    target: 'provider'|'projectGroup'|'project'|'serviceAccount'|'region', // can be added more. these are just samples.
 }
 
 export interface LegendConfig {
