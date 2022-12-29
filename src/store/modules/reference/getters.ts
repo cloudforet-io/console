@@ -38,7 +38,7 @@ export const userItems: Getter<any, any> = (state): UserReferenceMap => state.us
 
 export const webhookItems: Getter<any, any> = (state): WebhookReferenceMap => state.webhook?.items ?? {};
 
-export const referenceMap: Getter<any, any> = (state, getters): ReferenceMap => ({
+export const referenceMap: Getter<any, any> = (state, getters): Record<string, ReferenceMap> => ({
     projectGroup: getters.projectGroupItems,
     project: getters.projectItems,
     protocol: getters.protocolItems,

@@ -33,6 +33,7 @@
                            :items="state.data"
                            :currency="state.currency"
                            :currency-rates="props.currencyRates"
+                           :reference-map="referenceMap"
         />
     </widget-frame>
 </template>

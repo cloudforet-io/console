@@ -166,6 +166,7 @@ import { byteFormatter, numberFormatter, getValueByPath } from '@cloudforet/core
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
+import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -192,6 +193,7 @@ interface Props {
     showPagination?: boolean;
     widgetKey: string;
     disableNextPage: boolean;
+    referenceMap: Record<string, ReferenceMap>;
 }
 export default defineComponent<Props>({
     name: 'WidgetDataTable',
@@ -257,6 +259,10 @@ export default defineComponent<Props>({
             type: Boolean,
             default: true,
         },
+        referenceMap: {
+            type: Object as PropType<Record<string, ReferenceMap>>,
+            default: () => ({}),
+        },
         // printMode: {
         //     type: Boolean,
         //     default: false,
@@ -303,8 +309,8 @@ export default defineComponent<Props>({
                 let formattedValue: string;
                 if (data === null) formattedValue = '-';
                 else {
-                    const displayUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.display_unit as string] || undefined;
-                    const sourceUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.source_unit as string] || undefined;
+                    const displayUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.displayUnit as string] || undefined;
+                    const sourceUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.sourceUnit as string] || undefined;
                     const bytesOptions: bytes.BytesOptions = { unit: displayUnit, unitSeparator: UNIT_SEPARATOR };
 
                     if (sourceUnit) {
@@ -326,6 +332,10 @@ export default defineComponent<Props>({
                 return numberFormatter(value);
             } if (textOptions?.type === 'percent') {
                 return `${value}%`;
+            } if (textOptions?.type === 'reference') {
+                const referenceMap = props.referenceMap[textOptions.type];
+                const item = referenceMap[value];
+                return item?.label ?? value;
             }
             return value;
         };
