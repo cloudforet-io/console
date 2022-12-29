@@ -36,3 +36,17 @@ export const serviceAccountItems: Getter<any, any> = (state): ServiceAccountRefe
 export const userItems: Getter<any, any> = (state): UserReferenceMap => state.user?.items ?? {};
 
 export const webhookItems: Getter<any, any> = (state): WebhookReferenceMap => state.webhook?.items ?? {};
+
+export const referenceMap: Getter<any, any> = (state, getters) => ({
+    projectGroup: getters.projectGroupItems,
+    protocol: getters.protocolItems,
+    cloudServiceType: getters.cloudServiceTypeItems,
+    collector: getters.collectorItems,
+    plugin: getters.pluginItems,
+    provider: getters.providerItems,
+    region: getters.regionItems,
+    secret: getters.secretItems,
+    serviceAccount: getters.serviceAccountItems,
+    user: getters.userItems,
+    webhook: getters.webhookItems,
+});
