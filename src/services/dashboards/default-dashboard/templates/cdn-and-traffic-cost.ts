@@ -13,7 +13,7 @@ export const cdnTrafficCostDashboardPreview: DefaultDashboardPreviewConfig = {
     labels: ['Cost'],
     version: '1',
     description: {
-        preview_image: './assets/icons/ic_dashboard-template_cdn-traffic-cost.svg',
+        preview_image: 'ic_dashboard-template_cdn-traffic-cost',
     },
 };
 
