@@ -62,8 +62,8 @@ const props = defineProps<Props>();
 const emit = defineEmits<EventEmits>();
 
 const state = reactive({
-    targetRef: null,
-    contextMenuRef: null,
+    targetRef: null as HTMLElement | null,
+    contextMenuRef: null as typeof PContextMenu | null,
     variables: [] as MenuItem[],
     selected: [] as MenuItem[],
 });

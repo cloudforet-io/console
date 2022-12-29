@@ -82,8 +82,8 @@ const emit = defineEmits<EmitFn>();
 
 
 const state = reactive({
-    targetRef: null,
-    contextMenuRef: null,
+    targetRef: null as HTMLElement | null,
+    contextMenuRef: null as typeof PContextMenu | null,
     searchText: '',
     selected: [] as MenuItem[],
     options: [] as MenuItem[],
