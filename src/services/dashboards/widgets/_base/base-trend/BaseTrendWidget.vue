@@ -65,7 +65,7 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lif
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
-import { getWidgetTableDateFields } from '@/services/dashboards/widgets/widget-table-helper';
+import { getWidgetTableDateFields, sortTableDataByDate } from '@/services/dashboards/widgets/widget-table-helper';
 
 const DATE_FORMAT = 'yyyy-MM';
 const DATE_FIELD_NAME = 'date';
@@ -128,7 +128,7 @@ const fetchData = async () => {
                 field_group: ['date'],
             },
         });
-        state.data = results;
+        state.data = sortTableDataByDate(results);
     } catch (e) {
         state.data = [];
         ErrorHandler.handleError(e);

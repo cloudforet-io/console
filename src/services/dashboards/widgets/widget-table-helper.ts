@@ -1,13 +1,16 @@
 import dayjs from 'dayjs';
+import { sortBy } from 'lodash';
 
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import type { Granularity } from '@/services/dashboards/widgets/config';
+import type { HistoryDataModel } from '@/services/dashboards/widgets/type';
 
 /**
  * @name getWidgetTableDateFields
  * @description Get refined PDataTable fields.
+ * @example [{ name: 'usd_cost_sum.0.value', label: '2022-09' }, ...]
  */
 export const getWidgetTableDateFields = (granularity: Granularity, dateRange: DateRange): Field[] => {
     if (!granularity || !dateRange?.end) return [];
@@ -38,4 +41,16 @@ export const getWidgetTableDateFields = (granularity: Granularity, dateRange: Da
         count += 1;
     }
     return dateFields;
+};
+
+export const sortTableDataByDate = (rawData: HistoryDataModel['results']): HistoryDataModel['results'] => {
+    const results: HistoryDataModel['results'] = [];
+    rawData.forEach((d) => {
+        const _usdCostSum = sortBy(d.usd_cost_sum, 'date');
+        results.push({
+            ...d,
+            usd_cost_sum: _usdCostSum,
+        });
+    });
+    return results;
 };
