@@ -30,7 +30,7 @@
 
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
-                           :items="state.tableData"
+                           :items="state.data"
                            :currency="state.currency"
                            :currency-rates="props.currencyRates"
         />
@@ -43,7 +43,6 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep, random, sortBy } from 'lodash';
 
@@ -54,6 +53,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
 import { GRANULARITY } from '@/services/dashboards/config';
+import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
@@ -66,7 +66,7 @@ import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 // eslint-disable-next-line import/no-cycle
 import {
-    getRefinedDataTableData, getRefinedDataTableFields, getRefinedXYChartData,
+    getWidgetTableDateFields, getRefinedXYChartData,
 } from '@/services/dashboards/widgets/widget-helper';
 
 const DATE_FORMAT = 'yyyy-MM';
@@ -94,10 +94,9 @@ const state = reactive({
         if (!state.data) return [];
         return state.data.map((d) => d[state.groupBy]);
     }),
-    tableData: computed(() => getRefinedDataTableData(state.data, state.groupBy)),
-    tableFields: computed<DataTableField[]>(() => {
+    tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
-        const refinedFields = getRefinedDataTableFields(state.widgetConfig.options?.granularity, state.dateRange);
+        const refinedFields = getWidgetTableDateFields(state.widgetConfig.options?.granularity, state.dateRange);
         return [
             { label: state.groupByLabel, name: state.groupBy },
             ...refinedFields,
