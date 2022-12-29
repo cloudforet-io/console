@@ -57,6 +57,9 @@
                                            name="handbook-contents"
                             />
                         </template>
+                        <template #footer>
+                            <portal-target name="widget-footer" />
+                        </template>
                     </p-sidebar>
                 </div>
             </template>
