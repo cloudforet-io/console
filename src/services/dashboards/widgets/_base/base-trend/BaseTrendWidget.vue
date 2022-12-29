@@ -30,7 +30,7 @@
 
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
-                           :items="state.data"
+                           :items="state.tableData"
                            :currency="state.currency"
                            :currency-rates="props.currencyRates"
         />
@@ -43,6 +43,7 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
+import type { DataTableField } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep, random, sortBy } from 'lodash';
 
@@ -64,7 +65,9 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lif
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 // eslint-disable-next-line import/no-cycle
-import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-helper';
+import {
+    getRefinedDataTableData, getRefinedDataTableFields, getRefinedXYChartData,
+} from '@/services/dashboards/widgets/widget-helper';
 
 const DATE_FORMAT = 'yyyy-MM';
 const DATE_FIELD_NAME = 'date';
@@ -91,9 +94,15 @@ const state = reactive({
         if (!state.data) return [];
         return state.data.map((d) => d[state.groupBy]);
     }),
-    tableFields: computed(() => [
-        { label: state.groupByLabel, name: state.groupBy },
-    ]),
+    tableData: computed(() => getRefinedDataTableData(state.data, state.groupBy)),
+    tableFields: computed<DataTableField[]>(() => {
+        if (!state.groupBy) return [];
+        const refinedFields = getRefinedDataTableFields(state.widgetConfig.options?.granularity, state.dateRange);
+        return [
+            { label: state.groupByLabel, name: state.groupBy },
+            ...refinedFields,
+        ];
+    }),
     dateRange: computed<DateRange>(() => {
         const end = state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM-DD');
         const range = props.size === WIDGET_SIZE.full ? 11 : 3;
@@ -166,7 +175,7 @@ const drawChart = (chartData: XYChartData[]) => {
             dateFields: [DATE_FIELD_NAME],
         });
         const tooltip = createTooltip();
-        setXYSharedTooltipText(chart, tooltip, state.options.currency, props.currencyRates);
+        setXYSharedTooltipText(chart, tooltip, state.currency, props.currencyRates);
         series.set('tooltip', tooltip);
         series.data.setAll(cloneDeep(chartData));
     });
