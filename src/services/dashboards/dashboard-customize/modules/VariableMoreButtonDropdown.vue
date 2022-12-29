@@ -103,15 +103,16 @@ const handleClickButton = () => {
 };
 
 // After context menu is hidden, update selected variable's use.
-watch([visibleMenu, reorderedMenu], ([_visibleMenu, _reorderedMenu], prev) => {
+watch([visibleMenu, reorderedMenu], ([_visibleMenu]) => {
     if (_visibleMenu) {
         return;
     }
 
-    const [, prevReorderedMenu] = prev;
-    if (_reorderedMenu === prevReorderedMenu) {
-        return;
-    }
+    // TODO: refactor
+    // const [, prevReorderedMenu] = prev;
+    // if (_reorderedMenu === prevReorderedMenu) {
+    //     return;
+    // }
 
     const properties = { ...props.variableMap };
     selected.value.forEach((item) => {

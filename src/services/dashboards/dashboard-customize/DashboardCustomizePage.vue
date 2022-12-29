@@ -80,6 +80,8 @@ import DashboardManageVariableOverlay
 import DashboardCustomizePageName
     from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizePageName.vue';
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
+import VariableMoreButtonDropdown
+    from '@/services/dashboards/dashboard-customize/modules/VariableMoreButtonDropdown.vue';
 import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import type { DashboardModel } from '@/services/dashboards/model';
