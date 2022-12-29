@@ -184,6 +184,7 @@ export const createXYLineSeries = (
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
         valueXField: DEFAULT_DATE_FIELD_NAME,
+        maskBullets: false,
         ...settings,
     });
     series.strokes.template.setAll({
@@ -207,6 +208,7 @@ export const createXYColumnSeries = (
         xAxis: chart.xAxes.getIndex(0) as IXYAxis,
         yAxis: chart.yAxes.getIndex(0) as IXYAxis,
         valueXField: DEFAULT_DATE_FIELD_NAME,
+        maskBullets: false,
         ...settings,
     });
     series.columns.template.setAll({
