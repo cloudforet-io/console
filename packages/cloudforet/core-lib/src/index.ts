@@ -2,7 +2,7 @@ import bytes from 'bytes';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { isEmpty } from 'lodash';
+import { isEmpty, flatten } from 'lodash';
 import { DateTime } from 'luxon';
 
 dayjs.extend(tz);
@@ -79,3 +79,44 @@ export const tagsToObject = (tags: Array<{ key: string; value: string }>): Recor
     });
     return tagsObject;
 };
+
+
+const getObjectValue = (target: Record<string, any>|Array<any>, currentPath: string) => {
+    if (Array.isArray(target)) {
+        if (Number.isNaN(Number(currentPath))) {
+            return flatten(target.map((d) => {
+                if (typeof d === 'object') return getObjectValue(d, currentPath);
+                return d;
+            }));
+        }
+        return target[Number(currentPath)];
+    }
+    return target[currentPath];
+};
+
+export const getValueByPath = (data: any, path: string|null, splitDisableKeys: string[] = ['tags']) => {
+    if (typeof path !== 'string') return data;
+
+    let target = data;
+
+    let pathArr;
+    const key = splitDisableKeys.find((k) => path.startsWith(`${k}.`));
+    if (key) {
+        pathArr = [key, path.slice(key.length + 1)];
+    } else {
+        pathArr = path.split('.');
+    }
+
+
+    for (let i = 0; i < pathArr.length; i++) {
+        if (target === undefined || target === null || typeof target !== 'object') return target;
+
+        const currentPath = pathArr[i];
+
+        if (typeof target === 'object') {
+            target = getObjectValue(target, currentPath);
+        }
+    }
+    return target;
+};
+
