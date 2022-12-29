@@ -296,7 +296,14 @@ export default defineComponent<Props>({
             field, index: colIndex, colIndex,
         });
         const textFormatter = (value:string|number, textOptions: Field['textOptions']) => {
-            if (typeof value !== 'number') return value;
+            if (typeof value !== 'number') {
+                if (textOptions?.type === 'reference') {
+                    const referenceMap = props.referenceMap[textOptions.target];
+                    const item = referenceMap[value];
+                    return item?.label ?? item?.name ?? value;
+                }
+                return value;
+            }
             if (textOptions?.type === 'size') {
                 let data: number|null;
                 const UNIT_SEPARATOR = ' ';
@@ -332,10 +339,6 @@ export default defineComponent<Props>({
                 return numberFormatter(value);
             } if (textOptions?.type === 'percent') {
                 return `${value}%`;
-            } if (textOptions?.type === 'reference') {
-                const referenceMap = props.referenceMap[textOptions.type];
-                const item = referenceMap[value];
-                return item?.label ?? value;
             }
             return value;
         };
