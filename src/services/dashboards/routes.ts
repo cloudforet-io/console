@@ -33,6 +33,7 @@ const dashboardsRoute: RouteConfig = {
                 {
                     path: 'create',
                     name: DASHBOARDS_ROUTE.CREATE._NAME,
+                    meta: { translationId: 'DASHBOARDS.CREATE.TITLE' },
                     component: DashboardCreatePage,
                 },
                 // TODO: remove after test
