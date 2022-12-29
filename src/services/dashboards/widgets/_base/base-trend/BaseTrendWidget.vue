@@ -4,7 +4,7 @@
                   :width="props.width"
                   :edit-mode="props.editMode"
                   :date-range="state.dateRange"
-                  :currency="state.settings.currency.value"
+                  :currency="state.currency"
                   class="base-trend-widget"
     >
         <template v-if="state.selectorItems.length"
@@ -18,7 +18,7 @@
         <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
                            :loading="state.loading"
-                           :data="state.data"
+                           :data="state.chartData"
                            loader-type="skeleton"
                            show-data-from-scratch
             >
@@ -30,8 +30,8 @@
 
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
-                           :items="state.chartData"
-                           :currency="state.settings.currency.value"
+                           :items="state.data"
+                           :currency="state.currency"
                            :currency-rates="props.currencyRates"
         />
     </widget-frame>
@@ -44,7 +44,7 @@ import {
 
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { cloneDeep, random } from 'lodash';
+import { cloneDeep, random, sortBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -66,40 +66,6 @@ import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 // eslint-disable-next-line import/no-cycle
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-helper';
 
-// TODO: sample data
-const SAMPLE_RAW_DATA = {
-    more: true,
-    results: [
-        {
-            provider: 'aws',
-            usd_cost_sum: [
-                { date: '2022-08', value: random(100, 5000) },
-                // { date: '2022-09', value: 0 },
-                { date: '2022-10', value: random(100, 5000) },
-                { date: '2022-11', value: random(100, 5000) },
-            ],
-        },
-        {
-            provider: 'google_cloud',
-            usd_cost_sum: [
-                { date: '2022-08', value: random(100, 5000) },
-                { date: '2022-09', value: random(100, 5000) },
-                { date: '2022-10', value: random(100, 5000) },
-                { date: '2022-11', value: random(100, 5000) },
-            ],
-        },
-        {
-            provider: 'azure',
-            usd_cost_sum: [
-                { date: '2022-08', value: random(100, 5000) },
-                { date: '2022-09', value: random(100, 5000) },
-                { date: '2022-10', value: random(100, 5000) },
-                { date: '2022-11', value: random(100, 5000) },
-            ],
-        },
-    ],
-};
-
 const DATE_FORMAT = 'yyyy-MM';
 const DATE_FIELD_NAME = 'date';
 
@@ -119,18 +85,18 @@ const state = reactive({
         const groupBy = state.groupBy;
         return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;
     }),
+    chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data, state.groupBy)),
     chartType: computed(() => state.options.chart_type ?? CHART_TYPE.LINE),
-    chartData: computed(() => getRefinedXYChartData(state.data, state.groupBy)),
-    labels: computed(() => {
+    chartLabels: computed(() => {
         if (!state.data) return [];
         return state.data.map((d) => d[state.groupBy]);
     }),
-    tableFields: computed(() => [ // TODO: fill date fields
+    tableFields: computed(() => [
         { label: state.groupByLabel, name: state.groupBy },
     ]),
     dateRange: computed<DateRange>(() => {
-        const range = props.size === WIDGET_SIZE.full ? 12 : 4;
-        const end = state.settings.date_range.end;
+        const end = state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM-DD');
+        const range = props.size === WIDGET_SIZE.full ? 11 : 3;
         const start = dayjs.utc(end).subtract(range, 'month').format('YYYY-MM');
         return { start, end };
     }),
@@ -139,24 +105,29 @@ const state = reactive({
 /* Api */
 const fetchData = async () => {
     try {
+        state.loading = true;
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.widgetConfig.options?.granularity ?? GRANULARITY.MONTHLY,
                 group_by: [state.groupBy],
                 start: state.dateRange.start,
                 end: state.dateRange.end,
-                field_group: ['date'],
                 fields: {
                     usd_cost_sum: {
                         key: 'usd_cost',
                         operator: 'sum',
                     },
                 },
+                sort: [{ key: 'date', desc: false }],
+                field_group: ['date'],
             },
         });
-        // console.log(results);
+        state.data = results;
     } catch (e) {
+        state.data = [];
         ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
     }
 };
 
@@ -180,7 +151,7 @@ const drawChart = (chartData: XYChartData[]) => {
         chart.children.push(legend);
     }
 
-    state.labels.forEach((label) => {
+    state.chartLabels.forEach((label) => {
         const seriesSettings = {
             name: label,
             valueYField: label,
@@ -203,20 +174,16 @@ const drawChart = (chartData: XYChartData[]) => {
 };
 
 const initWidget = async () => {
-    state.loading = true;
-    state.data = await fetchData();
+    await fetchData();
     await nextTick();
     drawChart(state.chartData);
-    state.loading = false;
 };
 
 const refreshWidget = async () => {
-    state.loading = true;
-    state.data = await fetchData();
+    await fetchData();
     await nextTick();
     refreshRoot();
     drawChart(state.chartData);
-    state.loading = false;
 };
 
 /* Event */

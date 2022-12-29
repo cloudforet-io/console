@@ -5,6 +5,8 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { merge } from 'lodash';
 
+import { CURRENCY } from '@/store/modules/display/config';
+
 import {
     palette,
 } from '@/styles/colors';
@@ -64,6 +66,7 @@ export function useWidgetState<Data = any>(
             props.inheritOptions,
             props.dashboardVariables,
         )),
+        currency: computed(() => state.settings.currency?.value ?? CURRENCY.USD),
         size: computed<WidgetSize>(() => {
             if (state.widgetConfig.sizes.includes(props.size)) return props.size;
             return state.widgetConfig.sizes[0];
