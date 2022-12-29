@@ -1,5 +1,5 @@
 import type * as am5 from '@amcharts/amcharts5';
-import { color, Percent } from '@amcharts/amcharts5';
+import { Percent } from '@amcharts/amcharts5';
 import * as am5hierarchy from '@amcharts/amcharts5/hierarchy';
 
 import type { Currency } from '@/store/modules/display/config';

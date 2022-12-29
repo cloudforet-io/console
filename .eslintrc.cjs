@@ -31,7 +31,6 @@ module.exports = {
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         'no-unsafe-optional-chaining': 1,
         'no-undef': 1,
-        'no-useless-catch': 1,
         'no-unused-vars': ['off'],
         'no-mixed-operators': 0,
         'no-promise-executor-return': 1,
@@ -125,7 +124,7 @@ module.exports = {
         '@typescript-eslint/explicit-function-return-type': ['off'],
         '@typescript-eslint/explicit-module-boundary-types': ['off'],
         '@typescript-eslint/no-explicit-any': ['off'],
-        '@typescript-eslint/no-unused-vars': ['off'],
+        '@typescript-eslint/no-unused-vars': ['error'],
         '@typescript-eslint/no-shadow': ['error'],
         '@typescript-eslint/consistent-type-imports': ['error'],
 

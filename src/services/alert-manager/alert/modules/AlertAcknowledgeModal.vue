@@ -64,16 +64,12 @@ export default {
 
         /* api */
         const updateToAcknowledge = async () => {
-            try {
-                const params: AlertStateUpdateParams = {
-                    alerts: props.alerts?.map((d) => d.alert_id),
-                    state: ALERT_STATE.ACKNOWLEDGED,
-                };
-                if (state.isAssignedToMe) params.assignee = store.state.user.userId;
-                await SpaceConnector.client.monitoring.alert.updateState(params);
-            } catch (e) {
-                throw e;
-            }
+            const params: AlertStateUpdateParams = {
+                alerts: props.alerts?.map((d) => d.alert_id),
+                state: ALERT_STATE.ACKNOWLEDGED,
+            };
+            if (state.isAssignedToMe) params.assignee = store.state.user.userId;
+            await SpaceConnector.client.monitoring.alert.updateState(params);
         };
 
         const onClickConfirm = async () => {

@@ -53,12 +53,12 @@
 </template>
 
 <script setup lang="ts">
+// CAUTION: this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
 import {
     onMounted,
     reactive, toRefs, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import {
     PBadge, PContextMenu, PI, useContextMenuController,
@@ -125,7 +125,7 @@ const handleChangeVisible = () => {
     }
 };
 // TODO: search text binding
-const handleChangeContextMenuInput = (value: string): void => {
+const handleChangeContextMenuInput = (): void => {
     // state.searchText = value;
 };
 

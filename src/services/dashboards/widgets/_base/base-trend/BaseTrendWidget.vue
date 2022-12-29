@@ -44,7 +44,7 @@ import {
 
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { cloneDeep, random, sortBy } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -112,7 +112,7 @@ const state = reactive({
 const fetchData = async () => {
     try {
         state.loading = true;
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+        const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.widgetConfig.options?.granularity ?? GRANULARITY.MONTHLY,
                 group_by: [state.groupBy],

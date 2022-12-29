@@ -38,9 +38,9 @@
 </template>
 
 <script setup lang="ts">
-// this vOnClickOutside is using !! Please do not remove.
+// CAUTION: this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PFieldGroup, PIconButton, PLabel, PTextInput,

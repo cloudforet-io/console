@@ -356,32 +356,24 @@ export default {
         };
 
         const bindRole = async (userId, roleId) => {
-            try {
-                await SpaceConnector.client.identity.roleBinding.create({
-                    resource_type: 'identity.User',
-                    resource_id: userId,
-                    role_id: roleId,
-                });
-            } catch (e) {
-                throw e;
-            }
+            await SpaceConnector.client.identity.roleBinding.create({
+                resource_type: 'identity.User',
+                resource_id: userId,
+                role_id: roleId,
+            });
         };
         const unbindRole = async (userId, roleId) => {
-            try {
-                const res = await SpaceConnector.client.identity.roleBinding.list({
-                    resource_type: 'identity.User',
-                    resource_id: userId,
-                    role_id: roleId,
-                    role_type: 'DOMAIN',
+            const res = await SpaceConnector.client.identity.roleBinding.list({
+                resource_type: 'identity.User',
+                resource_id: userId,
+                role_id: roleId,
+                role_type: 'DOMAIN',
+            });
+            const roleBindingId = res.results[0].role_binding_id;
+            if (res.total_count > 0) {
+                await SpaceConnector.client.identity.roleBinding.delete({
+                    role_binding_id: roleBindingId,
                 });
-                const roleBindingId = res.results[0].role_binding_id;
-                if (res.total_count > 0) {
-                    await SpaceConnector.client.identity.roleBinding.delete({
-                        role_binding_id: roleBindingId,
-                    });
-                }
-            } catch (e) {
-                throw e;
             }
         };
         const addUser = async (item, roleId) => {

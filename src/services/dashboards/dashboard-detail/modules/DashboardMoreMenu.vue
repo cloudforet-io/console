@@ -16,6 +16,7 @@
 </template>
 
 <script setup lang="ts">
+/* eslint-disable  @typescript-eslint/no-non-null-assertion */
 import { computed, reactive } from 'vue';
 import VueI18n from 'vue-i18n';
 
