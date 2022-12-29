@@ -44,7 +44,7 @@ export const getRefinedXYChartData = (
  * @name getLegends
  * @description Extract legends from raw data.
  */
-export const getLegends = (rawData: HistoryDataModel['results'], groupBy: GroupBy, referenceMap: ReferenceMap): Legend[] => {
+export const getLegends = (rawData: HistoryDataModel['results'], groupBy: GroupBy, referenceMap: Record<string, ReferenceMap>): Legend[] => {
     if (!rawData || !groupBy || !referenceMap) return [];
     const legends: Legend[] = [];
     rawData.forEach((d) => {
@@ -53,7 +53,7 @@ export const getLegends = (rawData: HistoryDataModel['results'], groupBy: GroupB
         if (groupBy === GROUP_BY.PROJECT_GROUP) {
             _label = referenceMap.projectGroup[_name]?.label || _name;
         } else if (groupBy === GROUP_BY.PROJECT) {
-            _label = referenceMap.projects[_name]?.label || _name;
+            _label = referenceMap.project[_name]?.label || _name;
         } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
             _label = referenceMap.serviceAccount[_name]?.label || _name;
         } else if (groupBy === GROUP_BY.REGION) {
