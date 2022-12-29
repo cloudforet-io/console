@@ -1,107 +1,172 @@
 <template>
-    <div class="dashboard-variable-dropdown">
+    <div v-on-click-outside="hideContextMenu"
+         class="dashboard-variable-dropdown"
+         :class="{ 'open-menu': visibleMenu }"
+    >
         <button ref="targetRef"
                 class="dropdown-box"
-                :class="{ 'is-visible': state.visibleMenu, 'filled-value': state.selected.length }"
-                @click="showContextMenu"
+                :class="{ 'is-visible': visibleMenu, 'filled-value': selected.length }"
+                @click="handleChangeVisible"
         >
             <span class="variable-label">{{ variableName }}</span>
-            <span v-if="state.selected.length"
+            <span v-if="selected.length"
                   class="selected-items"
             >
-                <span class="item-for-display">{{ state.selected[0].label }}</span>
-                <p-badge v-if="state.selected.length > 1"
+                <span class="item-for-display">{{ selected[0].label }}</span>
+                <p-badge v-if="selected.length > 1"
+                         class="selected-count"
                          style-type="blue300"
                 >
-                    +{{ state.selected.length - 1 }}
+                    +{{ selected.length - 1 }}
                 </p-badge>
+                <button class="option-delete-button"
+                        @click.stop="handleClearSelected"
+                >
+                    <p-i name="ic_delete"
+                         width="1rem"
+                         height="1rem"
+                         color="inherit"
+                    />
+                </button>
             </span>
-            <span />
+
             <p-i :name="state.visibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                  :activated="state.visibleMenu"
                  color="inherit"
                  class="dropdown-icon"
             />
         </button>
-        <p-context-menu v-show="state.visibleMenu"
+        <p-context-menu v-show="visibleMenu"
                         ref="contextMenuRef"
                         searchable
                         use-fixed-menu-style
-                        :menu="state.menu"
-                        :selected="state.selected"
-                        :multi-selectable="state.selectionType === 'MULTI'"
-                        :show-radio-icon="state.selectionType === 'SINGLE'"
-                        :show-clear-selection="state.selectionType === 'MULTI'"
+                        :style="fixedMenuStyle"
+                        :menu="menu"
+                        :selected.sync="selected"
+                        :multi-selectable="selectionType === 'MULTI'"
+                        :show-radio-icon="selectionType === 'SINGLE'"
+                        :show-clear-selection="selectionType === 'MULTI'"
                         @update-search-input="handleChangeContextMenuInput"
         />
     </div>
 </template>
 
 <script setup lang="ts">
-// import { vOnClickOutside } from '@vueuse/components';
+import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed,
-    reactive, ref,
+    onMounted,
+    reactive, toRefs, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PBadge, PContextMenu, PI, useContextMenuController,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { ContextMenuType } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import type { VariableSelectionType } from '@/services/dashboards/config';
+
+// temporary
+interface MenuItem {
+    name?: string;
+    label?: string | TranslateResult;
+    type?: ContextMenuType;
+    disabled?: boolean;
+    link?: string;
+    target?: string;
+    icon?: string;
+}
 
 interface Props {
     variableName: string;
-    selected?: Array<MenuItem>;
-    variableSchema?: DashboardVariableSchemaProperty;
+    defaultSelected?: string| string[];
+    variableOptions: string[];
+    selectionType: VariableSelectionType;
+}
+interface EmitFn {
+    (e: 'change', value: string|string[]): void;
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits<EmitFn>();
+
 
 const state = reactive({
-    visibleMenu: false,
-    varialbeType: computed(() => props.variableSchema?.variable_type ?? 'MANAGED'),
-    selectionType: computed(() => props.variableSchema?.selection_type ?? 'SINGLE'),
+    targetRef: null,
+    contextMenuRef: null,
     searchText: '',
-    // TODO: Must be filtered by searchText & reordered by Fn in context menu controller
-    menu: [
-        { name: 'spaceone', label: 'SpaceONE Dev' },
-        { name: 'test1', label: 'Test-1' },
-        { name: 'test2', label: 'Test-2' },
-        { name: 'test3', label: 'Test-3' },
-        { name: 'test4', label: 'Test-4' },
-    ] as MenuItem[],
-    selected: props.selected ?? [
-        { name: 'spaceone', label: 'SpaceONE Dev' },
-        { name: 'spaceone', label: 'SpaceONE Dev' },
-        { name: 'spaceone', label: 'SpaceONE Dev' },
-    ] as MenuItem[],
+    selected: [] as MenuItem[],
+    options: [] as MenuItem[],
 });
+
+const {
+    targetRef,
+    contextMenuRef,
+    selected,
+    options,
+} = toRefs(state);
+
 const {
     visibleMenu,
-    // showContextMenu,
+    showContextMenu,
     hideContextMenu,
     // focusOnContextMenu,
-    // reorderMenuBySelection,
-    // fixedMenuStyle,
+    reorderMenuBySelection,
+    fixedMenuStyle,
+    menu,
 } = useContextMenuController({
-    targetRef: ref(null),
-    contextMenuRef: ref(null),
+    targetRef,
+    contextMenuRef,
     useReorderBySelection: true,
     useFixedStyle: true,
-    menu: ref([]),
+    menu: options,
 });
-// const hideContextMenu = () => {
-//     state.visibleMenu = false;
-// };
-const showContextMenu = (e: MouseEvent) => {
-    state.visibleMenu = !state.visibleMenu;
-    e.stopPropagation();
+
+// event
+const handleClearSelected = () => {
+    state.selected = [];
 };
+const handleChangeVisible = () => {
+    if (visibleMenu.value) {
+        hideContextMenu();
+    } else {
+        reorderMenuBySelection(selected.value);
+        showContextMenu();
+    }
+};
+// TODO: search text binding
 const handleChangeContextMenuInput = (value: string): void => {
-    state.searchText = value;
+    // state.searchText = value;
 };
+
+// reconvert to string | string[]
+watch(() => state.selected, () => {
+    let reconvertedSelected;
+    if (props.selectionType === 'SINGLE') {
+        reconvertedSelected = state.selected[0].name;
+    } else reconvertedSelected = state.selected.map((d) => d.name);
+    emit('change', reconvertedSelected);
+});
+
+onMounted(() => {
+    // convert to MenuItem for selected
+    if (props.defaultSelected) {
+        const defaultSelected = [] as MenuItem[];
+        if (Array.isArray(props.defaultSelected)) {
+            props.defaultSelected.forEach((d) => {
+                defaultSelected.push({ name: d, label: d });
+            });
+        } else defaultSelected.push({ name: props.defaultSelected, label: props.defaultSelected });
+        state.selected = defaultSelected;
+    }
+
+    // convert to MenuItem for variable options
+    const defaultMenu = [] as MenuItem[];
+    props.variableOptions.forEach((d) => {
+        defaultMenu.push({ name: d, label: d });
+    });
+    state.options = defaultMenu;
+});
 
 </script>
 
@@ -109,6 +174,9 @@ const handleChangeContextMenuInput = (value: string): void => {
 .dashboard-variable-dropdown {
     @apply inline-block relative;
     max-width: 20rem;
+    &.open-menu {
+        @apply relative;
+    }
 
     .dropdown-box {
         @apply flex items-center border border-solid border-gray-300 bg-white rounded-md;
@@ -121,11 +189,21 @@ const handleChangeContextMenuInput = (value: string): void => {
 
         .selected-items {
             @apply inline-flex items-center;
-            padding: 0 0.5rem;
+            padding-left: 0.5rem;
 
             .item-for-display {
                 @apply text-gray-900 text-label-md font-bold;
-                margin-right: 0.25rem;
+            }
+            .selected-count {
+                margin-left: 0.25rem;
+            }
+            .option-delete-button {
+                @apply flex items-center justify-center text-gray-400 rounded-full;
+                margin-left: 0.5rem;
+
+                &:hover {
+                    @apply bg-gray-200 text-gray-900;
+                }
             }
         }
 

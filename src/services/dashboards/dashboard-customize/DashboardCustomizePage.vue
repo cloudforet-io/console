@@ -15,16 +15,16 @@
         <p-divider />
         <div class="dashboard-selectors">
             <div class="variable-selector-wrapper">
-                <!--                <template v-for="(name, idx) in variableState.order">-->
-                <!--                    <variable-selector-dropdown v-if="variableState.variableProperties[name].use"-->
-                <!--                                                :key="`${name}-${idx}`"-->
-                <!--                                                :variable-name="name"-->
-                <!--                                                :default-selected="variableState.variableData[name]"-->
-                <!--                                                :variable-options="variableState.variableProperties[name].options"-->
-                <!--                                                :selection-type="variableState.variableProperties[name].selection_type"-->
-                <!--                                                @change="handleVariableChange(name, $event)"-->
-                <!--                    />-->
-                <!--                </template>-->
+                <template v-for="(name, idx) in variableState.order">
+                    <variable-selector-dropdown v-if="variableState.variableProperties[name].use"
+                                                :key="`${name}-${idx}`"
+                                                :variable-name="name"
+                                                :default-selected="variableState.variableData[name]"
+                                                :variable-options="variableState.variableProperties[name].options"
+                                                :selection-type="variableState.variableProperties[name].selection_type"
+                                                @change="handleVariableChange(name, $event)"
+                    />
+                </template>
                 <!--                <variable-more-button-dropdown :variable-map="variableState.variableProperties"-->
                 <!--                                               :variable-order="variableState.order"-->
                 <!--                                               @change="handleChangeVariableUse"-->
@@ -241,10 +241,10 @@ const handleSave = async () => {
 // const handleChangeVariableUse = (variables: DashboardVariablesSchema['properties']) => {
 //     variableState.variableProperties = variables;
 // };
-// const handleVariableChange = (name: string, selected: string|string[]) => {
-//     variableState.variableData[name] = selected;
-//     console.log(variableState.variableData);
-// };
+const handleVariableChange = (name: string, selected: string|string[]) => {
+    variableState.variableData[name] = selected;
+    console.log(variableState.variableData);
+};
 
 onMounted(() => {
     getDashboardData();
