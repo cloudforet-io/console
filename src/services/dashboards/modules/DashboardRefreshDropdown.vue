@@ -14,7 +14,7 @@
                            :read-only="loading"
                            :class="{ loading }"
                            menu-position="right"
-                           @select="handleSelectInterval"
+                           @select="handleSelectRefreshIntervalOption"
         />
     </div>
 </template>
@@ -22,7 +22,7 @@
 <script lang="ts">
 import type { PropType, SetupContext } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -85,41 +85,66 @@ export default defineComponent<Props>({
                 name: interval.value,
                 label: interval.label,
             }))),
+            intervalDuration: computed<number|undefined>(() => {
+                if (!refreshIntervalOptionList.includes(state.intervalOptionProxy)) return undefined;
+                return REFRESH_INTERVAL_OPTIONS_MAP[state.intervalOptionProxy];
+            }),
         });
 
-        const handleSelectInterval = (interval) => {
-            state.interval = interval;
-        };
-        // eslint-disable-next-line no-undef
-        let intervalFunction: NodeJS.Timeout | null;
+        let refreshIntervalFunction: ReturnType<typeof setInterval> | null;
 
-        const executeInterval = () => {
-            if (refreshIntervalOptionList.includes(props.intervalOption) && !intervalFunction) {
-                intervalFunction = setInterval(() => {
-                    if (props.loading) {
-                        if (intervalFunction) {
-                            clearInterval(intervalFunction);
-                            intervalFunction = null;
-                        }
-                    } else {
-                        emit('refresh');
-                    }
-                }, REFRESH_INTERVAL_OPTIONS_MAP[props.intervalOption]);
+        const clearRefreshInterval = () => {
+            if (refreshIntervalFunction) {
+                clearInterval(refreshIntervalFunction);
+                refreshIntervalFunction = null;
             }
+        };
+        const executeRefreshInterval = () => {
+            if (!state.intervalDuration) {
+                clearRefreshInterval();
+                return;
+            }
+
+            refreshIntervalFunction = setInterval(() => {
+                if (props.loading) {
+                    clearRefreshInterval();
+                    executeRefreshInterval(); // do not emit refresh to wait for previous data. pass to next tick.
+                } else {
+                    emit('refresh');
+                }
+            }, state.intervalDuration);
+        };
+
+        const handleSelectRefreshIntervalOption = (option) => {
+            state.intervalOptionProxy = option;
+            clearRefreshInterval();
+            executeRefreshInterval();
         };
 
         watch(() => props.loading, (loading) => {
             if (loading) {
-                if (intervalFunction) {
-                    clearInterval(intervalFunction);
-                    intervalFunction = null;
-                }
+                clearRefreshInterval();
             } else {
-                executeInterval();
+                executeRefreshInterval();
             }
         });
 
-        executeInterval();
+        const handleBrowserVisibilityChange = () => {
+            if (document.hidden) {
+                clearRefreshInterval();
+            } else {
+                executeRefreshInterval();
+            }
+        };
+
+        onMounted(() => {
+            executeRefreshInterval();
+            document.addEventListener('visibilitychange', handleBrowserVisibilityChange, false);
+        });
+        onUnmounted(() => {
+            clearRefreshInterval();
+            document.removeEventListener('visibilitychange', handleBrowserVisibilityChange, false);
+        });
 
         const handleRefresh = () => {
             emit('refresh');
@@ -127,7 +152,7 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            handleSelectInterval,
+            handleSelectRefreshIntervalOption,
             handleRefresh,
         };
     },
