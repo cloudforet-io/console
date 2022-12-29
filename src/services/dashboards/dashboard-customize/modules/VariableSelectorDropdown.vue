@@ -141,11 +141,11 @@ const handleChangeContextMenuInput = (value: string): void => {
 };
 
 // reconvert to string | string[]
-watch(() => state.selected, () => {
+watch(() => state.selected, (_selected) => {
     let reconvertedSelected;
     if (props.selectionType === 'SINGLE') {
-        reconvertedSelected = state.selected[0].name;
-    } else reconvertedSelected = state.selected.map((d) => d.name);
+        reconvertedSelected = _selected[0].name;
+    } else reconvertedSelected = _selected.map((d) => d.name);
     emit('change', reconvertedSelected);
 });
 
@@ -215,19 +215,6 @@ onMounted(() => {
             @apply border-blue-400 bg-blue-200;
             &.is-visible {
                 @apply border-blue-600;
-            }
-        }
-    }
-
-    /* custom design-system component - p-context-menu-item */
-    :deep(.options-menu) {
-
-        .p-context-menu-item {
-            &.selected {
-                @apply bg-white;
-            }
-            &:hover {
-                @apply bg-blue-200;
             }
         }
     }
