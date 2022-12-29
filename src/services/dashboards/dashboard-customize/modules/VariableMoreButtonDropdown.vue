@@ -1,22 +1,29 @@
 <template>
-    <div class="variable-more-button">
-        <p-button icon-left="ic_plus"
+    <div v-on-click-outside="hideContextMenu"
+         class="variable-more-button-dropdown"
+         :class="{'open-menu': visibleMenu}"
+    >
+        <p-button ref="targetRef"
+                  icon-left="ic_plus"
                   style-type="highlight"
                   @click="handleClickButton"
         >
             {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
         </p-button>
-        <p-context-menu v-if="state.visibleMenu"
-                        :menu="state.variables"
-                        :selected="state.selected"
-                        multi-selectable
+        <p-context-menu v-show="visibleMenu"
+                        ref="contextMenuRef"
+                        class="variables-menu"
                         searchable
                         use-fixed-menu-style
+                        :style="fixedMenuStyle"
+                        :menu="variables"
+                        :selected.sync="selected"
+                        multi-selectable
                         show-clear-selection
-                        @select="handleVariableSelect"
         >
             <template #bottom>
-                <p-button style-type="secondary"
+                <p-button class="manage-variable-button"
+                          style-type="secondary"
                           icon-left="ic_setting"
                           @click="handleOpenOverlay"
                 >
@@ -28,13 +35,15 @@
 </template>
 
 <script lang="ts" setup>
+import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed, onMounted, reactive,
+    onMounted, reactive, toRefs, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
-import { PButton, PContextMenu } from '@spaceone/design-system';
+import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, forEach } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
@@ -45,29 +54,41 @@ interface Props {
     variableMap: DashboardVariablesSchema['properties'];
     variableOrder: string[];
 }
-
 interface EventEmits {
     (e: string, value: string): void;
-    (e: 'manage-more'): void;
-    (e: 'select', value: DashboardVariablesSchema['properties']): void;
+    (e: 'change', value: DashboardVariablesSchema['properties']): void;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<EventEmits>();
 
 const state = reactive({
-    visibleMenu: false,
-    variables: computed(() => {
-        const properties = props.variableMap;
-        const menuItems = [] as any[];
-        Object.keys(properties).forEach((d) => menuItems.push({
-            name: d,
-            label: properties[d].name,
-        }));
-        return menuItems;
-    }),
-    order: computed(() => props.variableOrder),
+    targetRef: null,
+    contextMenuRef: null,
+    variables: [] as MenuItem[],
     selected: [] as MenuItem[],
+});
+
+const {
+    targetRef,
+    contextMenuRef,
+    variables,
+    selected,
+} = toRefs(state);
+
+const {
+    visibleMenu,
+    hideContextMenu,
+    showContextMenu,
+    fixedMenuStyle,
+    reorderMenuBySelection,
+    menu,
+} = useContextMenuController({
+    targetRef,
+    contextMenuRef,
+    useReorderBySelection: true,
+    useFixedStyle: true,
+    menu: variables,
 });
 
 // event
@@ -75,34 +96,57 @@ const handleOpenOverlay = () => {
     SpaceRouter.router.push({ hash: MANAGE_VARIABLES_HASH_NAME });
 };
 const handleClickButton = () => {
-    state.visibleMenu = !state.visibleMenu;
-};
-const handleVariableSelect = (item: MenuItem) => {
-    if (!item.name) return;
-    const result = cloneDeep(props.variableMap) as DashboardVariablesSchema['properties'];
-    if (props.variableMap[item.name]) {
-        result[item.name].use = !result[item.name].use;
+    if (visibleMenu.value) {
+        hideContextMenu();
+    } else {
+        reorderMenuBySelection(selected.value);
+        showContextMenu();
     }
-    emit('select', result);
 };
+
+// After context menu is hidden, update selected variable's use.
+watch(() => visibleMenu.value, () => {
+    if (visibleMenu.value) return;
+    const properties = cloneDeep(props.variableMap) as DashboardVariablesSchema['properties'];
+    props.variableOrder.forEach((d) => {
+        properties[d].use = state.selected.some((item) => item.name === d);
+    });
+    emit('change', properties);
+});
 
 onMounted(() => {
     const properties = props.variableMap;
     const defaultSelected = [] as MenuItem[];
-    Object.keys(properties).forEach((d) => {
-        if (!properties[d].use) return;
+    const defaultVariables = [] as MenuItem[];
+    props.variableOrder.forEach((d) => {
+        defaultVariables.push({
+            name: d, label: d,
+        });
+        if (!properties[d]?.use) return;
         defaultSelected.push({
             name: d,
-            label: properties[d].name,
+            label: d,
         });
     });
+    state.variables = defaultVariables;
     state.selected = defaultSelected;
 });
 
 </script>
 
 <style lang="postcss" scoped>
-.variable-more-button {
-    @apply inline-block relative;
+.variable-more-button-dropdown {
+    @apply inline-block;
+
+    &.open-menu {
+        @apply relative;
+    }
+
+    .variables-menu {
+
+        .manage-variable-button {
+            @apply w-full;
+        }
+    }
 }
 </style>

@@ -25,10 +25,10 @@
                                                 @change="handleChangeVariable(name, $event)"
                     />
                 </template>
-                <!--                <variable-more-button-dropdown :variable-map="variableState.variableProperties"-->
-                <!--                                               :variable-order="variableState.order"-->
-                <!--                                               @change="handleChangeVariableUse"-->
-                <!--                />-->
+                <variable-more-button-dropdown :variable-map="variableState.variableProperties"
+                                               :variable-order="variableState.order"
+                                               @change="handleChangeVariableUse"
+                />
             </div>
             <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
                                         refresh-disabled
@@ -236,9 +236,9 @@ const handleUpdateLabelList = (labelList: Array<string>) => {
 const handleSave = async () => {
     await updateDashboardData();
 };
-// const handleChangeVariableUse = (variables: DashboardVariablesSchema['properties']) => {
-//     variableState.variableProperties = variables;
-// };
+const handleChangeVariableUse = (variables: DashboardVariablesSchema['properties']) => {
+    variableState.variableProperties = variables;
+};
 const handleChangeVariable = (name: string, selected: string|string[]) => {
     variableState.variableData[name] = selected;
 };
