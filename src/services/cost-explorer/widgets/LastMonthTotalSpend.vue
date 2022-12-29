@@ -193,17 +193,13 @@ export default defineComponent<WidgetProps>({
         const costQueryHelper = new QueryHelper();
         const fetchData = async () => {
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
-            try {
-                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    granularity: GRANULARITY.MONTHLY,
-                    start: state.firstMonth.format('YYYY-MM'),
-                    end: state.thisMonth.format('YYYY-MM'),
-                    ...costQueryHelper.apiQuery,
-                });
-                return results;
-            } catch (e) {
-                throw e;
-            }
+            const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
+                granularity: GRANULARITY.MONTHLY,
+                start: state.firstMonth.format('YYYY-MM'),
+                end: state.thisMonth.format('YYYY-MM'),
+                ...costQueryHelper.apiQuery,
+            });
+            return results;
         };
 
         const getChartData = async () => {

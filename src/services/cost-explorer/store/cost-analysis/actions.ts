@@ -84,43 +84,35 @@ export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ c
 };
 
 export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, commit }, name): Promise<CostQuerySetModel|Error> => {
-    try {
-        const {
-            granularity, stack, period,
-            groupBy, filters, primaryGroupBy, moreGroupBy,
-        } = state;
-        const options = getRefinedCostQueryOptions({
-            granularity,
-            stack,
-            period,
-            group_by: groupBy,
-            primary_group_by: primaryGroupBy, // will be deprecated(< v1.10.5)
-            more_group_by: moreGroupBy, // will be deprecated(< v1.10.5)
-            filters,
-        });
-        const updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
-            name,
-            options,
-        });
-        commit('setSelectedQueryId', updatedQueryData.cost_query_set_id);
-        return updatedQueryData;
-    } catch (e) {
-        throw e;
-    }
+    const {
+        granularity, stack, period,
+        groupBy, filters, primaryGroupBy, moreGroupBy,
+    } = state;
+    const options = getRefinedCostQueryOptions({
+        granularity,
+        stack,
+        period,
+        group_by: groupBy,
+        primary_group_by: primaryGroupBy, // will be deprecated(< v1.10.5)
+        more_group_by: moreGroupBy, // will be deprecated(< v1.10.5)
+        filters,
+    });
+    const updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
+        name,
+        options,
+    });
+    commit('setSelectedQueryId', updatedQueryData.cost_query_set_id);
+    return updatedQueryData;
 };
 
 export const editQuery: Action<CostAnalysisStoreState, any> = async (_, { selectedQuery, formState }): Promise<CostQuerySetModel|Error> => {
-    try {
-        const { queryName } = formState;
-        let updatedQueryData;
-        if (selectedQuery.name !== queryName) {
-            updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
-                cost_query_set_id: selectedQuery.cost_query_set_id,
-                name: queryName,
-            });
-        }
-        return updatedQueryData;
-    } catch (e) {
-        throw e;
+    const { queryName } = formState;
+    let updatedQueryData;
+    if (selectedQuery.name !== queryName) {
+        updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
+            cost_query_set_id: selectedQuery.cost_query_set_id,
+            name: queryName,
+        });
     }
+    return updatedQueryData;
 };

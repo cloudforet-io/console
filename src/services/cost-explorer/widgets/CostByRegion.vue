@@ -322,22 +322,18 @@ export default defineComponent<WidgetProps>({
         const costQueryHelper = new QueryHelper();
         const fetchData = async (): Promise<OriginData[]> => {
             costQueryHelper.setFilters(getConvertedFilter(props.filters));
-            try {
-                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    include_usage_quantity: false,
-                    granularity: 'ACCUMULATED',
-                    group_by: ['provider', 'region_code'],
-                    start: dayjs.utc(props.period?.start).format('YYYY-MM'),
-                    end: dayjs.utc(props.period?.end).format('YYYY-MM'),
-                    page: {
-                        limit: 15,
-                    },
-                    ...costQueryHelper.apiQuery,
-                });
-                return results;
-            } catch (e) {
-                throw e;
-            }
+            const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
+                include_usage_quantity: false,
+                granularity: 'ACCUMULATED',
+                group_by: ['provider', 'region_code'],
+                start: dayjs.utc(props.period?.start).format('YYYY-MM'),
+                end: dayjs.utc(props.period?.end).format('YYYY-MM'),
+                page: {
+                    limit: 15,
+                },
+                ...costQueryHelper.apiQuery,
+            });
+            return results;
         };
         const getChartData = async () => {
             try {

@@ -67,16 +67,12 @@ export default {
 
         /* api */
         const updateToResolve = async () => {
-            try {
-                const params: AlertStateUpdateParams = {
-                    alerts: props.alerts?.map((d) => d.alert_id),
-                    state: ALERT_STATE.RESOLVED,
-                };
-                if (state.noteInput) params.note = state.noteInput;
-                await SpaceConnector.client.monitoring.alert.updateState(params);
-            } catch (e) {
-                throw e;
-            }
+            const params: AlertStateUpdateParams = {
+                alerts: props.alerts?.map((d) => d.alert_id),
+                state: ALERT_STATE.RESOLVED,
+            };
+            if (state.noteInput) params.note = state.noteInput;
+            await SpaceConnector.client.monitoring.alert.updateState(params);
         };
 
         /* Handlers */

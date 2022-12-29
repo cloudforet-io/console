@@ -135,20 +135,16 @@ export const deleteProjectGroup: Action<ProjectPageState, any> = async ({ state,
         throw new Error('No Target for deletion');
     }
 
-    try {
-        await SpaceConnector.client.identity.projectGroup.delete({
-            project_group_id: getters.actionTargetNodeData.id,
-        });
+    await SpaceConnector.client.identity.projectGroup.delete({
+        project_group_id: getters.actionTargetNodeData.id,
+    });
 
-        state.rootNode.deleteNodeByPath(getters.actionTargetNodePath);
-        // fetch data to update has child info
-        const targetNode = state.rootNode.getNodeByPath(getters.actionTargetNodePath);
-        await state.rootNode.fetchData(targetNode);
-    } catch (e: any) {
-        throw e;
-    } finally {
-        commit('setActionTargetItem', {});
-    }
+    state.rootNode.deleteNodeByPath(getters.actionTargetNodePath);
+    // fetch data to update has child info
+    const targetNode = state.rootNode.getNodeByPath(getters.actionTargetNodePath);
+    await state.rootNode.fetchData(targetNode);
+
+    commit('setActionTargetItem', {});
 };
 
 const permissionApiQueryHelper = new ApiQueryHelper();

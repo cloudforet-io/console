@@ -137,18 +137,14 @@ export default {
         const budgetQueryHelper = new QueryHelper();
         const fetchData = async () => {
             budgetQueryHelper.setFilters(getConvertedBudgetFilter(props.filters));
-            try {
-                const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
-                    include_budget_count: true,
-                    include_project_info: false,
-                    start: dayjs.utc(props.period?.start).format('YYYY-MM'),
-                    end: dayjs.utc(props.period?.end).format('YYYY-MM'),
-                    ...budgetQueryHelper.apiQuery,
-                });
-                return results;
-            } catch (e) {
-                throw e;
-            }
+            const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
+                include_budget_count: true,
+                include_project_info: false,
+                start: dayjs.utc(props.period?.start).format('YYYY-MM'),
+                end: dayjs.utc(props.period?.end).format('YYYY-MM'),
+                ...budgetQueryHelper.apiQuery,
+            });
+            return results;
         };
         const getData = async () => {
             try {

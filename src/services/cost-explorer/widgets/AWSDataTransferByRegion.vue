@@ -303,27 +303,23 @@ export default {
             costQueryHelper
                 .setFilters(getConvertedFilter(props.filters))
                 .addFilter({ k: 'provider', v: 'aws', o: '=' }, { k: 'product', v: 'AWSDataTransfer', o: '=' });
-            try {
-                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    include_usage_quantity: true,
-                    granularity: 'ACCUMULATED',
-                    group_by: ['usage_type', 'region_code'],
-                    start: dayjs.utc(props.period?.start).format('YYYY-MM'),
-                    end: dayjs.utc(props.period?.end).format('YYYY-MM'),
-                    ...costQueryHelper.apiQuery,
-                });
-                const convertedResults = results.map((d) => {
-                    let usageQuantity = d.usage_quantity;
-                    usageQuantity = bytes.parse(`${d.usage_quantity}GB`);
-                    return {
-                        ...d,
-                        usage_quantity: usageQuantity,
-                    };
-                });
-                return convertedResults;
-            } catch (e) {
-                throw e;
-            }
+            const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
+                include_usage_quantity: true,
+                granularity: 'ACCUMULATED',
+                group_by: ['usage_type', 'region_code'],
+                start: dayjs.utc(props.period?.start).format('YYYY-MM'),
+                end: dayjs.utc(props.period?.end).format('YYYY-MM'),
+                ...costQueryHelper.apiQuery,
+            });
+            const convertedResults = results.map((d) => {
+                let usageQuantity = d.usage_quantity;
+                usageQuantity = bytes.parse(`${d.usage_quantity}GB`);
+                return {
+                    ...d,
+                    usage_quantity: usageQuantity,
+                };
+            });
+            return convertedResults;
         };
         const getChartData = async () => {
             try {
