@@ -22,7 +22,7 @@
                                                 :default-selected="variableState.variableData[name]"
                                                 :variable-options="variableState.variableProperties[name].options"
                                                 :selection-type="variableState.variableProperties[name].selection_type"
-                                                @change="handleVariableChange(name, $event)"
+                                                @change="handleChangeVariable(name, $event)"
                     />
                 </template>
                 <!--                <variable-more-button-dropdown :variable-map="variableState.variableProperties"-->
@@ -241,9 +241,8 @@ const handleSave = async () => {
 // const handleChangeVariableUse = (variables: DashboardVariablesSchema['properties']) => {
 //     variableState.variableProperties = variables;
 // };
-const handleVariableChange = (name: string, selected: string|string[]) => {
+const handleChangeVariable = (name: string, selected: string|string[]) => {
     variableState.variableData[name] = selected;
-    console.log(variableState.variableData);
 };
 
 onMounted(() => {
