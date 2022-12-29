@@ -4,6 +4,7 @@ export interface BoardItemProps {
     rounded?: boolean;
     leftIcon?: string;
     iconButtonSets?: IconSet[];
+    selected?: boolean;
 }
 
 export type ButtonEventHandler = (...args: any[] | any) => Promise<void> | void;

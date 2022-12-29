@@ -1,22 +1,36 @@
 <template>
-    <div class="p-board" :class="[ [`${styleType}-style`] ]" :style="styleVariableByOptions">
+    <div class="p-board"
+         :class="[ [`${styleType}-style`] ]"
+         :style="styleVariableByOptions"
+    >
         <template v-for="(board, index) in boardList">
             <p-board-item :key="`board-${index}`"
                           class="p-board-item"
-                          :class="{ 'first-list-item': index === 0, 'last-list-item': index === boardList.length - 1}"
+                          :class="{
+                              'first-list-item': index === 0,
+                              'last-list-item': index === boardList.length - 1,
+                              'selectable': selectable
+                          }"
                           :left-icon="board.leftIcon"
                           :icon-button-sets="board.iconButtonSets"
                           :rounded="board.rounded"
+                          :selected="selected === index"
                           @click.stop="handleClickBoardItem(board, index)"
             >
                 <template #left-content>
-                    <slot name="item-left-content" v-bind="{...$props, board, index}" />
+                    <slot name="item-left-content"
+                          v-bind="{...$props, board, index}"
+                    />
                 </template>
                 <template #content>
-                    <slot name="item-content" v-bind="{...$props, board, index}" />
+                    <slot name="item-content"
+                          v-bind="{...$props, board, index}"
+                    />
                 </template>
                 <template #custom-right-content>
-                    <slot name="item-custom-right-content" v-bind="{...$props, board, index}" />
+                    <slot name="item-custom-right-content"
+                          v-bind="{...$props, board, index}"
+                    />
                 </template>
             </p-board-item>
         </template>
@@ -58,6 +72,10 @@ export default defineComponent<BoardProps>({
             type: Number,
             default: 10,
         },
+        selectable: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -72,10 +90,12 @@ export default defineComponent<BoardProps>({
                 }
                 return styles;
             }),
+            selected: undefined as undefined|number,
         });
 
 
-        const handleClickBoardItem = (item: BoardSet, index) => {
+        const handleClickBoardItem = (item: BoardSet, index: number) => {
+            if (props.selectable) state.selected = index;
             emit('item-click', item, index);
         };
 

@@ -58,6 +58,24 @@ export const getBoardItemArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    selected: {
+        name: 'selected',
+        type: { name: 'boolean' },
+        description: 'Selected style',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     // slots
     contentSlot: {
         name: 'content',

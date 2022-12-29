@@ -56,19 +56,19 @@ Main content used for `board-item` component is injected using `content` slot.<b
             i18n,
             components: { PBoardItem },
             template: `
-    <div class="h-full w-full overflow p-8">
-        <p-board-item
-            left-icon="ic_more"
-            :icon-button-sets="standardIconActionSet"
-        >
-            <template #content>
-                <strong>Content Slot Area</strong>
-                <p>This area is content slot</p>
-                <p>Put the content you want in this space</p>
-            </template>
-        </p-board-item>
-    </div>
-    `,
+                <div class="h-full w-full overflow p-8">
+                    <p-board-item
+                        left-icon="ic_more"
+                        :icon-button-sets="standardIconActionSet"
+                    >
+                        <template #content>
+                            <strong>Content Slot Area</strong>
+                            <p>This area is content slot</p>
+                            <p>Put the content you want in this space</p>
+                        </template>
+                    </p-board-item>
+                </div>
+            `,
             setup() {
                 return {
                     standardIconActionSet,
@@ -81,6 +81,7 @@ Main content used for `board-item` component is injected using `content` slot.<b
 <br/>
 <br/>
 
+
 ## Left Icon
 
 By default, the icon name is injected into the icons component with a size of 40x40 and used,<br/>
@@ -92,17 +93,17 @@ and when you want a custom ui, use the `left-content` slot to replace it.<br/>
             i18n,
             components: { PBoardItem },
             template: `
-    <div class="h-full w-full overflow p-8">
-        <p-board-item
-            left-icon="ic_collector_tags"
-        >
-            <template #content>
-                <strong>Left Icon</strong>
-                <p>Collector tags icon</p>
-            </template>
-        </p-board-item>
-    </div>
-    `,
+                <div class="h-full w-full overflow p-8">
+                    <p-board-item
+                        left-icon="ic_collector_tags"
+                    >
+                        <template #content>
+                            <strong>Left Icon</strong>
+                            <p>Collector tags icon</p>
+                        </template>
+                    </p-board-item>
+                </div>
+            `,
             setup() {
                 return {}
             }
@@ -113,9 +114,8 @@ and when you want a custom ui, use the `left-content` slot to replace it.<br/>
 <br/>
 <br/>
 
+
 ## Rounded
-<br/>
-<br/>
 
 <Canvas>
     <Story name="Rounded">
@@ -143,6 +143,40 @@ and when you want a custom ui, use the `left-content` slot to replace it.<br/>
 
 <br/>
 <br/>
+
+
+## Selected
+
+<Canvas>
+    <Story name="Selected">
+        {{
+            i18n,
+            components: { PBoardItem },
+            template: `
+                <div class="h-full w-full overflow p-8">
+                    <p-board-item :selected="selected"
+                        @click="handleSelect"
+                    >
+                        <template #content>
+                            <p>Hover your mouse over here</p>
+                        </template>
+                    </p-board-item>
+                </div>
+            `,
+            setup() {
+                const state = reactive({ selected: false });
+                const handleSelect = (e) => {
+                    state.selected = !state.selected
+                };
+                return {...toRefs(state), handleSelect}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Icon Button Sets
 

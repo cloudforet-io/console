@@ -1,6 +1,7 @@
 <template>
     <div class="p-board-item"
-         :class="{'rounded': rounded}"
+         :class="{'rounded': rounded, 'selected': selected}"
+         v-on="$listeners"
     >
         <div class="content-area">
             <div v-if="leftIcon"
@@ -94,7 +95,7 @@ export default defineComponent<BoardItemProps>({
             type: String,
             default: undefined,
         },
-        isSelected: {
+        selected: {
             type: Boolean,
             default: undefined,
         },
@@ -128,6 +129,13 @@ export default defineComponent<BoardItemProps>({
     box-sizing: border-box;
     &.rounded {
         @apply rounded-md;
+    }
+    &.selectable {
+        cursor: pointer;
+    }
+    &.selected {
+        @apply border-blue-600 text-blue-600;
+        border-bottom-width: 1px !important;
     }
 
     &:hover {

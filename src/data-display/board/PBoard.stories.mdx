@@ -258,6 +258,41 @@ In screen **breakpoints below tablet (less than 1024px)**, the given number of c
 <br/>
 <br/>
 
+
+## Selectable
+<Canvas>
+    <Story name="Selectable">
+        {{
+            i18n,
+            components: { PBoard },
+            template: `
+                <div class="h-full w-full overflow p-8">
+                    <p-board
+                        :board-sets="boardItemList"
+                        selectable
+                    >
+                        <template #item-content>
+                            <strong>Example Title</strong>
+                            <p>Any content can be here.</p>
+                        </template>
+                    </p-board>
+                </div>
+            `,
+            setup() {
+                const state = reactive({
+                    boardItemList: boardStandardItemSets,
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Playground
 
 <Canvas>
