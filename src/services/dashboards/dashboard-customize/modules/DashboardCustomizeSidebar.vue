@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="dashboard-customize-sidebar">
         <portal to="widget-title">
             <span class="sidebar-title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.SIDEBAR_TITLE') }}</span> <br>
         </portal>
@@ -44,18 +44,20 @@
                         <span class="text">{{ widget.title }}</span>
                     </div>
                 </draggable>
-                <div class="footer-wrapper">
-                    <p-button style-type="transparent"
-                              @click="handleClickCancelButton"
-                    >
-                        {{ $t('DASHBOARDS.CUSTOMIZE.CANCEL') }}
-                    </p-button>
-                    <p-button style-type="primary"
-                              @click="handleClickSaveButton"
-                    >
-                        {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
-                    </p-button>
-                </div>
+            </div>
+        </portal>
+        <portal to="widget-footer">
+            <div class="footer-wrapper">
+                <p-button style-type="transparent"
+                          @click="handleClickCancelButton"
+                >
+                    {{ $t('DASHBOARDS.CUSTOMIZE.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          @click="handleClickSaveButton"
+                >
+                    {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
+                </p-button>
             </div>
         </portal>
         <dashboard-add-widget-modal :visible.sync="state.addWidgetModalVisible"
@@ -137,7 +139,6 @@ onUnmounted(() => {
     line-height: 125%;
 }
 
-$sidebar-md: 25%;
 .sidebar-contents {
     position: relative;
     gap: 1.5625rem;
@@ -161,6 +162,7 @@ $sidebar-md: 25%;
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
+        padding-bottom: 1rem;
         .draggable-item {
             @apply border border-gray-200 rounded bg-white;
             display: flex;
@@ -178,17 +180,20 @@ $sidebar-md: 25%;
             @apply bg-blue-200;
         }
     }
-    .footer-wrapper {
-        @apply grid grid-cols-12 border-t border-gray-200;
-        position: fixed;
-        right: 0;
-        bottom: 0;
-        width: $(sidebar-md);
-        gap: 0.75rem;
-        padding: 0.75rem 1rem;
-        button {
-            @apply col-span-6;
-        }
+}
+.footer-wrapper {
+    @apply grid grid-cols-12 border-t border-gray-200;
+    width: 100%;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    button {
+        @apply col-span-6;
     }
+}
+</style>
+<style lang="postcss">
+$footer-height: 57px;
+.p-sidebar .sidebar-wrapper {
+    padding-bottom: $footer-height;
 }
 </style>
