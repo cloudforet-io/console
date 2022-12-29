@@ -81,8 +81,7 @@ import type { XYChartData, HistoryDataModel } from '@/services/dashboards/widget
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
-// eslint-disable-next-line import/no-cycle
-import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-helper';
+import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
 
 const SAMPLE_RAW_DATA = {
     more: false,

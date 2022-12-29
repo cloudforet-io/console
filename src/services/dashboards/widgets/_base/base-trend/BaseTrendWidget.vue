@@ -53,6 +53,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
 import { GRANULARITY } from '@/services/dashboards/config';
+import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
@@ -63,8 +64,8 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lif
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
-// eslint-disable-next-line import/no-cycle
-import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-helper';
+import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
+import { getWidgetTableDateFields } from '@/services/dashboards/widgets/widget-table-helper';
 
 const DATE_FORMAT = 'yyyy-MM';
 const DATE_FIELD_NAME = 'date';
@@ -91,9 +92,14 @@ const state = reactive({
         if (!state.data) return [];
         return state.data.map((d) => d[state.groupBy]);
     }),
-    tableFields: computed(() => [
-        { label: state.groupByLabel, name: state.groupBy },
-    ]),
+    tableFields: computed<Field[]>(() => {
+        if (!state.groupBy) return [];
+        const refinedFields = getWidgetTableDateFields(state.widgetConfig.options?.granularity, state.dateRange);
+        return [
+            { label: state.groupByLabel, name: state.groupBy },
+            ...refinedFields,
+        ];
+    }),
     dateRange: computed<DateRange>(() => {
         const end = state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM-DD');
         const range = props.size === WIDGET_SIZE.full ? 11 : 3;
@@ -166,7 +172,7 @@ const drawChart = (chartData: XYChartData[]) => {
             dateFields: [DATE_FIELD_NAME],
         });
         const tooltip = createTooltip();
-        setXYSharedTooltipText(chart, tooltip, state.options.currency, props.currencyRates);
+        setXYSharedTooltipText(chart, tooltip, state.currency, props.currencyRates);
         series.set('tooltip', tooltip);
         series.data.setAll(cloneDeep(chartData));
     });
