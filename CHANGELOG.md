@@ -1,3 +1,10 @@
+# [1.1.0-beta.499](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.498...v1.1.0-beta.499) (2022-12-29)
+
+
+### Features
+
+* **p-board:** selectable option ([#208](https://github.com/cloudforet-io/mirinae/issues/208)) ([ddf5308](https://github.com/cloudforet-io/mirinae/commit/ddf53084daee1f35b2e518971873fbf4a4ed0399))
+
 # [1.1.0-beta.498](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.497...v1.1.0-beta.498) (2022-12-28)
 
 
