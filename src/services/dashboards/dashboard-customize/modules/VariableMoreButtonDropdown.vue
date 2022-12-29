@@ -139,7 +139,6 @@ onMounted(() => {
     state.variables = defaultVariables;
     state.selected = defaultSelected;
 });
-
 </script>
 
 <style lang="postcss" scoped>
