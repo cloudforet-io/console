@@ -52,19 +52,18 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DateRange } from '@/services/dashboards/config';
-import { GRANULARITY } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
+import type { Granularity, GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
 import { GROUP_BY, CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/config';
-import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widgets/type';
+import type { HistoryDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
-import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
+import { getLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
 import { getWidgetTableDateFields, sortTableDataByDate } from '@/services/dashboards/widgets/widget-table-helper';
 
 const DATE_FORMAT = 'yyyy-MM';
@@ -82,21 +81,15 @@ const {
 const state = reactive({
     ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
     groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROVIDER),
-    groupByLabel: computed<string>(() => {
-        const groupBy = state.groupBy;
-        return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;
-    }),
+    granularity: computed<Granularity>(() => state.widgetConfig.options?.granularity),
     chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data, state.groupBy)),
     chartType: computed(() => state.options.chart_type ?? CHART_TYPE.LINE),
-    chartLabels: computed(() => {
-        if (!state.data) return [];
-        return state.data.map((d) => d[state.groupBy]);
-    }),
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
-        const refinedFields = getWidgetTableDateFields(state.widgetConfig.options?.granularity, state.dateRange);
+        const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange);
+        const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
         return [
-            { label: state.groupByLabel, name: state.groupBy },
+            { label: groupByLabel, name: state.groupBy },
             ...refinedFields,
         ];
     }),
@@ -106,6 +99,7 @@ const state = reactive({
         const start = dayjs.utc(end).subtract(range, 'month').format('YYYY-MM');
         return { start, end };
     }),
+    legends: computed<Legend[]>(() => getLegends(state.data, state.groupBy, props.referenceMap)),
 });
 
 /* Api */
@@ -114,7 +108,7 @@ const fetchData = async () => {
         state.loading = true;
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
-                granularity: state.widgetConfig.options?.granularity ?? GRANULARITY.MONTHLY,
+                granularity: state.granularity,
                 group_by: [state.groupBy],
                 start: state.dateRange.start,
                 end: state.dateRange.end,
@@ -157,10 +151,10 @@ const drawChart = (chartData: XYChartData[]) => {
         chart.children.push(legend);
     }
 
-    state.chartLabels.forEach((label) => {
+    state.legends.forEach((l) => {
         const seriesSettings = {
-            name: label,
-            valueYField: label,
+            name: l.label,
+            valueYField: l.name,
         };
         const series = state.chartType === CHART_TYPE.LINE
             ? createXYLineSeries(chart, seriesSettings)
