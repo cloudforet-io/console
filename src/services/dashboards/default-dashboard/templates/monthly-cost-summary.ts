@@ -18,7 +18,7 @@ export const monthlyCostSummaryDashboardPreview: DefaultDashboardPreviewConfig =
     labels: ['Cost'],
     version: '1',
     description: {
-        preview_image: './assets/icons/ic_dashboard-template_monthly-cost-summary.svg',
+        preview_image: 'ic_dashboard-template_monthly-cost-summary',
     },
 };
 

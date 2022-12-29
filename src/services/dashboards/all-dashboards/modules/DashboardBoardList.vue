@@ -72,6 +72,8 @@ import {
 import {
     PBoard, PFieldTitle, PI, PLabel, PPagination,
 } from '@spaceone/design-system';
+import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
+
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -134,7 +136,7 @@ export default defineComponent<DashboardBoardListProps>({
             thisPage: 1,
             dashboardScopeType: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? 'domain' : 'project')),
             dashboardScopeTypeForView: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? 'Workspace' : 'Project')),
-            dashboardListByBoardSets: computed(() => props.dashboardList
+            dashboardListByBoardSets: computed<BoardSet[]>(() => props.dashboardList
                 .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
                 .map((d) => (
                     {

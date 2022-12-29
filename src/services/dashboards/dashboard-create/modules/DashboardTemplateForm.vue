@@ -9,59 +9,49 @@
                             {{ $t('DASHBOARDS.CREATE.LABEL_DEFAULT_TEMPLATE') }}
                         </span>
                         <div class="card-wrapper">
-                            <!--                            FIXME:: waiting for NEW card component-->
-                            <p-select-card
-                                v-for="(item, idx) in defaultTemplateMock"
-                                :key="`default-template-${idx}`"
-                                :selected="selectedTemplate === item.name"
-                                :tab-index="idx"
-                                @click="() => handleSelectTemplate(item.name)"
+                            <p-board
+                                selectable
+                                style-type="cards"
+                                :style-options="{ column: 2 }"
+                                :board-sets="state.defaultBoardSets"
+                                @item-click="handleSelectTemplate"
                             >
-                                <template #bottom>
-                                    <div class="default-template-card">
-                                        <p-i :name="item.icon"
-                                             width="2.25rem"
-                                             height="2.25rem"
+                                <template #item-content="{board}">
+                                    <strong>{{ board.name }}</strong>
+                                    <div class="dashboard-label-wrapper">
+                                        <p-label v-for="(label, idx) in board.labels"
+                                                 :key="`board-${board.name}-label-${idx}`"
+                                                 :text="label"
                                         />
-                                        <span>{{ item.label }}</span>
-                                        <p-field-title v-for="(labelItem, labelIdx) in item.tags"
-                                                       :key="`default-template-label-${idx}-${labelIdx}`"
-                                        >
-                                            {{ labelItem }}
-                                        </p-field-title>
                                     </div>
                                 </template>
-                            </p-select-card>
+                            </p-board>
                         </div>
                     </div>
-                    <div class="card-container">
+                    <div v-if="state.existingBoardSets.length"
+                         class="card-container"
+                    >
                         <span class="card-wrapper-title">
                             {{ $t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
                         </span>
                         <div class="card-wrapper">
-                            <!--                            FIXME:: waiting for NEW card component-->
-                            <p-select-card
-                                v-for="(item, idx) in customTemplateMock"
-                                :key="`custom-template-${idx}`"
-                                :selected="selectedTemplate === item.name"
-                                :tab-index="idx"
-                                @click="() => handleSelectTemplate(item.name)"
+                            <p-board
+                                selectable
+                                style-type="cards"
+                                :style-options="{ column: 2 }"
+                                :board-sets="state.existingBoardSets"
+                                @item-click="handleSelectTemplate"
                             >
-                                <template #bottom>
-                                    <div class="custom-template-card">
-                                        <p-i :name="item.icon"
-                                             width="2.25rem"
-                                             height="2.25rem"
+                                <template #item-content="{board}">
+                                    <strong>{{ board.name }}</strong>
+                                    <div class="dashboard-label-wrapper">
+                                        <p-label v-for="(label, idx) in board.labels"
+                                                 :key="`board-${board.name}-label-${idx}`"
+                                                 :text="label"
                                         />
-                                        <span>{{ item.label }}</span>
-                                        <p-field-title v-for="(labelItem, labelIdx) in item.tags"
-                                                       :key="`custom-template-label-${idx}-${labelIdx}`"
-                                        >
-                                            {{ labelItem }}
-                                        </p-field-title>
                                     </div>
                                 </template>
-                            </p-select-card>
+                            </p-board>
                         </div>
                     </div>
                 </div>
@@ -70,78 +60,39 @@
     </section>
 </template>
 
-<script lang="ts">
-import type { SetupContext } from 'vue';
-import { reactive, toRefs } from 'vue';
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PSelectCard, PI, PFieldTitle,
+    PPaneLayout, PPanelTop, PBoard, PLabel,
 } from '@spaceone/design-system';
+import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
-export default {
-    name: 'DashboardTemplateForm',
-    components: {
-        PPanelTop,
-        PPaneLayout,
-        PSelectCard,
-        PI,
-        PFieldTitle,
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            selectedTemplate: '',
-        });
+import type { DashboardConfig } from '@/services/dashboards/config';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
 
-        const defaultTemplateMock: Array<any> = [
-            {
-                label: 'Monthly Cost Summary',
-                name: 'monthly_cost_summary',
-                icon: 'ic_edit',
-                tags: [
-                    'Cost', 'AWS', 'Azure',
-                ],
-            },
-            {
-                label: 'Cloud Asset Overview',
-                name: 'cloud_asset_overview',
-                icon: 'ic_delete',
-                tags: [
-                    'Resources', 'AWS', 'Google Cloud Platform',
-                ],
-            },
-        ];
+const emit = defineEmits(['set-template']);
 
-        const customTemplateMock: Array<any> = [
-            {
-                label: 'Dashboard 1',
-                name: 'dashboard_1',
-                icon: '',
-                tags: [
-                    'Cost', 'AWS', 'Azure',
-                ],
-            },
-            {
-                label: 'Wonny\'s Dashboard',
-                name: 'wonnys_dashboard',
-                icon: 'ic_delete',
-                tags: [
-                    'Resources', 'AWS', 'Google Cloud Platform',
-                ],
-            },
-        ];
 
-        const handleSelectTemplate = (templateName: string) => {
-            state.selectedTemplate = templateName;
-            emit('set-template', templateName);
-        };
+type dashboardTemplateBoardSet = DashboardConfig & { leftIcon: string, iconButtonSets: Array<any> };
 
-        return {
-            ...toRefs(state),
-            defaultTemplateMock,
-            customTemplateMock,
-            handleSelectTemplate,
-        };
-    },
+const state = reactive({
+    selectedTemplate: {} as DashboardConfig,
+    defaultBoardSets: computed<dashboardTemplateBoardSet[]>(() => Object.values(DASHBOARD_TEMPLATES).map((d: DashboardConfig) => ({
+        ...d,
+        // below values are used only for render
+        leftIcon: d.description?.preview_image ?? '',
+        iconButtonSets: [{ iconName: 'ic_external-link', tooltipText: 'Preview', eventAction: () => {} }],
+    }))),
+    existingBoardSets: computed<BoardSet[]>(() => []),
+});
+
+
+const handleSelectTemplate = (selectedTemplate: dashboardTemplateBoardSet) => {
+    const _selectedTemplate: Partial<dashboardTemplateBoardSet> = { ...selectedTemplate };
+    delete _selectedTemplate.leftIcon;
+    delete _selectedTemplate.iconButtonSets;
+    emit('set-template', _selectedTemplate);
 };
 </script>
 
@@ -160,11 +111,6 @@ export default {
             font-weight: 700;
             margin-bottom: 0.5rem;
             display: block;
-        }
-        .card-wrapper {
-            display: grid;
-            grid-gap: 0.5rem;
-            grid-template-columns: 50% 50%;
         }
     }
 }
