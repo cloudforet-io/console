@@ -1,18 +1,15 @@
 import type { AsyncComponent } from 'vue';
 
-
-import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import {
     keyBy, merge, mergeWith, sortBy, values,
 } from 'lodash';
 
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { DateRange } from '@/services/dashboards/config';
+import type { Field } from '@/services/dashboards/widgets/_components/type';
 import type {
-    BaseConfigInfo, Granularity,
-    GroupBy, WidgetConfig,
+    BaseConfigInfo, Granularity, GroupBy, WidgetConfig,
 } from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widgets/type';
 import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/widget-config-list';
@@ -115,21 +112,16 @@ export const getRefinedXYChartData = (
 };
 
 /**
- * @name getRefinedDataTableFields
+ * @name getWidgetTableDateFields
  * @description Get refined PDataTable fields.
  */
-export const getRefinedDataTableFields = (granularity: Granularity, dateRange: DateRange): DataTableFieldType[] => {
+export const getWidgetTableDateFields = (granularity: Granularity, dateRange: DateRange): Field[] => {
     if (!granularity || !dateRange?.end) return [];
-    const dateFields: DataTableFieldType[] = [];
+    const dateFields: Field[] = [];
     const start = dayjs.utc(dateRange.start);
     const end = dayjs.utc(dateRange.end);
 
-    const timeUnit = getTimeUnitByPeriod(granularity, dayjs.utc(dateRange.start), dayjs.utc(dateRange.end));
-    let dateFormat = 'YYYY-MM-DD';
-    if (granularity === GRANULARITY.MONTHLY) dateFormat = 'YYYY-MM';
-    if (granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
-
-    const nameDateFormat = dateFormat;
+    const timeUnit = getTimeUnitByPeriod(granularity, start, end);
     let labelDateFormat = 'M/D';
     if (timeUnit === 'month') {
         labelDateFormat = 'MMM';
@@ -138,34 +130,18 @@ export const getRefinedDataTableFields = (granularity: Granularity, dateRange: D
     }
 
     let now = start;
+    let count = 0;
     while (now.isSameOrBefore(end, timeUnit)) {
         dateFields.push({
-            name: now.format(nameDateFormat),
+            name: `usd_cost_sum.${count}.value`,
             label: now.locale('en').format(labelDateFormat),
             textAlign: 'right',
-            sortable: true,
+            textOptions: {
+                type: 'cost',
+            },
         });
         now = now.add(1, timeUnit);
+        count += 1;
     }
     return dateFields;
-};
-
-/**
- * @name getRefinedDataTableData
- * @description Get refined data of PDataTable.
- * @example [{ "provider": "aws", "2022-09": 123, "2022-10": 1, "2022-11": 10 }]
- */
-export const getRefinedDataTableData = (rawData: HistoryDataModel['results'], groupBy: GroupBy, valueKey = 'usd_cost_sum') => {
-    if (!rawData || !groupBy) return [];
-    const results: any = [];
-    rawData.forEach((d) => {
-        const result = {
-            [groupBy]: d[groupBy],
-        };
-        d[valueKey].forEach((val) => {
-            result[val.date] = val.value;
-        });
-        results.push(result);
-    });
-    return results;
 };
