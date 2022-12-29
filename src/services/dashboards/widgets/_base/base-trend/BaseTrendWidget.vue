@@ -124,7 +124,7 @@ const fetchData = async () => {
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'date', desc: false }],
+                sort: [{ key: '_total_usd_cost_sum', desc: true }],
                 field_group: ['date'],
             },
         });
