@@ -90,7 +90,11 @@ const state = reactive({
         const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange);
         const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
         return [
-            { label: groupByLabel, name: state.groupBy },
+            {
+                label: groupByLabel,
+                name: state.groupBy,
+                textOptions: { type: 'reference', target: 'provider' }, // TODO: have to be changed!!!
+            },
             ...refinedFields,
         ];
     }),
