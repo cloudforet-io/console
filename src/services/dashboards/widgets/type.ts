@@ -1,12 +1,12 @@
 export interface HistoryDataModel {
     more?: boolean;
-    results: {
+    results: Array<{
         [groupBy: string]: string | any; // product: 'AmazonCloudFront'
         usd_cost_sum: Array<{
             date: string;
             value: number
         }>;
-    }[];
+    }>;
 }
 
 export interface XYChartData {
