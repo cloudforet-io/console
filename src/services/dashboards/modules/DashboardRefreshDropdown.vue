@@ -90,6 +90,7 @@ export default defineComponent<Props>({
         const handleSelectInterval = (interval) => {
             state.interval = interval;
         };
+        // eslint-disable-next-line no-undef
         let intervalFunction: NodeJS.Timeout | null;
 
         const executeInterval = () => {

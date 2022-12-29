@@ -42,6 +42,7 @@
 
 <script lang="ts">
 
+import type Vue from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';

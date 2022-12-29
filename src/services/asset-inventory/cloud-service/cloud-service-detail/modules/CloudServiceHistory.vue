@@ -223,7 +223,9 @@ export default {
             if (value?.startsWith('{')) return '{ ... }';
             return value;
         };
-        const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
+        const delay = (time) => new Promise((resolve) => {
+            setTimeout(resolve, time);
+        });
         const loadMoreHistoryData = async () => {
             const newPageStart = state.pageStart + TIMELINE_ITEM_LIMIT;
             if (state.totalCount < newPageStart) return;

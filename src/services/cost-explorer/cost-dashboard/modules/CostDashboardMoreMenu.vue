@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-
+/* eslint-disable  @typescript-eslint/no-non-null-assertion */
 import { computed, reactive, toRefs } from 'vue';
 
 import { PSelectDropdown } from '@spaceone/design-system';

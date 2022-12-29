@@ -14,7 +14,7 @@
     "test:unit": "vitest run",
     "test:unit:watch": "vitest watch --ui",
     "test:coverage": "vitest run --coverage",
-    "eslint": "eslint --ext .js,.vue,.ts .",
+    "eslint": "eslint --max-warnings=0 --ext .js,.vue,.ts .",
     "stylelint": "stylelint \"src/**/*.{css,vue,pcss,scss}\"",
     "lint": "npm run eslint && npm run stylelint",
     "prepare": "node -e \"if(require('fs').existsSync('.git')){process.exit(1)}\" || is-ci || husky install",

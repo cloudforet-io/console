@@ -1,5 +1,6 @@
 interface RequestIdleCallback {
     didTimeout?: boolean;
+    // eslint-disable-next-line no-undef
     timeRemaining?(): DOMHighResTimeStamp;
 }
 
