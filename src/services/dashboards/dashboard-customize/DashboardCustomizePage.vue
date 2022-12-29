@@ -25,10 +25,10 @@
                                                 @change="handleChangeVariable(name, $event)"
                     />
                 </template>
-                <!--                <variable-more-button-dropdown :variable-map="variableState.variableProperties"-->
-                <!--                                               :variable-order="variableState.order"-->
-                <!--                                               @change="handleChangeVariableUse"-->
-                <!--                />-->
+                <variable-more-button-dropdown :variable-map="variableState.variableProperties"
+                                               :variable-order="variableState.order"
+                                               @change="handleChangeVariableUse"
+                />
             </div>
             <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
                                         refresh-disabled
@@ -80,6 +80,8 @@ import DashboardManageVariableOverlay
 import DashboardCustomizePageName
     from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizePageName.vue';
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
+import VariableMoreButtonDropdown
+    from '@/services/dashboards/dashboard-customize/modules/VariableMoreButtonDropdown.vue';
 import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import type { DashboardModel } from '@/services/dashboards/model';
@@ -236,9 +238,9 @@ const handleUpdateLabelList = (labelList: Array<string>) => {
 const handleSave = async () => {
     await updateDashboardData();
 };
-// const handleChangeVariableUse = (variables: DashboardVariablesSchema['properties']) => {
-//     variableState.variableProperties = variables;
-// };
+const handleChangeVariableUse = (variables: DashboardVariablesSchema['properties']) => {
+    variableState.variableProperties = variables;
+};
 const handleChangeVariable = (name: string, selected: string|string[]) => {
     variableState.variableData[name] = selected;
 };

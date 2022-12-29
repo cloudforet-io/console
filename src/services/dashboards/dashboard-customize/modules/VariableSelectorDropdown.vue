@@ -42,7 +42,7 @@
                         searchable
                         use-fixed-menu-style
                         :style="fixedMenuStyle"
-                        :menu="menu"
+                        :menu="reorderedMenu"
                         :selected.sync="selected"
                         :multi-selectable="selectionType === 'MULTI'"
                         :show-radio-icon="selectionType === 'SINGLE'"
@@ -82,8 +82,8 @@ const emit = defineEmits<EmitFn>();
 
 
 const state = reactive({
-    targetRef: null,
-    contextMenuRef: null,
+    targetRef: null as HTMLElement | null,
+    contextMenuRef: null as typeof PContextMenu | null,
     searchText: '',
     selected: [] as MenuItem[],
     options: [] as MenuItem[],
@@ -100,16 +100,15 @@ const {
     visibleMenu,
     showContextMenu,
     hideContextMenu,
-    // focusOnContextMenu,
-    reorderMenuBySelection,
     fixedMenuStyle,
-    menu,
+    reorderedMenu,
 } = useContextMenuController({
     targetRef,
     contextMenuRef,
     useReorderBySelection: true,
     useFixedStyle: true,
-    menu: options,
+    originMenu: options,
+    selected,
 });
 
 // event
@@ -120,8 +119,7 @@ const handleChangeVisible = () => {
     if (visibleMenu.value) {
         hideContextMenu();
     } else {
-        reorderMenuBySelection(selected.value);
-        showContextMenu();
+        showContextMenu(true); // update reorderedMenu automatically
     }
 };
 // TODO: search text binding
