@@ -28,7 +28,6 @@ import {
     defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
-import { color } from '@amcharts/amcharts5';
 import { PDataLoader } from '@spaceone/design-system';
 import { random, range } from 'lodash';
 
@@ -36,7 +35,7 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setTreemapLabelText } from '@/common/composables/amcharts5/tree-map-helper';
 
 import {
-    gray, palette, violet, white,
+    gray, palette, white,
 } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';

@@ -48,9 +48,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 export default {
     name: 'CurrencySelectDropdown',
