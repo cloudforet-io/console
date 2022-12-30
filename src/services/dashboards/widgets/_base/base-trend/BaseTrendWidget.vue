@@ -33,7 +33,7 @@
                            :items="state.data"
                            :currency="state.currency"
                            :currency-rates="props.currencyRates"
-                           :reference-map="referenceMap"
+                           :all-reference-map="allReferenceMap"
         />
     </widget-frame>
 </template>
@@ -104,7 +104,7 @@ const state = reactive({
         const start = dayjs.utc(end).subtract(range, 'month').format('YYYY-MM');
         return { start, end };
     }),
-    legends: computed<Legend[]>(() => getLegends(state.data, state.groupBy, props.referenceMap)),
+    legends: computed<Legend[]>(() => getLegends(state.data, state.groupBy, props.allReferenceMap)),
 });
 
 /* Api */

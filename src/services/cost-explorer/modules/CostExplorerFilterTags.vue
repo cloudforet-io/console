@@ -35,7 +35,7 @@ import { cloneDeep } from 'lodash';
 
 import { store } from '@/store';
 
-import type { ReferenceMap } from '@/store/modules/reference/type';
+import type { AllReferenceMap } from '@/store/modules/reference/type';
 
 import { FILTER, FILTER_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import type { CostFiltersMap } from '@/services/cost-explorer/type';
@@ -51,8 +51,6 @@ interface TagItem {
     keyItem?: KeyItem;
     valueItem: ValueItem
 }
-
-type ResourceMap = Record<string, ReferenceMap>;
 
 export default defineComponent<Props>({
     name: 'CostExplorerFilterTags',
@@ -91,7 +89,7 @@ export default defineComponent<Props>({
         });
 
         /* Util */
-        const getRefinedTagItems = (resourceMap: ResourceMap, filters: CostFiltersMap): TagItem[] => {
+        const getRefinedTagItems = (resourceMap: AllReferenceMap, filters: CostFiltersMap): TagItem[] => {
             const results: TagItem[] = [];
             Object.entries(filters).forEach(([category, filterItems]) => {
                 const resourceItems = resourceMap[category];

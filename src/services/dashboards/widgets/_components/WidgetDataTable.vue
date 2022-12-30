@@ -166,7 +166,7 @@ import { byteFormatter, numberFormatter, getValueByPath } from '@cloudforet/core
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
-import type { ReferenceMap } from '@/store/modules/reference/type';
+import type { AllReferenceMap } from '@/store/modules/reference/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -193,7 +193,7 @@ interface Props {
     showPagination?: boolean;
     widgetKey: string;
     disableNextPage: boolean;
-    referenceMap: Record<string, ReferenceMap>;
+    allReferenceMap: AllReferenceMap;
 }
 export default defineComponent<Props>({
     name: 'WidgetDataTable',
@@ -259,8 +259,8 @@ export default defineComponent<Props>({
             type: Boolean,
             default: true,
         },
-        referenceMap: {
-            type: Object as PropType<Record<string, ReferenceMap>>,
+        allReferenceMap: {
+            type: Object as PropType<AllReferenceMap>,
             default: () => ({}),
         },
         // printMode: {
@@ -298,9 +298,9 @@ export default defineComponent<Props>({
         const textFormatter = (value:string|number, textOptions: Field['textOptions']) => {
             if (typeof value !== 'number') {
                 if (textOptions?.type === 'reference') {
-                    const referenceMap = props.referenceMap[textOptions.target];
-                    const item = referenceMap[value];
-                    return item?.label ?? item?.name ?? value;
+                    const allReferenceMap = props.allReferenceMap[textOptions.target];
+                    const referenceMap = allReferenceMap[value];
+                    return referenceMap?.label ?? referenceMap?.name ?? value;
                 }
                 return value;
             }

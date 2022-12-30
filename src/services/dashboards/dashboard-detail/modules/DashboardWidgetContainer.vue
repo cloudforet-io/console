@@ -23,7 +23,7 @@
                        :width="width"
                        :theme="widgetThemeList[idx]"
                        :edit-mode="editMode"
-                       :reference-map="referenceMap"
+                       :all-reference-map="allReferenceMap"
                        @click-expand-icon="handleExpand"
             />
         </template>
@@ -39,7 +39,7 @@ import {
 
 import { flattenDeep } from 'lodash';
 
-import type { ReferenceMap } from '@/store/modules/reference/type';
+import type { AllReferenceMap } from '@/store/modules/reference/type';
 
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import {
@@ -58,7 +58,7 @@ interface Props {
     editMode?: boolean;
     dashboardSettings: DashboardSettings;
     dashboardVariables: DashboardVariables;
-    referenceMap: ReferenceMap;
+    allReferenceMap: AllReferenceMap;
 }
 export default defineComponent<Props>({
     name: 'DashboardWidgetContainer',
@@ -85,8 +85,8 @@ export default defineComponent<Props>({
             type: Object as PropType<DashboardVariables>,
             default: () => ({}),
         },
-        referenceMap: {
-            type: Object as PropType<ReferenceMap>,
+        allReferenceMap: {
+            type: Object as PropType<AllReferenceMap>,
             default: () => ({}),
         },
     },

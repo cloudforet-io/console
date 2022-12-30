@@ -2,7 +2,7 @@ import {
     keyBy, merge, sortBy, values,
 } from 'lodash';
 
-import type { ReferenceMap } from '@/store/modules/reference/type';
+import type { AllReferenceMap } from '@/store/modules/reference/type';
 
 import type { GroupBy } from '@/services/dashboards/widgets/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/config';
@@ -44,22 +44,22 @@ export const getRefinedXYChartData = (
  * @name getLegends
  * @description Extract legends from raw data.
  */
-export const getLegends = (rawData: HistoryDataModel['results'], groupBy: GroupBy, referenceMap: Record<string, ReferenceMap>): Legend[] => {
-    if (!rawData || !groupBy || !referenceMap) return [];
+export const getLegends = (rawData: HistoryDataModel['results'], groupBy: GroupBy, allReferenceMap: AllReferenceMap): Legend[] => {
+    if (!rawData || !groupBy || !allReferenceMap) return [];
     const legends: Legend[] = [];
     rawData.forEach((d) => {
         let _name = d[groupBy];
         let _label = d[groupBy];
         if (groupBy === GROUP_BY.PROJECT_GROUP) {
-            _label = referenceMap.projectGroup[_name]?.label || _name;
+            _label = allReferenceMap.projectGroup[_name]?.label || _name;
         } else if (groupBy === GROUP_BY.PROJECT) {
-            _label = referenceMap.project[_name]?.label || _name;
+            _label = allReferenceMap.project[_name]?.label || _name;
         } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
-            _label = referenceMap.serviceAccount[_name]?.label || _name;
+            _label = allReferenceMap.serviceAccount[_name]?.label || _name;
         } else if (groupBy === GROUP_BY.REGION) {
-            _label = referenceMap.region[_name]?.name || _name;
+            _label = allReferenceMap.region[_name]?.name || _name;
         } else if (groupBy === GROUP_BY.PROVIDER) {
-            _label = referenceMap.provider[_name]?.name || _name;
+            _label = allReferenceMap.provider[_name]?.name || _name;
         }
         if (!_name) {
             _name = `no_${groupBy}`;
