@@ -63,6 +63,7 @@ import type {
     GNBDashboardMenuItem,
 } from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/type';
 
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 interface Props {
@@ -114,7 +115,10 @@ export default defineComponent<Props>({
 
         const dashboardRouteFormatter = (id) => ({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: { dashboardId: id },
+            params: {
+                dashboardId: id,
+                dashboardScope: id.startsWith('project') ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
+            },
         });
         const getIsHovered = (itemId: string):boolean => !!(state.hoveredItem && state.hoveredItem === itemId);
         const hideMenu = () => {

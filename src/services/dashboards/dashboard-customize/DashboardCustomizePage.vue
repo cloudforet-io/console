@@ -73,7 +73,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type {
     DashboardConfig, DashboardVariablesSchema, DashboardSettings,
 } from '@/services/dashboards/config';
-import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
+import { DASHBOARD_SCOPE, MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
 import DashboardCustomizePageName
@@ -221,7 +221,13 @@ const updateDashboardData = async () => {
                 ...param,
             });
         }
-        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: props.dashboardId } });
+        await SpaceRouter.router.push({
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            params: {
+                dashboardId: props.dashboardId,
+                dashboardScope: state.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
+            },
+        });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
     }
