@@ -2,7 +2,7 @@
     <div class="dashboard-control-buttons">
         <p-button icon-left="dashboard-customize"
                   style-type="tertiary"
-                  @click="$router.push({ name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME })"
+                  @click="handleClickCustomize"
         >
             {{ $t('DASHBOARDS.DETAIL.CUSTOMIZE') }}
         </p-button>
@@ -34,6 +34,8 @@ import { useRoute } from 'vue-router/composables';
 import { PButton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+import { SpaceRouter } from '@/router';
+
 import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
 import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 import PdfDownloadOverlay from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
@@ -48,6 +50,7 @@ const handleVisibleCloneModal = () => {
 };
 
 const props = defineProps<{
+    dashboardId: string;
     dashboardName?: string;
 }>();
 
@@ -65,6 +68,10 @@ const handlePreviewRendered = (elements) => {
 
 const handleVisiblePdfDownloadOverlay = () => {
     state.visiblePdfDownload = true;
+};
+
+const handleClickCustomize = () => {
+    SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
 };
 
 </script>
