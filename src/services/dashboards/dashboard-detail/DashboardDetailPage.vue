@@ -57,7 +57,7 @@
         <dashboard-widget-container
             ref="widgetContainerRef"
             :widget-info-list="state.dashboardWidgetInfoList"
-            :all-reference-map="state.allReferenceMap"
+            :all-reference-type-info="state.allReferenceTypeInfo"
         />
         <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
                                    :dashboard-id="props.dashboardId"
@@ -90,7 +90,7 @@ import { store } from '@/store';
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { AllReferenceMap } from '@/store/modules/reference/type';
+import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -140,7 +140,7 @@ const state = reactive({
     cloneModalVisible: false,
     refreshInterval: '15s',
     loading: false,
-    allReferenceMap: computed<AllReferenceMap>(() => store.getters['reference/allReferenceMap']),
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
 });
 
 const widgetContainerRef = ref<any>(null);

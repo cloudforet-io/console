@@ -33,7 +33,7 @@
                            :items="state.data"
                            :currency="state.currency"
                            :currency-rates="props.currencyRates"
-                           :all-reference-map="allReferenceMap"
+                           :all-reference-type-info="allReferenceTypeInfo"
         />
     </widget-frame>
 </template>
@@ -48,6 +48,8 @@ import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ReferenceType } from '@/store/modules/reference/type';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -65,7 +67,9 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lif
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 import { getLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
-import { getWidgetTableDateFields, sortTableDataByDate } from '@/services/dashboards/widgets/widget-table-helper';
+import {
+    getReferenceTypeOfGroupBy, getWidgetTableDateFields, sortTableDataByDate,
+} from '@/services/dashboards/widgets/widget-table-helper';
 
 const DATE_FORMAT = 'yyyy-MM';
 const DATE_FIELD_NAME = 'date';
@@ -89,11 +93,12 @@ const state = reactive({
         if (!state.groupBy) return [];
         const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange);
         const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
+        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
         return [
             {
                 label: groupByLabel,
                 name: state.groupBy,
-                textOptions: { type: 'reference', target: 'provider' }, // TODO: have to be changed!!!
+                textOptions: { type: 'reference', referenceType },
             },
             ...refinedFields,
         ];
@@ -104,7 +109,7 @@ const state = reactive({
         const start = dayjs.utc(end).subtract(range, 'month').format('YYYY-MM');
         return { start, end };
     }),
-    legends: computed<Legend[]>(() => getLegends(state.data, state.groupBy, props.allReferenceMap)),
+    legends: computed<Legend[]>(() => getLegends(state.data, state.groupBy, props.allReferenceTypeInfo)),
 });
 
 /* Api */

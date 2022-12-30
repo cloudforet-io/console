@@ -1,3 +1,5 @@
+import type { ReferenceType } from '@/store/modules/reference/type';
+
 export const UNIT_MAP = {
     B: 'B',
     KB: 'KB',
@@ -27,7 +29,7 @@ interface SizeOption {
 
 interface ReferenceOption {
     type: 'reference',
-    target: 'provider'|'projectGroup'|'project'|'serviceAccount'|'region', // can be added more. these are just samples.
+    referenceType: ReferenceType;
 }
 
 export interface LegendConfig {

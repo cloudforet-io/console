@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
 import { sortBy } from 'lodash';
 
+import type { AllReferenceTypeInfo, ReferenceType } from '@/store/modules/reference/type';
+
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
-import type { Granularity } from '@/services/dashboards/widgets/config';
+import type { Granularity, GroupBy } from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel } from '@/services/dashboards/widgets/type';
 
 /**
@@ -53,4 +55,10 @@ export const sortTableDataByDate = (rawData: HistoryDataModel['results']): Histo
         });
     });
     return results;
+};
+
+export const getReferenceTypeOfGroupBy = (allReferenceTypeInfo: AllReferenceTypeInfo, groupBy: GroupBy): ReferenceType | undefined => {
+    const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
+    if (referenceTypeInfo) return referenceTypeInfo.type;
+    return undefined;
 };
