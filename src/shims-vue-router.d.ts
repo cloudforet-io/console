@@ -18,7 +18,7 @@ import {
     lnbVisible?: boolean;
     menuId?: string;
     label?: string|RouteLabelFormatter;
-    translationId?: string;
+    translationId?: string|RouteLabelFormatter;
     copiable?: boolean; // for breadcrumbs
     isSignInPage?: boolean;
     accessLevel?: AccessLevel;
