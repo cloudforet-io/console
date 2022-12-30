@@ -82,6 +82,7 @@ import { store } from '@/store';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import DashboardAddWidgetModal from '@/services/dashboards/dashboard-customize/modules/DashboardAddWidgetModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
@@ -115,7 +116,13 @@ const handleClickAddWidget = () => {
     state.addWidgetModalVisible = true;
 };
 const handleClickCancelButton = () => {
-    SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId: props.dashboardId } });
+    SpaceRouter.router.push({
+        name: DASHBOARDS_ROUTE.DETAIL._NAME,
+        params: {
+            dashboardId: props.dashboardId,
+            dashboardScope: props.dashboardId.startsWith('project') ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
+        },
+    });
 };
 const handleClickSaveButton = () => {
     emit('save');

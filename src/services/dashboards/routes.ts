@@ -22,6 +22,7 @@ const dashboardsRoute: RouteConfig = {
         {
             path: '/',
             component: { template: '<router-view/>' },
+            redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
             meta: { menuId: MENU_ID.DASHBOARDS },
             children: [
                 {
@@ -43,22 +44,41 @@ const dashboardsRoute: RouteConfig = {
                     component: WidgetPreviewPage,
                 },
                 {
-                    path: ':dashboardId?',
-                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
-                    meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
+                    path: ':dashboardScope',
+                    meta: {
+                        translationId: ({ params }) => {
+                            // song-lang
+                            if (params.dashboardScope === 'project') return 'Project';
+                            return 'Entire Workspaces';
+                        },
+                        copiable: true,
+                    },
+                    redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
                     props: true,
-                    component: DashboardDetailPage,
-                },
-                {
-                    path: 'customize',
-                    component: { template: '<router-view />' },
+                    component: { template: '<router-view/>' },
                     children: [
                         {
                             path: ':dashboardId',
-                            name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-                            meta: { label: ({ params }) => params.dashboardId, copiable: true },
+                            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                            meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
                             props: true,
-                            component: DashboardCustomizePage,
+                            component: DashboardDetailPage,
+                        },
+                        {
+                            path: 'customize',
+                            meta: { translationId: 'DASHBOARDS.DETAIL.CUSTOMIZE' },
+                            props: true,
+                            component: { template: '<router-view/>' },
+                            redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
+                            children: [
+                                {
+                                    path: ':dashboardId',
+                                    name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                                    meta: { label: ({ params }) => params.dashboardId, copiable: true },
+                                    props: true,
+                                    component: DashboardCustomizePage,
+                                },
+                            ],
                         },
                     ],
                 },

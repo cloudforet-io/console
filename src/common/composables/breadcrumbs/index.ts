@@ -1,6 +1,6 @@
 import { computed, getCurrentInstance } from 'vue';
+import type Vue from 'vue';
 import type { Location } from 'vue-router';
-import type { Vue } from 'vue/types/vue';
 
 import { i18n } from '@/translations';
 
@@ -41,7 +41,13 @@ export const useBreadcrumbs = () => {
                         results.push({ name: label, to: location, copiable: d.meta.copiable });
                     }
                 } else if (d.meta.translationId) {
-                    results.push({ name: i18n.t(d.meta.translationId), to: location, copiable: d.meta.copiable });
+                    const translationId = d.meta.translationId;
+                    if (typeof translationId === 'function') {
+                        const translationIdResult = translationId(vm.$route);
+                        if (translationIdResult) results.push({ name: i18n.t(translationIdResult), to: location, copiable: d.meta.copiable });
+                    } else {
+                        results.push({ name: i18n.t(translationId), to: location, copiable: d.meta.copiable });
+                    }
                 } else if (d.meta.menuId) {
                     const menuInfo = MENU_INFO_MAP[d.meta.menuId];
                     if (menuInfo) {

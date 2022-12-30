@@ -36,6 +36,7 @@ import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import type { ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
@@ -65,6 +66,7 @@ export default defineComponent({
                     name: DASHBOARDS_ROUTE.DETAIL._NAME,
                     params: {
                         dashboardId: d.domain_dashboard_id,
+                        dashboardScope: DASHBOARD_SCOPE.DOMAIN,
                     },
                 },
                 favoriteType: FAVORITE_TYPE.DASHBOARD,
@@ -128,6 +130,7 @@ export default defineComponent({
                             name: DASHBOARDS_ROUTE.DETAIL._NAME,
                             params: {
                                 dashboardId: board.project_dashboard_id,
+                                dashboardScope: DASHBOARD_SCOPE.PROJECT,
                             },
                         },
                         favoriteType: FAVORITE_TYPE.DASHBOARD,
@@ -145,6 +148,7 @@ export default defineComponent({
                         name: DASHBOARDS_ROUTE.DETAIL._NAME,
                         params: {
                             dashboardId: board.project_dashboard_id,
+                            dashboardScope: DASHBOARD_SCOPE.PROJECT,
                         },
                     },
                     favoriteType: FAVORITE_TYPE.DASHBOARD,

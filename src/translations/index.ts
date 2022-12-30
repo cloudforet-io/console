@@ -43,9 +43,9 @@ export const i18n = new VueI18n({
     locale: 'en', // set locale
     fallbackLocale: 'en',
     messages: {
-        en: removeEmpty({ ...en, COMPONENT: componentEN }),
-        ko: removeEmpty({ ...ko, COMPONENT: componentKO }),
-        jp: removeEmpty({ ...ja, COMPONENT: componentJA }),
+        en: removeEmpty({ ...en, ...componentEN }),
+        ko: removeEmpty({ ...ko, ...componentKO }),
+        jp: removeEmpty({ ...ja, ...componentJA }),
     },
     silentTranslationWarn: true,
     silentFallbackWarn: true,

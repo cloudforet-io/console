@@ -70,6 +70,7 @@ import type { SuggestionType } from '@/common/modules/navigations/gnb/modules/gn
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
@@ -151,7 +152,10 @@ export default defineComponent<Props>({
 
         const dashboardRouteFormatter = (id) => ({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
-            params: { dashboardId: id },
+            params: {
+                dashboardId: id,
+                dashboardScope: id.startsWith('project') ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
+            },
         });
         const handleSelect = () => { hideMenu(); };
 

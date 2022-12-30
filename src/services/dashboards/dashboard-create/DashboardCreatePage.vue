@@ -106,7 +106,13 @@ export default {
                     const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(dashboardCreateParams);
                     dashboardId = result.domain_dashboard_id;
                 }
-                await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId } });
+                await SpaceRouter.router.push({
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    params: {
+                        dashboardId,
+                        dashboardScope: state.dashboardScope,
+                    },
+                });
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

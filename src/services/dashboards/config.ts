@@ -18,8 +18,8 @@ export type RefreshIntervalOption = keyof typeof REFRESH_INTERVAL_OPTIONS_MAP;
 export const refreshIntervalOptionList = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP) as RefreshIntervalOption[];
 
 export const DASHBOARD_SCOPE = {
-    DOMAIN: 'DOMAIN',
-    PROJECT: 'PROJECT',
+    DOMAIN: 'domain',
+    PROJECT: 'project',
 };
 export type DashboardScope = keyof typeof DASHBOARD_SCOPE;
 
