@@ -1,15 +1,15 @@
 <template>
     <div class="dashboard-customize-page">
-        <dashboard-customize-page-name :name="state.dashboardName"
+        <dashboard-customize-page-name :name="dashboardDetailState.dashboardName"
                                        @update:name="handleUpdateDashboardName"
         />
         <div class="filters-box">
             <dashboard-labels editable
-                              :label-list="state.labelList"
+                              :label-list="dashboardDetailState.labelList"
                               @update:labelList="handleUpdateLabelList"
             />
-            <dashboard-toolset :date-range.sync="state.dashboardSettings.date_range"
-                               :currency.sync="state.dashboardSettings.currency"
+            <dashboard-toolset :date-range.sync="dashboardDetailState.settings.date_range"
+                               :currency.sync="dashboardDetailState.settings.currency"
             />
         </div>
         <p-divider />
@@ -34,18 +34,16 @@
                                         refresh-disabled
             />
         </div>
-        <dashboard-widget-container
-            ref="widgetContainerRef"
-            :dashboard-id="props.dashboardId"
-            :widget-info-list="state.dashboardWidgetInfoList"
-            :edit-mode="true"
-            :dashboard-variables="state.dashboardInfo.variables"
-            :dashboard-settings="state.dashboardSettings"
+        <dashboard-widget-container :dashboard-id="dashboardDetailState.dashboardId"
+                                    :widget-info-list="dashboardDetailState.dashboardWidgetInfoList"
+                                    :dashboard-variables="dashboardDetailState.variables"
+                                    :dashboard-settings="dashboardDetailState.settings"
+                                    edit-mode
         />
-        <dashboard-customize-sidebar :widget-info-list.sync="state.dashboardWidgetInfoList"
+        <dashboard-customize-sidebar :widget-info-list.sync="dashboardDetailState.dashboardWidgetInfoList"
                                      :dashboard-id="props.dashboardId"
-                                     :enable-date-range.sync="state.dashboardSettings.date_range.enabled"
-                                     :enable-currency.sync="state.dashboardSettings.currency.enabled"
+                                     :enable-date-range.sync="dashboardDetailState.settings.date_range.enabled"
+                                     :enable-currency.sync="dashboardDetailState.settings.currency.enabled"
                                      @save="handleSave"
         />
         <dashboard-manage-variable-overlay :visible="variableState.showOverlay" />
@@ -59,21 +57,17 @@ import {
 } from 'vue';
 
 import { PDivider } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-import { flattenDeep } from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
-import { CURRENCY } from '@/store/modules/display/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type {
-    DashboardConfig, DashboardVariablesSchema, DashboardSettings,
+    DashboardConfig, DashboardVariablesSchema,
 } from '@/services/dashboards/config';
 import { DASHBOARD_SCOPE, MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
@@ -86,7 +80,7 @@ import VariableMoreButtonDropdown
 import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
 import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
-import type { DashboardModel } from '@/services/dashboards/model';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
@@ -98,22 +92,11 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+
 const state = reactive({
-    labelList: [] as Array<string>,
     refreshInterval: undefined,
-    isProjectDashboard: computed<boolean>(() => props.dashboardId.startsWith('project')),
-    dashboardInfo: {} as DashboardModel,
-    dashboardName: '',
-    dashboardWidgetInfoList: [] as DashboardContainerWidgetInfo[],
-    dashboardSettings: {
-        date_range: {
-            start: dayjs.utc().format('YYYY-MM-01'),
-            end: dayjs.utc().format('YYYY-MM-DD'),
-        },
-        currency: {
-            value: CURRENCY.USD,
-        },
-    } as DashboardSettings,
 });
 const vm = getCurrentInstance()?.proxy as Vue;
 const variableState = reactive({
@@ -176,30 +159,7 @@ const variableState = reactive({
 /* Api */
 const getDashboardData = async () => {
     try {
-        let result: DashboardModel;
-        if (state.isProjectDashboard) {
-            result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
-        } else {
-            result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: props.dashboardId });
-        }
-        state.dashboardInfo = result;
-        state.dashboardWidgetInfoList = flattenDeep(result?.layouts ?? []).map((info) => ({
-            ...info,
-            widgetKey: uuidv4(),
-        }));
-        state.dashboardName = result.name;
-
-        state.dashboardSettings = {
-            date_range: {
-                enabled: result.settings.date_range.enabled,
-                start: result.settings.date_range.start,
-                end: result.settings.date_range.end,
-            },
-            currency: {
-                enabled: result.settings.currency.enabled,
-                value: result.settings.currency?.value ?? CURRENCY.USD,
-            },
-        };
+        await dashboardDetailStore.getDashboardData(props.dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
@@ -208,19 +168,19 @@ const getDashboardData = async () => {
 const updateDashboardData = async () => {
     try {
         const param: Partial<DashboardConfig> = {
-            name: state.dashboardName,
-            layouts: [state.dashboardWidgetInfoList.map((widget) => {
+            name: dashboardDetailState.dashboardName,
+            labels: dashboardDetailState.labelList,
+            settings: dashboardDetailState.settings,
+            layouts: [dashboardDetailState.dashboardWidgetInfoList.map((widget) => {
                 const result: Partial<DashboardContainerWidgetInfo> = { ...widget };
                 delete result.widgetKey;
                 return result as DashboardLayoutWidgetInfo;
             })],
-            labels: state.labelList,
-            settings: state.dashboardSettings,
             // TODO: add other params
             // variables:
             // variables_schema:
         };
-        if (state.isProjectDashboard) {
+        if (dashboardDetailState.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
                 project_dashboard_id: props.dashboardId,
                 ...param,
@@ -245,10 +205,10 @@ const updateDashboardData = async () => {
 
 /* Event */
 const handleUpdateDashboardName = (name: string) => {
-    state.dashboardName = name;
+    dashboardDetailState.dashboardName = name;
 };
 const handleUpdateLabelList = (labelList: Array<string>) => {
-    state.labelList = labelList;
+    dashboardDetailState.labelList = labelList;
 };
 const handleSave = async () => {
     await updateDashboardData();
