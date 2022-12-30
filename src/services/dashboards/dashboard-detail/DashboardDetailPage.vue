@@ -57,8 +57,8 @@
         </div>
         <dashboard-widget-container
             ref="widgetContainerRef"
+            :dashboard-id="props.dashboardId"
             :widget-info-list="state.dashboardWidgetInfoList"
-            :all-reference-type-info="state.allReferenceTypeInfo"
         />
         <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
                                    :dashboard-id="props.dashboardId"
@@ -74,7 +74,7 @@
 
 <script setup lang="ts">
 import {
-    reactive, ref, computed, watch, onMounted,
+    reactive, ref, computed, watch,
 } from 'vue';
 
 import {
@@ -86,12 +86,10 @@ import { flattenDeep } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -101,6 +99,7 @@ import { gray } from '@/styles/colors';
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardViewer, DateRange } from '@/services/dashboards/config';
+import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
@@ -111,7 +110,6 @@ import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/Da
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
 const PUBLIC_ICON_COLOR = gray[500];
 
@@ -127,7 +125,7 @@ const state = reactive({
     dashboardName: '',
     isProjectDashboard: computed<boolean>(() => props.dashboardId.startsWith('project')),
     labelList: computed<string[]>(() => state.dashboardInfo?.labels ?? []),
-    dashboardWidgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => flattenDeep(state.dashboardInfo?.layouts)),
+    dashboardWidgetInfoList: computed<DashboardContainerWidgetInfo[]>(() => flattenDeep(state.dashboardInfo?.layouts)),
     enableDateRange: false,
     dateRange: {
         start: dayjs.utc().format('YYYY-MM-01'),
@@ -141,7 +139,6 @@ const state = reactive({
     cloneModalVisible: false,
     refreshInterval: '15s',
     loading: false,
-    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
 });
 
 const widgetContainerRef = ref<any>(null);
@@ -198,9 +195,6 @@ watch(() => props.dashboardId, (dashboardId) => {
     if (dashboardId) getDashboardData();
 }, { immediate: true });
 
-onMounted(async () => {
-    await store.dispatch('reference/loadAll');
-});
 </script>
 
 <style lang="postcss" scoped>

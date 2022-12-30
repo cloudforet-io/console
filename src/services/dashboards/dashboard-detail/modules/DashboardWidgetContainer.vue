@@ -5,8 +5,8 @@
         <template v-for="(width, idx) in widgetWidthList">
             <component :is="getWidgetComponent(widgetInfoList[idx].widget_name)"
                        v-if="widgetInfoList[idx]"
-                       :id="widgetInfoList[idx].widget_name"
-                       :key="`widget-${widgetInfoList[idx].widget_name}-${idx}`"
+                       :id="widgetInfoList[idx].widgetKey"
+                       :key="widgetInfoList[idx].widgetKey"
                        ref="widgetRef"
                        v-intersection-observer="handleIntersectionObserver"
                        :widget-config-id="widgetInfoList[idx].widget_name"
@@ -39,6 +39,8 @@ import {
 
 import { flattenDeep } from 'lodash';
 
+import { store } from '@/store';
+
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
@@ -46,19 +48,20 @@ import {
     WIDGET_CONTAINER_MAX_WIDTH, WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
 import { widgetThemeAssigner } from '@/services/dashboards/dashboard-detail/lib/theme-helper';
+import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
 import AWSCloudFrontCost from '@/services/dashboards/widgets/aws-cloud-front-cost/AWSCloudFrontCost.vue';
-import type { WidgetSize, DashboardLayoutWidgetInfo, WidgetConfig } from '@/services/dashboards/widgets/config';
+import type { WidgetSize, WidgetConfig } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
 import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 interface Props {
-    widgetInfoList: DashboardLayoutWidgetInfo[];
+    dashboardId: string;
+    widgetInfoList: DashboardContainerWidgetInfo[];
     editMode?: boolean;
     dashboardSettings: DashboardSettings;
     dashboardVariables: DashboardVariables;
-    allReferenceTypeInfo: AllReferenceTypeInfo;
 }
 export default defineComponent<Props>({
     name: 'DashboardWidgetContainer',
@@ -69,8 +72,12 @@ export default defineComponent<Props>({
         intersectionObserver: vIntersectionObserver as DirectiveFunction,
     },
     props: {
+        dashboardId: {
+            type: String,
+            default: '',
+        },
         widgetInfoList: {
-            type: Array as PropType<DashboardLayoutWidgetInfo[]>,
+            type: Array as PropType<DashboardContainerWidgetInfo[]>,
             default: () => ([]),
         },
         editMode: {
@@ -83,10 +90,6 @@ export default defineComponent<Props>({
         },
         dashboardVariables: {
             type: Object as PropType<DashboardVariables>,
-            default: () => ({}),
-        },
-        allReferenceTypeInfo: {
-            type: Object as PropType<AllReferenceTypeInfo>,
             default: () => ({}),
         },
     },
@@ -106,7 +109,8 @@ export default defineComponent<Props>({
                 return widgetThemeAssigner(widgetThemeOptions);
             }),
             widgetRef: [] as Array<InstanceType<typeof AWSCloudFrontCost>>,
-            initiatedWidgetMap: {} as {[widgetName: string]: boolean},
+            initiatedWidgetMap: {} as {[widgetKey: string]: boolean},
+            allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
         });
         const containerRef = ref<HTMLElement|null>(null);
 
@@ -164,8 +168,13 @@ export default defineComponent<Props>({
         });
 
         watch(() => props.widgetInfoList, (widgetInfoList) => {
+            if (!Array.isArray(widgetInfoList)) return;
             state.widgetSizeList = widgetInfoList.map((widget) => widget.size);
-            state.initiatedWidgetMap = {};
+            const initiatedWidgetMap = {};
+            widgetInfoList.forEach((widget) => {
+                initiatedWidgetMap[widget.widgetKey] = state.initiatedWidgetMap[widget.widgetKey];
+            });
+            state.initiatedWidgetMap = initiatedWidgetMap;
         }, { immediate: true, deep: true });
 
         // for PDF export - start
@@ -174,14 +183,13 @@ export default defineComponent<Props>({
             state.widgetRef.forEach((d:any) => {
                 if (typeof d?.refreshWidget === 'function' && state.initiatedWidgetMap[d.$el.id]) promises.push(d?.refreshWidget());
             });
-            emit('update:loading', true);
             await Promise.allSettled(promises);
-            emit('update:loading', false);
         };
         expose({
             refreshAllWidget,
         });
-        onMounted(() => {
+        onMounted(async () => {
+            await store.dispatch('reference/loadAll');
             emit('rendered', state.widgetRef);
         });
         // for PDF export - end
