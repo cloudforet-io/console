@@ -10,19 +10,19 @@
                     {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.CURRENT_MONTH') }}
                 </p>
                 <div class="cost-value">
-                    {{ currencyMoneyFormatter(state.currentMonthlyCost, state.options.currency) }}
+                    {{ currencyMoneyFormatter(state.currentMonthlyCost, state.currency) }}
                 </div>
                 <div class="cost-info">
                     <p-i
-                        :name="state.isDecrease ? 'ic_decrease' : 'ic_increase'"
+                        :name="state.isDecreased ? 'ic_decrease' : 'ic_increase'"
                         fill
                         width="1rem"
                         height="1rem"
-                        :color="state.isDecrease ? green[700] : red[500]"
+                        :color="state.isDecreased ? green[700] : red[500]"
                         original
                     />
-                    {{ currencyMoneyFormatter(state.differenceCost, state.options.currency) }}
-                    <p-badge :style-type="state.isDecrease ? 'green200' : 'alert'"
+                    {{ currencyMoneyFormatter(state.differenceCost, state.currency) }}
+                    <p-badge :style-type="state.isDecreased ? 'green200' : 'alert'"
                              shape="square"
                     >
                         {{ state.differenceCostRate }} %
@@ -35,10 +35,10 @@
                     {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.PREVIOUS_MONTH') }}
                 </p>
                 <div class="cost-value">
-                    {{ currencyMoneyFormatter(state.previousMonthlyCost, state.options.currency) }}
+                    {{ currencyMoneyFormatter(state.previousMonthlyCost, state.currency) }}
                 </div>
                 <div class="cost-info">
-                    {{ state.previousMonth.format(DATE_FORMAT) }}
+                    {{ state.previousMonth.format('MMM YYYY') }}
                 </div>
             </div>
             <div class="chart-wrapper">
@@ -65,16 +65,19 @@ import {
 import {
     PDivider, PDataLoader, PBadge, PI,
 } from '@spaceone/design-system';
-import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { random } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { green, red } from '@/styles/colors';
 
+import type { DateRange } from '@/services/dashboards/config';
+import { GRANULARITY } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
 import type { XYChartData, HistoryDataModel } from '@/services/dashboards/widgets/type';
@@ -83,28 +86,6 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lif
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
 
-const SAMPLE_RAW_DATA = {
-    more: false,
-    results: [
-        {
-            usd_cost_sum: [
-                { date: '2022-01', value: random(100, 5000) },
-                { date: '2022-02', value: random(100, 5000) },
-                { date: '2022-03', value: random(100, 5000) },
-                { date: '2022-04', value: random(100, 5000) },
-                { date: '2022-05', value: random(100, 5000) },
-                { date: '2022-06', value: random(100, 5000) },
-                { date: '2022-07', value: random(100, 5000) },
-                { date: '2022-08', value: random(100, 5000) },
-                { date: '2022-09', value: 0 },
-                { date: '2022-10', value: random(100, 5000) },
-                { date: '2022-11', value: random(100, 5000) },
-                { date: '2022-12', value: random(100, 5000) },
-            ],
-        },
-    ],
-};
-
 const chartContext = ref<HTMLElement | null>(null);
 const {
     createXYDateChart, createXYColumnSeries,
@@ -112,7 +93,7 @@ const {
     disposeRoot, refreshRoot,
 } = useAmcharts5(chartContext);
 
-const DATE_FORMAT = 'MMM YYYY';
+const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 
 const props = defineProps<WidgetProps>();
@@ -120,39 +101,69 @@ const props = defineProps<WidgetProps>();
 const state = reactive({
     ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
     chartData: computed(() => getRefinedXYChartData(state.data)),
-    currentMonthlyCost: 0,
-    previousMonthlyCost: 0,
-    differenceCost: computed<number>(() => state.currentMonthlyCost - state.previousMonthlyCost),
-    differenceCostRate: computed<number>(() => (state.differenceCost !== 0 ? state.differenceCost / state.currentMonthlyCost * 100 : 0)),
-    isDecrease: computed<boolean>(() => (state.differenceCost < 0)),
-    previousMonth: computed<Dayjs>(() => (dayjs.utc(state.options.date_range?.start).subtract(1, 'month'))),
+    dateRange: computed<DateRange>(() => {
+        const end = state.settings?.date_range?.end ?? dayjs.utc().format(DATE_FORMAT);
+        const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
+        return { start, end };
+    }),
+    selectedMonth: computed(() => (dayjs.utc(state.dateRange.end))),
+    previousMonth: computed(() => (dayjs.utc(state.dateRange.end).subtract(1, 'month'))),
+    currentMonthlyCost: computed(() => getMonthlyCost(state.selectedMonth)),
+    previousMonthlyCost: computed(() => getMonthlyCost(state.previousMonth)),
+    differenceCost: computed(() => {
+        const cost = state.currentMonthlyCost - state.previousMonthlyCost;
+        if (cost === 0 || Number.isNaN(cost)) return '--';
+        return cost;
+    }),
+    differenceCostRate: computed(() => {
+        if (state.differenceCost === 0 || Number.isNaN(state.differenceCost)) return '--';
+        return (state.differenceCost / state.currentMonthlyCost * 100).toFixed(2);
+    }),
+    isDecreased: computed<boolean>(() => (state.differenceCost < 0)),
 });
 
-// TODO: api binding
-const fetchData = async () => new Promise((resolve) => {
-    setTimeout(() => {
-        resolve(SAMPLE_RAW_DATA.results);
-    }, 2000);
-});
+/* Api */
+const fetchData = async () => {
+    try {
+        state.loading = true;
+        const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+            // TODO: inherit from dashboard variables
+            query: {
+                granularity: GRANULARITY.MONTHLY,
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                fields: {
+                    usd_cost_sum: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
+                },
+                field_group: ['date'],
+                // filter: [{ k: 'project_id', v: 'project-18655561c535', o: 'eq' }],
+            },
+        });
+        state.data = results;
+    } catch (e) {
+        state.date = [];
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
 
 /* Util */
+const getMonthlyCost = (month) => {
+    if (!state.data) return '--';
+    const monthlyCost = state.data[0].usd_cost_sum.find((costData) => costData.date === month.format(DATE_FORMAT))?.value;
+    return monthlyCost;
+};
+
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis, yAxis } = createXYDateChart();
-    setChartColors(chart, state.colorSet);
-
     xAxis.get('baseInterval').timeUnit = 'month';
     const yRendered = yAxis.get('renderer');
     yRendered.grid.template.setAll({ strokeOpacity: 0 });
     yRendered.labels.template.setAll({ visible: false });
-
-    chart.setAll({
-        paddingTop: 0,
-        paddingRight: 0,
-        paddingBottom: 0,
-        paddingLeft: -10,
-    });
-
-
     const seriesSettings = {
         valueYField: 'value',
     };
@@ -162,28 +173,24 @@ const drawChart = (chartData: XYChartData[]) => {
         fillOpacity: 0.5,
         strokeOpacity: 0,
     });
+    setChartColors(chart, state.colorSet);
+    chart.setAll({
+        paddingTop: 0,
+        paddingRight: 0,
+        paddingBottom: 0,
+        paddingLeft: -10,
+    });
+
     series.columns.template.adapters.add('fillOpacity', (fillOpacity, target) => {
-        const selectedMonth = dayjs.utc(state.options.date_range?.start).format(DATE_FORMAT);
-        const previousMonth = dayjs.utc(state.options.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
         const targetMonth = dayjs.utc(target.dataItem?.dataContext?.[DATE_FIELD_NAME]).format(DATE_FORMAT);
-        if (targetMonth === previousMonth) {
-            return 1;
-        }
-        if (targetMonth === selectedMonth) {
-            return 0.2;
-        }
+        if (targetMonth === state.previousMonth.format(DATE_FORMAT)) return 1;
+        if (targetMonth === state.selectedMonth.format(DATE_FORMAT)) return 0.2;
         return fillOpacity;
     });
 
     const tooltip = createTooltip();
-    setXYSingleTooltipText(chart, tooltip, state.options.currency, props.currencyRates);
-    tooltip.label.adapters.add('text', (_, target) => {
-        let value = target.dataItem?.dataContext?.[DATE_FIELD_NAME];
-        if (state.options.currency) value = currencyMoneyFormatter(value, state.options.currency, props.currencyRates);
-        return `{valueX.formatDate('MMM')}: [bold]${value}[/]`;
-    });
+    setXYSingleTooltipText(chart, tooltip, state.currency, props.currencyRates);
     series.set('tooltip', tooltip);
-
     series.data.processor = createDataProcessor({
         dateFormat: DATE_FORMAT,
     });
@@ -191,20 +198,16 @@ const drawChart = (chartData: XYChartData[]) => {
 };
 
 const initWidget = async () => {
-    state.loading = true;
-    state.data = await fetchData();
+    await fetchData();
     await nextTick();
     drawChart(state.chartData);
-    state.loading = false;
 };
 
 const refreshWidget = async () => {
-    state.loading = true;
-    state.data = await fetchData();
+    await fetchData();
     await nextTick();
     refreshRoot();
     drawChart(state.chartData);
-    state.loading = false;
 };
 
 useWidgetLifecycle({
@@ -251,7 +254,6 @@ defineExpose({
         width: 100%;
         .chart-loader {
             height: 100%;
-
             .chart {
                 height: 100%;
             }
