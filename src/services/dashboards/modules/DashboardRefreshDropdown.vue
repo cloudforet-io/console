@@ -117,6 +117,7 @@ export default defineComponent<Props>({
 
         const handleSelectRefreshIntervalOption = (option) => {
             state.intervalOptionProxy = option;
+            if (props.refreshDisabled) return;
             clearRefreshInterval();
             executeRefreshInterval();
         };
@@ -125,6 +126,7 @@ export default defineComponent<Props>({
             if (loading) {
                 clearRefreshInterval();
             } else {
+                if (props.refreshDisabled) return;
                 executeRefreshInterval();
             }
         });
@@ -138,6 +140,7 @@ export default defineComponent<Props>({
         };
 
         onMounted(() => {
+            if (props.refreshDisabled) return;
             executeRefreshInterval();
             document.addEventListener('visibilitychange', handleBrowserVisibilityChange, false);
         });
