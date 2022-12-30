@@ -92,7 +92,6 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
-import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
@@ -157,7 +156,7 @@ export default {
             //
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            groupByStoreMap: computed<Record<string, ReferenceMap>>(() => ({
+            groupByStoreMap: computed(() => ({
                 [GROUP_BY.PROJECT_GROUP]: state.projectGroups,
                 [GROUP_BY.PROJECT]: state.projects,
                 [GROUP_BY.PROVIDER]: state.providers,

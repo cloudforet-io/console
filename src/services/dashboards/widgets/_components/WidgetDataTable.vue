@@ -166,6 +166,7 @@ import { byteFormatter, numberFormatter, getValueByPath } from '@cloudforet/core
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
+import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -175,16 +176,14 @@ import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import type {
-    Field, LegendConfig, TableSize,
+    Field, LegendConfig, TableSize, WidgetTableData,
 } from '@/services/dashboards/widgets/_components/type';
 import { TABLE_SIZE, UNIT_MAP } from '@/services/dashboards/widgets/_components/type';
-
-import { GROUP_BY } from '../config';
 
 interface Props {
     loading: boolean;
     fields: Field[];
-    items: any[];
+    items: WidgetTableData[];
     thisPage: number;
     showLegend?: boolean;
     showLegendIndex?: boolean;
@@ -194,6 +193,7 @@ interface Props {
     showPagination?: boolean;
     widgetKey: string;
     disableNextPage: boolean;
+    allReferenceTypeInfo: AllReferenceTypeInfo;
 }
 export default defineComponent<Props>({
     name: 'WidgetDataTable',
@@ -259,6 +259,10 @@ export default defineComponent<Props>({
             type: Boolean,
             default: true,
         },
+        allReferenceTypeInfo: {
+            type: Object as PropType<AllReferenceTypeInfo>,
+            default: () => ({}),
+        },
         // printMode: {
         //     type: Boolean,
         //     default: false,
@@ -292,7 +296,13 @@ export default defineComponent<Props>({
             field, index: colIndex, colIndex,
         });
         const textFormatter = (value:string|number, textOptions: Field['textOptions']) => {
-            if (typeof value !== 'number') return value;
+            if (typeof value !== 'number') {
+                if (textOptions?.type === 'reference') {
+                    const referenceMap = props.allReferenceTypeInfo[textOptions.referenceType].referenceMap;
+                    return referenceMap[value]?.label ?? referenceMap[value]?.name ?? value;
+                }
+                return value;
+            }
             if (textOptions?.type === 'size') {
                 let data: number|null;
                 const UNIT_SEPARATOR = ' ';
@@ -305,8 +315,8 @@ export default defineComponent<Props>({
                 let formattedValue: string;
                 if (data === null) formattedValue = '-';
                 else {
-                    const displayUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.display_unit as string] || undefined;
-                    const sourceUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.source_unit as string] || undefined;
+                    const displayUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.displayUnit as string] || undefined;
+                    const sourceUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.sourceUnit as string] || undefined;
                     const bytesOptions: bytes.BytesOptions = { unit: displayUnit, unitSeparator: UNIT_SEPARATOR };
 
                     if (sourceUnit) {
@@ -360,7 +370,6 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            GROUP_BY,
             // getIndexNumber,
             getConvertedIndex,
             getLegendIconColor,

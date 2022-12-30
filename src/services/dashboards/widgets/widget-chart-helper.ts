@@ -2,8 +2,11 @@ import {
     keyBy, merge, sortBy, values,
 } from 'lodash';
 
+import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
+
 import type { GroupBy } from '@/services/dashboards/widgets/config';
-import type { HistoryDataModel, XYChartData } from '@/services/dashboards/widgets/type';
+import type { HistoryDataModel, XYChartData, Legend } from '@/services/dashboards/widgets/type';
+
 
 const mergeByKey = (arrA, arrB, key) => {
     const merged = merge(keyBy(arrA, key), keyBy(arrB, key));
@@ -33,4 +36,32 @@ export const getRefinedXYChartData = (
         chartData = mergeByKey(chartData, refinedList, categoryKey);
     });
     return sortBy(chartData, categoryKey);
+};
+
+
+/**
+ * @name getLegends
+ * @description Extract legends from raw data.
+ */
+export const getLegends = (rawData: HistoryDataModel['results'], groupBy: GroupBy, allReferenceTypeInfo: AllReferenceTypeInfo): Legend[] => {
+    if (!rawData || !groupBy || !allReferenceTypeInfo) return [];
+    const legends: Legend[] = [];
+    rawData.forEach((d) => {
+        let _name = d[groupBy];
+        let _label = d[groupBy];
+        const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
+        if (_name && referenceTypeInfo) {
+            const referenceMap = referenceTypeInfo.referenceMap;
+            _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
+        } else if (!_name) {
+            _name = `no_${groupBy}`;
+            _label = 'Unknown';
+        }
+        legends.push({
+            name: _name,
+            label: _label,
+            disabled: false,
+        });
+    });
+    return legends;
 };

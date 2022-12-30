@@ -37,7 +37,6 @@
         <dashboard-widget-container
             ref="widgetContainerRef"
             :widget-info-list="state.dashboardWidgetInfoList"
-            :loading.sync="state.loading"
             :edit-mode="true"
             :dashboard-variables="state.dashboardInfo.variables"
             :dashboard-settings="state.dashboardSettings"

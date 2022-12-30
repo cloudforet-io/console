@@ -57,7 +57,7 @@
         <dashboard-widget-container
             ref="widgetContainerRef"
             :widget-info-list="state.dashboardWidgetInfoList"
-            :loading.sync="state.loading"
+            :all-reference-type-info="state.allReferenceTypeInfo"
         />
         <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
                                    :dashboard-id="props.dashboardId"
@@ -73,7 +73,7 @@
 
 <script setup lang="ts">
 import {
-    reactive, ref, computed, watch,
+    reactive, ref, computed, watch, onMounted,
 } from 'vue';
 
 import {
@@ -85,10 +85,12 @@ import { flattenDeep } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -138,6 +140,7 @@ const state = reactive({
     cloneModalVisible: false,
     refreshInterval: '15s',
     loading: false,
+    allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
 });
 
 const widgetContainerRef = ref<any>(null);
@@ -193,6 +196,10 @@ const getDashboardData = async () => {
 watch(() => props.dashboardId, (dashboardId) => {
     if (dashboardId) getDashboardData();
 }, { immediate: true });
+
+onMounted(async () => {
+    await store.dispatch('reference/loadAll');
+});
 </script>
 
 <style lang="postcss" scoped>

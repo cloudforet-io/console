@@ -18,6 +18,15 @@ export interface ReferenceItem<Data = Record<string, any>> {
 
 export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<string, Item>;
 
+export type ReferenceType = 'projectGroup'|'project'|'cloudServiceType'|'provider'|'region'|'serviceAccount'|'collector'|'protocol'|'plugin'|'secret'|'user'|'webhook';
+interface ReferenceTypeInfo {
+    type: ReferenceType;
+    key: string; // project_id
+    name: string; // Project
+    referenceMap: ReferenceMap;
+}
+export type AllReferenceTypeInfo = Record<ReferenceType, ReferenceTypeInfo>;
+
 export interface ReferenceState<Items = Record<string, any>> {
     items: Items;
 }

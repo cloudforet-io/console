@@ -52,8 +52,6 @@ interface TagItem {
     valueItem: ValueItem
 }
 
-type ResourceMap = Record<string, ReferenceMap>;
-
 export default defineComponent<Props>({
     name: 'CostExplorerFilterTags',
     components: {
@@ -91,7 +89,7 @@ export default defineComponent<Props>({
         });
 
         /* Util */
-        const getRefinedTagItems = (resourceMap: ResourceMap, filters: CostFiltersMap): TagItem[] => {
+        const getRefinedTagItems = (resourceMap: Record<string, ReferenceMap>, filters: CostFiltersMap): TagItem[] => {
             const results: TagItem[] = [];
             Object.entries(filters).forEach(([category, filterItems]) => {
                 const resourceItems = resourceMap[category];

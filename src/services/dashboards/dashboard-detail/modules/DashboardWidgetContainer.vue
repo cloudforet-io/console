@@ -23,6 +23,7 @@
                        :width="width"
                        :theme="widgetThemeList[idx]"
                        :edit-mode="editMode"
+                       :all-reference-type-info="allReferenceTypeInfo"
                        @click-expand-icon="handleExpand"
             />
         </template>
@@ -37,6 +38,8 @@ import {
 } from 'vue';
 
 import { flattenDeep } from 'lodash';
+
+import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import {
@@ -55,6 +58,7 @@ interface Props {
     editMode?: boolean;
     dashboardSettings: DashboardSettings;
     dashboardVariables: DashboardVariables;
+    allReferenceTypeInfo: AllReferenceTypeInfo;
 }
 export default defineComponent<Props>({
     name: 'DashboardWidgetContainer',
@@ -79,6 +83,10 @@ export default defineComponent<Props>({
         },
         dashboardVariables: {
             type: Object as PropType<DashboardVariables>,
+            default: () => ({}),
+        },
+        allReferenceTypeInfo: {
+            type: Object as PropType<AllReferenceTypeInfo>,
             default: () => ({}),
         },
     },

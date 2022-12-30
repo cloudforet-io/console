@@ -1,3 +1,5 @@
+import type { ReferenceType } from '@/store/modules/reference/type';
+
 export const UNIT_MAP = {
     B: 'B',
     KB: 'KB',
@@ -20,9 +22,14 @@ interface NumberOption {
 }
 interface SizeOption {
     type: 'size';
-    display_unit?: UnitMap;
-    source_unit?: UnitMap;
+    displayUnit?: UnitMap;
+    sourceUnit?: UnitMap;
     default?: number;
+}
+
+interface ReferenceOption {
+    type: 'reference',
+    referenceType: ReferenceType;
 }
 
 export interface LegendConfig {
@@ -39,7 +46,7 @@ export interface Field {
     width?: string;
     label?: string;
     textAlign?: 'left' | 'right';
-    textOptions?: CostOption | PercentOption | SizeOption | NumberOption;
+    textOptions?: CostOption | PercentOption | SizeOption | NumberOption | ReferenceOption;
     detailOptions?: {
         enabled?: boolean;
         type?: 'modal'|'popover';
