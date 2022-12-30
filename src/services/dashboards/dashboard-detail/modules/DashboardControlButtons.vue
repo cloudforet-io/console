@@ -19,8 +19,8 @@
                               :items="state.previewItems"
                               :file-name="state.pdfFileName"
         >
-            <dashboard-detail-preview v-if="params?.dashboardId"
-                                      :dashboard-id="params?.dashboardId"
+            <dashboard-detail-preview v-if="props.dashboardId"
+                                      :dashboard-id="props.dashboardId"
                                       @rendered="handlePreviewRendered"
             />
         </pdf-download-overlay>
@@ -29,7 +29,6 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import { PButton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
@@ -53,8 +52,6 @@ const props = defineProps<{
     dashboardId: string;
     dashboardName?: string;
 }>();
-
-const { params } = useRoute();
 
 const state = reactive({
     visiblePdfDownload: false,

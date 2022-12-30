@@ -31,7 +31,8 @@
                 </span>
             </template>
             <template #extra>
-                <dashboard-control-buttons :dashboard-name="state.dashboardName"
+                <dashboard-control-buttons :dashboard-id="props.dashboardId"
+                                           :dashboard-name="state.dashboardName"
                                            @update:visible-clone-modal="handleVisibleCloneModal"
                 />
             </template>
