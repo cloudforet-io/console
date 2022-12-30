@@ -44,9 +44,15 @@ const dashboardsRoute: RouteConfig = {
                     component: WidgetPreviewPage,
                 },
                 {
-                    path: 'project',
-                    // song-lang
-                    meta: { label: 'Project', copiable: true },
+                    path: ':dashboardScope',
+                    meta: {
+                        translationId: ({ params }) => {
+                            // song-lang
+                            if (params.dashboardScope === 'project') return 'Project';
+                            return 'Entire Workspaces';
+                        },
+                        copiable: true,
+                    },
                     redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
                     props: true,
                     component: { template: '<router-view/>' },
