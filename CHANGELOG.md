@@ -1,3 +1,10 @@
+# [1.1.0-beta.501](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.500...v1.1.0-beta.501) (2023-01-01)
+
+
+### Features
+
+* **p-board-item:** add overlay slot ([#210](https://github.com/cloudforet-io/mirinae/issues/210)) ([b943159](https://github.com/cloudforet-io/mirinae/commit/b943159b3ddded7ee3f77a960f305ebb7198d8db))
+
 # [1.1.0-beta.500](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.499...v1.1.0-beta.500) (2022-12-29)
 
 
