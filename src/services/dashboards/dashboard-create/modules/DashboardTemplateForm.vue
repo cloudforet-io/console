@@ -26,6 +26,11 @@
                                     </div>
                                 </template>
                             </p-board>
+                            <p-text-pagination
+                                :this-page="state.defaultTemplateThisPage"
+                                :all-page="Math.ceil(state.defaultBoardSets.length / 10)"
+                                @pageChange="handleChangePagination"
+                            />
                         </div>
                     </div>
                     <div v-if="state.existingBoardSets.length"
@@ -64,7 +69,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PBoard, PLabel,
+    PPaneLayout, PPanelTop, PBoard, PLabel, PTextPagination,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
@@ -85,6 +90,8 @@ const state = reactive({
         iconButtonSets: [{ iconName: 'ic_external-link', tooltipText: 'Preview', eventAction: () => {} }],
     }))),
     existingBoardSets: computed<BoardSet[]>(() => []),
+    len: computed(() => state.defaultBoardSets.length),
+    defaultTemplateThisPage: 1,
 });
 
 
@@ -93,6 +100,11 @@ const handleSelectTemplate = (selectedTemplate: dashboardTemplateBoardSet) => {
     delete _selectedTemplate.leftIcon;
     delete _selectedTemplate.iconButtonSets;
     emit('set-template', _selectedTemplate);
+};
+
+const handleChangePagination = (page: number) => {
+    if (page > state.defaultBoardSets.length) return;
+    state.defaultTemplateThisPage = page;
 };
 </script>
 
@@ -111,6 +123,10 @@ const handleSelectTemplate = (selectedTemplate: dashboardTemplateBoardSet) => {
             font-weight: 700;
             margin-bottom: 0.5rem;
             display: block;
+        }
+        .text-pagination {
+            @apply flex justify-center;
+            margin: 0.75rem auto 0 auto;
         }
     }
 }
