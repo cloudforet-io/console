@@ -21,6 +21,7 @@
                  class="right-overlay-wrapper desktop"
             >
                 <div class="overlay-contents">
+                    <slot name="overlay-contents" />
                     <p-tooltip v-for="(iconAction, index) in iconSetList"
                                :key="`${iconAction.iconName}-desktop-${index}`"
                                class="overlay-icon-button"
