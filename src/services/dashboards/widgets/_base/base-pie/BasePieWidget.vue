@@ -48,14 +48,12 @@ import { random } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import type {
-    Field,
-    LegendConfig,
-} from '@/services/dashboards/widgets/_components/type';
+import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
 import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/config';
+import type { Legend } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -117,7 +115,7 @@ const state = reactive({
             rapidIncrease: (item) => item?.usd_cost > 30000,
         },
     ]),
-    legends: computed<LegendConfig[]>(() => state.chartData.map((i) => ({
+    legends: computed<Legend[]>(() => state.chartData.map((i) => ({
         name: i.provider,
     }))),
     thisPage: 1,
