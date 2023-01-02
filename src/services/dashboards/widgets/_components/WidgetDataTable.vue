@@ -159,6 +159,7 @@ import {
     PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
+import { cloneDeep } from 'lodash';
 
 import { numberFormatter, getValueByPath } from '@cloudforet/core-lib';
 
@@ -297,6 +298,9 @@ const getColSlotProps = (item, field, colIndex, rowIndex) => ({
 /* event */
 const handleClickLegend = (index) => {
     // if (props.printMode) return;
+    const _legends = cloneDeep(props.legends);
+    _legends[index].disabled = !_legends[index].disabled;
+    state.proxyLegend = _legends;
     emit('toggle-legend', index);
 };
 const handleClickRow = (rowData) => {
