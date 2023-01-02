@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard-detail-page">
-        <p-page-title :title="state.dashboardName">
-            <template v-if="state.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+        <p-page-title :title="dashboardDetailState.dashboardName">
+            <template v-if="dashboardDetailState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
                 <p-i name="ic_public"
@@ -18,31 +18,31 @@
                     <p-icon-button name="ic_edit-text"
                                    width="1.5rem"
                                    height="1.5rem"
-                                   :disabled="!state.hasManagePermission && state.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   :disabled="!state.hasManagePermission && dashboardDetailState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    class="ml-1"
                                    @click="handleVisibleNameEditModal"
                     />
                     <p-icon-button name="ic_trashcan"
                                    width="1.5rem"
                                    height="1.5rem"
-                                   :disabled="!state.hasManagePermission && state.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   :disabled="!state.hasManagePermission && dashboardDetailState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    @click="handleVisibleDeleteModal"
                     />
                 </span>
             </template>
             <template #extra>
                 <dashboard-control-buttons :dashboard-id="props.dashboardId"
-                                           :dashboard-name="state.dashboardName"
+                                           :dashboard-name="dashboardDetailState.dashboardName"
                                            @update:visible-clone-modal="handleVisibleCloneModal"
                 />
             </template>
         </p-page-title>
         <div class="filter-box">
-            <dashboard-labels :label-list="state.labelList" />
-            <dashboard-toolset :enable-currency="state.enableCurrency"
-                               :currency.sync="state.currency"
-                               :enable-date-range="state.enableDateRange"
-                               :date-range.sync="state.dateRange"
+            <dashboard-labels :label-list="dashboardDetailState.labelList" />
+            <dashboard-toolset :enable-currency="dashboardDetailState.enableCurrency"
+                               :currency.sync="dashboardDetailState.currency"
+                               :enable-date-range="dashboardDetailState.enableDateRange"
+                               :date-range.sync="dashboardDetailState.dateRange"
                                @update:dateRange="handleUpdateURLParam"
                                @update:currency="handleUpdateURLParam"
             />
@@ -51,18 +51,17 @@
         <div class="filter-box">
             <div>filters</div>
             <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
-                                        :loading="state.loading"
+                                        :loading="dashboardDetailState.loadingWidgets"
                                         @refresh="handleRefresh"
             />
         </div>
-        <dashboard-widget-container
-            ref="widgetContainerRef"
-            :dashboard-id="props.dashboardId"
-            :widget-info-list="state.dashboardWidgetInfoList"
+        <dashboard-widget-container ref="widgetContainerRef"
+                                    :dashboard-id="dashboardDetailState.dashboardId"
+                                    :widget-info-list="dashboardDetailState.dashboardWidgetInfoList"
         />
         <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
                                    :dashboard-id="props.dashboardId"
-                                   :dashboard-name="state.dashboardName"
+                                   :dashboard-name="dashboardDetailState.dashboardName"
                                    @confirm="handleNameUpdate"
         />
         <dashboard-delete-modal :visible.sync="state.deleteModalVisible"
@@ -74,21 +73,15 @@
 
 <script setup lang="ts">
 import {
-    reactive, ref, computed, watch,
+    reactive, ref, watch,
 } from 'vue';
 
 import {
     PDivider, PI, PIconButton, PPageTitle,
 } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-import { flattenDeep } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 
-import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY } from '@/store/modules/display/config';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -98,13 +91,11 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { gray } from '@/styles/colors';
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import type { DashboardViewer, DateRange } from '@/services/dashboards/config';
-import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
-import type { DashboardModel } from '@/services/dashboards/model';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
@@ -118,37 +109,36 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
-    dashboardInfo: {} as DashboardModel,
-    dashboardViewer: computed<DashboardViewer>(() => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE),
-    dashboardName: '',
-    isProjectDashboard: computed<boolean>(() => props.dashboardId.startsWith('project')),
-    labelList: computed<string[]>(() => state.dashboardInfo?.labels ?? []),
-    dashboardWidgetInfoList: computed<DashboardContainerWidgetInfo[]>(() => flattenDeep(state.dashboardInfo?.layouts)),
-    enableDateRange: false,
-    dateRange: {
-        start: dayjs.utc().format('YYYY-MM-01'),
-        end: dayjs.utc().format('YYYY-MM-DD'),
-    } as DateRange,
-    enableCurrency: false,
-    currency: CURRENCY.USD as Currency,
     //
     nameEditModalVisible: false,
     deleteModalVisible: false,
     cloneModalVisible: false,
     refreshInterval: '15s',
-    loading: false,
 });
 
-const widgetContainerRef = ref<any>(null);
+const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
+
+
+const getDashboardData = async (dashboardId: string) => {
+    try {
+        await dashboardDetailStore.getDashboardData(dashboardId);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
+    }
+};
 
 // name edit
 const handleVisibleNameEditModal = () => {
     state.nameEditModalVisible = true;
 };
 const handleNameUpdate = (name: string) => {
-    state.dashboardName = name;
+    dashboardDetailState.dashboardName = name;
 };
 
 // delete dashboard
@@ -161,39 +151,20 @@ const handleVisibleCloneModal = () => {
     state.cloneModalVisible = true;
 };
 
-
 // else
-const handleRefresh = () => {
-    widgetContainerRef.value?.refreshAllWidget();
+const handleRefresh = async () => {
+    dashboardDetailState.loadingWidgets = true;
+    if (widgetContainerRef.value) await widgetContainerRef.value.refreshAllWidget();
+    dashboardDetailState.loadingWidgets = false;
 };
 const handleUpdateURLParam = () => {
     // TODO: write currency/dateRange data in url parameters
 };
 
-const getDashboardData = async () => {
-    try {
-        let result: DashboardModel;
-        if (state.isProjectDashboard) {
-            result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: props.dashboardId });
-        } else {
-            result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: props.dashboardId });
-        }
-        state.dashboardInfo = result;
-        state.dashboardName = result.name;
-
-        state.enableCurrency = result.settings.currency.enabled;
-        state.currency = result.settings.currency?.value ?? CURRENCY.USD;
-        state.enableDateRange = result.settings.date_range.enabled;
-        state.dateRange = result.settings.date_range;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
-    }
-};
-
-watch(() => props.dashboardId, (dashboardId) => {
-    if (dashboardId) getDashboardData();
+watch(() => props.dashboardId, (_dashboardId) => {
+    getDashboardData(_dashboardId);
 }, { immediate: true });
+
 
 </script>
 
