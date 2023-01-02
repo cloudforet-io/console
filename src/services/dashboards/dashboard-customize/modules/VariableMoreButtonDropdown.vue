@@ -38,11 +38,12 @@
 // CAUTION: this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    onMounted, reactive, toRefs, watch,
+    reactive, toRefs, watch,
 } from 'vue';
 
 import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { cloneDeep } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
@@ -50,7 +51,7 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 
 interface Props {
-    variableMap: DashboardVariablesSchema['properties'];
+    variables: DashboardVariablesSchema['properties'];
     variableOrder: string[];
 }
 interface EventEmits {
@@ -64,14 +65,14 @@ const emit = defineEmits<EventEmits>();
 const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as typeof PContextMenu | null,
-    variables: [] as MenuItem[],
+    variableList: [] as MenuItem[],
     selected: [] as MenuItem[],
 });
 
 const {
     targetRef,
     contextMenuRef,
-    variables,
+    variableList,
     selected,
 } = toRefs(state);
 
@@ -86,12 +87,13 @@ const {
     contextMenuRef,
     useReorderBySelection: true,
     useFixedStyle: true,
-    originMenu: variables,
+    originMenu: variableList,
     selected,
 });
 
 // event
 const handleOpenOverlay = () => {
+    hideContextMenu();
     SpaceRouter.router.push({ hash: MANAGE_VARIABLES_HASH_NAME });
 };
 const handleClickButton = () => {
@@ -103,32 +105,40 @@ const handleClickButton = () => {
 };
 
 // After context menu is hidden, update selected variable's use.
-watch([visibleMenu, reorderedMenu], ([_visibleMenu]) => {
-    if (_visibleMenu) {
-        return;
-    }
-
-    // TODO: refactor
-    // const [, prevReorderedMenu] = prev;
-    // if (_reorderedMenu === prevReorderedMenu) {
-    //     return;
-    // }
-
-    const properties = { ...props.variableMap };
-    selected.value.forEach((item) => {
-        if (!item.name) return;
-        if (!properties[item.name].use) return;
-        properties[item.name] = { ...props.variableMap[item.name], use: true };
+// TODO: refactor
+watch(() => visibleMenu.value, () => {
+    if (visibleMenu.value) return;
+    const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
+    props.variableOrder.forEach((d) => {
+        properties[d].use = state.selected.some((item) => item.name === d);
     });
     emit('change', properties);
 });
+// watch([visibleMenu, reorderedMenu], ([_visibleMenu]) => {
+//     if (_visibleMenu) {
+//         return;
+//     }
+//
+//     // const [, prevReorderedMenu] = prev;
+//     // if (_reorderedMenu === prevReorderedMenu) {
+//     //     return;
+//     // }
+//
+//     const properties = { ...props.variables };
+//     selected.value.forEach((item) => {
+//         if (!item.name) return;
+//         if (!properties[item.name].use) return;
+//         properties[item.name] = { ...props.variables[item.name], use: true };
+//     });
+//     emit('change', properties);
+// });
 
-onMounted(() => {
-    const properties = props.variableMap;
+watch(() => props.variables, (variables) => {
+    const properties = variables;
     const defaultSelected = [] as MenuItem[];
-    const defaultVariables = [] as MenuItem[];
+    const defaultVariableList = [] as MenuItem[];
     props.variableOrder.forEach((d) => {
-        defaultVariables.push({
+        defaultVariableList.push({
             name: d, label: d,
         });
         if (!properties[d]?.use) return;
@@ -137,9 +147,10 @@ onMounted(() => {
             label: d,
         });
     });
-    state.variables = defaultVariables;
+    state.variableList = defaultVariableList;
     state.selected = defaultSelected;
-});
+}, { immediate: true });
+
 </script>
 
 <style lang="postcss" scoped>
