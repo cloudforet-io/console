@@ -1,10 +1,7 @@
 <template>
-    <widget-frame :title="state.title"
-                  :size="state.size"
-                  :width="props.width"
+    <widget-frame v-bind="widgetFrameProps"
                   :date-range="state.options.date_range"
                   :currency="state.options.currency"
-                  :edit-mode="props.editMode"
     >
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
@@ -23,6 +20,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose, defineProps, reactive, toRefs,
 } from 'vue';
@@ -36,6 +34,7 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
 // import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 
@@ -68,6 +67,8 @@ const state = reactive({
         };
     }) ?? []),
 });
+
+const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
     setTimeout(() => {

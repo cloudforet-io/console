@@ -1,8 +1,5 @@
 <template>
-    <widget-frame :title="state.title"
-                  :size="state.size"
-                  :width="props.width"
-                  :edit-mode="props.editMode"
+    <widget-frame v-bind="widgetFrameProps"
                   class="aws-cloud-front-cost"
     >
         <template v-if="state.selectorItems.length"
@@ -36,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
@@ -51,6 +49,7 @@ import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
 import { GROUP_BY, CHART_TYPE } from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel } from '@/services/dashboards/widgets/type';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
@@ -87,6 +86,8 @@ const state = reactive({
         { name: 'requests.https', label: 'Requests (HTTPS)' },
     ]),
 });
+
+const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
 const fetchData = async () => new Promise((resolve) => {
