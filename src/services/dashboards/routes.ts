@@ -1,6 +1,10 @@
 import type { RouteConfig } from 'vue-router';
 
+import { i18n } from '@/translations';
+
 import { MENU_ID } from '@/lib/menu/config';
+
+import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
@@ -65,20 +69,36 @@ const dashboardsRoute: RouteConfig = {
                             component: DashboardDetailPage,
                         },
                         {
-                            path: 'customize',
-                            meta: { translationId: 'DASHBOARDS.DETAIL.CUSTOMIZE' },
-                            props: true,
-                            component: { template: '<router-view/>' },
-                            redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
-                            children: [
-                                {
-                                    path: ':dashboardId',
-                                    name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-                                    meta: { label: ({ params }) => params.dashboardId, copiable: true },
-                                    props: true,
-                                    component: DashboardCustomizePage,
+                            path: 'customize/:dashboardId?',
+                            name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                            meta: {
+                                breadcrumbs: ({ params }) => {
+                                    const breadcrumbs: Breadcrumb[] = [
+                                        {
+                                            // song-lang
+                                            name: i18n.t('Customize'),
+                                            to: {
+                                                name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                                            },
+                                        },
+                                    ];
+                                    if (params.dashboardId) {
+                                        breadcrumbs.push({
+                                            name: params.dashboardId,
+                                            to: {
+                                                name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                                                params: {
+                                                    dashboardId: params.dashboardId,
+                                                },
+                                            },
+                                            copiable: true,
+                                        });
+                                    }
+                                    return breadcrumbs;
                                 },
-                            ],
+                            },
+                            props: true,
+                            component: DashboardCustomizePage,
                         },
                     ],
                 },
