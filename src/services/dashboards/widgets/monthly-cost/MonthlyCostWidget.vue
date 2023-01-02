@@ -77,7 +77,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { green, red } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
-import { GRANULARITY } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
 import type { XYChartData, HistoryDataModel } from '@/services/dashboards/widgets/type';
@@ -112,12 +111,14 @@ const state = reactive({
     previousMonthlyCost: computed(() => getMonthlyCost(state.previousMonth)),
     differenceCost: computed(() => {
         const cost = state.currentMonthlyCost - state.previousMonthlyCost;
-        if (cost === 0 || Number.isNaN(cost)) return '--';
+        if (Number.isNaN(cost)) return '--';
         return cost;
     }),
     differenceCostRate: computed(() => {
-        if (state.differenceCost === 0 || Number.isNaN(state.differenceCost)) return '--';
-        return (state.differenceCost / state.currentMonthlyCost * 100).toFixed(2);
+        let previousMonthlyCost = state.previousMonthlyCost;
+        if (Number.isNaN(state.differenceCost)) return '--';
+        if (state.currentMonthlyCost === 0) previousMonthlyCost = 1;
+        return (state.differenceCost / previousMonthlyCost * 100).toFixed(2);
     }),
     isDecreased: computed<boolean>(() => (state.differenceCost < 0)),
 });
@@ -129,7 +130,7 @@ const fetchData = async () => {
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             // TODO: inherit from dashboard variables
             query: {
-                granularity: GRANULARITY.MONTHLY,
+                granularity: state.options.granularity,
                 start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
@@ -154,7 +155,7 @@ const fetchData = async () => {
 /* Util */
 const getMonthlyCost = (month) => {
     if (!state.data) return '--';
-    const monthlyCost = state.data[0].usd_cost_sum.find((costData) => costData.date === month.format(DATE_FORMAT))?.value;
+    const monthlyCost = state.data[0].usd_cost_sum.find((costData) => costData.date === month.format(DATE_FORMAT))?.value || 0;
     return monthlyCost;
 };
 
