@@ -90,7 +90,7 @@ const state = reactive({
         // below values are used only for render
         leftIcon: d.description?.preview_image ?? '',
         iconButtonSets: [{ iconName: 'ic_external-link', tooltipText: 'Preview', eventAction: () => {} }],
-    })).splice(10 * (state.defaultTemplateThisPage - 1), 10 * state.defaultTemplateThisPage - 1)),
+    })).slice(10 * (state.defaultTemplateThisPage - 1), 10 * state.defaultTemplateThisPage - 1)),
     // existing templates
     existingTemplateThisPage: 1,
     existingBoardSets: computed<dashboardTemplateBoardSet[]>(() => []),
