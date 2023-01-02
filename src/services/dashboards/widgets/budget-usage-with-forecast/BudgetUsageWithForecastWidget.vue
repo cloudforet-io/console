@@ -1,7 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   :date-range="state.options.date_range"
-                  :currency="state.options.currency"
+                  :currency="state.currency"
     >
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"

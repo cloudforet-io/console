@@ -29,6 +29,10 @@
                            :currency="state.currency"
                            :currency-rates="props.currencyRates"
                            :all-reference-type-info="allReferenceTypeInfo"
+                           :legends.sync="state.legends"
+                           :color-set="state.colorSet"
+                           show-legend
+                           @toggle-legend="handleToggleLegend"
         />
     </widget-frame>
 </template>
@@ -39,6 +43,7 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
+import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
@@ -78,13 +83,11 @@ const DATE_FIELD_NAME = 'date';
 const props = defineProps<WidgetProps>();
 
 const chartContext = ref<HTMLElement|null>(null);
-const {
-    createXYDateChart, createXYLineSeries, createXYColumnSeries,
-    createTooltip, setXYSharedTooltipText, setChartColors, createDataProcessor, createLegend,
-    disposeRoot, refreshRoot,
-} = useAmcharts5(chartContext);
+const chartHelper = useAmcharts5(chartContext);
+
 const state = reactive({
     ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
+    chart: null as null | XYChart,
     groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROVIDER),
     granularity: computed<Granularity>(() => state.widgetConfig.options?.granularity),
     chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data, state.groupBy)),
@@ -109,7 +112,7 @@ const state = reactive({
         const start = dayjs.utc(end).subtract(range, 'month').format('YYYY-MM');
         return { start, end };
     }),
-    legends: computed<Legend[]>(() => getLegends(state.data, state.groupBy, props.allReferenceTypeInfo)),
+    legends: [] as Legend[],
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
@@ -134,6 +137,7 @@ const fetchData = async () => {
             },
         });
         state.data = sortTableDataByDate(results);
+        state.legends = getLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
     } catch (e) {
         state.data = [];
         ErrorHandler.handleError(e);
@@ -144,9 +148,9 @@ const fetchData = async () => {
 
 /* Util */
 const drawChart = (chartData: XYChartData[]) => {
-    const { chart, xAxis } = createXYDateChart({}, getDateAxisSettings(state.dateRange));
+    const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
-    setChartColors(chart, state.colorSet);
+    chartHelper.setChartColors(chart, state.colorSet);
 
     if (state.chartType === CHART_TYPE.LINE) {
         chart.get('cursor')?.lineX.setAll({
@@ -156,7 +160,7 @@ const drawChart = (chartData: XYChartData[]) => {
 
     let legend;
     if (state.options.legend_options?.enabled && state.options.legend_options.show_at === 'chart') {
-        legend = createLegend({
+        legend = chartHelper.createLegend({
             nameField: 'name',
         });
         chart.children.push(legend);
@@ -168,20 +172,21 @@ const drawChart = (chartData: XYChartData[]) => {
             valueYField: l.name,
         };
         const series = state.chartType === CHART_TYPE.LINE
-            ? createXYLineSeries(chart, seriesSettings)
-            : createXYColumnSeries(chart, { ...seriesSettings, stacked: true });
+            ? chartHelper.createXYLineSeries(chart, seriesSettings)
+            : chartHelper.createXYColumnSeries(chart, { ...seriesSettings, stacked: true });
         chart.series.push(series);
         // set data processor
-        series.data.processor = createDataProcessor({
+        series.data.processor = chartHelper.createDataProcessor({
             dateFormat: DATE_FORMAT,
             dateFields: [DATE_FIELD_NAME],
         });
-        const tooltip = createTooltip();
-        setXYSharedTooltipText(chart, tooltip, state.currency, props.currencyRates);
+        const tooltip = chartHelper.createTooltip();
+        chartHelper.setXYSharedTooltipText(chart, tooltip, state.currency, props.currencyRates);
         series.set('tooltip', tooltip);
         series.data.setAll(cloneDeep(chartData));
     });
     if (legend) legend.data.setAll(chart.series.values);
+    state.chart = chart;
 };
 
 const initWidget = async () => {
@@ -193,7 +198,7 @@ const initWidget = async () => {
 const refreshWidget = async () => {
     await fetchData();
     await nextTick();
-    refreshRoot();
+    chartHelper.refreshRoot();
     drawChart(state.chartData);
 };
 
@@ -202,9 +207,12 @@ const handleSelectSelectorType = (selected: string) => {
     state.selectedSelectorType = selected;
     refreshWidget();
 };
+const handleToggleLegend = (index) => {
+    chartHelper.toggleSeries(state.chart, index);
+};
 
 useWidgetLifecycle({
-    disposeWidget: disposeRoot,
+    disposeWidget: chartHelper.disposeRoot,
 });
 
 defineExpose({
