@@ -49,7 +49,9 @@
             </div>
         </p-field-group>
         <div class="button-wrapper">
-            <p-button style-type="tertiary">
+            <p-button style-type="tertiary"
+                      @click="handleCancel"
+            >
                 {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.CANCEL') }}
             </p-button>
             <p-button>
@@ -59,41 +61,44 @@
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue';
+<script setup lang="ts">
+import { reactive, toRefs } from 'vue';
 import draggable from 'vuedraggable';
 
 import {
-    PButton, PFieldGroup, PIconButton, PSelectDropdown, PTextInput, PI,
+    PButton, PFieldGroup, PIconButton, PSelectDropdown, PTextInput, PI, useProxyValue,
 } from '@spaceone/design-system';
 
-export default defineComponent({
-    name: 'DashboardManageVariableForm',
-    components: {
-        PButton,
-        PFieldGroup,
-        PIconButton,
-        PSelectDropdown,
-        PTextInput,
-        PI,
-        draggable,
-    },
-    setup() {
-        const state = reactive({
-            name: '',
-            selectionType: 'MULTI',
-            options: [
-                { name: 'a', label: 'a-test' },
-                { name: 'b', label: 'b-test-test' },
-                { name: 'c', label: 'c-test-test-test' },
-            ],
-        });
+import type {
+    OverlayStatus,
+} from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
 
-        return {
-            ...toRefs(state),
-        };
-    },
+interface Props {
+    contentType: OverlayStatus;
+}
+interface EmitFn {
+    (e: string, value: string): void;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<EmitFn>();
+
+const state = reactive({
+    proxyContentType: useProxyValue('contentType', props, emit),
+    name: '',
+    selectionType: 'MULTI',
+    options: [
+        { name: 'a', label: 'a-test' },
+        { name: 'b', label: 'b-test-test' },
+        { name: 'c', label: 'c-test-test-test' },
+    ],
 });
+
+const { name, options } = toRefs(state);
+
+const handleCancel = () => {
+    state.proxyContentType = 'LIST';
+};
 
 </script>
 
