@@ -1,17 +1,17 @@
 <template>
     <div class="widget-frame"
-         :class="{ full: isFull, 'edit-mode': editMode }"
-         :style="{ width: width ? `${width}px` : '100%' }"
+         :class="{ full: state.isFull, 'edit-mode': props.editMode }"
+         :style="{ width: props.width ? `${props.width}px` : '100%' }"
     >
         <div class="widget-header">
             <h3 class="title">
-                {{ title }}
+                {{ props.title }}
             </h3><slot name="header-right" />
         </div>
         <div class="body"
-             :style="{overflowY}"
+             :style="{overflowY: props.overflowY}"
         >
-            <slot v-if="!errorMode" />
+            <slot v-if="!props.errorMode" />
             <div v-else
                  class="error-container"
             >
@@ -32,19 +32,19 @@
         <div class="widget-footer">
             <div class="widget-footer-wrapper">
                 <div class="footer-left">
-                    <label v-if="dateLabel"
+                    <label v-if="state.dateLabel"
                            class="widget-footer-label"
-                    >{{ dateLabel }}</label>
-                    <p-divider v-if="isDivided"
+                    >{{ state.dateLabel }}</label>
+                    <p-divider v-if="state.isDivided"
                                :vertical="true"
                     />
-                    <label class="widget-footer-label">{{ currencyLabel }}</label>
+                    <label class="widget-footer-label">{{ state.currencyLabel }}</label>
                 </div>
                 <div class="footer-right">
                     <slot name="footer-right">
-                        <p-anchor v-if="(widgetLink || widgetRoute) && !printMode"
-                                  :href="widgetLink"
-                                  :to="widgetRoute"
+                        <p-anchor v-if="(props.widgetLink || props.widgetRoute) && !props.printMode"
+                                  :href="props.widgetLink"
+                                  :to="props.widgetRoute"
                                   class="anchor-button"
                                   icon-name="ic_arrow_right"
                         >
@@ -54,11 +54,11 @@
                 </div>
             </div>
         </div>
-        <div v-if="editMode"
+        <div v-if="props.editMode"
              class="edit-mode-cover"
         >
             <div class="button-group">
-                <template v-for="icon in editModeIconButtonList">
+                <template v-for="icon in state.editModeIconButtonList">
                     <p-icon-button v-if="icon.isAvailable"
                                    :key="`${icon.name}-${getUUID()}`"
                                    :name="icon.name"
@@ -69,15 +69,14 @@
                 </template>
             </div>
         </div>
-        <delete-modal :visible.sync="visibleDeleteModal" />
-        <p-button-modal :visible.sync="visibleEditModal" />
+        <delete-modal :visible.sync="state.visibleDeleteModal" />
+        <p-button-modal :visible.sync="state.visibleEditModal" />
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType, SetupContext } from 'vue';
+<script setup lang="ts">
 import {
-    reactive, toRefs, defineComponent, computed,
+    reactive, computed,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Route } from 'vue-router';
@@ -90,19 +89,16 @@ import dayjs from 'dayjs';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
-import { gray } from '@/styles/colors';
-
 import type { DateRange } from '@/services/dashboards/config';
 import type { WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
-
 
 interface Props {
     title: TranslateResult;
@@ -110,18 +106,19 @@ interface Props {
     width?: number;
     widgetLink?: string;
     widgetRoute?: Route;
-    widgetIndex: number;
+    widgetIndex?: number;
     dateRange?: DateRange;
-    noData: boolean;
-    printMode: boolean;
-    selectedDates: string[];
+    noData?: boolean;
+    printMode?: boolean;
+    selectedDates?: string[];
     currency?: Currency;
     editMode?: boolean;
     errorMode?: boolean;
-    disableExpandIcon: boolean;
-    disableEditIcon: boolean;
-    disableDeleteIcon: boolean;
-    isFull: boolean;
+    disableExpandIcon?: boolean;
+    disableEditIcon?: boolean;
+    disableDeleteIcon?: boolean;
+    disableFullSize?: boolean;
+    overflowY?: string;
 }
 
 interface IconConfig {
@@ -129,148 +126,65 @@ interface IconConfig {
     name: string;
     handleClick: () => void;
 }
+const { i18nDayjs } = useI18nDayjs();
 
-export default defineComponent<Props>({
-    name: 'WidgetFrame',
-    components: {
-        PButton,
-        PButtonModal,
-        DeleteModal,
-        PIconButton,
-        PAnchor,
-        PDivider,
-    },
-    props: {
-        title: {
-            type: String as PropType<TranslateResult>,
-            default: 'Title',
-        },
-        size: {
-            type: String as PropType<WidgetSize>,
-            default: WIDGET_SIZE.md,
-        },
-        width: {
-            type: Number,
-            default: undefined,
-        },
-        widgetLink: {
-            type: String,
-            default: undefined,
-        },
-        widgetRoute: {
-            type: Object as PropType<Route>,
-            default: undefined,
-        },
-        widgetIndex: {
-            type: Number,
-            default: undefined,
-        },
-        dateRange: {
-            type: Object as PropType<DateRange>,
-            default: undefined,
-        },
-        noData: {
-            type: Boolean,
-            default: false,
-        },
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-        selectedDates: {
-            type: Array as PropType<string[]>,
-            default: () => [],
-        },
-        currency: {
-            type: String as PropType<Currency>,
-            default: undefined,
-        },
-        editMode: {
-            type: Boolean,
-            default: false,
-        },
-        errorMode: {
-            type: Boolean,
-            default: false,
-        },
-        disableExpandIcon: {
-            type: Boolean,
-            default: false,
-        },
-        disableEditIcon: {
-            type: Boolean,
-            default: false,
-        },
-        disableDeleteIcon: {
-            type: Boolean,
-            default: false,
-        },
-        isFull: {
-            type: Boolean,
-            default: false,
-        },
-        overflowY: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const { i18nDayjs } = useI18nDayjs();
-        const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
-        const handleEditButtonClick = () => { state.visibleEditModal = true; };
-        const state = reactive({
-            isFull: computed<boolean>(() => props.isFull),
-            dateLabel: computed<TranslateResult|undefined>(() => {
-                const start = setBasicDateFormat(props.dateRange?.start);
-                const end = setBasicDateFormat(props.dateRange?.end);
-                if (start && end) {
-                    return `${start} ~ ${end}`;
-                }
-                if (start && !end) {
-                    const today = dayjs();
-                    const diff = today.diff(start, 'day', true);
-                    if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
-                    if (diff >= 6 && diff < 7) return i18n.t('DASHBOARDS.WIDGET.DATE_PAST_7_DAYS');
-                    return i18nDayjs.value(start).from(today.subtract(1, 'day'));
-                }
-                return undefined;
-            }),
-            currencyLabel: computed<string|undefined>(() => (props.currency ? `${CURRENCY_SYMBOL[props.currency]}${props.currency}` : undefined)),
-            isDivided: computed<boolean|undefined>(() => (state.dateLabel && !props.noData && state.currencyLabel)),
-            visibleEditModal: false,
-            visibleDeleteModal: false,
-            editModeIconButtonList: computed<IconConfig[]>(() => [
-                {
-                    isAvailable: !props.disableExpandIcon,
-                    name: state.isFull ? 'ic_collapse-angle' : 'ic_expand-angle',
-                    handleClick: () => {
-                        emit('click-expand-icon', state.isFull ? 'collapse' : 'expand', props.widgetIndex);
-                    },
-                },
-                {
-                    isAvailable: !props.disableEditIcon,
-                    name: 'ic_edit',
-                    handleClick: handleEditButtonClick,
-                },
-                {
-                    isAvailable: !props.disableDeleteIcon,
-                    name: 'ic_trashcan',
-                    handleClick: () => {
-                        state.visibleDeleteModal = true;
-                    },
-                },
-            ]),
-        });
-
-        return {
-            ...toRefs(state),
-            WIDGET_SIZE,
-            getUUID,
-            gray,
-            handleEditButtonClick,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    width: undefined,
+    widgetLink: undefined,
+    widgetRoute: undefined,
+    widgetIndex: undefined,
+    dateRange: () => ({ start: undefined, end: undefined }),
+    selectedDates: () => [],
+    currency: CURRENCY.USD,
+    overflowY: undefined,
 });
+const emit = defineEmits(['click-expand-icon']);
+const state = reactive({
+    isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
+    dateLabel: computed<TranslateResult|undefined>(() => {
+        const start = setBasicDateFormat(props.dateRange?.start);
+        const end = setBasicDateFormat(props.dateRange?.end);
+        if (start && end) {
+            return `${start} ~ ${end}`;
+        }
+        if (start && !end) {
+            const today = dayjs();
+            const diff = today.diff(start, 'day', true);
+            if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
+            if (diff >= 6 && diff < 7) return i18n.t('DASHBOARDS.WIDGET.DATE_PAST_7_DAYS');
+            return i18nDayjs.value(start).from(today.subtract(1, 'day'));
+        }
+        return undefined;
+    }),
+    currencyLabel: computed<string|undefined>(() => (props.currency ? `${CURRENCY_SYMBOL[props.currency]}${props.currency}` : undefined)),
+    isDivided: computed<boolean|undefined>(() => (state.dateLabel && !props.noData && state.currencyLabel)),
+    visibleEditModal: false,
+    visibleDeleteModal: false,
+    editModeIconButtonList: computed<IconConfig[]>(() => [
+        {
+            isAvailable: !props.disableExpandIcon,
+            name: state.isFull ? 'ic_collapse-angle' : 'ic_expand-angle',
+            handleClick: () => {
+                emit('click-expand-icon', state.isFull ? 'collapse' : 'expand', props.widgetIndex);
+            },
+        },
+        {
+            isAvailable: !props.disableEditIcon,
+            name: 'ic_edit',
+            handleClick: handleEditButtonClick,
+        },
+        {
+            isAvailable: !props.disableDeleteIcon,
+            name: 'ic_trashcan',
+            handleClick: () => {
+                state.visibleDeleteModal = true;
+            },
+        },
+    ]),
+});
+
+const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
+const handleEditButtonClick = () => { state.visibleEditModal = true; };
 </script>
 
 <style lang="postcss" scoped>
