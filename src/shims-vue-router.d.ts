@@ -1,4 +1,5 @@
 declare module 'vue-router' {
+    import type { TranslateResult } from 'vue-i18n';
   import type {
       RouteConfigMultipleViews as OriginRouteConfigMultipleViews,
       RouteConfigSingleView as OriginRouteConfigSingleView,
@@ -11,14 +12,23 @@ import {
 
     import type { AccessLevel } from '@/lib/access-control/config';
 
+    import type { Breadcrumb } from '@/common/modules/page-layouts/type';
+
   interface RouteLabelFormatter {
-    (route: Route): string;
+    (route: Route): TranslateResult|TranslateResult[];
+  }
+  interface RouteTranslationIdFormatter {
+    (route: Route): string|string[];
+  }
+  interface RouteBreadcrumbsFormatter {
+      (route: Route): Breadcrumb[];
   }
   interface RouteMeta {
     lnbVisible?: boolean;
     menuId?: string;
     label?: string|RouteLabelFormatter;
-    translationId?: string|RouteLabelFormatter;
+    translationId?: string|RouteTranslationIdFormatter;
+    breadcrumbs?: RouteBreadcrumbsFormatter;
     copiable?: boolean; // for breadcrumbs
     isSignInPage?: boolean;
     accessLevel?: AccessLevel;

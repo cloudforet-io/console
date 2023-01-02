@@ -32,8 +32,11 @@ export const useBreadcrumbs = () => {
                     location.path = path;
                 }
 
-                const label = d.meta.label;
-                if (label) {
+                if (d.meta.breadcrumbs && typeof d.meta.breadcrumbs === 'function') {
+                    const breadcrumbsFunctionResults = d.meta.breadcrumbs(vm.$route);
+                    results.push(...breadcrumbsFunctionResults);
+                } else if (d.meta.label) {
+                    const label = d.meta.label;
                     if (typeof label === 'function') {
                         const labelResult = label(vm.$route);
                         if (labelResult) results.push({ name: labelResult, to: location, copiable: d.meta.copiable });
