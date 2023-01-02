@@ -66,7 +66,11 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lif
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
-import { getLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
+import {
+    getDateAxisSettings,
+    getLegends,
+    getRefinedXYChartData,
+} from '@/services/dashboards/widgets/widget-chart-helper';
 import {
     getReferenceTypeOfGroupBy, getWidgetTableDateFields, sortTableDataByDate,
 } from '@/services/dashboards/widgets/widget-table-helper';
@@ -143,7 +147,7 @@ const fetchData = async () => {
 
 /* Util */
 const drawChart = (chartData: XYChartData[]) => {
-    const { chart, xAxis } = createXYDateChart();
+    const { chart, xAxis } = createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
     setChartColors(chart, state.colorSet);
 

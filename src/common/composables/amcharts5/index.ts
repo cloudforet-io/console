@@ -87,9 +87,9 @@ export const useAmcharts5 = (
         disposeRoot,
         clearChildrenOfRoot,
         //
-        createXYDateChart: (settings?: am5xy.IXYChartSettings) => {
+        createXYDateChart: (settings?: am5xy.IXYChartSettings, dateAxisSettings?: Partial<am5xy.IDateAxisSettings<any>>) => {
             if (!state.root) throw new Error('No root');
-            return createXYDateChart(state.root as Root, settings);
+            return createXYDateChart(state.root as Root, settings, dateAxisSettings);
         },
         createXYCategoryChart: (settings?: am5xy.IXYChartSettings) => {
             if (!state.root) throw new Error('No root');
