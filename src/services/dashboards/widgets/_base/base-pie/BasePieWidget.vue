@@ -21,7 +21,7 @@
                            :currency="state.options.currency"
                            :currency-rates="props.currencyRates"
                            size="md"
-                           :disable-next-page="state.limit"
+                           :show-next-page="!state.limit"
                            :this-page.sync="state.thisPage"
                            @toggle-legend="handleToggleLegend"
         >

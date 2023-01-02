@@ -1,8 +1,8 @@
 <template>
     <div class="widget-data-table">
         <p-data-loader class="table-container"
-                       :loading="loading"
-                       :data="items"
+                       :loading="props.loading"
+                       :data="props.items"
                        show-data-from-scratch
                        disable-empty-case
         >
@@ -10,8 +10,8 @@
                 <table>
                     <thead>
                         <tr>
-                            <th v-for="(field, fieldColIndex) in fields"
-                                :key="`th-${widgetKey}-${fieldColIndex}`"
+                            <th v-for="(field, fieldColIndex) in props.fields"
+                                :key="`th-${props.widgetKey}-${fieldColIndex}`"
                                 :style="{
                                     minWidth: field.width || undefined,
                                     width: field.width || undefined,
@@ -51,26 +51,26 @@
                     <tbody ref="tbodyRef">
                         <p-empty v-if="isEmpty"
                                  class="no-data-wrapper"
-                                 :colspan="fields.length"
+                                 :colspan="props.fields.length"
                         >
                             {{ $t('DASHBOARDS.WIDGET.NO_DATA') }}
                         </p-empty>
                         <slot v-else
                               name="body"
-                              :items="items"
-                              v-bind="{fields}"
+                              :items="props.items"
+                              v-bind="{fields: props.fields}"
                         >
-                            <tr v-for="(item, rowIndex) in items"
-                                :key="`tr-${widgetKey}-${rowIndex}`"
+                            <tr v-for="(item, rowIndex) in props.items"
+                                :key="`tr-${props.widgetKey}-${rowIndex}`"
                                 :data-index="rowIndex"
                                 @click="handleClickRow({rowIndex, item})"
                             >
-                                <td v-for="(field, colIndex) in fields"
-                                    :key="`td-${widgetKey}-${rowIndex}-${colIndex}`"
+                                <td v-for="(field, colIndex) in props.fields"
+                                    :key="`td-${props.widgetKey}-${rowIndex}-${colIndex}`"
                                     :class="{
                                         'has-width': !!field.width,
                                         [field?.textAlign || 'left']: true,
-                                        [size]: true,
+                                        [props.size]: true,
                                         'link-item': field?.link,
                                         'detail-item': field?.detailOptions?.enabled,
                                     }"
@@ -80,10 +80,10 @@
                                     >
                                         <div class="detail-item-wrapper">
                                             <span class="td-contents">
-                                                <template v-if="colIndex === 0 && showLegend">
-                                                    <p-status v-if="showLegend"
+                                                <template v-if="colIndex === 0 && props.showLegend">
+                                                    <p-status v-if="props.showLegend"
                                                               class="toggle-button"
-                                                              :text="showLegendIndex ? (getConvertedIndex(rowIndex) + 1)?.toString() : ''"
+                                                              :text="props.showLegendIndex ? (getConvertedIndex(rowIndex) + 1)?.toString() : ''"
                                                               :icon-color="getLegendIconColor(rowIndex)"
                                                               :text-color="getLegendTextColor(rowIndex)"
                                                               @click.stop="handleClickLegend(rowIndex)"
@@ -139,32 +139,31 @@
                 </table>
             </template>
         </p-data-loader>
-        <div v-if="showPagination"
+        <div v-if="!props.disablePagination"
              class="table-pagination-wrapper"
         >
-            <p-text-pagination :this-page.sync="proxyThisPage"
-                               :disable-next-page="disableNextPage"
+            <p-text-pagination :this-page.sync="state.proxyThisPage"
+                               :disable-next-page="!props.showNextPage"
             />
         </div>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 
 import {
-    defineComponent, reactive, toRefs,
+    defineProps, reactive,
 } from 'vue';
-import type { PropType } from 'vue';
 
 import {
     PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
 
-import { byteFormatter, numberFormatter, getValueByPath } from '@cloudforet/core-lib';
+import { numberFormatter, getValueByPath } from '@cloudforet/core-lib';
 
 import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
@@ -184,212 +183,123 @@ interface Props {
     loading: boolean;
     fields: Field[];
     items: WidgetTableData[];
-    thisPage: number;
+    thisPage?: number;
     showLegend?: boolean;
     showLegendIndex?: boolean;
-    legends: Array<any>;
+    legends?: LegendConfig[];
     currency?: Currency;
     currencyRates?: CurrencyRates;
-    showPagination?: boolean;
-    widgetKey: string;
-    disableNextPage: boolean;
-    allReferenceTypeInfo: AllReferenceTypeInfo;
+    disablePagination?: boolean;
+    widgetKey?: string;
+    size?: TableSize;
+    showNextPage?: boolean;
+    allReferenceTypeInfo?: AllReferenceTypeInfo;
 }
-export default defineComponent<Props>({
-    name: 'WidgetDataTable',
-    components: {
-        PPopover,
-        PTooltip,
-        PI,
-        PDataLoader,
-        PStatus,
-        PEmpty,
-        PTextPagination,
-    },
-    props: {
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        fields: {
-            type: Array as PropType<Field[]>,
-            default: () => ([]),
-        },
-        items: {
-            type: Array,
-            default: () => ([]),
-        },
-        thisPage: {
-            type: Number,
-            default: 1,
-        },
-        showLegend: {
-            type: Boolean,
-            default: false,
-        },
-        showLegendIndex: {
-            type: Boolean,
-            default: false,
-        },
-        legends: {
-            type: Array as PropType<LegendConfig[]>,
-            default: undefined,
-        },
-        currency: {
-            type: String as PropType<Currency>,
-            default: CURRENCY.USD,
-        },
-        currencyRates: {
-            type: Object as PropType<CurrencyRates>,
-            default: () => ({}),
-        },
-        showPagination: {
-            type: Boolean,
-            default: true,
-        },
-        widgetKey: {
-            type: String,
-            default: '7rem',
-        },
-        size: {
-            type: String as PropType<TableSize>,
-            default: TABLE_SIZE.sm,
-        },
-        disableNextPage: {
-            type: Boolean,
-            default: true,
-        },
-        allReferenceTypeInfo: {
-            type: Object as PropType<AllReferenceTypeInfo>,
-            default: () => ({}),
-        },
-        // printMode: {
-        //     type: Boolean,
-        //     default: false,
-        // },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            proxyThisPage: useProxyValue('thisPage', props, emit),
-        });
 
-        /* util */
-        const getConvertedIndex = (index) => ((index + ((state.proxyThisPage - 1) * props.items.length)));
-        const labelColorFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].color : 'text-gray-900');
-        const labelTextFormatter = (index) => ((props.legends && props.legends[getConvertedIndex(index)]) ? props.legends[getConvertedIndex(index)].label : '');
-        // const getIndexNumber = (index) => {
-        //     const tableIndex = index + ((state.proxyThisPage - 1) * props.items.length) + 1;
-        //     return tableIndex?.toString();
-        // };
-        const getLegendIconColor = (index) => {
-            const legend = props.legends[getConvertedIndex(index)];
-            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-            if (legend?.color) return legend.color;
-            return DEFAULT_CHART_COLORS[getConvertedIndex(index)];
-        };
-        const getLegendTextColor = (index) => {
-            const legend = props.legends[getConvertedIndex(index)];
-            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-            return null;
-        };
-        const getHeadSlotProps = (field, colIndex) => ({
-            field, index: colIndex, colIndex,
-        });
-        const textFormatter = (value:string|number, textOptions: Field['textOptions']) => {
-            if (typeof value !== 'number') {
-                if (textOptions?.type === 'reference') {
-                    const referenceMap = props.allReferenceTypeInfo[textOptions.referenceType].referenceMap;
-                    return referenceMap[value]?.label ?? referenceMap[value]?.name ?? value;
-                }
-                return value;
-            }
-            if (textOptions?.type === 'size') {
-                let data: number|null;
-                const UNIT_SEPARATOR = ' ';
-
-                if (typeof value === 'number') data = value;
-                else if (typeof value === 'string') data = Number(value);
-                else if (textOptions?.default !== undefined) data = textOptions?.default ?? 0;
-                else data = null;
-
-                let formattedValue: string;
-                if (data === null) formattedValue = '-';
-                else {
-                    const displayUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.displayUnit as string] || undefined;
-                    const sourceUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.sourceUnit as string] || undefined;
-                    const bytesOptions: bytes.BytesOptions = { unit: displayUnit, unitSeparator: UNIT_SEPARATOR };
-
-                    if (sourceUnit) {
-                        data = bytes.parse(`${value}${sourceUnit}`);
-                    }
-
-                    const res = bytes(data, bytesOptions);
-                    if (!res) formattedValue = '-';
-                    else if (res.split(UNIT_SEPARATOR)[1] === 'B') {
-                        formattedValue = `${data} bytes`;
-                    } else {
-                        formattedValue = res;
-                    }
-                }
-                return formattedValue;
-            } if (textOptions?.type === 'cost') {
-                return currencyMoneyFormatter(value, props.currency, props.currencyRates);
-            } if (textOptions?.type === 'number') {
-                return numberFormatter(value);
-            } if (textOptions?.type === 'percent') {
-                return `${value}%`;
-            }
-            return value;
-        };
-        const getValue = (item:string|number|object, field: Field):string|number => {
-            if (typeof item === 'object') {
-                return textFormatter(getValueByPath(item, field.name), field.textOptions);
-            }
-            return textFormatter(item, field.textOptions);
-        };
-        const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
-            if (typeof option === 'string' || typeof option === 'boolean') {
-                return option;
-            }
-            if (option) return option(item);
-            return undefined;
-        };
-        const getColSlotProps = (item, field, colIndex, rowIndex) => ({
-            item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
-        });
-
-        /* event */
-        const handleClickLegend = (index) => {
-            // if (props.printMode) return;
-            emit('toggle-legend', index);
-        };
-        const handleClickRow = (rowData) => {
-            // if (props.printMode) return;
-            emit('click-row', rowData);
-        };
-
-        return {
-            ...toRefs(state),
-            // getIndexNumber,
-            getConvertedIndex,
-            getLegendIconColor,
-            getLegendTextColor,
-            labelColorFormatter,
-            labelTextFormatter,
-            handleClickLegend,
-            handleClickRow,
-            currencyMoneyFormatter,
-            byteFormatter,
-            numberFormatter,
-            CURRENCY_SYMBOL,
-            getHeadSlotProps,
-            getColSlotProps,
-            getValue,
-            getHandler,
-            gray,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    fields: () => [],
+    items: () => [],
+    thisPage: 1,
+    legends: () => [],
+    currency: CURRENCY.USD,
+    currencyRates: () => ({}) as CurrencyRates,
+    widgetKey: '',
+    size: TABLE_SIZE.sm,
+    allReferenceTypeInfo: () => ({}) as AllReferenceTypeInfo,
 });
+const emit = defineEmits<{(e: string, value: number): void}>();
+const state = reactive({
+    proxyThisPage: useProxyValue('thisPage', props, emit),
+});
+
+/* util */
+const getConvertedIndex = (index) => ((index + ((state.proxyThisPage - 1) * props.items.length)));
+const getLegendIconColor = (index) => {
+    const legend = props.legends[getConvertedIndex(index)];
+    if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+    if (legend?.color) return legend.color;
+    return DEFAULT_CHART_COLORS[getConvertedIndex(index)];
+};
+const getLegendTextColor = (index) => {
+    const legend = props.legends[getConvertedIndex(index)];
+    if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+    return null;
+};
+const getHeadSlotProps = (field, colIndex) => ({
+    field, index: colIndex, colIndex,
+});
+const textFormatter = (value:string|number, textOptions: Field['textOptions']) => {
+    if (typeof value !== 'number') {
+        if (textOptions?.type === 'reference') {
+            const referenceMap = props.allReferenceTypeInfo[textOptions.referenceType].referenceMap;
+            return referenceMap[value]?.label ?? referenceMap[value]?.name ?? value;
+        }
+        return value;
+    }
+    if (textOptions?.type === 'size') {
+        let data: number|null;
+        const UNIT_SEPARATOR = ' ';
+
+        if (typeof value === 'number') data = value;
+        else if (typeof value === 'string') data = Number(value);
+        else if (textOptions?.default !== undefined) data = textOptions?.default ?? 0;
+        else data = null;
+
+        let formattedValue: string;
+        if (data === null) formattedValue = '-';
+        else {
+            const displayUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.displayUnit as string] || undefined;
+            const sourceUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.sourceUnit as string] || undefined;
+            const bytesOptions: bytes.BytesOptions = { unit: displayUnit, unitSeparator: UNIT_SEPARATOR };
+
+            if (sourceUnit) {
+                data = bytes.parse(`${value}${sourceUnit}`);
+            }
+
+            const res = bytes(data, bytesOptions);
+            if (!res) formattedValue = '-';
+            else if (res.split(UNIT_SEPARATOR)[1] === 'B') {
+                formattedValue = `${data} bytes`;
+            } else {
+                formattedValue = res;
+            }
+        }
+        return formattedValue;
+    } if (textOptions?.type === 'cost') {
+        return currencyMoneyFormatter(value, props.currency, props.currencyRates);
+    } if (textOptions?.type === 'number') {
+        return numberFormatter(value);
+    } if (textOptions?.type === 'percent') {
+        return `${value}%`;
+    }
+    return value;
+};
+const getValue = (item:string|number|object, field: Field):string|number => {
+    if (typeof item === 'object') {
+        return textFormatter(getValueByPath(item, field.name), field.textOptions);
+    }
+    return textFormatter(item, field.textOptions);
+};
+const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
+    if (typeof option === 'string' || typeof option === 'boolean') {
+        return option;
+    }
+    if (option) return option(item);
+    return undefined;
+};
+const getColSlotProps = (item, field, colIndex, rowIndex) => ({
+    item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
+});
+
+/* event */
+const handleClickLegend = (index) => {
+    // if (props.printMode) return;
+    emit('toggle-legend', index);
+};
+const handleClickRow = (rowData) => {
+    // if (props.printMode) return;
+    emit('click-row', rowData);
+};
 </script>
 
 <style lang="postcss" scoped>
