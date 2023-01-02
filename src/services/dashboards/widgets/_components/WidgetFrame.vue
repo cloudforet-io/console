@@ -1,6 +1,6 @@
 <template>
     <div class="widget-frame"
-         :class="{ full: props.isFull, 'edit-mode': props.editMode }"
+         :class="{ full: state.isFull, 'edit-mode': props.editMode }"
          :style="{ width: props.width ? `${props.width}px` : '100%' }"
     >
         <div class="widget-header">
@@ -89,7 +89,7 @@ import dayjs from 'dayjs';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
@@ -98,6 +98,7 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { DateRange } from '@/services/dashboards/config';
 import type { WidgetSize } from '@/services/dashboards/widgets/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 
 interface Props {
     title: TranslateResult;
@@ -105,18 +106,18 @@ interface Props {
     width?: number;
     widgetLink?: string;
     widgetRoute?: Route;
-    widgetIndex: number;
+    widgetIndex?: number;
     dateRange?: DateRange;
-    noData: boolean;
-    printMode: boolean;
-    selectedDates: string[];
+    noData?: boolean;
+    printMode?: boolean;
+    selectedDates?: string[];
     currency?: Currency;
     editMode?: boolean;
     errorMode?: boolean;
-    disableExpandIcon: boolean;
-    disableEditIcon: boolean;
-    disableDeleteIcon: boolean;
-    isFull: boolean;
+    disableExpandIcon?: boolean;
+    disableEditIcon?: boolean;
+    disableDeleteIcon?: boolean;
+    disableFullSize?: boolean;
     overflowY?: string;
 }
 
@@ -127,10 +128,19 @@ interface IconConfig {
 }
 const { i18nDayjs } = useI18nDayjs();
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    width: undefined,
+    widgetLink: undefined,
+    widgetRoute: undefined,
+    widgetIndex: undefined,
+    dateRange: () => ({ start: undefined, end: undefined }),
+    selectedDates: () => [],
+    currency: CURRENCY.USD,
+    overflowY: undefined,
+});
 const emit = defineEmits(['click-expand-icon']);
 const state = reactive({
-    isFull: computed<boolean>(() => props.isFull),
+    isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
         const start = setBasicDateFormat(props.dateRange?.start);
         const end = setBasicDateFormat(props.dateRange?.end);
