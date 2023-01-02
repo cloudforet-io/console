@@ -1,11 +1,15 @@
+import type { IDateAxisSettings } from '@amcharts/amcharts5/xy';
+import dayjs from 'dayjs';
 import {
     keyBy, merge, sortBy, values,
 } from 'lodash';
 
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
+import type { DateRange } from '@/services/dashboards/config';
 import type { GroupBy } from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel, XYChartData, Legend } from '@/services/dashboards/widgets/type';
+
 
 
 const mergeByKey = (arrA, arrB, key) => {
@@ -64,4 +68,13 @@ export const getLegends = (rawData: HistoryDataModel['results'], groupBy: GroupB
         });
     });
     return legends;
+};
+
+export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSettings<any>> => {
+    const start = dayjs.utc(dateRange.start);
+    const end = dayjs.utc(dateRange.end).add(1, 'month'); // 1 month added because of `max` property bug
+    return {
+        min: start.valueOf(),
+        max: end.valueOf(),
+    };
 };

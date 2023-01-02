@@ -1,7 +1,7 @@
 import type { Root } from '@amcharts/amcharts5';
 import * as am5 from '@amcharts/amcharts5';
 import type { IXYAxis } from '@amcharts/amcharts5/.internal/charts/xy/series/XYSeries';
-import type { IXYChartSettings, IXYSeriesSettings } from '@amcharts/amcharts5/xy';
+import type { IDateAxisSettings, IXYChartSettings, IXYSeriesSettings } from '@amcharts/amcharts5/xy';
 import * as am5xy from '@amcharts/amcharts5/xy';
 
 import type { Currency } from '@/store/modules/display/config';
@@ -36,7 +36,7 @@ const createXYChart = (root: Root, settings?: IXYChartSettings): am5xy.XYChart =
     }));
 };
 
-export const createXYDateChart = (root: Root, settings?: IXYChartSettings): {
+export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateAxisSettings?: Partial<IDateAxisSettings<any>>): {
     chart: am5xy.XYChart,
     xAxis: am5xy.DateAxis<am5xy.AxisRenderer>,
     yAxis: am5xy.ValueAxis<am5xy.AxisRenderer>
@@ -73,6 +73,7 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings): {
             day: 'M/dd',
             month: 'yyyy',
         },
+        ...dateAxisSettings,
     }));
 
     const yRenderer = am5xy.AxisRendererY.new(root, {
