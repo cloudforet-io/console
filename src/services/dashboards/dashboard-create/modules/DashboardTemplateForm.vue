@@ -27,6 +27,7 @@
                                 </template>
                             </p-board>
                             <p-text-pagination
+                                v-if="state.defaultBoardSets.length > 10"
                                 :this-page="state.defaultTemplateThisPage"
                                 :all-page="Math.ceil(state.defaultBoardSets.length / 10)"
                                 @pageChange="handleChangePagination"
@@ -71,27 +72,28 @@ import { computed, reactive } from 'vue';
 import {
     PPaneLayout, PPanelTop, PBoard, PLabel, PTextPagination,
 } from '@spaceone/design-system';
-import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
 import type { DashboardConfig } from '@/services/dashboards/config';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
 
-const emit = defineEmits(['set-template']);
 
+const emit = defineEmits(['set-template']);
 
 type dashboardTemplateBoardSet = DashboardConfig & { leftIcon: string, iconButtonSets: Array<any> };
 
 const state = reactive({
     selectedTemplate: {} as DashboardConfig,
+    // default templates
+    defaultTemplateThisPage: 1,
     defaultBoardSets: computed<dashboardTemplateBoardSet[]>(() => Object.values(DASHBOARD_TEMPLATES).map((d: DashboardConfig) => ({
         ...d,
         // below values are used only for render
         leftIcon: d.description?.preview_image ?? '',
         iconButtonSets: [{ iconName: 'ic_external-link', tooltipText: 'Preview', eventAction: () => {} }],
-    }))),
-    existingBoardSets: computed<BoardSet[]>(() => []),
-    len: computed(() => state.defaultBoardSets.length),
-    defaultTemplateThisPage: 1,
+    })).splice(10 * (state.defaultTemplateThisPage - 1), 10 * state.defaultTemplateThisPage - 1)),
+    // existing templates
+    existingTemplateThisPage: 1,
+    existingBoardSets: computed<dashboardTemplateBoardSet[]>(() => []),
 });
 
 
@@ -99,7 +101,7 @@ const handleSelectTemplate = (selectedTemplate: dashboardTemplateBoardSet) => {
     const _selectedTemplate: Partial<dashboardTemplateBoardSet> = { ...selectedTemplate };
     delete _selectedTemplate.leftIcon;
     delete _selectedTemplate.iconButtonSets;
-    emit('set-template', _selectedTemplate);
+    emit('set-template', _selectedTemplate as DashboardConfig);
 };
 
 const handleChangePagination = (page: number) => {
