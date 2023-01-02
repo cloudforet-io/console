@@ -42,7 +42,6 @@ interface DashboardDetailInfoStoreState {
     // widget info states
     dashboardWidgetInfoList: DashboardContainerWidgetInfo[];
     loadingWidgets: boolean;
-
 }
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
     const state = reactive<DashboardDetailInfoStoreState>({
@@ -77,6 +76,24 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         loadingWidgets: false,
     });
 
+    const resetDashboardSettings = () => {
+        state.dateRange = {
+            start: dayjs.utc().format('YYYY-MM-01'),
+            end: dayjs.utc().format('YYYY-MM-DD'),
+        };
+        state.settings = {
+            date_range: {
+                enabled: false,
+                start: dayjs.utc().format('YYYY-MM-01'),
+                end: dayjs.utc().format('YYYY-MM-DD'),
+            },
+            currency: {
+                enabled: false,
+                value: CURRENCY.USD,
+            },
+        };
+    };
+
     const resetDashboardData = () => {
         state.dashboardInfo = null;
         state.dashboardName = '';
@@ -102,8 +119,32 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.dashboardWidgetInfoList = [];
     };
 
+    const setDashboardInfo = (dashboardInfo: DashboardModel) => {
+        state.dashboardInfo = dashboardInfo;
+        state.dashboardName = dashboardInfo.name;
+
+        state.enableCurrency = dashboardInfo.settings.currency.enabled;
+        state.currency = dashboardInfo.settings.currency?.value ?? CURRENCY.USD;
+        state.enableDateRange = dashboardInfo.settings.date_range.enabled;
+        state.dateRange = dashboardInfo.settings.date_range;
+        state.settings = {
+            date_range: {
+                enabled: dashboardInfo.settings.date_range.enabled,
+                start: dashboardInfo.settings.date_range.start,
+                end: dashboardInfo.settings.date_range.end,
+            },
+            currency: {
+                enabled: dashboardInfo.settings.currency.enabled,
+                value: dashboardInfo.settings.currency?.value ?? CURRENCY.USD,
+            },
+        };
+        state.dashboardWidgetInfoList = flattenDeep(dashboardInfo?.layouts ?? []).map((info) => ({
+            ...info,
+            widgetKey: uuidv4(),
+        }));
+    };
+
     const getDashboardData = async (dashboardId: string) => {
-        console.debug('getDashboardData', dashboardId);
         if (dashboardId === state.dashboardId) return;
 
         state.dashboardId = dashboardId;
@@ -115,28 +156,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             } else {
                 result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: state.dashboardId });
             }
-            state.dashboardInfo = result;
-            state.dashboardName = result.name;
-
-            state.enableCurrency = result.settings.currency.enabled;
-            state.currency = result.settings.currency?.value ?? CURRENCY.USD;
-            state.enableDateRange = result.settings.date_range.enabled;
-            state.dateRange = result.settings.date_range;
-            state.settings = {
-                date_range: {
-                    enabled: result.settings.date_range.enabled,
-                    start: result.settings.date_range.start,
-                    end: result.settings.date_range.end,
-                },
-                currency: {
-                    enabled: result.settings.currency.enabled,
-                    value: result.settings.currency?.value ?? CURRENCY.USD,
-                },
-            };
-            state.dashboardWidgetInfoList = flattenDeep(result?.layouts ?? []).map((info) => ({
-                ...info,
-                widgetKey: uuidv4(),
-            }));
+            setDashboardInfo(result);
         } catch (e) {
             resetDashboardData();
             throw e;
@@ -150,5 +170,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     return {
         state,
         getDashboardData,
+        resetDashboardSettings,
+        setDashboardInfo,
     };
 });
