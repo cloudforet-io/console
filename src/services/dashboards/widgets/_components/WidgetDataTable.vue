@@ -83,7 +83,7 @@
                                                 <template v-if="colIndex === 0 && props.showLegend">
                                                     <p-status v-if="props.showLegend"
                                                               class="toggle-button"
-                                                              :text="props.showLegendIndex ? (getConvertedIndex(rowIndex) + 1)?.toString() : ''"
+                                                              :text="props.showLegendIndex ? ((rowIndex) + 1)?.toString() : ''"
                                                               :icon-color="getLegendIconColor(rowIndex)"
                                                               :text-color="getLegendTextColor(rowIndex)"
                                                               @click.stop="handleClickLegend(rowIndex)"
@@ -159,6 +159,7 @@ import {
     PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
+import { cloneDeep } from 'lodash';
 
 import { numberFormatter, getValueByPath } from '@cloudforet/core-lib';
 
@@ -175,9 +176,10 @@ import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import type {
-    Field, LegendConfig, TableSize, WidgetTableData,
+    Field, TableSize, WidgetTableData,
 } from '@/services/dashboards/widgets/_components/type';
 import { TABLE_SIZE, UNIT_MAP } from '@/services/dashboards/widgets/_components/type';
+import type { Legend } from '@/services/dashboards/widgets/type';
 
 interface Props {
     loading: boolean;
@@ -186,7 +188,7 @@ interface Props {
     thisPage?: number;
     showLegend?: boolean;
     showLegendIndex?: boolean;
-    legends?: LegendConfig[];
+    legends?: Legend[];
     currency?: Currency;
     currencyRates?: CurrencyRates;
     disablePagination?: boolean;
@@ -194,6 +196,7 @@ interface Props {
     size?: TableSize;
     showNextPage?: boolean;
     allReferenceTypeInfo?: AllReferenceTypeInfo;
+    colorSet?: string[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -206,22 +209,23 @@ const props = withDefaults(defineProps<Props>(), {
     widgetKey: '',
     size: TABLE_SIZE.sm,
     allReferenceTypeInfo: () => ({}) as AllReferenceTypeInfo,
+    colorSet: () => [],
 });
-const emit = defineEmits<{(e: string, value: number): void}>();
+const emit = defineEmits<{(e: string, value: any): void}>();
 const state = reactive({
     proxyThisPage: useProxyValue('thisPage', props, emit),
+    proxyLegend: useProxyValue('legends', props, emit),
 });
 
 /* util */
-const getConvertedIndex = (index) => ((index + ((state.proxyThisPage - 1) * props.items.length)));
-const getLegendIconColor = (index) => {
-    const legend = props.legends[getConvertedIndex(index)];
+const getLegendIconColor = (index): string => {
+    const legend = props.legends[index];
     if (legend?.disabled) return DISABLED_LEGEND_COLOR;
-    if (legend?.color) return legend.color;
-    return DEFAULT_CHART_COLORS[getConvertedIndex(index)];
+    if (props.colorSet) return props.colorSet[index];
+    return DEFAULT_CHART_COLORS[index];
 };
 const getLegendTextColor = (index) => {
-    const legend = props.legends[getConvertedIndex(index)];
+    const legend = props.legends[index];
     if (legend?.disabled) return DISABLED_LEGEND_COLOR;
     return null;
 };
@@ -294,6 +298,9 @@ const getColSlotProps = (item, field, colIndex, rowIndex) => ({
 /* event */
 const handleClickLegend = (index) => {
     // if (props.printMode) return;
+    const _legends = cloneDeep(props.legends);
+    _legends[index].disabled = !_legends[index].disabled;
+    state.proxyLegend = _legends;
     emit('toggle-legend', index);
 };
 const handleClickRow = (rowData) => {

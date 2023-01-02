@@ -16,6 +16,7 @@ import type {
     WidgetConfig, WidgetOptions, WidgetSize,
     InheritOptions, WidgetProps,
 } from '@/services/dashboards/widgets/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/view-config';
 import { WIDGET_THEMES } from '@/services/dashboards/widgets/view-config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
@@ -38,7 +39,7 @@ const getRefinedOptions = (
     return merge({}, mergedOptions, parentOptions);
 };
 
-const getColorSet = (theme: WidgetTheme, colorSetType: WidgetColorSetType = 'basic') => {
+const getColorSet = (theme: WidgetTheme, colorSetType: WidgetColorSetType = 'basic'): string[] => {
     let colorSet = WIDGET_THEMES.map((d) => palette[d][400]);
     if (colorSetType === 'massive') {
         const colors1 = WIDGET_THEMES.map((d) => [palette[d][400], palette[d][600]]).flat();
@@ -67,6 +68,7 @@ export function useWidgetState<Data = any>(
             props.dashboardVariables,
         )),
         currency: computed(() => state.settings.currency?.value ?? CURRENCY.USD),
+        disableFullSize: computed<boolean>(() => !state.widgetConfig.sizes.includes(WIDGET_SIZE.full)),
         size: computed<WidgetSize>(() => {
             if (state.widgetConfig.sizes.includes(props.size)) return props.size;
             return state.widgetConfig.sizes[0];
@@ -74,7 +76,7 @@ export function useWidgetState<Data = any>(
         loading: true,
         settings: computed<DashboardSettings>(() => props.dashboardSettings),
         data: null as Data|null,
-        colorSet: computed(() => {
+        colorSet: computed<string[]>(() => {
             if (!props.theme) return [];
             const colorSetType: WidgetColorSetType = state.data?.length > 9 ? 'massive' : 'basic';
             return getColorSet(props.theme, colorSetType);
