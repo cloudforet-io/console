@@ -16,6 +16,6 @@ export interface XYChartData {
 
 export interface Legend {
     name: string;
-    label: string;
+    label?: string;
     disabled?: boolean;
 }

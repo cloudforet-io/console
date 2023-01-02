@@ -32,12 +32,6 @@ interface ReferenceOption {
     referenceType: ReferenceType;
 }
 
-export interface LegendConfig {
-    color?: string;
-    disabled?: boolean;
-    name?: string;
-}
-
 type Handler = (item:any) => string;
 type BoolHandler = (item:any) => boolean;
 
