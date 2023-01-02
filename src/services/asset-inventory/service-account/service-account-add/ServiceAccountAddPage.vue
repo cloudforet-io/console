@@ -69,6 +69,7 @@
                       style-type="primary"
                       size="lg"
                       :disabled="!isValid"
+                      :loading="formLoading"
                       @click="handleSave"
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
@@ -172,6 +173,7 @@ export default {
                 if (!formState.isProjectFormValid) return false;
                 return true;
             }),
+            formLoading: false,
         });
 
         /* Api */
@@ -193,6 +195,7 @@ export default {
         };
         const createServiceAccount = async (): Promise<string|undefined> => {
             try {
+                formState.formLoading = true;
                 const res = await SpaceConnector.client.identity.serviceAccount.create({
                     provider: props.provider,
                     name: formState.baseInformationForm.accountName.trim(),
@@ -206,6 +209,8 @@ export default {
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
                 return undefined;
+            } finally {
+                formState.formLoading = false;
             }
         };
         const createSecret = async (serviceAccountId: string): Promise<boolean> => {
