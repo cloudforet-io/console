@@ -22,12 +22,12 @@
                                                 :default-selected="variableState.variableData[name]"
                                                 :variable-options="variableState.variableProperties[name].options"
                                                 :selection-type="variableState.variableProperties[name].selection_type"
-                                                @change="handleChangeVariable(name, $event)"
+                                                @change="handleChangeVariableOptions(name, $event)"
                     />
                 </template>
-                <variable-more-button-dropdown :variable-map="variableState.variableProperties"
+                <variable-more-button-dropdown :variables="variableState.variableProperties"
                                                :variable-order="variableState.order"
-                                               @change="handleChangeVariableUse"
+                                               @change="handleChangeVariable"
                 />
             </div>
             <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
@@ -47,7 +47,11 @@
                                      :enable-currency.sync="state.dashboardSettings.currency.enabled"
                                      @save="handleSave"
         />
-        <dashboard-manage-variable-overlay :visible="variableState.showOverlay" />
+        <dashboard-manage-variable-overlay :visible="variableState.showOverlay"
+                                           :variables="variableState.variableProperties"
+                                           :order="variableState.order"
+                                           @change="handleChangeVariable"
+        />
     </div>
 </template>
 
@@ -243,10 +247,10 @@ const handleUpdateLabelList = (labelList: Array<string>) => {
 const handleSave = async () => {
     await updateDashboardData();
 };
-const handleChangeVariableUse = (variables: DashboardVariablesSchema['properties']) => {
+const handleChangeVariable = (variables: DashboardVariablesSchema['properties']) => {
     variableState.variableProperties = variables;
 };
-const handleChangeVariable = (name: string, selected: string|string[]) => {
+const handleChangeVariableOptions = (name: string, selected: string|string[]) => {
     variableState.variableData[name] = selected;
 };
 
