@@ -17,14 +17,14 @@
         >
             {{ $t(widgetConfig.description.translation_id) }}
         </div>
-        <p-json-schema-form v-if="widgetOptionsJsonSchema"
+        <p-json-schema-form v-if="widgetOptionsJsonSchema.properties"
                             :schema="widgetOptionsJsonSchema"
                             :form-data.sync="schemaFormData"
                             class="widget-options-form"
                             @validate="handleFormValidate"
         >
             <template #label-extra="{ propertyName }">
-                <div v-if="!nonInheritableProperties.includes(propertyName)"
+                <div v-if="inheritableProperties.includes(propertyName)"
                      class="inherit-toggle-button"
                 >
                     <span class="text"
@@ -151,7 +151,7 @@ export default defineComponent<Props>({
             widgetConfig: computed(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
             widgetOptionsJsonSchema: {} as JsonSchema,
             requiredProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.schema?.required ?? []),
-            nonInheritableProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.non_inheritable_properties || []),
+            inheritableProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.inheritable_properties || []),
             //
             schemaFormData: {},
             isSchemaFormValid: undefined,
