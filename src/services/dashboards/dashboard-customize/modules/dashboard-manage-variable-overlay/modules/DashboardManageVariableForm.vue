@@ -48,6 +48,7 @@
                         <div class="option-delete-area">
                             <p-icon-button v-if="options.length > 1"
                                            name="ic_trashcan"
+                                           @click="handleDeleteOption(option.key)"
                             />
                         </div>
                     </div>
@@ -140,6 +141,9 @@ const handleCancel = () => {
 };
 const handleAddOption = () => {
     state.options = [...state.options, { key: getUUID(), value: '' }];
+};
+const handleDeleteOption = (key: string) => {
+    state.options = state.options.filter((d) => d.key !== key);
 };
 
 onMounted(() => {
