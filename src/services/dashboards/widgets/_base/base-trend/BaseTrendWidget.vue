@@ -1,10 +1,5 @@
 <template>
-    <widget-frame :title="state.title"
-                  :size="state.size"
-                  :width="props.width"
-                  :edit-mode="props.editMode"
-                  :date-range="state.dateRange"
-                  :currency="state.currency"
+    <widget-frame v-bind="widgetFrameProps"
                   class="base-trend-widget"
     >
         <template v-if="state.selectorItems.length"
@@ -39,6 +34,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
@@ -62,6 +58,7 @@ import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components
 import type { Granularity, GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
 import { GROUP_BY, CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
@@ -86,7 +83,6 @@ const {
     createTooltip, setXYSharedTooltipText, setChartColors, createDataProcessor, createLegend,
     disposeRoot, refreshRoot,
 } = useAmcharts5(chartContext);
-
 const state = reactive({
     ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
     groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROVIDER),
@@ -115,6 +111,7 @@ const state = reactive({
     }),
     legends: computed<Legend[]>(() => getLegends(state.data, state.groupBy, props.allReferenceTypeInfo)),
 });
+const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
 const fetchData = async () => {

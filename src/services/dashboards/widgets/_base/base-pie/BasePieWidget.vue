@@ -1,9 +1,5 @@
 <template>
-    <widget-frame :title="state.title"
-                  :size="state.size"
-                  :width="props.width"
-                  :edit-mode="props.editMode"
-    >
+    <widget-frame v-bind="widgetFrameProps">
         <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
                            :loading="state.loading"
@@ -40,6 +36,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     computed,
     defineExpose,
@@ -59,6 +56,7 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
 import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/config';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
@@ -125,6 +123,8 @@ const state = reactive({
     thisPage: 1,
     limit: computed(() => state.thisPage > 3),
 });
+
+const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 // TODO: api binding
 const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
