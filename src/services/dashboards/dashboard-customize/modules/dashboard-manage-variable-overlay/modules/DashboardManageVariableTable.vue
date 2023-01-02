@@ -40,7 +40,7 @@
                               style-type="tertiary"
                               icon-left="ic_edit"
                               size="sm"
-                              @click="handleEditVariable"
+                              @click="handleEditVariable(value)"
                     >
                         {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.EDIT') }}
                     </p-button>
@@ -64,32 +64,27 @@ import {
 } from 'vue';
 
 import {
-    PBadge, PDataTable, PSelectStatus, PToggleButton, useProxyValue, PButton,
+    PBadge, PDataTable, PSelectStatus, PToggleButton, PButton,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
 import type { VariableType, DashboardVariablesSchema } from '@/services/dashboards/config';
-import type {
-    OverlayStatus,
-} from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
 
 interface Props {
-    contentType: OverlayStatus;
     variables: DashboardVariablesSchema['properties'];
     order: string[];
 }
 interface EmitFn {
-    (e: string, value: string): void;
     (e: 'delete', value: string): void;
     (e: 'use-change', name: string, value: boolean): void;
+    (e: 'edit', name: string): void;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<EmitFn>();
 
 const state = reactive({
-    proxyContentType: useProxyValue('contentType', props, emit),
     orderedVariables: computed(() => props.order.map((d) => {
         const currentVariable = {
             ...props.variables[d],
@@ -143,8 +138,8 @@ const variableTypeBadgeStyleFormatter = (type: VariableType) => {
 const handleSelectType = (selected) => {
     state.selectedVariableType = selected;
 };
-const handleEditVariable = () => {
-    state.proxyContentType = 'EDIT';
+const handleEditVariable = (propertyName: string) => {
+    emit('edit', propertyName);
 };
 const handleDeleteVariable = (propertyName: string) => {
     emit('delete', propertyName);
