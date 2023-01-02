@@ -36,6 +36,7 @@
         </div>
         <dashboard-widget-container
             ref="widgetContainerRef"
+            :dashboard-id="props.dashboardId"
             :widget-info-list="state.dashboardWidgetInfoList"
             :edit-mode="true"
             :dashboard-variables="state.dashboardInfo.variables"
@@ -60,6 +61,7 @@ import {
 import { PDivider } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { flattenDeep } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -82,6 +84,7 @@ import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize
 import VariableMoreButtonDropdown
     from '@/services/dashboards/dashboard-customize/modules/VariableMoreButtonDropdown.vue';
 import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
+import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import type { DashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
@@ -101,7 +104,7 @@ const state = reactive({
     isProjectDashboard: computed<boolean>(() => props.dashboardId.startsWith('project')),
     dashboardInfo: {} as DashboardModel,
     dashboardName: '',
-    dashboardWidgetInfoList: [] as DashboardLayoutWidgetInfo[],
+    dashboardWidgetInfoList: [] as DashboardContainerWidgetInfo[],
     dashboardSettings: {
         date_range: {
             start: dayjs.utc().format('YYYY-MM-01'),
@@ -180,7 +183,10 @@ const getDashboardData = async () => {
             result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: props.dashboardId });
         }
         state.dashboardInfo = result;
-        state.dashboardWidgetInfoList = flattenDeep(result?.layouts ?? []);
+        state.dashboardWidgetInfoList = flattenDeep(result?.layouts ?? []).map((info) => ({
+            ...info,
+            widgetKey: uuidv4(),
+        }));
         state.dashboardName = result.name;
 
         state.dashboardSettings = {
@@ -203,7 +209,11 @@ const updateDashboardData = async () => {
     try {
         const param: Partial<DashboardConfig> = {
             name: state.dashboardName,
-            layouts: [state.dashboardWidgetInfoList],
+            layouts: [state.dashboardWidgetInfoList.map((widget) => {
+                const result: Partial<DashboardContainerWidgetInfo> = { ...widget };
+                delete result.widgetKey;
+                return result as DashboardLayoutWidgetInfo;
+            })],
             labels: state.labelList,
             settings: state.dashboardSettings,
             // TODO: add other params
