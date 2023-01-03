@@ -5,12 +5,17 @@
         <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_NAME')"
                        required
         >
-            <p-text-input v-model="name" />
+            <p-text-input :value="name"
+                          :invalid="invalidState.name"
+                          @input="setForm('name', $event)"
+            />
         </p-field-group>
         <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_SELECTION_TYPE')"
                        required
         >
-            <p-select-dropdown />
+            <p-select-dropdown :items="selectionMenu"
+                               :selected.sync="selectionType"
+            />
         </p-field-group>
         <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_OPTIONS')"
                        required
@@ -19,6 +24,7 @@
                 <p-button class="option-add-button"
                           icon-left="ic_plus"
                           style-type="secondary"
+                          @click="handleAddOption"
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD_OPTIONS') }}
                 </p-button>
@@ -26,8 +32,8 @@
                            class="draggable-wrapper"
                            ghost-class="ghost"
                 >
-                    <div v-for="(option, idx) in options"
-                         :key="`drag-item-${option.name}-${idx}`"
+                    <div v-for="(option) in options"
+                         :key="`drag-item-${option.key}`"
                          class="draggable-item"
                     >
                         <p-i class="grab-area"
@@ -35,13 +41,14 @@
                              width="1rem"
                              height="1rem"
                         />
-                        <p-text-input class="option-input"
-                                      :value="option.label"
+                        <p-text-input v-model="option.value"
+                                      class="option-input"
                                       :placeholder="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.PLACEHOLDER_OPTIONS')"
                         />
                         <div class="option-delete-area">
                             <p-icon-button v-if="options.length > 1"
                                            name="ic_trashcan"
+                                           @click="handleDeleteOption(option.key)"
                             />
                         </div>
                     </div>
@@ -54,7 +61,7 @@
             >
                 {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.CANCEL') }}
             </p-button>
-            <p-button>
+            <p-button :disabled="formInvalid">
                 {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.SAVE') }}
             </p-button>
         </div>
@@ -62,19 +69,27 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, toRefs } from 'vue';
+import {
+    computed, onMounted, reactive, toRefs,
+} from 'vue';
 import draggable from 'vuedraggable';
 
 import {
     PButton, PFieldGroup, PIconButton, PSelectDropdown, PTextInput, PI, useProxyValue,
 } from '@spaceone/design-system';
 
+import { getUUID } from '@/lib/component-util/getUUID';
+
+import { useFormValidator } from '@/common/composables/form-validator';
+
+import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import type {
     OverlayStatus,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
 
 interface Props {
     contentType: OverlayStatus;
+    selectedVariable?: DashboardVariableSchemaProperty;
 }
 interface EmitFn {
     (e: string, value: string): void;
@@ -83,22 +98,61 @@ interface EmitFn {
 const props = defineProps<Props>();
 const emit = defineEmits<EmitFn>();
 
+const {
+    forms: {
+        name,
+    },
+    setForm,
+    invalidState,
+} = useFormValidator({
+    name: '',
+}, {
+    name(value: string) { return value.trim().length > 0; },
+});
 const state = reactive({
     proxyContentType: useProxyValue('contentType', props, emit),
-    name: '',
     selectionType: 'MULTI',
     options: [
-        { name: 'a', label: 'a-test' },
-        { name: 'b', label: 'b-test-test' },
-        { name: 'c', label: 'c-test-test-test' },
+        { key: getUUID(), value: '' },
     ],
+    selectionMenu: computed(() => [
+        { name: 'MULTI', label: 'Multi select' },
+        { name: 'SINGLE', label: 'Single select' },
+    ]),
+    formInvalid: computed(() => {
+        const nameState = invalidState.name ?? true;
+        if (props.contentType === 'ADD') {
+            return nameState;
+        }
+        // TODO: add Otions invalid state
+        const isNameChanged = props.selectedVariable?.name === name.value;
+        const isSelectionTypeChanged = props.selectedVariable?.selection_type === state.selectionType;
+        return nameState || (isNameChanged && isSelectionTypeChanged);
+    }),
 });
 
-const { name, options } = toRefs(state);
+const {
+    selectionType, options, selectionMenu, formInvalid,
+} = toRefs(state);
 
+// Event
 const handleCancel = () => {
     state.proxyContentType = 'LIST';
 };
+const handleAddOption = () => {
+    state.options = [...state.options, { key: getUUID(), value: '' }];
+};
+const handleDeleteOption = (key: string) => {
+    state.options = state.options.filter((d) => d.key !== key);
+};
+
+onMounted(() => {
+    if (props.contentType === 'EDIT') {
+        setForm('name', props.selectedVariable?.name ?? '');
+        state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
+        state.options = props.selectedVariable?.options.map((d) => ({ key: getUUID(), value: d })) ?? [{ key: getUUID(), value: '' }];
+    }
+});
 
 </script>
 

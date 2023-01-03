@@ -37,9 +37,11 @@
                                              :order="order"
                                              @use-change="handleChangeVariableUse"
                                              @delete="handleOpenDeleteModal"
+                                             @edit="handleChangeEditContent"
             />
             <dashboard-manage-variable-form v-else
                                             :content-type.sync="contentType"
+                                            :selected-variable="variables[selected]"
             />
         </div>
         <delete-modal :header-title="deleteModalState.headerTitle"
@@ -96,15 +98,15 @@ const state = reactive({
         ADD: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD'),
         EDIT: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SUB_TITLE_EDIT'),
     })),
+    selected: '',
 });
 
-const { contentType, titleSet } = toRefs(state);
+const { contentType, titleSet, selected } = toRefs(state);
 
 const deleteModalState = reactive({
     headerTitle: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE_TITLE'),
     visible: false,
     loading: false,
-    selected: '',
 });
 
 /* EVENT */
@@ -112,16 +114,20 @@ const handleChangeAddContent = () => {
     state.contentType = 'ADD';
 };
 const handleOpenDeleteModal = (propertyName: string) => {
-    deleteModalState.selected = propertyName;
+    if (state.contentType === 'LIST') state.selected = propertyName;
     deleteModalState.visible = true;
 };
 const handleDeleteVariable = () => {
-    console.log(deleteModalState.selected, 'Delete!!!!');
+    console.log(state.selected, 'Delete!!!!');
 };
 const handleChangeVariableUse = (name: string, value: boolean) => {
     const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
     properties[name].use = value;
     emit('change', properties);
+};
+const handleChangeEditContent = (propertyName: string) => {
+    state.selected = propertyName;
+    state.contentType = 'EDIT';
 };
 
 </script>
