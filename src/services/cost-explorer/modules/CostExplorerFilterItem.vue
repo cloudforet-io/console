@@ -20,9 +20,9 @@
             use-fixed-menu-style
             @update:selected="handleUpdateSelected"
         />
-        <p-query-search-dropdown
+        <p-filterable-query-dropdown
             v-else-if="category === FILTER.TAGS || category === FILTER.ADDITIONAL_INFO"
-            class="query-search-dropdown"
+            class="filterable-query-dropdown"
             :key-item-sets="querySearchHandlerState.keyItemSets"
             :value-handler-map="querySearchHandlerState.valueHandlerMap"
             :selected="querySearchHandlerState.selectedQueryItems"
@@ -49,7 +49,7 @@ import {
 } from 'vue';
 
 import {
-    PQuerySearchDropdown,
+    PFilterableQueryDropdown,
     PFilterableDropdown,
 } from '@spaceone/design-system';
 import type {
@@ -83,7 +83,7 @@ interface Props {
 export default {
     name: 'CostExplorerFilterItem',
     components: {
-        PQuerySearchDropdown,
+        PFilterableQueryDropdown,
         ProjectSelectDropdown,
         PFilterableDropdown,
     },
@@ -269,8 +269,8 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-explorer-filter-item {
-    /* custom p-query-search-dropdown */
-    :deep(.query-search-dropdown) {
+    /* custom p-filterable-query-dropdown */
+    :deep(.filterable-query-dropdown) {
         .input-wrapper {
             word-break: initial;
         }
