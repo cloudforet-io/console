@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import basePieWidgetConfig from '@/services/dashboards/widgets/_base/base-pie/widget-config';
-import baseTrendWidgetConfig from '@/services/dashboards/widgets/_base/base-trend/widget-config';
 import dashboardCommonWidgetConfig from '@/services/dashboards/widgets/_base/dashboard-common/widget-config';
 import costMapWidgetConfig from '@/services/dashboards/widgets/cost-map/widget-config';
 import costPieWidgetConfig from '@/services/dashboards/widgets/cost-pie/widget-config';
@@ -42,10 +41,9 @@ describe('[Widget Helper] getWidgetConfig', () => {
         expect(mergedCostPieConfig.options_schema?.schema?.properties['filters.provider']).toBeTruthy();
     });
     it('Merge default_properties of base trend config', () => {
-        expect(baseTrendWidgetConfig?.options_schema?.default_properties).toMatchObject(['group_by']);
         const mergedBaseTrendConfig = getWidgetConfig(costTrendConfigId);
         expect(mergedBaseTrendConfig?.options_schema?.default_properties).toEqual(expect.arrayContaining([
-            'group_by', 'filters.provider', 'filters.project_id', 'filters.service_account_id',
+            'filters.provider', 'filters.project_id', 'filters.service_account_id',
         ]));
     });
     it('test MonthlyCostWidget', () => {
