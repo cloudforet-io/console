@@ -73,6 +73,7 @@ export function useWidgetState<Data = any>(
         granularity: computed<Granularity>(() => state.widgetConfig.options?.granularity),
         chartType: computed(() => state.options.chart_type ?? CHART_TYPE.LINE),
         disableFullSize: computed<boolean>(() => !state.widgetConfig.sizes.includes(WIDGET_SIZE.full)),
+        isOnlyFullSize: computed<boolean>(() => state.widgetConfig.sizes.length === 1 && state.widgetConfig.sizes[0] === WIDGET_SIZE.full),
         size: computed<WidgetSize>(() => {
             if (state.widgetConfig.sizes.includes(props.size)) return props.size;
             return state.widgetConfig.sizes[0];

@@ -10,7 +10,7 @@
                        ref="widgetRef"
                        v-intersection-observer="handleIntersectionObserver"
                        :widget-config-id="widget.widget_name"
-                       :widget-key="widget.widget_name"
+                       :widget-key="widget.widgetKey"
                        :title="widget.title"
                        :options="widget.widget_options"
                        :inherit-options="widget.inherit_options"
