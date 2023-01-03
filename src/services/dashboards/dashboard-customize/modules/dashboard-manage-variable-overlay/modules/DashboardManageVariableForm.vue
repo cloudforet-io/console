@@ -122,6 +122,7 @@ const {
         if (props.variableNames.includes(value)) {
             return i18n.t('Name is duplicated');
         }
+        // TODO: add invalid text about name length
         return value.trim().length > 0;
     },
 });
