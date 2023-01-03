@@ -23,6 +23,8 @@ import type {
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import type { DashboardModel } from '@/services/dashboards/model';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
+import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 
 interface DashboardDetailInfoStoreState {
@@ -167,6 +169,18 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         }
     };
 
+    const setFullSizeWidget = (widgetKey: string) => {
+        state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.map((info) => {
+            const widgetSizes = getWidgetConfig(info.widget_name)?.sizes;
+            if (info.widgetKey === widgetKey && widgetSizes) {
+                return {
+                    ...info,
+                    size: (info.size === WIDGET_SIZE.full) ? (widgetSizes[0] ?? WIDGET_SIZE.md) : WIDGET_SIZE.full,
+                };
+            }
+            return info;
+        });
+    };
     store.dispatch('reference/loadAll');
 
     return {
@@ -174,5 +188,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         getDashboardData,
         resetDashboardSettings,
         setDashboardInfo,
+        setFullSizeWidget,
     };
 });
