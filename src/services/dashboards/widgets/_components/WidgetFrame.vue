@@ -1,7 +1,7 @@
 <template>
     <div class="widget-frame"
          :class="{ full: state.isFull, 'edit-mode': props.editMode }"
-         :style="{ width: props.width ? `${props.width}px` : '100%' }"
+         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%' }"
     >
         <div class="widget-header">
             <h3 class="title">
@@ -62,6 +62,7 @@
                     <p-icon-button v-if="icon.isAvailable"
                                    :key="`${icon.name}-${getUUID()}`"
                                    :name="icon.name"
+                                   :disabled="icon.disabled"
                                    shape="square"
                                    style-type="tertiary"
                                    @click="icon.handleClick"
@@ -97,6 +98,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { DateRange } from '@/services/dashboards/config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type { WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 
@@ -118,12 +120,15 @@ interface Props {
     disableEditIcon?: boolean;
     disableDeleteIcon?: boolean;
     disableFullSize?: boolean;
+    isOnlyFullSize?: boolean;
+    widgetKey: string;
     overflowY?: string;
 }
 
 interface IconConfig {
     isAvailable: boolean;
     name: string;
+    disabled: boolean;
     handleClick: () => void;
 }
 const { i18nDayjs } = useI18nDayjs();
@@ -137,8 +142,12 @@ const props = withDefaults(defineProps<Props>(), {
     selectedDates: () => [],
     currency: CURRENCY.USD,
     overflowY: undefined,
+    disableFullSize: false,
+    isOnlyFullSize: false,
 });
-const emit = defineEmits(['click-expand-icon']);
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
@@ -164,18 +173,21 @@ const state = reactive({
         {
             isAvailable: !props.disableExpandIcon,
             name: state.isFull ? 'ic_collapse-angle' : 'ic_expand-angle',
+            disabled: props.disableFullSize || props.isOnlyFullSize,
             handleClick: () => {
-                emit('click-expand-icon', state.isFull ? 'collapse' : 'expand', props.widgetIndex);
+                dashboardDetailStore.setFullSizeWidget(props.widgetKey);
             },
         },
         {
             isAvailable: !props.disableEditIcon,
             name: 'ic_edit',
+            disabled: false,
             handleClick: handleEditButtonClick,
         },
         {
             isAvailable: !props.disableDeleteIcon,
             name: 'ic_trashcan',
+            disabled: false,
             handleClick: () => {
                 state.visibleDeleteModal = true;
             },
