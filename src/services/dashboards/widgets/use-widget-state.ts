@@ -13,13 +13,13 @@ import {
     palette,
 } from '@/styles/colors';
 
+import type { ChartType } from '@/services/cost-explorer/cost-dashboard/type';
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import type {
     WidgetConfig, WidgetOptions, WidgetSize,
     InheritOptions, WidgetProps,
     Granularity, GroupBy,
 } from '@/services/dashboards/widgets/config';
-import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/view-config';
 import { WIDGET_THEMES } from '@/services/dashboards/widgets/view-config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
@@ -63,7 +63,9 @@ export interface WidgetState<Data = any> {
     title: ComputedRef<string>;
     options: ComputedRef<WidgetOptions>;
     currency: ComputedRef<Currency>;
-    disableFullSize: ComputedRef<boolean>;
+    groupBy: ComputedRef<GroupBy | string>;
+    granularity: ComputedRef<Granularity>;
+    chartType?: ComputedRef<ChartType>;
     size: ComputedRef<WidgetSize>;
     loading: boolean;
     settings: ComputedRef<DashboardSettings>;
@@ -85,11 +87,9 @@ export function useWidgetState<Data = any>(
             props.dashboardVariables,
         )),
         currency: computed(() => state.settings.currency?.value ?? CURRENCY.USD),
-        groupBy: computed<GroupBy>(() => state.options.group_by),
+        groupBy: computed<GroupBy | string>(() => state.options.group_by),
         granularity: computed<Granularity>(() => state.widgetConfig.options?.granularity),
-        chartType: computed(() => state.options.chart_type ?? CHART_TYPE.LINE),
-        disableFullSize: computed<boolean>(() => !state.widgetConfig.sizes.includes(WIDGET_SIZE.full)),
-        isOnlyFullSize: computed<boolean>(() => state.widgetConfig.sizes.length === 1 && state.widgetConfig.sizes[0] === WIDGET_SIZE.full),
+        chartType: computed(() => state.options.chart_type),
         size: computed<WidgetSize>(() => {
             if (state.widgetConfig.sizes.includes(props.size)) return props.size;
             return state.widgetConfig.sizes[0];
