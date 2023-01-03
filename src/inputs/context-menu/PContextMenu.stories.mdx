@@ -179,7 +179,7 @@ Each `MenuItem` has the following type to represent it:
 ## Slots
 
 <Description markdown={`
-Context Menu have ${contextMenuSlots.length} slots: \n
+Context Menu have the slots below: \n
 |Slot|Description|
 |-|-|
 ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join('\n')}
@@ -188,10 +188,10 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
 <br/>
 
 
-### No Data Slots
+### No Data Slot
 
 <Canvas>
-    <Story name="No Data Slots" args={{menu: menuItems}}>
+    <Story name="No Data Slot" args={{menu: menuItems}}>
         {{
             props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PEmpty, PTextEditor },
@@ -381,6 +381,47 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
         </div>
 <!--<div>-->
 `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Search Slots
+
+<Canvas>
+    <Story name="Search Slots" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu, PEmpty, PTextEditor },
+            template: `
+        <div class="flex h-full flex-col">
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>search slots</strong></h2>
+                <p-context-menu :menu="menu" searchable>
+                    <template #search-left>
+                        <div class="p-1 bg-peacock-100 text-peacock-600">Left</div>
+                    </template>
+                    <template #search-default>
+                         <div class="p-1 bg-coral-100 w-full text-coral-600"><input v-model="searchText"/></div>
+                    </template>
+                    <template #search-right>
+                        <div class="p-1 bg-yellow-100 text-yellow-700">Right</div>
+                    </template>
+                </p-context-menu>
+            </div>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    searchText: 'Default'
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
         }}
     </Story>
 </Canvas>

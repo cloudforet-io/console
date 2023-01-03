@@ -30,7 +30,15 @@
                               @update:value="handleUpdateSearchText"
                               @keydown.up.native="onKeyUp()"
                               @keydown.down.native="onKeyDown()"
-                    />
+                    >
+                        <template v-for="(_, slot) of searchSlots"
+                                  #[slot]="scope"
+                        >
+                            <slot :name="`search-${slot}`"
+                                  v-bind="scope"
+                            />
+                        </template>
+                    </p-search>
                 </div>
                 <p-text-button v-if="showClearSelection && multiSelectable"
                                class="clear-all-wrapper"
@@ -146,6 +154,8 @@ import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 
+import { reduce } from 'lodash';
+
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { useListFocus } from '@/hooks/list-focus';
 import { useProxyValue } from '@/hooks/proxy-state';
@@ -225,7 +235,7 @@ export default defineComponent<ContextMenuProps>({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit, slots }) {
         const state = reactive({
             searchText: '',
             isFocusedOnSearch: false,
@@ -331,6 +341,12 @@ export default defineComponent<ContextMenuProps>({
             state.proxySelected = [];
         });
 
+        /* slots */
+        const searchSlots = computed(() => reduce(slots, (res, d, name) => {
+            if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
+            return res;
+        }, {}));
+
         return {
             ...toRefs(state),
             onClickMenu,
@@ -341,6 +357,7 @@ export default defineComponent<ContextMenuProps>({
             handleClickClearSelection,
             getItemId,
             handleUpdateSearchText,
+            searchSlots,
         };
     },
 });
