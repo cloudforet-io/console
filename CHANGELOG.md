@@ -1,3 +1,11 @@
+# [1.1.0-beta.503](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.502...v1.1.0-beta.503) (2023-01-03)
+
+
+### Features
+
+* **context-menu:** add searchText and rename event to update:search-text ([8caddc8](https://github.com/cloudforet-io/mirinae/commit/8caddc81a450d8e6e144f3146e78f901e73d967d))
+* **context-menu:** bind search component slots ([2333a3c](https://github.com/cloudforet-io/mirinae/commit/2333a3c085c55673bf40c35f793509534ef663c6))
+
 # [1.1.0-beta.502](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.501...v1.1.0-beta.502) (2023-01-03)
 
 
