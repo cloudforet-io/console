@@ -3,6 +3,9 @@ import * as am5 from '@amcharts/amcharts5';
 import type { IXYAxis } from '@amcharts/amcharts5/.internal/charts/xy/series/XYSeries';
 import type { IDateAxisSettings, IXYChartSettings, IXYSeriesSettings } from '@amcharts/amcharts5/xy';
 import * as am5xy from '@amcharts/amcharts5/xy';
+import bytes from 'bytes';
+
+import { byteFormatter } from '@cloudforet/core-lib';
 
 import type { Currency } from '@/store/modules/display/config';
 import type { CurrencyRates } from '@/store/modules/display/type';
@@ -12,6 +15,8 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { DEFAULT_CATEGORY_FIELD_NAME, DEFAULT_DATE_FIELD_NAME } from '@/common/composables/amcharts5/config';
 
 import { gray } from '@/styles/colors';
+
+import type { UnitMap } from '@/services/dashboards/widgets/_components/type';
 
 // Chart
 const createXYChart = (root: Root, settings?: IXYChartSettings): am5xy.XYChart => {
@@ -226,8 +231,22 @@ export const setXYSharedTooltipText = (chart: am5xy.XYChart, tooltip: am5.Toolti
         chart.series.each((s) => {
             const fieldName = s.get('valueYField') || s.get('valueXField') || '';
             let value = target.dataItem?.dataContext?.[fieldName];
-            if (!value) return;
+            if (value === undefined) value = '--';
             if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
+            _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
+        });
+        return _text;
+    });
+};
+export const setXYSharedTooltipTextByUsage = (chart: am5xy.XYChart, tooltip: am5.Tooltip, sourceUnit?: UnitMap): void => {
+    tooltip.label.adapters.add('text', (text, target) => {
+        let _text = `[${gray[700]}]{valueX}[/]`;
+        chart.series.each((s) => {
+            const fieldName = s.get('valueYField') || s.get('valueXField') || '';
+            let value = target.dataItem?.dataContext?.[fieldName];
+            if (value === undefined) value = '--';
+            value = bytes.parse(`${value}${sourceUnit}`);
+            value = byteFormatter(value);
             _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
         });
         return _text;

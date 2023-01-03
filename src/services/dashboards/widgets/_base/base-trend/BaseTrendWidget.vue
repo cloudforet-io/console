@@ -77,7 +77,7 @@ import {
     getReferenceTypeOfGroupBy, getWidgetTableDateFields, sortTableDataByDate,
 } from '@/services/dashboards/widgets/widget-table-helper';
 
-const DATE_FORMAT = 'yyyy-MM';
+const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 
 const props = defineProps<WidgetProps>();
@@ -104,9 +104,9 @@ const state = reactive({
         ];
     }),
     dateRange: computed<DateRange>(() => {
-        const end = state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM-DD');
+        const end = state.settings?.date_range?.end ?? dayjs.utc().format(DATE_FORMAT);
         const range = props.size === WIDGET_SIZE.full ? 11 : 3;
-        const start = dayjs.utc(end).subtract(range, 'month').format('YYYY-MM');
+        const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
     legends: [] as Legend[],

@@ -24,7 +24,7 @@ import { createTreeMapSeries, setTreemapTooltipText, setTreemapLabelText } from 
 import type { ChartContext } from '@/common/composables/amcharts5/type';
 import {
     createXYCategoryChart, createXYDateChart, createXYLineSeries, createXYColumnSeries,
-    setXYSharedTooltipText, setXYSingleTooltipText, createXYVerticalChart,
+    setXYSharedTooltipText, setXYSingleTooltipText, createXYVerticalChart, setXYSharedTooltipTextByUsage,
 } from '@/common/composables/amcharts5/xy-chart-helper';
 
 
@@ -158,6 +158,7 @@ export const useAmcharts5 = (
             return createDataProcessor(state.root as Root, settings);
         },
         setXYSharedTooltipText,
+        setXYSharedTooltipTextByUsage,
         setXYSingleTooltipText,
         setPieTooltipText,
         setTreemapTooltipText,
