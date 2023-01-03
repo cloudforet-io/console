@@ -124,6 +124,10 @@ export interface WidgetOptions {
         enabled?: boolean;
         type: 'cost-usage'|'days';
     };
+    pagination_options?: {
+        enabled?: boolean;
+        page_size?: number;
+    };
     filters?: WidgetFiltersMap;
 }
 

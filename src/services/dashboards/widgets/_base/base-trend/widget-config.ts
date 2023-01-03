@@ -12,6 +12,10 @@ const baseTrendWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: 'MONTHLY',
+        pagination_options: {
+            enabled: true,
+            page_size: 5,
+        },
     },
 };
 
