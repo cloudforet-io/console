@@ -184,7 +184,7 @@ import type { Legend } from '@/services/dashboards/widgets/type';
 interface Props {
     loading: boolean;
     fields: Field[];
-    items: WidgetTableData[];
+    items?: WidgetTableData[];
     thisPage?: number;
     showLegend?: boolean;
     showLegendIndex?: boolean;
