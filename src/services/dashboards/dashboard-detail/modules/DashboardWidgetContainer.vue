@@ -80,7 +80,7 @@ export default defineComponent<Props>({
             widgetInfoList: computed(() => dashboardDetailState.dashboardWidgetInfoList),
             dashboardVariables: computed(() => dashboardDetailState.variables),
             dashboardSettings: computed(() => dashboardDetailState.settings),
-            widgetDataMap: computed<Record<string, boolean>>({
+            widgetDataMap: computed({
                 get() { return dashboardDetailState.widgetDataMap; },
                 set(val) { dashboardDetailState.widgetDataMap = val; },
             }),
@@ -156,16 +156,16 @@ export default defineComponent<Props>({
 
 
         const refreshAllWidget = async () => {
-            const promises: WidgetExpose['refreshWidget'][] = [];
+            const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
 
             const filteredRefs = state.widgetRef.filter((comp: WidgetComponent|null) => {
                 if (!comp || typeof comp.refreshWidget() !== 'function') return false;
                 if (!state.initiatedWidgetMap[comp.$el?.id]) return false;
-                promises.push(comp.refreshWidget);
+                refreshWidgetPromises.push(comp.refreshWidget);
                 return true;
             });
 
-            const results = await Promise.allSettled(promises);
+            const results = await Promise.allSettled(refreshWidgetPromises);
 
             results.forEach((result, idx) => {
                 if (result.status === 'fulfilled') {

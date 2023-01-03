@@ -27,8 +27,9 @@ import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 interface WidgetDataMap {
-[widgetKey: string]: any;
+    [widgetKey: string]: any;
 }
+
 interface DashboardDetailInfoStoreState {
     loadingDashboard: boolean;
     dashboardId: string;
