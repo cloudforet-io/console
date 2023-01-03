@@ -30,7 +30,7 @@
                                 v-show="defaultTemplateState.allPage > 10"
                                 :this-page="defaultTemplateState.thisPage"
                                 :all-page="defaultTemplateState.allPage"
-                                @pageChange="(page) => handleChangePagination(page, 'DEFAULT')"
+                                @pageChange="handleChangePagination($event, 'DEFAULT')"
                             />
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                             <p-text-pagination
                                 :this-page="existingTemplateState.thisPage"
                                 :all-page="existingTemplateState.allPage"
-                                @pageChange="(page) => handleChangePagination(page, 'EXISTING')"
+                                @pageChange="handleChangePagination($event, 'EXISTING')"
                             />
                         </div>
                     </div>
@@ -85,10 +85,15 @@ import {
     PPaneLayout, PPanelTop, PBoard, PLabel, PTextPagination, PSearch, PEmpty,
 } from '@spaceone/design-system';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
+
 import type { DashboardConfig } from '@/services/dashboards/config';
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
+import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 
 const emit = defineEmits(['set-template']);
@@ -101,21 +106,42 @@ const defaultTemplateState = reactive({
     boardSets: computed<DashboardTemplateBoardSet[]>(() => Object.values(DASHBOARD_TEMPLATES).map((d: DashboardConfig) => ({
         ...d,
         // below values are used only for render
-        leftIcon: d.description?.preview_image ?? '',
-        // song-lang
-        iconButtonSets: [{ iconName: 'ic_external-link', tooltipText: 'Preview', eventAction: () => {} }],
+        leftIcon: d.description?.icon ?? '',
+        iconButtonSets: [{
+            iconName: 'ic_external-link',
+            // song-lang
+            tooltipText: 'Preview',
+            eventAction: () => {
+                const href = `/images/dashboard-previews/dashboard-img_${d.description?.preview_image}--thumbnail.png`;
+                window.open(href, '_blank');
+            },
+        }],
     })).slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1)),
 });
 const existingTemplateState = reactive({
-    dashboards: computed<DashboardConfig[]>(() => [...store.state.dashboard.domainItems, ...store.state.dashboard.projectItems].filter((d) => d.name.includes(existingTemplateState.searchValue))),
+    dashboards: computed<DashboardModel[]>(() => [...store.state.dashboard.domainItems, ...store.state.dashboard.projectItems].filter((d) => d.name.includes(existingTemplateState.searchValue))),
     thisPage: 1,
     allPage: computed<number>(() => Math.ceil(existingTemplateState.dashboards.length / 10) || 1),
-    boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards.map((d: DashboardConfig) => ({
+    boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards.map((d: DomainDashboardModel & ProjectDashboardModel) => ({
         ...d,
         // below values are used only for render
         leftIcon: d.description?.preview_image ?? '',
         // song-lang
-        iconButtonSets: [{ iconName: 'ic_external-link', tooltipText: 'Preview', eventAction: () => {} }],
+        iconButtonSets: [{
+            iconName: 'ic_external-link',
+            tooltipText: 'Preview',
+            eventAction: () => {
+                const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');
+                const { href } = SpaceRouter.router.resolve({
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    params: {
+                        dashboardId: isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id,
+                        dashboardScope: isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
+                    },
+                });
+                window.open(href, '_blank');
+            },
+        }],
     })).slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
     searchValue: '',
 });
