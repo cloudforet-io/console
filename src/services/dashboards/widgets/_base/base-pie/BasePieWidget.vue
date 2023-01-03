@@ -17,12 +17,13 @@
                            :fields="state.tableFields"
                            :items="state.chartData"
                            show-legend
-                           :legends="state.legends"
-                           :currency="state.options.currency"
+                           :legends.sync="state.legends"
+                           :currency="state.currency"
                            :currency-rates="props.currencyRates"
                            size="md"
                            :show-next-page="!state.limit"
                            :this-page.sync="state.thisPage"
+                           :color-set="state.colorSet"
                            @toggle-legend="handleToggleLegend"
         >
             <template #detail-provider>
@@ -52,7 +53,7 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
-import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/config';
+import { CHART_TYPE } from '@/services/dashboards/widgets/config';
 import type { Legend } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
@@ -76,12 +77,10 @@ const state = reactive({
     ...toRefs(useWidgetState<Data[]>(props)),
     chart: null as null|ReturnType<typeof createPieChart | typeof createDonutChart>,
     series: null as null|ReturnType<typeof createPieSeries>,
-    groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROVIDER),
     groupByLabel: computed<string>(() => {
         const groupBy = state.groupBy;
         return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;
     }),
-    chartType: computed(() => state.options.chart_type ?? CHART_TYPE.PIE),
     chartData: computed<Data[]>(() => {
         if (!state.data) return [];
         return state.data;

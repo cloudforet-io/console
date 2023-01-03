@@ -47,7 +47,7 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
-import { GROUP_BY, CHART_TYPE } from '@/services/dashboards/widgets/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
@@ -77,7 +77,6 @@ const {
 
 const state = reactive({
     ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
-    chartType: computed(() => state.options.chart_type ?? CHART_TYPE.LINE),
     labels: computed(() => ['data-transfer.out', 'requests.http', 'requests.https']),
     tableFields: computed(() => [
         GROUP_BY_ITEM_MAP[GROUP_BY.PROJECT],
