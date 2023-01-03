@@ -107,14 +107,13 @@ const existingTemplateState = reactive({
     dashboards: computed<DashboardConfig[]>(() => [...store.state.dashboard.domainItems, ...store.state.dashboard.projectItems].filter((d) => d.name.includes(existingTemplateState.searchValue))),
     thisPage: 1,
     allPage: computed<number>(() => Math.ceil(existingTemplateState.dashboards.length / 10) || 1),
-    // boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards.map((d: DashboardConfig) => ({
-    //     ...d,
-    //     // below values are used only for render
-    //     leftIcon: d.description?.preview_image ?? '',
-    //     // song-lang
-    //     iconButtonSets: [{ iconName: 'ic_external-link', tooltipText: 'Preview', eventAction: () => {} }],
-    // })).slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
-    boardSets: [],
+    boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards.map((d: DashboardConfig) => ({
+        ...d,
+        // below values are used only for render
+        leftIcon: d.description?.preview_image ?? '',
+        // song-lang
+        iconButtonSets: [{ iconName: 'ic_external-link', tooltipText: 'Preview', eventAction: () => {} }],
+    })).slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
     searchValue: '',
 });
 
