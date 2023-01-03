@@ -34,7 +34,9 @@
                                         refresh-disabled
             />
         </div>
-        <dashboard-widget-container edit-mode />
+        <dashboard-widget-container edit-mode
+                                    reuse-previous-data
+        />
         <dashboard-customize-sidebar :widget-info-list.sync="dashboardDetailState.dashboardWidgetInfoList"
                                      :dashboard-id="props.dashboardId"
                                      :enable-date-range.sync="dashboardDetailState.settings.date_range.enabled"

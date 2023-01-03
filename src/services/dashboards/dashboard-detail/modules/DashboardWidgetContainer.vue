@@ -53,6 +53,7 @@ import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widge
 
 interface Props {
     editMode?: boolean;
+    reusePreviousData?: boolean;
 }
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 export default defineComponent<Props>({
@@ -62,6 +63,10 @@ export default defineComponent<Props>({
     },
     props: {
         editMode: {
+            type: Boolean,
+            default: false,
+        },
+        reusePreviousData: {
             type: Boolean,
             default: false,
         },
@@ -110,7 +115,8 @@ export default defineComponent<Props>({
             if (isIntersecting) {
                 const targetWidgetRef: WidgetComponent|null = state.widgetRef.find((d) => d?.$el?.id === target.id);
                 if (typeof targetWidgetRef?.initWidget === 'function') {
-                    const data = await targetWidgetRef.initWidget(state.widgetDataMap[target.id]);
+                    const prevData = props.reusePreviousData ? state.widgetDataMap[target.id] : undefined;
+                    const data = await targetWidgetRef.initWidget(prevData);
                     state.widgetDataMap[target.id] = data;
                     state.initiatedWidgetMap[target.id] = data;
                 }

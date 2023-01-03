@@ -14,7 +14,9 @@
             <div>Applied Filters</div> <dashboard-labels :label-list="state.labelList" />
         </div>
         <div class="divider" />
-        <dashboard-widget-container @rendered="handleAllRendered" />
+        <dashboard-widget-container reuse-previous-data
+                                    @rendered="handleAllRendered"
+        />
     </div>
 </template>
 
