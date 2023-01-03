@@ -169,7 +169,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         }
     };
 
-    const setFullSizeWidget = (widgetKey: string) => {
+    const toggleWidgetSize = (widgetKey: string) => {
         state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.map((info) => {
             const widgetSizes = getWidgetConfig(info.widget_name)?.sizes;
             if (info.widgetKey === widgetKey && widgetSizes) {
@@ -188,6 +188,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         getDashboardData,
         resetDashboardSettings,
         setDashboardInfo,
-        setFullSizeWidget,
+        toggleWidgetSize,
     };
 });

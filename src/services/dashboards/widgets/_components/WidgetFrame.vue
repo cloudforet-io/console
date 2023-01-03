@@ -108,7 +108,6 @@ interface Props {
     width?: number;
     widgetLink?: string;
     widgetRoute?: Route;
-    widgetIndex?: number;
     dateRange?: DateRange;
     noData?: boolean;
     printMode?: boolean;
@@ -137,7 +136,6 @@ const props = withDefaults(defineProps<Props>(), {
     width: undefined,
     widgetLink: undefined,
     widgetRoute: undefined,
-    widgetIndex: undefined,
     dateRange: () => ({ start: undefined, end: undefined }),
     selectedDates: () => [],
     currency: CURRENCY.USD,
@@ -175,7 +173,7 @@ const state = reactive({
             name: state.isFull ? 'ic_collapse-angle' : 'ic_expand-angle',
             disabled: props.disableFullSize || props.isOnlyFullSize,
             handleClick: () => {
-                dashboardDetailStore.setFullSizeWidget(props.widgetKey);
+                dashboardDetailStore.toggleWidgetSize(props.widgetKey);
             },
         },
         {
