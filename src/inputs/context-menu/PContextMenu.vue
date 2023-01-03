@@ -25,12 +25,20 @@
                 <div v-if="searchable"
                      class="search-wrapper"
                 >
-                    <p-search :value="searchText"
+                    <p-search :value="proxySearchText"
                               :is-focused.sync="isFocusedOnSearch"
                               @update:value="handleUpdateSearchText"
                               @keydown.up.native="onKeyUp()"
                               @keydown.down.native="onKeyDown()"
-                    />
+                    >
+                        <template v-for="(_, slot) of searchSlots"
+                                  #[slot]="scope"
+                        >
+                            <slot :name="`search-${slot}`"
+                                  v-bind="scope"
+                            />
+                        </template>
+                    </p-search>
                 </div>
                 <p-text-button v-if="showClearSelection && multiSelectable"
                                class="clear-all-wrapper"
@@ -53,7 +61,7 @@
                                              :selected="!noSelectIndication && selectedNameMap[item.name] !== undefined"
                                              :select-marker="multiSelectable ? 'checkbox' : (showRadioIcon ? 'radio' : undefined)"
                                              :ellipsis="itemHeightFixed"
-                                             :highlight-term="highlightTerm"
+                                             :highlight-term="proxySearchText || highlightTerm"
                                              :tabindex="index"
                                              @click.stop="onClickMenu(item, index, $event)"
                                              @keyup.enter="onClickMenu(item, index, $event)"
@@ -146,6 +154,8 @@ import {
     computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 
+import { reduce } from 'lodash';
+
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { useListFocus } from '@/hooks/list-focus';
 import { useProxyValue } from '@/hooks/proxy-state';
@@ -224,10 +234,14 @@ export default defineComponent<ContextMenuProps>({
             type: Boolean,
             default: false,
         },
+        searchText: {
+            type: String,
+            default: '',
+        },
     },
-    setup(props, { emit }) {
+    setup(props, { emit, slots }) {
         const state = reactive({
-            searchText: '',
+            proxySearchText: props.searchText ?? '',
             isFocusedOnSearch: false,
             proxySelected: useProxyValue<MenuItem[]>('selected', props, emit),
             selectedNameMap: computed<Record<string, number>>(() => {
@@ -315,8 +329,8 @@ export default defineComponent<ContextMenuProps>({
             state.proxySelected = [];
         };
         const handleUpdateSearchText = async (value: string) => {
-            state.searchText = value;
-            emit('update-search-input', value);
+            state.proxySearchText = value;
+            emit('update:search-text', value);
         };
 
         watch(() => state.proxySelected, (proxySelected) => {
@@ -327,9 +341,20 @@ export default defineComponent<ContextMenuProps>({
             }
         }, { immediate: true });
 
+        watch(() => props.searchText, (searchText) => {
+            if (state.proxySearchText === searchText) return;
+            state.proxySearchText = searchText;
+        });
+
         onUnmounted(() => {
             state.proxySelected = [];
         });
+
+        /* slots */
+        const searchSlots = computed(() => reduce(slots, (res, d, name) => {
+            if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
+            return res;
+        }, {}));
 
         return {
             ...toRefs(state),
@@ -341,6 +366,7 @@ export default defineComponent<ContextMenuProps>({
             handleClickClearSelection,
             getItemId,
             handleUpdateSearchText,
+            searchSlots,
         };
     },
 });

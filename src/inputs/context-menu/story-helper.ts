@@ -1,6 +1,11 @@
 import type { ArgTypes } from '@storybook/addons';
 
 import { getContextMenuItemArgTypes } from '@/inputs/context-menu/context-menu-item/story-helper';
+// eslint-disable-next-line import/no-cycle
+import { getSearchSlotArgTypes } from '@/inputs/search/search/story-helper';
+
+const searchSlots = Object.values(getSearchSlotArgTypes());
+
 
 export const contextMenuSlots: [string, string][] = [
     ['menu', 'A slot that replaces the whole context menu. It\'s useful when you want to use context menu\'s container style, no data & loading container only.'],
@@ -11,6 +16,8 @@ export const contextMenuSlots: [string, string][] = [
     // eslint-disable-next-line max-len
     ['item-text-list', 'A slot used when customizing each menu item whose type is \'item\' type with default style applied. This leads directly to the text-list slot of ContextMenuItem. This works only when the highlightTerm is given.'],
     ['header-{item.name}', 'A slot that replaces the inner area of a menu item whose type is \'header\' with a specific name.'],
+    ...searchSlots.map<[string, string]>((slot) => [`search-${slot.name}`, `A slot for search component's ${slot.name} slot: ${slot.description} (This is enabled in searchable case only)`]),
+
 ];
 
 const contextMenuEvents: [string, string][] = [
@@ -24,7 +31,7 @@ const contextMenuEvents: [string, string][] = [
     ['click-button', 'This event is emitted when the button(in the item whose type is button) is clicked. As arguments, item, index and click event will be passed.'],
     ['click-done', 'This event is emitted when the done-button(in multi-selectable & show-select-header case) is clicked.'],
     ['click-show-more', 'This event is emitted when the show-more-button is clicked.'],
-    ['update-search-input', 'This event is emitted when the input value of search component(in searchable case) is updated.'],
+    ['update:search-text', 'This event is emitted when the input value of search component(in searchable case) is updated. It allows two way binding of searchText prop.'],
 ];
 
 const getArgTypes = (category: string, info: [string, string][]) => {
@@ -251,6 +258,24 @@ export const getContextMenuArgTypes = (): ArgTypes => {
             },
             control: {
                 type: 'boolean',
+            },
+        },
+        searchText: {
+            name: 'searchText',
+            type: { name: 'string', required: true },
+            description: 'Input value for search component in searchable case. sync for two way binding is supported.',
+            defaultValue: '',
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: '',
+                },
+            },
+            control: {
+                type: 'text',
             },
         },
         ...getArgTypes('slots', contextMenuSlots),

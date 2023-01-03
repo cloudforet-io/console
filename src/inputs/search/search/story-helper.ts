@@ -1,5 +1,6 @@
 import type { ArgTypes } from '@storybook/addons';
 
+// eslint-disable-next-line import/no-cycle
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 
 const initContextMenuArgTypes = (): ArgTypes => {
@@ -12,6 +13,51 @@ const initContextMenuArgTypes = (): ArgTypes => {
     };
     return argTypes;
 };
+
+export const getSearchSlotArgTypes = (): ArgTypes => ({
+    left: {
+        name: 'left',
+        description: 'A slot for insert something into left side of input element.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+            defaultValue: {
+                summary: null,
+            },
+        },
+    },
+    default: {
+        name: 'default',
+        description: 'A slot for replace input element. Use it carefully and don\'t forget bind props and event handlers that provided by slot props.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+            defaultValue: {
+                summary: null,
+            },
+        },
+    },
+    right: {
+        name: 'right',
+        description: 'A slot for replace right side of input element including delete button.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+            defaultValue: {
+                summary: null,
+            },
+        },
+    },
+});
 
 export const getSearchArgTypes = (): ArgTypes => {
     const contextMenuArgTypes = initContextMenuArgTypes();
@@ -267,49 +313,8 @@ export const getSearchArgTypes = (): ArgTypes => {
             control: null,
         },
         /* slots */
-        left: {
-            name: 'left',
-            description: 'Slot for insert something into left side of input element.',
-            defaultValue: null,
-            table: {
-                type: {
-                    summary: null,
-                },
-                category: 'slots',
-                defaultValue: {
-                    summary: null,
-                },
-            },
-        },
-        default: {
-            name: 'default',
-            description: `Slot for replace input element.
-                      Use it carefully and don't forget bind props and event handlers that provided by slot props.`,
-            defaultValue: null,
-            table: {
-                type: {
-                    summary: null,
-                },
-                category: 'slots',
-                defaultValue: {
-                    summary: null,
-                },
-            },
-        },
-        right: {
-            name: 'right',
-            description: 'Slot for replace right side of input element including delete button.',
-            defaultValue: null,
-            table: {
-                type: {
-                    summary: null,
-                },
-                category: 'slots',
-                defaultValue: {
-                    summary: null,
-                },
-            },
-        },
+        ...getSearchSlotArgTypes(),
+        /* events */
         onInput: {
             name: 'input',
             description: 'Emitted when input occurred.',
