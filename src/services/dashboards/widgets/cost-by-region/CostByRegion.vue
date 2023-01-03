@@ -35,7 +35,7 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetProps } from '@/services/dashboards/widgets/config';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
@@ -43,6 +43,20 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lif
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 
+interface Data {
+    title: string;
+    region_code?: string;
+    continent_code?: string;
+    latitude: number;
+    longitude: number;
+    color: string;
+    pieData: {
+        category: string;
+        color: string;
+        provider: string;
+        value: number
+    }[]
+}
 const SAMPLE_RAW_DATA = {
     more: true,
     results: [
@@ -97,7 +111,7 @@ const SAMPLE_PIE_DATA = [{
 
 const props = defineProps<WidgetProps>();
 const state = reactive({
-    ...toRefs(useWidgetState(props)),
+    ...toRefs(useWidgetState<Data[]>(props)),
     groupByLabel: computed<string>(() => {
         const groupBy = state.groupBy;
         return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;
@@ -119,7 +133,7 @@ const {
     disposeRoot, clearChildrenOfRoot,
 } = useAmcharts5(chartContext);
 
-const fetchData = async () => new Promise((resolve) => {
+const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
     setTimeout(() => {
         resolve(SAMPLE_RAW_DATA.results);
     }, 1000);
@@ -156,20 +170,21 @@ const drawChart = () => {
     pointSeries.data.setAll(state.data);
 };
 
-const initWidget = async () => {
+const initWidget = async (data?: Data[]) => {
     state.loading = true;
-    state.data = await fetchData();
+    state.data = data ?? await fetchData();
     await nextTick();
     clearChildrenOfRoot();
     drawChart();
     state.loading = false;
+    return state.data;
 };
 
 useWidgetLifecycle({
     disposeWidget: disposeRoot,
 });
 
-defineExpose({
+defineExpose<WidgetExpose>({
     initWidget,
     refreshWidget: initWidget,
 });

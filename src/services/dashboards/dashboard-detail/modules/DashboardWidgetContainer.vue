@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import { vIntersectionObserver } from '@vueuse/components';
-import type { DirectiveFunction, SetupContext } from 'vue';
+import type { ComponentPublicInstance, DirectiveFunction, SetupContext } from 'vue';
 import {
     defineComponent, reactive, toRefs, ref, onMounted, watch, onBeforeUnmount, computed,
 } from 'vue';
@@ -45,19 +45,19 @@ import {
 import { widgetThemeAssigner } from '@/services/dashboards/dashboard-detail/lib/theme-helper';
 import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
-import AWSCloudFrontCost from '@/services/dashboards/widgets/aws-cloud-front-cost/AWSCloudFrontCost.vue';
-import type { WidgetSize, WidgetConfig } from '@/services/dashboards/widgets/config';
+import type {
+    WidgetSize, WidgetConfig, WidgetExpose, WidgetProps,
+} from '@/services/dashboards/widgets/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
 import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 interface Props {
     editMode?: boolean;
+    reusePreviousData?: boolean;
 }
+type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 export default defineComponent<Props>({
     name: 'DashboardWidgetContainer',
-    components: {
-        AWSCloudFrontCost,
-    },
     directives: {
         intersectionObserver: vIntersectionObserver as DirectiveFunction,
     },
@@ -66,15 +66,24 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
+        reusePreviousData: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props, { emit, expose }: SetupContext) {
+    setup(props, { expose }: SetupContext) {
         const dashboardDetailStore = useDashboardDetailInfoStore();
         const dashboardDetailState = dashboardDetailStore.state;
 
         const state = reactive({
+            dashboardId: computed(() => dashboardDetailState.dashboardId),
             widgetInfoList: computed(() => dashboardDetailState.dashboardWidgetInfoList),
             dashboardVariables: computed(() => dashboardDetailState.variables),
             dashboardSettings: computed(() => dashboardDetailState.settings),
+            widgetDataMap: computed({
+                get() { return dashboardDetailState.widgetDataMap; },
+                set(val) { dashboardDetailState.widgetDataMap = val; },
+            }),
             // width
             containerWidth: WIDGET_CONTAINER_MIN_WIDTH,
             widgetSizeList: [] as WidgetSize[],
@@ -88,8 +97,8 @@ export default defineComponent<Props>({
                 });
                 return widgetThemeAssigner(widgetThemeOptions);
             }),
-            widgetRef: [] as Array<InstanceType<typeof AWSCloudFrontCost>>,
-            initiatedWidgetMap: {} as {[widgetKey: string]: boolean},
+            widgetRef: [] as Array<WidgetComponent|null>,
+            initiatedWidgetMap: {} as Record<string, any>,
             allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
         });
         const containerRef = ref<HTMLElement|null>(null);
@@ -101,12 +110,16 @@ export default defineComponent<Props>({
             return containerWidth - (containerWidth % 80);
         };
 
-        const handleIntersectionObserver = ([{ isIntersecting, target }]) => {
+        const handleIntersectionObserver = async ([{ isIntersecting, target }]) => {
             if (state.initiatedWidgetMap[target.id]) return;
             if (isIntersecting) {
-                state.initiatedWidgetMap[target.id] = true;
-                const targetWidgetRef = state.widgetRef.filter((d) => d.$el.id === target.id)[0];
-                if (typeof targetWidgetRef.initWidget === 'function') targetWidgetRef.initWidget();
+                const targetWidgetRef: WidgetComponent|null = state.widgetRef.find((d) => d?.$el?.id === target.id);
+                if (typeof targetWidgetRef?.initWidget === 'function') {
+                    const prevData = props.reusePreviousData ? state.widgetDataMap[target.id] : undefined;
+                    const data = await targetWidgetRef.initWidget(prevData);
+                    state.widgetDataMap[target.id] = data;
+                    state.initiatedWidgetMap[target.id] = data;
+                }
             }
         };
 
@@ -141,22 +154,34 @@ export default defineComponent<Props>({
             state.initiatedWidgetMap = initiatedWidgetMap;
         }, { immediate: true, deep: true });
 
-        // for PDF export - start
+
         const refreshAllWidget = async () => {
-            const promises: (()=>void)[] = [];
-            state.widgetRef.forEach((d:any) => {
-                if (typeof d?.refreshWidget === 'function' && state.initiatedWidgetMap[d.$el.id]) promises.push(d?.refreshWidget());
+            const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
+
+            const filteredRefs = state.widgetRef.filter((comp: WidgetComponent|null) => {
+                if (!comp || typeof comp.refreshWidget() !== 'function') return false;
+                if (!state.initiatedWidgetMap[comp.$el?.id]) return false;
+                refreshWidgetPromises.push(comp.refreshWidget);
+                return true;
             });
-            await Promise.allSettled(promises);
+
+            const results = await Promise.allSettled(refreshWidgetPromises);
+
+            results.forEach((result, idx) => {
+                if (result.status === 'fulfilled') {
+                    const widgetKey = filteredRefs[idx]?.$el?.id;
+                    state.widgetDataMap[widgetKey] = result.value;
+                }
+            });
         };
         expose({
             refreshAllWidget,
         });
         onMounted(async () => {
             await store.dispatch('reference/loadAll');
-            emit('rendered', state.widgetRef);
+            // for PDF export
+            // emit('rendered', state.widgetRef);
         });
-        // for PDF export - end
 
         return {
             containerRef,

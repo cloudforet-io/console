@@ -75,7 +75,7 @@ import { green, red } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetProps } from '@/services/dashboards/widgets/config';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
 import type { XYChartData, HistoryDataModel } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
@@ -91,8 +91,9 @@ const DATE_FIELD_NAME = 'date';
 
 const props = defineProps<WidgetProps>();
 
+type Data = HistoryDataModel['results'];
 const state = reactive({
-    ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
+    ...toRefs(useWidgetState<Data>(props)),
     chartData: computed(() => getRefinedXYChartData(state.data)),
     dateRange: computed<DateRange>(() => {
         const end = state.settings?.date_range?.end ?? dayjs.utc().format(DATE_FORMAT);
@@ -119,9 +120,8 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-const fetchData = async () => {
+const fetchData = async (): Promise<Data> => {
     try {
-        state.loading = true;
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             // TODO: inherit from dashboard variables
             query: {
@@ -138,12 +138,10 @@ const fetchData = async () => {
                 // filter: [{ k: 'project_id', v: 'project-18655561c535', o: 'eq' }],
             },
         });
-        state.data = results;
+        return results;
     } catch (e) {
-        state.date = [];
         ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
+        return [];
     }
 };
 
@@ -193,24 +191,30 @@ const drawChart = (chartData: XYChartData[]) => {
     series.data.setAll(chartData);
 };
 
-const initWidget = async () => {
-    await fetchData();
+const initWidget = async (data?: Data): Promise<Data> => {
+    state.loading = true;
+    state.data = data ?? await fetchData();
     await nextTick();
     drawChart(state.chartData);
+    state.loading = false;
+    return state.data;
 };
 
-const refreshWidget = async () => {
-    await fetchData();
+const refreshWidget = async (): Promise<Data> => {
+    state.loading = true;
+    state.data = await fetchData();
     await nextTick();
     chartHelper.refreshRoot();
     drawChart(state.chartData);
+    state.loading = false;
+    return state.data;
 };
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
 });
 
-defineExpose({
+defineExpose<WidgetExpose<Data>>({
     initWidget,
     refreshWidget,
 });

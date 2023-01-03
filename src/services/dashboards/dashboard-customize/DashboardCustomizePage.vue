@@ -34,7 +34,9 @@
                                         refresh-disabled
             />
         </div>
-        <dashboard-widget-container edit-mode />
+        <dashboard-widget-container edit-mode
+                                    reuse-previous-data
+        />
         <dashboard-customize-sidebar :widget-info-list.sync="dashboardDetailState.dashboardWidgetInfoList"
                                      :dashboard-id="props.dashboardId"
                                      :enable-date-range.sync="dashboardDetailState.settings.date_range.enabled"
@@ -194,7 +196,7 @@ const updateDashboardData = async () => {
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: props.dashboardId,
-                dashboardScope: state.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
+                dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
     } catch (e) {

@@ -58,24 +58,39 @@ import { i18n } from '@/translations';
 import { indigo, red, yellow } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetProps } from '@/services/dashboards/widgets/config';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
+import type { Legend } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
+import type { WidgetState } from '@/services/dashboards/widgets/use-widget-state';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 
 const props = defineProps<WidgetProps>();
+
+interface BudgetStatusWidgetState extends WidgetState {
+    data: Data[]|undefined;
+    legends: ComputedRef<Omit<Legend, 'name'>[]>;
+}
 const state = reactive({
-    ...toRefs(useWidgetState(props)),
-    legends: computed(() => ([
+    ...toRefs(useWidgetState<Data[]>(props)),
+    legends: computed<Omit<Legend, 'name'>[]>(() => ([
         { label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.OVERSPENT'), color: red[400] },
         { label: '90-100%', color: yellow[500] },
         { label: '70-90%', color: indigo[500] },
         { label: '< 70%', color: indigo[100] },
     ])),
-});
+} as BudgetStatusWidgetState);
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
+interface Data {
+    budgetId: string;
+    budgetName: string;
+    color: string;
+    usage: number;
+    limit: number;
+    usdCost: number;
+}
 /* Api */
 const SAMPLE_DATA = [
     ...range(0, 5).map((d) => ({
@@ -103,28 +118,31 @@ const SAMPLE_DATA = [
         usdCost: 4124,
     })),
 ];
-const fetchData = async () => new Promise((resolve) => {
+const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
     setTimeout(() => {
         resolve(SAMPLE_DATA);
     }, 1000);
 });
 
-const initWidget = async () => {
+const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
-    state.data = await fetchData();
+    state.data = data ?? await fetchData();
     await nextTick();
     state.loading = false;
+    return state.data;
 };
 
-const refreshWidget = async () => {
+const refreshWidget = async (): Promise<Data[]> => {
     state.loading = true;
     state.data = await fetchData();
     await nextTick();
     state.loading = false;
+    return state.data;
 };
 
 /* Util */
-const getTooltipText = (rowIdx, colIdx) => {
+const getTooltipText = (rowIdx, colIdx): string => {
+    if (!state.data) return '';
     const index = colIdx * 10 + rowIdx;
     const limit = state.data[index].limit;
     const usdCost = state.data[index].usdCost;
@@ -137,7 +155,7 @@ const getTooltipText = (rowIdx, colIdx) => {
     return `${state.data[index].budgetName} (${percentage})`;
 };
 
-defineExpose({
+defineExpose<WidgetExpose<Data[]>>({
     initWidget,
     refreshWidget,
 });

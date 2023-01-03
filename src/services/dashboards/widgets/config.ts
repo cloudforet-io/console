@@ -166,3 +166,8 @@ export interface WidgetProps {
     editMode?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
 }
+
+export interface WidgetExpose<Data = any> {
+    initWidget: (data?: Data) => Promise<Data>;
+    refreshWidget: () => Promise<Data>;
+}
