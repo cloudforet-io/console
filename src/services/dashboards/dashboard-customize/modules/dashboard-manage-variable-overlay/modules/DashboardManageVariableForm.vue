@@ -70,12 +70,17 @@
             >
                 {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.CANCEL') }}
             </p-button>
-            <p-button :disabled="formInvalid"
+            <p-button :disabled="formInvalidState.formInvalid"
                       @click="handleSave"
             >
                 {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.SAVE') }}
             </p-button>
         </div>
+        <delete-modal :header-title="deleteModalState.headerTitle"
+                      :visible.sync="deleteModalState.visible"
+                      :loading="deleteModalState.loading"
+                      @confirm="handleConfirmDeleteModal"
+        />
     </div>
 </template>
 
@@ -93,6 +98,7 @@ import { i18n } from '@/translations';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
@@ -150,22 +156,41 @@ const state = reactive({
         { name: 'MULTI', label: 'Multi select' },
         { name: 'SINGLE', label: 'Single select' },
     ]),
-    formInvalid: computed(() => {
-        const optionState = state.options.filter((d) => d.value !== '').length === 0;
-        const nameState = invalidState.name ?? true;
-        const basicInvalidState = optionState || nameState;
-        if (props.contentType === 'ADD') {
-            return basicInvalidState;
-        }
-        const isNameChanged = props.selectedVariable?.name === name.value;
-        const isSelectionTypeChanged = props.selectedVariable?.selection_type === state.selectionType;
+
+});
+
+const formInvalidState = reactive({
+    baseInvalid: computed<boolean>(() => (invalidState.name ?? true) || (state.options.filter((d) => d.value !== '').length === 0)),
+    isChanged: computed<boolean>(() => {
+        const isNameChanged = (props.selectedVariable?.name ?? '') === name.value;
+        const isSelectionTypeChanged = (props.selectedVariable?.selection_type ?? 'MULTI') === state.selectionType;
         const isOptionChanged = checkOptionsChanged(props.selectedVariable?.options ?? [], state.options);
-        return basicInvalidState || (isNameChanged && isSelectionTypeChanged && isOptionChanged);
+
+        return isNameChanged && isSelectionTypeChanged && isOptionChanged;
     }),
+    formInvalid: computed<boolean>(() => {
+        if (props.contentType === 'ADD') {
+            return formInvalidState.baseInvalid;
+        }
+        return formInvalidState.baseInvalid || formInvalidState.isChanged;
+    }),
+});
+
+const deleteModalState = reactive({
+    headerTitle: i18n.t('Are you sure you want to discard changes?'),
+    visible: false,
+    loading: false,
 });
 
 // Event
 const handleCancel = () => {
+    if (!formInvalidState.isChanged) {
+        deleteModalState.visible = true;
+        return;
+    }
+    state.proxyContentType = 'LIST';
+};
+const handleConfirmDeleteModal = () => {
     state.proxyContentType = 'LIST';
 };
 const handleAddOption = () => {
@@ -195,7 +220,7 @@ onMounted(() => {
 });
 
 const {
-    selectionType, options, selectionMenu, formInvalid,
+    selectionType, options, selectionMenu,
 } = toRefs(state);
 
 </script>

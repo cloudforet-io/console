@@ -4,7 +4,7 @@
     >
         <p-page-title :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
                       child
-                      @goBack="$router.go(-1)"
+                      @goBack="handleClickGoBackButton"
         />
         <div class="content-wrapper">
             <p-panel-top :use-total-count="contentType === 'LIST'"
@@ -68,6 +68,7 @@ import {
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
+import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { getUUID } from '@/lib/component-util/getUUID';
@@ -155,6 +156,14 @@ const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
     state.selectedVariable = '';
     state.contentType = 'LIST';
 };
+const handleClickGoBackButton = () => {
+    // TODO: refactor
+    if (state.contentType !== 'LIST') {
+        state.contentType = 'LIST';
+    }
+    SpaceRouter.router.go(-1);
+};
+
 
 const {
     contentType, titleSet, selectedVariable, variableNames,
