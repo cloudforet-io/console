@@ -6,40 +6,34 @@
         >
             {{ $t('DASHBOARDS.DETAIL.CUSTOMIZE') }}
         </p-button>
-        <pdf-download-button :title="$t('DASHBOARDS.DETAIL.EXPORT')"
-                             @click="handleVisiblePdfDownloadOverlay"
-        />
+        <!--        <pdf-download-button :title="$t('DASHBOARDS.DETAIL.EXPORT')"-->
+        <!--                             @click="handleVisiblePdfDownloadOverlay"-->
+        <!--        />-->
         <p-button icon-left="ic_duplicate"
                   style-type="tertiary"
                   @click="handleVisibleCloneModal"
         >
             {{ $t('DASHBOARDS.DETAIL.CLONE') }}
         </p-button>
-        <pdf-download-overlay v-model="state.visiblePdfDownload"
-                              :items="state.previewItems"
-                              :file-name="state.pdfFileName"
-        >
-            <dashboard-detail-preview v-if="props.dashboardId"
-                                      :dashboard-id="props.dashboardId"
-                                      @rendered="handlePreviewRendered"
-            />
-        </pdf-download-overlay>
+        <!--        <pdf-download-overlay v-model="state.visiblePdfDownload"-->
+        <!--                              :items="state.previewItems"-->
+        <!--                              :file-name="state.pdfFileName"-->
+        <!--        >-->
+        <!--            <dashboard-detail-preview v-if="props.dashboardId"-->
+        <!--                                      :dashboard-id="props.dashboardId"-->
+        <!--                                      @rendered="handlePreviewRendered"-->
+        <!--            />-->
+        <!--        </pdf-download-overlay>-->
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
 
 import { PButton } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 
 import { SpaceRouter } from '@/router';
 
-import PdfDownloadButton from '@/common/components/buttons/PdfDownloadButton.vue';
-import type { Item } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
-import PdfDownloadOverlay from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
 
-import DashboardDetailPreview from '@/services/dashboards/dashboard-detail/modules/DashboardDetailPreview.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const emit = defineEmits(['update:visible-clone-modal', 'update:visible-pdf-download-overlay']);
@@ -53,19 +47,19 @@ const props = defineProps<{
     dashboardName?: string;
 }>();
 
-const state = reactive({
-    visiblePdfDownload: false,
-    previewItems: [] as Item[],
-    pdfFileName: computed<string>(() => `${props.dashboardName ?? 'Cost_Dashboard'}_${dayjs().format('YYYYMMDD')}`),
-});
+// const state = reactive({
+//     visiblePdfDownload: false,
+//     previewItems: [] as Item[],
+//     pdfFileName: computed<string>(() => `${props.dashboardName ?? 'Cost_Dashboard'}_${dayjs().format('YYYYMMDD')}`),
+// });
 
-const handlePreviewRendered = (elements) => {
-    state.previewItems = elements.map((element) => ({ element: (element?.$el ?? element), type: 'image' } as Item));
-};
+// const handlePreviewRendered = (elements) => {
+//     state.previewItems = elements.map((element) => ({ element: (element?.$el ?? element), type: 'image' } as Item));
+// };
 
-const handleVisiblePdfDownloadOverlay = () => {
-    state.visiblePdfDownload = true;
-};
+// const handleVisiblePdfDownloadOverlay = () => {
+//     state.visiblePdfDownload = true;
+// };
 
 const handleClickCustomize = () => {
     SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });

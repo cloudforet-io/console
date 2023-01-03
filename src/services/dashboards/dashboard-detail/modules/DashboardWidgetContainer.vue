@@ -2,25 +2,22 @@
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <template v-for="(width, idx) in widgetWidthList">
-            <component :is="getWidgetComponent(widgetInfoList[idx].widget_name)"
-                       v-if="widgetInfoList[idx]"
-                       :id="widgetInfoList[idx].widgetKey"
-                       :key="widgetInfoList[idx].widgetKey"
+        <template v-for="(widget, idx) in widgetInfoList">
+            <component :is="getWidgetComponent(widget.widget_name)"
+                       v-if="widget"
+                       :id="widget.widgetKey"
+                       :key="widget.widgetKey"
                        ref="widgetRef"
                        v-intersection-observer="handleIntersectionObserver"
-                       :widget-config-id="widgetInfoList[idx].widget_name"
-                       :widget-key="widgetInfoList[idx].widget_name"
-                       :title="widgetInfoList[idx].title"
-                       :options="widgetInfoList[idx].widget_options"
-                       :inherit-options="{
-                           currency: { enabled: true },
-                           date_range: { enabled: true },
-                       }"
+                       :widget-config-id="widget.widget_name"
+                       :widget-key="widget.widget_name"
+                       :title="widget.title"
+                       :options="widget.widget_options"
+                       :inherit-options="widget.inherit_options"
                        :dashboard-variables="dashboardVariables"
                        :dashboard-settings="dashboardSettings"
                        :size="widgetSizeList[idx]"
-                       :width="width"
+                       :width="widgetWidthList[idx]"
                        :theme="widgetThemeList[idx]"
                        :edit-mode="editMode"
                        :all-reference-type-info="allReferenceTypeInfo"
@@ -32,7 +29,7 @@
 
 <script lang="ts">
 import { vIntersectionObserver } from '@vueuse/components';
-import type { DirectiveFunction, PropType, SetupContext } from 'vue';
+import type { DirectiveFunction, SetupContext } from 'vue';
 import {
     defineComponent, reactive, toRefs, ref, onMounted, watch, onBeforeUnmount, computed,
 } from 'vue';
@@ -43,13 +40,12 @@ import { store } from '@/store';
 
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
-import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import {
     WIDGET_CONTAINER_MAX_WIDTH, WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
 import { widgetThemeAssigner } from '@/services/dashboards/dashboard-detail/lib/theme-helper';
-import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import AWSCloudFrontCost from '@/services/dashboards/widgets/aws-cloud-front-cost/AWSCloudFrontCost.vue';
 import type { WidgetSize, WidgetConfig } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
@@ -57,11 +53,7 @@ import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
 import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 interface Props {
-    dashboardId: string;
-    widgetInfoList: DashboardContainerWidgetInfo[];
     editMode?: boolean;
-    dashboardSettings: DashboardSettings;
-    dashboardVariables: DashboardVariables;
 }
 export default defineComponent<Props>({
     name: 'DashboardWidgetContainer',
@@ -72,29 +64,19 @@ export default defineComponent<Props>({
         intersectionObserver: vIntersectionObserver as DirectiveFunction,
     },
     props: {
-        dashboardId: {
-            type: String,
-            default: '',
-        },
-        widgetInfoList: {
-            type: Array as PropType<DashboardContainerWidgetInfo[]>,
-            default: () => ([]),
-        },
         editMode: {
             type: Boolean,
             default: false,
         },
-        dashboardSettings: {
-            type: Object as PropType<DashboardSettings>,
-            default: () => ({}),
-        },
-        dashboardVariables: {
-            type: Object as PropType<DashboardVariables>,
-            default: () => ({}),
-        },
     },
     setup(props, { emit, expose }: SetupContext) {
+        const dashboardDetailStore = useDashboardDetailInfoStore();
+        const dashboardDetailState = dashboardDetailStore.state;
+
         const state = reactive({
+            widgetInfoList: computed(() => dashboardDetailState.dashboardWidgetInfoList),
+            dashboardVariables: computed(() => dashboardDetailState.variables),
+            dashboardSettings: computed(() => dashboardDetailState.settings),
             // width
             containerWidth: WIDGET_CONTAINER_MIN_WIDTH,
             widgetSizeList: [] as WidgetSize[],
@@ -102,7 +84,7 @@ export default defineComponent<Props>({
             // theme
             widgetThemeList: computed<Array<WidgetTheme | undefined>>(() => {
                 const widgetThemeOptions: Array<WidgetConfig['theme']> = [];
-                props.widgetInfoList.forEach((widget) => {
+                state.widgetInfoList.forEach((widget) => {
                     const widgetConfig = getWidgetConfig(widget.widget_name);
                     widgetThemeOptions.push(widgetConfig.theme);
                 });
@@ -167,7 +149,7 @@ export default defineComponent<Props>({
             observeInstance.unobserve(containerRef?.value as Element);
         });
 
-        watch(() => props.widgetInfoList, (widgetInfoList) => {
+        watch(() => state.widgetInfoList, (widgetInfoList) => {
             if (!Array.isArray(widgetInfoList)) return;
             state.widgetSizeList = widgetInfoList.map((widget) => widget.size);
             const initiatedWidgetMap = {};

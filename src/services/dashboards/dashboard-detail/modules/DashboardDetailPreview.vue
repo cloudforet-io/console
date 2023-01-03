@@ -14,11 +14,7 @@
             <div>Applied Filters</div> <dashboard-labels :label-list="state.labelList" />
         </div>
         <div class="divider" />
-        <dashboard-widget-container
-            :dashboard-widget-layouts="state.dashboardWidgetLayouts"
-            :loading.sync="state.loading"
-            @rendered="handleAllRendered"
-        />
+        <dashboard-widget-container @rendered="handleAllRendered" />
     </div>
 </template>
 

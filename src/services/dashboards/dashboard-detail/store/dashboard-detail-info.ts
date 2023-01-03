@@ -38,7 +38,7 @@ interface DashboardDetailInfoStoreState {
     enableDateRange: boolean;
     dateRange: DateRange;
     settings: DashboardSettings;
-    variables: ComputedRef<DashboardVariables>;
+    variables: DashboardVariables;
     // widget info states
     dashboardWidgetInfoList: DashboardContainerWidgetInfo[];
     loadingWidgets: boolean;
@@ -70,7 +70,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 value: CURRENCY.USD,
             },
         },
-        variables: computed<DashboardVariables>(() => state.dashboardInfo?.variables ?? {}),
+        variables: {},
         // widget info states
         dashboardWidgetInfoList: [],
         loadingWidgets: false,
@@ -116,6 +116,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 value: CURRENCY.USD,
             },
         };
+        state.variables = {};
         state.dashboardWidgetInfoList = [];
     };
 
@@ -138,6 +139,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 value: dashboardInfo.settings.currency?.value ?? CURRENCY.USD,
             },
         };
+        state.variables = dashboardInfo.variables ?? {};
         state.dashboardWidgetInfoList = flattenDeep(dashboardInfo?.layouts ?? []).map((info) => ({
             ...info,
             widgetKey: uuidv4(),
