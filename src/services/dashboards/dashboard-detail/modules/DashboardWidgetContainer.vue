@@ -21,7 +21,6 @@
                        :theme="widgetThemeList[idx]"
                        :edit-mode="editMode"
                        :all-reference-type-info="allReferenceTypeInfo"
-                       @click-expand-icon="handleExpand"
             />
         </template>
     </div>
@@ -48,7 +47,6 @@ import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import AWSCloudFrontCost from '@/services/dashboards/widgets/aws-cloud-front-cost/AWSCloudFrontCost.vue';
 import type { WidgetSize, WidgetConfig } from '@/services/dashboards/widgets/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
 import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
@@ -103,22 +101,6 @@ export default defineComponent<Props>({
             return containerWidth - (containerWidth % 80);
         };
 
-        /**
-         * If widgetSizeList is given: ['MD', 'MD', **'SM'**, 'LG', 'SM'],
-         * And user wants to expand 'SM' to 'FULL'
-         * -> Each widget has its own widgetIndex (in this case, widgetIndex is 2)
-         * If expand button has clicked, individual widget emits its own widgetIndex.
-         * and widgetContainer gains widgetIndex which wants to be changed.
-         *
-         * So on, widgetSizeList is changed by ['MD', 'MD', **'FULL'**, 'LG', 'SM']
-         * And realign widths to every widget.
-         * */
-        const handleExpand = (type: 'expand'|'collapse', widgetIndex: number): void => {
-            const _widgetSizeList = [...state.widgetSizeList];
-            if (type === 'expand') _widgetSizeList[widgetIndex] = WIDGET_SIZE.full;
-            if (type === 'collapse') _widgetSizeList[widgetIndex] = state.widgetSizeList[widgetIndex];
-            state.widgetSizeList = [..._widgetSizeList];
-        };
         const handleIntersectionObserver = ([{ isIntersecting, target }]) => {
             if (state.initiatedWidgetMap[target.id]) return;
             if (isIntersecting) {
@@ -180,7 +162,6 @@ export default defineComponent<Props>({
             containerRef,
             ...toRefs(state),
             getWidgetComponent,
-            handleExpand,
             handleIntersectionObserver,
         };
     },
