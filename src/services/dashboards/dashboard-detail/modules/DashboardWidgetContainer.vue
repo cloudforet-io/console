@@ -110,7 +110,7 @@ export default defineComponent<Props>({
             return containerWidth - (containerWidth % 80);
         };
 
-        const handleIntersectionObserver = ([{ isIntersecting, target }]) => {
+        const handleIntersectionObserver = async ([{ isIntersecting, target }]) => {
             if (state.initiatedWidgetMap[target.id]) return;
             if (isIntersecting) {
                 const targetWidgetRef: WidgetComponent|null = state.widgetRef.find((d) => d?.$el?.id === target.id);
