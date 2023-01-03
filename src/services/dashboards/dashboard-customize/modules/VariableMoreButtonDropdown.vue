@@ -138,13 +138,13 @@ watch(() => props.variables, (variables) => {
     const defaultSelected = [] as MenuItem[];
     const defaultVariableList = [] as MenuItem[];
     props.variableOrder.forEach((d) => {
+        const currentProperty = properties[d];
         defaultVariableList.push({
-            name: d, label: d,
+            name: d, label: currentProperty.name,
         });
-        if (!properties[d]?.use) return;
+        if (!currentProperty?.use) return;
         defaultSelected.push({
-            name: d,
-            label: d,
+            name: d, label: currentProperty.name,
         });
     });
     state.variableList = defaultVariableList;

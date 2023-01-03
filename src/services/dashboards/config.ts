@@ -85,7 +85,7 @@ export interface DashboardVariableSchemaProperty {
     use?: boolean;
     selection_type: VariableSelectionType;
     options: string[];
-    name?: string; // for managed variables
+    name: string;
     default_use?: boolean; // for managed variables. If property exists, ignore it. Otherwise, replace value of 'use'.
 }
 export interface DashboardVariablesSchema {

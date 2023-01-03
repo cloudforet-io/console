@@ -15,14 +15,14 @@
         <p-divider />
         <div class="dashboard-selectors">
             <div class="variable-selector-wrapper">
-                <template v-for="(name, idx) in variableState.order">
-                    <variable-selector-dropdown v-if="variableState.variableProperties[name].use"
-                                                :key="`${name}-${idx}`"
-                                                :variable-name="name"
-                                                :default-selected="variableState.variableData[name]"
-                                                :variable-options="variableState.variableProperties[name].options"
-                                                :selection-type="variableState.variableProperties[name].selection_type"
-                                                @change="handleChangeVariableOptions(name, $event)"
+                <template v-for="(propertyName, idx) in variableState.order">
+                    <variable-selector-dropdown v-if="variableState.variableProperties[propertyName]?.use"
+                                                :key="`${propertyName}-${idx}`"
+                                                :variable-name="variableState.variableProperties[propertyName].name"
+                                                :default-selected="variableState.variableData[propertyName]"
+                                                :variable-options="variableState.variableProperties[propertyName].options"
+                                                :selection-type="variableState.variableProperties[propertyName].selection_type"
+                                                @change="handleChangeVariableOptions(propertyName, $event)"
                     />
                 </template>
                 <variable-more-button-dropdown :variables="variableState.variableProperties"
@@ -111,7 +111,7 @@ const variableState = reactive({
         // provider: ['test1', 'test4'], // undefined case
         user: ['test4'],
         region: ['test3'],
-        node: 'test1',
+        randomkeynode: 'test1',
     },
     variableProperties: {
         project: {
@@ -149,7 +149,7 @@ const variableState = reactive({
             options: ['test1', 'test2', 'test3', 'test4'],
             name: 'Region',
         },
-        node: {
+        randomkeynode: {
             variable_type: 'CUSTOM',
             use: false,
             selection_type: 'SINGLE',
@@ -157,7 +157,7 @@ const variableState = reactive({
             name: 'Node',
         },
     } as DashboardVariablesSchema['properties'],
-    order: ['project', 'provider', 'serviceAccount', 'region', 'user', 'node'],
+    order: ['project', 'provider', 'serviceAccount', 'region', 'user', 'randomkeynode'],
 });
 
 /* Api */
@@ -217,11 +217,12 @@ const handleUpdateLabelList = (labelList: Array<string>) => {
 const handleSave = async () => {
     await updateDashboardData();
 };
-const handleChangeVariable = (variables: DashboardVariablesSchema['properties']) => {
+const handleChangeVariable = (variables: DashboardVariablesSchema['properties'], order?: string[]) => {
     variableState.variableProperties = variables;
+    if (order) variableState.order = order;
 };
-const handleChangeVariableOptions = (name: string, selected: string|string[]) => {
-    variableState.variableData[name] = selected;
+const handleChangeVariableOptions = (propertyName: string, selected: string|string[]) => {
+    variableState.variableData[propertyName] = selected;
 };
 
 onMounted(() => {
