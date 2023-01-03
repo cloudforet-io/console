@@ -98,7 +98,6 @@ const SAMPLE_PIE_DATA = [{
 const props = defineProps<WidgetProps>();
 const state = reactive({
     ...toRefs(useWidgetState(props)),
-    groupBy: GROUP_BY.REGION,
     groupByLabel: computed<string>(() => {
         const groupBy = state.groupBy;
         return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;

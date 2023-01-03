@@ -15,8 +15,9 @@ import type { DashboardSettings, DashboardVariables } from '@/services/dashboard
 import type {
     WidgetConfig, WidgetOptions, WidgetSize,
     InheritOptions, WidgetProps,
+    Granularity, GroupBy,
 } from '@/services/dashboards/widgets/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
+import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/view-config';
 import { WIDGET_THEMES } from '@/services/dashboards/widgets/view-config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
@@ -68,6 +69,9 @@ export function useWidgetState<Data = any>(
             props.dashboardVariables,
         )),
         currency: computed(() => state.settings.currency?.value ?? CURRENCY.USD),
+        groupBy: computed<GroupBy>(() => state.options.group_by),
+        granularity: computed<Granularity>(() => state.widgetConfig.options?.granularity),
+        chartType: computed(() => state.options.chart_type ?? CHART_TYPE.LINE),
         disableFullSize: computed<boolean>(() => !state.widgetConfig.sizes.includes(WIDGET_SIZE.full)),
         size: computed<WidgetSize>(() => {
             if (state.widgetConfig.sizes.includes(props.size)) return props.size;

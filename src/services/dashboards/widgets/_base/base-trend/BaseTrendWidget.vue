@@ -60,8 +60,8 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import type { Granularity, GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
-import { GROUP_BY, CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/config';
+import type { WidgetProps } from '@/services/dashboards/widgets/config';
+import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
@@ -88,10 +88,7 @@ const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
     ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
     chart: null as null | XYChart,
-    groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROVIDER),
-    granularity: computed<Granularity>(() => state.widgetConfig.options?.granularity),
     chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data, state.groupBy)),
-    chartType: computed(() => state.options.chart_type ?? CHART_TYPE.LINE),
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
         const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange);
