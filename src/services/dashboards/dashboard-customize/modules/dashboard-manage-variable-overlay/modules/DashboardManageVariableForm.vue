@@ -25,7 +25,8 @@
                                :selected.sync="selectionType"
             />
         </p-field-group>
-        <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_OPTIONS')"
+        <p-field-group class="options-field"
+                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_OPTIONS')"
                        required
         >
             <div class="options-wrapper">
@@ -217,44 +218,49 @@ const {
         }
     }
 
+    .options-field {
+        @apply w-1/2;
+
+        .options-wrapper {
+            @apply w-full bg-gray-100 rounded-md;
+            padding: 0.5rem;
+
+            .option-add-button {
+                margin-bottom: 0.5rem;
+            }
+            .draggable-wrapper {
+                @apply border border-gray-200 rounded flex flex-col bg-white;
+                padding: 0.75rem 0.375rem;
+                gap: 0.5rem;
+                .draggable-item {
+                    @apply flex items-center bg-white;
+                    .grab-area {
+                        cursor: grab;
+                        &:active {
+                            cursor: grabbing;
+                        }
+                    }
+                    .option-input {
+                        @apply w-full;
+                    }
+                    .option-delete-area {
+                        width: 2rem;
+                        height: 2rem;
+                    }
+                }
+                .ghost {
+                    @apply bg-blue-200;
+                }
+            }
+        }
+    }
+
     @screen tablet {
-        .name-field, .selection-type-field {
+        .name-field, .selection-type-field, .options-field {
             @apply w-full;
         }
     }
 
-    .options-wrapper {
-        @apply bg-gray-100 rounded-md;
-        padding: 0.5rem;
-
-        .option-add-button {
-            margin-bottom: 0.5rem;
-        }
-        .draggable-wrapper {
-            @apply border border-gray-200 rounded flex flex-col bg-white;
-            padding: 0.75rem 0.375rem;
-            gap: 0.5rem;
-            .draggable-item {
-                @apply flex items-center bg-white;
-                .grab-area {
-                    cursor: grab;
-                    &:active {
-                        cursor: grabbing;
-                    }
-                }
-                .option-input {
-                    @apply w-full;
-                }
-                .option-delete-area {
-                    width: 2rem;
-                    height: 2rem;
-                }
-            }
-            .ghost {
-                @apply bg-blue-200;
-            }
-        }
-    }
     .button-wrapper {
         @apply flex w-full;
         gap: 1rem;
