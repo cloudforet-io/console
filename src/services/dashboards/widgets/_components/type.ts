@@ -22,7 +22,6 @@ interface NumberOption {
 }
 interface SizeOption {
     type: 'size';
-    displayUnit?: UnitMap;
     sourceUnit?: UnitMap;
     default?: number;
 }

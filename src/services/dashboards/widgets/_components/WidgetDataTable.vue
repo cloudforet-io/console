@@ -161,7 +161,7 @@ import {
 import bytes from 'bytes';
 import { cloneDeep } from 'lodash';
 
-import { numberFormatter, getValueByPath } from '@cloudforet/core-lib';
+import { numberFormatter, byteFormatter, getValueByPath } from '@cloudforet/core-lib';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
@@ -242,7 +242,6 @@ const textFormatter = (value:string|number, textOptions: Field['textOptions']) =
     }
     if (textOptions?.type === 'size') {
         let data: number|null;
-        const UNIT_SEPARATOR = ' ';
 
         if (typeof value === 'number') data = value;
         else if (typeof value === 'string') data = Number(value);
@@ -252,21 +251,13 @@ const textFormatter = (value:string|number, textOptions: Field['textOptions']) =
         let formattedValue: string;
         if (data === null) formattedValue = '-';
         else {
-            const displayUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.displayUnit as string] || undefined;
             const sourceUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.sourceUnit as string] || undefined;
-            const bytesOptions: bytes.BytesOptions = { unit: displayUnit, unitSeparator: UNIT_SEPARATOR };
-
             if (sourceUnit) {
                 data = bytes.parse(`${value}${sourceUnit}`);
             }
 
-            const res = bytes(data, bytesOptions);
-            if (!res) formattedValue = '-';
-            else if (res.split(UNIT_SEPARATOR)[1] === 'B') {
-                formattedValue = `${data} bytes`;
-            } else {
-                formattedValue = res;
-            }
+            if (!data) formattedValue = '--';
+            else formattedValue = byteFormatter(data);
         }
         return formattedValue;
     } if (textOptions?.type === 'cost') {
