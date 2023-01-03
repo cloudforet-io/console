@@ -1,7 +1,7 @@
 import type { ArgTypes } from '@storybook/addons';
 
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
-import { SEARCH_DROPDOWN_TYPE } from '@/inputs/dropdown/search-dropdown/type';
+import { FILTERABLE_DROPDOWN_TYPE } from '@/inputs/dropdown/filterable-dropdown/type';
 import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
 
 
@@ -11,7 +11,7 @@ const extraArgTypes: ArgTypes = {
         name: 'type',
         type: { name: 'string' },
         description: 'Type of single selection. Do not work in multi select mode. There are 2 types: `default` and `radioButton`.',
-        defaultValue: SEARCH_DROPDOWN_TYPE.default,
+        defaultValue: FILTERABLE_DROPDOWN_TYPE.default,
         table: {
             type: {
                 summary: 'string',
@@ -23,7 +23,7 @@ const extraArgTypes: ArgTypes = {
         },
         control: {
             type: 'select',
-            options: Object.values(SEARCH_DROPDOWN_TYPE),
+            options: Object.values(FILTERABLE_DROPDOWN_TYPE),
         },
     },
     handler: {
@@ -245,7 +245,7 @@ const initContextMenuArgTypes = (): ArgTypes => {
     return argTypes;
 };
 
-export const getSearchDropdownArgTypes = (): ArgTypes => ({
+export const getFilterableDropdownArgTypes = (): ArgTypes => ({
     ...extraArgTypes,
     ...initSearchArgTypes(),
     ...initContextMenuArgTypes(),

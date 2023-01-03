@@ -19,7 +19,7 @@ const refineArrayTypeValue = (schema: JsonSchema, val?: any[]): string[] | undef
     if (!val?.length) return undefined;
     if (typeof val[0] === 'string') return val;
     const items = getMenuItemsFromSchema(schema);
-    if (items) return val.map((d) => d.name); // 'name' for PSearchDropdown
+    if (items) return val.map((d) => d.name); // 'name' for PFilterableDropdown
     return val.map((d) => d.value);
 };
 
@@ -37,7 +37,7 @@ const getMenuItemsFromSchema = (schemaProperty: JsonSchema): string[]|undefined 
                     items = items ? items.concat(item.enum) : item.enum;
                 }
             });
-            // PSearchDropdown case (array, strict select)
+            // PFilterableDropdown case (array, strict select)
         } else if (typeof schemaProperty.items === 'object') {
             items = Array.isArray(schemaProperty.items.enum) ? schemaProperty.items.enum : undefined;
         }
@@ -77,7 +77,7 @@ export const initFormDataWithSchema = (schema?: JsonSchema, formData?: object): 
                 result[key] = undefined;
             } else {
                 const isSearchDropdownType = !!getMenuItemsFromSchema(property);
-                const keyProperty = isSearchDropdownType ? 'name' : 'value'; // 'name' for PSearchDropdown, 'value' for PTextInput
+                const keyProperty = isSearchDropdownType ? 'name' : 'value'; // 'name' for PFilterableDropdown, 'value' for PTextInput
                 result[key] = result[key].map((d) => ({ [keyProperty]: d }));
             }
         }
@@ -128,7 +128,7 @@ export const getComponentNameBySchemaProperty = (schemaProperty: InnerJsonSchema
     if (schemaProperty.type === 'object') return 'PJsonSchemaForm';
     if (Array.isArray(schemaProperty.enum) && schemaProperty.type === 'string') return 'PSelectDropdown';
     const items = getMenuItemsFromSchema(schemaProperty);
-    if (items) return 'PSearchDropdown';
+    if (items) return 'PFilterableDropdown';
     return 'PTextInput';
 };
 

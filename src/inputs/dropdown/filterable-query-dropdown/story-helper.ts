@@ -1,8 +1,8 @@
 import type { ArgTypes } from '@storybook/addons';
 
-import { getKeyItemSets, getValueHandlerMap } from '@/inputs/dropdown/query-search-dropdown/mock';
+import { getKeyItemSets, getValueHandlerMap } from '@/inputs/dropdown/filterable-query-dropdown/mock';
 
-export const getQuerySearchDropdownArgTypes = (): ArgTypes => {
+export const getFilterableQueryDropdownArgTypes = (): ArgTypes => {
     const keyItemSets = getKeyItemSets(5, 1);
     return {
         placeholder: {

@@ -73,7 +73,7 @@ import type { TranslateResult } from 'vue-i18n';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
 import type { MenuItem } from '@/inputs/context-menu/type';
-import type { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
+import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { SearchProps } from '@/inputs/search/search/type';
 import { i18n } from '@/translations';
 import { makeByPassListeners } from '@/util/composition-helpers';
@@ -163,7 +163,7 @@ export default defineComponent<SearchProps>({
             }),
             filteredMenu: [] as MenuItem[],
             searchableItems: computed<MenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),
-            bindingMenu: computed<SearchDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
+            bindingMenu: computed<FilterableDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
             proxyValue: useProxyValue('value', props, emit),
             menuRef: null,
         });

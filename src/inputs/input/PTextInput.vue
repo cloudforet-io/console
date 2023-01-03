@@ -115,7 +115,7 @@ import { useProxyValue } from '@/hooks/proxy-state';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
-import type { SearchDropdownMenuItem } from '@/inputs/dropdown/search-dropdown/type';
+import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 import { INPUT_SIZE } from '@/inputs/input/type';
 import type { SelectedItem, TextInputHandler, InputSize } from '@/inputs/input/type';
 
@@ -259,7 +259,7 @@ export default defineComponent<TextInputProps>({
             isInvalid: props.selected.some((item) => item.invalid),
             searchableItems: computed<MenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),
             filteredMenu: [] as MenuItem[],
-            bindingMenu: computed<SearchDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
+            bindingMenu: computed<FilterableDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
         });
         const {
             targetRef, targetElement, contextMenuStyle,
@@ -335,7 +335,7 @@ export default defineComponent<TextInputProps>({
             emit('focus-menu', idx);
         };
 
-        const handleSelectMenuItem = ({ label, name }: SearchDropdownMenuItem) => {
+        const handleSelectMenuItem = ({ label, name }: FilterableDropdownMenuItem) => {
             const _selectedItems = [...state.proxySelectedValue, { label, value: name }];
             const _selectedValues = _selectedItems.map((d) => d.value);
             _selectedItems.forEach((selected, idx) => {

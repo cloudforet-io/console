@@ -3,27 +3,27 @@ import { getCurrentInstance, reactive, toRefs } from 'vue';
 import Fuse from 'fuse.js'
 
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import PSearchDropdown from './PSearchDropdown.vue';
+import PFilterableDropdown from './PFilterableDropdown.vue';
 import PButton from '@/inputs/buttons/button/PButton';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 
-import { getSearchDropdownArgTypes } from '@/inputs/dropdown/search-dropdown/story-helper';
-import { getSearchDropdownMenu, getSearchDropdownMenuWithMultiTypes } from '@/inputs/dropdown/search-dropdown/mock';
+import { getFilterableDropdownArgTypes } from '@/inputs/dropdown/filterable-dropdown/story-helper';
+import { getSearchDropdownMenu, getSearchDropdownMenuWithMultiTypes } from '@/inputs/dropdown/filterable-dropdown/mock';
 
 
-<Meta title='Inputs/Dropdown/Search Dropdown' parameters={{
+<Meta title='Inputs/Dropdown/Filterable Dropdown' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A182254',
     },
-}} argTypes={getSearchDropdownArgTypes()}/>
+}} argTypes={getFilterableDropdownArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
-    components: { PSearchDropdown },
+    components: { PFilterableDropdown },
     template: `
-        <p-search-dropdown
+        <p-filterable-dropdown
             :menu="menu"
             :loading="loading"
             :type="type"
@@ -48,7 +48,7 @@ export const Template = (args, { argTypes }) => ({
             @focus-menu="onFocusMenu"
             @select-menu="onSelectMenu"
         >
-        </p-search-dropdown>
+        </p-filterable-dropdown>
     `,
     setup(props) {
         const vm = getCurrentInstance()?.proxy
@@ -64,7 +64,7 @@ export const Template = (args, { argTypes }) => ({
 });
 
 
-# Search Dropdown
+# Filterable Dropdown
 <br/>
 <br/>
 
@@ -73,10 +73,10 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Basic" args={{menu: getSearchDropdownMenu()}}>
         {{
-            props: Object.keys(getSearchDropdownArgTypes()),
-            components: { PSearchDropdown },
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
             template: `
-        <p-search-dropdown :menu="menu" use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" use-fixed-menu-style />
 `,
         }}
     </Story>
@@ -90,10 +90,10 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="With Header" args={{menu: getSearchDropdownMenuWithMultiTypes()}}>
         {{
-            props: Object.keys(getSearchDropdownArgTypes()),
-            components: { PSearchDropdown, PButton },
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown, PButton },
             template: `
-        <p-search-dropdown :menu="menu" use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" use-fixed-menu-style />
 `,
         }}
     </Story>
@@ -107,9 +107,9 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Using Handler" >
         {{
-            components: { PSearchDropdown, PButton },
+            components: { PFilterableDropdown, PButton },
             template: `
-            <p-search-dropdown :loading="loading" :handler="simpleHandler" use-fixed-menu-style />
+            <p-filterable-dropdown :loading="loading" :handler="simpleHandler" use-fixed-menu-style />
 `,
             setup() {
                 const state = reactive({
@@ -153,7 +153,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Use Fixed Menu Style" >
         {{
-            components: { PSearchDropdown, PToggleButton },
+            components: { PFilterableDropdown, PToggleButton },
             template: `
         <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 90%;">
             <div style="height: 500px;">
@@ -163,7 +163,7 @@ export const Template = (args, { argTypes }) => ({
                     Therefore, the menu is placed on front, except for all other fixed elements with high z-index.<br/>
                     When you scroll parent elements, the menu will be automatically hidden.
                 </p>
-                <p-search-dropdown v-if="show" :menu="menu" :use-fixed-menu-style="useFixedMenuStyle" />
+                <p-filterable-dropdown v-if="show" :menu="menu" :use-fixed-menu-style="useFixedMenuStyle" />
             </div>
         </div>
 `,
@@ -197,10 +197,10 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Invalid" args={{menu: getSearchDropdownMenu()}}>
         {{
-            props: Object.keys(getSearchDropdownArgTypes()),
-            components: { PSearchDropdown },
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
             template: `
-        <p-search-dropdown :menu="menu" invalid use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" invalid use-fixed-menu-style />
 `,
         }}
     </Story>
@@ -214,10 +214,10 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Disabled" args={{menu: getSearchDropdownMenu()}}>
         {{
-            props: Object.keys(getSearchDropdownArgTypes()),
-            components: { PSearchDropdown },
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
             template: `
-        <p-search-dropdown :menu="menu" disabled use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" disabled use-fixed-menu-style />
 `,
         }}
     </Story>
@@ -231,10 +231,10 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Readonly" args={{menu: getSearchDropdownMenu()}}>
         {{
-            props: Object.keys(getSearchDropdownArgTypes()),
-            components: { PSearchDropdown },
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
             template: `
-        <p-search-dropdown
+        <p-filterable-dropdown
             :menu="menu"
             :readonly="true"
             type="radioButton"
@@ -254,10 +254,10 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Radio Button Type" args={{menu: getSearchDropdownMenu()}}>
         {{
-            props: Object.keys(getSearchDropdownArgTypes()),
-            components: { PSearchDropdown },
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
             template: `
-        <p-search-dropdown :menu="menu" type="radioButton" use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" type="radioButton" use-fixed-menu-style />
 `,
         }}
     </Story>
@@ -271,10 +271,10 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Multi Selectable" args={{menu: getSearchDropdownMenu()}}>
         {{
-            props: Object.keys(getSearchDropdownArgTypes()),
-            components: { PSearchDropdown },
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
             template: `
-        <p-search-dropdown :menu="menu" :multi-selectable="true" use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" :multi-selectable="true" use-fixed-menu-style />
 `,
         }}
     </Story>
@@ -288,10 +288,10 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Multi Selectable With no Delete All Button" args={{menu: getSearchDropdownMenu()}}>
         {{
-            props: Object.keys(getSearchDropdownArgTypes()),
-            components: { PSearchDropdown },
+            props: Object.keys(getFilterableDropdownArgTypes()),
+            components: { PFilterableDropdown },
             template: `
-        <p-search-dropdown :menu="menu" :multi-selectable="true" :disable-delete-all="true" use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" :multi-selectable="true" :disable-delete-all="true" use-fixed-menu-style />
 `,
         }}
     </Story>
@@ -305,7 +305,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Strict Select Mode">
         {{
-            components: { PSearchDropdown, PToggleButton },
+            components: { PFilterableDropdown, PToggleButton },
             template: `
     <div>
         <p class="mb-2">
@@ -313,7 +313,7 @@ export const Template = (args, { argTypes }) => ({
         </p>
         <div class=m-4>
             <p class="m-2">default type</p>
-            <p-search-dropdown
+            <p-filterable-dropdown
                 :key="strictSelectMode ? 'strict-default' : 'default-default'"
                 :menu="menu"
                 :selected="defaultSelected"
@@ -323,7 +323,7 @@ export const Template = (args, { argTypes }) => ({
         </div>
         <div class=m-4>
             <p class="m-2">radioButton type</p>
-            <p-search-dropdown
+            <p-filterable-dropdown
                 :key="strictSelectMode ? 'strict-radio' : 'default-radio'"
                 :menu="menu"
                 type="radioButton"
@@ -334,7 +334,7 @@ export const Template = (args, { argTypes }) => ({
         </div>
         <div class=m-4>
             <p class="m-2">multi selectable</p>
-            <p-search-dropdown
+            <p-filterable-dropdown
                 :key="strictSelectMode ? 'strict-checkbox' : 'default-checkbox'"
                 :menu="menu"
                 :multi-selectable="true"

@@ -7,16 +7,16 @@ interface HandlerRes {
 }
 export type AutocompleteHandler = (inputText: string, list: MenuItem[]) => Promise<HandlerRes>|HandlerRes;
 
-export const SEARCH_DROPDOWN_TYPE = Object.freeze({
+export const FILTERABLE_DROPDOWN_TYPE = Object.freeze({
     default: 'default',
     radioButton: 'radioButton',
 } as const);
 
-export type SEARCH_DROPDOWN_TYPE = typeof SEARCH_DROPDOWN_TYPE[keyof typeof SEARCH_DROPDOWN_TYPE];
+export type FILTERABLE_DROPDOWN_TYPE = typeof FILTERABLE_DROPDOWN_TYPE[keyof typeof FILTERABLE_DROPDOWN_TYPE];
 
-export type SearchDropdownMenuItem = MenuItem;
+export type FilterableDropdownMenuItem = MenuItem;
 
-export interface SearchDropdownProps extends ContextMenuFixedStyleProps {
+export interface FilterableDropdownProps extends ContextMenuFixedStyleProps {
     /* search props */
     value: string;
     placeholder?: string;
@@ -27,10 +27,10 @@ export interface SearchDropdownProps extends ContextMenuFixedStyleProps {
     /* context menu props */
     menu: MenuItem[];
     loading?: boolean;
-    selected?: SearchDropdownMenuItem[];
+    selected?: FilterableDropdownMenuItem[];
     multiSelectable?: boolean;
     /* extra props */
-    type?: SEARCH_DROPDOWN_TYPE;
+    type?: FILTERABLE_DROPDOWN_TYPE;
     handler?: AutocompleteHandler;
     disableHandler?: boolean;
     exactMode?: boolean;

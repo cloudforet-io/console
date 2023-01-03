@@ -1,33 +1,33 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import {
-    getQuerySearchDropdownArgTypes
-} from "@/inputs/dropdown/query-search-dropdown/story-helper";
+    getFilterableQueryDropdownArgTypes
+} from "@/inputs/dropdown/filterable-query-dropdown/story-helper";
 
-import PQuerySearchDropdown
-    from "@/inputs/dropdown/query-search-dropdown/PQuerySearchDropdown";
+import PFilterableQueryDropdown
+    from "@/inputs/dropdown/filterable-query-dropdown/PFilterableQueryDropdown.vue";
 import { reactive, toRefs } from "vue";
 import {
     useProxyValue
 } from "@/hooks"; import {SetupContext} from "vue";
-import { getKeyItemSets, getValueHandlerMap } from '@/inputs/dropdown/query-search-dropdown/mock';
+import { getKeyItemSets, getValueHandlerMap } from '@/inputs/dropdown/filterable-query-dropdown/mock';
 
-<Meta title='Inputs/Dropdown/Query Search Dropdown' parameters={{
+<Meta title='Inputs/Dropdown/Filterable Query Dropdown' parameters={{
     design: {
         type: 'figma',
         url: 'figma url',
     }
-}} argTypes={getQuerySearchDropdownArgTypes()}/>
+}} argTypes={getFilterableQueryDropdownArgTypes()}/>
 
 
 export const Template = (args, {argTypes}) => ({
     props: Object.keys(argTypes),
-    components: { PQuerySearchDropdown },
+    components: { PFilterableQueryDropdown },
     template: `
         <div class="h-full w-full overflow p-8">
-            <p-query-search-dropdown v-model="proxyValue"
+            <p-filterable-query-dropdown v-model="proxyValue"
                             :keyItemSets="keyItemSets"
                             :valueHandlerMap="valueHandlerMap"
-            ></p-query-search-dropdown>
+            ></p-filterable-query-dropdown>
         </div>
     `,
     setup(props, { emit }) {
@@ -40,23 +40,23 @@ export const Template = (args, {argTypes}) => ({
     }
 });
 
-# Query Search Dropdown
+# Filterable Query Dropdown
 <br/>
 
-Query Search Dropdown is <b>```key:value``` format search dropdown.</b> <br/>
+Filterable Query Dropdown is <b>```key:value``` format search dropdown.</b> <br/>
 
 
 ## Basic
 <Canvas>
     <Story name="Basic" height="300px">
         {{
-            components: { PQuerySearchDropdown },
+            components: { PFilterableQueryDropdown },
             template: `
 <div class="h-full w-full overflow p-8">
-    <p-query-search-dropdown
+    <p-filterable-query-dropdown
         :key-item-sets="keyItemSets"
         :value-handler-map="valueHandlerMap"
-    ></p-query-search-dropdown>
+    ></p-filterable-query-dropdown>
 </div>
     `,
             setup() {
@@ -80,14 +80,14 @@ Query Search Dropdown is <b>```key:value``` format search dropdown.</b> <br/>
 <Canvas>
     <Story name="Multi Selectable" height="300px">
         {{
-            components: { PQuerySearchDropdown },
+            components: { PFilterableQueryDropdown },
             template: `
 <div class="h-full w-full overflow p-8">
-    <p-query-search-dropdown
+    <p-filterable-query-dropdown
         :key-item-sets="keyItemSets"
         :value-handler-map="valueHandlerMap"
         multi-selectable
-    ></p-query-search-dropdown>
+    ></p-filterable-query-dropdown>
 </div>
     `,
             setup() {
@@ -109,15 +109,15 @@ Query Search Dropdown is <b>```key:value``` format search dropdown.</b> <br/>
 <Canvas>
     <Story name="Use Fixed Menu Style">
         {{
-            components: { PQuerySearchDropdown },
+            components: { PFilterableQueryDropdown },
             template: `
 <div class="h-full w-full overflow p-8">
-    <p-query-search-dropdown
+    <p-filterable-query-dropdown
         :key-item-sets="keyItemSets"
         :value-handler-map="valueHandlerMap"
         use-fixed-menu-style
         multi-selectable
-    ></p-query-search-dropdown>
+    ></p-filterable-query-dropdown>
 </div>
     `,
             setup() {

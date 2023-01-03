@@ -6,7 +6,7 @@ import type { SupportLanguage } from '@/translations';
 const TEXT_INPUT_TYPES = ['password', 'text', 'number'] as const;
 export type TextInputType = typeof TEXT_INPUT_TYPES[number];
 
-const COMPONENTS = ['PTextInput', 'GenerateIdFormat', 'PJsonSchemaForm', 'PSelectDropdown', 'PSearchDropdown'] as const;
+const COMPONENTS = ['PTextInput', 'GenerateIdFormat', 'PJsonSchemaForm', 'PSelectDropdown', 'PFilterableDropdown'] as const;
 export type ComponentName = typeof COMPONENTS[number];
 
 export type JsonSchema<Properties = object> = JSONSchemaType<Properties> & {
