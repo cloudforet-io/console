@@ -26,6 +26,7 @@ import {
 import { PButtonModal, PTab } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { storeToRefs } from 'pinia';
+import { v4 as uuidv4 } from 'uuid';
 
 import { i18n } from '@/translations';
 
@@ -33,7 +34,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardDefaultWidgetTab from '@/services/dashboards/dashboard-customize/modules/DashboardDefaultWidgetTab.vue';
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
+import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 
@@ -72,7 +73,8 @@ export default defineComponent<Props>({
         const handleConfirm = () => {
             if (!widgetConfigId?.value || !widgetTitle?.value) return;
             const widgetConfig = getWidgetConfig(widgetConfigId.value);
-            const dashboardLayoutWidgetInfo: DashboardLayoutWidgetInfo = {
+            const dashboardLayoutWidgetInfo: DashboardContainerWidgetInfo = {
+                widgetKey: uuidv4(),
                 widget_name: widgetConfigId?.value,
                 title: widgetTitle?.value,
                 size: widgetConfig.sizes[0],
