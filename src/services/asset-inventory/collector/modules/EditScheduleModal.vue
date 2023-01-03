@@ -20,12 +20,12 @@
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL')"
                            required
             >
-                <p-search-dropdown :selected.sync="formState.timezone"
-                                   :menu="timezones"
-                                   class="timezone"
-                                   use-fixed-menu-style
-                                   disabled
-                                   @update:selected="changeTimezone"
+                <p-filterable-dropdown :selected.sync="formState.timezone"
+                                       :menu="timezones"
+                                       class="timezone"
+                                       use-fixed-menu-style
+                                       disabled
+                                       @update:selected="changeTimezone"
                 />
             </p-field-group>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_LABEL')"
@@ -114,9 +114,9 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButtonModal, PSearchDropdown, PFieldGroup, PRadio, PButton, PTextInput, PI, PSelectDropdown,
+    PButtonModal, PFilterableDropdown, PFieldGroup, PRadio, PButton, PTextInput, PI, PSelectDropdown,
 } from '@spaceone/design-system';
-import type { SearchDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
+import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import {
@@ -156,7 +156,7 @@ export default {
         PRadio,
         PTextInput,
         PButton,
-        PSearchDropdown,
+        PFilterableDropdown,
         PFieldGroup,
         PButtonModal,
         PSelectDropdown,
@@ -188,7 +188,7 @@ export default {
                 type: 'item',
                 label: store.state.user.timezone === 'UTC' ? `${store.state.user.timezone} (default)` : store.state.user.timezone,
                 name: store.state.user.timezone,
-            }] || [{ type: 'item', label: 'UTC', name: 'UTC' }]) as SearchDropdownMenuItem[],
+            }] || [{ type: 'item', label: 'UTC', name: 'UTC' }]) as FilterableDropdownMenuItem[],
             selectedHours: {} as ScheduleHours,
             selectedUTCHoursList: computed(() => {
                 const utcHours = [] as number[];
@@ -216,7 +216,7 @@ export default {
             hoursMatrix: range(24),
             timezones: map(timezoneList, (d) => ({
                 type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
-            })) as SearchDropdownMenuItem[],
+            })) as FilterableDropdownMenuItem[],
             scheduleTypes: computed(() => {
                 const result: ScheduleType = {
                     hourly: i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_LABEL'),

@@ -44,11 +44,11 @@
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
                 <span class="text-gray-500"> ({{ responderState.selectedMemberItems.length }})</span>
             </p>
-            <p-search-dropdown :menu="responderState.allMemberItems"
-                               :selected.sync="responderState.selectedMemberItems"
-                               :disabled="manageDisabled"
-                               multi-selectable
-                               @update:selected="handleUpdateSelected"
+            <p-filterable-dropdown :menu="responderState.allMemberItems"
+                                   :selected.sync="responderState.selectedMemberItems"
+                                   :disabled="manageDisabled"
+                                   multi-selectable
+                                   @update:selected="handleUpdateSelected"
             />
         </article>
     </p-pane-layout>
@@ -61,7 +61,7 @@ import {
 import VueI18n from 'vue-i18n';
 
 import {
-    PBadge, PCollapsibleList, PPaneLayout, PPanelTop, PSearchDropdown,
+    PBadge, PCollapsibleList, PPaneLayout, PPanelTop, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { differenceBy } from 'lodash';
@@ -98,7 +98,7 @@ export default {
         PPanelTop,
         PCollapsibleList,
         PBadge,
-        PSearchDropdown,
+        PFilterableDropdown,
         ProjectChannelList,
     },
     props: {

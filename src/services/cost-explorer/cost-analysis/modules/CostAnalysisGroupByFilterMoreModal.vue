@@ -13,7 +13,7 @@
                 <template #label-extra>
                     <span class="font-normal">({{ selectedTags.length }})</span>
                 </template>
-                <p-search-dropdown
+                <p-filterable-dropdown
                     :handler="tagsMenuHandler"
                     :selected.sync="selectedTags"
                     use-fixed-menu-style
@@ -26,7 +26,7 @@
                 <template #label-extra>
                     <span class="font-normal">({{ selectedAdditionalInfo.length }})</span>
                 </template>
-                <p-search-dropdown
+                <p-filterable-dropdown
                     :handler="additionalInfoMenuHandler"
                     :selected.sync="selectedAdditionalInfo"
                     use-fixed-menu-style
@@ -44,9 +44,9 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PSearchDropdown, PFieldGroup,
+    PButtonModal, PFilterableDropdown, PFieldGroup,
 } from '@spaceone/design-system';
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
+import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -71,7 +71,7 @@ export default defineComponent<Props>({
     components: {
         PFieldGroup,
         PButtonModal,
-        PSearchDropdown,
+        PFilterableDropdown,
     },
     props: {
         visible: {

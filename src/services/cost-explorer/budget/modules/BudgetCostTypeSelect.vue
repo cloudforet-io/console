@@ -15,16 +15,16 @@
                 {{ costTypeLabel }}
             </p-radio>
         </div>
-        <p-search-dropdown v-if="selectedCostType !== 'all'"
-                           :visible-menu.sync="visibleResourceMenu"
-                           :menu="resourceMenuItems"
-                           :handler="resourceMenuItems ? undefined : resourceMenuHandler"
-                           :loading="resourceMenuLoading"
-                           :invalid="!disableValidation && invalidState.selectedResources"
-                           :selected="selectedResources"
-                           multi-selectable
-                           class="mt-2"
-                           @update:selected="setForm('selectedResources', $event)"
+        <p-filterable-dropdown v-if="selectedCostType !== 'all'"
+                               :visible-menu.sync="visibleResourceMenu"
+                               :menu="resourceMenuItems"
+                               :handler="resourceMenuItems ? undefined : resourceMenuHandler"
+                               :loading="resourceMenuLoading"
+                               :invalid="!disableValidation && invalidState.selectedResources"
+                               :selected="selectedResources"
+                               multi-selectable
+                               class="mt-2"
+                               @update:selected="setForm('selectedResources', $event)"
         />
     </p-field-group>
 </template>
@@ -38,11 +38,11 @@ import {
 import type { PropType, SetupContext } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PFieldGroup, PRadio, PSearchDropdown } from '@spaceone/design-system';
+import { PFieldGroup, PRadio, PFilterableDropdown } from '@spaceone/design-system';
 import type {
     AutocompleteHandler,
-    SearchDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
+    FilterableDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce } from 'lodash';
@@ -75,7 +75,7 @@ interface DistinctResult {
     total_count?: number;
 }
 
-const getSearchDropdownItems = (resourceItems: ReferenceMap): SearchDropdownMenuItem[] => Object.keys(resourceItems).map((k) => ({
+const getSearchDropdownItems = (resourceItems: ReferenceMap): FilterableDropdownMenuItem[] => Object.keys(resourceItems).map((k) => ({
     name: k, label: resourceItems[k].label,
 }));
 
@@ -84,7 +84,7 @@ export default defineComponent<Props>({
     components: {
         PFieldGroup,
         PRadio,
-        PSearchDropdown,
+        PFilterableDropdown,
     },
     props: {
         costTypes: {
@@ -107,7 +107,7 @@ export default defineComponent<Props>({
             isAllValid,
         } = useFormValidator({
             selectedCostType: 'all' as BudgetCostType,
-            selectedResources: [] as SearchDropdownMenuItem[],
+            selectedResources: [] as FilterableDropdownMenuItem[],
         }, {
             selectedResources(value: BudgetCostType) {
                 if (selectedCostType.value === 'all') return '';
@@ -126,7 +126,7 @@ export default defineComponent<Props>({
                 service_account_id: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ACCOUNT'),
                 product: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PRODUCT'),
             })),
-            resourceMenuItems: computed<SearchDropdownMenuItem[]|undefined>(() => {
+            resourceMenuItems: computed<FilterableDropdownMenuItem[]|undefined>(() => {
                 if (selectedCostType.value === 'provider') return getSearchDropdownItems(state.providers);
                 if (selectedCostType.value === 'region_code') return getSearchDropdownItems(state.regions);
                 if (selectedCostType.value === 'service_account_id') return getSearchDropdownItems(state.serviceAccounts);
@@ -224,7 +224,7 @@ export default defineComponent<Props>({
 <style lang="postcss" scoped>
 .budget-cost-type-select-field {
     width: 30rem;
-    .p-search-dropdown {
+    .p-filterable-dropdown {
         margin-top: 0.5rem;
     }
 }

@@ -1,20 +1,20 @@
 <template>
     <div class="project-select-dropdown">
-        <p-search-dropdown :loading="loading"
-                           :visible-menu.sync="visibleMenu"
-                           :is-focused.sync="isFocused"
-                           :type="multiSelectable ? undefined : 'radioButton'"
-                           :multi-selectable="multiSelectable"
-                           :exact-mode="false"
-                           :use-fixed-menu-style="useFixedMenuStyle"
-                           :invalid="invalid"
-                           :disabled="disabled"
-                           :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
-                           :selected.sync="selectedItems"
-                           :readonly="true"
-                           :disable-delete-all="true"
-                           @update:visible-menu="handleUpdateVisibleMenu"
-                           @delete-tag="handleDeleteTag"
+        <p-filterable-dropdown :loading="loading"
+                               :visible-menu.sync="visibleMenu"
+                               :is-focused.sync="isFocused"
+                               :type="multiSelectable ? undefined : 'radioButton'"
+                               :multi-selectable="multiSelectable"
+                               :exact-mode="false"
+                               :use-fixed-menu-style="useFixedMenuStyle"
+                               :invalid="invalid"
+                               :disabled="disabled"
+                               :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
+                               :selected.sync="selectedItems"
+                               :readonly="true"
+                               :disable-delete-all="true"
+                               @update:visible-menu="handleUpdateVisibleMenu"
+                               @delete-tag="handleDeleteTag"
         >
             <template #menu-no-data-format>
                 <div />
@@ -69,7 +69,7 @@
                     </p-button>
                 </div>
             </template>
-        </p-search-dropdown>
+        </p-filterable-dropdown>
     </div>
 </template>
 
@@ -81,7 +81,7 @@ import {
 } from 'vue';
 
 import {
-    PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree, PButton,
+    PCheckBox, PI, PRadio, PFilterableDropdown, PSelectDropdown, PTag, PTree, PButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -103,7 +103,7 @@ import type { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/servic
 export default {
     name: 'ProjectSelectDropdown',
     components: {
-        PSearchDropdown,
+        PFilterableDropdown,
         PSelectDropdown,
         PTag,
         PTree,
@@ -342,8 +342,8 @@ export default {
 
 <style lang="postcss" scoped>
 .project-select-dropdown {
-    /* custom design-system component - p-search-dropdown */
-    :deep(.p-search-dropdown) {
+    /* custom design-system component - p-filterable-dropdown */
+    :deep(.p-filterable-dropdown) {
         .button-wrapper {
             padding: 0.5rem;
             &.top {
@@ -364,7 +364,7 @@ export default {
         }
     }
 
-    /* custom design-system component - p-search-dropdown */
+    /* custom design-system component - p-filterable-dropdown */
     :deep(.no-data) {
         padding: 0;
     }

@@ -77,7 +77,7 @@ import {
     PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PButton, PContextMenu, useContextMenuFixedStyle,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { SearchDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
+import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -198,7 +198,7 @@ export default defineComponent<Props>({
         });
 
         /* Util */
-        const isSelected = (selectedItem: SelectDropdownMenu | SearchDropdownMenuItem[]): boolean => {
+        const isSelected = (selectedItem: SelectDropdownMenu | FilterableDropdownMenuItem[]): boolean => {
             if (Array.isArray(selectedItem)) return !!selectedItem.length;
             return selectedItem && !isEmpty(selectedItem);
         };

@@ -24,7 +24,7 @@
                 >
                     <template #default="{invalid}">
                         <div v-if="formState.activeTab === 'external' && supportFind">
-                            <p-search-dropdown
+                            <p-filterable-dropdown
                                 v-model="searchText"
                                 :class="{invalid}"
                                 type="radioButton"
@@ -43,7 +43,7 @@
                                         <span v-if="externalItems.length > 100">{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
                                     </div>
                                 </template>
-                            </p-search-dropdown>
+                            </p-filterable-dropdown>
                         </div>
                         <div v-else
                              class="id-input-form"
@@ -164,7 +164,7 @@ import {
     PButton,
     PTextInput,
     PBoxTab,
-    PSearchDropdown,
+    PFilterableDropdown,
     PDivider,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -219,7 +219,7 @@ export default {
         PSelectDropdown,
         PButton,
         PBoxTab,
-        PSearchDropdown,
+        PFilterableDropdown,
         PDivider,
         TagsInputGroup,
     },
@@ -561,7 +561,7 @@ export default {
         overflow-y: hidden;
     }
 
-    .p-search-dropdown {
+    .p-filterable-dropdown {
         width: 25rem;
 
         &.invalid {
