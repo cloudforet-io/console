@@ -235,8 +235,9 @@ const getHeadSlotProps = (field, colIndex) => ({
 const textFormatter = (value:string|number, textOptions: Field['textOptions']) => {
     if (typeof value !== 'number') {
         if (textOptions?.type === 'reference') {
-            const referenceMap = props.allReferenceTypeInfo[textOptions.referenceType].referenceMap;
-            return referenceMap[value]?.label ?? referenceMap[value]?.name ?? value;
+            if (!value) return 'Unknown';
+            const referenceMap = props.allReferenceTypeInfo[textOptions.referenceType]?.referenceMap;
+            return referenceMap?.[value]?.label ?? referenceMap?.[value]?.name ?? value;
         }
         return value;
     }
