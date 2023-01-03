@@ -1,3 +1,10 @@
+# [1.1.0-beta.502](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.501...v1.1.0-beta.502) (2023-01-03)
+
+
+### Features
+
+* **filterable-dropdown, filterable-query-dropdown:** rename search keyword to filterable ([#212](https://github.com/cloudforet-io/mirinae/issues/212)) ([7258d85](https://github.com/cloudforet-io/mirinae/commit/7258d85989528ce718aa9c26907492d4b1d20825))
+
 # [1.1.0-beta.501](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.500...v1.1.0-beta.501) (2023-01-01)
 
 
