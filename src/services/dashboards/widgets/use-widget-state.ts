@@ -1,3 +1,4 @@
+import type { ComputedRef } from 'vue';
 import {
     computed, reactive,
 } from 'vue';
@@ -5,6 +6,7 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { merge } from 'lodash';
 
+import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 
 import {
@@ -56,10 +58,24 @@ const getColorSet = (theme: WidgetTheme, colorSetType: WidgetColorSetType = 'bas
     return colorSet;
 };
 
+export interface WidgetState<Data = any> {
+    widgetConfig: ComputedRef<WidgetConfig>;
+    title: ComputedRef<string>;
+    options: ComputedRef<WidgetOptions>;
+    currency: ComputedRef<Currency>;
+    disableFullSize: ComputedRef<boolean>;
+    size: ComputedRef<WidgetSize>;
+    loading: boolean;
+    settings: ComputedRef<DashboardSettings>;
+    data: undefined|Data;
+    colorSet: ComputedRef<string[]>;
+    selectorItems: ComputedRef<MenuItem[]>;
+    selectedSelectorType: undefined;
+}
 export function useWidgetState<Data = any>(
     props: WidgetProps,
 ) {
-    const state = reactive({
+    const state = reactive<WidgetState<Data>>({
         widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(props.widgetConfigId)),
         title: computed<string>(() => props.title ?? state.widgetConfig.title),
         options: computed<WidgetOptions>(() => getRefinedOptions(
