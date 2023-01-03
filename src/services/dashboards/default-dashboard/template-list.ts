@@ -1,6 +1,6 @@
 import {
-    cdnTrafficCostDashboard,
-    cdnTrafficCostDashboardPreview,
+    cdnAndTrafficCostDashboard,
+    cdnAndTrafficCostDashboardPreview,
 } from '@/services/dashboards/default-dashboard/templates/cdn-and-traffic-cost';
 import {
     monthlyCostSummaryDashboard,
@@ -9,10 +9,10 @@ import {
 
 export const DASHBOARD_TEMPLATES = {
     monthlyCostSummary: monthlyCostSummaryDashboard,
-    cdnTrafficCost: cdnTrafficCostDashboard,
+    cdnTrafficCost: cdnAndTrafficCostDashboard,
 };
 
 export const DASHBOARD_TEMPLATE_PREVIEWS = [
     monthlyCostSummaryDashboardPreview,
-    cdnTrafficCostDashboardPreview,
+    cdnAndTrafficCostDashboardPreview,
 ];

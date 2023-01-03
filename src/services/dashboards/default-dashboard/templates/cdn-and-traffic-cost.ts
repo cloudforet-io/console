@@ -8,17 +8,18 @@ const widgetList = [
     'awsCloudFrontCost',
 ];
 
-export const cdnTrafficCostDashboardPreview: DefaultDashboardPreviewConfig = {
+export const cdnAndTrafficCostDashboardPreview: DefaultDashboardPreviewConfig = {
     name: 'CDN & Traffic Cost',
     labels: ['Cost'],
     version: '1',
     description: {
-        preview_image: 'ic_dashboard-template_cdn-traffic-cost',
+        icon: 'ic_dashboard-template_cdn-traffic-cost',
+        preview_image: 'cdnAndTrafficCost',
     },
 };
 
-export const cdnTrafficCostDashboard: DashboardConfig = {
-    ...cdnTrafficCostDashboardPreview,
+export const cdnAndTrafficCostDashboard: DashboardConfig = {
+    ...cdnAndTrafficCostDashboardPreview,
     settings: {
         date_range: {
             enabled: true,
