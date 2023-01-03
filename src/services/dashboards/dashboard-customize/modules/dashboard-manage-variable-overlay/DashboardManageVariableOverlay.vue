@@ -127,6 +127,7 @@ const handleDeleteVariable = () => {
     emit('change', properties, changedOrder);
 
     if (state.contentType === 'EDIT') state.contentType = 'LIST';
+    state.selectedVariable = '';
     deleteModalState.visible = false;
 };
 const handleChangeVariableUse = (name: string, value: boolean) => {
@@ -148,6 +149,7 @@ const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
         properties[state.selectedVariable] = variable;
         emit('change', properties);
     }
+    state.selectedVariable = '';
     state.contentType = 'LIST';
 };
 
