@@ -93,7 +93,7 @@ const state = reactive({
     chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data, state.groupBy)),
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
-        const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange);
+        const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange, { type: 'cost' });
         const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
         return [
