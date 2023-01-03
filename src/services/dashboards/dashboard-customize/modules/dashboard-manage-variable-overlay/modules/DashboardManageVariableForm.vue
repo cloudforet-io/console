@@ -2,26 +2,31 @@
     <div
         class="manage-wrapper"
     >
-        <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_NAME')"
+        <p-field-group class="name-field"
+                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_NAME')"
                        :invalid="invalidState.name"
                        :invalid-text="invalidTexts.name"
                        required
         >
             <template #default="{ invalid }">
-                <p-text-input :value="name"
+                <p-text-input class="name-input"
+                              :value="name"
                               :invalid="invalid"
                               @input="setForm('name', $event)"
                 />
             </template>
         </p-field-group>
-        <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_SELECTION_TYPE')"
+        <p-field-group class="selection-type-field"
+                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_SELECTION_TYPE')"
                        required
         >
-            <p-select-dropdown :items="selectionMenu"
+            <p-select-dropdown class="selection-type-dropdown"
+                               :items="selectionMenu"
                                :selected.sync="selectionType"
             />
         </p-field-group>
-        <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_OPTIONS')"
+        <p-field-group class="options-field"
+                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_OPTIONS')"
                        required
         >
             <div class="options-wrapper">
@@ -199,38 +204,63 @@ const {
 .manage-wrapper {
     padding: 0 1rem 1rem;
 
-    .options-wrapper {
-        @apply bg-gray-100 rounded-md;
-        padding: 0.5rem;
-
-        .option-add-button {
-            margin-bottom: 0.5rem;
+    .name-field {
+        @apply w-1/3;
+        .name-input {
+            @apply w-full;
         }
-        .draggable-wrapper {
-            @apply border border-gray-200 rounded flex flex-col bg-white;
-            padding: 0.75rem 0.375rem;
-            gap: 0.5rem;
-            .draggable-item {
-                @apply flex items-center bg-white;
-                .grab-area {
-                    cursor: grab;
-                    &:active {
-                        cursor: grabbing;
+    }
+
+    .selection-type-field {
+        @apply w-1/3;
+        .selection-type-dropdown {
+            @apply w-full;
+        }
+    }
+
+    .options-field {
+        @apply w-1/2;
+
+        .options-wrapper {
+            @apply w-full bg-gray-100 rounded-md;
+            padding: 0.5rem;
+
+            .option-add-button {
+                margin-bottom: 0.5rem;
+            }
+            .draggable-wrapper {
+                @apply border border-gray-200 rounded flex flex-col bg-white;
+                padding: 0.75rem 0.375rem;
+                gap: 0.5rem;
+                .draggable-item {
+                    @apply flex items-center bg-white;
+                    .grab-area {
+                        cursor: grab;
+                        &:active {
+                            cursor: grabbing;
+                        }
+                    }
+                    .option-input {
+                        @apply w-full;
+                    }
+                    .option-delete-area {
+                        width: 2rem;
+                        height: 2rem;
                     }
                 }
-                .option-input {
-                    @apply w-full;
+                .ghost {
+                    @apply bg-blue-200;
                 }
-                .option-delete-area {
-                    width: 2rem;
-                    height: 2rem;
-                }
-            }
-            .ghost {
-                @apply bg-blue-200;
             }
         }
     }
+
+    @screen tablet {
+        .name-field, .selection-type-field, .options-field {
+            @apply w-full;
+        }
+    }
+
     .button-wrapper {
         @apply flex w-full;
         gap: 1rem;
