@@ -61,7 +61,9 @@
             >
                 {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.CANCEL') }}
             </p-button>
-            <p-button :disabled="formInvalid">
+            <p-button :disabled="formInvalid"
+                      @click="handleSave"
+            >
                 {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.SAVE') }}
             </p-button>
         </div>
@@ -93,6 +95,7 @@ interface Props {
 }
 interface EmitFn {
     (e: string, value: string): void;
+    (e: 'save', value: DashboardVariableSchemaProperty): void;
 }
 
 const props = defineProps<Props>();
@@ -109,6 +112,15 @@ const {
 }, {
     name(value: string) { return value.trim().length > 0; },
 });
+
+// helper
+const checkOptionsChanged = (subject: string[] = [], target: {key: string, value: string}[]): boolean => {
+    const emptyExcludedTarget = target.filter((d) => d.value !== '');
+    if (subject.length !== emptyExcludedTarget.length) return false;
+    for (let idx = 0; idx < subject.length; idx++) if (subject[idx] !== emptyExcludedTarget[idx].value) return false;
+    return true;
+};
+
 const state = reactive({
     proxyContentType: useProxyValue('contentType', props, emit),
     selectionType: 'MULTI',
@@ -120,20 +132,18 @@ const state = reactive({
         { name: 'SINGLE', label: 'Single select' },
     ]),
     formInvalid: computed(() => {
+        const optionState = state.options.filter((d) => d.value !== '').length === 0;
         const nameState = invalidState.name ?? true;
+        const basicInvalidState = optionState || nameState;
         if (props.contentType === 'ADD') {
-            return nameState;
+            return basicInvalidState;
         }
-        // TODO: add Otions invalid state
         const isNameChanged = props.selectedVariable?.name === name.value;
         const isSelectionTypeChanged = props.selectedVariable?.selection_type === state.selectionType;
-        return nameState || (isNameChanged && isSelectionTypeChanged);
+        const isOptionChanged = checkOptionsChanged(props.selectedVariable?.options ?? [], state.options);
+        return basicInvalidState || (isNameChanged && isSelectionTypeChanged && isOptionChanged);
     }),
 });
-
-const {
-    selectionType, options, selectionMenu, formInvalid,
-} = toRefs(state);
 
 // Event
 const handleCancel = () => {
@@ -146,6 +156,17 @@ const handleDeleteOption = (key: string) => {
     state.options = state.options.filter((d) => d.key !== key);
 };
 
+const handleSave = () => {
+    const variableToSave = {
+        variable_type: 'CUSTOM',
+        name: name.value,
+        use: false,
+        selection_type: state.selectionType,
+        options: state.options.map((d) => d.value).filter((value) => value !== ''),
+    } as DashboardVariableSchemaProperty;
+    emit('save', variableToSave);
+};
+
 onMounted(() => {
     if (props.contentType === 'EDIT') {
         setForm('name', props.selectedVariable?.name ?? '');
@@ -153,6 +174,10 @@ onMounted(() => {
         state.options = props.selectedVariable?.options.map((d) => ({ key: getUUID(), value: d })) ?? [{ key: getUUID(), value: '' }];
     }
 });
+
+const {
+    selectionType, options, selectionMenu, formInvalid,
+} = toRefs(state);
 
 </script>
 

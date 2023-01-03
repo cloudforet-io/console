@@ -120,15 +120,6 @@ const state = reactive({
     })),
 });
 
-const {
-    orderedVariables,
-    variableFilterList,
-    selectedVariableType,
-    variableFields,
-    selectionType,
-    variableType,
-} = toRefs(state);
-
 /* Helper */
 const variableTypeBadgeStyleFormatter = (type: VariableType) => {
     if (type === 'MANAGED') return 'gray';
@@ -147,6 +138,15 @@ const handleDeleteVariable = (propertyName: string) => {
 const handleToggleUse = (propertyName: string, value: boolean) => {
     emit('use-change', propertyName, !value);
 };
+
+const {
+    orderedVariables,
+    variableFilterList,
+    selectedVariableType,
+    variableFields,
+    selectionType,
+    variableType,
+} = toRefs(state);
 
 </script>
 

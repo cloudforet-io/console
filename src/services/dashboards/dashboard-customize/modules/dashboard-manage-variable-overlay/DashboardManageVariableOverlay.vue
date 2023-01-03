@@ -41,7 +41,8 @@
             />
             <dashboard-manage-variable-form v-else
                                             :content-type.sync="contentType"
-                                            :selected-variable="variables[selected]"
+                                            :selected-variable="variables[selectedVariable]"
+                                            @save="handleSaveVariable"
             />
         </div>
         <delete-modal :header-title="deleteModalState.headerTitle"
@@ -68,10 +69,12 @@ import { cloneDeep } from 'lodash';
 
 import { i18n } from '@/translations';
 
+import { getUUID } from '@/lib/component-util/getUUID';
+
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.vue';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { DashboardVariablesSchema, DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import DashboardManageVariableForm from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/modules/DashboardManageVariableForm.vue';
 import DashboardManageVariableTable
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/modules/DashboardManageVariableTable.vue';
@@ -85,7 +88,7 @@ interface Props {
     order: string[];
 }
 interface EmitFn {
-    (e: 'change', value: DashboardVariablesSchema['properties']): void;
+    (e: 'change', variables: DashboardVariablesSchema['properties'], order?: string[]): void;
 }
 
 const props = defineProps<Props>();
@@ -98,10 +101,8 @@ const state = reactive({
         ADD: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD'),
         EDIT: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SUB_TITLE_EDIT'),
     })),
-    selected: '',
+    selectedVariable: '' as string,
 });
-
-const { contentType, titleSet, selected } = toRefs(state);
 
 const deleteModalState = reactive({
     headerTitle: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE_TITLE'),
@@ -114,11 +115,18 @@ const handleChangeAddContent = () => {
     state.contentType = 'ADD';
 };
 const handleOpenDeleteModal = (propertyName: string) => {
-    if (state.contentType === 'LIST') state.selected = propertyName;
+    if (state.contentType === 'LIST') state.selectedVariable = propertyName;
     deleteModalState.visible = true;
 };
 const handleDeleteVariable = () => {
-    console.log(state.selected, 'Delete!!!!');
+    const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
+    delete properties[state.selectedVariable];
+    const changedOrder = props.order.filter((d) => d !== state.selectedVariable);
+    emit('change', properties, changedOrder);
+
+    if (state.contentType === 'EDIT') state.contentType = 'LIST';
+    state.selectedVariable = '';
+    deleteModalState.visible = false;
 };
 const handleChangeVariableUse = (name: string, value: boolean) => {
     const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
@@ -126,9 +134,24 @@ const handleChangeVariableUse = (name: string, value: boolean) => {
     emit('change', properties);
 };
 const handleChangeEditContent = (propertyName: string) => {
-    state.selected = propertyName;
+    state.selectedVariable = propertyName;
     state.contentType = 'EDIT';
 };
+const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
+    const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
+    if (state.contentType === 'ADD') {
+        const variableKey = getUUID();
+        properties[variableKey] = variable;
+        emit('change', properties, [...props.order, variableKey]);
+    } else {
+        properties[state.selectedVariable] = variable;
+        emit('change', properties);
+    }
+    state.selectedVariable = '';
+    state.contentType = 'LIST';
+};
+
+const { contentType, titleSet, selectedVariable } = toRefs(state);
 
 </script>
 
