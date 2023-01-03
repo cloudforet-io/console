@@ -30,7 +30,7 @@
                                 v-show="defaultTemplateState.allPage > 10"
                                 :this-page="defaultTemplateState.thisPage"
                                 :all-page="defaultTemplateState.allPage"
-                                @pageChange="(page) => handleChangePagination(page, 'DEFAULT')"
+                                @pageChange="handleChangePagination($event, 'DEFAULT')"
                             />
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                             <p-text-pagination
                                 :this-page="existingTemplateState.thisPage"
                                 :all-page="existingTemplateState.allPage"
-                                @pageChange="(page) => handleChangePagination(page, 'EXISTING')"
+                                @pageChange="handleChangePagination($event, 'EXISTING')"
                             />
                         </div>
                     </div>
