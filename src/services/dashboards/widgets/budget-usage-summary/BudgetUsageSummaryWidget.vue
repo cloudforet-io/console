@@ -1,8 +1,5 @@
 <template>
-    <widget-frame :title="state.title"
-                  :size="state.size"
-                  :width="props.width"
-                  :edit-mode="props.editMode"
+    <widget-frame v-bind="widgetFrameProps"
                   :error-mode="false"
     >
         <div class="budget-usage-summary">
@@ -48,6 +45,7 @@
 
 <script setup lang="ts">
 
+import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose,
     defineProps, nextTick, reactive, ref, toRefs,
@@ -65,6 +63,7 @@ import { gray } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
@@ -113,6 +112,8 @@ const state = reactive({
     leftBudgetRate: 0,
     budgetCount: 0,
 });
+
+const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 const fetchData = async () => new Promise((resolve) => {
     setTimeout(() => {

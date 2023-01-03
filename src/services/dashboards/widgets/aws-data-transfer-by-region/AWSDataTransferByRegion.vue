@@ -1,8 +1,5 @@
 <template>
-    <widget-frame :title="state.title"
-                  :size="state.size"
-                  :width="props.width"
-                  :edit-mode="props.editMode"
+    <widget-frame v-bind="widgetFrameProps"
                   class="aws-data-transfer-by-region"
     >
         <template #header-right>
@@ -25,7 +22,7 @@
             <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
                                :items="state.tableItems"
-                               :currency="state.options.currency"
+                               :currency="state.currency"
                                :currency-rates="props.currencyRates"
             />
         </div>
@@ -33,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
@@ -50,6 +48,7 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
@@ -107,6 +106,8 @@ const state = reactive({
     ]),
     tableItems: [],
 });
+
+const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 const chartContext = ref<HTMLElement|null>(null);
 const {

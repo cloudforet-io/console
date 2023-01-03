@@ -47,7 +47,7 @@ import {
     DASHBOARD_SCOPE,
     DASHBOARD_VIEWER,
 } from '@/services/dashboards/config';
-import type { DashboardScope, DashboardViewer } from '@/services/dashboards/config';
+import type { DashboardScope, DashboardViewer, DashboardConfig } from '@/services/dashboards/config';
 import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/dashboard-create/modules/DashboardViewerForm.vue';
@@ -72,10 +72,12 @@ export default {
             setForm,
             isAllValid,
         } = useFormValidator({
-            dashboardTemplate: '',
-            dashboardProject: undefined as ProjectItemResp|undefined,
+            dashboardTemplate: {} as DashboardConfig,
+            dashboardProject: undefined as undefined|ProjectItemResp,
         }, {
-            dashboardTemplate(value: boolean) { return !value ? i18n.t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : ''; },
+            dashboardTemplate(value: DashboardConfig) {
+                return !Object.keys(value).length ? i18n.t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : '';
+            },
             dashboardProject(value: ProjectItemResp|undefined) {
                 return !value && state.dashboardScope === DASHBOARD_SCOPE.PROJECT
                     ? i18n.t('DASHBOARDS.CREATE.VALIDATION_PROJECT') : '';
@@ -88,10 +90,17 @@ export default {
         });
 
         const handleClickCreate = async () => {
+            const {
+                layouts, variables, settings, variables_schema, name, labels,
+            } = dashboardTemplate.value as DashboardConfig;
             const dashboardCreateParams = {
-                // TODO:: connect real name after bind templates
-                name: `${state.dashboardScope} ${state.dashboardViewerType} dashboard - ${(Math.random().toString().slice(3, 6))}`,
                 viewers: state.dashboardViewerType,
+                name,
+                layouts,
+                variables,
+                settings,
+                variables_schema,
+                labels,
             };
 
             try {
@@ -106,7 +115,13 @@ export default {
                     const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(dashboardCreateParams);
                     dashboardId = result.domain_dashboard_id;
                 }
-                await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.DETAIL._NAME, params: { dashboardId } });
+                await SpaceRouter.router.push({
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    params: {
+                        dashboardId,
+                        dashboardScope: state.dashboardScope,
+                    },
+                });
             } catch (e) {
                 ErrorHandler.handleError(e);
             }

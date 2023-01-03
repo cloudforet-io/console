@@ -1,9 +1,5 @@
 <template>
-    <widget-frame :title="state.title"
-                  :size="state.size"
-                  :width="props.width"
-                  :edit-mode="props.editMode"
-    >
+    <widget-frame v-bind="widgetFrameProps">
         <div class="monthly-cost">
             <div class="cost">
                 <p class="cost-label">
@@ -57,6 +53,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     computed,
     defineExpose, defineProps, nextTick, reactive, ref, toRefs,
@@ -80,6 +77,7 @@ import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
 import type { XYChartData, HistoryDataModel } from '@/services/dashboards/widgets/type';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';

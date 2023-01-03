@@ -1,8 +1,5 @@
 <template>
-    <widget-frame :title="state.title"
-                  :size="state.size"
-                  :width="props.width"
-                  :edit-mode="props.editMode"
+    <widget-frame v-bind="widgetFrameProps"
                   class="budget-status-widget"
     >
         <p-data-loader :loading="state.loading"
@@ -46,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     computed,
     defineExpose,
@@ -61,6 +59,7 @@ import { indigo, red, yellow } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetProps } from '@/services/dashboards/widgets/config';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 
@@ -74,6 +73,8 @@ const state = reactive({
         { label: '< 70%', color: indigo[100] },
     ])),
 });
+
+const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
 const SAMPLE_DATA = [

@@ -1,9 +1,5 @@
 <template>
-    <widget-frame :title="state.title"
-                  :size="state.size"
-                  :width="props.width"
-                  :edit-mode="props.editMode"
-    >
+    <widget-frame v-bind="widgetFrameProps">
         <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
                            :loading="state.loading"
@@ -25,7 +21,7 @@
                            :currency="state.options.currency"
                            :currency-rates="props.currencyRates"
                            size="md"
-                           :disable-next-page="state.limit"
+                           :show-next-page="!state.limit"
                            :this-page.sync="state.thisPage"
                            @toggle-legend="handleToggleLegend"
         >
@@ -40,6 +36,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     computed,
     defineExpose,
@@ -51,14 +48,13 @@ import { random } from 'lodash';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
-import type {
-    Field,
-    LegendConfig,
-} from '@/services/dashboards/widgets/_components/type';
+import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
 import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/config';
+import type { Legend } from '@/services/dashboards/widgets/type';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
@@ -119,12 +115,14 @@ const state = reactive({
             rapidIncrease: (item) => item?.usd_cost > 30000,
         },
     ]),
-    legends: computed<LegendConfig[]>(() => state.chartData.map((i) => ({
+    legends: computed<Legend[]>(() => state.chartData.map((i) => ({
         name: i.provider,
     }))),
     thisPage: 1,
     limit: computed(() => state.thisPage > 3),
 });
+
+const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 // TODO: api binding
 const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
