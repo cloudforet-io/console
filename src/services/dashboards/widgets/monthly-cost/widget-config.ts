@@ -18,6 +18,9 @@ const monthlyCostWidgetConfig: WidgetConfig = {
         inherit_count: 1,
     },
     sizes: ['sm'],
+    options: {
+        granularity: 'MONTHLY',
+    },
 };
 
 export default monthlyCostWidgetConfig;

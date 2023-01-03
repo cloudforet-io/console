@@ -239,7 +239,7 @@ export const setXYSingleTooltipText = (chart: am5xy.XYChart, tooltip: am5.Toolti
     let fieldName;
     chart.series.each((series) => {
         strokeColor = series.get('stroke')?.toString();
-        fieldName = series.get('name');
+        fieldName = series.get('valueYField') || '';
     });
     tooltip.label.setAll({
         fill: am5.color(gray[900]),
