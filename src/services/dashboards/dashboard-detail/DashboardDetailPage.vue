@@ -55,10 +55,7 @@
                                         @refresh="handleRefresh"
             />
         </div>
-        <dashboard-widget-container ref="widgetContainerRef"
-                                    :dashboard-id="dashboardDetailState.dashboardId"
-                                    :widget-info-list="dashboardDetailState.dashboardWidgetInfoList"
-        />
+        <dashboard-widget-container ref="widgetContainerRef" />
         <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
                                    :dashboard-id="props.dashboardId"
                                    :dashboard-name="dashboardDetailState.dashboardName"
