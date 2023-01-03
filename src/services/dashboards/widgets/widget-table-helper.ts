@@ -14,7 +14,12 @@ import type { HistoryDataModel } from '@/services/dashboards/widgets/type';
  * @description Get refined PDataTable fields.
  * @example [{ name: 'usd_cost_sum.0.value', label: '2022-09' }, ...]
  */
-export const getWidgetTableDateFields = (granularity: Granularity, dateRange: DateRange): Field[] => {
+export const getWidgetTableDateFields = (
+    granularity: Granularity,
+    dateRange: DateRange,
+    textOptions: Field['textOptions'],
+    fieldsKey = 'usd_cost',
+): Field[] => {
     if (!granularity || !dateRange?.end) return [];
     const dateFields: Field[] = [];
     const start = dayjs.utc(dateRange.start);
@@ -32,12 +37,10 @@ export const getWidgetTableDateFields = (granularity: Granularity, dateRange: Da
     let count = 0;
     while (now.isSameOrBefore(end, timeUnit)) {
         dateFields.push({
-            name: `usd_cost_sum.${count}.value`,
+            name: `${fieldsKey}_sum.${count}.value`,
             label: now.locale('en').format(labelDateFormat),
             textAlign: 'right',
-            textOptions: {
-                type: 'cost',
-            },
+            textOptions,
         });
         now = now.add(1, timeUnit);
         count += 1;
@@ -49,9 +52,11 @@ export const sortTableDataByDate = (rawData: HistoryDataModel['results']): Histo
     const results: HistoryDataModel['results'] = [];
     rawData.forEach((d) => {
         const _usdCostSum = sortBy(d.usd_cost_sum, 'date');
+        const _usageQuantitySum = sortBy(d.usage_quantity_sum, 'date');
         results.push({
             ...d,
             usd_cost_sum: _usdCostSum,
+            usage_quantity_sum: _usageQuantitySum,
         });
     });
     return results;

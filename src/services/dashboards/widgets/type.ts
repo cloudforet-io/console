@@ -4,7 +4,11 @@ export interface HistoryDataModel {
     more?: boolean;
     results: Array<{
         [groupBy: string]: string | any; // product: 'AmazonCloudFront'
-        usd_cost_sum: Array<{
+        usd_cost_sum?: Array<{
+            date: string;
+            value: number
+        }>;
+        usage_quantity_sum?: Array<{
             date: string;
             value: number
         }>;

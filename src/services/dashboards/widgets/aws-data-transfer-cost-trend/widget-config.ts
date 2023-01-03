@@ -12,7 +12,10 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsDataTransferCostTrend',
     title: 'AWS Data-Transfer Cost Trend',
     labels: ['Cost'],
-    base_configs: [{ config_id: 'baseTrend' }],
+    base_configs: [{ config_id: 'dashboardCommon' }],
+    widget_component: () => ({
+        component: import('@/services/dashboards/widgets/aws-data-transfer-cost-trend/AWSDataTransferCostTrend.vue'),
+    }),
     description: {
         translation_id: 'DASHBOARDS.WIDGET.AWS_DATA_TRANSFER_COST_TREND.DESC',
         preview_image: 'widget-img_awsDataTransferCostTrend--thumbnail.png',
@@ -26,6 +29,7 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
     options: {
         chart_type: CHART_TYPE.LINE,
         granularity: GRANULARITY.MONTHLY,
+        group_by: 'usage_type',
         legend_options: {
             enabled: true,
             show_at: 'chart',
