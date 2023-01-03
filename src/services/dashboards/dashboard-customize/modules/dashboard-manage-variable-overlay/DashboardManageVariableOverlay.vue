@@ -41,6 +41,7 @@
             />
             <dashboard-manage-variable-form v-else
                                             :content-type.sync="contentType"
+                                            :variable-names="variableNams"
                                             :selected-variable="variables[selectedVariable]"
                                             @save="handleSaveVariable"
             />
@@ -102,6 +103,10 @@ const state = reactive({
         EDIT: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SUB_TITLE_EDIT'),
     })),
     selectedVariable: '' as string,
+    variableNams: computed<string[]>(() => {
+        const properties = props.variables;
+        return props.order.map((d) => properties[d].name).filter((name) => name !== properties[state.selectedVariable]?.name);
+    }),
 });
 
 const deleteModalState = reactive({
@@ -151,7 +156,9 @@ const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
     state.contentType = 'LIST';
 };
 
-const { contentType, titleSet, selectedVariable } = toRefs(state);
+const {
+    contentType, titleSet, selectedVariable, variableNams,
+} = toRefs(state);
 
 </script>
 
