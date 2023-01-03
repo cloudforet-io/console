@@ -3,12 +3,16 @@
         class="manage-wrapper"
     >
         <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_NAME')"
+                       :invalid="invalidState.name"
+                       :invalid-text="invalidTexts.name"
                        required
         >
-            <p-text-input :value="name"
-                          :invalid="invalidState.name"
-                          @input="setForm('name', $event)"
-            />
+            <template #default="{ invalid }">
+                <p-text-input :value="name"
+                              :invalid="invalid"
+                              @input="setForm('name', $event)"
+                />
+            </template>
         </p-field-group>
         <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_SELECTION_TYPE')"
                        required
@@ -80,6 +84,8 @@ import {
     PButton, PFieldGroup, PIconButton, PSelectDropdown, PTextInput, PI, useProxyValue,
 } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
 import { getUUID } from '@/lib/component-util/getUUID';
 
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -91,6 +97,7 @@ import type {
 
 interface Props {
     contentType: OverlayStatus;
+    variableNames: string[];
     selectedVariable?: DashboardVariableSchemaProperty;
 }
 interface EmitFn {
@@ -107,10 +114,17 @@ const {
     },
     setForm,
     invalidState,
+    invalidTexts,
 } = useFormValidator({
     name: '',
 }, {
-    name(value: string) { return value.trim().length > 0; },
+    name(value: string) {
+        if (props.variableNames.includes(value)) {
+            return i18n.t('Name is duplicated');
+        }
+        // TODO: add invalid text about name length
+        return value.trim().length > 0;
+    },
 });
 
 // helper
