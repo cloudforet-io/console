@@ -75,7 +75,7 @@ export function useWidgetState<Data = any>(
         }),
         loading: true,
         settings: computed<DashboardSettings>(() => props.dashboardSettings),
-        data: null as Data|null,
+        data: undefined as Data|undefined,
         colorSet: computed<string[]>(() => {
             if (!props.theme) return [];
             const colorSetType: WidgetColorSetType = state.data?.length > 9 ? 'massive' : 'basic';
