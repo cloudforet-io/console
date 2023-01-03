@@ -2,22 +2,26 @@
     <div
         class="manage-wrapper"
     >
-        <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_NAME')"
+        <p-field-group class="name-field"
+                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_NAME')"
                        :invalid="invalidState.name"
                        :invalid-text="invalidTexts.name"
                        required
         >
             <template #default="{ invalid }">
-                <p-text-input :value="name"
+                <p-text-input class="name-input"
+                              :value="name"
                               :invalid="invalid"
                               @input="setForm('name', $event)"
                 />
             </template>
         </p-field-group>
-        <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_SELECTION_TYPE')"
+        <p-field-group class="selection-type-field"
+                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_SELECTION_TYPE')"
                        required
         >
-            <p-select-dropdown :items="selectionMenu"
+            <p-select-dropdown class="selection-type-dropdown"
+                               :items="selectionMenu"
                                :selected.sync="selectionType"
             />
         </p-field-group>
@@ -198,6 +202,26 @@ const {
 <style lang="postcss" scoped>
 .manage-wrapper {
     padding: 0 1rem 1rem;
+
+    .name-field {
+        @apply w-1/3;
+        .name-input {
+            @apply w-full;
+        }
+    }
+
+    .selection-type-field {
+        @apply w-1/3;
+        .selection-type-dropdown {
+            @apply w-full;
+        }
+    }
+
+    @screen tablet {
+        .name-field, .selection-type-field {
+            @apply w-full;
+        }
+    }
 
     .options-wrapper {
         @apply bg-gray-100 rounded-md;
