@@ -81,14 +81,10 @@ import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-fr
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
-import { getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
+import { getDateAxisSettings, getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
 
 const chartContext = ref<HTMLElement | null>(null);
-const {
-    createXYDateChart, createXYColumnSeries,
-    createTooltip, createDataProcessor, setChartColors, setXYSingleTooltipText,
-    disposeRoot, refreshRoot,
-} = useAmcharts5(chartContext);
+const chartHelper = useAmcharts5(chartContext);
 
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
@@ -120,6 +116,7 @@ const state = reactive({
     }),
     isDecreased: computed<boolean>(() => (state.differenceCost < 0)),
 });
+const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
 const fetchData = async () => {
@@ -158,7 +155,7 @@ const getMonthlyCost = (month) => {
 };
 
 const drawChart = (chartData: XYChartData[]) => {
-    const { chart, xAxis, yAxis } = createXYDateChart();
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
     const yRendered = yAxis.get('renderer');
     yRendered.grid.template.setAll({ strokeOpacity: 0 });
@@ -166,13 +163,13 @@ const drawChart = (chartData: XYChartData[]) => {
     const seriesSettings = {
         valueYField: 'value',
     };
-    const series = createXYColumnSeries(chart, seriesSettings);
+    const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
     chart.series.push(series);
     series.columns.template.setAll({
         fillOpacity: 0.5,
         strokeOpacity: 0,
     });
-    setChartColors(chart, state.colorSet);
+    chartHelper.setChartColors(chart, state.colorSet);
     chart.setAll({
         paddingTop: 0,
         paddingRight: 0,
@@ -187,10 +184,10 @@ const drawChart = (chartData: XYChartData[]) => {
         return fillOpacity;
     });
 
-    const tooltip = createTooltip();
-    setXYSingleTooltipText(chart, tooltip, state.currency, props.currencyRates);
+    const tooltip = chartHelper.createTooltip();
+    chartHelper.setXYSingleTooltipText(chart, tooltip, state.currency, props.currencyRates);
     series.set('tooltip', tooltip);
-    series.data.processor = createDataProcessor({
+    series.data.processor = chartHelper.createDataProcessor({
         dateFormat: DATE_FORMAT,
     });
     series.data.setAll(chartData);
@@ -205,12 +202,12 @@ const initWidget = async () => {
 const refreshWidget = async () => {
     await fetchData();
     await nextTick();
-    refreshRoot();
+    chartHelper.refreshRoot();
     drawChart(state.chartData);
 };
 
 useWidgetLifecycle({
-    disposeWidget: disposeRoot,
+    disposeWidget: chartHelper.disposeRoot,
 });
 
 defineExpose({
