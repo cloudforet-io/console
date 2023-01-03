@@ -101,10 +101,8 @@ const state = reactive({
         ADD: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD'),
         EDIT: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SUB_TITLE_EDIT'),
     })),
-    selectedVariable: '',
+    selectedVariable: '' as string,
 });
-
-const { contentType, titleSet, selectedVariable } = toRefs(state);
 
 const deleteModalState = reactive({
     headerTitle: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE_TITLE'),
@@ -141,7 +139,7 @@ const handleChangeEditContent = (propertyName: string) => {
 };
 const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
     const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
-    if (contentType.value === 'ADD') {
+    if (state.contentType === 'ADD') {
         const variableKey = getUUID();
         properties[variableKey] = variable;
         emit('change', properties, [...props.order, variableKey]);
@@ -152,6 +150,8 @@ const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
     state.selectedVariable = '';
     state.contentType = 'LIST';
 };
+
+const { contentType, titleSet, selectedVariable } = toRefs(state);
 
 </script>
 

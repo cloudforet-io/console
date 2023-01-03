@@ -145,11 +145,6 @@ const state = reactive({
     }),
 });
 
-const {
-    selectionType, options, selectionMenu, formInvalid,
-} = toRefs(state);
-
-
 // Event
 const handleCancel = () => {
     state.proxyContentType = 'LIST';
@@ -166,8 +161,8 @@ const handleSave = () => {
         variable_type: 'CUSTOM',
         name: name.value,
         use: false,
-        selection_type: selectionType.value,
-        options: options.value.map((d) => d.value).filter((value) => value !== ''),
+        selection_type: state.selectionType,
+        options: state.options.map((d) => d.value).filter((value) => value !== ''),
     } as DashboardVariableSchemaProperty;
     emit('save', variableToSave);
 };
@@ -179,6 +174,10 @@ onMounted(() => {
         state.options = props.selectedVariable?.options.map((d) => ({ key: getUUID(), value: d })) ?? [{ key: getUUID(), value: '' }];
     }
 });
+
+const {
+    selectionType, options, selectionMenu, formInvalid,
+} = toRefs(state);
 
 </script>
 
