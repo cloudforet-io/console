@@ -25,7 +25,7 @@
                 <div v-if="searchable"
                      class="search-wrapper"
                 >
-                    <p-search :value="searchText"
+                    <p-search :value="proxySearchText"
                               :is-focused.sync="isFocusedOnSearch"
                               @update:value="handleUpdateSearchText"
                               @keydown.up.native="onKeyUp()"
@@ -61,7 +61,7 @@
                                              :selected="!noSelectIndication && selectedNameMap[item.name] !== undefined"
                                              :select-marker="multiSelectable ? 'checkbox' : (showRadioIcon ? 'radio' : undefined)"
                                              :ellipsis="itemHeightFixed"
-                                             :highlight-term="highlightTerm"
+                                             :highlight-term="proxySearchText || highlightTerm"
                                              :tabindex="index"
                                              @click.stop="onClickMenu(item, index, $event)"
                                              @keyup.enter="onClickMenu(item, index, $event)"
@@ -234,10 +234,14 @@ export default defineComponent<ContextMenuProps>({
             type: Boolean,
             default: false,
         },
+        searchText: {
+            type: String,
+            default: '',
+        },
     },
     setup(props, { emit, slots }) {
         const state = reactive({
-            searchText: '',
+            proxySearchText: props.searchText ?? '',
             isFocusedOnSearch: false,
             proxySelected: useProxyValue<MenuItem[]>('selected', props, emit),
             selectedNameMap: computed<Record<string, number>>(() => {
@@ -325,8 +329,8 @@ export default defineComponent<ContextMenuProps>({
             state.proxySelected = [];
         };
         const handleUpdateSearchText = async (value: string) => {
-            state.searchText = value;
-            emit('update-search-input', value);
+            state.proxySearchText = value;
+            emit('update:search-text', value);
         };
 
         watch(() => state.proxySelected, (proxySelected) => {
@@ -336,6 +340,11 @@ export default defineComponent<ContextMenuProps>({
                 state.proxySelected = getFilteredSelectedItems(proxySelected, state.selectableMenuItems);
             }
         }, { immediate: true });
+
+        watch(() => props.searchText, (searchText) => {
+            if (state.proxySearchText === searchText) return;
+            state.proxySearchText = searchText;
+        });
 
         onUnmounted(() => {
             state.proxySelected = [];

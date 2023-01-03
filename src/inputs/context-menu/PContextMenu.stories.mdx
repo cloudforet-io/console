@@ -664,9 +664,12 @@ It works only in multi select case.
             components: { PContextMenu},
             template: `
 <div>
-    <p-context-menu :menu="menu" searchable :highlight-term="searchTerm"
+    <div class="my-2"><span class="font-bold">searchText:</span> {{searchText}}</div>
+    <p-context-menu :menu="menu"
+        searchable
+        :search-text.sync="searchText"
         :loading="loading"
-        @update-search-input="handleUpdateSearchInput"
+        @update:search-text="handleUpdateSearchInput"
     />
 </div>
 `,
@@ -676,7 +679,7 @@ It works only in multi select case.
                 const state = reactive({
                     menu: allItems,
                     loading: false,
-                    searchTerm: ''
+                    searchText: 'a'
                 });
                 const handleUpdateSearchInput = async (value) => {
                     state.loading = true;
@@ -690,7 +693,6 @@ It works only in multi select case.
                             }))
                         }, 200)
                     })
-                    state.searchTerm = value;
                     state.loading = false;
                 }
                 return {
