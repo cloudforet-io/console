@@ -39,7 +39,10 @@
                             {{ $t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
                         </span>
                         <div class="card-wrapper">
-                            <p-search :value.sync="existingTemplateState.searchValue" />
+                            <p-search
+                                :value.sync="existingTemplateState.searchValue"
+                                @update:value="handleInputSearch"
+                            />
                             <div class="existing-dashboard-board">
                                 <p-board
                                     selectable
@@ -76,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PPaneLayout, PPanelTop, PBoard, PLabel, PTextPagination, PSearch, PEmpty,
@@ -135,9 +138,9 @@ const handleChangePagination = (page: number, type: 'DEFAULT'|'EXISTING'): void 
     }
 };
 
-watch(() => existingTemplateState.searchValue, () => {
+const handleInputSearch = () => {
     existingTemplateState.thisPage = 1;
-});
+};
 
 (async () => {
     await Promise.allSettled([
