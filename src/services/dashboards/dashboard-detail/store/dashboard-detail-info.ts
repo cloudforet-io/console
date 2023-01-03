@@ -26,7 +26,9 @@ import type { DashboardModel } from '@/services/dashboards/model';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
-
+interface WidgetDataMap {
+[widgetKey: string]: any;
+}
 interface DashboardDetailInfoStoreState {
     loadingDashboard: boolean;
     dashboardId: string;
@@ -44,6 +46,7 @@ interface DashboardDetailInfoStoreState {
     // widget info states
     dashboardWidgetInfoList: DashboardContainerWidgetInfo[];
     loadingWidgets: boolean;
+    widgetDataMap: WidgetDataMap;
 }
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
     const state = reactive<DashboardDetailInfoStoreState>({
@@ -76,6 +79,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         // widget info states
         dashboardWidgetInfoList: [],
         loadingWidgets: false,
+        widgetDataMap: {},
     });
 
     const resetDashboardSettings = () => {
@@ -146,6 +150,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             ...info,
             widgetKey: uuidv4(),
         }));
+        state.widgetDataMap = {};
     };
 
     const getDashboardData = async (dashboardId: string) => {
@@ -181,6 +186,14 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             return info;
         });
     };
+    const initiateAllWidgets = () => {
+        const widgetDataMap = {};
+        state.dashboardWidgetInfoList.forEach((widget) => {
+            widgetDataMap[widget.widgetKey] = state.widgetDataMap[widget.widgetKey];
+        });
+        state.widgetDataMap = widgetDataMap;
+    };
+
     store.dispatch('reference/loadAll');
 
     return {
@@ -189,5 +202,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         resetDashboardSettings,
         setDashboardInfo,
         toggleWidgetSize,
+        initiateAllWidgets,
     };
 });

@@ -60,8 +60,10 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import type { WidgetProps } from '@/services/dashboards/widgets/config';
 import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/config';
+import type {
+    WidgetExpose, WidgetProps,
+} from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
@@ -114,9 +116,8 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-const fetchData = async () => {
+const fetchData = async (): Promise<HistoryDataModel['results']> => {
     try {
-        state.loading = true;
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.granularity,
@@ -133,13 +134,10 @@ const fetchData = async () => {
                 field_group: ['date'],
             },
         });
-        state.data = sortTableDataByDate(results);
-        state.legends = getLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
+        return sortTableDataByDate(results);
     } catch (e) {
-        state.data = [];
         ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
+        return [];
     }
 };
 
@@ -186,17 +184,25 @@ const drawChart = (chartData: XYChartData[]) => {
     state.chart = chart;
 };
 
-const initWidget = async () => {
-    await fetchData();
+const initWidget = async (data?: HistoryDataModel['results']) => {
+    state.loading = true;
+    state.data = data ?? await fetchData();
+    state.legends = getLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     drawChart(state.chartData);
+    state.loading = false;
+    return state.data;
 };
 
 const refreshWidget = async () => {
-    await fetchData();
+    state.loading = true;
+    state.data = await fetchData();
+    state.legends = getLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.refreshRoot();
     drawChart(state.chartData);
+    state.loading = false;
+    return state.data;
 };
 
 /* Event */
@@ -212,7 +218,7 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
 });
 
-defineExpose({
+defineExpose<WidgetExpose<HistoryDataModel['results']>>({
     initWidget,
     refreshWidget,
 });

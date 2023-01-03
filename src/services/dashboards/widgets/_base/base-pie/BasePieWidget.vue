@@ -52,8 +52,8 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { GroupBy, WidgetProps } from '@/services/dashboards/widgets/config';
 import { CHART_TYPE } from '@/services/dashboards/widgets/config';
+import type { GroupBy, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
 import type { Legend } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
@@ -176,28 +176,30 @@ const handleToggleLegend = (index) => {
     toggleSeries(state.chart, index);
 };
 
-const initWidget = async () => {
+const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
-    state.data = await fetchData();
+    state.data = data ?? await fetchData();
     await nextTick();
     drawChart(state.chartData);
     state.loading = false;
+    return state.data;
 };
 
-const refreshWidget = async () => {
+const refreshWidget = async (): Promise<Data[]> => {
     state.loading = true;
     state.data = await fetchData();
     await nextTick();
     refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
+    return state.data;
 };
 
 useWidgetLifecycle({
     disposeWidget: disposeRoot,
 });
 
-defineExpose({
+defineExpose<WidgetExpose<Data[]>>({
     initWidget,
     refreshWidget,
 });

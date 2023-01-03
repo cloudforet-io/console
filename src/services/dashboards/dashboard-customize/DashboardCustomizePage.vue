@@ -194,7 +194,7 @@ const updateDashboardData = async () => {
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: props.dashboardId,
-                dashboardScope: state.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
+                dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
     } catch (e) {

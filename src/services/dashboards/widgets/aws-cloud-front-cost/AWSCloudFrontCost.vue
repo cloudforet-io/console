@@ -46,7 +46,7 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import type { WidgetProps } from '@/services/dashboards/widgets/config';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/config';
 import type { HistoryDataModel } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
@@ -127,9 +127,9 @@ const drawChart = (chartData) => {
     if (legend) legend.data.setAll(chart.series.values);
 };
 
-const initWidget = async () => {
+const initWidget = async (data?: HistoryDataModel['results']) => {
     state.loading = true;
-    state.data = await fetchData();
+    state.data = data ?? await fetchData();
     await nextTick();
     drawChart(state.data);
     state.loading = false;
@@ -154,13 +154,10 @@ useWidgetLifecycle({
     disposeWidget: disposeRoot,
 });
 
-defineExpose<{
-    initWidget:() => Promise<void>,
-    refreshWidget:() => Promise<void>
-        }>({
-            initWidget,
-            refreshWidget,
-        });
+defineExpose<WidgetExpose<HistoryDataModel['results']>>({
+    initWidget,
+    refreshWidget,
+});
 </script>
 <style lang="postcss" scoped>
 .aws-cloud-front-cost {

@@ -37,7 +37,7 @@ import {
 } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetProps } from '@/services/dashboards/widgets/config';
+import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
@@ -76,7 +76,7 @@ const {
 } = useAmcharts5(chartContext);
 
 const state = reactive({
-    ...toRefs(useWidgetState(props)),
+    ...toRefs(useWidgetState<CostMapData>(props)),
     chartData: computed(() => {
         if (!state.data) return [];
         return state.data;
@@ -154,6 +154,7 @@ const initWidget = async () => {
     await nextTick();
     drawChart(state.data);
     state.loading = false;
+    return state.data;
 };
 
 const refreshWidget = async () => {
@@ -163,13 +164,14 @@ const refreshWidget = async () => {
     refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
+    return state.data;
 };
 
 useWidgetLifecycle({
     disposeWidget: disposeRoot,
 });
 
-defineExpose({
+defineExpose<WidgetExpose<CostMapData>>({
     initWidget,
     refreshWidget,
 });

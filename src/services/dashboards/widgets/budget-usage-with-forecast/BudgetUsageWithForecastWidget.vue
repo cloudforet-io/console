@@ -32,7 +32,7 @@ import {
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetProps } from '@/services/dashboards/widgets/config';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
 // import { GROUP_BY } from '@/services/dashboards/widgets/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
@@ -86,19 +86,21 @@ const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
 
 const getPercentage = (item: Data) => item.total_spent / item.total_budget * 100;
 
-const initWidget = async () => {
+const initWidget = async (data?: Data[]) => {
     state.loading = true;
-    state.data = await fetchData();
+    state.data = data ?? await fetchData();
     state.loading = false;
+    return state.data;
 };
 
 const refreshWidget = async () => {
     state.loading = true;
     state.data = await fetchData();
     state.loading = false;
+    return state.data;
 };
 
-defineExpose({
+defineExpose<WidgetExpose<Data[]>>({
     initWidget,
     refreshWidget,
 });

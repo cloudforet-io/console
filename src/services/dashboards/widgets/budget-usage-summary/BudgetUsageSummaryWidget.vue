@@ -62,12 +62,22 @@ import type { createPieChart } from '@/common/composables/amcharts5/pie-chart-he
 import { gray } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetProps } from '@/services/dashboards/widgets/config';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 
+interface Data {
+    budget_type: string;
+    budget_count: number;
+    limit: number;
+    usd_cost: number;
+    usage: number;
+    pieSettings?: {
+        fill: ReturnType<typeof color>
+    }
+}
 const SAMPLE_RAW_DATA = {
     results: [
         {
@@ -99,7 +109,7 @@ const {
 } = useAmcharts5(chartContext);
 
 const state = reactive({
-    ...toRefs(useWidgetState(props)),
+    ...toRefs(useWidgetState<Data[]>(props)),
     chart: null as null|ReturnType<typeof createPieChart>,
     series: null as null|ReturnType<typeof createPieSeries>,
     chartData: computed(() => {
@@ -115,7 +125,7 @@ const state = reactive({
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
-const fetchData = async () => new Promise((resolve) => {
+const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
     setTimeout(() => {
         resolve(SAMPLE_RAW_DATA.results);
     }, 1000);
@@ -144,28 +154,30 @@ const drawChart = (chartData) => {
     state.series = series;
 };
 
-const initWidget = async () => {
+const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
-    state.data = await fetchData();
+    state.data = data ?? await fetchData();
     await nextTick();
     drawChart(state.chartData);
     state.loading = false;
+    return state.data;
 };
 
-const refreshWidget = async () => {
+const refreshWidget = async (): Promise<Data[]> => {
     state.loading = true;
     state.data = await fetchData();
     await nextTick();
     refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
+    return state.data;
 };
 
 useWidgetLifecycle({
     disposeWidget: disposeRoot,
 });
 
-defineExpose({
+defineExpose<WidgetExpose<Data[]>>({
     initWidget,
     refreshWidget,
 });
