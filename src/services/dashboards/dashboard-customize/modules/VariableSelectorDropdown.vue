@@ -41,11 +41,11 @@
                         class="options-menu"
                         searchable
                         use-fixed-menu-style
+                        show-select-marker
                         :style="fixedMenuStyle"
                         :menu="reorderedMenu"
                         :selected.sync="selected"
                         :multi-selectable="selectionType === 'MULTI'"
-                        :show-radio-icon="selectionType === 'SINGLE'"
                         :show-clear-selection="selectionType === 'MULTI'"
                         @update-search-input="handleChangeContextMenuInput"
         />

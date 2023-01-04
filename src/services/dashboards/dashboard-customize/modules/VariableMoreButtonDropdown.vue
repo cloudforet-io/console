@@ -19,6 +19,7 @@
                         :menu="reorderedMenu"
                         :selected.sync="selected"
                         multi-selectable
+                        show-select-marker
                         show-clear-selection
         >
             <template #bottom>
