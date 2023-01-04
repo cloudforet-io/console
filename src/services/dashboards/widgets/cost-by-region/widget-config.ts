@@ -26,6 +26,10 @@ const costByRegionWidgetConfig: WidgetConfig = {
             enabled: true,
             show_at: 'table',
         },
+        pagination_options: {
+            enabled: true,
+            page_size: 10,
+        },
     },
 };
 

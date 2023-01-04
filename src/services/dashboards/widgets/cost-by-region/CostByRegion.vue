@@ -15,9 +15,15 @@
             </p-data-loader>
             <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
-                               :items="state.tableItems"
+                               :items="state.data?.results"
                                :currency="state.currency"
                                :currency-rates="props.currencyRates"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :legends.sync="state.legends"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.data?.more"
+                               show-legend
+                               @update:thisPage="handleUpdateThisPage"
             />
         </div>
     </widget-frame>
@@ -30,74 +36,46 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { DateRange } from '@/services/dashboards/config';
+import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import type { AccumulatedDataModel } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
-import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 
-interface Data {
-    title: string;
-    region_code?: string;
-    continent_code?: string;
-    latitude: number;
-    longitude: number;
-    color: string;
-    pieData: {
-        category: string;
-        color: string;
-        provider: string;
-        value: number
-    }[]
+
+type Data = AccumulatedDataModel['results'];
+interface FullData {
+    results: Data;
+    more: boolean;
 }
-const SAMPLE_RAW_DATA = {
-    more: true,
-    results: [
-        {
-            title: 'Asia Pacific',
-            region_code: 'ap-northeast-2',
-            latitude: 47.212106,
-            longitude: 103.183594,
-            color: '#FF9900',
-            pieData: [
-                {
-                    category: 'AWS',
-                    color: '#FF9900',
-                    provider: 'aws',
-                    value: 11496.92345235,
-                },
-            ],
-        },
-        {
-            title: 'North America',
-            continent_code: 'north_america',
-            latitude: 39.563353,
-            longitude: -99.316406,
-            color: '#4285F4',
-            pieData: [
-                {
-                    category: 'AWS',
-                    color: '#FF9900',
-                    provider: 'aws',
-                    value: 321,
-                },
-                {
-                    category: 'Google',
-                    color: '#4285F4',
-                    provider: 'google_cloud',
-                    value: 11.31,
-                },
-            ],
-        },
-    ],
-};
+
+// interface Data {
+//     title: string;
+//     region_code?: string;
+//     continent_code?: string;
+//     latitude: number;
+//     longitude: number;
+//     color: string;
+//     pieData: {
+//         category: string;
+//         color: string;
+//         provider: string;
+//         value: number
+//     }[]
+// }
 const SAMPLE_PIE_DATA = [{
     country: 'France',
     sales: 100000,
@@ -111,18 +89,18 @@ const SAMPLE_PIE_DATA = [{
 
 const props = defineProps<WidgetProps>();
 const state = reactive({
-    ...toRefs(useWidgetState<Data[]>(props)),
-    groupByLabel: computed<string>(() => {
-        const groupBy = state.groupBy;
-        return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;
-    }),
-    tableFields: computed(() => [
-        { label: 'Provider', name: GROUP_BY.PROVIDER },
-        { label: 'Region', name: GROUP_BY.REGION },
-        { label: 'Cost', name: 'cost' },
+    ...toRefs(useWidgetState<FullData>(props)),
+    tableFields: computed<Field[]>(() => [
+        { label: 'Provider', name: GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' } },
+        { label: 'Region', name: GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' } },
+        { label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' } },
     ]),
     tableItems: [],
     thisPage: 1,
+    dateRange: computed<DateRange>(() => ({
+        start: dayjs.utc(state.settings?.date_range?.start).format('YYYY-MM'),
+        end: dayjs.utc(state.settings?.date_range?.end).format('YYYY-MM'),
+    })),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
@@ -130,11 +108,29 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
-    setTimeout(() => {
-        resolve(SAMPLE_RAW_DATA.results);
-    }, 1000);
-});
+const fetchData = async (): Promise<FullData> => {
+    try {
+        const query: any = {
+            granularity: state.granularity,
+            group_by: [GROUP_BY.REGION, GROUP_BY.PROVIDER],
+            start: state.dateRange.start,
+            end: state.dateRange.end,
+            fields: {
+                usd_cost_sum: {
+                    key: 'usd_cost',
+                    operator: 'sum',
+                },
+            },
+            sort: [{ key: 'usd_cost_sum', desc: true }],
+        };
+        if (state.pageSize) query.page = { start: state.thisPage, limit: state.pageSize };
+        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
+        return { results, more };
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return { results: [], more: false };
+    }
+};
 
 const drawChart = () => {
     const chart = chartHelper.createMapChart();
@@ -167,7 +163,7 @@ const drawChart = () => {
     pointSeries.data.setAll(state.data);
 };
 
-const initWidget = async (data?: Data[]) => {
+const initWidget = async (data?: FullData) => {
     state.loading = true;
     state.data = data ?? await fetchData();
     await nextTick();
@@ -176,14 +172,29 @@ const initWidget = async (data?: Data[]) => {
     state.loading = false;
     return state.data;
 };
+const refreshWidget = async () => {
+    state.loading = true;
+    state.data = await fetchData();
+    await nextTick();
+    chartHelper.clearChildrenOfRoot();
+    drawChart();
+    state.loading = false;
+    return state.data;
+};
+
+/* Event */
+const handleUpdateThisPage = (thisPage: number) => {
+    state.thisPage = thisPage;
+    refreshWidget();
+};
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
 });
 
-defineExpose<WidgetExpose>({
+defineExpose<WidgetExpose<FullData>>({
     initWidget,
-    refreshWidget: initWidget,
+    refreshWidget,
 });
 </script>
 <style lang="postcss" scoped>
