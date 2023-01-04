@@ -1,3 +1,10 @@
+# [1.1.0-beta.506](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.505...v1.1.0-beta.506) (2023-01-04)
+
+
+### Bug Fixes
+
+* **use-context-menu-fixed-style:** make work reactive to useFixedMenuStyle ([#217](https://github.com/cloudforet-io/mirinae/issues/217)) ([a2bd50a](https://github.com/cloudforet-io/mirinae/commit/a2bd50a67a59cbf47aae9030263085925e4da172))
+
 # [1.1.0-beta.505](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.504...v1.1.0-beta.505) (2023-01-04)
 
 
