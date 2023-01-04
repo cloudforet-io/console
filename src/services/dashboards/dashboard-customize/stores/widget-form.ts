@@ -1,4 +1,4 @@
-import { reactive, toRefs } from 'vue';
+import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -68,7 +68,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     };
 
     return {
-        ...toRefs(state),
+        state,
         setWidgetConfigId,
         setWidgetTitle,
         setIsValid,
