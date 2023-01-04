@@ -31,7 +31,8 @@ export const getRefinedXYChartData = (
 
     let chartData;
     rawData.forEach((data) => {
-        const groupByName = groupBy ? data[groupBy] : 'value'; // AmazonCloudFront
+        let groupByName = groupBy ? data[groupBy] : 'value'; // AmazonCloudFront
+        if (!groupByName) groupByName = `no_${groupBy}`;
         const valueList = data[valueKey]; // [{date: '2022-11', value: 34}, ...]
         const refinedList = valueList.map((valueSet) => ({
             date: valueSet.date,

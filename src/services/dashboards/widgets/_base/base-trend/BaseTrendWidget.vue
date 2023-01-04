@@ -25,14 +25,17 @@
 
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
-                           :items="state.data"
+                           :items="state.data?.results"
                            :currency="state.currency"
                            :currency-rates="props.currencyRates"
                            :all-reference-type-info="allReferenceTypeInfo"
                            :legends.sync="state.legends"
                            :color-set="state.colorSet"
+                           :this-page="state.thisPage"
+                           :show-next-page="state.data?.more"
                            show-legend
                            @toggle-legend="handleToggleLegend"
+                           @update:thisPage="handleUpdateThisPage"
         />
     </widget-frame>
 </template>
@@ -76,9 +79,14 @@ import {
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/widget-chart-helper';
 import {
-    getReferenceTypeOfGroupBy, getWidgetTableDateFields, sortTableDataByDate,
+    getReferenceTypeOfGroupBy, getWidgetTableDateFields, sortHistoryTableData,
 } from '@/services/dashboards/widgets/widget-table-helper';
 
+type Data = HistoryDataModel['results'];
+interface FullData {
+    results: Data;
+    more: boolean;
+}
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 
@@ -88,9 +96,9 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const state = reactive({
-    ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
+    ...toRefs(useWidgetState<FullData>(props)),
     chart: null as null | XYChart,
-    chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data, state.groupBy)),
+    chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data?.results, state.groupBy)),
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
         const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange, { type: 'cost' });
@@ -112,32 +120,33 @@ const state = reactive({
         return { start, end };
     }),
     legends: [] as Legend[],
+    thisPage: 1,
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-const fetchData = async (): Promise<HistoryDataModel['results']> => {
+const fetchData = async (): Promise<FullData> => {
     try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
-            query: {
-                granularity: state.granularity,
-                group_by: [state.groupBy],
-                start: state.dateRange.start,
-                end: state.dateRange.end,
-                fields: {
-                    usd_cost_sum: {
-                        key: 'usd_cost',
-                        operator: 'sum',
-                    },
+        const query: any = {
+            granularity: state.granularity,
+            group_by: [state.groupBy],
+            start: state.dateRange.start,
+            end: state.dateRange.end,
+            fields: {
+                usd_cost_sum: {
+                    key: 'usd_cost',
+                    operator: 'sum',
                 },
-                sort: [{ key: '_total_usd_cost_sum', desc: true }],
-                field_group: ['date'],
             },
-        });
-        return sortTableDataByDate(results);
+            sort: [{ key: '_total_usd_cost_sum', desc: true }],
+            field_group: ['date'],
+        };
+        if (state.pageSize) query.page = { start: state.thisPage, limit: state.pageSize };
+        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
+        return { results: sortHistoryTableData(results), more };
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
+        return { results: [], more: false };
     }
 };
 
@@ -184,10 +193,10 @@ const drawChart = (chartData: XYChartData[]) => {
     state.chart = chart;
 };
 
-const initWidget = async (data?: HistoryDataModel['results']) => {
+const initWidget = async (data?: FullData) => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     drawChart(state.chartData);
     state.loading = false;
@@ -197,7 +206,7 @@ const initWidget = async (data?: HistoryDataModel['results']) => {
 const refreshWidget = async () => {
     state.loading = true;
     state.data = await fetchData();
-    state.legends = getLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.refreshRoot();
     drawChart(state.chartData);
@@ -213,12 +222,16 @@ const handleSelectSelectorType = (selected: string) => {
 const handleToggleLegend = (index) => {
     chartHelper.toggleSeries(state.chart, index);
 };
+const handleUpdateThisPage = (thisPage: number) => {
+    state.thisPage = thisPage;
+    refreshWidget();
+};
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
 });
 
-defineExpose<WidgetExpose<HistoryDataModel['results']>>({
+defineExpose<WidgetExpose<FullData>>({
     initWidget,
     refreshWidget,
 });

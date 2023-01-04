@@ -65,7 +65,7 @@ export interface WidgetState<Data = any> {
     currency: ComputedRef<Currency>;
     groupBy: ComputedRef<GroupBy | string>;
     granularity: ComputedRef<Granularity>;
-    chartType?: ComputedRef<ChartType>;
+    chartType: ComputedRef<ChartType|undefined>;
     size: ComputedRef<WidgetSize>;
     loading: boolean;
     settings: ComputedRef<DashboardSettings>;
@@ -73,6 +73,7 @@ export interface WidgetState<Data = any> {
     colorSet: ComputedRef<string[]>;
     selectorItems: ComputedRef<MenuItem[]>;
     selectedSelectorType: undefined;
+    pageSize: ComputedRef<number|undefined>;
 }
 export function useWidgetState<Data = any>(
     props: WidgetProps,
@@ -87,9 +88,9 @@ export function useWidgetState<Data = any>(
             props.dashboardVariables,
         )),
         currency: computed(() => state.settings.currency?.value ?? CURRENCY.USD),
-        groupBy: computed<GroupBy | string>(() => state.options.group_by),
+        groupBy: computed<GroupBy|string>(() => state.options.group_by),
         granularity: computed<Granularity>(() => state.widgetConfig.options?.granularity),
-        chartType: computed(() => state.options.chart_type),
+        chartType: computed<ChartType|undefined>(() => state.options?.chart_type),
         size: computed<WidgetSize>(() => {
             if (state.widgetConfig.sizes.includes(props.size)) return props.size;
             return state.widgetConfig.sizes[0];
@@ -118,6 +119,10 @@ export function useWidgetState<Data = any>(
             ];
         }),
         selectedSelectorType: undefined,
+        pageSize: computed(() => {
+            if (state.options?.pagination_options?.enabled) return state.options.pagination_options.page_size;
+            return undefined;
+        }),
     });
 
     return state;

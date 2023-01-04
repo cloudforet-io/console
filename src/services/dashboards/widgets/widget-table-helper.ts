@@ -48,7 +48,7 @@ export const getWidgetTableDateFields = (
     return dateFields;
 };
 
-export const sortTableDataByDate = (rawData: HistoryDataModel['results']): HistoryDataModel['results'] => {
+export const sortHistoryTableData = (rawData: HistoryDataModel['results']): HistoryDataModel['results'] => {
     const results: HistoryDataModel['results'] = [];
     rawData.forEach((d) => {
         const _usdCostSum = sortBy(d.usd_cost_sum, 'date');
