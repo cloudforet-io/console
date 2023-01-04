@@ -41,7 +41,6 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 
-import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
@@ -94,7 +93,6 @@ const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
     ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
     fieldsKey: computed<string>(() => SELECTOR_TYPE_FIELDS_KEY_MAP[state.selectedSelectorType]),
-    chart: null as null | XYChart,
     chartData: computed<XYChartData[]>(() => {
         const valueKey = `${state.fieldsKey}_sum`;
         return getRefinedXYChartData(state.data, state.groupBy, DATE_FIELD_NAME, valueKey);
@@ -103,7 +101,7 @@ const state = reactive({
         if (!state.groupBy) return [];
         const _textOptions: Field['textOptions'] = {
             type: state.fieldsKey === 'usd_cost' ? 'cost' : 'size',
-            sourceUnit: 'GB',
+            sourceUnit: USAGE_SOURCE_UNIT,
         };
         const refinedFields = getWidgetTableDateFields(state.granularity, state.dateRange, _textOptions, state.fieldsKey);
         return [
@@ -131,7 +129,11 @@ const getRefinedTableData = (results: HistoryDataModel['results']): HistoryDataM
 const fetchData = async (): Promise<HistoryDataModel['results']> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters([{ k: state.groupBy, v: ['data-transfer.out', 'data-transfer.in', 'data-transfer.etc'], o: '' }]);
+        apiQueryHelper.setFilters([
+            { k: state.groupBy, v: ['data-transfer.out', 'data-transfer.in', 'data-transfer.etc'], o: '' },
+            { k: 'product', v: 'AWSDataTransfer', o: '=' },
+            { k: 'usage_type', v: null, o: '!=' },
+        ]);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.granularity,
