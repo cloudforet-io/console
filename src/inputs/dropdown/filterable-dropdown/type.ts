@@ -1,4 +1,3 @@
-import type { ContextMenuFixedStyleProps } from '@/hooks/context-menu-fixed-style';
 import type { MenuItem } from '@/inputs/context-menu/type';
 
 interface HandlerRes {
@@ -16,7 +15,7 @@ export type FILTERABLE_DROPDOWN_TYPE = typeof FILTERABLE_DROPDOWN_TYPE[keyof typ
 
 export type FilterableDropdownMenuItem = MenuItem;
 
-export interface FilterableDropdownProps extends ContextMenuFixedStyleProps {
+export interface FilterableDropdownProps {
     /* search props */
     value: string;
     placeholder?: string;
@@ -29,6 +28,8 @@ export interface FilterableDropdownProps extends ContextMenuFixedStyleProps {
     loading?: boolean;
     selected?: FilterableDropdownMenuItem[];
     multiSelectable?: boolean;
+    useFixedMenuStyle?: boolean;
+    visibleMenu?: boolean;
     /* extra props */
     type?: FILTERABLE_DROPDOWN_TYPE;
     handler?: AutocompleteHandler;

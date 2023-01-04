@@ -8,12 +8,7 @@ import type { ResizeObserverEntry } from '@juggle/resize-observer';
 import { ResizeObserver } from '@juggle/resize-observer';
 import { throttle } from 'lodash';
 
-export interface ContextMenuFixedStyleProps {
-    useFixedMenuStyle?: boolean;
-    visibleMenu?: boolean;
-}
-
-interface StateArgs {
+interface UseContextMenuFixedStyleOptions {
     useFixedMenuStyle?: ComputedRef<boolean|undefined> | boolean;
     visibleMenu: Ref<boolean|undefined>;
     targetRef?: Ref<Vue|HTMLElement|null>;
@@ -33,7 +28,7 @@ const getScrollableParent = (ele?: Element|null): Element => {
     return isScrollable(ele) ? ele : getScrollableParent(ele.parentElement);
 };
 
-export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu, targetRef }: StateArgs) => {
+export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu, targetRef }: UseContextMenuFixedStyleOptions) => {
     const state = reactive({
         useFixedMenuStyle,
         visibleMenu,
@@ -49,11 +44,12 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu, targe
         if (state.visibleMenu) state.visibleMenu = false;
     }, 300);
 
-    const setStyleOfContextMenu = () => {
-        const targetRects: DOMRect = contextMenuFixedStyleState.targetElement?.getBoundingClientRect();
+    const setStyleOfContextMenu = (targetElement: Element) => {
+        const targetRects: DOMRect = targetElement.getBoundingClientRect();
 
         const contextMenuStyle: Partial<CSSStyleDeclaration> = {
             // overflowY: 'auto',
+            position: 'absolute',
             height: 'auto',
             minHeight: '32px',
         };
@@ -80,41 +76,43 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu, targe
         contextMenuFixedStyleState.contextMenuStyle = contextMenuStyle;
     };
 
-    watch(() => state.visibleMenu, async () => {
-        if (!state.visibleMenu || !contextMenuFixedStyleState.targetRef) {
+    watch([() => state.visibleMenu, () => contextMenuFixedStyleState.targetElement], async ([_visibleMenu, targetElement]) => {
+        if (!_visibleMenu || !targetElement) {
             contextMenuFixedStyleState.contextMenuStyle = {};
+            return;
         }
-
-        await nextTick(); // Needed codes for timing issues between painting DOM and visibleMenu
-
-        setStyleOfContextMenu();
+        if (_visibleMenu && targetElement) {
+            await nextTick(); // Needed codes for timing issues between painting DOM and visibleMenu
+            setStyleOfContextMenu(targetElement);
+        }
     }, { immediate: true });
 
-    if (state.useFixedMenuStyle) {
-        let scrollParent: Element|undefined;
-        watch(() => contextMenuFixedStyleState.targetElement, (targetElement) => {
-            if (targetElement) {
-                scrollParent = getScrollableParent(targetElement.parentElement);
-                if (scrollParent) {
-                    scrollParent.addEventListener('scroll', hideMenu);
-                }
-            } else if (scrollParent) {
-                scrollParent.removeEventListener('scroll', hideMenu);
+    let scrollParent: Element|undefined;
+    watch([() => contextMenuFixedStyleState.targetElement, () => state.useFixedMenuStyle], ([targetElement, _useFixedMenuStyle]) => {
+        if (_useFixedMenuStyle && targetElement) {
+            scrollParent = getScrollableParent(targetElement.parentElement);
+            if (scrollParent) {
+                scrollParent.addEventListener('scroll', hideMenu);
             }
-        });
+        } else if (scrollParent) {
+            scrollParent.removeEventListener('scroll', hideMenu);
+        }
+    });
 
-        onMounted(() => {
-            window.addEventListener('resize', hideMenu);
-        });
+    const handleWindowResize = () => {
+        if (state.useFixedMenuStyle) hideMenu();
+    };
+    onMounted(() => {
+        window.addEventListener('resize', handleWindowResize);
+    });
 
-        onUnmounted(() => {
-            window.removeEventListener('resize', hideMenu);
-        });
-    }
+    onUnmounted(() => {
+        window.removeEventListener('resize', handleWindowResize);
+    });
 
     const observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
-        entries.forEach(() => {
-            setStyleOfContextMenu();
+        entries.forEach((entry) => {
+            setStyleOfContextMenu(entry.target);
         });
     });
 

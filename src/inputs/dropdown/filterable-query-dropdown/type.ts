@@ -1,7 +1,6 @@
-import type { ContextMenuFixedStyleProps } from '@/hooks';
 import type { KeyItemSet, QueryItem, ValueHandlerMap } from '@/inputs/search/query-search/type';
 
-export interface FilterableQueryDropdownProps extends ContextMenuFixedStyleProps {
+export interface FilterableQueryDropdownProps {
     value: string;
     placeholder: string;
     focused: boolean;
@@ -9,4 +8,6 @@ export interface FilterableQueryDropdownProps extends ContextMenuFixedStyleProps
     valueHandlerMap: ValueHandlerMap;
     selected: QueryItem[];
     multiSelectable: boolean;
+    useFixedMenuStyle?: boolean;
+    visibleMenu?: boolean;
 }
