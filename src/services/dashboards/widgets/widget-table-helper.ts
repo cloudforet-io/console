@@ -48,11 +48,11 @@ export const getWidgetTableDateFields = (
     return dateFields;
 };
 
-export const sortHistoryTableData = (rawData: HistoryDataModel['results']): HistoryDataModel['results'] => {
+export const sortTableData = (rawData: HistoryDataModel['results'], sortKey = 'date'): HistoryDataModel['results'] => {
     const results: HistoryDataModel['results'] = [];
     rawData.forEach((d) => {
-        const _usdCostSum = sortBy(d.usd_cost_sum, 'date');
-        const _usageQuantitySum = sortBy(d.usage_quantity_sum, 'date');
+        const _usdCostSum = sortBy(d.usd_cost_sum, sortKey);
+        const _usageQuantitySum = sortBy(d.usage_quantity_sum, sortKey);
         results.push({
             ...d,
             usd_cost_sum: _usdCostSum,
