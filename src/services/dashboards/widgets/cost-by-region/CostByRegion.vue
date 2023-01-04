@@ -122,16 +122,13 @@ const state = reactive({
         { label: 'Cost', name: 'cost' },
     ]),
     tableItems: [],
+    thisPage: 1,
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 const chartContext = ref<HTMLElement|null>(null);
-const {
-    createMapChart, createMapPolygonSeries, createMapPointSeries, createPieChart, createPieSeries,
-    createBullet, createTooltip, setPieTooltipText,
-    disposeRoot, clearChildrenOfRoot,
-} = useAmcharts5(chartContext);
+const chartHelper = useAmcharts5(chartContext);
 
 const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
     setTimeout(() => {
@@ -140,17 +137,17 @@ const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
 });
 
 const drawChart = () => {
-    const chart = createMapChart();
-    const polygonSeries = createMapPolygonSeries();
+    const chart = chartHelper.createMapChart();
+    const polygonSeries = chartHelper.createMapPolygonSeries();
     chart.series.push(polygonSeries);
-    const pointSeries = createMapPointSeries();
+    const pointSeries = chartHelper.createMapPointSeries();
     chart.series.push(pointSeries);
     pointSeries.bullets.push(() => {
-        const pieChart = createPieChart({
+        const pieChart = chartHelper.createPieChart({
             width: 32,
             height: 32,
         });
-        const pieSeries = createPieSeries({
+        const pieSeries = chartHelper.createPieSeries({
             categoryField: 'country',
             valueField: 'sales',
         });
@@ -158,12 +155,12 @@ const drawChart = () => {
         pieSeries.ticks.template.set('forceHidden', true);
         pieChart.series.push(pieSeries);
 
-        const tooltip = createTooltip();
-        setPieTooltipText(pieSeries, tooltip, state.options.currency, props.currencyRates);
+        const tooltip = chartHelper.createTooltip();
+        chartHelper.setPieTooltipText(pieSeries, tooltip, state.options.currency, props.currencyRates);
         pieSeries.slices.template.set('tooltip', tooltip);
 
         pieSeries.data.setAll(SAMPLE_PIE_DATA);
-        return createBullet({
+        return chartHelper.createBullet({
             sprite: pieChart,
         });
     });
@@ -174,14 +171,14 @@ const initWidget = async (data?: Data[]) => {
     state.loading = true;
     state.data = data ?? await fetchData();
     await nextTick();
-    clearChildrenOfRoot();
+    chartHelper.clearChildrenOfRoot();
     drawChart();
     state.loading = false;
     return state.data;
 };
 
 useWidgetLifecycle({
-    disposeWidget: disposeRoot,
+    disposeWidget: chartHelper.disposeRoot,
 });
 
 defineExpose<WidgetExpose>({
