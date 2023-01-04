@@ -78,6 +78,24 @@ export const getButtonArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    readonly: {
+        name: 'readonly',
+        type: { name: 'boolean' },
+        description: 'Whether to make readonly or not',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     loading: {
         name: 'loading',
         type: { name: 'boolean' },

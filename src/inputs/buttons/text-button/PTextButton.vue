@@ -5,6 +5,7 @@
                 [size]: true,
                 loading: !!loading,
                 disabled: !!disabled,
+                readonly
             } "
             v-on="{
                 ...$listeners,
@@ -95,6 +96,10 @@ export default defineComponent<TextButtonProps>({
             type: Boolean,
             default: false,
         },
+        readonly: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const state = reactive({
@@ -117,7 +122,7 @@ export default defineComponent<TextButtonProps>({
     text-align: center;
     padding: 0 0.25rem;
 
-    &:hover {
+    &:not(.disabled):not(.readonly)&:hover {
         cursor: pointer;
         text-decoration: underline;
         text-underline-offset: 2px;
@@ -152,6 +157,10 @@ export default defineComponent<TextButtonProps>({
     }
     &.disabled {
         @apply text-gray-400;
+        cursor: not-allowed;
+        text-decoration: none;
+    }
+    &.readonly {
         cursor: not-allowed;
         text-decoration: none;
     }

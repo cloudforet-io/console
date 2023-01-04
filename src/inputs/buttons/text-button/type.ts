@@ -20,4 +20,5 @@ export interface TextButtonProps {
     iconRight?: string;
     loading?: boolean;
     disabled?: boolean;
+    readonly?: boolean;
 }

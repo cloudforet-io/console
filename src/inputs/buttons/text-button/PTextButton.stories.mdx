@@ -24,6 +24,7 @@ export const Template = (args, {argTypes})=>({
                 :loading="loading"
                 :icon-left="iconLeft"
                 :icon-right="iconRight"
+                :readonly="readonly"
             >
                 {{$props.default}}
             </p-text-button>
@@ -109,25 +110,6 @@ export const Template = (args, {argTypes})=>({
     </Story>
 </Canvas>
 
-
-## Disabled
-<Canvas>
-    <Story name='Disabled'>
-        {{
-            components:{ PTextButton },
-            template: `
-                <div style="display:flex; align-items:center; justify-content:center;">
-                    <p-text-button>
-                        normal
-                    </p-text-button>
-                    <p-text-button disabled>
-                        disabled
-                    </p-text-button>
-                </div>`,
-        }}
-    </Story>
-</Canvas>
-
 ## Loading
 <Canvas>
     <Story name='Loading'>
@@ -142,6 +124,47 @@ export const Template = (args, {argTypes})=>({
         }}
     </Story>
 </Canvas>
+
+## Readonly & Disabled
+<Canvas>
+    <Story name='Readonly & Disabled'>
+        {{
+            components:{ PTextButton },
+            template: `
+                <div class="flex flex-col">
+                    <div class="py-4">
+                        <p class="mb-3 font-bold">default style type: </p>
+                        <div class="flex items-center gap-4">
+                            <p-text-button>
+                                normal
+                            </p-text-button>
+                            <p-text-button disabled>
+                                disabled
+                            </p-text-button>
+                            <p-text-button readonly>
+                                readonly
+                            </p-text-button>
+                        </div>
+                    </div>
+                    <div class="py-4">
+                        <p class="mb-3 font-bold">highlight style type: </p>
+                       <div class="flex items-center gap-4">
+                           <p-text-button style-type="highlight">
+                               normal
+                           </p-text-button>
+                           <p-text-button disabled style-type="highlight">
+                               disabled
+                           </p-text-button>
+                           <p-text-button readonly style-type="highlight">
+                               readonly
+                           </p-text-button>
+                        </div>
+                    </div>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
 
 
 ## Playground

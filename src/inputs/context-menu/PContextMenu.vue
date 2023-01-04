@@ -17,6 +17,7 @@
                     <p-button size="sm"
                               style-type="primary"
                               :disabled="!state.proxySelected.length"
+                              :readonly="readonly"
                               @click="$emit('click-done', $event)"
                     >
                         {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
@@ -44,6 +45,7 @@
                                class="clear-all-wrapper"
                                style-type="highlight"
                                size="sm"
+                               :readonly="readonly"
                                @click.stop="handleClickClearSelection"
                 >
                     {{ $t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }} ({{ state.selectedCount }})
@@ -58,6 +60,7 @@
                                              :link="item.link"
                                              :target="item.target"
                                              :disabled="item.disabled"
+                                             :readonly="readonly"
                                              :selected="!props.noSelectIndication && state.selectedNameMap[item.name] !== undefined"
                                              :select-marker="props.multiSelectable ? 'checkbox' : (props.showRadioIcon ? 'radio' : undefined)"
                                              :ellipsis="props.itemHeightFixed"
@@ -103,6 +106,7 @@
                                       style-type="secondary"
                                       :block="true"
                                       :icon-left="item.icon"
+                                      :readonly="readonly"
                                       @click="$emit('click-button', item, index, $event)"
                             >
                                 {{ item.label }}
@@ -186,6 +190,7 @@ interface ContextMenuProps {
     showClearSelection?: boolean;
     searchable?: boolean;
     searchText?: string;
+    readonly?: boolean;
 }
 interface ContextMenuEmits {
     (e: 'update:selected', selected: MenuItem[]): void,
@@ -205,6 +210,7 @@ const props = withDefaults(defineProps<ContextMenuProps>(), {
     selected: () => [],
     highlightTerm: '',
     searchText: '',
+    readonly: false,
 });
 const emit = defineEmits<ContextMenuEmits>();
 const slots = useSlots();
@@ -273,6 +279,7 @@ const onKeyDown = (idx?: number) => {
 };
 const onClickMenu = (item: MenuItem, index) => {
     if (item.disabled) return;
+    if (props.readonly) return;
 
     if (props.multiSelectable) {
         if (state.selectedNameMap[item.name ?? ''] !== undefined) {

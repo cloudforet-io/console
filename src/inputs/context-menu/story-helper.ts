@@ -278,6 +278,24 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                 type: 'text',
             },
         },
+        readonly: {
+            name: 'readonly',
+            type: { name: 'boolean' },
+            description: 'Whether to make readonly or not.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: false,
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         ...getArgTypes('slots', contextMenuSlots),
         ...getArgTypes('events', contextMenuEvents),
     };

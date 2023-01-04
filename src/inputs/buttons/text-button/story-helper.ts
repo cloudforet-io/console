@@ -117,6 +117,24 @@ export const getTextButtonArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    readonly: {
+        name: 'readonly',
+        type: { name: 'boolean' },
+        description: 'Whether to make readonly or not',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     // slots
     default: {
         name: 'default',

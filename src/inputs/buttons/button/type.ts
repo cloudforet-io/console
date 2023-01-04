@@ -23,6 +23,7 @@ export type ButtonSize = typeof BUTTON_SIZE[keyof typeof BUTTON_SIZE];
 export interface ButtonProps {
     href?: string;
     disabled?: boolean;
+    readonly?: boolean;
     loading?: boolean;
     styleType?: ButtonStyle;
     size?: ButtonSize;

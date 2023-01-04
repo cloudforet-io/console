@@ -8,11 +8,12 @@
                    'loading': !!loading,
                    'block': !!block,
                    'disabled': !!disabled,
+                   readonly
                } "
                v-on="{
                    ...$listeners,
                    click: (event) => {
-                       if (!disabled && !loading) {
+                       if (!disabled && !readonly && !loading) {
                            if (!$listeners.click) return;
 
                            if (typeof $listeners.click === 'function') $listeners.click(event);
@@ -111,6 +112,10 @@ export default defineComponent<ButtonProps>({
             type: Boolean,
             default: false,
         },
+        readonly: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -140,7 +145,7 @@ export default defineComponent<ButtonProps>({
         background-color: $default-color;
         color: $text-color;
         border-color: $border-color;
-        &:hover {
+        &:not(.readonly):hover {
             background-color: $hover-color;
             &:active {
                 background-color: $active-color;
@@ -152,6 +157,9 @@ export default defineComponent<ButtonProps>({
             &:hover, &:active {
                 @apply bg-gray-200;
             }
+        }
+        &.readonly {
+            cursor: not-allowed;
         }
     }
 }

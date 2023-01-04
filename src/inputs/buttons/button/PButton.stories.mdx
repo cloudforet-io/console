@@ -23,6 +23,7 @@ export const Template = (args, {argTypes})=>({
                 :styleType="styleType"
                 :size="size"
                 :disabled="disabled"
+                :readonly="readonly"
                 :loading="loading"
                 :block="block"
                 :icon-left="iconLeft"
@@ -211,6 +212,31 @@ export const Template = (args, {argTypes})=>({
                         size="sm"
                     >
                         <div>Block, size: sm</div>
+                    </p-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Readonly
+<Canvas>
+    <Story name='Readonly' height='150px'>
+        {{
+            components:{ PButton, PLottie },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
+                    <p-button
+                        styleType="primary"
+                        :readonly="true"
+                    >
+                            Readonly
+                    </p-button>
+                    <p-button
+                        styleType="secondary"
+                        :readonly="true"
+                        class="mx-2"
+                    >
+                        Readonly
                     </p-button>
                 </div>`,
         }}
