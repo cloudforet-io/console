@@ -133,10 +133,10 @@ export const getContextMenuArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
-        showRadioIcon: {
-            name: 'showRadioIcon',
+        showSelectMarker: {
+            name: 'showSelectMarker',
             type: { name: 'boolean' },
-            description: 'Whether to show radio button icon or not.',
+            description: 'Whether to show checkbox or radio icon or not.',
             defaultValue: false,
             table: {
                 type: {

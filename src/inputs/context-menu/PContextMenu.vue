@@ -62,7 +62,7 @@
                                              :disabled="item.disabled"
                                              :readonly="readonly"
                                              :selected="!props.noSelectIndication && state.selectedNameMap[item.name] !== undefined"
-                                             :select-marker="props.multiSelectable ? 'checkbox' : (props.showRadioIcon ? 'radio' : undefined)"
+                                             :select-marker="props.showSelectMarker ? props.multiSelectable ? 'checkbox' : 'radio' : undefined"
                                              :ellipsis="props.itemHeightFixed"
                                              :highlight-term="state.proxySearchText || props.highlightTerm"
                                              :tabindex="index"
@@ -181,7 +181,7 @@ interface ContextMenuProps {
     loading?: boolean;
     selected?: MenuItem[];
     multiSelectable?: boolean;
-    showRadioIcon?: boolean;
+    showSelectMarker?: boolean;
     strictSelectMode?: boolean;
     itemHeightFixed?: boolean;
     highlightTerm?: string;

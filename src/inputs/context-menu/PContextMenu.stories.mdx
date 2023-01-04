@@ -32,7 +32,7 @@ export const Template = (args, { argTypes }) => ({
             :loading="loading"
             :selected="selected"
             :multi-selectable="multiSelectable"
-            :show-radio-icon="showRadioIcon"
+            :show-select-marker="showSelectMarker"
             :strict-select-mode="strictSelectMode"
             :item-height-fixed="itemHeightFixed"
             :highlight-term="highlightTerm"
@@ -139,43 +139,45 @@ Each `MenuItem` has the following type to represent it:
 <br/>
 <br/>
 
-## Show Radio Icon
+## Multi Selectable & Show Select Marker
 
 <Canvas>
-    <Story name="Show Radio Icon" args={{menu: menuItems}} height={'18rem'}>
-        {{
-            props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu },
-            template: `
-        <p-context-menu :menu="menu" :show-radio-icon="true" />
-`,
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Multi Selectable
-
-<Canvas>
-    <Story name="Multi Selectable" args={{menu: menuItems}} height={'20rem'}>
+    <Story name=" Multi Selectable & Show Select Marker" args={{menu: menuItems}} height={'18rem'}>
         {{
             props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu },
             template: `
         <div>
-            <p-context-menu :menu="menu" :multi-selectable="true" :selected="selected" />
+            <p class="text-label-lg font-bold mb-3">Single select without marker</p>
+            <p-context-menu :menu="menu" :selected.sync="singleSelected"/>
             <br/>
-            <p>Selected: {{ selected }}</p>
+            <p class="text-label-lg font-bold mb-3">Single select with marker</p>
+            <p-context-menu :menu="menu" :selected.sync="singleSelected" show-select-marker />
+            <br/>
+            <p class="text-label-lg font-bold mb-3">Mutli select without marker</p>
+            <p-context-menu :menu="menu" :selected.sync="multiSelected" multi-selectable />
+            <br/>
+            <p class="text-label-lg font-bold mb-3">Mutli select with marker</p>
+            <p-context-menu :menu="menu" :selected.sync="multiSelected" multi-selectable show-select-marker />
+            <br/>
         </div>
 `,
+            setup() {
+                const state = reactive({
+                    singleSelected: [],
+                    multiSelected: [],
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
         }}
     </Story>
 </Canvas>
 
 <br/>
 <br/>
+
 
 ## Slots
 
@@ -442,7 +444,7 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
             Use Strict Select Mode: <strong> {{strictSelectMode ? 'On' : 'Off' }}</strong> <p-toggle-button :value="strictSelectMode" @change="onChange" />
         </p>
         <div class="m-4">
-            <p class="m-2 font-bold">multiSelectable: false, showRadioIcon: true</p>
+            <p class="m-2 font-bold">multiSelectable: false, showSelectMarker: true</p>
             <div class="m-2">
                 <p class="mb-2">Selected:</p>
                 <pre class="p-2 text-xs bg-gray-100 leading-3">{{singleSelected}}</pre>
@@ -452,7 +454,7 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
                 :menu="menu"
                 :selected.sync="singleSelected"
                 :strict-select-mode="strictSelectMode"
-                show-radio-icon
+                show-select-marker
             />
         </div>
         <div class="m-4">
@@ -588,7 +590,7 @@ It works only in multi select case.
             props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu },
             template: `
-        <p-context-menu :menu="menu" show-clear-selection multi-selectable />
+        <p-context-menu :menu="menu" show-clear-selection multi-selectable show-select-marker />
 `,
         }}
     </Story>
@@ -611,7 +613,7 @@ It works only in multi select case.
             Next items exist: <p-toggle-button :value="hasMore" @change="hasMore = !hasMore"/>
         </div>
     </div>
-    <p-context-menu :menu="menu" show-clear-selection multi-selectable
+    <p-context-menu :menu="menu" show-clear-selection multi-selectable show-select-marker
         :loading="loading"
         @click-show-more="handleClickShowMore"
     />
@@ -716,7 +718,7 @@ It works only in multi select case.
             props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu },
             template: `
-        <p-context-menu :menu="menu" readonly show-clear-selection multi-selectable />
+        <p-context-menu :menu="menu" readonly show-clear-selection multi-selectable show-select-marker />
 `,
         }}
     </Story>

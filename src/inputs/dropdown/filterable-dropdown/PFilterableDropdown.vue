@@ -5,7 +5,7 @@
     >
         <p-search ref="targetRef"
                   :value="state.proxyValue"
-                  :placeholder="state.placeholderValue ? state.placeholderValue : $t('COMPONENT.FILTERABLE_DROPDOWN.PLACEHOLDER')"
+                  :placeholder="state.placeholderValue ? state.placeholderValue : $t('COMPONENT.FILTERABLE_DROPDOWN.SINGLE_PLACEHOLDER')"
                   disable-icon
                   :is-focused.sync="state.proxyIsFocused"
                   :invalid="invalid"
@@ -82,7 +82,7 @@
                         :selected.sync="state.proxySelected"
                         :multi-selectable="multiSelectable"
                         :show-select-header="multiSelectable"
-                        :show-radio-icon="state.filterableDropdownType === FILTERABLE_DROPDOWN_TYPE.radioButton"
+                        :show-select-marker="state.filterableDropdownType === FILTERABLE_DROPDOWN_TYPE.radioButton"
                         :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
                         :class="state.filterableDropdownType"
                         @select="handleSelectMenuItem"
