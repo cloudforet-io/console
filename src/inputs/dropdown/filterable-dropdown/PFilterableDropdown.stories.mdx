@@ -1,8 +1,7 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import { getCurrentInstance, reactive, toRefs } from 'vue';
+import { reactive, toRefs } from 'vue';
 import Fuse from 'fuse.js'
-
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import {useProxyValue} from "@/hooks/proxy-state";
 import PFilterableDropdown from './PFilterableDropdown.vue';
 import PButton from '@/inputs/buttons/button/PButton';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
@@ -50,12 +49,11 @@ export const Template = (args, { argTypes }) => ({
         >
         </p-filterable-dropdown>
     `,
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy
+    setup(props, {emit}) {
         const state = reactive({
-            proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, props.visibleMenu),
-            proxySelected: makeOptionalProxy('selected', vm, props.selected),
-            proxyPlaceholder: makeOptionalProxy('placeholder', vm, props.placeholder),
+            proxyVisibleMenu: useProxyValue('visibleMenu', props, emit),
+            proxySelected: useProxyValue('selected', props, emit),
+            proxyPlaceholder: useProxyValue('placeholder', props, emit),
         })
         return {
             ...toRefs(state)
@@ -71,12 +69,14 @@ export const Template = (args, { argTypes }) => ({
 ## Basic
 
 <Canvas>
-    <Story name="Basic" args={{menu: getSearchDropdownMenu()}}>
+    <Story name="Basic" args={{menu: getSearchDropdownMenu()}} height={'400px'}>
         {{
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown },
             template: `
-        <p-filterable-dropdown :menu="menu" use-fixed-menu-style />
+<div class="h-full w-full overflow p-8">
+        <p-filterable-dropdown :menu="menu"  />
+</div>
 `,
         }}
     </Story>
@@ -88,12 +88,12 @@ export const Template = (args, { argTypes }) => ({
 ## With Header
 
 <Canvas>
-    <Story name="With Header" args={{menu: getSearchDropdownMenuWithMultiTypes()}}>
+    <Story name="With Header" args={{menu: getSearchDropdownMenuWithMultiTypes()}} height={'400px'}>
         {{
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown, PButton },
             template: `
-        <p-filterable-dropdown :menu="menu" use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" />
 `,
         }}
     </Story>
@@ -105,11 +105,11 @@ export const Template = (args, { argTypes }) => ({
 ## Using Handler
 
 <Canvas>
-    <Story name="Using Handler" >
+    <Story name="Using Handler" height={'400px'}>
         {{
             components: { PFilterableDropdown, PButton },
             template: `
-            <p-filterable-dropdown :loading="loading" :handler="simpleHandler" use-fixed-menu-style />
+            <p-filterable-dropdown :loading="loading" :handler="simpleHandler" />
 `,
             setup() {
                 const state = reactive({
@@ -151,7 +151,7 @@ export const Template = (args, { argTypes }) => ({
 ## Use Fixed Menu Style
 
 <Canvas>
-    <Story name="Use Fixed Menu Style" >
+    <Story name="Use Fixed Menu Style">
         {{
             components: { PFilterableDropdown, PToggleButton },
             template: `
@@ -195,12 +195,12 @@ export const Template = (args, { argTypes }) => ({
 ## Invalid
 
 <Canvas>
-    <Story name="Invalid" args={{menu: getSearchDropdownMenu()}}>
+    <Story name="Invalid" args={{menu: getSearchDropdownMenu()}} height={'400px'}>
         {{
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown },
             template: `
-        <p-filterable-dropdown :menu="menu" invalid use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" invalid />
 `,
         }}
     </Story>
@@ -212,12 +212,12 @@ export const Template = (args, { argTypes }) => ({
 ## Disabled
 
 <Canvas>
-    <Story name="Disabled" args={{menu: getSearchDropdownMenu()}}>
+    <Story name="Disabled" args={{menu: getSearchDropdownMenu()}} height={'400px'}>
         {{
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown },
             template: `
-        <p-filterable-dropdown :menu="menu" disabled use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" disabled />
 `,
         }}
     </Story>
@@ -229,7 +229,7 @@ export const Template = (args, { argTypes }) => ({
 ## Readonly
 
 <Canvas>
-    <Story name="Readonly" args={{menu: getSearchDropdownMenu()}}>
+    <Story name="Readonly" args={{menu: getSearchDropdownMenu()}} height={'400px'}>
         {{
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown },
@@ -238,7 +238,6 @@ export const Template = (args, { argTypes }) => ({
             :menu="menu"
             :readonly="true"
             type="radioButton"
-            use-fixed-menu-style
         />
 `,
         }}
@@ -252,12 +251,12 @@ export const Template = (args, { argTypes }) => ({
 ## Radio Button Type
 
 <Canvas>
-    <Story name="Radio Button Type" args={{menu: getSearchDropdownMenu()}}>
+    <Story name="Radio Button Type" args={{menu: getSearchDropdownMenu()}} height={'400px'}>
         {{
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown },
             template: `
-        <p-filterable-dropdown :menu="menu" type="radioButton" use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" type="radioButton" />
 `,
         }}
     </Story>
@@ -269,12 +268,12 @@ export const Template = (args, { argTypes }) => ({
 ## Multi Selectable
 
 <Canvas>
-    <Story name="Multi Selectable" args={{menu: getSearchDropdownMenu()}}>
+    <Story name="Multi Selectable" args={{menu: getSearchDropdownMenu()}} height={'400px'}>
         {{
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown },
             template: `
-        <p-filterable-dropdown :menu="menu" :multi-selectable="true" use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" :multi-selectable="true" />
 `,
         }}
     </Story>
@@ -286,12 +285,12 @@ export const Template = (args, { argTypes }) => ({
 ## Multi Selectable With no Delete All Button
 
 <Canvas>
-    <Story name="Multi Selectable With no Delete All Button" args={{menu: getSearchDropdownMenu()}}>
+    <Story name="Multi Selectable With no Delete All Button" args={{menu: getSearchDropdownMenu()}} height={'400px'}>
         {{
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown },
             template: `
-        <p-filterable-dropdown :menu="menu" :multi-selectable="true" :disable-delete-all="true" use-fixed-menu-style />
+        <p-filterable-dropdown :menu="menu" :multi-selectable="true" :disable-delete-all="true" />
 `,
         }}
     </Story>
@@ -303,7 +302,7 @@ export const Template = (args, { argTypes }) => ({
 ## Strict Select Mode
 
 <Canvas>
-    <Story name="Strict Select Mode">
+    <Story name="Strict Select Mode" height={'400px'}>
         {{
             components: { PFilterableDropdown, PToggleButton },
             template: `
@@ -318,7 +317,6 @@ export const Template = (args, { argTypes }) => ({
                 :menu="menu"
                 :selected="defaultSelected"
                 :strict-select-mode="strictSelectMode"
-                use-fixed-menu-style
             />
         </div>
         <div class=m-4>
@@ -329,7 +327,6 @@ export const Template = (args, { argTypes }) => ({
                 type="radioButton"
                 :selected="radioSelected"
                 :strict-select-mode="strictSelectMode"
-                use-fixed-menu-style
             />
         </div>
         <div class=m-4>
@@ -340,7 +337,6 @@ export const Template = (args, { argTypes }) => ({
                 :multi-selectable="true"
                 :selected="checkboxSelected"
                 :strict-select-mode="strictSelectMode"
-                use-fixed-menu-style
             />
         </div>
     </div>
@@ -377,7 +373,7 @@ export const Template = (args, { argTypes }) => ({
 ## Playground
 
 <Canvas>
-    <Story name="playground" args={{menu: getSearchDropdownMenu()}} height={'300px'}>
+    <Story name="playground" args={{menu: getSearchDropdownMenu()}} height={'400px'}>
         {Template.bind({})}
     </Story>
 </Canvas>

@@ -14,27 +14,3 @@ export const FILTERABLE_DROPDOWN_TYPE = Object.freeze({
 export type FILTERABLE_DROPDOWN_TYPE = typeof FILTERABLE_DROPDOWN_TYPE[keyof typeof FILTERABLE_DROPDOWN_TYPE];
 
 export type FilterableDropdownMenuItem = MenuItem;
-
-export interface FilterableDropdownProps {
-    /* search props */
-    value: string;
-    placeholder?: string;
-    isFocused?: boolean;
-    invalid?: boolean;
-    disabled?: boolean;
-    readonly?: boolean;
-    /* context menu props */
-    menu: MenuItem[];
-    loading?: boolean;
-    selected?: FilterableDropdownMenuItem[];
-    multiSelectable?: boolean;
-    useFixedMenuStyle?: boolean;
-    visibleMenu?: boolean;
-    /* extra props */
-    type?: FILTERABLE_DROPDOWN_TYPE;
-    handler?: AutocompleteHandler;
-    disableHandler?: boolean;
-    exactMode?: boolean;
-    strictSelectMode?: boolean;
-    disableDeleteAll?: boolean;
-}
