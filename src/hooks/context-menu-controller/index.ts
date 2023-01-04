@@ -1,4 +1,4 @@
-import type { ComputedRef, Ref } from 'vue';
+import type { ComponentPublicInstance, ComputedRef, Ref } from 'vue';
 import type Vue from 'vue';
 import { reactive, toRef } from 'vue';
 
@@ -6,10 +6,11 @@ import type { PContextMenu } from '@/components';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import type { MenuItem } from '@/inputs/context-menu/type';
 
+type ContextMenuComponent = ComponentPublicInstance<typeof PContextMenu>;
 export interface UseContextMenuControllerOptions {
     visibleMenu?: Ref<boolean>|boolean;
     targetRef: Ref<HTMLElement|Vue|null>;
-    contextMenuRef: Ref<typeof PContextMenu|null>;
+    contextMenuRef: Ref<ContextMenuComponent|null>;
 
     /*
     Useful when used inside an element whose css position attribute value is fixed.
@@ -85,7 +86,9 @@ export const useContextMenuController = ({
     };
 
     const focusOnContextMenu: FocusOnContextMenu = async (position?: number) => {
-        if (state.contextMenuRef) state.contextMenuRef.focus(position);
+        if (state.contextMenuRef) {
+            state.contextMenuRef.focus(position);
+        }
     };
 
     const reorderMenuBySelection: ReorderMenuBySelection = (_selected: MenuItem[] = state.selected, origin: MenuItem[] = state.originMenu): MenuItem[] => {

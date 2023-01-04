@@ -19,19 +19,3 @@ export interface MenuItem {
     target?: string;
     icon?: string;
 }
-
-export interface ContextMenuProps {
-    menu: MenuItem[];
-    loading?: boolean;
-    selected?: MenuItem[];
-    multiSelectable?: boolean;
-    showRadioIcon?: boolean;
-    strictSelectMode?: boolean;
-    itemHeightFixed?: boolean;
-    highlightTerm?: string;
-    noSelectIndication?: boolean;
-    showSelectHeader?: boolean;
-    showClearSelection?: boolean;
-    searchable?: boolean;
-    searchText?: string;
-}

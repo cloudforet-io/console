@@ -3,30 +3,30 @@
          @keyup.esc="onClickEsc"
     >
         <div class="menu-container">
-            <slot v-show="menu.length > 0"
+            <slot v-show="props.menu.length > 0"
                   name="menu"
-                  v-bind="{...$props}"
+                  v-bind="{...props}"
             >
-                <div v-if="showSelectHeader && multiSelectable"
+                <div v-if="props.showSelectHeader && props.multiSelectable"
                      class="selected-list-wrapper"
                 >
                     <div>
                         <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
-                        <span class="pl-2">({{ selectedCount }})</span>
+                        <span class="pl-2">({{ state.selectedCount }})</span>
                     </div>
                     <p-button size="sm"
                               style-type="primary"
-                              :disabled="!proxySelected.length"
+                              :disabled="!state.proxySelected.length"
                               @click="$emit('click-done', $event)"
                     >
                         {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
                     </p-button>
                 </div>
-                <div v-if="searchable"
+                <div v-if="props.searchable"
                      class="search-wrapper"
                 >
-                    <p-search :value="proxySearchText"
-                              :is-focused.sync="isFocusedOnSearch"
+                    <p-search :value="state.proxySearchText"
+                              :is-focused.sync="state.isFocusedOnSearch"
                               @update:value="handleUpdateSearchText"
                               @keydown.up.native="onKeyUp()"
                               @keydown.down.native="onKeyDown()"
@@ -40,16 +40,16 @@
                         </template>
                     </p-search>
                 </div>
-                <p-text-button v-if="showClearSelection && multiSelectable"
+                <p-text-button v-if="props.showClearSelection && props.multiSelectable"
                                class="clear-all-wrapper"
                                style-type="highlight"
                                size="sm"
                                @click.stop="handleClickClearSelection"
                 >
-                    {{ $t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }} ({{ selectedCount }})
+                    {{ $t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }} ({{ state.selectedCount }})
                 </p-text-button>
                 <slot name="items">
-                    <template v-for="(item, index) in menu">
+                    <template v-for="(item, index) in props.menu">
                         <p-context-menu-item v-if="item.type === undefined || item.type === 'item'"
                                              :id="getItemId(index)"
                                              :key="`item-${item.name}-${index}`"
@@ -58,10 +58,10 @@
                                              :link="item.link"
                                              :target="item.target"
                                              :disabled="item.disabled"
-                                             :selected="!noSelectIndication && selectedNameMap[item.name] !== undefined"
-                                             :select-marker="multiSelectable ? 'checkbox' : (showRadioIcon ? 'radio' : undefined)"
-                                             :ellipsis="itemHeightFixed"
-                                             :highlight-term="proxySearchText || highlightTerm"
+                                             :selected="!props.noSelectIndication && state.selectedNameMap[item.name] !== undefined"
+                                             :select-marker="props.multiSelectable ? 'checkbox' : (props.showRadioIcon ? 'radio' : undefined)"
+                                             :ellipsis="props.itemHeightFixed"
+                                             :highlight-term="state.proxySearchText || props.highlightTerm"
                                              :tabindex="index"
                                              @click.stop="onClickMenu(item, index, $event)"
                                              @keyup.enter="onClickMenu(item, index, $event)"
@@ -70,12 +70,12 @@
                         >
                             <template #default>
                                 <slot name="item--format"
-                                      v-bind="{...$props, item, index}"
+                                      v-bind="{...props, item, index}"
                                 />
                             </template>
                             <template #text-list="{text, matched, textList, regex, index: textIndex}">
                                 <slot name="item-text-list"
-                                      v-bind="{...$props, item, index, text, matched, textList, regex, textIndex}"
+                                      v-bind="{...props, item, index, text, matched, textList, regex, textIndex}"
                                 />
                             </template>
                         </p-context-menu-item>
@@ -85,7 +85,7 @@
                         />
                         <slot v-else-if="item.type==='header'"
                               :name="`header-${item.name}`"
-                              v-bind="{...$props, item, key: index}"
+                              v-bind="{...props, item, key: index}"
                         >
                             <div :key="index"
                                  class="context-header"
@@ -123,7 +123,7 @@
                         </div>
                     </template>
                 </slot>
-                <div v-if="$slots.bottom"
+                <div v-if="slots.bottom"
                      class="bottom-slot-area"
                 >
                     <slot name="bottom" />
@@ -133,7 +133,7 @@
                  class="no-data"
             >
                 <slot name="no-data-format"
-                      v-bind="{...$props}"
+                      v-bind="{...props}"
                 >
                     {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
                 </slot>
@@ -148,10 +148,9 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
+<script setup lang="ts">
 import {
-    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
+    computed, onUnmounted, reactive, useSlots, watch,
 } from 'vue';
 
 import { reduce } from 'lodash';
@@ -162,10 +161,8 @@ import { useProxyValue } from '@/hooks/proxy-state';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PTextButton from '@/inputs/buttons/text-button/PTextButton.vue';
 import PContextMenuItem from '@/inputs/context-menu/context-menu-item/PContextMenuItem.vue';
-import type { ContextMenuProps, MenuItem } from '@/inputs/context-menu/type';
+import type { MenuItem } from '@/inputs/context-menu/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
-import { i18n } from '@/translations';
-
 
 const getFilteredSelectedItems = (selected: MenuItem[], menu: MenuItem[]): MenuItem[] => {
     const filtered = selected.filter((d) => menu.find((item) => item.name === d.name));
@@ -175,200 +172,161 @@ const getFilteredSelectedItems = (selected: MenuItem[], menu: MenuItem[]): MenuI
 
 const FOCUS_GROUP_ID = 'context-item';
 
-export default defineComponent<ContextMenuProps>({
-    name: 'PContextMenu',
-    components: {
-        PSearch,
-        PTextButton,
-        PSpinner,
-        PContextMenuItem,
-        PButton,
-    },
-    i18n,
-    props: {
-        menu: {
-            type: Array as PropType<MenuItem[]>,
-            default: () => [],
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        selected: {
-            type: Array as PropType<MenuItem[]>,
-            default: () => [],
-        },
-        multiSelectable: {
-            type: Boolean,
-            default: false,
-        },
-        showRadioIcon: {
-            type: Boolean,
-            default: false,
-        },
-        strictSelectMode: {
-            type: Boolean,
-            default: false,
-        },
-        itemHeightFixed: {
-            type: Boolean,
-            default: false,
-        },
-        highlightTerm: {
-            type: String,
-            default: '',
-        },
-        noSelectIndication: {
-            type: Boolean,
-            default: false,
-        },
-        showSelectHeader: {
-            type: Boolean,
-            default: false,
-        },
-        showClearSelection: {
-            type: Boolean,
-            default: false,
-        },
-        searchable: {
-            type: Boolean,
-            default: false,
-        },
-        searchText: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props, { emit, slots }) {
-        const state = reactive({
-            proxySearchText: props.searchText ?? '',
-            isFocusedOnSearch: false,
-            proxySelected: useProxyValue<MenuItem[]>('selected', props, emit),
-            selectedNameMap: computed<Record<string, number>>(() => {
-                const selectedMap = {};
-                state.proxySelected.forEach((item, idx) => {
-                    selectedMap[item.name] = idx;
-                });
-                return selectedMap;
-            }),
-            selectableMenuItems: computed(() => props.menu.filter((d) => !d.disabled && (d.type === undefined || d.type === 'item'))),
-            selectedCount: computed(() => {
-                if (props.strictSelectMode) return state.selectableMenuItems.filter((d) => state.selectedNameMap[d.name] !== undefined).length;
-                return state.proxySelected.length;
-            }),
-            menuItemLength: computed(() => props.menu.filter((d) => d.type === undefined || d.type === 'item').length),
+interface ContextMenuProps {
+    menu: MenuItem[];
+    loading?: boolean;
+    selected?: MenuItem[];
+    multiSelectable?: boolean;
+    showRadioIcon?: boolean;
+    strictSelectMode?: boolean;
+    itemHeightFixed?: boolean;
+    highlightTerm?: string;
+    noSelectIndication?: boolean;
+    showSelectHeader?: boolean;
+    showClearSelection?: boolean;
+    searchable?: boolean;
+    searchText?: string;
+}
+interface ContextMenuEmits {
+    (e: 'update:selected', selected: MenuItem[]): void,
+    (e: 'focus', focusedIdx?: number): void,
+    (e: 'blur'): void,
+    (e: 'keyup:up:end'): void,
+    (e: 'keyup:down:end'): void,
+    (e: 'select', item: MenuItem, index: number): void,
+    (e: 'update:search-text', searchText: string): void,
+    (e: 'keyup:esc', mouseEvent: MouseEvent): void,
+    (e: 'click-button', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
+    (e: 'click-done', mouseEvent: MouseEvent): void,
+    (e: 'click-show-more', item: MenuItem, index: number, mouseEvent: MouseEvent): void,
+}
+const props = withDefaults(defineProps<ContextMenuProps>(), {
+    menu: () => [],
+    selected: () => [],
+    highlightTerm: '',
+    searchText: '',
+});
+const emit = defineEmits<ContextMenuEmits>();
+const slots = useSlots();
+
+const state = reactive({
+    proxySearchText: props.searchText ?? '',
+    isFocusedOnSearch: false,
+    proxySelected: useProxyValue<MenuItem[], ContextMenuProps, ContextMenuEmits>('selected', props, emit),
+    selectedNameMap: computed<Record<string, number>>(() => {
+        const selectedMap = {};
+        state.proxySelected.forEach((item, idx) => {
+            selectedMap[item.name] = idx;
         });
+        return selectedMap;
+    }),
+    selectableMenuItems: computed(() => props.menu.filter((d) => !d.disabled && (d.type === undefined || d.type === 'item'))),
+    selectedCount: computed(() => {
+        if (props.strictSelectMode) return state.selectableMenuItems.filter((d) => state.selectedNameMap[d.name] !== undefined).length;
+        return state.proxySelected.length;
+    }),
+    menuItemLength: computed(() => props.menu.filter((d) => d.type === undefined || d.type === 'item').length),
+});
 
 
-        const {
-            focus: _focus, blur: _blur, handleMoveUp, handleMoveDown, getItemId,
-        } = useListFocus<MenuItem>(computed(() => props.menu), FOCUS_GROUP_ID, (item) => (!item.type || item.type === 'item') && !item.disabled);
+const {
+    focus: _focus, blur: _blur, handleMoveUp, handleMoveDown, getItemId,
+} = useListFocus<MenuItem>(computed(() => props.menu), FOCUS_GROUP_ID, (item) => (!item.type || item.type === 'item') && !item.disabled);
 
-        /* util */
-        const focus = (position) => {
-            const focusedIdx = _focus(position);
-            if (focusedIdx !== undefined) emit('focus', focusedIdx);
-        };
-        const blur = () => {
-            _blur();
-            emit('blur');
-        };
+/* util */
+const focus = (position?: number) => {
+    const focusedIdx = _focus(position);
+    if (focusedIdx !== undefined) emit('focus', focusedIdx);
+};
+const blur = () => {
+    _blur();
+    emit('blur');
+};
 
-        /* event */
-        const onKeyUp = (idx?: number) => {
-            // this case is from search element
-            if (idx === undefined) {
-                if (props.searchable) state.isFocusedOnSearch = false;
-                emit('keyup:up:end');
-                return;
-            }
+/* event */
+const onKeyUp = (idx?: number) => {
+    // this case is from search element
+    if (idx === undefined) {
+        if (props.searchable) state.isFocusedOnSearch = false;
+        emit('keyup:up:end');
+        return;
+    }
 
-            // event from context menu item
-            const focusedIdx = handleMoveUp(idx);
-            if (focusedIdx === undefined) {
-                // if no items for focus left, focus on search element in searchable case.
-                if (props.searchable) state.isFocusedOnSearch = true;
-                else emit('keyup:up:end');
-            }
-        };
-        const onKeyDown = (idx?: number) => {
-            // this case is from search element
-            if (idx === undefined) {
-                if (props.searchable) focus(0);
-                return;
-            }
+    // event from context menu item
+    const focusedIdx = handleMoveUp(idx);
+    if (focusedIdx === undefined) {
+        // if no items for focus left, focus on search element in searchable case.
+        if (props.searchable) state.isFocusedOnSearch = true;
+        else emit('keyup:up:end');
+    }
+};
+const onKeyDown = (idx?: number) => {
+    // this case is from search element
+    if (idx === undefined) {
+        if (props.searchable) focus(0);
+        return;
+    }
 
-            // event from context menu item
-            const focusedIdx = handleMoveDown(idx);
-            if (focusedIdx === undefined) emit('keyup:down:end');
-        };
-        const onClickMenu = (item: MenuItem, index, event) => {
-            if (item.disabled) return;
+    // event from context menu item
+    const focusedIdx = handleMoveDown(idx);
+    if (focusedIdx === undefined) emit('keyup:down:end');
+};
+const onClickMenu = (item: MenuItem, index) => {
+    if (item.disabled) return;
 
-            if (props.multiSelectable) {
-                if (state.selectedNameMap[item.name ?? ''] !== undefined) {
-                    const indexOfSelected = state.selectedNameMap[item.name ?? ''];
-                    state.proxySelected.splice(indexOfSelected, 1);
-                    state.proxySelected = [...state.proxySelected];
-                } else {
-                    state.proxySelected.splice(state.proxySelected.length - 1, 0, item);
-                    state.proxySelected = [...state.proxySelected];
-                }
-            } else {
-                state.proxySelected = [item];
-            }
+    if (props.multiSelectable) {
+        if (state.selectedNameMap[item.name ?? ''] !== undefined) {
+            const indexOfSelected = state.selectedNameMap[item.name ?? ''];
+            state.proxySelected.splice(indexOfSelected, 1);
+            state.proxySelected = [...state.proxySelected];
+        } else {
+            state.proxySelected.splice(state.proxySelected.length - 1, 0, item);
+            state.proxySelected = [...state.proxySelected];
+        }
+    } else {
+        state.proxySelected = [item];
+    }
 
-            emit(`${item.name}:select`, index, event);
-            emit('select', item, index);
-        };
-        const onClickEsc = (e) => {
-            emit('keyup:esc', e);
-            blur();
-        };
-        const handleClickClearSelection = () => {
-            state.proxySelected = [];
-        };
-        const handleUpdateSearchText = async (value: string) => {
-            state.proxySearchText = value;
-            emit('update:search-text', value);
-        };
+    emit('select', item, index);
+};
+const onClickEsc = (e: MouseEvent) => {
+    emit('keyup:esc', e);
+    blur();
+};
+const handleClickClearSelection = () => {
+    state.proxySelected = [];
+};
+const handleUpdateSearchText = async (value: string) => {
+    state.proxySearchText = value;
+    emit('update:search-text', value);
+};
 
-        watch(() => state.proxySelected, (proxySelected) => {
-            if (!proxySelected.length) return;
+watch(() => state.proxySelected, (proxySelected) => {
+    if (!proxySelected.length) return;
 
-            if (props.strictSelectMode) {
-                state.proxySelected = getFilteredSelectedItems(proxySelected, state.selectableMenuItems);
-            }
-        }, { immediate: true });
+    if (props.strictSelectMode) {
+        state.proxySelected = getFilteredSelectedItems(proxySelected, state.selectableMenuItems);
+    }
+}, { immediate: true });
 
-        watch(() => props.searchText, (searchText) => {
-            if (state.proxySearchText === searchText) return;
-            state.proxySearchText = searchText;
-        });
+watch(() => props.searchText, (searchText) => {
+    if (state.proxySearchText === searchText) return;
+    state.proxySearchText = searchText;
+});
 
-        onUnmounted(() => {
-            state.proxySelected = [];
-        });
+onUnmounted(() => {
+    state.proxySelected = [];
+});
 
-        /* slots */
-        const searchSlots = computed(() => reduce(slots, (res, d, name) => {
-            if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
-            return res;
-        }, {}));
+/* slots */
+const searchSlots = computed(() => reduce(slots, (res, d, name) => {
+    if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
+    return res;
+}, {}));
 
-        return {
-            ...toRefs(state),
-            onClickMenu,
-            onKeyDown,
-            onKeyUp,
-            focus,
-            onClickEsc,
-            handleClickClearSelection,
-            getItemId,
-            handleUpdateSearchText,
-            searchSlots,
-        };
-    },
+/* exposes */
+defineExpose({
+    focus,
 });
 </script>
 

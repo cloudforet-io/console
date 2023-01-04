@@ -1,4 +1,5 @@
 import { createLocalVue, mount } from '@vue/test-utils';
+import type { ComponentPublicInstance } from 'vue';
 import Vue, { defineComponent, ref } from 'vue';
 
 import { expect } from 'vitest';
@@ -9,6 +10,8 @@ import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
 
 const localVue = createLocalVue();
+type ContextMenuComponent = ComponentPublicInstance<typeof PContextMenu>;
+const $t = () => {};
 
 const mockLoadComposableInApp = (getOptions: () => Partial<UseContextMenuControllerOptions>, additional: { menu?: MenuItem[]} = {}) => {
     let result: UseContextMenuControllerReturns|undefined;
@@ -58,6 +61,9 @@ const mockLoadComposableInApp = (getOptions: () => Partial<UseContextMenuControl
     const wrapper = mount(mockComponent, {
         localVue,
         attachTo: '#root', // this is for testing focus status
+        mocks: {
+            $t,
+        },
     });
     return { result, error, wrapper };
 };
@@ -72,7 +78,7 @@ describe('Context Menu Controller', () => {
         it('should emit error if useReorderBySelection is given but originMenu is not given.', () => {
             const { result, error } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
-                contextMenuRef: ref<typeof PContextMenu|null>(null),
+                contextMenuRef: ref<ContextMenuComponent|null>(null),
                 useReorderBySelection: true,
                 selected: [],
             }));
@@ -82,7 +88,7 @@ describe('Context Menu Controller', () => {
         it('should emit error if useReorderBySelection is given but selected is not given.', () => {
             const { result, error } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
-                contextMenuRef: ref<typeof PContextMenu|null>(null),
+                contextMenuRef: ref<ContextMenuComponent|null>(null),
                 useReorderBySelection: true,
                 originMenu: [],
             }));
@@ -95,7 +101,7 @@ describe('Context Menu Controller', () => {
         describe('Control menu visibility: ', () => {
             const { result, wrapper } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
-                contextMenuRef: ref<typeof PContextMenu|null>(null),
+                contextMenuRef: ref<ContextMenuComponent|null>(null),
                 visibleMenu: ref(false),
             }));
             const { showContextMenu, hideContextMenu } = result as UseContextMenuControllerReturns;
@@ -117,7 +123,7 @@ describe('Context Menu Controller', () => {
         describe('Get fixed context menu style: ', () => {
             const { result } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
-                contextMenuRef: ref<typeof PContextMenu|null>(null),
+                contextMenuRef: ref<ContextMenuComponent|null>(null),
                 visibleMenu: ref(true),
                 useFixedStyle: true,
             }));
@@ -130,7 +136,7 @@ describe('Context Menu Controller', () => {
         describe('Control focusing on menu: ', () => {
             const { result } = mockLoadComposableInApp(() => ({
                 targetRef: ref<HTMLElement|null>(null),
-                contextMenuRef: ref<typeof PContextMenu|null>(null),
+                contextMenuRef: ref<ContextMenuComponent|null>(null),
                 visibleMenu: ref(true),
             }), { menu: [{ name: 'a', label: 'A' }, { name: 'b', label: 'B' }, { name: 'c', label: 'C' }] });
             const { focusOnContextMenu } = result as UseContextMenuControllerReturns;
@@ -147,7 +153,7 @@ describe('Context Menu Controller', () => {
                 const mockLoadForReorderTest = (options: Partial<UseContextMenuControllerOptions> = {}) => {
                     const { result, error } = mockLoadComposableInApp(() => ({
                         targetRef: ref<HTMLElement|null>(null),
-                        contextMenuRef: ref<typeof PContextMenu|null>(null),
+                        contextMenuRef: ref<ContextMenuComponent|null>(null),
                         visibleMenu: ref(true),
                         ...options,
                     }));
