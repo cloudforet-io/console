@@ -32,10 +32,17 @@
                 />
             </template>
             <template #col-options-format="{ value }">
-                <span>{{ value.join(', ') }}</span>
+                <p-collapsible-panel class="options-area"
+                                     is-collapsed
+                                     :line-clamp="1"
+                >
+                    {{ value.join(', ') }}
+                </p-collapsible-panel>
             </template>
             <template #col-managable-format="{ value }">
-                <template v-if="value">
+                <div v-if="value"
+                     class="button-wrapper"
+                >
                     <p-button class="manage-button"
                               style-type="tertiary"
                               icon-left="ic_edit"
@@ -52,7 +59,7 @@
                     >
                         {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE') }}
                     </p-button>
-                </template>
+                </div>
             </template>
         </p-data-table>
     </div>
@@ -64,7 +71,7 @@ import {
 } from 'vue';
 
 import {
-    PBadge, PDataTable, PSelectStatus, PToggleButton, PButton,
+    PBadge, PDataTable, PSelectStatus, PToggleButton, PButton, PCollapsiblePanel,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -106,9 +113,9 @@ const state = reactive({
         { name: 'name', label: 'Name' },
         { name: 'selection_type', label: 'Selection Type' },
         { name: 'variable_type', label: 'Variable Type' },
-        { name: 'use', label: 'Use' },
-        { name: 'options', label: 'Options' },
-        { name: 'managable', label: ' ' },
+        { name: 'use', label: 'Use', width: '90px' },
+        { name: 'options', label: 'Options', width: '448px' },
+        { name: 'managable', label: ' ', width: '164px' },
     ],
     selectionType: computed(() => ({
         SINGLE: i18n.t('Single select'),
@@ -138,7 +145,6 @@ const handleDeleteVariable = (propertyName: string) => {
 const handleToggleUse = (propertyName: string, value: boolean) => {
     emit('use-change', propertyName, !value);
 };
-
 const {
     orderedVariables,
     variableFilterList,
@@ -165,8 +171,14 @@ const {
         }
     }
     .variable-table {
-        .manage-button {
-            margin-right: 0.375rem;
+        .options-area {
+            padding: 0;
+        }
+        .button-wrapper {
+            @apply flex items-center justify-center;
+            .manage-button {
+                margin-right: 0.375rem;
+            }
         }
     }
 }
