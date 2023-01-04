@@ -163,7 +163,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     };
 
     const getDashboardData = async (dashboardId?: string) => {
-        if (dashboardId === state.dashboardId || dashboardId === '') return;
+        if (dashboardId === state.dashboardId || dashboardId === undefined) return;
 
         state.dashboardId = dashboardId;
         state.loadingDashboard = true;
