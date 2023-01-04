@@ -19,6 +19,7 @@ import type {
     WidgetConfig, WidgetOptions, WidgetSize,
     InheritOptions, WidgetProps,
     Granularity, GroupBy,
+    SelectorType,
 } from '@/services/dashboards/widgets/config';
 import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/view-config';
 import { WIDGET_THEMES } from '@/services/dashboards/widgets/view-config';
@@ -72,7 +73,7 @@ export interface WidgetState<Data = any> {
     data: undefined|Data;
     colorSet: ComputedRef<string[]>;
     selectorItems: ComputedRef<MenuItem[]>;
-    selectedSelectorType: undefined;
+    selectedSelectorType?: SelectorType;
     pageSize: ComputedRef<number|undefined>;
 }
 export function useWidgetState<Data = any>(
@@ -88,8 +89,8 @@ export function useWidgetState<Data = any>(
             props.dashboardVariables,
         )),
         currency: computed(() => state.settings.currency?.value ?? CURRENCY.USD),
-        groupBy: computed<GroupBy|string>(() => state.options.group_by),
-        granularity: computed<Granularity>(() => state.widgetConfig.options?.granularity),
+        groupBy: computed<GroupBy|string>(() => state.options?.group_by),
+        granularity: computed<Granularity>(() => state.options?.granularity),
         chartType: computed<ChartType|undefined>(() => state.options?.chart_type),
         size: computed<WidgetSize>(() => {
             if (state.widgetConfig.sizes.includes(props.size)) return props.size;
@@ -104,8 +105,8 @@ export function useWidgetState<Data = any>(
             return getColorSet(props.theme, colorSetType);
         }),
         selectorItems: computed<MenuItem[]>(() => {
-            if (!state.options.selector_options?.enabled) return [];
-            if (state.options.selector_options.type === 'cost-usage') {
+            if (!state.options?.selector_options?.enabled) return [];
+            if (state.options?.selector_options.type === 'cost-usage') {
                 if (!state.selectedSelectorType) state.selectedSelectorType = 'cost';
                 return [
                     { type: 'item', name: 'cost', label: 'Cost' },

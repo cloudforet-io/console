@@ -175,3 +175,5 @@ export interface WidgetExpose<Data = any> {
     initWidget: (data?: Data) => Promise<Data>;
     refreshWidget: () => Promise<Data>;
 }
+
+export type SelectorType = 'cost' | 'usage' | 'day' | 'month';
