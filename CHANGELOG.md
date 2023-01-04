@@ -1,3 +1,10 @@
+# [1.1.0-beta.505](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.504...v1.1.0-beta.505) (2023-01-04)
+
+
+### Features
+
+* **context-menu, text-button, button:** add readonly prop ([#216](https://github.com/cloudforet-io/mirinae/issues/216)) ([230c75f](https://github.com/cloudforet-io/mirinae/commit/230c75f5177989795f9984cafd8430554d5aa18f))
+
 # [1.1.0-beta.504](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.503...v1.1.0-beta.504) (2023-01-04)
 
 
