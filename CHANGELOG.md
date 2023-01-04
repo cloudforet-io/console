@@ -1,3 +1,10 @@
+# [1.1.0-beta.504](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.503...v1.1.0-beta.504) (2023-01-04)
+
+
+### Bug Fixes
+
+* **button-modal:** fix alert theme header style ([#215](https://github.com/cloudforet-io/mirinae/issues/215)) ([065a640](https://github.com/cloudforet-io/mirinae/commit/065a64048dd6c73d85fc0c8def42f15f231d26b1))
+
 # [1.1.0-beta.503](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.502...v1.1.0-beta.503) (2023-01-03)
 
 
