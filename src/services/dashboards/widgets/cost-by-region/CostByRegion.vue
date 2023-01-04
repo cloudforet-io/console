@@ -23,7 +23,7 @@
                                :this-page="state.thisPage"
                                :show-next-page="state.data?.more"
                                show-legend
-                               @update:thisPage="handleUpdateThisPage"
+                               @update:this-page="handleUpdateThisPage"
             />
         </div>
     </widget-frame>
