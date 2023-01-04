@@ -1,3 +1,10 @@
+# [1.1.0-beta.508](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.507...v1.1.0-beta.508) (2023-01-04)
+
+
+### Features
+
+* **context-menu:** remove showRadioIcon, add showSelectMarker prop ([#220](https://github.com/cloudforet-io/mirinae/issues/220)) ([55ac4fa](https://github.com/cloudforet-io/mirinae/commit/55ac4fa94665c4e22b36c3283353f67142245ad4))
+
 # [1.1.0-beta.507](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.506...v1.1.0-beta.507) (2023-01-04)
 
 
