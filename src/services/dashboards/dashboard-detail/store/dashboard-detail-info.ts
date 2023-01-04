@@ -18,7 +18,7 @@ import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 
 import type {
-    DateRange, DashboardViewer, DashboardSettings, DashboardVariables,
+    DateRange, DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
 } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
@@ -44,6 +44,8 @@ interface DashboardDetailInfoStoreState {
     dateRange: DateRange;
     settings: DashboardSettings;
     variables: DashboardVariables;
+    variables_schema: DashboardVariablesSchema;
+    labels: string[];
     // widget info states
     dashboardWidgetInfoList: DashboardContainerWidgetInfo[];
     loadingWidgets: boolean;
@@ -53,7 +55,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const state = reactive<DashboardDetailInfoStoreState>({
         loadingDashboard: false,
         dashboardId: '',
-        isProjectDashboard: computed<boolean>(() => state.dashboardId.startsWith('project')),
+        isProjectDashboard: computed<boolean>(() => state.dashboardId?.startsWith('project')),
         dashboardViewer: computed<DashboardViewer>(() => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE),
         dashboardInfo: null,
         dashboardName: '',
@@ -77,6 +79,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
         },
         variables: {},
+        variables_schema: { properties: {}, order: [] },
+        labels: [],
         // widget info states
         dashboardWidgetInfoList: [],
         loadingWidgets: false,
@@ -124,6 +128,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
         };
         state.variables = {};
+        state.variables_schema = { properties: {}, order: [] };
+        state.labels = [];
         state.dashboardWidgetInfoList = [];
     };
 
@@ -146,7 +152,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 value: dashboardInfo.settings.currency?.value ?? CURRENCY.USD,
             },
         };
+        state.variables_schema = dashboardInfo.variables_schema;
         state.variables = dashboardInfo.variables ?? {};
+        state.labels = dashboardInfo.labels;
         state.dashboardWidgetInfoList = flattenDeep(dashboardInfo?.layouts ?? []).map((info) => ({
             ...info,
             widgetKey: uuidv4(),
@@ -154,8 +162,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.widgetDataMap = {};
     };
 
-    const getDashboardData = async (dashboardId: string) => {
-        if (dashboardId === state.dashboardId) return;
+    const getDashboardData = async (dashboardId?: string) => {
+        if (dashboardId === state.dashboardId || dashboardId === '') return;
 
         state.dashboardId = dashboardId;
         state.loadingDashboard = true;

@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import type Vue from 'vue';
 import {
-    computed, getCurrentInstance, onMounted, reactive,
+    computed, getCurrentInstance, onBeforeUnmount, onMounted, reactive,
 } from 'vue';
 
 import { PDivider } from '@spaceone/design-system';
@@ -89,7 +89,7 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
 
 interface Props {
-    dashboardId: string;
+    dashboardId?: string;
 }
 
 const props = defineProps<Props>();
@@ -195,7 +195,8 @@ const updateDashboardData = async () => {
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId: props.dashboardId,
+                // FIXME:: change dashboardId when creating dashboard
+                dashboardId: props?.dashboardId ?? '',
                 dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
@@ -221,6 +222,19 @@ const handleChangeVariable = (variables: DashboardVariablesSchema['properties'],
 const handleChangeVariableOptions = (propertyName: string, selected: string|string[]) => {
     variableState.variableData[propertyName] = selected;
 };
+
+// for preventing refresh
+const handleUnload = (event) => {
+    event.preventDefault(); event.returnValue = '';
+};
+
+onMounted(() => {
+    window.addEventListener('beforeunload', handleUnload);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('beforeunload', handleUnload);
+});
 
 onMounted(() => {
     getDashboardData();

@@ -150,7 +150,7 @@ const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
     const _selectedTemplate: Partial<DashboardTemplateBoardSet> = { ...selectedTemplate };
     delete _selectedTemplate.leftIcon;
     delete _selectedTemplate.iconButtonSets;
-    emit('set-template', _selectedTemplate as DashboardConfig);
+    emit('set-template', _selectedTemplate as DashboardModel);
 };
 
 const handleChangePagination = (page: number, type: 'DEFAULT'|'EXISTING'): void => {
