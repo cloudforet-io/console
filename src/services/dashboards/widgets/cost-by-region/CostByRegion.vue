@@ -62,20 +62,6 @@ interface FullData {
     more: boolean;
 }
 
-// interface Data {
-//     title: string;
-//     region_code?: string;
-//     continent_code?: string;
-//     latitude: number;
-//     longitude: number;
-//     color: string;
-//     pieData: {
-//         category: string;
-//         color: string;
-//         provider: string;
-//         value: number
-//     }[]
-// }
 const SAMPLE_PIE_DATA = [{
     country: 'France',
     sales: 100000,
