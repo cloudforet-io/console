@@ -61,6 +61,7 @@
                             multi-selectable
                             item-height-fixed
                             show-select-header
+                            show-select-marker
                             @select="handleSelectOption"
             />
         </div>
