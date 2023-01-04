@@ -35,22 +35,21 @@ import { reactive, toRefs } from 'vue';
 
 import { PPageTitle, PButton } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import {
     DASHBOARD_SCOPE,
     DASHBOARD_VIEWER,
 } from '@/services/dashboards/config';
-import type { DashboardScope, DashboardViewer, DashboardConfig } from '@/services/dashboards/config';
+import type { DashboardScope, DashboardViewer } from '@/services/dashboards/config';
 import DashboardScopeForm from '@/services/dashboards/dashboard-create/modules/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/dashboard-create/modules/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/dashboard-create/modules/DashboardViewerForm.vue';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import type { DashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import type { ProjectItemResp } from '@/services/project/type';
 
@@ -64,6 +63,7 @@ export default {
         PButton,
     },
     setup() {
+        const dashboardDetailStore = useDashboardDetailInfoStore();
         const {
             forms: {
                 dashboardTemplate,
@@ -72,10 +72,10 @@ export default {
             setForm,
             isAllValid,
         } = useFormValidator({
-            dashboardTemplate: {} as DashboardConfig,
+            dashboardTemplate: {} as DashboardModel,
             dashboardProject: undefined as undefined|ProjectItemResp,
         }, {
-            dashboardTemplate(value: DashboardConfig) {
+            dashboardTemplate(value: DashboardModel) {
                 return !Object.keys(value).length ? i18n.t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : '';
             },
             dashboardProject(value: ProjectItemResp|undefined) {
@@ -89,42 +89,9 @@ export default {
             dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
         });
 
-        const handleClickCreate = async () => {
-            const {
-                layouts, variables, settings, variables_schema, name, labels,
-            } = dashboardTemplate.value as DashboardConfig;
-            const dashboardCreateParams = {
-                viewers: state.dashboardViewerType,
-                name,
-                layouts,
-                variables,
-                settings,
-                variables_schema,
-                labels,
-            };
-
-            try {
-                let dashboardId = '';
-                if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) {
-                    const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
-                        ...dashboardCreateParams,
-                        project_id: dashboardProject.value?.id ?? '',
-                    });
-                    dashboardId = result.project_dashboard_id;
-                } else {
-                    const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(dashboardCreateParams);
-                    dashboardId = result.domain_dashboard_id;
-                }
-                await SpaceRouter.router.push({
-                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
-                    params: {
-                        dashboardId,
-                        dashboardScope: state.dashboardScope,
-                    },
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+        const handleClickCreate = () => {
+            dashboardDetailStore.setDashboardInfo(dashboardTemplate.value);
+            SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME, params: { dashboardScope: state.dashboardScope } });
         };
 
         return {

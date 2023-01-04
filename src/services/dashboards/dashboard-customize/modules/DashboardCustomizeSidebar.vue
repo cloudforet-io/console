@@ -89,7 +89,7 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 interface Props {
     widgetInfoList: DashboardContainerWidgetInfo[];
-    dashboardId: string;
+    dashboardId?: string;
 }
 
 const props = defineProps<Props>();
