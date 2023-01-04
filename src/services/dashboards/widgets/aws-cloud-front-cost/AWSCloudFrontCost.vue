@@ -47,7 +47,7 @@ import {
 import { PDataLoader } from '@spaceone/design-system';
 import bytes from 'bytes';
 import dayjs from 'dayjs';
-import { cloneDeep, reverse } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { byteFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -106,7 +106,7 @@ const state = reactive({
     chartData: computed(() => {
         const valueKey = `${state.fieldsKey}_sum`;
         const _chartData = getRefinedXYChartData(state.data?.results, state.groupBy, 'usage_type', valueKey, true);
-        return reverse(_chartData);
+        return _chartData.reverse();
     }),
     tableFields: computed<Field[]>(() => {
         if (!state.groupBy) return [];
@@ -134,6 +134,7 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
 const fetchData = async (): Promise<FullData> => {
+    // TODO: If there's no groupBy(required field), widget has to show invalid text.
     if (!state.groupBy) return { results: [], more: false };
     try {
         const apiQueryHelper = new ApiQueryHelper();
