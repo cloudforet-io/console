@@ -237,6 +237,7 @@ const textFormatter = (value:string|number, textOptions: Field['textOptions']) =
         if (textOptions?.type === 'reference') {
             if (!value) return 'Unknown';
             const referenceMap = props.allReferenceTypeInfo[textOptions.referenceType]?.referenceMap;
+            if (textOptions.referenceType === 'region') return referenceMap?.[value]?.name ?? value;
             return referenceMap?.[value]?.label ?? referenceMap?.[value]?.name ?? value;
         }
         return value;
