@@ -219,6 +219,10 @@ const handleSave = async () => {
 const handleChangeVariable = (variables: DashboardVariablesSchema['properties'], order?: string[]) => {
     variableState.variableProperties = variables;
     if (order) variableState.order = order;
+    variableState.order.forEach((d) => {
+        if (variables[d].use) return;
+        if (variableState.variableData[d]) delete variableState.variableData[d];
+    });
 };
 const handleChangeVariableOptions = (propertyName: string, selected: string|string[]) => {
     variableState.variableData[propertyName] = selected;
