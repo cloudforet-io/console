@@ -195,7 +195,8 @@ const updateDashboardData = async () => {
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId: props.dashboardId,
+                // FIXME:: change dashboardId when creating dashboard
+                dashboardId: props?.dashboardId ?? '',
                 dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });

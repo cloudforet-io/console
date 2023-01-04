@@ -162,8 +162,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.widgetDataMap = {};
     };
 
-    const getDashboardData = async (dashboardId: string) => {
-        if (dashboardId === state.dashboardId || !dashboardId) return;
+    const getDashboardData = async (dashboardId?: string) => {
+        if (dashboardId === state.dashboardId || dashboardId === '') return;
 
         state.dashboardId = dashboardId;
         state.loadingDashboard = true;
