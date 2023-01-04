@@ -15,6 +15,14 @@ export interface HistoryDataModel {
     }>;
 }
 
+export interface AccumulatedDataModel {
+    more?: boolean;
+    results: Array<{
+        [groupBy: string]: string | any;
+        usd_cost_sum?: number;
+    }>
+}
+
 export interface XYChartData {
     date?: string;
     [resourceName: string]: number | any; // AmazonCloudFront: 12333
