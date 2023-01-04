@@ -26,7 +26,7 @@
                                :invalid-text="invalidTexts.selectedInternalUserItems"
                 >
                     <template #default="{invalid}">
-                        <p-search-dropdown
+                        <p-filterable-dropdown
                             :menu="internalUserItems"
                             :selected="selectedInternalUserItems"
                             multi-selectable
@@ -81,7 +81,7 @@
                         >{{ $t('PROJECT.DETAIL.MEMBER.ROLE_WARNING') }}</span>
                     </template>
                     <template #default="{invalid}">
-                        <p-search-dropdown
+                        <p-filterable-dropdown
                             :menu="roleItems"
                             :selected="selectedRoleItems"
                             type="radioButton"
@@ -119,7 +119,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButtonModal, PFieldGroup, PBoxTab, PSearchDropdown, PTooltip, PI, PTextInput,
+    PButtonModal, PFieldGroup, PBoxTab, PFilterableDropdown, PTooltip, PI, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { SelectedItem as InputItem } from '@spaceone/design-system/types/inputs/input/type';
@@ -150,7 +150,7 @@ export default {
         PButtonModal,
         PFieldGroup,
         PBoxTab,
-        PSearchDropdown,
+        PFilterableDropdown,
         PTooltip,
         PI,
         PTextInput,

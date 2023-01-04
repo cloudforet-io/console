@@ -25,7 +25,7 @@
                                :invalid-text="invalidTexts.selectedRoleItems"
                 >
                     <template #default="{invalid}">
-                        <p-search-dropdown
+                        <p-filterable-dropdown
                             :menu="roleItems"
                             :selected="selectedRoleItems"
                             type="radioButton"
@@ -66,7 +66,7 @@ import { reactive, toRefs } from 'vue';
 import type { PropType, SetupContext } from 'vue';
 
 import {
-    PButtonModal, PFieldGroup, PSearchDropdown, PTextInput,
+    PButtonModal, PFieldGroup, PFilterableDropdown, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { SelectedItem as InputItem } from '@spaceone/design-system/types/inputs/input/type';
@@ -90,7 +90,7 @@ export default {
     components: {
         PButtonModal,
         PFieldGroup,
-        PSearchDropdown,
+        PFilterableDropdown,
         PTextInput,
     },
     directives: {

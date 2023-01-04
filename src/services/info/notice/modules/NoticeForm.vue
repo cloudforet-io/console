@@ -32,12 +32,12 @@
                     <span>{{ $t('INFO.NOTICE.FORM.SELECTED_DOMAIN') }}</span>
                 </p-radio>
                 <br>
-                <p-search-dropdown class="mt-2 w-1/2"
-                                   :menu="domainList"
-                                   :selected="selectedDomain"
-                                   :disabled="isAllDomainSelected || type === 'EDIT'"
-                                   :placeholder="isAllDomainSelected ? $t('INFO.NOTICE.FORM.PLACEHOLDER_ALL') : ''"
-                                   @update:selected="handleSelectDomain"
+                <p-filterable-dropdown class="mt-2 w-1/2"
+                                       :menu="domainList"
+                                       :selected="selectedDomain"
+                                       :disabled="isAllDomainSelected || type === 'EDIT'"
+                                       :placeholder="isAllDomainSelected ? $t('INFO.NOTICE.FORM.PLACEHOLDER_ALL') : ''"
+                                       @update:selected="handleSelectDomain"
                 />
             </p-field-group>
             <p-field-group class="notice-label-wrapper"
@@ -106,7 +106,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PFieldGroup, PTextInput, PRadio, PSearchDropdown, PCheckBox, PButton,
+    PPaneLayout, PFieldGroup, PTextInput, PRadio, PFilterableDropdown, PCheckBox, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -142,7 +142,7 @@ export default {
         PFieldGroup,
         PTextInput,
         PRadio,
-        PSearchDropdown,
+        PFilterableDropdown,
         PCheckBox,
         PButton,
     },

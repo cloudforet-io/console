@@ -1,14 +1,14 @@
 <template>
     <div>
-        <p-search-dropdown v-model="searchTerm"
-                           :menu="menuItems"
-                           :selected="selectedItems"
-                           multi-selectable
-                           use-fixed-menu-style
-                           :exact-mode="false"
-                           :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
-                           @update:selected="handleUpdateSelected"
-                           @search="handleSearch"
+        <p-filterable-dropdown v-model="searchTerm"
+                               :menu="menuItems"
+                               :selected="selectedItems"
+                               multi-selectable
+                               use-fixed-menu-style
+                               :exact-mode="false"
+                               :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
+                               @update:selected="handleUpdateSelected"
+                               @search="handleSearch"
         >
             <template v-if="type === CLOUD_SERVICE_FILTER_KEY.REGION"
                       #menu-item--format="{item}"
@@ -33,7 +33,7 @@
                     />
                 </div>
             </template>
-        </p-search-dropdown>
+        </p-filterable-dropdown>
     </div>
 </template>
 
@@ -43,11 +43,11 @@ import {
 } from 'vue';
 
 import {
-    PSearchDropdown,
+    PFilterableDropdown,
 } from '@spaceone/design-system';
 import type {
-    SearchDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
+    FilterableDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 
 import { store } from '@/store';
 
@@ -84,7 +84,7 @@ export default defineComponent<Props>({
     name: 'CloudServiceFilterSearchDropdown',
     components: {
         TextHighlighting,
-        PSearchDropdown,
+        PFilterableDropdown,
     },
     props: {
         type: {
@@ -99,7 +99,7 @@ export default defineComponent<Props>({
     setup(props, { emit }) {
         const state = reactive({
             searchTerm: '',
-            selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selected.map((selectedName) => ({
+            selectedItems: computed<FilterableDropdownMenuItem[]>(() => props.selected.map((selectedName) => ({
                 name: selectedName,
                 label: state.menuItems.find((d) => d.name === selectedName)?.label || selectedName,
             }))),
@@ -112,7 +112,7 @@ export default defineComponent<Props>({
             }),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => getRegionFilterMenuItem(d.key, state.regions, state.providers))),
-            menuItems: computed<SearchDropdownMenuItem[]|RegionMenuItem[]>(() => {
+            menuItems: computed<FilterableDropdownMenuItem[]|RegionMenuItem[]>(() => {
                 if (props.type === CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY) {
                     return categoryItems;
                 } if (props.type === CLOUD_SERVICE_FILTER_KEY.REGION) {
@@ -141,7 +141,7 @@ export default defineComponent<Props>({
             emit('update:selected', state.selectedItems.map((d) => d.name).concat([val]));
         };
 
-        const handleUpdateSelected = (selected: SearchDropdownMenuItem[]) => {
+        const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
             emit('update:selected', selected.map((d) => d.name));
         };
 

@@ -12,7 +12,7 @@
                                  :selected-project-ids="selectedItems.map(d => d.name)"
                                  @update:selectedProjectIds="handleSelectedProjectIds"
         />
-        <p-search-dropdown
+        <p-filterable-dropdown
             v-else-if="category === FILTER.SERVICE_ACCOUNT || category === FILTER.REGION || category === FILTER.PROVIDER"
             :menu="menuItems"
             :selected="selectedItems"
@@ -20,9 +20,9 @@
             use-fixed-menu-style
             @update:selected="handleUpdateSelected"
         />
-        <p-query-search-dropdown
+        <p-filterable-query-dropdown
             v-else-if="category === FILTER.TAGS || category === FILTER.ADDITIONAL_INFO"
-            class="query-search-dropdown"
+            class="filterable-query-dropdown"
             :key-item-sets="querySearchHandlerState.keyItemSets"
             :value-handler-map="querySearchHandlerState.valueHandlerMap"
             :selected="querySearchHandlerState.selectedQueryItems"
@@ -30,7 +30,7 @@
             multi-selectable
             @update:selected="handleUpdateSelectedQueryItems"
         />
-        <p-search-dropdown
+        <p-filterable-dropdown
             v-else
             :handler="menuHandler"
             :selected="selectedItems"
@@ -49,12 +49,12 @@ import {
 } from 'vue';
 
 import {
-    PQuerySearchDropdown,
-    PSearchDropdown,
+    PFilterableQueryDropdown,
+    PFilterableDropdown,
 } from '@spaceone/design-system';
 import type {
-    AutocompleteHandler, SearchDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
+    AutocompleteHandler, FilterableDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 
@@ -83,9 +83,9 @@ interface Props {
 export default {
     name: 'CostExplorerFilterItem',
     components: {
-        PQuerySearchDropdown,
+        PFilterableQueryDropdown,
         ProjectSelectDropdown,
-        PSearchDropdown,
+        PFilterableDropdown,
     },
     props: {
         category: {
@@ -104,7 +104,7 @@ export default {
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
         });
         const state = reactive({
-            selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selectedFilterItems?.map((filterItem) => ({
+            selectedItems: computed<FilterableDropdownMenuItem[]>(() => props.selectedFilterItems?.map((filterItem) => ({
                 name: filterItem.v,
                 label: state.menuItems.find((d) => d.name === filterItem.v)?.label || filterItem.v,
             }))),
@@ -220,7 +220,7 @@ export default {
             }));
             emit('update-filter-items', updatedFilterItems);
         };
-        const handleUpdateSelected = (selectedItems: SearchDropdownMenuItem[]) => {
+        const handleUpdateSelected = (selectedItems: FilterableDropdownMenuItem[]) => {
             const updatedFilterItems = selectedItems.map((d) => ({
                 k: props.category,
                 v: d.name,
@@ -269,8 +269,8 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-explorer-filter-item {
-    /* custom p-query-search-dropdown */
-    :deep(.query-search-dropdown) {
+    /* custom p-filterable-query-dropdown */
+    :deep(.filterable-query-dropdown) {
         .input-wrapper {
             word-break: initial;
         }

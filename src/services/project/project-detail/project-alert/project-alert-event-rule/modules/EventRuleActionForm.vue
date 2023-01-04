@@ -62,22 +62,22 @@
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.ASSIGNEE') }}
                 </p>
-                <p-search-dropdown class="user-search-dropdown"
-                                   type="radioButton"
-                                   :menu="userItems"
-                                   :selected.sync="selectedAssignee"
-                                   use-fixed-menu-style
+                <p-filterable-dropdown class="user-search-dropdown"
+                                       type="radioButton"
+                                       :menu="userItems"
+                                       :selected.sync="selectedAssignee"
+                                       use-fixed-menu-style
                 />
             </div>
             <div class="form-box mobile-block">
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.ADDITIONAL_RESPONDER') }}
                 </p>
-                <p-search-dropdown class="user-search-dropdown"
-                                   :menu="userItems"
-                                   :selected.sync="selectedResponder"
-                                   multi-selectable
-                                   use-fixed-menu-style
+                <p-filterable-dropdown class="user-search-dropdown"
+                                       :menu="userItems"
+                                       :selected.sync="selectedResponder"
+                                       multi-selectable
+                                       use-fixed-menu-style
                 />
             </div>
             <div class="form-box additional-information">
@@ -115,7 +115,7 @@ import {
 } from 'vue';
 
 import {
-    PToggleButton, PRadio, PButton, PCheckBox, PSelectDropdown, PSearchDropdown,
+    PToggleButton, PRadio, PButton, PCheckBox, PSelectDropdown, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -145,7 +145,7 @@ export default {
         PButton,
         PCheckBox,
         PSelectDropdown,
-        PSearchDropdown,
+        PFilterableDropdown,
     },
     props: {
         actions: {
@@ -322,7 +322,7 @@ export default {
             width: 60%;
         }
 
-        /* custom design-system component - p-search-dropdown */
+        /* custom design-system component - p-filterable-dropdown */
         .user-search-dropdown {
             :deep(.p-tag .text) {
                 @apply truncate;

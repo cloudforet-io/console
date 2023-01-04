@@ -51,10 +51,10 @@
                            :invalid-text="validationState.timezoneInvalidText"
             >
                 <template #default="{invalid}">
-                    <p-search-dropdown :menu="timezones"
-                                       :selected.sync="formState.timezone"
-                                       :invalid="invalid"
-                                       :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
+                    <p-filterable-dropdown :menu="timezones"
+                                           :selected.sync="formState.timezone"
+                                           :invalid="invalid"
+                                           :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
                     />
                 </template>
             </p-field-group>
@@ -131,10 +131,10 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PPaneLayout, PButton, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PSearchDropdown,
+    PPaneLayout, PButton, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { SearchDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/search-dropdown/type';
+import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import { map } from 'lodash';
 
 import { store } from '@/store';
@@ -158,7 +158,7 @@ export default {
         PTextInput,
         PFieldGroup,
         PPaneLayout,
-        PSearchDropdown,
+        PFilterableDropdown,
     },
     props: {
         role: {
@@ -179,13 +179,13 @@ export default {
             })) as MenuItem[],
             timezones: map(timezoneList, (d) => ({
                 type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
-            })) as SearchDropdownMenuItem[],
+            })) as FilterableDropdownMenuItem[],
         });
 
         const formState = reactive({
             userName: '' as string | undefined,
             email: '',
-            timezone: [] as SearchDropdownMenuItem[],
+            timezone: [] as FilterableDropdownMenuItem[],
             language: '' as LanguageCode | undefined,
             password: '',
             passwordCheck: '',
@@ -334,7 +334,7 @@ export default {
 }
 .p-text-input,
 .p-select-dropdown,
-.p-search-dropdown {
+.p-filterable-dropdown {
     width: 100%;
     max-width: 25rem;
     flex-shrink: 0;
@@ -349,7 +349,7 @@ export default {
 @screen mobile {
     .p-text-input,
     .p-select-dropdown,
-    .p-search-dropdown {
+    .p-filterable-dropdown {
         max-width: unset;
     }
 }
