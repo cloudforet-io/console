@@ -1,3 +1,10 @@
+# [1.1.0-beta.507](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.506...v1.1.0-beta.507) (2023-01-04)
+
+
+### Bug Fixes
+
+* **collapsible-panel:** fix tailwind css issue ([#219](https://github.com/cloudforet-io/mirinae/issues/219)) ([5feca56](https://github.com/cloudforet-io/mirinae/commit/5feca56af30fb7135c59570cf1a23c1b6b67dd30))
+
 # [1.1.0-beta.506](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.505...v1.1.0-beta.506) (2023-01-04)
 
 
