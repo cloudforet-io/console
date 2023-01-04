@@ -1,6 +1,7 @@
 <template>
     <div class="dashboard-customize-page">
         <dashboard-customize-page-name :name="dashboardDetailState.dashboardName"
+                                       :dashboard-id="dashboardId"
                                        @update:name="handleUpdateDashboardName"
         />
         <div class="filters-box">
