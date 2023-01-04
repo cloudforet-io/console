@@ -112,10 +112,17 @@ const state = reactive({
     }),
 });
 
+// song-lang
 const deleteModalState = reactive({
     type: 'DELETE' as 'DELETE' | 'ESCAPE' | 'CANCEL',
-    headerTitle: '' as string | TranslateResult,
-    contents: '' as string | TranslateResult,
+    headerTitle: computed<TranslateResult>(() => {
+        if (deleteModalState.type === 'DELETE') return i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE_TITLE');
+        return i18n.t('Are you sure you want to discard changes?');
+    }),
+    contents: computed<TranslateResult>(() => {
+        if (deleteModalState.type === 'DELETE') return '';
+        return i18n.t('Changes will not be saved.');
+    }),
     visible: false,
     loading: false,
 });
@@ -129,15 +136,8 @@ const deleteVariable = () => {
 };
 const resetDeleteModalState = () => {
     deleteModalState.visible = false;
-    deleteModalState.headerTitle = '';
-    deleteModalState.contents = '';
     state.selectedVariable = '';
     if (state.contentType !== 'LIST') state.contentType = 'LIST';
-};
-const setCancelAlert = () => {
-    deleteModalState.headerTitle = i18n.t('Are you sure you want to discard changes?');
-    deleteModalState.contents = i18n.t('Changes will not be saved.');
-    deleteModalState.visible = true;
 };
 
 /* Event */
@@ -147,7 +147,6 @@ const handleChangeAddContent = () => {
 const handleOpenDeleteModal = (propertyName: string) => {
     if (state.contentType === 'LIST') state.selectedVariable = propertyName;
     deleteModalState.type = 'DELETE';
-    deleteModalState.headerTitle = i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE_TITLE');
     deleteModalState.visible = true;
 };
 const handleConfirmModalAction = () => {
@@ -183,14 +182,14 @@ const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
 const handleClickGoBackButton = () => {
     if (state.contentType !== 'LIST') {
         deleteModalState.type = 'ESCAPE';
-        setCancelAlert();
+        deleteModalState.visible = true;
         return;
     }
     SpaceRouter.router.go(-1);
 };
 const handleClickCancel = () => {
     deleteModalState.type = 'CANCEL';
-    setCancelAlert();
+    deleteModalState.visible = true;
 };
 
 const {
