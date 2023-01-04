@@ -76,11 +76,6 @@
                 {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.SAVE') }}
             </p-button>
         </div>
-        <delete-modal :header-title="deleteModalState.headerTitle"
-                      :visible.sync="deleteModalState.visible"
-                      :loading="deleteModalState.loading"
-                      @confirm="handleConfirmDeleteModal"
-        />
     </div>
 </template>
 
@@ -98,7 +93,6 @@ import { i18n } from '@/translations';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
@@ -113,7 +107,8 @@ interface Props {
 }
 interface EmitFn {
     (e: string, value: string): void;
-    (e: 'save', value: DashboardVariableSchemaProperty): void;
+    (e: 'save-click', value: DashboardVariableSchemaProperty): void;
+    (e: 'cancel-click'): void;
 }
 
 const props = defineProps<Props>();
@@ -176,21 +171,12 @@ const formInvalidState = reactive({
     }),
 });
 
-const deleteModalState = reactive({
-    headerTitle: i18n.t('Are you sure you want to discard changes?'),
-    visible: false,
-    loading: false,
-});
-
 // Event
 const handleCancel = () => {
     if (!formInvalidState.isChanged) {
-        deleteModalState.visible = true;
+        emit('cancel-click');
         return;
     }
-    state.proxyContentType = 'LIST';
-};
-const handleConfirmDeleteModal = () => {
     state.proxyContentType = 'LIST';
 };
 const handleAddOption = () => {
@@ -208,7 +194,7 @@ const handleSave = () => {
         selection_type: state.selectionType,
         options: state.options.map((d) => d.value).filter((value) => value !== ''),
     } as DashboardVariableSchemaProperty;
-    emit('save', variableToSave);
+    emit('save-click', variableToSave);
 };
 
 onMounted(() => {

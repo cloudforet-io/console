@@ -43,13 +43,15 @@
                                             :content-type.sync="contentType"
                                             :variable-names="variableNames"
                                             :selected-variable="variables[selectedVariable]"
-                                            @save="handleSaveVariable"
+                                            @save-click="handleSaveVariable"
+                                            @cancel-click="handleClickCancel"
             />
         </div>
         <delete-modal :header-title="deleteModalState.headerTitle"
+                      :contents="deleteModalState.contents"
                       :visible.sync="deleteModalState.visible"
                       :loading="deleteModalState.loading"
-                      @confirm="handleDeleteVariable"
+                      @confirm="handleConfirmModalAction"
         />
     </overlay-page-layout>
 </template>
@@ -111,28 +113,50 @@ const state = reactive({
 });
 
 const deleteModalState = reactive({
-    headerTitle: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE_TITLE'),
+    type: 'DELETE' as 'DELETE' | 'ESCAPE' | 'CANCEL',
+    headerTitle: '' as string | TranslateResult,
+    contents: '' as string | TranslateResult,
     visible: false,
     loading: false,
 });
 
-/* EVENT */
+/* Helper */
+const deleteVariable = () => {
+    const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
+    delete properties[state.selectedVariable];
+    const changedOrder = props.order.filter((d) => d !== state.selectedVariable);
+    emit('change', properties, changedOrder);
+};
+const resetDeleteModalState = () => {
+    deleteModalState.visible = false;
+    deleteModalState.headerTitle = '';
+    deleteModalState.contents = '';
+    state.selectedVariable = '';
+    if (state.contentType !== 'LIST') state.contentType = 'LIST';
+};
+const setCancelAlert = () => {
+    deleteModalState.headerTitle = i18n.t('Are you sure you want to discard changes?');
+    deleteModalState.contents = i18n.t('Changes will not be saved.');
+    deleteModalState.visible = true;
+};
+
+/* Event */
 const handleChangeAddContent = () => {
     state.contentType = 'ADD';
 };
 const handleOpenDeleteModal = (propertyName: string) => {
     if (state.contentType === 'LIST') state.selectedVariable = propertyName;
+    deleteModalState.type = 'DELETE';
+    deleteModalState.headerTitle = i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE_TITLE');
     deleteModalState.visible = true;
 };
-const handleDeleteVariable = () => {
-    const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
-    delete properties[state.selectedVariable];
-    const changedOrder = props.order.filter((d) => d !== state.selectedVariable);
-    emit('change', properties, changedOrder);
-
-    if (state.contentType === 'EDIT') state.contentType = 'LIST';
-    state.selectedVariable = '';
-    deleteModalState.visible = false;
+const handleConfirmModalAction = () => {
+    if (deleteModalState.type === 'DELETE') {
+        deleteVariable();
+    } else if (deleteModalState.type === 'ESCAPE') {
+        SpaceRouter.router.go(-1);
+    }
+    resetDeleteModalState();
 };
 const handleChangeVariableUse = (name: string, value: boolean) => {
     const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
@@ -157,13 +181,17 @@ const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
     state.contentType = 'LIST';
 };
 const handleClickGoBackButton = () => {
-    // TODO: refactor
     if (state.contentType !== 'LIST') {
-        state.contentType = 'LIST';
+        deleteModalState.type = 'ESCAPE';
+        setCancelAlert();
+        return;
     }
     SpaceRouter.router.go(-1);
 };
-
+const handleClickCancel = () => {
+    deleteModalState.type = 'CANCEL';
+    setCancelAlert();
+};
 
 const {
     contentType, titleSet, selectedVariable, variableNames,
