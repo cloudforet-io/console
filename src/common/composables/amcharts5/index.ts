@@ -24,7 +24,7 @@ import { createTreeMapSeries, setTreemapTooltipText, setTreemapLabelText } from 
 import type { ChartContext } from '@/common/composables/amcharts5/type';
 import {
     createXYCategoryChart, createXYDateChart, createXYLineSeries, createXYColumnSeries,
-    setXYSharedTooltipText, setXYSingleTooltipText, createXYVerticalChart, setXYSharedTooltipTextByUsage,
+    setXYSharedTooltipText, setXYSingleTooltipText, createXYHorizontalChart, setXYSharedTooltipTextByUsage,
 } from '@/common/composables/amcharts5/xy-chart-helper';
 
 
@@ -95,9 +95,9 @@ export const useAmcharts5 = (
             if (!state.root) throw new Error('No root');
             return createXYCategoryChart(state.root as Root, settings);
         },
-        createXYVerticalChart: (settings?: am5xy.IXYChartSettings) => {
+        createXYHorizontalChart: (settings?: am5xy.IXYChartSettings) => {
             if (!state.root) throw new Error('No root');
-            return createXYVerticalChart(state.root as Root, settings);
+            return createXYHorizontalChart(state.root as Root, settings);
         },
         createPieChart: (settings?: am5percent.IPieChartSettings): am5percent.PieChart => {
             if (!state.root) throw new Error('No root');

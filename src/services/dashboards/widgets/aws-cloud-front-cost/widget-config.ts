@@ -1,5 +1,6 @@
+import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/config';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 import { excludePropertiesFromDashboardCommonWidgetConfig } from '@/services/dashboards/widgets/widget-options-schema-helper';
 
@@ -27,7 +28,8 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
-        group_by: GROUP_BY.PROJECT,
+        chart_type: CHART_TYPE.STACKED_COLUMN,
+        granularity: GRANULARITY.ACCUMULATED,
         legend_options: {
             enabled: true,
             show_at: 'chart',
@@ -35,6 +37,10 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
         selector_options: {
             enabled: true,
             type: 'cost-usage',
+        },
+        pagination_options: {
+            enabled: true,
+            page_size: 5,
         },
     },
     options_schema: {

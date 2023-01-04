@@ -28,7 +28,7 @@
                            :items="state.data?.results"
                            :currency="state.currency"
                            :currency-rates="props.currencyRates"
-                           :all-reference-type-info="allReferenceTypeInfo"
+                           :all-reference-type-info="props.allReferenceTypeInfo"
                            :legends.sync="state.legends"
                            :color-set="state.colorSet"
                            :this-page="state.thisPage"
@@ -79,7 +79,7 @@ import {
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/widget-chart-helper';
 import {
-    getReferenceTypeOfGroupBy, getWidgetTableDateFields, sortHistoryTableData,
+    getReferenceTypeOfGroupBy, getWidgetTableDateFields, sortTableData,
 } from '@/services/dashboards/widgets/widget-table-helper';
 
 type Data = HistoryDataModel['results'];
@@ -143,7 +143,7 @@ const fetchData = async (): Promise<FullData> => {
         };
         if (state.pageSize) query.page = { start: state.thisPage, limit: state.pageSize };
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
-        return { results: sortHistoryTableData(results), more };
+        return { results: sortTableData(results), more };
     } catch (e) {
         ErrorHandler.handleError(e);
         return { results: [], more: false };

@@ -70,7 +70,7 @@ import {
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/widget-chart-helper';
 import {
-    getWidgetTableDateFields, sortHistoryTableData,
+    getWidgetTableDateFields, sortTableData,
 } from '@/services/dashboards/widgets/widget-table-helper';
 
 const DATE_FORMAT = 'YYYY-MM';
@@ -154,7 +154,7 @@ const fetchData = async (): Promise<HistoryDataModel['results']> => {
             },
         });
         const _refinedData = getRefinedTableData(results);
-        return sortHistoryTableData(_refinedData);
+        return sortTableData(_refinedData);
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];

@@ -135,7 +135,7 @@ export const createXYCategoryChart = (root: Root, settings?: IXYChartSettings): 
     return { chart, xAxis, yAxis };
 };
 
-export const createXYVerticalChart = (root: Root, settings?: IXYChartSettings): {
+export const createXYHorizontalChart = (root: Root, settings?: IXYChartSettings): {
     chart: am5xy.XYChart,
     xAxis: am5xy.ValueAxis<am5xy.AxisRenderer>,
     yAxis: am5xy.CategoryAxis<am5xy.AxisRenderer>
