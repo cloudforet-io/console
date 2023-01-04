@@ -1,14 +1,22 @@
 <template>
     <div class="p-collapsible-panel">
-        <div class="contents">
-            <div ref="fakeTextRef" class="text fake" :style="{'-webkit-line-clamp': lineClamp}">
+        <div class="panel-contents">
+            <div ref="fakeTextRef"
+                 class="text fake"
+                 :style="{'-webkit-line-clamp': lineClamp}"
+            >
                 <slot />
             </div>
-            <div class="text" :class="{collapsed: proxyIsCollapsed}" :style="{'-webkit-line-clamp': lineClamp}">
+            <div class="text"
+                 :class="{collapsed: proxyIsCollapsed}"
+                 :style="{'-webkit-line-clamp': lineClamp}"
+            >
                 <slot v-if="lineClamp !== 0 || !proxyIsCollapsed" />
             </div>
         </div>
-        <p-collapsible-toggle v-if="lineClamp === 0 || isOverflow" v-model="proxyIsCollapsed" />
+        <p-collapsible-toggle v-if="lineClamp === 0 || isOverflow"
+                              v-model="proxyIsCollapsed"
+        />
     </div>
 </template>
 
@@ -80,7 +88,7 @@ export default defineComponent<CollapsiblePanelProps>({
 .p-collapsible-panel {
     width: 100%;
     padding: 0.625rem;
-    .contents {
+    .panel-contents {
         position: relative;
         font-size: 0.75rem;
         line-height: 1.5;
