@@ -22,28 +22,28 @@
                                :valid="validationState.isUserIdValid"
                                :valid-text="validationState.userIdValidText"
                 >
+                    <template v-if="formState.activeTab === 'external' && supportFind && externalItems.length > 100"
+                              #help
+                    >
+                        <div class="external-items-help-text">
+                            <span>{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
+                        </div>
+                    </template>
                     <template #default="{invalid}">
                         <div v-if="formState.activeTab === 'external' && supportFind">
                             <p-filterable-dropdown
-                                v-model="searchText"
+                                :search-text.sync="searchText"
                                 :class="{invalid}"
-                                type="radioButton"
+                                show-select-marker
                                 :menu="externalItems"
                                 :selected.sync="selectedItems"
                                 :loading="loading"
                                 disable-handler
                                 :exact-mode="false"
                                 use-fixed-menu-style
-                                @select-menu="onSelectExternalUser"
+                                @select="onSelectExternalUser"
                                 @delete-tag="onDeleteSelectedExternalUser"
-                                @search="onSearchExternalUser"
-                            >
-                                <template #menu-help-text>
-                                    <div class="help-text">
-                                        <span v-if="externalItems.length > 100">{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
-                                    </div>
-                                </template>
-                            </p-filterable-dropdown>
+                            />
                         </div>
                         <div v-else
                              class="id-input-form"
@@ -495,14 +495,6 @@ export default {
             await getExternalUser(userItem.name);
             await checkUserID();
         };
-        const onSearchExternalUser = async (userId: string) => {
-            const trimmedUserId = userId.trim();
-            if (trimmedUserId) {
-                state.selectedItems = [{ name: trimmedUserId, label: trimmedUserId }];
-                await getExternalUser(trimmedUserId);
-                await checkUserID();
-            }
-        };
         const onDeleteSelectedExternalUser = () => {
             setFormState();
             setValidationState();
@@ -547,7 +539,6 @@ export default {
             checkUserID,
             onSelectExternalUser,
             onDeleteSelectedExternalUser,
-            onSearchExternalUser,
             handleUpdateTags,
         };
     },
@@ -560,7 +551,12 @@ export default {
         margin-bottom: 1.5rem;
         overflow-y: hidden;
     }
-
+    .external-items-help-text {
+        @apply text-gray-400;
+        font-size: 0.75rem;
+        line-height: 1.3;
+        padding: 0.25rem 0;
+    }
     .p-filterable-dropdown {
         width: 25rem;
 
@@ -568,12 +564,6 @@ export default {
             .p-search {
                 @apply border-alert;
             }
-        }
-        .help-text {
-            @apply text-gray-400;
-            font-size: 0.75rem;
-            line-height: 1.3;
-            padding: 0.25rem 0.5rem;
         }
     }
     .id-input-form {

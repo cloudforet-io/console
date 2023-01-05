@@ -4,6 +4,7 @@
                            :menu="allMemberItems"
                            :selected.sync="selectedMemberItems"
                            multi-selectable
+                           appearance-type="stack"
                            use-fixed-menu-style
     />
 </template>

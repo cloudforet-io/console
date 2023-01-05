@@ -30,6 +30,8 @@
                             :menu="internalUserItems"
                             :selected="selectedInternalUserItems"
                             multi-selectable
+                            appearance-type="stack"
+                            show-select-marker
                             use-fixed-menu-style
                             :invalid="invalid"
                             @update:selected="setForm('selectedInternalUserItems', $event)"
@@ -84,7 +86,7 @@
                         <p-filterable-dropdown
                             :menu="roleItems"
                             :selected="selectedRoleItems"
-                            type="radioButton"
+                            show-select-marker
                             use-fixed-menu-style
                             :invalid="invalid"
                             @update:selected="handleSelectRoleItems"

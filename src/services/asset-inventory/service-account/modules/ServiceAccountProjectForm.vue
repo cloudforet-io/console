@@ -3,6 +3,7 @@
         <project-select-dropdown
             class="project-select-dropdown"
             project-selectable
+            multi-selectable
             :selected-project-ids.sync="selectedProjects"
             :use-fixed-menu-style="false"
             :invalid="proxyIsValid === false"

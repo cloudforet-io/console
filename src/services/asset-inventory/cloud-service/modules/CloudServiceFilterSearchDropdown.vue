@@ -1,14 +1,14 @@
 <template>
     <div>
-        <p-filterable-dropdown v-model="searchTerm"
+        <p-filterable-dropdown :search-text.sync="searchTerm"
                                :menu="menuItems"
                                :selected="selectedItems"
                                multi-selectable
                                use-fixed-menu-style
-                               :exact-mode="false"
+                               appearance-type="stack"
+                               show-select-marker
                                :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
                                @update:selected="handleUpdateSelected"
-                               @search="handleSearch"
         >
             <template v-if="type === CLOUD_SERVICE_FILTER_KEY.REGION"
                       #menu-item--format="{item}"
@@ -122,25 +122,22 @@ export default defineComponent<Props>({
             }),
             menuLoading: false,
         });
-        const regionMenuHandler = (inputText: string, list: RegionMenuItem[]) => {
+        const regionMenuHandler = (inputText: string) => {
             const trimmed = inputText?.trim();
-            let results: RegionMenuItem[] = [...list];
+            let results: RegionMenuItem[];
             if (trimmed) {
                 const regex = getTextHighlightRegex(inputText);
-                results = results.filter((d) => regex.test(d.label));
+                results = state.menuItems.filter((d) => regex.test(d.label));
+            } else {
+                results = [...state.menuItems];
             }
 
             return {
                 results,
-                totalCount: state.regionItems.length,
             };
         };
 
         /* event */
-        const handleSearch = (val: string) => {
-            emit('update:selected', state.selectedItems.map((d) => d.name).concat([val]));
-        };
-
         const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
             emit('update:selected', selected.map((d) => d.name));
         };
@@ -157,7 +154,6 @@ export default defineComponent<Props>({
             ...toRefs(state),
             CLOUD_SERVICE_FILTER_KEY,
             regionMenuHandler,
-            handleSearch,
             handleUpdateSelected,
         };
     },
