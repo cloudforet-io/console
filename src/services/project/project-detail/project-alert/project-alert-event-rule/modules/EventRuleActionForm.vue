@@ -63,10 +63,9 @@
                     {{ $t('PROJECT.EVENT_RULE.ASSIGNEE') }}
                 </p>
                 <p-filterable-dropdown class="user-search-dropdown"
-                                       type="radioButton"
+                                       show-select-marker
                                        :menu="userItems"
                                        :selected.sync="selectedAssignee"
-                                       use-fixed-menu-style
                 />
             </div>
             <div class="form-box mobile-block">
@@ -77,7 +76,8 @@
                                        :menu="userItems"
                                        :selected.sync="selectedResponder"
                                        multi-selectable
-                                       use-fixed-menu-style
+                                       appearance-type="stack"
+                                       show-select-marker
                 />
             </div>
             <div class="form-box additional-information">
@@ -320,14 +320,6 @@ export default {
         }
         .project-select-dropdown, .user-search-dropdown {
             width: 60%;
-        }
-
-        /* custom design-system component - p-filterable-dropdown */
-        .user-search-dropdown {
-            :deep(.p-tag .text) {
-                @apply truncate;
-                max-width: 15rem;
-            }
         }
     }
 }
