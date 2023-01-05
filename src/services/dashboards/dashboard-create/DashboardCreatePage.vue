@@ -65,6 +65,7 @@ export default {
     },
     setup() {
         const dashboardDetailStore = useDashboardDetailInfoStore();
+        const dashboardDetailState = dashboardDetailStore.state;
         const {
             forms: {
                 dashboardTemplate,
@@ -107,7 +108,8 @@ export default {
                 };
             }
 
-            dashboardDetailStore.setDashboardInfo(_dashboardTemplate, undefined);
+            dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
+            dashboardDetailState.dashboardId = undefined;
             SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME, params: { dashboardScope: state.dashboardScope } });
         };
 

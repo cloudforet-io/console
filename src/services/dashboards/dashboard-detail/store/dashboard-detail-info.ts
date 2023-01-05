@@ -136,10 +136,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.dashboardWidgetInfoList = [];
     };
 
-    const setDashboardInfo = (dashboardInfo: DashboardModel, dashboardId?: string | undefined) => {
+    const setDashboardInfo = (dashboardInfo: DashboardModel) => {
         state.dashboardInfo = dashboardInfo;
         state.dashboardName = dashboardInfo.name;
-        state.dashboardId = dashboardId;
         state.projectId = (dashboardInfo as ProjectDashboardModel).project_id ?? '';
 
         state.enableCurrency = dashboardInfo.settings?.currency?.enabled ?? false;

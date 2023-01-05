@@ -126,7 +126,6 @@ const state = reactive({
             properties: variableState.variableProperties,
             order: variableState.order,
         },
-        viewers: dashboardDetailState.dashboardViewer,
     })),
 });
 const vm = getCurrentInstance()?.proxy as Vue;
@@ -231,10 +230,16 @@ const updateDashboardData = async () => {
 const createDashboard = async () => {
     try {
         if (dashboardDetailState.isProjectDashboard) {
-            const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create(state.apiParam);
+            const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
+                ...state.apiParam,
+                viewers: dashboardDetailState.dashboardViewer,
+            });
             dashboardDetailState.dashboardId = result.project_dashboard_id;
         } else {
-            const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(state.apiParam);
+            const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create({
+                ...state.apiParam,
+                viewers: dashboardDetailState.dashboardViewer,
+            });
             dashboardDetailState.dashboardId = result.domain_dashboard_id;
         }
         await SpaceRouter.router.push({
