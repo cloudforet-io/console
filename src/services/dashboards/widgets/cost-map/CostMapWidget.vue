@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   :error-mode="false"
+                  @refresh="handleRefresh"
     >
         <div class="cost-map">
             <div class="chart-wrapper">
@@ -165,6 +166,10 @@ const refreshWidget = async () => {
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
+};
+
+const handleRefresh = () => {
+    refreshWidget();
 };
 
 useWidgetLifecycle({

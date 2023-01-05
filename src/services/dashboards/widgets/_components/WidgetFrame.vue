@@ -74,6 +74,8 @@
         <!--sul-lang-->
         <p-button-modal :visible.sync="state.visibleEditModal"
                         :header-title="$t('Update Widget')"
+                        :disabled="!widgetFormState.isValid"
+                        @confirm="handleConfirm"
         >
             <template #body>
                 <div v-if="!props.widgetConfigId"
@@ -116,6 +118,8 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import type { DateRange } from '@/services/dashboards/config';
 import DashboardAddDefaultWidgetRightArea
     from '@/services/dashboards/dashboard-customize/modules/DashboardAddDefaultWidgetRightArea.vue';
+import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
+import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type { WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
@@ -164,8 +168,11 @@ const props = withDefaults(defineProps<Props>(), {
     isOnlyFullSize: false,
 });
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
+const emit = defineEmits(['refresh']);
 
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const widgetFormStore = useWidgetFormStore();
+const widgetFormState = widgetFormStore.state;
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
@@ -215,6 +222,17 @@ const state = reactive({
 
 const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
 const handleEditButtonClick = () => { state.visibleEditModal = true; };
+const handleConfirm = () => {
+    const widgetInfo: Partial<DashboardContainerWidgetInfo> = {
+        widget_name: widgetFormState.widgetConfigId ?? '',
+        title: widgetFormState.widgetTitle ?? '',
+        inherit_options: widgetFormState.inheritOptions ?? {},
+        widget_options: widgetFormState.widgetOptions ?? {},
+    };
+    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
+    state.visibleEditModal = false;
+    emit('refresh');
+};
 </script>
 
 <style lang="postcss" scoped>

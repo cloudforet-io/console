@@ -2,6 +2,7 @@
     <widget-frame v-bind="widgetFrameProps"
                   :date-range="state.options.date_range"
                   :currency="state.currency"
+                  @refresh="handleRefresh"
     >
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
@@ -98,6 +99,10 @@ const refreshWidget = async () => {
     state.data = await fetchData();
     state.loading = false;
     return state.data;
+};
+
+const handleRefresh = () => {
+    refreshWidget();
 };
 
 defineExpose<WidgetExpose<Data[]>>({

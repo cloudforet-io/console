@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="base-trend-widget"
+                  @refresh="handleRefresh"
     >
         <template v-if="state.selectorItems.length"
                   #header-right
@@ -225,6 +226,9 @@ const handleToggleLegend = (index) => {
 };
 const handleUpdateThisPage = (thisPage: number) => {
     state.thisPage = thisPage;
+    refreshWidget();
+};
+const handleRefresh = () => {
     refreshWidget();
 };
 

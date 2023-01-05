@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   :error-mode="false"
+                  @refresh="handleRefresh"
     >
         <div class="budget-usage-summary">
             <div class="budget">
@@ -171,6 +172,10 @@ const refreshWidget = async (): Promise<Data[]> => {
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
+};
+
+const handleRefresh = () => {
+    refreshWidget();
 };
 
 useWidgetLifecycle({

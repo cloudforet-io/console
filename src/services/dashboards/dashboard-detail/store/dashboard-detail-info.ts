@@ -203,6 +203,18 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.widgetDataMap = widgetDataMap;
     };
 
+    const updateWidgetInfo = (widgetKey: string, data: any) => {
+        const targetIndex = state.dashboardWidgetInfoList.findIndex((info) => info.widgetKey === widgetKey);
+        if (targetIndex > -1) {
+            const _dashboardWidgetInfoList = [...state.dashboardWidgetInfoList];
+            _dashboardWidgetInfoList[targetIndex] = {
+                ...state.dashboardWidgetInfoList[targetIndex],
+                ...data,
+            };
+            state.dashboardWidgetInfoList = _dashboardWidgetInfoList;
+        }
+    };
+
     store.dispatch('reference/loadAll');
 
     return {
@@ -214,5 +226,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         initiateAllWidgets,
         // getter
         dashboardWidgetInfoList: computed(() => state.dashboardWidgetInfoList),
+        // action
+        updateWidgetInfo,
     };
 });

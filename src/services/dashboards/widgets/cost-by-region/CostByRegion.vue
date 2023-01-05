@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="cost-by-region"
+                  @refresh="handleRefresh"
     >
         <div class="content-wrapper">
             <p-data-loader class="chart-loader"
@@ -270,6 +271,10 @@ const refreshWidget = async (thisPage = 1) => {
 const handleUpdateThisPage = (thisPage: number) => {
     state.thisPage = thisPage;
     refreshWidget(thisPage);
+};
+
+const handleRefresh = () => {
+    refreshWidget();
 };
 
 /* Init */
