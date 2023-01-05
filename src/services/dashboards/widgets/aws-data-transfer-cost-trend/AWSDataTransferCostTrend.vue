@@ -72,7 +72,7 @@ import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-wi
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
-import type { HistoryDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
+import type { CostAnalyzeDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
@@ -89,7 +89,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const state = reactive({
-    ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
+    ...toRefs(useWidgetState<CostAnalyzeDataModel['results']>(props)),
     fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost' : 'usage_quantity')),
     chartData: computed<XYChartData[]>(() => {
         const valueKey = `${state.fieldsKey}_sum`;
@@ -118,13 +118,13 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Util */
-const getRefinedTableData = (results: HistoryDataModel['results']): HistoryDataModel['results'] => results.map((result) => ({
+const getRefinedTableData = (results: CostAnalyzeDataModel['results']): CostAnalyzeDataModel['results'] => results.map((result) => ({
     ...result,
     [state.groupBy]: USAGE_TYPE_LABEL_MAP[result[state.groupBy]],
 }));
 
 /* Api */
-const fetchData = async (): Promise<HistoryDataModel['results']> => {
+const fetchData = async (): Promise<CostAnalyzeDataModel['results']> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters([
@@ -208,7 +208,7 @@ const drawChart = (chartData: XYChartData[]) => {
     state.chart = chart;
 };
 
-const initWidget = async (data?: HistoryDataModel['results']) => {
+const initWidget = async (data?: CostAnalyzeDataModel['results']) => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.legends = getLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
@@ -244,7 +244,7 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
 });
 
-defineExpose<WidgetExpose<HistoryDataModel['results']>>({
+defineExpose<WidgetExpose<CostAnalyzeDataModel['results']>>({
     initWidget,
     refreshWidget,
 });

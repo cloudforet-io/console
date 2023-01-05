@@ -82,9 +82,9 @@ import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-wi
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
-import type { HistoryDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
+import type { CostAnalyzeDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 
-type Data = HistoryDataModel['results'];
+type Data = CostAnalyzeDataModel['results'];
 interface FullData {
     results: Data;
     more: boolean;

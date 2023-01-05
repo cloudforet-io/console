@@ -10,7 +10,7 @@ import type { DateRange } from '@/services/dashboards/config';
 import type { GroupBy } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import type {
-    HistoryDataModel, XYChartData, Legend, TreemapChartData,
+    CostAnalyzeDataModel, XYChartData, Legend, TreemapChartData,
 } from '@/services/dashboards/widgets/type';
 
 
@@ -25,7 +25,7 @@ const mergeByKey = (arrA, arrB, key) => {
  * @example [{ date: '2021-11', aws: 100, azure: 300 }, { date: '2021-09', aws: 300, azure: 100 }]
  */
 export const getRefinedXYChartData = (
-    rawData?: HistoryDataModel['results'],
+    rawData?: CostAnalyzeDataModel['results'],
     groupBy?: GroupBy,
     categoryKey = 'date',
     valueKey = 'usd_cost_sum',
@@ -64,7 +64,7 @@ export const getRefinedXYChartData = (
  * @name getLegends
  * @description Extract legends from raw data.
  */
-export const getLegends = (rawData: HistoryDataModel['results'], groupBy: GroupBy, allReferenceTypeInfo: AllReferenceTypeInfo): Legend[] => {
+export const getLegends = (rawData: CostAnalyzeDataModel['results'], groupBy: GroupBy, allReferenceTypeInfo: AllReferenceTypeInfo): Legend[] => {
     if (!rawData || !groupBy || !allReferenceTypeInfo) return [];
     const legends: Legend[] = [];
     rawData.forEach((d) => {

@@ -83,7 +83,7 @@ import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-wi
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
-import type { XYChartData, HistoryDataModel } from '@/services/dashboards/widgets/type';
+import type { XYChartData, CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
 
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -93,7 +93,7 @@ const DATE_FIELD_NAME = 'date';
 
 const props = defineProps<WidgetProps>();
 
-type Data = HistoryDataModel['results'];
+type Data = CostAnalyzeDataModel['results'];
 const state = reactive({
     ...toRefs(useWidgetState<Data>(props)),
     chartData: computed(() => getRefinedXYChartData(state.data)),
