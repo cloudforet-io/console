@@ -31,5 +31,6 @@ export interface XYChartData {
 export interface Legend {
     name: string;
     label?: TranslateResult;
+    color?: string;
     disabled?: boolean;
 }

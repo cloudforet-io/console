@@ -221,6 +221,7 @@ const state = reactive({
 const getLegendIconColor = (index): string => {
     const legend = props.legends[index];
     if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+    if (legend?.color) return legend.color;
     if (props.colorSet) return props.colorSet[index];
     return DEFAULT_CHART_COLORS[index];
 };
