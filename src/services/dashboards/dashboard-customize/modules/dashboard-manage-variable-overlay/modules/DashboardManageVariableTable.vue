@@ -92,17 +92,22 @@ const props = defineProps<Props>();
 const emit = defineEmits<EmitFn>();
 
 const state = reactive({
-    orderedVariables: computed(() => props.order.map((d) => {
-        const currentVariable = {
-            ...props.variables[d],
-            propertyName: d,
-        };
-        if (currentVariable.variable_type === 'MANAGED') return currentVariable;
-        return {
-            ...currentVariable,
-            managable: d,
-        };
-    })),
+    orderedVariables: computed(() => {
+        const convertedVariables = props.order.map((d) => {
+            const currentVariable = {
+                ...props.variables[d],
+                propertyName: d,
+            };
+            if (currentVariable.variable_type === 'MANAGED') return currentVariable;
+            return {
+                ...currentVariable,
+                managable: d,
+            };
+        });
+        if (state.selectedVariableType === 'ALL') return convertedVariables;
+        const variablesFilteredByType = convertedVariables.filter((d) => d.variable_type === state.selectedVariableType);
+        return variablesFilteredByType;
+    }),
     variableFilterList: computed(() => [
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_ALL'), name: 'ALL' },
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'), name: 'MANAGED' },
