@@ -70,7 +70,7 @@ import {
 } from 'vue';
 
 import { PDivider, PI } from '@spaceone/design-system';
-import { isEqual } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -242,6 +242,12 @@ const handleSave = async () => {
 const handleChangeVariable = (variables: DashboardVariablesSchema['properties'], order?: string[]) => {
     variableState.variableProperties = variables;
     if (order) variableState.order = order;
+    const _variableData = cloneDeep(variableState.variableData);
+    variableState.order.forEach((d) => {
+        if (variables[d].use) return;
+        if (variableState.variableData[d]) delete _variableData[d];
+    });
+    variableState.variableData = _variableData;
 };
 const handleChangeVariableOptions = (propertyName: string, selected: string|string[]) => {
     variableState.variableData[propertyName] = selected;
