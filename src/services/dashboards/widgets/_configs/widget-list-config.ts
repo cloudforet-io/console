@@ -28,12 +28,12 @@ export const CONSOLE_WIDGET_ORDER = [
     'awsDataTransferCostTrend',
     'costTrendStacked',
     'awsCloudFrontCost',
+    'costPie',
     'costDonut',
     'costByRegion',
     'awsDataTransferByRegion',
     'budgetStatus',
     'budgetUsageWithForecast',
-    'costPie',
 ];
 
 export const CONSOLE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {
@@ -44,12 +44,12 @@ export const CONSOLE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {
     awsDataTransferCostTrend,
     costTrendStacked,
     awsCloudFrontCost,
+    costPie,
     costDonut,
     costByRegion,
     awsDataTransferByRegion,
     budgetStatus,
     budgetUsageWithForecast,
-    costPie,
     // costAnalysisQuery,
 };
 
