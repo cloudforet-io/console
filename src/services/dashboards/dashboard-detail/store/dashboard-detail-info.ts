@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import dayjs from 'dayjs';
-import { flattenDeep } from 'lodash';
+import { cloneDeep, flattenDeep } from 'lodash';
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -203,10 +203,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.widgetDataMap = widgetDataMap;
     };
 
-    const updateWidgetInfo = (widgetKey: string, data: any) => {
+    const updateWidgetInfo = (widgetKey: string, data: Partial<DashboardContainerWidgetInfo>) => {
         const targetIndex = state.dashboardWidgetInfoList.findIndex((info) => info.widgetKey === widgetKey);
         if (targetIndex > -1) {
-            const _dashboardWidgetInfoList = [...state.dashboardWidgetInfoList];
+            const _dashboardWidgetInfoList = cloneDeep(state.dashboardWidgetInfoList);
             _dashboardWidgetInfoList[targetIndex] = {
                 ...state.dashboardWidgetInfoList[targetIndex],
                 ...data,
