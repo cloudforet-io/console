@@ -69,10 +69,8 @@ import {
     computed, getCurrentInstance, onBeforeUnmount, onMounted, reactive,
 } from 'vue';
 
-import { PDivider } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
 import { PDivider, PI } from '@spaceone/design-system';
-import { isEqual } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
