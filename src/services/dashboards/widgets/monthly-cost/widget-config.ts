@@ -1,4 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
+import { GRANULARITY } from '@/services/dashboards/widgets/config';
 
 const monthlyCostWidgetConfig: WidgetConfig = {
     widget_config_id: 'monthlyCost',
@@ -19,7 +20,7 @@ const monthlyCostWidgetConfig: WidgetConfig = {
     },
     sizes: ['sm'],
     options: {
-        granularity: 'MONTHLY',
+        granularity: GRANULARITY.MONTHLY,
     },
 };
 
