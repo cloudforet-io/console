@@ -115,7 +115,6 @@ const state = reactive({
         { label: 'Region', name: GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' } },
         { label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' } },
     ]),
-    tableItems: [],
     legends: [] as Legend[],
     chartLegends: computed(() => uniqWith(state.legends, isEqual)),
     chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results)),

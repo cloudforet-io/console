@@ -44,6 +44,7 @@ import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { PDataLoader } from '@spaceone/design-system';
 import bytes from 'bytes';
@@ -67,7 +68,7 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { UsageType, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
@@ -84,14 +85,9 @@ interface FullData {
     results: Data;
     more: boolean;
 }
-type UsageType = 'data-transfer.out' | 'requests.http' | 'requests.https';
 
 const USAGE_SOURCE_UNIT = 'GB';
-const SELECTOR_TYPE_FIELDS_KEY_MAP = {
-    cost: 'usd_cost',
-    usage: 'usage_quantity',
-};
-const USAGE_TYPE_LABEL_MAP: Record<UsageType, string> = {
+const USAGE_TYPE_LABEL_MAP: Record<Extract<UsageType, 'data-transfer.out'|'requests.http'|'requests.https'>, TranslateResult> = {
     'data-transfer.out': 'Transfer-out',
     'requests.http': 'Requests (HTTP)',
     'requests.https': 'Requests (HTTPS)',
@@ -103,7 +99,7 @@ const chartHelper = useAmcharts5(chartContext);
 
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
-    fieldsKey: computed<string>(() => SELECTOR_TYPE_FIELDS_KEY_MAP[state.selectedSelectorType]),
+    fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost' : 'usage_quantity')),
     legends: [] as Legend[],
     chartData: computed(() => {
         const valueKey = `${state.fieldsKey}_sum`;
@@ -152,11 +148,11 @@ const fetchData = async (): Promise<FullData> => {
             end: state.dateRange.end,
             fields: {
                 usd_cost_sum: {
-                    key: SELECTOR_TYPE_FIELDS_KEY_MAP.cost,
+                    key: 'usd_cost',
                     operator: 'sum',
                 },
                 usage_quantity_sum: {
-                    key: SELECTOR_TYPE_FIELDS_KEY_MAP.usage,
+                    key: 'usage_quantity',
                     operator: 'sum',
                 },
             },

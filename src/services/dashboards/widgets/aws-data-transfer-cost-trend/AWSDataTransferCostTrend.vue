@@ -41,6 +41,7 @@ import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
@@ -57,7 +58,7 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetProps, WidgetExpose, UsageType } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import {
     getDateAxisSettings,
@@ -76,11 +77,7 @@ import type { HistoryDataModel, Legend, XYChartData } from '@/services/dashboard
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 const USAGE_SOURCE_UNIT = 'GB';
-const SELECTOR_TYPE_FIELDS_KEY_MAP = {
-    cost: 'usd_cost',
-    usage: 'usage_quantity',
-};
-const USAGE_TYPE_LABEL_MAP = {
+const USAGE_TYPE_LABEL_MAP: Record<Extract<UsageType, 'data-transfer.out'|'data-transfer.in'|'data-transfer.etc'>, TranslateResult> = {
     'data-transfer.out': 'Transfer-out',
     'data-transfer.in': 'Transfer-in',
     'data-transfer.etc': 'etc.',
@@ -93,7 +90,7 @@ const chartHelper = useAmcharts5(chartContext);
 
 const state = reactive({
     ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
-    fieldsKey: computed<string>(() => SELECTOR_TYPE_FIELDS_KEY_MAP[state.selectedSelectorType]),
+    fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost' : 'usage_quantity')),
     chartData: computed<XYChartData[]>(() => {
         const valueKey = `${state.fieldsKey}_sum`;
         return getRefinedXYChartData(state.data, state.groupBy, DATE_FIELD_NAME, valueKey);
@@ -143,11 +140,11 @@ const fetchData = async (): Promise<HistoryDataModel['results']> => {
                 end: state.dateRange.end,
                 fields: {
                     usd_cost_sum: {
-                        key: SELECTOR_TYPE_FIELDS_KEY_MAP.cost,
+                        key: 'usd_cost',
                         operator: 'sum',
                     },
                     usage_quantity_sum: {
-                        key: SELECTOR_TYPE_FIELDS_KEY_MAP.usage,
+                        key: 'usage_quantity',
                         operator: 'sum',
                     },
                 },

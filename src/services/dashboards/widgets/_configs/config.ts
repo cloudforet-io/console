@@ -177,3 +177,4 @@ export interface WidgetExpose<Data = any> {
 }
 
 export type SelectorType = 'cost' | 'usage' | 'day' | 'month';
+export type UsageType = 'data-transfer.out' | 'data-transfer.in' | 'data-transfer.etc' | 'requests.http' | 'requests.https';
