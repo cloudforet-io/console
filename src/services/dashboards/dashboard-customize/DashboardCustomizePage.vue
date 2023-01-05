@@ -30,6 +30,17 @@
                                                :variable-order="variableState.order"
                                                @change="handleChangeVariable"
                 />
+                <button class="reset-button"
+                        @click="handleResetVariables"
+                >
+                    <p-i name="ic_refresh"
+                         width="1rem"
+                         height="1rem"
+                         color="inherit"
+                    />
+                    <!--song-lang-->
+                    <span>{{ $t('Reset') }}</span>
+                </button>
             </div>
             <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
                                         refresh-disabled
@@ -58,7 +69,8 @@ import {
     computed, getCurrentInstance, onBeforeUnmount, onMounted, reactive,
 } from 'vue';
 
-import { PDivider } from '@spaceone/design-system';
+import { PDivider, PI } from '@spaceone/design-system';
+import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -70,6 +82,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type {
     DashboardConfig, DashboardVariablesSchema,
+    DashboardVariables,
 } from '@/services/dashboards/config';
 import { DASHBOARD_SCOPE, MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
@@ -110,7 +123,8 @@ const variableState = reactive({
         user: ['test4'],
         region: ['test3'],
         randomkeynode: 'test1',
-    },
+        randomkeynode2: 'test5555',
+    } as DashboardVariables,
     variableProperties: {
         project: {
             variable_type: 'MANAGED',
@@ -149,13 +163,20 @@ const variableState = reactive({
         },
         randomkeynode: {
             variable_type: 'CUSTOM',
-            use: false,
-            selection_type: 'SINGLE',
+            use: true,
+            selection_type: 'MULTI',
             options: ['test1', 'test2', 'test3', 'test4'],
             name: 'Node',
         },
+        randomkeynode2: {
+            variable_type: 'CUSTOM',
+            use: true,
+            selection_type: 'SINGLE',
+            options: ['test1', 'test2', 'test3', 'test4'],
+            name: 'Node22',
+        },
     } as DashboardVariablesSchema['properties'],
-    order: ['project', 'provider', 'serviceAccount', 'region', 'user', 'randomkeynode'],
+    order: ['project', 'provider', 'serviceAccount', 'region', 'user', 'randomkeynode', 'randomkeynode2'],
 });
 
 /* Api */
@@ -223,6 +244,34 @@ const handleChangeVariable = (variables: DashboardVariablesSchema['properties'],
 const handleChangeVariableOptions = (propertyName: string, selected: string|string[]) => {
     variableState.variableData[propertyName] = selected;
 };
+const handleResetVariables = () => {
+    const initialPropertiesWithChangedVariable = {} as DashboardVariablesSchema['properties'];
+    const initialDataWithChangedVariable = {} as DashboardVariables;
+    const originSchemaProperties = dashboardDetailState.variables_schema.properties;
+    const originData = dashboardDetailState.variables;
+    const originOrder = dashboardDetailState.variables_schema.order;
+
+    // reset variables_schema
+    variableState.order.forEach((d) => {
+        if (originSchemaProperties[d]) {
+            initialPropertiesWithChangedVariable[d] = {
+                ...variableState.variableProperties[d],
+                use: originSchemaProperties[d].use,
+            };
+        } else initialPropertiesWithChangedVariable[d] = variableState.variableProperties[d];
+    });
+
+    // reset variables
+    originOrder.forEach((d) => {
+        if (!variableState.variableProperties[d]) return;
+        if (isEqual(variableState.variableProperties[d], originSchemaProperties[d])) {
+            initialDataWithChangedVariable[d] = originData[d];
+        }
+    });
+
+    variableState.variableProperties = initialPropertiesWithChangedVariable;
+    variableState.variableData = initialDataWithChangedVariable;
+};
 
 // for preventing refresh
 const handleUnload = (event) => {
@@ -256,6 +305,11 @@ onMounted(() => {
             @apply relative flex items-center flex-wrap;
             gap: 0.5rem;
             padding: 1.5rem 0 1.25rem;
+
+            .reset-button {
+                @apply flex items-center text-label-md text-blue-700;
+                gap: 0.25rem;
+            }
         }
     }
 }
