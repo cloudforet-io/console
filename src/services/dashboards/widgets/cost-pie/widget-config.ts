@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 
 const costPieWidgetConfig: Partial<WidgetConfig> = {
@@ -10,6 +10,9 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
     description: {
         translation_id: 'DASHBOARDS.WIDGET.COST_PIE.DESC',
         preview_image: 'widget-img_costPie--thumbnail.png',
+    },
+    options: {
+        chart_type: CHART_TYPE.PIE,
     },
     options_schema: {
         default_properties: ['group_by'],
