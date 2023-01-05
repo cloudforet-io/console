@@ -8,6 +8,7 @@ import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import type { DateRange } from '@/services/dashboards/config';
 import type { GroupBy } from '@/services/dashboards/widgets/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/config';
 import type {
     HistoryDataModel, XYChartData, Legend, TreemapChartData,
 } from '@/services/dashboards/widgets/type';
@@ -69,10 +70,14 @@ export const getLegends = (rawData: HistoryDataModel['results'], groupBy: GroupB
     rawData.forEach((d) => {
         let _name = d[groupBy];
         let _label = d[groupBy];
+        let _color;
         const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
         if (_name && referenceTypeInfo) {
             const referenceMap = referenceTypeInfo.referenceMap;
             _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
+            if (groupBy === GROUP_BY.PROVIDER) {
+                _color = referenceMap[_name]?.color;
+            }
         } else if (!_name) {
             _name = `no_${groupBy}`;
             _label = 'Unknown';
@@ -80,6 +85,7 @@ export const getLegends = (rawData: HistoryDataModel['results'], groupBy: GroupB
         legends.push({
             name: _name,
             label: _label,
+            color: _color,
             disabled: false,
         });
     });
