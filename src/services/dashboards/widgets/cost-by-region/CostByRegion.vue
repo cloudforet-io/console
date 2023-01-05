@@ -314,9 +314,7 @@ defineExpose<WidgetExpose<FullData>>({
                         height: 0.5rem;
                     }
                     .label {
-                        @apply mr-4 text-gray-500;
-                        font-size: 0.75rem;
-                        line-height: 1.5;
+                        @apply mr-4 text-label-sm text-gray-700;
                         white-space: nowrap;
                     }
                 }
@@ -324,9 +322,6 @@ defineExpose<WidgetExpose<FullData>>({
         }
         .widget-data-table {
             @apply col-span-7;
-            .toggle-button {
-                cursor: default;
-            }
         }
     }
 }
