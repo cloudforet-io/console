@@ -229,18 +229,23 @@ const updateDashboardData = async () => {
 };
 const createDashboard = async () => {
     try {
-        let _dashboardId = '';
         if (dashboardDetailState.isProjectDashboard) {
-            const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create(state.apiParam);
-            _dashboardId = result.project.project_dashboard_id;
+            const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
+                ...state.apiParam,
+                viewers: dashboardDetailState.dashboardViewer,
+            });
+            dashboardDetailState.dashboardId = result.project_dashboard_id;
         } else {
-            const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(state.apiParam);
-            _dashboardId = result.domain.domain_dashboard_id;
+            const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create({
+                ...state.apiParam,
+                viewers: dashboardDetailState.dashboardViewer,
+            });
+            dashboardDetailState.dashboardId = result.domain_dashboard_id;
         }
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId: _dashboardId,
+                dashboardId: dashboardDetailState.dashboardId as string,
                 dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
