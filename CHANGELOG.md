@@ -1,3 +1,10 @@
+# [1.1.0-beta.509](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.508...v1.1.0-beta.509) (2023-01-05)
+
+
+### Features
+
+* **context-menu:** remove strict-select-mode prop ([#221](https://github.com/cloudforet-io/mirinae/issues/221)) ([511e39b](https://github.com/cloudforet-io/mirinae/commit/511e39b95c54fc926a55598e016fef97c9c661a9))
+
 # [1.1.0-beta.508](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.507...v1.1.0-beta.508) (2023-01-04)
 
 
