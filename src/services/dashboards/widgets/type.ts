@@ -15,6 +15,16 @@ export interface CostAnalyzeDataModel {
     }>;
 }
 
+export interface BudgetDataModel {
+    more?: boolean;
+    results: Array<{
+        budget_id: string;
+        name?: string;
+        total_spent?: number;
+        total_budget?: number;
+    }>;
+}
+
 export interface XYChartData {
     date?: string;
     [resourceName: string]: number | any; // AmazonCloudFront: 12333

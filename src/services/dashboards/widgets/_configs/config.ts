@@ -112,7 +112,7 @@ export interface WidgetFiltersMap {
     region_code?: WidgetFilter[];
 }
 export interface WidgetOptions {
-    group_by?: GroupBy;
+    group_by?: GroupBy | string;
     granularity?: Granularity;
     stacked?: boolean;
     legend_options?: LegendOptions;
