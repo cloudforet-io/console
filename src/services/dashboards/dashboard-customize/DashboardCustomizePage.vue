@@ -121,9 +121,11 @@ const state = reactive({
             delete result.widgetKey;
             return result as DashboardLayoutWidgetInfo;
         })],
-        // TODO: add other params
-        // variables:
-        // variables_schema:
+        variables: variableState.variableData,
+        variables_schema: {
+            properties: variableState.variableProperties,
+            order: variableState.order,
+        },
     })),
 });
 const vm = getCurrentInstance()?.proxy as Vue;
@@ -203,21 +205,6 @@ const getDashboardData = async () => {
 };
 const updateDashboardData = async () => {
     try {
-        const param: Partial<DashboardConfig> = {
-            name: dashboardDetailState.dashboardName,
-            labels: dashboardDetailState.labelList,
-            settings: dashboardDetailState.settings,
-            layouts: [dashboardDetailState.dashboardWidgetInfoList.map((widget) => {
-                const result: Partial<DashboardContainerWidgetInfo> = { ...widget };
-                delete result.widgetKey;
-                return result as DashboardLayoutWidgetInfo;
-            })],
-            variables: variableState.variableData,
-            variables_schema: {
-                properties: variableState.variableProperties,
-                order: variableState.order,
-            },
-        };
         if (dashboardDetailState.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
                 project_dashboard_id: props.dashboardId,
@@ -232,8 +219,7 @@ const updateDashboardData = async () => {
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                // FIXME:: change dashboardId when creating dashboard
-                dashboardId: props?.dashboardId ?? '',
+                dashboardId: props.dashboardId as string,
                 dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
