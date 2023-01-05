@@ -70,13 +70,18 @@
                 </template>
             </div>
         </div>
-        <delete-modal :visible.sync="state.visibleDeleteModal" />
+        <!--sul-lang-->
+        <delete-modal :visible.sync="state.visibleDeleteModal"
+                      :header-title="$t('Are you sure you want to discard changes?')"
+                      :contents="$t('Changes will not be saved.')"
+                      @confirm="handleDeleteModalConfirm"
+        />
         <!--sul-lang-->
         <p-button-modal :visible.sync="state.visibleEditModal"
                         :header-title="$t('Update Widget')"
                         :disabled="!widgetFormState.isValid"
                         size="sm"
-                        @confirm="handleConfirm"
+                        @confirm="handleEditModalConfirm"
         >
             <template #body>
                 <div v-if="!props.widgetConfigId"
@@ -223,7 +228,7 @@ const state = reactive({
 
 const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
 const handleEditButtonClick = () => { state.visibleEditModal = true; };
-const handleConfirm = () => {
+const handleEditModalConfirm = () => {
     const widgetInfo: Partial<DashboardContainerWidgetInfo> = {
         widget_name: widgetFormState.widgetConfigId ?? '',
         title: widgetFormState.widgetTitle ?? '',
@@ -233,6 +238,10 @@ const handleConfirm = () => {
     dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
     state.visibleEditModal = false;
     emit('refresh');
+};
+const handleDeleteModalConfirm = () => {
+    dashboardDetailStore.deleteWidget(props.widgetKey);
+    state.visibleDeleteModal = false;
 };
 </script>
 

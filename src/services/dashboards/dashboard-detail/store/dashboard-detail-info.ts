@@ -215,6 +215,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         }
     };
 
+    const deleteWidget = (widgetKey: string) => {
+        state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widgetKey !== widgetKey);
+    };
+
     store.dispatch('reference/loadAll');
 
     return {
@@ -228,5 +232,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         dashboardWidgetInfoList: computed(() => state.dashboardWidgetInfoList),
         // action
         updateWidgetInfo,
+        deleteWidget,
     };
 });
