@@ -92,22 +92,16 @@ export default defineComponent({
         });
 
         const mashUpProjectGroup = (dashboardList: ProjectDashboardModel[] = []): LNBMenu[] => {
-            const dashboardItemsWithoutGroup = [] as ProjectDashboardModel[];
             const dashboardItemsWithGroup = {} as Record<string, ProjectDashboardModel[]>;
-            // Since all lnbitem do not have groups, and even if they do have groups, they are not sorted.
-            // Items with groups are converted to map format, and if there are no groups, they are put in noGroupList.
             dashboardList.forEach((d) => {
-                // With group
-                const groupId: string|undefined = state.projectItems[d.project_id]?.data.groupInfo.name;
-                if (groupId) {
-                    if (dashboardItemsWithGroup[groupId]) {
-                        dashboardItemsWithGroup[groupId].push(d);
+                const projectGroupLabel: string|undefined = state.projectItems[d.project_id]?.label;
+                if (projectGroupLabel) {
+                    if (dashboardItemsWithGroup[projectGroupLabel]) {
+                        dashboardItemsWithGroup[projectGroupLabel].push(d);
                     } else {
-                        dashboardItemsWithGroup[groupId] = [d];
+                        dashboardItemsWithGroup[projectGroupLabel] = [d];
                     }
                 }
-                // No-group
-                dashboardItemsWithoutGroup.push(d);
             });
 
             // Result to return
@@ -137,23 +131,6 @@ export default defineComponent({
                     })),
                 ]);
             });
-
-            // No-group items are mapped to LNBItem type and pushed to result.
-            result.push(
-                ...dashboardItemsWithoutGroup.map((board) => ({
-                    type: MENU_ITEM_TYPE.ITEM,
-                    id: board.project_dashboard_id,
-                    label: board.name,
-                    to: {
-                        name: DASHBOARDS_ROUTE.DETAIL._NAME,
-                        params: {
-                            dashboardId: board.project_dashboard_id,
-                            dashboardScope: DASHBOARD_SCOPE.PROJECT,
-                        },
-                    },
-                    favoriteType: FAVORITE_TYPE.DASHBOARD,
-                })),
-            );
 
             // Return LNBMenu type as (LNBItem | LNBItem[])[]
             return result;
