@@ -5,13 +5,24 @@
         <div class="content-wrapper">
             <p-data-loader class="chart-loader"
                            :loading="state.loading"
-                           :data="state.data"
+                           :data="state.chartData"
                            loader-type="skeleton"
                            show-data-from-scratch
             >
                 <div ref="chartContext"
                      class="chart"
                 />
+                <div class="legend-wrapper">
+                    <span v-for="(legend, idx) in state.chartLegends"
+                          :key="`${legend.name}-${idx}`"
+                          class="circle-wrapper"
+                    >
+                        <span v-if="legend.name"
+                              class="circle"
+                              :style="{background: storeState.providers[legend.name]?.color}"
+                        /><span class="label">{{ storeState.providers[legend.name]?.label }}</span>
+                    </span>
+                </div>
             </p-data-loader>
             <widget-data-table :loading="state.loading"
                                :fields="state.tableFields"
@@ -20,10 +31,9 @@
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :legends.sync="state.legends"
-                               :this-page="state.thisPage"
+                               :this-page.sync="state.thisPage"
                                :show-next-page="state.data?.more"
-                               show-legend
-                               @update:this-page="handleUpdateThisPage"
+                               @update:thisPage="handleUpdateThisPage"
             />
         </div>
     </widget-frame>
@@ -37,8 +47,17 @@ import {
 
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
+import {
+    groupBy, isEqual, sum, uniqWith,
+} from 'lodash';
 
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { store } from '@/store';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -49,29 +68,43 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/config';
-import type { AccumulatedDataModel } from '@/services/dashboards/widgets/type';
+import { CONTINENT_INFO } from '@/services/dashboards/widgets/cost-by-region/config';
+import type { AccumulatedDataModel, Legend } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
-
+import { getLegends } from '@/services/dashboards/widgets/widget-chart-helper';
 
 type Data = AccumulatedDataModel['results'];
 interface FullData {
     results: Data;
     more: boolean;
 }
-
-const SAMPLE_PIE_DATA = [{
-    country: 'France',
-    sales: 100000,
-}, {
-    country: 'Spain',
-    sales: 160000,
-}, {
-    country: 'United Kingdom',
-    sales: 80000,
-}];
+interface CostDataByProvider {
+    [continent: string]: {
+        [provider: string]: number;
+    }
+}
+interface PieChartData {
+    category: string;
+    color: string;
+    provider: string;
+    value: number;
+    pieSettings: {
+        fill: string;
+        stroke: string;
+    }
+}
+interface MapChartData {
+    title: string;
+    continent_code?: string;
+    latitude: number;
+    longitude: number;
+    height: number;
+    width: number;
+    pieChartData: PieChartData[];
+}
 
 const props = defineProps<WidgetProps>();
 const state = reactive({
@@ -82,11 +115,18 @@ const state = reactive({
         { label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' } },
     ]),
     tableItems: [],
+    legends: [] as Legend[],
+    chartLegends: computed(() => uniqWith(state.legends, isEqual)),
+    chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results)),
     thisPage: 1,
     dateRange: computed<DateRange>(() => ({
         start: dayjs.utc(state.settings?.date_range?.start).format('YYYY-MM'),
         end: dayjs.utc(state.settings?.date_range?.end).format('YYYY-MM'),
     })),
+});
+const storeState = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
@@ -94,11 +134,55 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
+/* Util */
+const getCostDataByProvider = (results: Data): CostDataByProvider => {
+    const data = results.map((d) => ({
+        ...d,
+        continent_code: storeState.regions[d.region_code]?.continent?.continent_code,
+    }));
+    const continentGroupBy = groupBy(data, 'continent_code');
+    const result = {};
+    Object.entries(continentGroupBy).forEach(([continent, cItem]) => {
+        const providerGroupBy = groupBy(cItem, 'provider');
+        Object.entries(providerGroupBy).forEach(([provider, pItem]) => {
+            if (continent && continent !== 'undefined' && provider && provider !== 'undefined') {
+                const providerCost = sum(pItem.map((d) => d.usd_cost_sum));
+                if (result[continent]) result[continent][provider] = providerCost;
+                else result[continent] = { [provider]: providerCost };
+            }
+        });
+    });
+    return result;
+};
+const getRefinedMapChartData = (results?: Data): MapChartData[] => {
+    if (!results?.length) return [];
+    const costDataByProvider = getCostDataByProvider(results);
+    return Object.keys(costDataByProvider).map((continent) => ({
+        title: CONTINENT_INFO[continent]?.continent_label,
+        continent_code: CONTINENT_INFO[continent]?.continent_code,
+        latitude: CONTINENT_INFO[continent]?.latitude,
+        longitude: CONTINENT_INFO[continent]?.longitude,
+        width: 48,
+        height: 48,
+        pieChartData: Object.entries(costDataByProvider[continent]).map(([provider, cost]) => ({
+            category: storeState.providers[provider]?.label || provider,
+            color: storeState.providers[provider]?.color || '',
+            provider,
+            value: cost as number,
+            pieSettings: {
+                fill: storeState.providers[provider]?.color || '',
+                stroke: storeState.providers[provider]?.color || '',
+            },
+        })),
+    }));
+};
+
+/* Api */
 const fetchData = async (): Promise<FullData> => {
     try {
         const query: any = {
             granularity: state.granularity,
-            group_by: [GROUP_BY.REGION, GROUP_BY.PROVIDER],
+            group_by: [state.groupBy, GROUP_BY.REGION],
             start: state.dateRange.start,
             end: state.dateRange.end,
             fields: {
@@ -109,7 +193,9 @@ const fetchData = async (): Promise<FullData> => {
             },
             sort: [{ key: 'usd_cost_sum', desc: true }],
         };
-        if (state.pageSize) query.page = { start: state.thisPage, limit: state.pageSize };
+        if (state.pageSize) {
+            query.page = { start: getPageStart(state.thisPage, state.pageSize), limit: state.pageSize };
+        }
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
         return { results, more };
     } catch (e) {
@@ -118,52 +204,64 @@ const fetchData = async (): Promise<FullData> => {
     }
 };
 
-const drawChart = () => {
+const drawChart = (chartData: MapChartData[]) => {
     const chart = chartHelper.createMapChart();
     const polygonSeries = chartHelper.createMapPolygonSeries();
     chart.series.push(polygonSeries);
     const pointSeries = chartHelper.createMapPointSeries();
     chart.series.push(pointSeries);
-    pointSeries.bullets.push(() => {
+    pointSeries.bullets.push((root, series, dataItem) => {
+        const _chartData = dataItem?.dataContext?.data;
         const pieChart = chartHelper.createPieChart({
             width: 32,
             height: 32,
         });
         const pieSeries = chartHelper.createPieSeries({
-            categoryField: 'country',
-            valueField: 'sales',
+            categoryField: 'category',
+            valueField: 'value',
         });
-        pieSeries.labels.template.set('forceHidden', true);
-        pieSeries.ticks.template.set('forceHidden', true);
         pieChart.series.push(pieSeries);
+        pieSeries.data.setAll(_chartData.pieChartData);
+        pieSeries.slices.template.setAll({
+            templateField: 'pieSettings',
+        });
 
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(pieSeries, tooltip, state.options.currency, props.currencyRates);
+        chartHelper.setPieTooltipText(pieSeries, tooltip, state.currency, props.currencyRates);
         pieSeries.slices.template.set('tooltip', tooltip);
 
-        pieSeries.data.setAll(SAMPLE_PIE_DATA);
         return chartHelper.createBullet({
             sprite: pieChart,
         });
     });
-    pointSeries.data.setAll(state.data);
+
+    chartData.forEach((d) => {
+        pointSeries.data.push({
+            geometry: { type: 'Point', coordinates: [d.longitude, d.latitude] },
+            title: d.title,
+            data: d,
+        });
+    });
 };
 
 const initWidget = async (data?: FullData) => {
     state.loading = true;
     state.data = data ?? await fetchData();
+    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.clearChildrenOfRoot();
-    drawChart();
+    drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async () => {
+const refreshWidget = async (thisPage = 1) => {
     state.loading = true;
+    state.thisPage = thisPage;
     state.data = await fetchData();
+    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.clearChildrenOfRoot();
-    drawChart();
+    drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
@@ -171,8 +269,16 @@ const refreshWidget = async () => {
 /* Event */
 const handleUpdateThisPage = (thisPage: number) => {
     state.thisPage = thisPage;
-    refreshWidget();
+    refreshWidget(thisPage);
 };
+
+/* Init */
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/provider/load'),
+        store.dispatch('reference/region/load'),
+    ]);
+})();
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
@@ -189,16 +295,38 @@ defineExpose<WidgetExpose<FullData>>({
         @apply grid grid-cols-12;
         height: 100%;
         padding-left: 1.5rem;
-        padding-bottom: 2.625rem;
         .chart-loader {
             @apply col-span-5;
             height: 100%;
+            padding-bottom: 1rem;
             .chart {
-                height: 100%;
+                height: 90%;
+            }
+            .legend-wrapper {
+                .circle-wrapper {
+                    display: inline-flex;
+                    align-items: center;
+                    width: 100%;
+                    .circle {
+                        @apply inline-block rounded-full;
+                        margin-right: 0.25rem;
+                        width: 0.5rem;
+                        height: 0.5rem;
+                    }
+                    .label {
+                        @apply mr-4 text-gray-500;
+                        font-size: 0.75rem;
+                        line-height: 1.5;
+                        white-space: nowrap;
+                    }
+                }
             }
         }
         .widget-data-table {
             @apply col-span-7;
+            .toggle-button {
+                cursor: default;
+            }
         }
     }
 }
