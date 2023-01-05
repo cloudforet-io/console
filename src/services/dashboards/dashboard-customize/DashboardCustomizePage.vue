@@ -100,7 +100,7 @@ import DashboardLabels from '@/services/dashboards/modules/dashboard-label/Dashb
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {
     dashboardId?: string;

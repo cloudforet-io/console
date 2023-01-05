@@ -59,12 +59,12 @@ import { i18n } from '@/translations';
 import { indigo, red, yellow } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
-import type { Legend } from '@/services/dashboards/widgets/type';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
-import type { WidgetState } from '@/services/dashboards/widgets/use-widget-state';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import type { Legend } from '@/services/dashboards/widgets/type';
 
 const props = defineProps<WidgetProps>();
 

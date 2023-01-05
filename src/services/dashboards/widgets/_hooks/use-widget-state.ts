@@ -20,10 +20,10 @@ import type {
     InheritOptions, WidgetProps,
     Granularity, GroupBy,
     SelectorType,
-} from '@/services/dashboards/widgets/config';
-import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/view-config';
-import { WIDGET_THEMES } from '@/services/dashboards/widgets/view-config';
-import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
+} from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+import { WIDGET_THEMES } from '@/services/dashboards/widgets/_configs/view-config';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 const getRefinedOptions = (
     configOptions?: WidgetOptions,

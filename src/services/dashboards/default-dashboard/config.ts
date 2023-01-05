@@ -1,6 +1,6 @@
 import type { DashboardConfig } from '@/services/dashboards/config';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
 export type DefaultDashboardPreviewConfig = Pick<DashboardConfig, 'name'|'version'|'labels'|'description'>;
 

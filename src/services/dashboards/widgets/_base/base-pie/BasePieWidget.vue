@@ -52,14 +52,14 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import { CHART_TYPE } from '@/services/dashboards/widgets/config';
-import type { GroupBy, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
-import type { Legend } from '@/services/dashboards/widgets/type';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
+import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
+import type { GroupBy, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
-import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import type { Legend } from '@/services/dashboards/widgets/type';
 
 type Data = Partial<Record<GroupBy, string>> & { usd_cost: number; };
 type ChartData = Partial<Record<GroupBy, string>> & { usd_cost: number; };

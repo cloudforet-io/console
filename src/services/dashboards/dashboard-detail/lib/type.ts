@@ -1,5 +1,5 @@
-import type { WidgetConfig, DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
+import type { WidgetConfig, DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 // WIDTH
 export type WidgetThemeOption = WidgetConfig['theme'];

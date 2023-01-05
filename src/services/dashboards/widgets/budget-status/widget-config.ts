@@ -1,5 +1,5 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/config';
-import { CHART_TYPE } from '@/services/dashboards/widgets/config';
+import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 
 const budgetStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetStatus',

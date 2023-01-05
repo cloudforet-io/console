@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import basePieWidgetConfig from '@/services/dashboards/widgets/_base/base-pie/widget-config';
 import dashboardCommonWidgetConfig from '@/services/dashboards/widgets/_base/dashboard-common/widget-config';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import costMapWidgetConfig from '@/services/dashboards/widgets/cost-map/widget-config';
 import costPieWidgetConfig from '@/services/dashboards/widgets/cost-pie/widget-config';
 import costTrendWidgetConfig from '@/services/dashboards/widgets/cost-trend/widget-config';
 import monthlyCostWidgetConfig from '@/services/dashboards/widgets/monthly-cost/widget-config';
-import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 const costPieConfigId = costPieWidgetConfig.widget_config_id;
 const basePieConfigId = basePieWidgetConfig.widget_config_id;

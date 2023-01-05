@@ -1,6 +1,6 @@
 import { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';
-import { GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/config';
-import type { WidgetConfig } from '@/services/dashboards/widgets/config';
+import { GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 
 const costAnalysisQueryWidgetConfig: WidgetConfig = {
     widget_config_id: 'costAnalysisQuery',

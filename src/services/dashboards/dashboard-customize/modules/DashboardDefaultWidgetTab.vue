@@ -53,8 +53,8 @@ import { i18n } from '@/translations';
 
 import DashboardAddDefaultWidgetRightArea
     from '@/services/dashboards/dashboard-customize/modules/DashboardAddDefaultWidgetRightArea.vue';
-import type { WidgetConfig } from '@/services/dashboards/widgets/config';
-import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/widget-config-list';
+import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-list-config';
 
 export default {
     name: 'DashboardDefaultWidgetTab',

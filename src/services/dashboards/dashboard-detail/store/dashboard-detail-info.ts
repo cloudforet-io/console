@@ -22,8 +22,8 @@ import type {
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
-import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface WidgetDataMap {
     [widgetKey: string]: any;

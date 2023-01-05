@@ -1,6 +1,6 @@
 import { ERROR_CASE_WIDGET_INFO } from '@/services/dashboards/default-dashboard/config';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
-import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 export const getDashboardLayoutWidgetInfoList = (widgetList: string[]): DashboardLayoutWidgetInfo[] => widgetList.map((widgetId) => {
     try {

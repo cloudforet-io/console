@@ -67,16 +67,16 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
-import type { HistoryDataModel, Legend } from '@/services/dashboards/widgets/type';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { getLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
-import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
-import { getLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/widget-chart-helper';
-import { sortTableData } from '@/services/dashboards/widgets/widget-table-helper';
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import type { HistoryDataModel, Legend } from '@/services/dashboards/widgets/type';
 
 
 type Data = HistoryDataModel['results'];

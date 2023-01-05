@@ -33,11 +33,11 @@ import {
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 // import { GROUP_BY } from '@/services/dashboards/widgets/config';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
 interface Data {
     target: string;

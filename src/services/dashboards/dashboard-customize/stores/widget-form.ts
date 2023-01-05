@@ -3,8 +3,8 @@ import { reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
-import type { DashboardLayoutWidgetInfo, InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/config';
-import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
+import type { DashboardLayoutWidgetInfo, InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 
 interface State {

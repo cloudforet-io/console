@@ -57,21 +57,21 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/config';
-import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/config';
-import type { HistoryDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
+import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import {
     getDateAxisSettings,
     getLegends,
     getRefinedXYChartData,
-} from '@/services/dashboards/widgets/widget-chart-helper';
+} from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import {
     getWidgetTableDateFields, sortTableData,
-} from '@/services/dashboards/widgets/widget-table-helper';
+} from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+// eslint-disable-next-line import/no-cycle
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import type { HistoryDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';

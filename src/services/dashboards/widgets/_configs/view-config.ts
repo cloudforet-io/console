@@ -1,4 +1,4 @@
-import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 
 export const GROUP_BY_ITEM_MAP = {
     [GROUP_BY.PROJECT_GROUP]: { name: GROUP_BY.PROJECT_GROUP, label: 'Project Group' },

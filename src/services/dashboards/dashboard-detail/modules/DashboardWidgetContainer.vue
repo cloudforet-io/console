@@ -47,9 +47,9 @@ import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type {
     WidgetSize, WidgetConfig, WidgetExpose, WidgetProps,
-} from '@/services/dashboards/widgets/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
-import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
+} from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface Props {
     editMode?: boolean;

@@ -1,8 +1,8 @@
 import { GRANULARITY } from '@/services/dashboards/config';
-import type { WidgetConfig } from '@/services/dashboards/widgets/config';
-import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/config';
-import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
-import { excludePropertiesFromDashboardCommonWidgetConfig } from '@/services/dashboards/widgets/widget-options-schema-helper';
+import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { excludePropertiesFromDashboardCommonWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-options-schema-helper';
 
 const {
     default_properties,

@@ -18,7 +18,7 @@ import costTrend from '@/services/dashboards/widgets/cost-trend/widget-config';
 import monthlyCost from '@/services/dashboards/widgets/monthly-cost/widget-config';
 // type
 // eslint-disable-next-line import/order
-import type { WidgetConfig } from '@/services/dashboards/widgets/config';
+import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 
 export const CONSOLE_WIDGET_ORDER = [
     'monthlyCost',

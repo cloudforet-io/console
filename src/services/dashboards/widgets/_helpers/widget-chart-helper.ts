@@ -7,8 +7,8 @@ import {
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import type { DateRange } from '@/services/dashboards/config';
-import type { GroupBy } from '@/services/dashboards/widgets/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import type { GroupBy } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import type {
     HistoryDataModel, XYChartData, Legend, TreemapChartData,
 } from '@/services/dashboards/widgets/type';

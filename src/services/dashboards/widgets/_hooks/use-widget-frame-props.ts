@@ -3,8 +3,8 @@ import { computed } from 'vue';
 
 import type { Currency } from '@/store/modules/display/config';
 
-import type { WidgetConfig, WidgetSize } from '@/services/dashboards/widgets/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
+import type { WidgetConfig, WidgetSize } from '@/services/dashboards/widgets/_configs/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
 interface WidgetFrameState {
     title: string;
