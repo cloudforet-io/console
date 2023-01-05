@@ -199,9 +199,11 @@ const updateDashboardData = async () => {
                 delete result.widgetKey;
                 return result as DashboardLayoutWidgetInfo;
             })],
-            // TODO: add other params
-            // variables:
-            // variables_schema:
+            variables: variableState.variableData,
+            variables_schema: {
+                properties: variableState.variableProperties,
+                order: variableState.order,
+            },
         };
         if (dashboardDetailState.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
