@@ -15,24 +15,18 @@
 
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
-                           :items="state.chartData"
-                           show-legend
+                           :items="state.data?.results"
                            :legends.sync="state.legends"
                            :currency="state.currency"
                            :currency-rates="props.currencyRates"
-                           size="md"
-                           :show-next-page="!state.limit"
-                           :this-page.sync="state.thisPage"
+                           :this-page="state.thisPage"
+                           :show-next-page="state.data?.more"
                            :color-set="state.colorSet"
+                           :all-reference-type-info="props.allReferenceTypeInfo"
+                           show-legend
                            @toggle-legend="handleToggleLegend"
-        >
-            <template #detail-provider>
-                This is test popover content
-            </template>
-            <template #detail-usd_cost>
-                This is test popover content2
-            </template>
-        </widget-data-table>
+                           @update:thisPage="handleUpdateThisPage"
+        />
     </widget-frame>
 </template>
 
@@ -45,121 +39,111 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-import { random } from 'lodash';
+import dayjs from 'dayjs';
+
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ReferenceType } from '@/store/modules/reference/type';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
-import type { GroupBy, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import {
+    getPieChartLegends, getRefinedPieChartData,
+} from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { getReferenceTypeOfGroupBy } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
-import type { Legend } from '@/services/dashboards/widgets/type';
+import type { Legend, CostAnalyzeDataModel, PieChartData } from '@/services/dashboards/widgets/type';
 
-type Data = Partial<Record<GroupBy, string>> & { usd_cost: number; };
-type ChartData = Partial<Record<GroupBy, string>> & { usd_cost: number; };
 
-const props = defineProps<WidgetProps>();
+type Data = CostAnalyzeDataModel['results'];
+interface FullData {
+    results: Data;
+    more: boolean;
+}
 
 const chartContext = ref<HTMLElement|null>(null);
-const {
-    createPieChart, createDonutChart, createPieSeries,
-    createTooltip, setPieTooltipText,
-    disposeRoot, refreshRoot, setChartColors, toggleSeries,
-} = useAmcharts5(chartContext);
+const chartHelper = useAmcharts5(chartContext);
 
+const props = defineProps<WidgetProps>();
 const state = reactive({
-    ...toRefs(useWidgetState<Data[]>(props)),
-    chart: null as null|ReturnType<typeof createPieChart | typeof createDonutChart>,
-    series: null as null|ReturnType<typeof createPieSeries>,
-    groupByLabel: computed<string>(() => {
-        const groupBy = state.groupBy;
-        return GROUP_BY_ITEM_MAP[groupBy]?.label ?? groupBy;
+    ...toRefs(useWidgetState<FullData>(props)),
+    chart: null as null|ReturnType<typeof chartHelper.createPieChart | typeof chartHelper.createDonutChart>,
+    series: null as null|ReturnType<typeof chartHelper.createPieSeries>,
+    chartData: computed<PieChartData[]>(() => {
+        if (!state.data?.results?.length) return [];
+        return getRefinedPieChartData(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     }),
-    chartData: computed<Data[]>(() => {
-        if (!state.data) return [];
-        return state.data;
+    tableFields: computed<Field[]>(() => {
+        if (!state.groupBy) return [];
+        const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
+        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
+        return [
+            { name: state.groupBy, label: groupByLabel, textOptions: { type: 'reference', referenceType } },
+            { label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' } },
+        ];
     }),
-    tableFields: computed<Field[]>(() => [
-        {
-            label: state.groupByLabel,
-            name: state.groupBy,
-            tooltipText: 'test tooltip',
-            icon: (item) => (item?.provider.length > 4 ? 'ic_tree_project-group' : 'ic_tree_project'),
-            link: '/home-dashboard',
-            detailOptions: {
-                enabled: true,
-                type: 'popover',
-            },
-        },
-        {
-            label: 'Cost',
-            name: 'usd_cost',
-            type: 'cost',
-            textAlign: 'right',
-            textOptions: {
-                type: 'size',
-                display_unit: 'GB',
-                source_unit: 'MB',
-            },
-            detailOptions: {
-                enabled: true,
-                type: 'popover',
-            },
-            rapidIncrease: (item) => item?.usd_cost > 30000,
-        },
-    ]),
-    legends: computed<Legend[]>(() => state.chartData.map((i) => ({
-        name: i.provider,
-    }))),
+    legends: [] as Legend[],
     thisPage: 1,
-    limit: computed(() => state.thisPage > 3),
+    dateRange: computed<DateRange>(() => ({
+        start: dayjs.utc(state.settings?.date_range?.start).format('YYYY-MM'),
+        end: dayjs.utc(state.settings?.date_range?.end).format('YYYY-MM'),
+    })),
 });
-
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
-// TODO: api binding
-const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
-    setTimeout(() => {
-        resolve([{
-            provider: 'google cloud',
-            usd_cost: random(10000, 50000),
-        },
-        {
-            provider: 'aws',
-            usd_cost: random(10000, 50000),
-        },
-        {
-            provider: 'azure',
-            usd_cost: random(10000, 50000),
-        },
-        {
-            provider: 'alibaba',
-            usd_cost: random(10000, 50000),
-        },
-        ]);
-    }, 1000);
-});
+/* Api */
+const fetchData = async (): Promise<FullData> => {
+    try {
+        const query: any = {
+            granularity: state.granularity,
+            group_by: [state.groupBy],
+            start: state.dateRange.start,
+            end: state.dateRange.end,
+            fields: {
+                usd_cost_sum: {
+                    key: 'usd_cost',
+                    operator: 'sum',
+                },
+            },
+            sort: [{ key: 'usd_cost_sum', desc: true }],
+        };
+        if (state.pageSize) {
+            query.page = { start: getPageStart(state.thisPage, state.pageSize), limit: state.pageSize };
+        }
+        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
+        return { results, more };
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return { results: [], more: false };
+    }
+};
 
-const drawChart = (chartData: ChartData[]) => {
+const drawChart = (chartData: PieChartData[]) => {
     let chart;
-    if (state.chartType === CHART_TYPE.DONUT) chart = createDonutChart();
-    else chart = createPieChart();
+    if (state.chartType === CHART_TYPE.DONUT) chart = chartHelper.createDonutChart();
+    else chart = chartHelper.createPieChart();
     const seriesSettings = {
         categoryField: state.groupBy,
-        valueField: 'usd_cost',
+        valueField: 'usd_cost_sum',
     };
-    const series = createPieSeries(seriesSettings);
+    const series = chartHelper.createPieSeries(seriesSettings);
     chart.series.push(series);
-    setChartColors(chart, state.colorSet);
+    chartHelper.setChartColors(chart, state.colorSet);
 
-    const tooltip = createTooltip();
-    setPieTooltipText(series, tooltip, state.options.currency, props.currencyRates);
+    const tooltip = chartHelper.createTooltip();
+    chartHelper.setPieTooltipText(series, tooltip, state.currency, props.currencyRates);
     series.slices.template.set('tooltip', tooltip);
     series.data.setAll(chartData);
 
@@ -167,43 +151,45 @@ const drawChart = (chartData: ChartData[]) => {
     state.series = series;
 };
 
-// const updateChart = (chartData: ChartData[]) => {
-//     if (!state.series) return;
-//     state.series.data.setAll(chartData);
-// };
-
-const handleToggleLegend = (index) => {
-    toggleSeries(state.chart, index);
-};
-
-const initWidget = async (data?: Data[]): Promise<Data[]> => {
+const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
+    state.legends = getPieChartLegends(state.data.results, state.groupBy);
     await nextTick();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
 
-const refreshWidget = async (): Promise<Data[]> => {
+const refreshWidget = async (thisPage = 1): Promise<FullData> => {
     state.loading = true;
+    state.thisPage = thisPage;
     state.data = await fetchData();
+    state.legends = getPieChartLegends(state.data.results, state.groupBy);
     await nextTick();
-    refreshRoot();
+    chartHelper.refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
+};
+
+/* Event */
+const handleToggleLegend = (index) => {
+    chartHelper.toggleSeries(state.chart, index);
+};
+const handleUpdateThisPage = (thisPage: number) => {
+    state.thisPage = thisPage;
+    refreshWidget(thisPage);
 };
 
 useWidgetLifecycle({
-    disposeWidget: disposeRoot,
+    disposeWidget: chartHelper.disposeRoot,
 });
 
-defineExpose<WidgetExpose<Data[]>>({
+defineExpose<WidgetExpose<FullData>>({
     initWidget,
     refreshWidget,
 });
-
 </script>
 
 <style scoped lang="postcss">

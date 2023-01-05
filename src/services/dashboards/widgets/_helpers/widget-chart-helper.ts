@@ -10,9 +10,8 @@ import type { DateRange } from '@/services/dashboards/config';
 import type { GroupBy } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import type {
-    CostAnalyzeDataModel, XYChartData, Legend, TreemapChartData,
+    CostAnalyzeDataModel, XYChartData, Legend, TreemapChartData, PieChartData,
 } from '@/services/dashboards/widgets/type';
-
 
 
 const mergeByKey = (arrA, arrB, key) => {
@@ -61,7 +60,7 @@ export const getRefinedXYChartData = (
 
 
 /**
- * @name getLegends
+ * @name getLegends -> XYChartLegend
  * @description Extract legends from raw data.
  */
 export const getLegends = (rawData: CostAnalyzeDataModel['results'], groupBy: GroupBy, allReferenceTypeInfo: AllReferenceTypeInfo): Legend[] => {
@@ -90,6 +89,11 @@ export const getLegends = (rawData: CostAnalyzeDataModel['results'], groupBy: Gr
         });
     });
     return legends;
+};
+
+export const getPieChartLegends = (rawData: CostAnalyzeDataModel['results'], groupBy: GroupBy): Legend[] => {
+    if (!rawData || !groupBy) return [];
+    return rawData.map((d) => ({ name: d[groupBy], disabled: false }));
 };
 
 export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSettings<any>> => {
@@ -132,4 +136,35 @@ export const getRefinedTreemapChartData = (rawData: TreemapChartData['children']
     return chartData;
 };
 
+
+/**
+ * @name getRefinedPieChartData
+ * @description Convert raw data to XYDateChart data.
+ * @example(before) [{ provider: 'aws', usd_cost_sum: 100  }, { provider: 'google_cloud', usd_cost_sum: 100  }]
+ * @example(after) [{ provider: 'AWS', usd_cost_sum: 100  }, { provider: 'Google Cloud', usd_cost_sum: 100  }]
+ */
+export const getRefinedPieChartData = (
+    rawData: CostAnalyzeDataModel['results'],
+    groupBy: GroupBy,
+    allReferenceTypeInfo: AllReferenceTypeInfo,
+): PieChartData[] => {
+    if (!rawData || !groupBy) return [];
+
+    const chartData: PieChartData[] = [];
+    rawData.forEach((d) => {
+        let _name = d[groupBy];
+        const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
+        if (_name && referenceTypeInfo) {
+            const referenceMap = referenceTypeInfo.referenceMap;
+            _name = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
+        } else if (!_name) {
+            _name = 'Unknown';
+        }
+        chartData.push({
+            ...d,
+            [groupBy]: _name,
+        } as PieChartData);
+    });
+    return chartData;
+};
 
