@@ -1,8 +1,9 @@
-import { reactive, toRefs } from 'vue';
+import { reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
-import type { InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import type { DashboardLayoutWidgetInfo, InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 
@@ -12,15 +13,19 @@ interface State {
     isValid: boolean;
     inheritOptions?: InheritOptions;
     widgetOptions?: WidgetOptions;
+    widgetInfo?: DashboardLayoutWidgetInfo;
 }
 
 export const useWidgetFormStore = defineStore('widget-form', () => {
+    const dashboardDetailInfoStore = useDashboardDetailInfoStore();
+
     const state = reactive<State>({
         widgetConfigId: undefined,
         widgetTitle: undefined,
         isValid: false,
         inheritOptions: undefined,
         widgetOptions: undefined,
+        widgetInfo: undefined,
     });
     const setWidgetConfigId = (val?: string) => {
         state.widgetConfigId = val;
@@ -67,11 +72,16 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         state.inheritOptions = inheritOptions;
     };
 
+    const initWidgetForm = (widgetKey: string) => {
+        state.widgetInfo = dashboardDetailInfoStore.dashboardWidgetInfoList.find((w) => w.widgetKey === widgetKey);
+    };
+
     return {
-        ...toRefs(state),
+        state,
         setWidgetConfigId,
         setWidgetTitle,
         setIsValid,
         setFormData,
+        initWidgetForm,
     };
 });

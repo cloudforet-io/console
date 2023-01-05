@@ -3,7 +3,7 @@
                     :header-title="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TITLE')"
                     size="lg"
                     class="dashboard-add-widget-modal"
-                    :disabled="!isValid"
+                    :disabled="!widgetFormState.isValid"
                     @confirm="handleConfirm"
     >
         <template #body>
@@ -25,7 +25,6 @@ import {
 
 import { PButtonModal, PTab } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-import { storeToRefs } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 
 import { i18n } from '@/translations';
@@ -56,9 +55,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const widgetFormStore = useWidgetFormStore();
-        const {
-            isValid, widgetOptions, inheritOptions, widgetConfigId, widgetTitle,
-        } = storeToRefs(widgetFormStore);
+        const widgetFormState = widgetFormStore.state;
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
         });
@@ -71,16 +68,16 @@ export default defineComponent<Props>({
         });
 
         const handleConfirm = () => {
-            if (!widgetConfigId?.value || !widgetTitle?.value) return;
-            const widgetConfig = getWidgetConfig(widgetConfigId.value);
+            if (!widgetFormState.widgetConfigId || !widgetFormState.widgetTitle) return;
+            const widgetConfig = getWidgetConfig(widgetFormState.widgetConfigId);
             const dashboardLayoutWidgetInfo: DashboardContainerWidgetInfo = {
                 widgetKey: uuidv4(),
-                widget_name: widgetConfigId?.value,
-                title: widgetTitle?.value,
+                widget_name: widgetFormState.widgetConfigId,
+                title: widgetFormState.widgetTitle,
                 size: widgetConfig.sizes[0],
                 version: '1', // TODO: auto?
-                inherit_options: inheritOptions?.value ?? {},
-                widget_options: widgetOptions?.value ?? {},
+                inherit_options: widgetFormState.inheritOptions ?? {},
+                widget_options: widgetFormState.widgetOptions ?? {},
             };
             emit('add-widget', dashboardLayoutWidgetInfo);
             state.proxyVisible = false;
@@ -88,7 +85,7 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            isValid,
+            widgetFormState,
             tabState,
             handleConfirm,
         };

@@ -103,7 +103,7 @@ interface WidgetFilter {
     v: null|string|boolean|number;
     o?: ConsoleFilterOperator;
 }
-interface WidgetFiltersMap {
+export interface WidgetFiltersMap {
     provider?: WidgetFilter[];
     project_id?: WidgetFilter[];
     service_account_id?: WidgetFilter[];

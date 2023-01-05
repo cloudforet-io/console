@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="budget-status-widget"
+                  @refresh="handleRefresh"
     >
         <p-data-loader :loading="state.loading"
                        class="chart-wrapper"
@@ -153,6 +154,10 @@ const getTooltipText = (rowIdx, colIdx): string => {
     else if (limit === 0) percentage = '-';
     else percentage = `${usage.toFixed(2)}%`;
     return `${state.data[index].budgetName} (${percentage})`;
+};
+
+const handleRefresh = () => {
+    refreshWidget();
 };
 
 defineExpose<WidgetExpose<Data[]>>({

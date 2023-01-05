@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="aws-data-transfer-cost-trend"
+                  @refresh="handleRefresh"
     >
         <template v-if="state.selectorItems.length"
                   #header-right
@@ -236,6 +237,10 @@ const handleSelectSelectorType = (selected: string) => {
     state.selectedSelectorType = selected;
     chartHelper.refreshRoot();
     drawChart(state.chartData);
+};
+
+const handleRefresh = () => {
+    refreshWidget();
 };
 
 useWidgetLifecycle({

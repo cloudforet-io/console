@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="aws-cloud-front-cost"
+                  @refresh="handleRefresh"
     >
         <template v-if="state.selectorItems.length"
                   #header-right
@@ -249,6 +250,10 @@ const handleSelectSelectorType = (selected: string) => {
 };
 const handleUpdateThisPage = (thisPage: number) => {
     state.thisPage = thisPage;
+    refreshWidget();
+};
+
+const handleRefresh = () => {
     refreshWidget();
 };
 

@@ -71,7 +71,26 @@
             </div>
         </div>
         <delete-modal :visible.sync="state.visibleDeleteModal" />
-        <p-button-modal :visible.sync="state.visibleEditModal" />
+        <!--sul-lang-->
+        <p-button-modal :visible.sync="state.visibleEditModal"
+                        :header-title="$t('Update Widget')"
+                        :disabled="!widgetFormState.isValid"
+                        size="sm"
+                        @confirm="handleConfirm"
+        >
+            <template #body>
+                <div v-if="!props.widgetConfigId"
+                     class="no-selected-wrapper"
+                >
+                    <span class="title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED') }}</span>
+                    <span class="text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED_HELP_TEXT') }}</span>
+                </div>
+                <dashboard-add-default-widget-right-area v-else
+                                                         :widget-config-id="props.widgetConfigId"
+                                                         :widget-key="props.widgetKey"
+                />
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
@@ -98,6 +117,10 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { DateRange } from '@/services/dashboards/config';
+import DashboardAddDefaultWidgetRightArea
+    from '@/services/dashboards/dashboard-customize/modules/DashboardAddDefaultWidgetRightArea.vue';
+import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
+import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type { WidgetSize } from '@/services/dashboards/widgets/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
@@ -108,6 +131,7 @@ interface Props {
     width?: number;
     widgetLink?: string;
     widgetRoute?: Route;
+    widgetConfigId?: string;
     dateRange?: DateRange;
     noData?: boolean;
     printMode?: boolean;
@@ -136,6 +160,7 @@ const props = withDefaults(defineProps<Props>(), {
     width: undefined,
     widgetLink: undefined,
     widgetRoute: undefined,
+    widgetConfigId: undefined,
     dateRange: () => ({ start: undefined, end: undefined }),
     selectedDates: () => [],
     currency: CURRENCY.USD,
@@ -144,8 +169,11 @@ const props = withDefaults(defineProps<Props>(), {
     isOnlyFullSize: false,
 });
 
-const dashboardDetailStore = useDashboardDetailInfoStore();
+const emit = defineEmits(['refresh']);
 
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const widgetFormStore = useWidgetFormStore();
+const widgetFormState = widgetFormStore.state;
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
@@ -195,6 +223,17 @@ const state = reactive({
 
 const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
 const handleEditButtonClick = () => { state.visibleEditModal = true; };
+const handleConfirm = () => {
+    const widgetInfo: Partial<DashboardContainerWidgetInfo> = {
+        widget_name: widgetFormState.widgetConfigId ?? '',
+        title: widgetFormState.widgetTitle ?? '',
+        inherit_options: widgetFormState.inheritOptions ?? {},
+        widget_options: widgetFormState.widgetOptions ?? {},
+    };
+    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
+    state.visibleEditModal = false;
+    emit('refresh');
+};
 </script>
 
 <style lang="postcss" scoped>

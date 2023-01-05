@@ -20,6 +20,7 @@ interface WidgetFrameProps {
     widgetKey: string;
     width?: number;
     editMode?: boolean;
+    widgetConfigId?: string;
 }
 
 type WidgetFrameBaseProps = WidgetFrameState & WidgetFrameProps;
@@ -28,6 +29,7 @@ export const useWidgetFrameProps = (props: WidgetFrameProps, state: WidgetFrameS
     widgetKey: props.widgetKey,
     width: props.width,
     editMode: props.editMode,
+    widgetConfigId: props.widgetConfigId,
     title: state.title,
     size: state.size,
     dateRange: state.dateRange,

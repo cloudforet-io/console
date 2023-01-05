@@ -1,5 +1,7 @@
 <template>
-    <widget-frame v-bind="widgetFrameProps">
+    <widget-frame v-bind="widgetFrameProps"
+                  @refresh="handleRefresh"
+    >
         <div class="monthly-cost">
             <div class="cost">
                 <p class="cost-label">
@@ -208,6 +210,10 @@ const refreshWidget = async (): Promise<Data> => {
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
+};
+
+const handleRefresh = () => {
+    refreshWidget();
 };
 
 useWidgetLifecycle({
