@@ -1,23 +1,21 @@
-import type { ComponentPublicInstance, ComputedRef, Ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import type Vue from 'vue';
 import { reactive, toRef } from 'vue';
 
-import type { PContextMenu } from '@/components';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import type { MenuItem } from '@/inputs/context-menu/type';
 
-type ContextMenuComponent = ComponentPublicInstance<typeof PContextMenu>;
 export interface UseContextMenuControllerOptions {
     visibleMenu?: Ref<boolean>|boolean;
     targetRef: Ref<HTMLElement|Vue|null>;
-    contextMenuRef: Ref<ContextMenuComponent|null>;
+    contextMenuRef: Ref<any|null>;
 
     /*
     Useful when used inside an element whose css position attribute value is fixed.
     It automatically resizes and provides a function that automatically closes when scrolling.
     fixedMenuStyle is returned only when this value is true.
      */
-    useFixedStyle?: boolean;
+    useFixedStyle?: boolean|Ref<boolean>|undefined|ComputedRef<boolean|undefined>;
 
     /*
     Whether to make update reorderedMenu by executing reorderMenuBySelection().
@@ -64,17 +62,13 @@ export const useContextMenuController = ({
         reorderedMenu: [] as MenuItem[],
     });
 
-    let fixedMenuStyle: Ref<Partial<CSSStyleDeclaration>>|undefined;
-    if (useFixedStyle) {
-        const {
-            contextMenuStyle,
-        } = useContextMenuFixedStyle({
-            useFixedMenuStyle: true,
-            visibleMenu: toRef(state, 'visibleMenu'),
-            targetRef,
-        });
-        fixedMenuStyle = contextMenuStyle;
-    }
+    const {
+        contextMenuStyle: fixedMenuStyle,
+    } = useContextMenuFixedStyle({
+        useFixedMenuStyle: useFixedStyle,
+        visibleMenu: toRef(state, 'visibleMenu'),
+        targetRef,
+    });
 
     const showContextMenu = (reorderMenu = false) => {
         if (reorderMenu && useReorderBySelection) reorderMenuBySelection();

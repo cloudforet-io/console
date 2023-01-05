@@ -3,6 +3,8 @@ import {
     computed, ref, watch,
 } from 'vue';
 
+import { kebabCase } from 'lodash';
+
 /**
  * @name useProxyValue
  * @description In case of array or object, set() does not work even if the original value is modified unless reallocated.
@@ -14,10 +16,12 @@ export function useProxyValue<T = any>(
     extraEventNames?: string|string[],
 ): Ref<T> {
     const proxyValue = ref<T>(props[name]);
+    const kebabCaseName = kebabCase(name);
     const setProxyValue = (value: T) => {
         (proxyValue.value as T) = value;
         if (!extraEventNames) {
-            emit(`update:${name}`, value);
+            emit(`update:${name}`, value); // will be deprecated
+            emit(`update:${kebabCaseName}`, value);
             return;
         }
 

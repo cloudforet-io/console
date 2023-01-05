@@ -9,7 +9,7 @@ import { ResizeObserver } from '@juggle/resize-observer';
 import { throttle } from 'lodash';
 
 interface UseContextMenuFixedStyleOptions {
-    useFixedMenuStyle?: ComputedRef<boolean|undefined> | boolean;
+    useFixedMenuStyle?: Ref<boolean|undefined> | ComputedRef<boolean|undefined> | boolean;
     visibleMenu: Ref<boolean|undefined>;
     targetRef?: Ref<Vue|HTMLElement|null>;
 }

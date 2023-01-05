@@ -244,7 +244,7 @@ export const getContextMenuArgTypes = (): ArgTypes => {
         },
         searchText: {
             name: 'searchText',
-            type: { name: 'string', required: true },
+            type: { name: 'string' },
             description: 'Input value for search component in searchable case. sync for two way binding is supported.',
             defaultValue: '',
             table: {
