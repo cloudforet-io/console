@@ -87,7 +87,7 @@ export default {
 
         const state = reactive({
             dashboardScope: DASHBOARD_SCOPE.DOMAIN as DashboardScope,
-            dashboardViewerType: DASHBOARD_VIEWER.PRIVATE as DashboardViewer,
+            dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
         });
 
         const handleClickCreate = () => {
@@ -95,17 +95,19 @@ export default {
             if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) {
                 _dashboardTemplate = {
                     ...dashboardTemplate.value,
-                    viewers: state.dashboardViewerType,
+                    dashboard_id: undefined,
                     project_id: dashboardProject.value?.id ?? '',
+                    viewers: state.dashboardViewerType,
                 };
             } else {
                 _dashboardTemplate = {
                     ...dashboardTemplate.value,
+                    dashboard_id: undefined,
                     viewers: state.dashboardViewerType,
                 };
             }
 
-            dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
+            dashboardDetailStore.setDashboardInfo(_dashboardTemplate, undefined);
             SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME, params: { dashboardScope: state.dashboardScope } });
         };
 
