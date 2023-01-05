@@ -59,6 +59,7 @@ import {
 } from 'vue';
 
 import { PDivider } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -219,7 +220,7 @@ const handleSave = async () => {
 const handleChangeVariable = (variables: DashboardVariablesSchema['properties'], order?: string[]) => {
     variableState.variableProperties = variables;
     if (order) variableState.order = order;
-   const _variableData = cloneDeep(variableState.variableData);
+    const _variableData = cloneDeep(variableState.variableData);
     variableState.order.forEach((d) => {
         if (variables[d].use) return;
         if (variableState.variableData[d]) delete _variableData[d];
