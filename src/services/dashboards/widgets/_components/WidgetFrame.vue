@@ -70,15 +70,13 @@
                 </template>
             </div>
         </div>
-        <!--sul-lang-->
         <delete-modal :visible.sync="state.visibleDeleteModal"
-                      :header-title="$t('Are you sure you want to discard changes?')"
-                      :contents="$t('Changes will not be saved.')"
+                      :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
+                      :contents="$t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
                       @confirm="handleDeleteModalConfirm"
         />
-        <!--sul-lang-->
         <p-button-modal :visible.sync="state.visibleEditModal"
-                        :header-title="$t('Update Widget')"
+                        :header-title="$t('DASHBOARDS.WIDGET.UPDATE_TITLE')"
                         :disabled="!widgetFormState.isValid"
                         size="sm"
                         @confirm="handleEditModalConfirm"
