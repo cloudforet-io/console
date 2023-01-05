@@ -75,6 +75,7 @@
         <p-button-modal :visible.sync="state.visibleEditModal"
                         :header-title="$t('Update Widget')"
                         :disabled="!widgetFormState.isValid"
+                        size="sm"
                         @confirm="handleConfirm"
         >
             <template #body>
