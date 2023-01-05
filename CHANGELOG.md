@@ -1,3 +1,10 @@
+# [1.1.0-beta.510](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.509...v1.1.0-beta.510) (2023-01-05)
+
+
+### Features
+
+* **ignore-window-arrow-keydown-events:** add composable ([#222](https://github.com/cloudforet-io/mirinae/issues/222)) ([d5502cc](https://github.com/cloudforet-io/mirinae/commit/d5502cca68514e5c70fa805bcaf999bc86c801c6))
+
 # [1.1.0-beta.509](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.508...v1.1.0-beta.509) (2023-01-05)
 
 
