@@ -51,8 +51,14 @@ export const getWidgetTableDateFields = (
 export const sortTableData = (rawData: CostAnalyzeDataModel['results'], sortKey = 'date'): CostAnalyzeDataModel['results'] => {
     const results: CostAnalyzeDataModel['results'] = [];
     rawData.forEach((d) => {
-        const _usdCostSum = sortBy(d.usd_cost_sum, sortKey);
-        const _usageQuantitySum = sortBy(d.usage_quantity_sum, sortKey);
+        let _usdCostSum = d.usd_cost_sum;
+        let _usageQuantitySum = d.usage_quantity_sum;
+        if (typeof d.usd_cost_sum === 'object') {
+            _usdCostSum = sortBy(d.usd_cost_sum, sortKey);
+        }
+        if (typeof d.usage_quantity_sum === 'object') {
+            _usageQuantitySum = sortBy(d.usage_quantity_sum, sortKey);
+        }
         results.push({
             ...d,
             usd_cost_sum: _usdCostSum,
