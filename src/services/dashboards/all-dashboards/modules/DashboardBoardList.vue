@@ -7,7 +7,9 @@
             </template>
         </p-field-title>
         <p-board :board-sets="dashboardListByBoardSets"
+                 selectable
                  class="board"
+                 @item-click="handleClickBoardItem"
         >
             <template #item-content="{board}">
                 <div class="board-item-title-wrapper">
@@ -134,7 +136,7 @@ export default defineComponent<DashboardBoardListProps>({
     setup(props) {
         const state = reactive({
             thisPage: 1,
-            dashboardScopeType: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? 'domain' : 'project')),
+            dashboardScopeType: computed(() => DASHBOARD_SCOPE[props.scopeType]),
             dashboardScopeTypeForView: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? 'Workspace' : 'Project')),
             dashboardListByBoardSets: computed<BoardSet[]>(() => props.dashboardList
                 .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
@@ -194,6 +196,15 @@ export default defineComponent<DashboardBoardListProps>({
         ];
 
         /* EVENT */
+        const handleClickBoardItem = (item: DashboardModel) => {
+            SpaceRouter.router.push({
+                name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                params: {
+                    dashboardScope: state.dashboardScopeType,
+                    dashboardId: item[`${state.dashboardScopeType}_dashboard_id`],
+                },
+            });
+        };
         const handleUpdateCloneModal = (visible) => {
             if (visible) return;
             cloneModalState.dashboardConfig = {} as DashboardConfig;
@@ -246,6 +257,7 @@ export default defineComponent<DashboardBoardListProps>({
             ...toRefs(state),
             deleteModalState,
             cloneModalState,
+            handleClickBoardItem,
             handleSetQuery,
             handlePage,
             handleDeleteDashboardConfirm,
