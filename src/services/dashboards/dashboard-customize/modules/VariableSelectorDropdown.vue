@@ -41,13 +41,14 @@
                         class="options-menu"
                         searchable
                         use-fixed-menu-style
+                        :search-text="searchText"
                         :style="fixedMenuStyle"
                         :menu="reorderedMenu"
                         :selected.sync="selected"
                         :multi-selectable="selectionType === 'MULTI'"
                         :show-radio-icon="selectionType === 'SINGLE'"
                         :show-clear-selection="selectionType === 'MULTI'"
-                        @update-search-input="handleChangeContextMenuInput"
+                        @update:search-text="handleChangeContextMenuInput"
         />
     </div>
 </template>
@@ -92,6 +93,7 @@ const state = reactive({
 const {
     targetRef,
     contextMenuRef,
+    searchText,
     selected,
     options,
 } = toRefs(state);
@@ -123,9 +125,13 @@ const handleChangeVisible = () => {
     }
 };
 // TODO: search text binding
-const handleChangeContextMenuInput = (): void => {
-    // state.searchText = value;
+const handleChangeContextMenuInput = (text: string): void => {
+    state.searchText = text;
 };
+
+watch(() => state.searchText, () => {
+    reorderedMenu.value = [];
+});
 
 // reconvert to string | string[]
 watch(() => state.selected, (_selected) => {
