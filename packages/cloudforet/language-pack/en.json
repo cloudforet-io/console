@@ -1316,6 +1316,8 @@
 			},
 			"DATE_PAST_7_DAYS": "Past 7 days",
 			"DATE_TODAY": "Today",
+			"DELETE_CONTENTS": "Changes will not be saved.",
+			"DELETE_TITLE": "Are you sure you want to discard changes?",
 			"DETAILS": "Details",
 			"EDIT_WIDGET": "Edit Widget",
 			"ERROR_MSG": "There is an error from an incompatibility dashboard's variables and widget options.",
@@ -1334,7 +1336,8 @@
 			},
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "Displays the top project list that used resources of compute, database, storage the most.   "
-			}
+			},
+			"UPDATE_TITLE": "Update Widget"
 		}
 	},
 	"IAM": {

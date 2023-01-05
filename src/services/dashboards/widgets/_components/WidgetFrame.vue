@@ -70,13 +70,16 @@
                 </template>
             </div>
         </div>
-        <delete-modal :visible.sync="state.visibleDeleteModal" />
-        <!--sul-lang-->
+        <delete-modal :visible.sync="state.visibleDeleteModal"
+                      :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
+                      :contents="$t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
+                      @confirm="handleDeleteModalConfirm"
+        />
         <p-button-modal :visible.sync="state.visibleEditModal"
-                        :header-title="$t('Update Widget')"
+                        :header-title="$t('DASHBOARDS.WIDGET.UPDATE_TITLE')"
                         :disabled="!widgetFormState.isValid"
                         size="sm"
-                        @confirm="handleConfirm"
+                        @confirm="handleEditModalConfirm"
         >
             <template #body>
                 <div v-if="!props.widgetConfigId"
@@ -223,7 +226,7 @@ const state = reactive({
 
 const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
 const handleEditButtonClick = () => { state.visibleEditModal = true; };
-const handleConfirm = () => {
+const handleEditModalConfirm = () => {
     const widgetInfo: Partial<DashboardContainerWidgetInfo> = {
         widget_name: widgetFormState.widgetConfigId ?? '',
         title: widgetFormState.widgetTitle ?? '',
@@ -233,6 +236,10 @@ const handleConfirm = () => {
     dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
     state.visibleEditModal = false;
     emit('refresh');
+};
+const handleDeleteModalConfirm = () => {
+    dashboardDetailStore.deleteWidget(props.widgetKey);
+    state.visibleDeleteModal = false;
 };
 </script>
 

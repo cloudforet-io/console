@@ -1316,6 +1316,8 @@
 			},
 			"DATE_PAST_7_DAYS": "",
 			"DATE_TODAY": "",
+			"DELETE_CONTENTS": "",
+			"DELETE_TITLE": "",
 			"DETAILS": "",
 			"EDIT_WIDGET": "",
 			"ERROR_MSG": "",
@@ -1334,7 +1336,8 @@
 			},
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": ""
-			}
+			},
+			"UPDATE_TITLE": ""
 		}
 	},
 	"IAM": {
