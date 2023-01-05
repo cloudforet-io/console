@@ -36,7 +36,7 @@
                            :show-next-page="state.data?.more"
                            show-legend
                            @toggle-legend="handleToggleLegend"
-                           @update:this-page="handleUpdateThisPage"
+                           @update:thisPage="handleUpdateThisPage"
         />
     </widget-frame>
 </template>
@@ -52,6 +52,7 @@ import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
@@ -142,7 +143,9 @@ const fetchData = async (): Promise<FullData> => {
             sort: [{ key: '_total_usd_cost_sum', desc: true }],
             field_group: ['date'],
         };
-        if (state.pageSize) query.page = { start: state.thisPage, limit: state.pageSize };
+        if (state.pageSize) {
+            query.page = { start: getPageStart(state.thisPage, state.pageSize), limit: state.pageSize };
+        }
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
         return { results: sortTableData(results), more };
     } catch (e) {
@@ -204,9 +207,9 @@ const initWidget = async (data?: FullData) => {
     return state.data;
 };
 
-const refreshWidget = async () => {
+const refreshWidget = async (thisPage = 1) => {
     state.loading = true;
-    state.thisPage = 1;
+    state.thisPage = thisPage;
     state.data = await fetchData();
     state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
@@ -226,7 +229,7 @@ const handleToggleLegend = (index) => {
 };
 const handleUpdateThisPage = (thisPage: number) => {
     state.thisPage = thisPage;
-    refreshWidget();
+    refreshWidget(thisPage);
 };
 const handleRefresh = () => {
     refreshWidget();

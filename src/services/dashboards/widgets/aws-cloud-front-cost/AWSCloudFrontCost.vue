@@ -51,6 +51,7 @@ import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { byteFormatter } from '@cloudforet/core-lib';
+import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -163,7 +164,9 @@ const fetchData = async (): Promise<FullData> => {
             field_group: ['usage_type'],
             ...apiQueryHelper.data,
         };
-        if (state.pageSize) query.page = { start: state.thisPage, limit: state.pageSize };
+        if (state.pageSize) {
+            query.page = { start: getPageStart(state.thisPage, state.pageSize), limit: state.pageSize };
+        }
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
         return { results: sortTableData(results, 'usage_type'), more };
     } catch (e) {
@@ -232,8 +235,9 @@ const initWidget = async (data?: FullData) => {
     return state.data;
 };
 
-const refreshWidget = async () => {
+const refreshWidget = async (thisPage = 1) => {
     state.loading = true;
+    state.thisPage = thisPage;
     state.data = await fetchData();
     state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
@@ -250,7 +254,7 @@ const handleSelectSelectorType = (selected: string) => {
 };
 const handleUpdateThisPage = (thisPage: number) => {
     state.thisPage = thisPage;
-    refreshWidget();
+    refreshWidget(thisPage);
 };
 
 const handleRefresh = () => {
