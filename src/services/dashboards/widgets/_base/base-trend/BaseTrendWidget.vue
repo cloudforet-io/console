@@ -35,7 +35,7 @@
                            :show-next-page="state.data?.more"
                            show-legend
                            @toggle-legend="handleToggleLegend"
-                           @update:thisPage="handleUpdateThisPage"
+                           @update:this-page="handleUpdateThisPage"
         />
     </widget-frame>
 </template>
@@ -205,6 +205,7 @@ const initWidget = async (data?: FullData) => {
 
 const refreshWidget = async () => {
     state.loading = true;
+    state.thisPage = 1;
     state.data = await fetchData();
     state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();

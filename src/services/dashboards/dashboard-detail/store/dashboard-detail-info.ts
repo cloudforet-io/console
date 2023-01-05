@@ -137,18 +137,18 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.dashboardInfo = dashboardInfo;
         state.dashboardName = dashboardInfo.name;
 
-        state.enableCurrency = dashboardInfo.settings.currency.enabled;
+        state.enableCurrency = dashboardInfo.settings?.currency?.enabled ?? false;
         state.currency = dashboardInfo.settings.currency?.value ?? CURRENCY.USD;
-        state.enableDateRange = dashboardInfo.settings.date_range.enabled;
+        state.enableDateRange = dashboardInfo.settings?.date_range?.enabled ?? false;
         state.dateRange = dashboardInfo.settings.date_range;
         state.settings = {
             date_range: {
-                enabled: dashboardInfo.settings.date_range.enabled,
-                start: dashboardInfo.settings.date_range.start,
-                end: dashboardInfo.settings.date_range.end,
+                enabled: dashboardInfo.settings?.date_range?.enabled ?? false,
+                start: dashboardInfo.settings?.date_range?.start,
+                end: dashboardInfo.settings?.date_range?.end,
             },
             currency: {
-                enabled: dashboardInfo.settings.currency.enabled,
+                enabled: dashboardInfo.settings?.currency?.enabled ?? false,
                 value: dashboardInfo.settings.currency?.value ?? CURRENCY.USD,
             },
         };
