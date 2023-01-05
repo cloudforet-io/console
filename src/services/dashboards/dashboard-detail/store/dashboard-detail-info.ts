@@ -1,4 +1,4 @@
-import type { ComputedRef } from 'vue';
+import type { ComputedRef, UnwrapRef } from 'vue';
 import {
     computed, reactive,
 } from 'vue';
@@ -11,7 +11,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
-
 import { store } from '@/store';
 
 import type { Currency } from '@/store/modules/display/config';
@@ -22,7 +21,7 @@ import type {
 } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
-import type { DashboardModel } from '@/services/dashboards/model';
+import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
@@ -32,11 +31,11 @@ interface WidgetDataMap {
 
 interface DashboardDetailInfoStoreState {
     loadingDashboard: boolean;
-    dashboardId: string;
+    dashboardId: string | undefined;
+    projectId: string;
     isProjectDashboard: ComputedRef<boolean>;
     dashboardInfo: DashboardModel|null;
     dashboardViewer: ComputedRef<DashboardViewer>;
-    labelList: string[];
     dashboardName: string;
     enableCurrency: boolean;
     currency: Currency;
@@ -51,15 +50,19 @@ interface DashboardDetailInfoStoreState {
     loadingWidgets: boolean;
     widgetDataMap: WidgetDataMap;
 }
+
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
     const state = reactive<DashboardDetailInfoStoreState>({
         loadingDashboard: false,
         dashboardId: '',
-        isProjectDashboard: computed<boolean>(() => state.dashboardId?.startsWith('project')),
+        projectId: '',
+        isProjectDashboard: computed<boolean>(() => {
+            if (state.projectId) return true;
+            return !!state.dashboardId?.startsWith('project');
+        }),
         dashboardViewer: computed<DashboardViewer>(() => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE),
         dashboardInfo: null,
         dashboardName: '',
-        labelList: [],
         enableCurrency: false,
         currency: CURRENCY.USD,
         enableDateRange: false,
@@ -85,7 +88,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         dashboardWidgetInfoList: [],
         loadingWidgets: false,
         widgetDataMap: {},
-    });
+    }) as UnwrapRef<DashboardDetailInfoStoreState>;
 
     const resetDashboardSettings = () => {
         state.dateRange = {
@@ -108,7 +111,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const resetDashboardData = () => {
         state.dashboardInfo = null;
         state.dashboardName = '';
-        state.labelList = [];
+        state.projectId = '';
         state.enableCurrency = false;
         state.currency = CURRENCY.USD;
         state.enableDateRange = false;
@@ -136,6 +139,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setDashboardInfo = (dashboardInfo: DashboardModel) => {
         state.dashboardInfo = dashboardInfo;
         state.dashboardName = dashboardInfo.name;
+        state.projectId = (dashboardInfo as ProjectDashboardModel).project_id ?? '';
 
         state.enableCurrency = dashboardInfo.settings?.currency?.enabled ?? false;
         state.currency = dashboardInfo.settings.currency?.value ?? CURRENCY.USD;
@@ -235,3 +239,4 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         deleteWidget,
     };
 });
+

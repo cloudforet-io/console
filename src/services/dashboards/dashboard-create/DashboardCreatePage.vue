@@ -53,6 +53,7 @@ import type { DashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import type { ProjectItemResp } from '@/services/project/type';
 
+
 export default {
     name: 'CreateDashboardPage',
     components: {
@@ -86,11 +87,25 @@ export default {
 
         const state = reactive({
             dashboardScope: DASHBOARD_SCOPE.DOMAIN as DashboardScope,
-            dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
+            dashboardViewerType: DASHBOARD_VIEWER.PRIVATE as DashboardViewer,
         });
 
         const handleClickCreate = () => {
-            dashboardDetailStore.setDashboardInfo(dashboardTemplate.value);
+            let _dashboardTemplate;
+            if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) {
+                _dashboardTemplate = {
+                    ...dashboardTemplate.value,
+                    viewers: state.dashboardViewerType,
+                    project_id: dashboardProject.value?.id ?? '',
+                };
+            } else {
+                _dashboardTemplate = {
+                    ...dashboardTemplate.value,
+                    viewers: state.dashboardViewerType,
+                };
+            }
+
+            dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
             SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME, params: { dashboardScope: state.dashboardScope } });
         };
 

@@ -6,7 +6,7 @@
         />
         <div class="filters-box">
             <dashboard-labels editable
-                              :label-list="dashboardDetailState.labelList"
+                              :label-list="dashboardDetailState.labels"
                               @update:labelList="handleUpdateLabelList"
             />
             <dashboard-toolset :date-range.sync="dashboardDetailState.settings.date_range"
@@ -112,6 +112,21 @@ const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     refreshInterval: undefined,
+    apiParam: computed<Partial<DashboardConfig>>(() => ({
+        name: dashboardDetailState.dashboardName,
+        labels: dashboardDetailState.labels,
+        settings: dashboardDetailState.settings,
+        layouts: [dashboardDetailState.dashboardWidgetInfoList.map((widget) => {
+            const result: Partial<DashboardContainerWidgetInfo> = { ...widget };
+            delete result.widgetKey;
+            return result as DashboardLayoutWidgetInfo;
+        })],
+        variables: variableState.variableData,
+        variables_schema: {
+            properties: variableState.variableProperties,
+            order: variableState.order,
+        },
+    })),
 });
 const vm = getCurrentInstance()?.proxy as Vue;
 const variableState = reactive({
@@ -190,37 +205,42 @@ const getDashboardData = async () => {
 };
 const updateDashboardData = async () => {
     try {
-        const param: Partial<DashboardConfig> = {
-            name: dashboardDetailState.dashboardName,
-            labels: dashboardDetailState.labelList,
-            settings: dashboardDetailState.settings,
-            layouts: [dashboardDetailState.dashboardWidgetInfoList.map((widget) => {
-                const result: Partial<DashboardContainerWidgetInfo> = { ...widget };
-                delete result.widgetKey;
-                return result as DashboardLayoutWidgetInfo;
-            })],
-            variables: variableState.variableData,
-            variables_schema: {
-                properties: variableState.variableProperties,
-                order: variableState.order,
-            },
-        };
         if (dashboardDetailState.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
                 project_dashboard_id: props.dashboardId,
-                ...param,
+                ...state.apiParam,
             });
         } else {
             await SpaceConnector.clientV2.dashboard.domainDashboard.update({
                 domain_dashboard_id: props.dashboardId,
-                ...param,
+                ...state.apiParam,
             });
         }
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                // FIXME:: change dashboardId when creating dashboard
-                dashboardId: props?.dashboardId ?? '',
+                dashboardId: props.dashboardId as string,
+                dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
+            },
+        });
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
+    }
+};
+const createDashboard = async () => {
+    try {
+        let _dashboardId = '';
+        if (dashboardDetailState.isProjectDashboard) {
+            const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create(state.apiParam);
+            _dashboardId = result.project.project_dashboard_id;
+        } else {
+            const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(state.apiParam);
+            _dashboardId = result.domain.domain_dashboard_id;
+        }
+        await SpaceRouter.router.push({
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            params: {
+                dashboardId: _dashboardId,
                 dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
@@ -233,11 +253,12 @@ const updateDashboardData = async () => {
 const handleUpdateDashboardName = (name: string) => {
     dashboardDetailState.dashboardName = name;
 };
-const handleUpdateLabelList = (labelList: Array<string>) => {
-    dashboardDetailState.labelList = labelList;
+const handleUpdateLabelList = (labels: Array<string>) => {
+    dashboardDetailState.labels = [...labels];
 };
 const handleSave = async () => {
-    await updateDashboardData();
+    if (dashboardDetailState.dashboardId) await updateDashboardData();
+    if (dashboardDetailState.dashboardId === undefined) await createDashboard();
 };
 const handleChangeVariable = (variables: DashboardVariablesSchema['properties'], order?: string[]) => {
     variableState.variableProperties = variables;

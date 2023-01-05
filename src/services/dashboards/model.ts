@@ -14,8 +14,8 @@ export interface DomainDashboardModel extends DashboardConfig {
 
 export interface ProjectDashboardModel extends DashboardConfig {
     project_dashboard_id: string;
-    viewers: DashboardViewer;
     project_id: string;
+    viewers: DashboardViewer;
     tags: Tags;
     user_id: string;
     domain_id: string;
@@ -24,6 +24,3 @@ export interface ProjectDashboardModel extends DashboardConfig {
 }
 
 export type DashboardModel = DomainDashboardModel | ProjectDashboardModel;
-
-
-

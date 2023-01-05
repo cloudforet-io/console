@@ -38,7 +38,7 @@
             </template>
         </p-page-title>
         <div class="filter-box">
-            <dashboard-labels :label-list="dashboardDetailState.labelList" />
+            <dashboard-labels :label-list="dashboardDetailState.labels" />
             <dashboard-toolset :enable-currency="dashboardDetailState.enableCurrency"
                                :currency.sync="dashboardDetailState.currency"
                                :enable-date-range="dashboardDetailState.enableDateRange"

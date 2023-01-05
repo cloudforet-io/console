@@ -20,14 +20,14 @@ export const refreshIntervalOptionList = Object.keys(REFRESH_INTERVAL_OPTIONS_MA
 export const DASHBOARD_SCOPE = {
     DOMAIN: 'domain',
     PROJECT: 'project',
-};
-export type DashboardScope = keyof typeof DASHBOARD_SCOPE;
+} as const;
+export type DashboardScope = typeof DASHBOARD_SCOPE[keyof typeof DASHBOARD_SCOPE];
 
 export const DASHBOARD_VIEWER = {
     PUBLIC: 'PUBLIC',
     PRIVATE: 'PRIVATE',
-};
-export type DashboardViewer = keyof typeof DASHBOARD_VIEWER;
+} as const;
+export type DashboardViewer = typeof DASHBOARD_VIEWER[keyof typeof DASHBOARD_VIEWER];
 
 
 export const GRANULARITY = {
