@@ -94,7 +94,7 @@ export default defineComponent({
         const mashUpProjectGroup = (dashboardList: ProjectDashboardModel[] = []): LNBMenu[] => {
             const dashboardItemsWithGroup = {} as Record<string, ProjectDashboardModel[]>;
             dashboardList.forEach((d) => {
-                const projectGroupLabel: string|undefined = state.projectItems[d.project_id].label;
+                const projectGroupLabel: string|undefined = state.projectItems[d.project_id]?.label;
                 if (projectGroupLabel) {
                     if (dashboardItemsWithGroup[projectGroupLabel]) {
                         dashboardItemsWithGroup[projectGroupLabel].push(d);
