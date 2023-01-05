@@ -36,6 +36,10 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
             enabled: true,
             type: 'cost-usage',
         },
+        pagination_options: {
+            enabled: true,
+            page_size: 5,
+        },
     },
     options_schema: {
         default_properties,
