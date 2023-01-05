@@ -31,7 +31,7 @@
                            :all-reference-type-info="props.allReferenceTypeInfo"
                            :legends.sync="state.legends"
                            :color-set="state.colorSet"
-                           :this-page.sync="state.thisPage"
+                           :this-page="state.thisPage"
                            :show-next-page="state.data?.more"
                            show-legend
                            @toggle-legend="handleToggleLegend"

@@ -31,7 +31,7 @@
                                :currency-rates="props.currencyRates"
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :legends.sync="state.legends"
-                               :this-page.sync="state.thisPage"
+                               :this-page="state.thisPage"
                                :show-next-page="state.data?.more"
                                @update:thisPage="handleUpdateThisPage"
             />
