@@ -1,4 +1,4 @@
-import type { Ref, SetupContext } from 'vue';
+import type { Ref } from 'vue';
 import {
     computed, ref, watch,
 } from 'vue';
@@ -7,10 +7,10 @@ import {
  * @name useProxyValue
  * @description In case of array or object, set() does not work even if the original value is modified unless reallocated.
  */
-export function useProxyValue<T = any, Props = any, Emits = SetupContext['emit']>(
+export function useProxyValue<T = any>(
     name: string,
-    props: Props,
-    emit: Emits,
+    props: any,
+    emit: any,
     extraEventNames?: string|string[],
 ): Ref<T> {
     const proxyValue = ref<T>(props[name]);

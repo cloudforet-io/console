@@ -168,12 +168,6 @@ import PContextMenuItem from '@/inputs/context-menu/context-menu-item/PContextMe
 import type { MenuItem } from '@/inputs/context-menu/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
 
-const getFilteredSelectedItems = (selected: MenuItem[], menu: MenuItem[]): MenuItem[] => {
-    const filtered = selected.filter((d) => menu.find((item) => item.name === d.name));
-    if (filtered.length === selected.length) return selected;
-    return filtered;
-};
-
 const FOCUS_GROUP_ID = 'context-item';
 
 interface ContextMenuProps {
@@ -182,7 +176,6 @@ interface ContextMenuProps {
     selected?: MenuItem[];
     multiSelectable?: boolean;
     showSelectMarker?: boolean;
-    strictSelectMode?: boolean;
     itemHeightFixed?: boolean;
     highlightTerm?: string;
     noSelectIndication?: boolean;
@@ -218,7 +211,7 @@ const slots = useSlots();
 const state = reactive({
     proxySearchText: props.searchText ?? '',
     isFocusedOnSearch: false,
-    proxySelected: useProxyValue<MenuItem[], ContextMenuProps, ContextMenuEmits>('selected', props, emit),
+    proxySelected: useProxyValue<MenuItem[]>('selected', props, emit),
     selectedNameMap: computed<Record<string, number>>(() => {
         const selectedMap = {};
         state.proxySelected.forEach((item, idx) => {
@@ -227,10 +220,7 @@ const state = reactive({
         return selectedMap;
     }),
     selectableMenuItems: computed(() => props.menu.filter((d) => !d.disabled && (d.type === undefined || d.type === 'item'))),
-    selectedCount: computed(() => {
-        if (props.strictSelectMode) return state.selectableMenuItems.filter((d) => state.selectedNameMap[d.name] !== undefined).length;
-        return state.proxySelected.length;
-    }),
+    selectedCount: computed(() => state.proxySelected.length),
     menuItemLength: computed(() => props.menu.filter((d) => d.type === undefined || d.type === 'item').length),
 });
 
@@ -307,14 +297,6 @@ const handleUpdateSearchText = async (value: string) => {
     state.proxySearchText = value;
     emit('update:search-text', value);
 };
-
-watch(() => state.proxySelected, (proxySelected) => {
-    if (!proxySelected.length) return;
-
-    if (props.strictSelectMode) {
-        state.proxySelected = getFilteredSelectedItems(proxySelected, state.selectableMenuItems);
-    }
-}, { immediate: true });
 
 watch(() => props.searchText, (searchText) => {
     if (state.proxySearchText === searchText) return;
