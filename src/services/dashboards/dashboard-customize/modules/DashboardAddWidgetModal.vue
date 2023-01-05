@@ -3,7 +3,7 @@
                     :header-title="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TITLE')"
                     size="lg"
                     class="dashboard-add-widget-modal"
-                    :disabled="!widgetFromState.isValid"
+                    :disabled="!widgetFormState.isValid"
                     @confirm="handleConfirm"
     >
         <template #body>
@@ -55,7 +55,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const widgetFormStore = useWidgetFormStore();
-        const widgetFromState = widgetFormStore.state;
+        const widgetFormState = widgetFormStore.state;
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
         });
@@ -68,16 +68,16 @@ export default defineComponent<Props>({
         });
 
         const handleConfirm = () => {
-            if (!widgetFromState.widgetConfigId || !widgetFromState.widgetTitle) return;
-            const widgetConfig = getWidgetConfig(widgetFromState.widgetConfigId);
+            if (!widgetFormState.widgetConfigId || !widgetFormState.widgetTitle) return;
+            const widgetConfig = getWidgetConfig(widgetFormState.widgetConfigId);
             const dashboardLayoutWidgetInfo: DashboardContainerWidgetInfo = {
                 widgetKey: uuidv4(),
-                widget_name: widgetFromState.widgetConfigId,
-                title: widgetFromState.widgetTitle,
+                widget_name: widgetFormState.widgetConfigId,
+                title: widgetFormState.widgetTitle,
                 size: widgetConfig.sizes[0],
                 version: '1', // TODO: auto?
-                inherit_options: widgetFromState.inheritOptions ?? {},
-                widget_options: widgetFromState.widgetOptions ?? {},
+                inherit_options: widgetFormState.inheritOptions ?? {},
+                widget_options: widgetFormState.widgetOptions ?? {},
             };
             emit('add-widget', dashboardLayoutWidgetInfo);
             state.proxyVisible = false;
@@ -85,7 +85,7 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            widgetFromState,
+            widgetFormState,
             tabState,
             handleConfirm,
         };
