@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import { GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/config';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
 
 const costMapWidgetConfig: WidgetConfig = {
@@ -20,6 +20,10 @@ const costMapWidgetConfig: WidgetConfig = {
         inherit_count: 1,
     },
     sizes: ['md', 'full'],
+    options: {
+        group_by: GROUP_BY.PROJECT,
+        granularity: GRANULARITY.ACCUMULATED,
+    },
     options_schema: {
         default_properties: ['group_by'],
         schema: {
