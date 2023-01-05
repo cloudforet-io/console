@@ -48,3 +48,9 @@ export interface TreemapChartData {
         font_color?: string;
     }>;
 }
+
+export interface PieChartData {
+    [groupBy: string]: string | any;
+    usd_cost_sum?: number;
+    usage_quantity_sum?: number;
+}
