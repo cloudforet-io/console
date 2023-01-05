@@ -1,7 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   :error-mode="false"
-                  :widget-link="state.widgetLink"
     >
         <div class="cost-map">
             <div class="chart-wrapper">
@@ -96,7 +95,7 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 const fetchData = async (): Promise<TreemapChartData[]> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
-        if (state.groupBy === 'project_id') apiQueryHelper.setFilters([{ k: 'project_id', v: null, o: '!=' }]);
+        apiQueryHelper.setFilters([{ k: state.groupBy, v: null, o: '!=' }]);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.options.granularity,
