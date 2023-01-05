@@ -103,7 +103,7 @@ export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSett
 export const getRefinedTreemapChartData = (rawData: TreemapChartData['children'], groupBy: GroupBy, allReferenceTypeInfo: AllReferenceTypeInfo) => {
     const chartData: TreemapChartData[] = [{
         name: 'Root',
-        value: 'Root',
+        value: '',
         children: [],
     }];
     if (!rawData || !groupBy || !allReferenceTypeInfo || false) return [];
