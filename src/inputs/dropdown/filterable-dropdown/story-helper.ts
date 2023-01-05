@@ -1,29 +1,99 @@
 import type { ArgTypes } from '@storybook/addons';
 
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
-import { FILTERABLE_DROPDOWN_TYPE } from '@/inputs/dropdown/filterable-dropdown/type';
-import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
+import { FILTERABLE_DROPDOWN_APPEARANCE_TYPES } from '@/inputs/dropdown/filterable-dropdown/type';
 
 
 const extraArgTypes: ArgTypes = {
     /* props */
-    type: {
-        name: 'type',
+    visibleMenu: {
+        name: 'visibleMenu',
+        type: { name: 'boolean' },
+        description: 'Use this prop when you want to control menu visibility manually. this is `sync` prop with event `update:visible-menu`.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    useFixedMenuStyle: {
+        name: 'useFixedMenuStyle',
+        type: { name: 'boolean' },
+        description: 'Whether to use position fixed style on menu or not. ',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    placeholder: {
+        name: 'placeholder',
         type: { name: 'string' },
-        description: 'Type of single selection. Do not work in multi select mode. There are 2 types: `default` and `radioButton`.',
-        defaultValue: FILTERABLE_DROPDOWN_TYPE.default,
+        description: 'Search input placeholder.',
+        defaultValue: undefined,
         table: {
             type: {
                 summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: 'default',
+                summary: 'undefined',
             },
         },
         control: {
-            type: 'select',
-            options: Object.values(FILTERABLE_DROPDOWN_TYPE),
+            type: 'text',
+        },
+    },
+    invalid: {
+        name: 'invalid',
+        type: { name: 'boolean' },
+        description: 'Whether to apply invalid style or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    disabled: {
+        name: 'disabled',
+        type: { name: 'boolean' },
+        description: 'Whether to disable selection or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
         },
     },
     handler: {
@@ -62,69 +132,33 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
-    exactMode: {
-        name: 'exactMode',
-        type: { name: 'boolean' },
-        description: 'If it is `true` and there is no exact match for the menu item, the search text will be blank.',
-        defaultValue: true,
+    appearanceType: {
+        name: 'appearanceType',
+        type: { name: 'string' },
+        description: 'Appearance type to display selected items.',
+        defaultValue: FILTERABLE_DROPDOWN_APPEARANCE_TYPES[0],
         table: {
             type: {
-                summary: 'boolean',
+                summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: 'true',
+                summary: `'${FILTERABLE_DROPDOWN_APPEARANCE_TYPES[0]}'`,
             },
         },
         control: {
-            type: 'boolean',
+            type: 'select',
+            options: FILTERABLE_DROPDOWN_APPEARANCE_TYPES,
         },
     },
-    disableDeleteAll: {
-        name: 'disableDeleteAll',
-        type: { name: 'boolean' },
-        description: 'If it is `true`, disable delete all and hide delete all button.',
-        defaultValue: false,
+    pageSize: {
+        name: 'pageSize',
+        type: { name: 'number' },
+        description: 'Page size to show items.',
+        defaultValue: 10,
         table: {
             type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
-    // context menu fixed style props
-    useFixedMenuStyle: {
-        name: 'useFixedMenuStyle',
-        type: { name: 'boolean' },
-        description: 'Whether to use position fixed style on menu or not. ',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
-    visibleMenu: {
-        name: 'visibleMenu',
-        type: { name: 'boolean' },
-        description: 'Whether to show the menu or not. Automatically determined if no value is given. `sync` props.',
-        defaultValue: undefined,
-        table: {
-            type: {
-                summary: 'boolean',
+                summary: 'number',
             },
             category: 'props',
             defaultValue: {
@@ -132,7 +166,8 @@ const extraArgTypes: ArgTypes = {
             },
         },
         control: {
-            type: null,
+            type: 'number',
+            options: { min: 0 },
         },
     },
     /* events */
@@ -207,23 +242,85 @@ const extraArgTypes: ArgTypes = {
             type: { summary: null },
         },
     },
-};
-
-const initSearchArgTypes = (): ArgTypes => {
-    const argTypes: ArgTypes = {};
-    const searchArgTypes = getSearchArgTypes();
-    Object.keys(searchArgTypes).forEach((k) => {
-        const item = searchArgTypes[k];
-        if (item.table?.category === 'slots') {
-            argTypes[`search-${k}`] = { ...item, name: `search-${k}` };
-        } else {
-            argTypes[k] = item;
-        }
-        if (['isFocused', 'value'].includes(k)) {
-            item.control = { type: null };
-        }
-    });
-    return argTypes;
+    /* events */
+    onUpdateVisibleMenu: {
+        name: 'update:visible-menu',
+        description: 'Event emitted when menu visibility is updated.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onUpdateSearchText: {
+        name: 'update:search-text',
+        description: 'Event emitted when search text is updated.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onUpdateSelected: {
+        name: 'update:selected',
+        description: 'Event emitted when selected is updated.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onSelect: {
+        name: 'select',
+        description: 'Event emitted when an item is selected.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onDeleteTag: {
+        name: 'delete-tag',
+        description: 'Event emitted when a tag is deleted. It works only when the multiSelectable is true and appearanceType is \'stack\'',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onClickShowMore: {
+        name: 'click-show-more',
+        description: 'Event emitted when \'show more\' item is clicked.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
 };
 
 const initContextMenuArgTypes = (): ArgTypes => {
@@ -233,8 +330,10 @@ const initContextMenuArgTypes = (): ArgTypes => {
         loading: contextMenuArgTypes.loading,
         selected: contextMenuArgTypes.selected,
         multiSelectable: contextMenuArgTypes.multiSelectable,
-        strictSelectMode: contextMenuArgTypes.strictSelectMode,
-        disableDeleteAll: contextMenuArgTypes.disableDeleteAll,
+        searchText: contextMenuArgTypes.searchText,
+        readonly: contextMenuArgTypes.readonly,
+        showSelectHeader: contextMenuArgTypes.showSelectHeader,
+        showSelectMarker: contextMenuArgTypes.showSelectMarker,
     };
     Object.keys(contextMenuArgTypes).forEach((k) => {
         const item = contextMenuArgTypes[k];
@@ -247,6 +346,5 @@ const initContextMenuArgTypes = (): ArgTypes => {
 
 export const getFilterableDropdownArgTypes = (): ArgTypes => ({
     ...extraArgTypes,
-    ...initSearchArgTypes(),
     ...initContextMenuArgTypes(),
 });

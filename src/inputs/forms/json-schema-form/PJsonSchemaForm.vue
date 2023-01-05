@@ -84,6 +84,7 @@
                                            :menu="schemaProperty.menuItems"
                                            :selected="rawFormData[schemaProperty.propertyName]"
                                            :multi-selectable="schemaProperty.multiInputMode"
+                                           show-select-marker
                                            use-fixed-menu-style
                                            :invalid="invalid"
                                            class="input-form"

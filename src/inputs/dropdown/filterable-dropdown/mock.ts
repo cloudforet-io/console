@@ -1,15 +1,23 @@
 import { faker } from '@faker-js/faker';
 import { range } from 'lodash';
 
-const getMenuItem = () => ({
-    name: faker.datatype.uuid(),
-    label: `${faker.random.word()}`, // (${faker.random.word()})`,
-    type: 'item',
-    // disabled: faker.datatype.boolean(),
-});
+import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 
-export const getSearchDropdownMenu = (min = 10, max = 30) => range(faker.datatype.number({ min, max })).map(() => getMenuItem());
-export const getSearchDropdownMenuWithMultiTypes = () => range(30).map((i) => {
+const getMenuItem = (word?: string): FilterableDropdownMenuItem => {
+    let label = faker.random.word();
+    if (word) {
+        label = label.slice(0, label.length / 2) + word + label.slice(label.length / 2);
+    }
+    return {
+        name: faker.datatype.uuid(),
+        label,
+        type: 'item',
+        // disabled: faker.datatype.boolean(),
+    };
+};
+
+export const getFilterableDropdownMenu = (min = 10, max = 30, word?: string): FilterableDropdownMenuItem[] => range(faker.datatype.number({ min, max })).map(() => getMenuItem(word));
+export const getFilterableDropdownMenuWithMultiTypes = (): FilterableDropdownMenuItem[] => range(30).map((i) => {
     const result = getMenuItem();
 
     if ([0, 10, 20].includes(i)) {
@@ -20,3 +28,4 @@ export const getSearchDropdownMenuWithMultiTypes = () => range(30).map((i) => {
 
     return result;
 });
+
