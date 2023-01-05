@@ -58,7 +58,10 @@ const handleClickTitle = () => {
 };
 const handleInput = (e: InputEvent | string, type: 'INPUT' | 'TEXT_INPUT') => {
     if (type === 'INPUT') state.nameInput = ((e as InputEvent).target as HTMLInputElement).value;
-    if (type === 'TEXT_INPUT') state.nameInput = (e as string);
+    if (type === 'TEXT_INPUT') {
+        state.nameInput = (e as string);
+        state.name = state.nameInput;
+    }
 };
 const handleEscape = () => {
     state.editMode = false;
@@ -83,6 +86,6 @@ const handleEnter = () => {
     text-decoration: underline;
 }
 .p-text-input {
-    width: 80%;
+    width: calc(100% - 2.25rem);
 }
 </style>
