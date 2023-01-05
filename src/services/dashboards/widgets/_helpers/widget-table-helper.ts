@@ -6,7 +6,7 @@ import type { AllReferenceTypeInfo, ReferenceType } from '@/store/modules/refere
 import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
-import type { Granularity, GroupBy } from '@/services/dashboards/widgets/config';
+import type { Granularity, GroupBy } from '@/services/dashboards/widgets/_configs/config';
 import type { HistoryDataModel } from '@/services/dashboards/widgets/type';
 
 /**

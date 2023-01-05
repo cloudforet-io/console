@@ -40,7 +40,7 @@ import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/tem
 import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 
 interface Props {

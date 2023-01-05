@@ -99,8 +99,8 @@ import type {
     DashboardLayoutWidgetInfo,
     WidgetFiltersMap,
     WidgetOptionsSchema,
-} from '@/services/dashboards/widgets/config';
-import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
+} from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 
 interface Props {

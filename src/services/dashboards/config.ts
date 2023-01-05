@@ -1,6 +1,6 @@
 import type { Currency } from '@/store/modules/display/config';
 
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/config';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 
 export const REFRESH_INTERVAL_OPTIONS_MAP = {

@@ -1,5 +1,5 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/config';
-import { CHART_TYPE, GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/config';
+import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 
 const costByRegionWidgetConfig: WidgetConfig = {
     widget_config_id: 'costByRegion',

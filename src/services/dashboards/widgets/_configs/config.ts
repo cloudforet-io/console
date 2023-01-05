@@ -4,15 +4,15 @@ import type { DynamicField } from '@spaceone/design-system/types/data-display/dy
 import type { DynamicWidgetType } from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
-import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
-
 import type { Tags } from '@/models';
+import type { ConsoleFilterOperator } from '@/query/type';
+
 
 import type { CurrencyRates } from '@/store/modules/display/type';
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 export const WIDGET_SIZE = {
     sm: 'sm',

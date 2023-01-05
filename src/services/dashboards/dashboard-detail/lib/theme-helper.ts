@@ -1,5 +1,5 @@
 import type { WidgetThemeOption, WidgetThemeAssignedList } from '@/services/dashboards/dashboard-detail/lib/type';
-import { WIDGET_THEMES } from '@/services/dashboards/widgets/view-config';
+import { WIDGET_THEMES } from '@/services/dashboards/widgets/_configs/view-config';
 
 const WIDGET_THEME_LEN = WIDGET_THEMES.length;
 

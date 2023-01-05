@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash';
 
 import dashboardCommonWidgetConfig from '@/services/dashboards/widgets/_base/dashboard-common/widget-config';
-import type { WidgetOptionsSchema } from '@/services/dashboards/widgets/config';
+import type { WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/config';
 
 export const excludePropertiesFromDashboardCommonWidgetConfig = (excludedProperties: string[]): WidgetOptionsSchema => {
     const _widgetOptionsSchema = cloneDeep(dashboardCommonWidgetConfig.options_schema);

@@ -4,8 +4,8 @@ import { mergeWith } from 'lodash';
 
 import type {
     BaseConfigInfo, WidgetConfig,
-} from '@/services/dashboards/widgets/config';
-import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/widget-config-list';
+} from '@/services/dashboards/widgets/_configs/config';
+import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-list-config';
 
 const mergeCustomizer = (val1, val2) => {
     if (Array.isArray(val1)) return [...new Set(val1.concat(val2))];

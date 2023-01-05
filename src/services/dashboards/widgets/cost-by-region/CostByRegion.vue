@@ -67,15 +67,15 @@ import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { getLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+// eslint-disable-next-line import/no-cycle
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 import { CONTINENT_INFO } from '@/services/dashboards/widgets/cost-by-region/config';
 import type { AccumulatedDataModel, Legend } from '@/services/dashboards/widgets/type';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
-import { getLegends } from '@/services/dashboards/widgets/widget-chart-helper';
 
 type Data = AccumulatedDataModel['results'];
 interface FullData {

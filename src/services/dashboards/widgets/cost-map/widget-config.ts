@@ -1,6 +1,6 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/config';
-import { GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/config';
-import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
+import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 
 const costMapWidgetConfig: WidgetConfig = {
     widget_config_id: 'costMap',

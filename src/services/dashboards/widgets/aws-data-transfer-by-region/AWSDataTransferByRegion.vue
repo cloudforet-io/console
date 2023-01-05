@@ -46,13 +46,13 @@ import { blue, coral, red } from '@/styles/colors';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/config';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
-import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/view-config';
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
 interface Data {
     usage_quantity: string;

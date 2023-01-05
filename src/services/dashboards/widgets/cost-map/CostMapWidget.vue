@@ -44,15 +44,15 @@ import {
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { GroupBy, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/config';
-import type { HistoryDataModel, TreemapChartData } from '@/services/dashboards/widgets/type';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
+import type { GroupBy, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+import { getRefinedTreemapChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
-import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
-import { getRefinedTreemapChartData } from '@/services/dashboards/widgets/widget-chart-helper';
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import type { HistoryDataModel, TreemapChartData } from '@/services/dashboards/widgets/type';
 
 const COLOR_FIELD_NAME = 'background_color';
 const TEXT_COLOR_FIELD_NAME = 'font_color';

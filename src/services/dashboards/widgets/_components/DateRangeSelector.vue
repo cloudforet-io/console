@@ -40,9 +40,9 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type { DateRange } from '@/services/dashboards/config';
 import CustomDateRangeModal from '@/services/dashboards/widgets/_components/CustomDateRangeModal.vue';
-import type { Granularity } from '@/services/dashboards/widgets/config';
-import { GRANULARITY } from '@/services/dashboards/widgets/config';
-import { getInitialDates } from '@/services/dashboards/widgets/date-range-helper';
+import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { getInitialDates } from '@/services/dashboards/widgets/_helpers/date-range-helper';
 
 const today = dayjs.utc();
 interface PeriodItem {

@@ -125,8 +125,8 @@ import DashboardAddDefaultWidgetRightArea
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
 import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
-import type { WidgetSize } from '@/services/dashboards/widgets/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
+import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {
     title: TranslateResult;

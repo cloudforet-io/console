@@ -34,7 +34,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import DashboardDefaultWidgetTab from '@/services/dashboards/dashboard-customize/modules/DashboardDefaultWidgetTab.vue';
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
 import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
-import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 
 interface Props {

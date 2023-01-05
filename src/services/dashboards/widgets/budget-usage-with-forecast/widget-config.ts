@@ -1,4 +1,4 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/config';
+import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 
 const budgetUsageWithForecastWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetUsageWithForecast',

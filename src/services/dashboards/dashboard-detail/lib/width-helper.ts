@@ -3,8 +3,8 @@ import {
     WIDGET_WIDTH_RANGE_LENGTH_MAX,
     WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
-import type { WidgetSize } from '@/services/dashboards/widgets/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/config';
+import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
 /** NAMING
  * widgetSize: WidgetSize -> 'sm'|'md'|'lg'|'xl'
