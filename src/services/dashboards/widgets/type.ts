@@ -33,3 +33,15 @@ export interface Legend {
     label?: TranslateResult;
     disabled?: boolean;
 }
+
+export interface TreemapChartData {
+    name: string;
+    value?: any;
+    children: Array<{
+        [groupBy: string]: string | any;
+        usd_cost_sum: number;
+        label?: string;
+        background_color?: string;
+        font_color?: string;
+    }>;
+}

@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   :error-mode="false"
+                  :widget-link="state.widgetLink"
     >
         <div class="cost-map">
             <div class="chart-wrapper">
@@ -27,35 +28,32 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-import { random, range } from 'lodash';
+import dayjs from 'dayjs';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setTreemapLabelText } from '@/common/composables/amcharts5/tree-map-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
-    gray, palette, white,
+    gray, palette, transparent, white,
 } from '@/styles/colors';
 
+import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetProps, WidgetExpose } from '@/services/dashboards/widgets/config';
+import type { GroupBy, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/config';
+import type { HistoryDataModel, TreemapChartData } from '@/services/dashboards/widgets/type';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/use-widget-state';
 import type { WidgetTheme } from '@/services/dashboards/widgets/view-config';
+import { getRefinedTreemapChartData } from '@/services/dashboards/widgets/widget-chart-helper';
 
-const SAMPLE_RAW_DATA = [{
-    name: 'Root',
-    value: 'Root',
-    children: range(10).map((d) => ({
-        project_id: `Project ${d + 1}`,
-        value: random(100, 1000),
-    })),
-}];
-
-const VALUE_FIELD_NAME = 'value';
-const CATEGORY_FIELD_NAME = GROUP_BY.PROJECT;
 const COLOR_FIELD_NAME = 'background_color';
 const TEXT_COLOR_FIELD_NAME = 'font_color';
 
@@ -69,40 +67,71 @@ interface CostMapData {
 const props = defineProps<WidgetProps>();
 
 const chartContext = ref<HTMLElement | null>(null);
-const {
-    createTreeMapSeries,
-    createTooltip, setTreemapTooltipText,
-    disposeRoot, refreshRoot,
-} = useAmcharts5(chartContext);
+const chartHelper = useAmcharts5(chartContext);
 
 const state = reactive({
-    ...toRefs(useWidgetState<CostMapData>(props)),
-    chartData: computed(() => {
-        if (!state.data) return [];
-        return state.data;
+    ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
+    groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROJECT),
+    chartData: computed(() => getRefinedTreemapChartData(state.data, state.groupBy, props.allReferenceTypeInfo)),
+    dateRange: computed<DateRange>(() => {
+        const end = state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM');
+        const start = state.settings?.date_range?.start ?? dayjs.utc(end).subtract(11, 'month').format('YYYY-MM');
+        return { start, end };
     }),
+    // Todo: Link to target
+    // widgetLink: computed(() => ({
+    //     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+    //     params: {},
+    //     query: {
+    //         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
+    //         groupBy: arrayToQueryString([state.groupBy]),
+    //         period: objectToQueryString(state.dateRange),
+    //     },
+    // })),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
-const fetchData = async () => new Promise((resolve) => {
-    setTimeout(() => {
-        resolve(SAMPLE_RAW_DATA);
-    }, 1000);
-});
+const fetchData = async (): Promise<TreemapChartData[]> => {
+    try {
+        const apiQueryHelper = new ApiQueryHelper();
+        if (state.groupBy === 'project_id') apiQueryHelper.setFilters([{ k: 'project_id', v: null, o: '!=' }]);
+        const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+            query: {
+                granularity: state.options.granularity,
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                group_by: [state.groupBy],
+                fields: {
+                    usd_cost_sum: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
+                },
+                sort: [{ key: 'usd_cost_sum', desc: true }],
+                ...apiQueryHelper.data,
+            },
+        });
+        return results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+};
 
 const drawChart = (chartData) => {
     const seriesSettings = {
-        valueField: VALUE_FIELD_NAME,
-        categoryField: CATEGORY_FIELD_NAME,
+        valueField: 'usd_cost_sum',
+        categoryField: 'value',
         nodePaddingInner: 4,
     };
-    const series = createTreeMapSeries(seriesSettings);
+    const series = chartHelper.createTreeMapSeries(seriesSettings);
 
     const setColorData = (rawData): CostMapData[] => {
         const themeColorName: WidgetTheme = props.theme || 'violet';
         const results: CostMapData[] = [];
+
         rawData.forEach((d, idx) => {
             let backgroundColor = palette[themeColorName][200];
             let fontColor;
@@ -114,16 +143,23 @@ const drawChart = (chartData) => {
                 break;
             case [1].includes(idx):
                 backgroundColor = palette[themeColorName][500];
+                fontColor = gray[900];
                 break;
             case [2].includes(idx):
                 backgroundColor = palette[themeColorName][400];
+                fontColor = gray[900];
                 break;
-            case [3, 4, 5, 6, 7].includes(idx):
+            case [3].includes(idx):
                 backgroundColor = palette[themeColorName][300];
+                fontColor = gray[900];
+                break;
+            case [4, 5, 6, 7].includes(idx):
+                backgroundColor = palette[themeColorName][300];
+                fontColor = transparent;
                 break;
             default:
                 backgroundColor = palette[themeColorName][200];
-                fontColor = gray[900];
+                fontColor = transparent;
                 break;
             }
 
@@ -135,12 +171,12 @@ const drawChart = (chartData) => {
         });
         return results;
     };
-    state.chartData[0].children = setColorData(chartData[0].children);
+    chartData[0].children = setColorData(chartData[0].children);
     series.rectangles.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[COLOR_FIELD_NAME]);
 
-    const tooltip = createTooltip();
+    const tooltip = chartHelper.createTooltip();
     series.set('tooltip', tooltip);
-    setTreemapTooltipText(series, tooltip, state.options.currency, props.currencyRates);
+    chartHelper.setTreemapTooltipText(series, tooltip, state.options.currency, props.currencyRates);
 
     setTreemapLabelText(series);
     series.labels.template.adapters.add('fill', (fill, target) => target.dataItem?.dataContext?.[TEXT_COLOR_FIELD_NAME]);
@@ -148,30 +184,30 @@ const drawChart = (chartData) => {
     series.data.setAll(chartData);
 };
 
-const initWidget = async () => {
+const initWidget = async (data?: TreemapChartData['children']): Promise<TreemapChartData['children']> => {
     state.loading = true;
-    state.data = await fetchData();
+    state.data = data ?? await fetchData();
     await nextTick();
-    drawChart(state.data);
+    drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
 
-const refreshWidget = async () => {
+const refreshWidget = async (): Promise<TreemapChartData['children']> => {
     state.loading = true;
     state.data = await fetchData();
     await nextTick();
-    refreshRoot();
+    chartHelper.refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
 
 useWidgetLifecycle({
-    disposeWidget: disposeRoot,
+    disposeWidget: chartHelper.disposeRoot,
 });
 
-defineExpose<WidgetExpose<CostMapData>>({
+defineExpose<WidgetExpose<TreemapChartData['children']>>({
     initWidget,
     refreshWidget,
 });
@@ -185,7 +221,6 @@ defineExpose<WidgetExpose<CostMapData>>({
     @apply relative;
     width: 100%;
     height: 22.125rem;
-
     .chart {
         height: 100%;
     }

@@ -8,7 +8,9 @@ import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import type { DateRange } from '@/services/dashboards/config';
 import type { GroupBy } from '@/services/dashboards/widgets/config';
-import type { HistoryDataModel, XYChartData, Legend } from '@/services/dashboards/widgets/type';
+import type {
+    HistoryDataModel, XYChartData, Legend, TreemapChartData,
+} from '@/services/dashboards/widgets/type';
 
 
 
@@ -92,3 +94,36 @@ export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSett
         max: end.valueOf(),
     };
 };
+
+
+/**
+ * @name getRefinedTreemapChartData
+ * @description Convert raw data to TreemapChart data.
+ */
+export const getRefinedTreemapChartData = (rawData: TreemapChartData['children'], groupBy: GroupBy, allReferenceTypeInfo: AllReferenceTypeInfo) => {
+    const chartData: TreemapChartData[] = [{
+        name: 'Root',
+        value: 'Root',
+        children: [],
+    }];
+    if (!rawData || !groupBy || !allReferenceTypeInfo || false) return [];
+
+    const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
+    if (referenceTypeInfo) {
+        const referenceMap = referenceTypeInfo.referenceMap;
+        rawData.forEach((d) => {
+            const _name = d[groupBy];
+            let _label = d[groupBy];
+            if (_name) _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
+            else if (!_name) _label = 'Unknown';
+
+            chartData[0].children.push({
+                ...d,
+                value: _label,
+            });
+        });
+    }
+    return chartData;
+};
+
+
