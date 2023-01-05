@@ -1,3 +1,15 @@
+# [2.0.0-beta.1](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.510...v2.0.0-beta.1) (2023-01-05)
+
+
+* BREAKING CHANGE: update filterable-dropdown features and styles (#223) ([906e04a](https://github.com/cloudforet-io/mirinae/commit/906e04ad2b0bd9071c7fb97cfbc18fec8c8db6e7)), closes [#223](https://github.com/cloudforet-io/mirinae/issues/223)
+
+
+### BREAKING CHANGES
+
+* update filterable-dropdown features and styles
+
+* feat(json-schema-form): apply updates of filterable-dropdown
+
 # [1.1.0-beta.510](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.509...v1.1.0-beta.510) (2023-01-05)
 
 
