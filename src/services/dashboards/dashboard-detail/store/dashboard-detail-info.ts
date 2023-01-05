@@ -212,5 +212,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setDashboardInfo,
         toggleWidgetSize,
         initiateAllWidgets,
+        // getter
+        dashboardWidgetInfoList: computed(() => state.dashboardWidgetInfoList),
     };
 });

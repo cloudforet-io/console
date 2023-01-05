@@ -95,12 +95,17 @@ import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
-import type { WidgetOptionsSchema } from '@/services/dashboards/widgets/config';
+import type {
+    DashboardLayoutWidgetInfo,
+    WidgetFiltersMap,
+    WidgetOptionsSchema,
+} from '@/services/dashboards/widgets/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/widget-helper';
 
 
 interface Props {
     widgetConfigId?: string;
+    widgetKey?: string;
 }
 
 const SAMPLE_DASHBOARD_VARIABLES = [
@@ -135,9 +140,14 @@ export default defineComponent<Props>({
             type: String,
             default: undefined,
         },
+        widgetKey: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
         const widgetFormStore = useWidgetFormStore();
+        const widgetFormState = widgetFormStore.state;
         const storeState = reactive({
             loading: true,
             provider: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -311,18 +321,60 @@ export default defineComponent<Props>({
             storeState.loading = false;
         })();
 
+        const convertWidgetInfoToJsonSchemaForm = (widgetInfo:DashboardLayoutWidgetInfo) => {
+            const { widget_options, inherit_options } = widgetInfo;
+            const _widgetOptions = cloneDeep(widget_options);
+            const _inheritOptions = cloneDeep(inherit_options);
+            const _formData = {};
+            const _inheritItemMap = {};
+            Object.entries(_widgetOptions).forEach(([optionKey, optionValue]) => {
+                if (optionKey === 'filters') {
+                    Object.entries((optionValue ?? {}) as WidgetFiltersMap).forEach(([key, value]) => {
+                        if (Array.isArray(value)) {
+                            _formData[`filters.${key}`] = value.map((filter) => filter.v);
+                        } else {
+                            _formData[`filters.${key}`] = value.v;
+                        }
+                    });
+                } else {
+                    _formData[optionKey] = optionValue;
+                }
+            });
+            Object.entries(_inheritOptions).forEach(([optionKey, optionValue]) => {
+                _formData[`filters.${optionKey}`] = optionValue?.variable_info?.key;
+                _inheritItemMap[`filters.${optionKey}`] = optionValue?.enabled;
+            });
+            return { schemaFormData: _formData, inheritItemMap: _inheritItemMap };
+        };
+        const setInitialValueForEditMode = (widgetKey: string) => {
+            state.widgetOptionsJsonSchema = initJsonSchema(state.widgetConfig.options_schema);
+            widgetFormStore.initWidgetForm(widgetKey);
+            const widgetInfo:DashboardLayoutWidgetInfo|undefined = widgetFormState.widgetInfo;
+            if (!widgetInfo) return;
+            handleInputName(widgetInfo.title);
+            const { schemaFormData, inheritItemMap } = convertWidgetInfoToJsonSchemaForm(widgetInfo);
+            state.inheritItemMap = inheritItemMap;
+            Object.entries(inheritItemMap).forEach(([key, value]) => {
+                handleChangeInheritToggle(key, { value });
+            });
+            state.schemaFormData = schemaFormData;
+        };
         /* Watcher */
-        watch(() => props.widgetConfigId, (widgetConfigId) => {
+        watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, widgetKey]) => {
             widgetFormStore.$reset();
             widgetFormStore.setWidgetConfigId(widgetConfigId);
-            state.schemaFormData = {};
-            resetAll();
+            if (widgetConfigId && widgetKey) {
+                setInitialValueForEditMode(widgetKey);
+            } else {
+                state.schemaFormData = {};
+                resetAll();
+            }
         }, { immediate: true });
         watch([() => state.widgetConfig, () => storeState.loading], ([widgetConfig, storeLoading]) => {
             if (widgetConfig) {
                 const defaultProperties = widgetConfig.options_schema?.default_properties ?? [];
                 state.selectedOptions = state.optionsMenuItems.filter((d) => !state.requiredProperties.includes(d.name) && defaultProperties.includes(d.name));
-                if (!storeLoading) {
+                if (!storeLoading && !props.widgetKey) {
                     state.widgetOptionsJsonSchema = initJsonSchema(widgetConfig.options_schema);
                 }
             }
