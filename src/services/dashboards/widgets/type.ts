@@ -1,26 +1,18 @@
 import type { TranslateResult } from 'vue-i18n';
 
-export interface HistoryDataModel {
+export interface CostAnalyzeDataModel {
     more?: boolean;
     results: Array<{
         [groupBy: string]: string | any; // product: 'AmazonCloudFront'
         usd_cost_sum?: Array<{
             [field_group: string]: any;
             value: number
-        }>;
+        }> | number;
         usage_quantity_sum?: Array<{
             [field_group: string]: any;
             value: number
-        }>;
+        }> | number;
     }>;
-}
-
-export interface AccumulatedDataModel {
-    more?: boolean;
-    results: Array<{
-        [groupBy: string]: string | any;
-        usd_cost_sum?: number;
-    }>
 }
 
 export interface XYChartData {

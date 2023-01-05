@@ -7,7 +7,7 @@ import { getTimeUnitByPeriod } from '@/services/cost-explorer/lib/helper';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import type { Granularity, GroupBy } from '@/services/dashboards/widgets/_configs/config';
-import type { HistoryDataModel } from '@/services/dashboards/widgets/type';
+import type { CostAnalyzeDataModel } from '@/services/dashboards/widgets/type';
 
 /**
  * @name getWidgetTableDateFields
@@ -48,8 +48,8 @@ export const getWidgetTableDateFields = (
     return dateFields;
 };
 
-export const sortTableData = (rawData: HistoryDataModel['results'], sortKey = 'date'): HistoryDataModel['results'] => {
-    const results: HistoryDataModel['results'] = [];
+export const sortTableData = (rawData: CostAnalyzeDataModel['results'], sortKey = 'date'): CostAnalyzeDataModel['results'] => {
+    const results: CostAnalyzeDataModel['results'] = [];
     rawData.forEach((d) => {
         const _usdCostSum = sortBy(d.usd_cost_sum, sortKey);
         const _usageQuantitySum = sortBy(d.usage_quantity_sum, sortKey);

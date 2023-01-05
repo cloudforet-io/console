@@ -52,7 +52,7 @@ import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-wi
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
-import type { HistoryDataModel, TreemapChartData } from '@/services/dashboards/widgets/type';
+import type { CostAnalyzeDataModel, TreemapChartData } from '@/services/dashboards/widgets/type';
 
 const COLOR_FIELD_NAME = 'background_color';
 const TEXT_COLOR_FIELD_NAME = 'font_color';
@@ -70,7 +70,7 @@ const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const state = reactive({
-    ...toRefs(useWidgetState<HistoryDataModel['results']>(props)),
+    ...toRefs(useWidgetState<CostAnalyzeDataModel['results']>(props)),
     groupBy: computed<GroupBy>(() => state.options.group_by ?? GROUP_BY.PROJECT),
     chartData: computed(() => getRefinedTreemapChartData(state.data, state.groupBy, props.allReferenceTypeInfo)),
     dateRange: computed<DateRange>(() => {
