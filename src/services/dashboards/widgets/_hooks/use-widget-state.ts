@@ -4,7 +4,9 @@ import {
 } from 'vue';
 
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { merge } from 'lodash';
+import { isEmpty, merge } from 'lodash';
+
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
@@ -20,6 +22,7 @@ import type {
     InheritOptions, WidgetProps,
     Granularity, GroupBy,
     SelectorType,
+    WidgetFiltersMap,
 } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { WIDGET_THEMES } from '@/services/dashboards/widgets/_configs/view-config';
@@ -59,6 +62,19 @@ const getColorSet = (theme: WidgetTheme, colorSetType: WidgetColorSetType = 'bas
     return colorSet;
 };
 
+const convertWidgetFiltersToConsoleFilters = (filters?: WidgetFiltersMap): ConsoleFilter[] => {
+    if (!filters || isEmpty(filters)) return [];
+    const results: ConsoleFilter[] = [];
+    Object.entries(filters).forEach(([property, widgetFilters]) => {
+        const values = widgetFilters.map((d) => d.v);
+        if (property && values.length) {
+            results.push({ k: property, v: values, o: '=' });
+        }
+    });
+    return results;
+};
+
+
 export interface WidgetState<Data = any> {
     widgetConfig: ComputedRef<WidgetConfig>;
     title: ComputedRef<string>;
@@ -75,6 +91,7 @@ export interface WidgetState<Data = any> {
     selectorItems: ComputedRef<MenuItem[]>;
     selectedSelectorType?: SelectorType;
     pageSize: ComputedRef<number|undefined>;
+    consoleFilters: ComputedRef<ConsoleFilter[]>;
 }
 export function useWidgetState<Data = any>(
     props: WidgetProps,
@@ -124,6 +141,7 @@ export function useWidgetState<Data = any>(
             if (state.options?.pagination_options?.enabled) return state.options.pagination_options.page_size;
             return undefined;
         }),
+        consoleFilters: computed(() => convertWidgetFiltersToConsoleFilters(state.options?.filters)),
     });
 
     return state;

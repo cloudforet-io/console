@@ -54,6 +54,7 @@ import { cloneDeep } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
 
@@ -130,6 +131,9 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 /* Api */
 const fetchData = async (): Promise<FullData> => {
     try {
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters(state.consoleFilters);
+        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
         const query: any = {
             granularity: state.granularity,
             group_by: [state.groupBy],
@@ -143,10 +147,8 @@ const fetchData = async (): Promise<FullData> => {
             },
             sort: [{ key: '_total_usd_cost_sum', desc: true }],
             field_group: ['date'],
+            ...apiQueryHelper.data,
         };
-        if (state.pageSize) {
-            query.page = { start: getPageStart(state.thisPage, state.pageSize), limit: state.pageSize };
-        }
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
         return { results: sortTableData(results), more };
     } catch (e) {
