@@ -24,7 +24,7 @@ const mergeByKey = (arrA, arrB, key) => {
  * @example [{ date: '2021-11', aws: 100, azure: 300 }, { date: '2021-09', aws: 300, azure: 100 }]
  */
 export const getRefinedXYChartData = (
-    rawData?: CostAnalyzeDataModel['results'],
+    rawData: CostAnalyzeDataModel['results'],
     groupBy?: GroupBy,
     categoryKey = 'date',
     valueKey = 'usd_cost_sum',
@@ -60,10 +60,15 @@ export const getRefinedXYChartData = (
 
 
 /**
- * @name getLegends -> XYChartLegend
+ * @name getXYChartLegends
  * @description Extract legends from raw data.
  */
-export const getLegends = (rawData: CostAnalyzeDataModel['results'], groupBy: GroupBy, allReferenceTypeInfo: AllReferenceTypeInfo): Legend[] => {
+export const getXYChartLegends = (
+    rawData: CostAnalyzeDataModel['results'],
+    groupBy: GroupBy,
+    allReferenceTypeInfo: AllReferenceTypeInfo,
+    disableReferenceColor = false,
+): Legend[] => {
     if (!rawData || !groupBy || !allReferenceTypeInfo) return [];
     const legends: Legend[] = [];
     rawData.forEach((d) => {
@@ -74,7 +79,7 @@ export const getLegends = (rawData: CostAnalyzeDataModel['results'], groupBy: Gr
         if (_name && referenceTypeInfo) {
             const referenceMap = referenceTypeInfo.referenceMap;
             _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
-            if (groupBy === GROUP_BY.PROVIDER) {
+            if (groupBy === GROUP_BY.PROVIDER && !disableReferenceColor) {
                 _color = referenceMap[_name]?.color;
             }
         } else if (!_name) {
