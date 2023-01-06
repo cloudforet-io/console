@@ -107,7 +107,7 @@ const defaultTemplateState = reactive({
         ...d,
         // below values are used only for render
         leftIcon: d.description?.icon ?? '',
-        iconButtonSets: [{
+        iconButtonSets: [!!d.description?.preview_image && {
             iconName: 'ic_external-link',
             // song-lang
             tooltipText: 'Preview',
