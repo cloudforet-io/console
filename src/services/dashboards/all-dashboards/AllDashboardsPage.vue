@@ -9,6 +9,8 @@
                           icon-left="ic_plus"
                           @click="handleCreateDashboard"
                 >
+                    <!--                    typo-here!!!-->
+                    <!--                    song-lang-->
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREAT') }}
                 </p-button>
             </template>

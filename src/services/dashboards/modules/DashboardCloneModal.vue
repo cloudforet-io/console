@@ -130,6 +130,10 @@ export default defineComponent<Props>({
             proxyVisible: props.visible,
             filteredVisibilityList: computed(() => (props.manageDisabled ? visibilityList.filter((item) => item.name === DASHBOARD_PRIVACY_TYPE.USER) : visibilityList)),
         });
+        // song-lang
+        // const _invalid_unique = 'Dashboard name must be unique';
+        // song-lang
+        // const _invalid_input = 'Please input dashboard name';
 
         const handleUpdateVisible = (visible) => {
             state.proxyVisible = visible;

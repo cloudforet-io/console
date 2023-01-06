@@ -117,10 +117,12 @@ const deleteModalState = reactive({
     type: 'DELETE' as 'DELETE' | 'ESCAPE' | 'CANCEL',
     headerTitle: computed<TranslateResult>(() => {
         if (deleteModalState.type === 'DELETE') return i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE_TITLE');
+        // song-lang
         return i18n.t('Are you sure you want to discard changes?');
     }),
     contents: computed<TranslateResult>(() => {
         if (deleteModalState.type === 'DELETE') return '';
+        // song-lang
         return i18n.t('Changes will not be saved.');
     }),
     visible: false,

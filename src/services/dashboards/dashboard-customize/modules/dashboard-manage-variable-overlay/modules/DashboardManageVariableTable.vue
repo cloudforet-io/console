@@ -123,7 +123,9 @@ const state = reactive({
         { name: 'managable', label: ' ', width: '164px' },
     ],
     selectionType: computed(() => ({
+        // song-lang
         SINGLE: i18n.t('Single select'),
+        // song-lang
         MULTI: i18n.t('Multi select'),
     })),
     variableType: computed(() => ({
