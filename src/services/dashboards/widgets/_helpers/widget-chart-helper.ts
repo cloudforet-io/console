@@ -30,7 +30,7 @@ export const getRefinedXYChartData = (
     valueKey = 'usd_cost_sum',
     isHorizontal = false,
 ): XYChartData[] => {
-    if (!rawData || !groupBy) return [];
+    if (!rawData) return [];
 
     let chartData: XYChartData[] = [];
     rawData.forEach((data) => {
@@ -38,7 +38,7 @@ export const getRefinedXYChartData = (
         if (!groupByName) groupByName = `no_${groupBy}`;
         const valueList = data[valueKey]; // [{date: '2022-11', value: 34}, ...]
         const refinedList: Record<string, any>[] = valueList.map((valueSet) => {
-            if (isHorizontal) {
+            if (isHorizontal && !!groupBy) {
                 return {
                     [groupBy]: groupByName,
                     [valueSet[categoryKey]]: valueSet.value,
@@ -55,6 +55,7 @@ export const getRefinedXYChartData = (
             chartData = mergeByKey(chartData, refinedList, categoryKey) as XYChartData[];
         }
     });
+    console.log(chartData);
     return sortBy(chartData, categoryKey);
 };
 
