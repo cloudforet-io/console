@@ -70,7 +70,7 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { CONTINENT_INFO } from '@/services/dashboards/widgets/_configs/continent-config';
-import { getLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -247,7 +247,7 @@ const drawChart = (chartData: MapChartData[]) => {
 const initWidget = async (data?: FullData) => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.clearChildrenOfRoot();
     drawChart(state.chartData);
@@ -258,7 +258,7 @@ const refreshWidget = async (thisPage = 1) => {
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.clearChildrenOfRoot();
     drawChart(state.chartData);

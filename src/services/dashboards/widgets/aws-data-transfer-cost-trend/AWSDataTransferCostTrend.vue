@@ -62,7 +62,7 @@ import type { WidgetProps, WidgetExpose, UsageType } from '@/services/dashboards
 import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import {
     getDateAxisSettings,
-    getLegends,
+    getXYChartLegends,
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import {
@@ -211,7 +211,7 @@ const drawChart = (chartData: XYChartData[]) => {
 const initWidget = async (data?: CostAnalyzeDataModel['results']) => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     drawChart(state.chartData);
     state.loading = false;
@@ -221,7 +221,7 @@ const initWidget = async (data?: CostAnalyzeDataModel['results']) => {
 const refreshWidget = async () => {
     state.loading = true;
     state.data = await fetchData();
-    state.legends = getLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.refreshRoot();
     drawChart(state.chartData);

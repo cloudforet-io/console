@@ -1,7 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="base-trend-widget"
-                  @refresh="handleRefresh"
+                  @refresh="refreshWidget"
     >
         <template v-if="state.selectorItems.length"
                   #header-right
@@ -72,7 +72,7 @@ import type {
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getDateAxisSettings,
-    getLegends,
+    getXYChartLegends,
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import {
@@ -123,6 +123,7 @@ const state = reactive({
     }),
     legends: [] as Legend[],
     thisPage: 1,
+    disableReferenceColor: computed<boolean>(() => !!state.colorSet.length),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
@@ -200,7 +201,7 @@ const drawChart = (chartData: XYChartData[]) => {
 const initWidget = async (data?: FullData) => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     await nextTick();
     drawChart(state.chartData);
     state.loading = false;
@@ -211,7 +212,7 @@ const refreshWidget = async (thisPage = 1) => {
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     await nextTick();
     chartHelper.refreshRoot();
     drawChart(state.chartData);
@@ -230,9 +231,6 @@ const handleToggleLegend = (index) => {
 const handleUpdateThisPage = (thisPage: number) => {
     state.thisPage = thisPage;
     refreshWidget(thisPage);
-};
-const handleRefresh = () => {
-    refreshWidget();
 };
 
 useWidgetLifecycle({
