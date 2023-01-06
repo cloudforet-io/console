@@ -97,7 +97,7 @@
                                                          class="icon"
                                                     />
                                                 </template>
-                                                <slot :name="`col-${colIndex}-text`"
+                                                <slot :name="`col-${field.name}-text`"
                                                       v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                                 >
                                                     <router-link v-if="getHandler(field.link, item)"
@@ -421,8 +421,11 @@ const handleClickRow = (rowData) => {
         &.right {
             @apply text-right;
         }
-        &.link-item:hover {
+        &.detail-item:hover {
             @apply bg-blue-100;
+            .detail {
+                @apply underline;
+            }
         }
 
         &.sm {
