@@ -11,6 +11,7 @@
             </template>
         </p-page-title>
         <div class="filter-box">
+            <!--            song-lang-->
             <div>Applied Filters</div> <dashboard-labels :label-list="state.labelList" />
         </div>
         <div class="divider" />
