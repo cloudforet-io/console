@@ -55,7 +55,6 @@ export const getRefinedXYChartData = (
             chartData = mergeByKey(chartData, refinedList, categoryKey) as XYChartData[];
         }
     });
-    console.log(chartData);
     return sortBy(chartData, categoryKey);
 };
 
