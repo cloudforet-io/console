@@ -1,7 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="base-trend-widget"
-                  :widget-route="state.widgetRoute"
+                  :widget-location="state.widgetLocation"
                   @refresh="refreshWidget"
     >
         <template v-if="state.selectorItems.length"
@@ -131,7 +131,7 @@ const state = reactive({
     legends: [] as Legend[],
     thisPage: 1,
     disableReferenceColor: computed<boolean>(() => !!state.colorSet.length),
-    widgetRoute: computed<Location>(() => ({
+    widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         params: {},
         query: {
