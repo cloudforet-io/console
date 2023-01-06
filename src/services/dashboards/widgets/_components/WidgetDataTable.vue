@@ -83,6 +83,7 @@
                                                 <template v-if="colIndex === 0 && props.showLegend">
                                                     <p-status v-if="props.showLegend"
                                                               class="toggle-button"
+                                                              :class="{ 'disable-toggle': disableToggle }"
                                                               :text="props.showLegendIndex ? ((rowIndex) + 1)?.toString() : ''"
                                                               :icon-color="getLegendIconColor(rowIndex)"
                                                               :text-color="getLegendTextColor(rowIndex)"
@@ -197,6 +198,7 @@ interface Props {
     showNextPage?: boolean;
     allReferenceTypeInfo?: AllReferenceTypeInfo;
     colorSet?: string[];
+    disableToggle?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -391,6 +393,9 @@ const handleClickRow = (rowData) => {
                 .toggle-button {
                     cursor: pointer;
                     margin-right: -0.25rem;
+                    &.disable-toggle {
+                        cursor: default;
+                    }
                 }
 
                 .rapid-increase {
