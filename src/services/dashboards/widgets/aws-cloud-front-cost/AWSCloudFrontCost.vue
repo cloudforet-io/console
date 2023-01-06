@@ -56,6 +56,8 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ReferenceType } from '@/store/modules/reference/type';
+
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -72,7 +74,7 @@ import type { UsageType, WidgetExpose, WidgetProps } from '@/services/dashboards
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { getReferenceTypeOfGroupBy, sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -112,8 +114,10 @@ const state = reactive({
             type: state.fieldsKey === 'usd_cost' ? 'cost' : 'size',
             sourceUnit: USAGE_SOURCE_UNIT,
         };
+        const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
+        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
         return [
-            GROUP_BY_ITEM_MAP[state.groupBy],
+            { name: state.groupBy, label: groupByLabel, textOptions: { type: 'reference', referenceType } },
             { name: `${state.fieldsKey}_sum.0.value`, label: 'Transfer-out', textOptions },
             { name: `${state.fieldsKey}_sum.1.value`, label: 'Requests (HTTP)' },
             { name: `${state.fieldsKey}_sum.2.value`, label: 'Requests (HTTPS)' },
