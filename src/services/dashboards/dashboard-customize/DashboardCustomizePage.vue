@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard-customize-page">
-        <dashboard-customize-page-name :name="dashboardDetailState.dashboardName"
-                                       :dashboard-id="dashboardId"
+        <dashboard-customize-page-name :name.sync="state.name"
+                                       :dashboard-id="props.dashboardId"
                                        @update:name="handleUpdateDashboardName"
         />
         <div class="filters-box">
@@ -66,7 +66,7 @@
 <script setup lang="ts">
 import type Vue from 'vue';
 import {
-    computed, getCurrentInstance, onBeforeUnmount, onMounted, reactive,
+    computed, getCurrentInstance, onBeforeUnmount, onMounted, reactive, watch,
 } from 'vue';
 
 import { PDivider, PI } from '@spaceone/design-system';
@@ -111,6 +111,7 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
+    name: dashboardDetailState.dashboardName,
     refreshInterval: undefined,
     apiParam: computed<Partial<DashboardConfig>>(() => ({
         name: dashboardDetailState.dashboardName,
@@ -256,7 +257,7 @@ const createDashboard = async () => {
 
 /* Event */
 const handleUpdateDashboardName = (name: string) => {
-    dashboardDetailState.dashboardName = name;
+    state.name = name;
 };
 const handleUpdateLabelList = (labels: Array<string>) => {
     dashboardDetailState.labels = [...labels];
@@ -312,16 +313,17 @@ const handleUnload = (event) => {
     event.preventDefault(); event.returnValue = '';
 };
 
+watch(() => dashboardDetailState.dashboardName, (name: string) => {
+    state.name = name;
+});
+
 onMounted(() => {
+    getDashboardData();
     window.addEventListener('beforeunload', handleUnload);
 });
 
 onBeforeUnmount(() => {
     window.removeEventListener('beforeunload', handleUnload);
-});
-
-onMounted(() => {
-    getDashboardData();
 });
 </script>
 
