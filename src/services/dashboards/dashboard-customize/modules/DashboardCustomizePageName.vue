@@ -6,40 +6,60 @@
         <template v-if="props.dashboardId"
                   #title
         >
-            <input v-if="state.editMode"
-                   v-on-click-outside="handleEscape"
-                   class="name-input"
-                   :value="state.nameInput"
-                   @input="handleInput($event, 'INPUT')"
-                   @keydown.esc="handleEscape"
-                   @keydown.enter="handleEnter"
+            <p-field-group
+                :invalid="invalidState.nameInput"
+                :invalid-text="invalidTexts.nameInput"
             >
-            <span v-else
-                  class="title-area"
-                  @click="handleClickTitle"
-            >
-                {{ state.name }}
-            </span>
+                <template #default>
+                    <input v-if="state.editMode"
+                           v-on-click-outside="handleEscape"
+                           class="name-input"
+                           :value="nameInput"
+                           @input="handleInput($event, 'INPUT')"
+                           @keydown.esc="handleEscape"
+                           @keydown.enter="handleEnter"
+                    >
+                    <span v-else
+                          class="title-area"
+                          @click="handleClickTitle"
+                    >
+                        {{ state.name }}
+                    </span>
+                </template>
+            </p-field-group>
         </template>
         <template v-else-if="props.dashboardId === undefined"
                   #title
         >
-            <p-text-input
-                :placeholder="name"
-                :value="state.nameInput"
-                @input="handleInput($event, 'TEXT_INPUT')"
-            />
+            <p-field-group
+                :invalid="invalidState.nameInput"
+                :invalid-text="invalidTexts.nameInput"
+            >
+                <template #default="{invalid}">
+                    <p-text-input
+                        :invalid="invalid"
+                        :placeholder="state.name"
+                        :value="nameInput"
+                        @input="handleInput($event, 'TEXT_INPUT')"
+                    />
+                </template>
+            </p-field-group>
         </template>
     </p-page-title>
 </template>
 <script setup lang="ts">
 // Below directive is used. Do not remove!!!
 import { vOnClickOutside } from '@vueuse/components';
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
-import { PPageTitle, PTextInput } from '@spaceone/design-system';
+import { PFieldGroup, PPageTitle, PTextInput } from '@spaceone/design-system';
 
+import { store } from '@/store';
+
+import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 
 const props = defineProps<{
     name: string;
@@ -47,30 +67,71 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{(e: string, value: string): void}>();
 
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+
 const state = reactive({
     name: useProxyValue('name', props, emit),
-    nameInput: props.dashboardId ? props.name : '',
     editMode: false,
+    dashboardNameList: computed<string[]>(() => {
+        if (dashboardDetailState.projectId) {
+            return store.state.dashboard.projectItems
+                .filter((item) => (item.project_id === dashboardDetailState.projectId))
+                .map((_item) => {
+                    if (_item.name !== dashboardDetailState.dashboardName) return _item.name;
+                    return '';
+                });
+        }
+        return store.state.dashboard.domainItems.map((item) => {
+            if (item.name !== dashboardDetailState.dashboardName) return item.name;
+            return '';
+        });
+    }),
+});
+const {
+    forms: {
+        nameInput,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
+    nameInput: props.dashboardId ? props.name : '',
+}, {
+    nameInput(value: string) {
+        // song-lang
+        if (!value.trim().length) return 'Please input dashboard name';
+        // song-lang
+        if (state.dashboardNameList.find((d) => d === value)) return 'Dashboard name must be unique';
+        return '';
+    },
 });
 
 const handleClickTitle = () => {
     state.editMode = true;
 };
-const handleInput = (e: InputEvent | string, type: 'INPUT' | 'TEXT_INPUT') => {
-    if (type === 'INPUT') state.nameInput = ((e as InputEvent).target as HTMLInputElement).value;
+const handleInput = (e: InputEvent | string, type: 'INPUT' | 'TEXT_INPUT'): void => {
+    if (type === 'INPUT') setForm('nameInput', ((e as InputEvent).target as HTMLInputElement).value);
     if (type === 'TEXT_INPUT') {
-        state.nameInput = (e as string);
-        state.name = state.nameInput;
+        setForm('nameInput', e as string);
+        handleEnter();
     }
 };
 const handleEscape = () => {
+    if (!state.editMode) return;
     state.editMode = false;
-    state.nameInput = props.name;
+    setForm('nameInput', props.name);
 };
 const handleEnter = () => {
+    if (!state.editMode || invalidState.nameInput) return;
     state.editMode = false;
-    state.name = state.nameInput;
+    state.name = nameInput.value;
 };
+
+(async () => {
+    await store.dispatch('dashboard/loadProjectDashboard');
+})();
 </script>
 
 <style scoped lang="postcss">
@@ -86,6 +147,21 @@ const handleEnter = () => {
     text-decoration: underline;
 }
 .p-text-input {
-    width: calc(100% - 2.25rem);
+    width: 100%;
+}
+
+.p-page-title {
+    :deep(.title-wrapper) {
+        display: flex;
+        width: 100%;
+        & h2 {
+            width: calc(100% - 2.25rem);
+        }
+    }
+}
+.p-field-group {
+    :deep(.invalid-feedback) {
+        font-weight: normal;
+    }
 }
 </style>
