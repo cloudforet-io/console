@@ -134,22 +134,23 @@ const fetchData = async (): Promise<FullData> => {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const query: any = {
-            granularity: state.granularity,
-            group_by: [state.groupBy],
-            start: state.dateRange.start,
-            end: state.dateRange.end,
-            fields: {
-                usd_cost_sum: {
-                    key: 'usd_cost',
-                    operator: 'sum',
+        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+            query: {
+                granularity: state.granularity,
+                group_by: [state.groupBy],
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                fields: {
+                    usd_cost_sum: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
                 },
+                sort: [{ key: '_total_usd_cost_sum', desc: true }],
+                field_group: ['date'],
+                ...apiQueryHelper.data,
             },
-            sort: [{ key: '_total_usd_cost_sum', desc: true }],
-            field_group: ['date'],
-            ...apiQueryHelper.data,
-        };
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
+        });
         return { results: sortTableData(results), more };
     } catch (e) {
         ErrorHandler.handleError(e);

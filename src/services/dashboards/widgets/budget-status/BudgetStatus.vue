@@ -56,6 +56,7 @@ import dayjs from 'dayjs';
 import { range } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 
@@ -125,12 +126,13 @@ const getColor = (rowIdx: number, colIdx: number): string => {
 /* Api */
 const fetchData = async (): Promise<Data> => {
     try {
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters(state.consoleFilters);
         const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, 'name'],
-                // start: state.dateRange.start, // TODO
-                start: '2022-02',
+                start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
                     total_spent: {
@@ -142,8 +144,9 @@ const fetchData = async (): Promise<Data> => {
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'total_spent', desc: true }], // TODO
+                sort: [{ key: 'total_spent', desc: true }], // TODO: should be changed after api updated
                 page: { limit: 200 },
+                ...apiQueryHelper.data,
             },
         });
         return results;

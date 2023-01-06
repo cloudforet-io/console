@@ -145,29 +145,29 @@ const fetchData = async (): Promise<FullData> => {
             { k: 'product', v: 'AmazonCloudFront', o: '=' },
             { k: 'usage_type', v: null, o: '!=' },
         ]);
-        const query = {
-            granularity: state.granularity,
-            group_by: [state.groupBy, 'usage_type'],
-            start: state.dateRange.start,
-            end: state.dateRange.end,
-            fields: {
-                usd_cost_sum: {
-                    key: 'usd_cost',
-                    operator: 'sum',
+        apiQueryHelper.addFilter(...state.consoleFilters);
+        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+            query: {
+                granularity: state.granularity,
+                group_by: [state.groupBy, 'usage_type'],
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                fields: {
+                    usd_cost_sum: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
+                    usage_quantity_sum: {
+                        key: 'usage_quantity',
+                        operator: 'sum',
+                    },
                 },
-                usage_quantity_sum: {
-                    key: 'usage_quantity',
-                    operator: 'sum',
-                },
+                sort: [{ key: '_total_usd_cost_sum', desc: true }],
+                field_group: ['usage_type'],
+                ...apiQueryHelper.data,
             },
-            sort: [{ key: '_total_usd_cost_sum', desc: true }],
-            field_group: ['usage_type'],
-            ...apiQueryHelper.data,
-        };
-        if (state.pageSize) {
-            query.page = { start: getPageStart(state.thisPage, state.pageSize), limit: state.pageSize };
-        }
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
+        });
         return { results: sortTableData(results, 'usage_type'), more };
     } catch (e) {
         ErrorHandler.handleError(e);

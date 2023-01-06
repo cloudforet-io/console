@@ -132,6 +132,7 @@ const fetchData = async (): Promise<CostAnalyzeDataModel['results']> => {
             { k: 'product', v: 'AWSDataTransfer', o: '=' },
             { k: 'usage_type', v: null, o: '!=' },
         ]);
+        apiQueryHelper.addFilter(...state.consoleFilters);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.granularity,
