@@ -185,10 +185,10 @@ defineExpose<WidgetExpose<Data>>({
     .chart-wrapper {
         width: 100%;
         height: 100%;
-        padding: 0 1.5rem 1.5rem 1.5rem;
+        padding: 0 1.5rem 1rem 1.5rem;
         .waffle-chart {
             display: flex;
-            height: 85%;
+            height: 87%;
             gap: 0.25rem;
             .status-col-wrapper {
                 display: grid;
@@ -206,6 +206,8 @@ defineExpose<WidgetExpose<Data>>({
         }
         .legend-wrapper {
             @apply text-gray-600;
+            position: absolute;
+            bottom: 0;
             display: flex;
             gap: 0.75rem;
             font-size: 0.75rem;
