@@ -54,6 +54,7 @@ import {
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
@@ -180,23 +181,25 @@ const getRefinedMapChartData = (results?: Data): MapChartData[] => {
 /* Api */
 const fetchData = async (): Promise<FullData> => {
     try {
-        const query: any = {
-            granularity: state.granularity,
-            group_by: [state.groupBy, GROUP_BY.REGION],
-            start: state.dateRange.start,
-            end: state.dateRange.end,
-            fields: {
-                usd_cost_sum: {
-                    key: 'usd_cost',
-                    operator: 'sum',
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters(state.consoleFilters);
+        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+            query: {
+                granularity: state.granularity,
+                group_by: [state.groupBy, GROUP_BY.REGION],
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                fields: {
+                    usd_cost_sum: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
                 },
+                sort: [{ key: 'usd_cost_sum', desc: true }],
+                ...apiQueryHelper.data,
             },
-            sort: [{ key: 'usd_cost_sum', desc: true }],
-        };
-        if (state.pageSize) {
-            query.page = { start: getPageStart(state.thisPage, state.pageSize), limit: state.pageSize };
-        }
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
+        });
         return { results, more };
     } catch (e) {
         ErrorHandler.handleError(e);
