@@ -73,7 +73,7 @@ import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components
 import type { UsageType, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
-import { getLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { getXYChartLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getReferenceTypeOfGroupBy, sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -228,7 +228,7 @@ const drawChart = (chartData) => {
 const initWidget = async (data?: FullData) => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     drawChart(state.chartData);
     state.loading = false;
@@ -239,7 +239,7 @@ const refreshWidget = async (thisPage = 1) => {
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.refreshRoot();
     drawChart(state.chartData);

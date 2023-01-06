@@ -1,5 +1,7 @@
 <template>
-    <widget-frame v-bind="widgetFrameProps">
+    <widget-frame v-bind="widgetFrameProps"
+                  @refresh="refreshWidget"
+    >
         <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
                            :loading="state.loading"
