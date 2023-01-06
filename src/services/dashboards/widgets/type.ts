@@ -12,6 +12,8 @@ export interface CostAnalyzeDataModel {
             [field_group: string]: any;
             value: number
         }> | number;
+        _total_usd_cost_sum?: number;
+        _total_usage_quantity_sum?: number;
     }>;
 }
 
