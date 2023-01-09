@@ -1,7 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="base-trend-widget"
-                  :widget-location="state.widgetLocation"
                   @refresh="refreshWidget"
     >
         <template v-if="state.selectorItems.length"
@@ -65,7 +64,6 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
@@ -135,7 +133,7 @@ const state = reactive({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         params: {},
         query: {
-            granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+            granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
             period: objectToQueryString(state.dateRange),
             filters: objectToQueryString(state.options.filters),

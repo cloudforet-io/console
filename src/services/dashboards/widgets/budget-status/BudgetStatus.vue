@@ -50,11 +50,13 @@ import {
     defineExpose,
     defineProps, nextTick, reactive, toRefs,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -64,6 +66,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo, red, yellow } from '@/styles/colors';
 
+import { getConvertedBudgetFilter } from '@/services/cost-explorer/lib/helper';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
@@ -72,8 +76,10 @@ import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-wi
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 import type { Legend, BudgetDataModel } from '@/services/dashboards/widgets/type';
 
+
 type Data = BudgetDataModel['results'];
 
+const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
 const state = reactive({
     ...toRefs(useWidgetState<Data>(props)),
@@ -86,6 +92,13 @@ const state = reactive({
     dateRange: computed<DateRange>(() => ({
         start: dayjs.utc(state.settings?.date_range?.start).format('YYYY-MM'),
         end: dayjs.utc(state.settings?.date_range?.end).format('YYYY-MM'),
+    })),
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.BUDGET._NAME,
+        params: {},
+        query: {
+            filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(state.consoleFilters)).rawQueryStrings,
+        },
     })),
 });
 
