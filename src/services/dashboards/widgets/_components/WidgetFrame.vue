@@ -1,7 +1,7 @@
 <template>
     <div class="widget-frame"
-         :class="{ full: state.isFull, 'edit-mode': props.editMode, 'no-height-limit': props.noHeightLimit }"
-         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%' }"
+         :class="{ full: state.isFull, 'edit-mode': props.editMode }"
+         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%'}"
     >
         <div class="widget-header">
             <h3 class="title">
@@ -327,8 +327,7 @@ const handleDeleteModalConfirm = () => {
         }
     }
     &.full {
-        height: 100%;
-        min-height: 29rem;
+        height: auto;
     }
     &.edit-mode {
         position: relative;
@@ -342,9 +341,5 @@ const handleDeleteModalConfirm = () => {
             @apply flex gap-2 flex-wrap justify-end;
         }
     }
-    &.no-height-limit {
-        min-height: auto;
-    }
 }
-
 </style>

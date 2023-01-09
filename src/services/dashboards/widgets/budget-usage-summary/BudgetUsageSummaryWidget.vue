@@ -247,9 +247,6 @@ defineExpose<WidgetExpose<Data[]>>({
 <style lang="postcss" scoped>
 .budget-usage-summary {
     padding: 0 1.5rem;
-    .full & {
-        @apply block;
-    }
     .budget {
         @apply flex flex-col row-gap-1 text-gray-900;
         line-height: 1.25;
@@ -284,22 +281,17 @@ defineExpose<WidgetExpose<Data[]>>({
 .chart-loader {
     height: 100%;
 }
-
-@screen desktop {
-    .full {
+.full {
+    @screen desktop {
         .budget-usage-summary {
             @apply flex justify-between;
         }
     }
-}
 
-@screen laptop {
-    .full {
-        &.no-height-limit {
-            min-height: 29rem;
-        }
+    @screen laptop {
         .budget-usage-summary {
             @apply block;
+            height: 23.625rem;
         }
     }
 }
