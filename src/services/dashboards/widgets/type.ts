@@ -20,8 +20,7 @@ export interface CostAnalyzeDataModel {
 export interface BudgetDataModel {
     more?: boolean;
     results: Array<{
-        budget_id: string;
-        name?: string;
+        [groupBy: string]: string | any; // budget_id: 'budget-xxxx'
         total_spent?: number;
         total_budget?: number;
     }>;

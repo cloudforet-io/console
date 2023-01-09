@@ -8,8 +8,8 @@ import awsDataTransferByRegion from '@/services/dashboards/widgets/aws-data-tran
 import awsDataTransferCostTrend from '@/services/dashboards/widgets/aws-data-transfer-cost-trend/widget-config';
 import awsPersonalHealthDashboard from '@/services/dashboards/widgets/aws-personal-health-dashboard/widget-config';
 import budgetStatus from '@/services/dashboards/widgets/budget-status/widget-config';
+import budgetUsageWithForecast from '@/services/dashboards/widgets/budget-usage-by-target/widget-config';
 import budgetUsageSummary from '@/services/dashboards/widgets/budget-usage-summary/widget-config';
-import budgetUsageWithForecast from '@/services/dashboards/widgets/budget-usage-with-forecast/widget-config';
 import costByRegion from '@/services/dashboards/widgets/cost-by-region/widget-config';
 import costDonut from '@/services/dashboards/widgets/cost-donut/widget-config';
 import costMap from '@/services/dashboards/widgets/cost-map/widget-config';

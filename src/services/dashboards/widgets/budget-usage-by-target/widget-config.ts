@@ -1,11 +1,12 @@
+import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 
-const budgetUsageWithForecastWidgetConfig: WidgetConfig = {
-    widget_config_id: 'budgetUsageWithForecast',
+const budgetUsageByTargetWidgetConfig: WidgetConfig = {
+    widget_config_id: 'budgetUsageByTarget',
     title: 'Budget Usage With Forecast',
     base_configs: [{ config_id: 'dashboardCommon' }],
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/budget-usage-with-forecast/BudgetUsageWithForecastWidget.vue'),
+        component: import('@/services/dashboards/widgets/budget-usage-by-target/BudgetUsageByTarget.vue'),
     }),
     labels: ['Cost'],
     description: {
@@ -17,6 +18,10 @@ const budgetUsageWithForecastWidgetConfig: WidgetConfig = {
         inherit: false,
     },
     sizes: ['lg', 'full'],
+    options: {
+        granularity: GRANULARITY.ACCUMULATED,
+        group_by: 'budget_id',
+    },
 } as WidgetConfig;
 
-export default budgetUsageWithForecastWidgetConfig;
+export default budgetUsageByTargetWidgetConfig;

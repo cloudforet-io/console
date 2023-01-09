@@ -270,7 +270,7 @@ const textFormatter = (value:string|number, textOptions: Field['textOptions']) =
     } if (textOptions?.type === 'number') {
         return numberFormatter(value);
     } if (textOptions?.type === 'percent') {
-        return `${value}%`;
+        return `${value.toFixed(1)}%`;
     }
     return value;
 };
