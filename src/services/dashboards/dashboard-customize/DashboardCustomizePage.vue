@@ -219,6 +219,7 @@ const updateDashboardData = async () => {
                 domain_dashboard_id: props.dashboardId,
             });
         }
+        await dashboardDetailStore.getDashboardInfo(props.dashboardId, true);
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
@@ -226,7 +227,6 @@ const updateDashboardData = async () => {
                 dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
-        dashboardDetailStore.getDashboardInfo(props.dashboardId, true);
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
     }
@@ -236,16 +236,19 @@ const createDashboard = async () => {
         if (dashboardDetailState.isProjectDashboard) {
             const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
                 ...state.apiParam,
+                name: state.name,
                 viewers: dashboardDetailState.dashboardViewer,
             });
             dashboardDetailState.dashboardId = result.project_dashboard_id;
         } else {
             const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create({
                 ...state.apiParam,
+                name: state.name,
                 viewers: dashboardDetailState.dashboardViewer,
             });
             dashboardDetailState.dashboardId = result.domain_dashboard_id;
         }
+        await dashboardDetailStore.getDashboardInfo(dashboardDetailState.dashboardId, true);
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
