@@ -104,14 +104,17 @@ const state = reactive({
     chartData: computed(() => {
         if (!state.data) return [];
 
+        let chartSpentBudgetRate = state.spentBudgetRate;
+        if (chartSpentBudgetRate > 100) chartSpentBudgetRate = 100;
+
         const results = [
             {
                 budget_type: 'spent_budget',
-                budget_rate: state.chartSpentBudgetRate,
+                budget_rate: chartSpentBudgetRate,
             },
             {
                 budget_type: 'left_budget',
-                budget_rate: (100 - state.chartSpentBudgetRate),
+                budget_rate: (100 - chartSpentBudgetRate),
                 pieSettings: {
                     fill: color(gray[400]),
                 },
@@ -139,12 +142,6 @@ const state = reactive({
         const budgetRate = (state.totalSpent / totalBudget) * 100;
 
         return (budgetRate.toFixed(2));
-    }),
-    chartSpentBudgetRate: computed(() => {
-        let chartSpentBudgetRate = state.spentBudgetRate;
-        if (chartSpentBudgetRate > 100) chartSpentBudgetRate = 100;
-
-        return chartSpentBudgetRate;
     }),
     leftBudget: computed(() => {
         if (!state.data) return '--';
