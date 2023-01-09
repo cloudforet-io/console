@@ -1,7 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="cost-by-region"
-                  :widget-location="state.widgetLocation"
                   @refresh="handleRefresh"
     >
         <div class="content-wrapper">

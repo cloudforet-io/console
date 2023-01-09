@@ -1,7 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="aws-data-transfer-cost-trend"
-                  :widget-location="state.widgetLocation"
                   @refresh="handleRefresh"
     >
         <template v-if="state.selectorItems.length"

@@ -1,7 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="aws-cloud-front-cost"
-                  :widget-location="state.widgetLocation"
                   @refresh="handleRefresh"
     >
         <template v-if="state.selectorItems.length"

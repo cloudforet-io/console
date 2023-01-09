@@ -1,7 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="base-pie-widget"
-                  :widget-location="state.widgetLocation"
                   @refresh="refreshWidget"
     >
         <div class="chart-wrapper">

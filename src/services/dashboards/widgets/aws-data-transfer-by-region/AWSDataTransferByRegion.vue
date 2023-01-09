@@ -1,7 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="aws-data-transfer-by-region"
-                  :widget-location="state.widgetLocation"
                   @refresh="refreshWidget"
     >
         <template #header-right>

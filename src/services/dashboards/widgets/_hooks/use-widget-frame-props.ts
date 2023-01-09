@@ -36,4 +36,5 @@ export const useWidgetFrameProps = (props: WidgetFrameProps, state: WidgetFrameS
     currency: state.currency,
     disableFullSize: !state.widgetConfig?.sizes.includes(WIDGET_SIZE.full),
     isOnlyFullSize: state.widgetConfig?.sizes.length === 1 && state.widgetConfig?.sizes[0] === WIDGET_SIZE.full,
+    widgetLocation: state.widgetLocation,
 }));

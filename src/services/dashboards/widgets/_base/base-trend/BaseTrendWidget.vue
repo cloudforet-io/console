@@ -1,7 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="base-trend-widget"
-                  :widget-location="state.widgetLocation"
                   @refresh="refreshWidget"
     >
         <template v-if="state.selectorItems.length"
