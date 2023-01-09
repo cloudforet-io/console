@@ -99,7 +99,7 @@ const state = reactive({
     ...toRefs(useWidgetState<Data>(props)),
     chartData: computed(() => getRefinedXYChartData(state.data)),
     dateRange: computed<DateRange>(() => {
-        const end = state.settings?.date_range?.end ?? dayjs.utc().format(DATE_FORMAT);
+        const end = dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT);
         const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
