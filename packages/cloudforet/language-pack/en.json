@@ -1285,6 +1285,7 @@
 				"AVAILABLE": "available",
 				"BUDGETS": "budgets",
 				"DESC": "Displays an overview of the total budget consumption along with total cost, budget, and usage rate.",
+				"TOTAL_BUDGET": "Total budget",
 				"TOTAL_SPENT": "Total spent"
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {

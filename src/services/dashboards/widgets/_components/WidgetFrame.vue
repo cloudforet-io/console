@@ -1,7 +1,7 @@
 <template>
     <div class="widget-frame"
          :class="{ full: state.isFull, 'edit-mode': props.editMode }"
-         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%' }"
+         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%'}"
     >
         <div class="widget-header">
             <h3 class="title">
@@ -132,6 +132,7 @@ interface Props {
     title: TranslateResult;
     size: WidgetSize;
     width?: number;
+    noHeightLimit?: boolean;
     widgetLink?: string;
     widgetLocation?: Location;
     widgetConfigId?: string;
@@ -330,8 +331,7 @@ const handleDeleteModalConfirm = () => {
         }
     }
     &.full {
-        height: 100%;
-        min-height: 29rem;
+        height: auto;
     }
     &.edit-mode {
         position: relative;
@@ -346,5 +346,4 @@ const handleDeleteModalConfirm = () => {
         }
     }
 }
-
 </style>
