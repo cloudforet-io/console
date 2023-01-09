@@ -15,7 +15,7 @@
                            v-on-click-outside="handleEscape"
                            class="name-input"
                            :value="nameInput"
-                           @input="handleInput($event, 'INPUT')"
+                           @input="handleInput"
                            @keydown.esc="handleEscape"
                            @keydown.enter="handleEnter"
                     >
@@ -40,7 +40,7 @@
                         :invalid="invalid"
                         :placeholder="state.name"
                         :value="nameInput"
-                        @input="handleInput($event, 'TEXT_INPUT')"
+                        @input="handlePTextInput"
                     />
                 </template>
             </p-field-group>
@@ -111,20 +111,26 @@ const {
 const handleClickTitle = () => {
     state.editMode = true;
 };
-const handleInput = (e: InputEvent | string, type: 'INPUT' | 'TEXT_INPUT'): void => {
-    if (type === 'INPUT') setForm('nameInput', ((e as InputEvent).target as HTMLInputElement).value);
-    if (type === 'TEXT_INPUT') {
-        setForm('nameInput', e as string);
-        handleEnter();
+
+
+const handlePTextInput = (t: string) => {
+    setForm('nameInput', t);
+    if (invalidState.nameInput === false) {
+        state.name = nameInput.value;
     }
 };
+const handleInput = (e: InputEvent): void => {
+    setForm('nameInput', (e.target as HTMLInputElement).value);
+};
+
+
 const handleEscape = () => {
     if (!state.editMode) return;
     state.editMode = false;
     setForm('nameInput', props.name);
 };
 const handleEnter = () => {
-    if (!state.editMode || invalidState.nameInput) return;
+    if (!state.editMode || invalidState.nameInput === true) return;
     state.editMode = false;
     state.name = nameInput.value;
 };

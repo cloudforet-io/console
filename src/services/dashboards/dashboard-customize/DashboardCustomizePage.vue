@@ -198,7 +198,7 @@ const variableState = reactive({
 /* Api */
 const getDashboardData = async () => {
     try {
-        await dashboardDetailStore.getDashboardData(props.dashboardId);
+        await dashboardDetailStore.getDashboardInfo(props.dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
@@ -208,15 +208,18 @@ const updateDashboardData = async () => {
     try {
         if (dashboardDetailState.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
-                project_dashboard_id: props.dashboardId,
                 ...state.apiParam,
+                name: state.name,
+                project_dashboard_id: props.dashboardId,
             });
         } else {
             await SpaceConnector.clientV2.dashboard.domainDashboard.update({
-                domain_dashboard_id: props.dashboardId,
                 ...state.apiParam,
+                name: state.name,
+                domain_dashboard_id: props.dashboardId,
             });
         }
+        await dashboardDetailStore.getDashboardInfo(props.dashboardId, true);
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
@@ -233,16 +236,19 @@ const createDashboard = async () => {
         if (dashboardDetailState.isProjectDashboard) {
             const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
                 ...state.apiParam,
+                name: state.name,
                 viewers: dashboardDetailState.dashboardViewer,
             });
             dashboardDetailState.dashboardId = result.project_dashboard_id;
         } else {
             const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create({
                 ...state.apiParam,
+                name: state.name,
                 viewers: dashboardDetailState.dashboardViewer,
             });
             dashboardDetailState.dashboardId = result.domain_dashboard_id;
         }
+        await dashboardDetailStore.getDashboardInfo(dashboardDetailState.dashboardId, true);
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
