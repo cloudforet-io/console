@@ -198,7 +198,7 @@ const variableState = reactive({
 /* Api */
 const getDashboardData = async () => {
     try {
-        await dashboardDetailStore.getDashboardData(props.dashboardId);
+        await dashboardDetailStore.getDashboardInfo(props.dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
@@ -208,13 +208,15 @@ const updateDashboardData = async () => {
     try {
         if (dashboardDetailState.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
-                project_dashboard_id: props.dashboardId,
                 ...state.apiParam,
+                name: state.name,
+                project_dashboard_id: props.dashboardId,
             });
         } else {
             await SpaceConnector.clientV2.dashboard.domainDashboard.update({
-                domain_dashboard_id: props.dashboardId,
                 ...state.apiParam,
+                name: state.name,
+                domain_dashboard_id: props.dashboardId,
             });
         }
         await SpaceRouter.router.push({
@@ -224,6 +226,7 @@ const updateDashboardData = async () => {
                 dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
+        dashboardDetailStore.getDashboardInfo(props.dashboardId, true);
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
     }

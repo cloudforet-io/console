@@ -123,7 +123,7 @@ const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
 const getDashboardData = async (dashboardId: string) => {
     try {
-        await dashboardDetailStore.getDashboardData(dashboardId);
+        await dashboardDetailStore.getDashboardInfo(dashboardId);
     } catch (e) {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
