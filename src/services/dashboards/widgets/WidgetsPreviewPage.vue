@@ -43,6 +43,7 @@
                            currency: { enabled: true },
                            date_range: { enabled: true },
                        }"
+                       :all-reference-type-info="allReferenceTypeInfo"
             />
             <div>
                 <p-field-group label="Currency"
@@ -83,6 +84,7 @@ import {
 import { store } from '@/store';
 
 import { CURRENCY } from '@/store/modules/display/config';
+import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 
@@ -127,6 +129,7 @@ export default defineComponent<Props>({
             }))),
             loading: false,
             disableTheme: computed(() => state.widgetConfig.theme.inherit === false),
+            allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
         });
 
         const { counter, pause, resume } = useInterval(1000, { controls: true });
