@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   :error-mode="false"
+                  :no-height-limit="true"
                   @refresh="handleRefresh"
     >
         <div class="budget-usage-summary">
@@ -17,13 +18,13 @@
             </div>
             <div class="budget">
                 <p class="budget-label">
-                    {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_SPENT') }}
+                    {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET') }}
                 </p>
                 <div class="budget-value">
                     {{ currencyMoneyFormatter(state.totalBudget, state.options.currency) }}
                 </div>
                 <div class="budget-info">
-                    {{ currencyMoneyFormatter(state.leftBudgetRate, state.options.currency) }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE') }}
+                    {{ currencyMoneyFormatter(state.leftBudget, state.options.currency) }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE') }}
                 </div>
             </div>
             <div class="chart-wrapper">
@@ -36,7 +37,7 @@
                     <div ref="chartContext"
                          class="chart"
                     >
-                        <span class="budget-usage">{{ state.budgetCount }}%</span>
+                        <span class="budget-usage">{{ state.spentBudgetRate }}%</span>
                     </div>
                 </p-data-loader>
             </div>
@@ -54,20 +55,26 @@ import {
 
 import { color } from '@amcharts/amcharts5';
 import { PDataLoader } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import type { createPieChart } from '@/common/composables/amcharts5/pie-chart-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
+import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+
 
 interface Data {
     budget_type: string;
@@ -79,27 +86,8 @@ interface Data {
         fill: ReturnType<typeof color>
     }
 }
-const SAMPLE_RAW_DATA = {
-    results: [
-        {
-            budget_type: 'spent_budget',
-            budget_count: 15,
-            limit: 3000, // total budget
-            usd_cost: 1500, // spent budget
-            usage: 60, // usage rate
-        },
-        {
-            budget_type: 'left_budget',
-            budget_count: 15,
-            limit: 3000, // total budget
-            usd_cost: 1500, // left budget
-            usage: 40, // left rate
-            pieSettings: {
-                fill: color(gray[400]),
-            },
-        },
-    ],
-};
+
+const DATE_FORMAT = 'YYYY-MM';
 
 const props = defineProps<WidgetProps>();
 
@@ -115,27 +103,101 @@ const state = reactive({
     series: null as null|ReturnType<typeof createPieSeries>,
     chartData: computed(() => {
         if (!state.data) return [];
-        return state.data;
+
+        const results = [
+            { budget_rate: state.chartSpentBudgetRate },
+            {
+                budget_type: 'spent_budget',
+                budget_rate: state.chartSpentBudgetRate,
+            },
+            {
+                budget_type: 'left_budget',
+                budget_rate: (100 - state.chartSpentBudgetRate),
+                pieSettings: {
+                    fill: color(gray[400]),
+                },
+            },
+        ];
+
+        return results;
     }),
-    totalBudget: 0,
-    totalSpent: 0,
-    leftBudget: 0,
-    leftBudgetRate: 0,
-    budgetCount: 0,
+    dateRange: computed<DateRange>(() => {
+        const end = state.settings?.date_range?.end ?? dayjs.utc().format(DATE_FORMAT);
+        const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
+        return { start, end };
+    }),
+    totalBudget: computed(() => {
+        if (!state.data) return '--';
+        return state.data[0].total_budget;
+    }),
+    totalSpent: computed(() => {
+        if (!state.data) return '--';
+        return state.data[0].total_spent;
+    }),
+    spentBudgetRate: computed(() => {
+        let totalBudget = state.totalBudget;
+        if (totalBudget === 0) totalBudget = 1;
+        const budgetRate = (state.totalSpent / totalBudget) * 100;
+
+        return (budgetRate.toFixed(2));
+    }),
+    chartSpentBudgetRate: computed(() => {
+        let chartSpentBudgetRate = state.spentBudgetRate;
+        if (chartSpentBudgetRate > 100) chartSpentBudgetRate = 100;
+
+        return chartSpentBudgetRate;
+    }),
+    leftBudget: computed(() => {
+        if (!state.data) return '--';
+
+        return state.totalBudget - state.totalSpent;
+    }),
+    budgetCount: computed(() => {
+        if (!state.data) return '--';
+
+        return state.data[0].budget_count;
+    }),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
-const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
-    setTimeout(() => {
-        resolve(SAMPLE_RAW_DATA.results);
-    }, 1000);
-});
+/* Api */
+const fetchData = async (): Promise<Data[]> => {
+    try {
+        const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+            query: {
+                granularity: state.options.granularity,
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                fields: {
+                    total_spent: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
+                    total_budget: {
+                        key: 'limit',
+                        operator: 'sum',
+                    },
+                    budget_count: {
+                        operator: 'count',
+                    },
+                },
+            },
+        });
+        console.log(results);
+        return results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+};
+
+/* Util */
 const drawChart = (chartData) => {
     const chart = createDonutChart();
     const seriesSettings = {
         categoryField: 'budget_type',
-        valueField: 'usage',
+        valueField: 'budget_rate',
     };
     const series = createPieSeries(seriesSettings);
     chart.series.push(series);
