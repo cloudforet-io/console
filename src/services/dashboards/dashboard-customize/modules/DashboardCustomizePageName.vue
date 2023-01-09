@@ -12,7 +12,7 @@
             >
                 <template #default>
                     <input v-if="state.editMode"
-                           v-on-click-outside="handleClickOutside"
+                           v-on-click-outside="handleEnter"
                            class="name-input"
                            :value="nameInput"
                            @input="handleInput"
@@ -108,29 +108,20 @@ const {
     },
 });
 
-const handleClickTitle = () => {
-    state.editMode = true;
-};
-
-
+// handlers for <p-text-input /> (creating feature)
 const handlePTextInput = (t: string) => {
     setForm('nameInput', t);
     if (invalidState.nameInput === false) {
         state.name = nameInput.value;
     }
 };
+
+// handlers for <input /> (customizing feature)
+const handleClickTitle = () => {
+    state.editMode = true;
+};
 const handleInput = (e: InputEvent): void => {
     setForm('nameInput', (e.target as HTMLInputElement).value);
-};
-
-const handleClickOutside = () => {
-    state.editMode = false;
-    if (invalidState.nameInput === false) {
-        state.name = nameInput.value;
-    } else {
-        setForm('nameInput', props.name);
-        state.name = props.name;
-    }
 };
 const handleEscape = () => {
     if (!state.editMode) return;
@@ -138,9 +129,13 @@ const handleEscape = () => {
     setForm('nameInput', props.name);
 };
 const handleEnter = () => {
-    if (!state.editMode || invalidState.nameInput === true) return;
     state.editMode = false;
-    state.name = nameInput.value;
+    if (invalidState.nameInput === false) {
+        state.name = nameInput.value;
+    } else {
+        setForm('nameInput', props.name);
+        state.name = props.name;
+    }
 };
 
 (async () => {
