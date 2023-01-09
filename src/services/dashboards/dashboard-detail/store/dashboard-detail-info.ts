@@ -81,8 +81,70 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 value: CURRENCY.USD,
             },
         },
-        variables: {},
-        variables_schema: { properties: {}, order: [] },
+        // TODO: temporary data
+        variables: {
+            project: ['test2', 'test3'],
+            // serviceAccount: 'test4', // undefined case
+            // provider: ['test1', 'test4'], // undefined case
+            user: ['test4'],
+            region: ['test3'],
+            randomkeynode: 'test1',
+            randomkeynode2: 'test5555',
+        },
+        variables_schema: {
+            properties: {
+                project: {
+                    variable_type: 'MANAGED',
+                    use: true,
+                    selection_type: 'MULTI',
+                    options: ['test1', 'test2', 'test3', 'test4'],
+                    name: 'Project',
+                },
+                serviceAccount: {
+                    variable_type: 'MANAGED',
+                    use: true,
+                    selection_type: 'SINGLE',
+                    options: ['test1', 'test2', 'test3', 'test4'],
+                    name: 'Service Account',
+                },
+                provider: {
+                    variable_type: 'MANAGED',
+                    use: true,
+                    selection_type: 'MULTI',
+                    options: ['1', '2', '3', '4'],
+                    name: 'Provider',
+                },
+                user: {
+                    variable_type: 'MANAGED',
+                    use: false,
+                    selection_type: 'MULTI',
+                    options: ['test1', 'test2', 'test3', 'test4'],
+                    name: 'User',
+                },
+                region: {
+                    variable_type: 'MANAGED',
+                    use: false,
+                    selection_type: 'MULTI',
+                    options: ['test1', 'test2', 'test3', 'test4'],
+                    name: 'Region',
+                },
+                randomkeynode: {
+                    variable_type: 'CUSTOM',
+                    use: true,
+                    selection_type: 'MULTI',
+                    options: ['test1', 'test2', 'test3', 'test4'],
+                    name: 'Node',
+                },
+                randomkeynode2: {
+                    variable_type: 'CUSTOM',
+                    use: true,
+                    selection_type: 'SINGLE',
+                    options: ['test1', 'test2', 'test3', 'test4'],
+                    name: 'Node22',
+                },
+            },
+            order: ['project', 'provider', 'serviceAccount', 'region', 'user', 'randomkeynode', 'randomkeynode2'],
+        },
         labels: [],
         // widget info states
         dashboardWidgetInfoList: [],
@@ -156,14 +218,22 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 value: dashboardInfo.settings.currency?.value ?? CURRENCY.USD,
             },
         };
-        state.variables_schema = dashboardInfo.variables_schema;
-        state.variables = dashboardInfo.variables ?? {};
+        // TODO: temporary code
+        // state.variables_schema = dashboardInfo.variables_schema;
+        // state.variables = dashboardInfo.variables ?? {};
         state.labels = dashboardInfo.labels;
         state.dashboardWidgetInfoList = flattenDeep(dashboardInfo?.layouts ?? []).map((info) => ({
             ...info,
             widgetKey: uuidv4(),
         }));
         state.widgetDataMap = {};
+    };
+
+    const setVariables = (variables: DashboardVariables) => {
+        state.variables = variables;
+    };
+    const setVariablesSchema = (variablesSchema: DashboardVariablesSchema) => {
+        state.variables_schema = variablesSchema;
     };
 
     const getDashboardData = async (dashboardId?: string) => {
@@ -230,6 +300,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         getDashboardData,
         resetDashboardSettings,
         setDashboardInfo,
+        setVariables,
+        setVariablesSchema,
         toggleWidgetSize,
         initiateAllWidgets,
         // getter

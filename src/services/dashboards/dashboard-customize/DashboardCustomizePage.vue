@@ -19,11 +19,7 @@
                 <template v-for="(propertyName, idx) in variableState.order">
                     <variable-selector-dropdown v-if="variableState.variableProperties[propertyName]?.use"
                                                 :key="`${propertyName}-${idx}`"
-                                                :variable-name="variableState.variableProperties[propertyName].name"
-                                                :default-selected="variableState.variableData[propertyName]"
-                                                :variable-options="variableState.variableProperties[propertyName].options"
-                                                :selection-type="variableState.variableProperties[propertyName].selection_type"
-                                                @change="handleChangeVariableOptions(propertyName, $event)"
+                                                :property-name="propertyName"
                     />
                 </template>
                 <variable-more-button-dropdown :variables="variableState.variableProperties"
@@ -121,77 +117,79 @@ const state = reactive({
             delete result.widgetKey;
             return result as DashboardLayoutWidgetInfo;
         })],
-        variables: variableState.variableData,
-        variables_schema: {
-            properties: variableState.variableProperties,
-            order: variableState.order,
-        },
+        variables: dashboardDetailState.variables,
+        variables_schema: dashboardDetailState.variables_schema,
     })),
 });
 const vm = getCurrentInstance()?.proxy as Vue;
 const variableState = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
-    variableData: {
-        project: ['test2', 'test3'],
-        // serviceAccount: 'test4', // undefined case
-        // provider: ['test1', 'test4'], // undefined case
-        user: ['test4'],
-        region: ['test3'],
-        randomkeynode: 'test1',
-        randomkeynode2: 'test5555',
-    } as DashboardVariables,
-    variableProperties: {
-        project: {
-            variable_type: 'MANAGED',
-            use: true,
-            selection_type: 'MULTI',
-            options: ['test1', 'test2', 'test3', 'test4'],
-            name: 'Project',
-        },
-        serviceAccount: {
-            variable_type: 'MANAGED',
-            use: true,
-            selection_type: 'SINGLE',
-            options: ['test1', 'test2', 'test3', 'test4'],
-            name: 'Service Account',
-        },
-        provider: {
-            variable_type: 'MANAGED',
-            use: true,
-            selection_type: 'MULTI',
-            options: ['test1', 'test2', 'test3', 'test4'],
-            name: 'Provider',
-        },
-        user: {
-            variable_type: 'MANAGED',
-            use: false,
-            selection_type: 'MULTI',
-            options: ['test1', 'test2', 'test3', 'test4'],
-            name: 'User',
-        },
-        region: {
-            variable_type: 'MANAGED',
-            use: false,
-            selection_type: 'MULTI',
-            options: ['test1', 'test2', 'test3', 'test4'],
-            name: 'Region',
-        },
-        randomkeynode: {
-            variable_type: 'CUSTOM',
-            use: true,
-            selection_type: 'MULTI',
-            options: ['test1', 'test2', 'test3', 'test4'],
-            name: 'Node',
-        },
-        randomkeynode2: {
-            variable_type: 'CUSTOM',
-            use: true,
-            selection_type: 'SINGLE',
-            options: ['test1', 'test2', 'test3', 'test4'],
-            name: 'Node22',
-        },
-    } as DashboardVariablesSchema['properties'],
-    order: ['project', 'provider', 'serviceAccount', 'region', 'user', 'randomkeynode', 'randomkeynode2'],
+    // variableData: {
+    //     project: ['test2', 'test3'],
+    //     // serviceAccount: 'test4', // undefined case
+    //     // provider: ['test1', 'test4'], // undefined case
+    //     user: ['test4'],
+    //     region: ['test3'],
+    //     randomkeynode: 'test1',
+    //     randomkeynode2: 'test5555',
+    // } as DashboardVariables,
+    // variableProperties: {
+    //     project: {
+    //         variable_type: 'MANAGED',
+    //         use: true,
+    //         selection_type: 'MULTI',
+    //         options: ['test1', 'test2', 'test3', 'test4'],
+    //         name: 'Project',
+    //     },
+    //     serviceAccount: {
+    //         variable_type: 'MANAGED',
+    //         use: true,
+    //         selection_type: 'SINGLE',
+    //         options: ['test1', 'test2', 'test3', 'test4'],
+    //         name: 'Service Account',
+    //     },
+    //     provider: {
+    //         variable_type: 'MANAGED',
+    //         use: true,
+    //         selection_type: 'MULTI',
+    //         options: ['test1', 'test2', 'test3', 'test4'],
+    //         name: 'Provider',
+    //     },
+    //     user: {
+    //         variable_type: 'MANAGED',
+    //         use: false,
+    //         selection_type: 'MULTI',
+    //         options: ['test1', 'test2', 'test3', 'test4'],
+    //         name: 'User',
+    //     },
+    //     region: {
+    //         variable_type: 'MANAGED',
+    //         use: false,
+    //         selection_type: 'MULTI',
+    //         options: ['test1', 'test2', 'test3', 'test4'],
+    //         name: 'Region',
+    //     },
+    //     randomkeynode: {
+    //         variable_type: 'CUSTOM',
+    //         use: true,
+    //         selection_type: 'MULTI',
+    //         options: ['test1', 'test2', 'test3', 'test4'],
+    //         name: 'Node',
+    //     },
+    //     randomkeynode2: {
+    //         variable_type: 'CUSTOM',
+    //         use: true,
+    //         selection_type: 'SINGLE',
+    //         options: ['test1', 'test2', 'test3', 'test4'],
+    //         name: 'Node22',
+    //     },
+    // } as DashboardVariablesSchema['properties'],
+    // order: ['project', 'provider', 'serviceAccount', 'region', 'user', 'randomkeynode', 'randomkeynode2'],
+    variableData: computed(() => dashboardDetailState.variables),
+    variableProperties: computed(() => dashboardDetailState.variables_schema.properties),
+    order: computed(() => dashboardDetailState.variables_schema.order),
+    originVariables: { ...dashboardDetailState.variables },
+    originVariablesSchema: { ...dashboardDetailState.variables_schema } as DashboardVariablesSchema,
 });
 
 /* Api */
@@ -266,24 +264,22 @@ const handleSave = async () => {
     if (dashboardDetailState.dashboardId === undefined) await createDashboard();
 };
 const handleChangeVariable = (variables: DashboardVariablesSchema['properties'], order?: string[]) => {
-    variableState.variableProperties = variables;
-    if (order) variableState.order = order;
-    const _variableData = cloneDeep(variableState.variableData);
+    dashboardDetailState.variables_schema.properties = variables;
+    if (order) dashboardDetailState.variables_schema.order = order;
+    const _variableData = cloneDeep(dashboardDetailState.variables);
     variableState.order.forEach((d) => {
         if (variables[d].use) return;
-        if (variableState.variableData[d]) delete _variableData[d];
+        if (dashboardDetailState.variables[d]) delete _variableData[d];
     });
-    variableState.variableData = _variableData;
+    dashboardDetailState.variables = _variableData;
 };
-const handleChangeVariableOptions = (propertyName: string, selected: string|string[]) => {
-    variableState.variableData[propertyName] = selected;
-};
+
 const handleResetVariables = () => {
     const initialPropertiesWithChangedVariable = {} as DashboardVariablesSchema['properties'];
     const initialDataWithChangedVariable = {} as DashboardVariables;
-    const originSchemaProperties = dashboardDetailState.variables_schema.properties;
-    const originData = dashboardDetailState.variables;
-    const originOrder = dashboardDetailState.variables_schema.order;
+    const originSchemaProperties = variableState.originVariablesSchema.properties;
+    const originData = variableState.originVariables;
+    const originOrder = variableState.originVariablesSchema.order;
 
     // reset variables_schema
     variableState.order.forEach((d) => {
@@ -298,13 +294,13 @@ const handleResetVariables = () => {
     // reset variables
     originOrder.forEach((d) => {
         if (!variableState.variableProperties[d]) return;
+        if (!originData[d]) return;
         if (isEqual(variableState.variableProperties[d], originSchemaProperties[d])) {
             initialDataWithChangedVariable[d] = originData[d];
         }
     });
-
-    variableState.variableProperties = initialPropertiesWithChangedVariable;
-    variableState.variableData = initialDataWithChangedVariable;
+    dashboardDetailState.variables_schema = { ...dashboardDetailState.variables_schema, properties: initialPropertiesWithChangedVariable };
+    dashboardDetailState.variables = initialDataWithChangedVariable;
 };
 
 // for preventing refresh
@@ -333,12 +329,12 @@ onMounted(() => {
     }
 
     .dashboard-selectors {
-        @apply relative flex justify-between z-10;
+        @apply relative flex justify-between items-start z-10;
+        padding: 1.5rem 0 1.25rem;
 
         .variable-selector-wrapper {
             @apply relative flex items-center flex-wrap;
             gap: 0.5rem;
-            padding: 1.5rem 0 1.25rem;
 
             .reset-button {
                 @apply flex items-center text-label-md text-blue-700;
