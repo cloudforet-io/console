@@ -181,11 +181,15 @@ const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
         const start = setBasicDateFormat(props.dateRange?.start);
-        const end = setBasicDateFormat(props.dateRange?.end);
-        if (start && end) {
-            return `${start} ~ ${end}`;
+        const endDayjs = props.dateRange?.end ? dayjs.utc(props.dateRange.end) : undefined;
+        if (start && endDayjs) {
+            let endText;
+            const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
+            if (isCurrentMonth) endText = dayjs.utc().format('YYYY-MM-DD');
+            else endText = endDayjs.endOf('month').format('YYYY-MM-DD');
+            return `${start} ~ ${endText}`;
         }
-        if (start && !end) {
+        if (start && !endDayjs) {
             const today = dayjs();
             const diff = today.diff(start, 'day', true);
             if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
@@ -224,7 +228,7 @@ const state = reactive({
     ]),
 });
 
-const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
+const setBasicDateFormat = (date) => (date ? dayjs.utc(date).format('YYYY-MM-DD') : undefined);
 const handleEditButtonClick = () => { state.visibleEditModal = true; };
 const handleEditModalConfirm = () => {
     const widgetInfo: Partial<DashboardContainerWidgetInfo> = {
