@@ -159,7 +159,7 @@ const changeVariables = (changedSelected: MenuItem[]) => {
     } else {
         variables[props.propertyName] = reconvertedSelected;
     }
-    dashboardDetailStore.setVariables(variables);
+    dashboardDetailState.variables = variables;
 };
 
 </script>

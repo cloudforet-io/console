@@ -124,78 +124,20 @@ const state = reactive({
 const vm = getCurrentInstance()?.proxy as Vue;
 const variableState = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
-    // variableData: {
-    //     project: ['test2', 'test3'],
-    //     // serviceAccount: 'test4', // undefined case
-    //     // provider: ['test1', 'test4'], // undefined case
-    //     user: ['test4'],
-    //     region: ['test3'],
-    //     randomkeynode: 'test1',
-    //     randomkeynode2: 'test5555',
-    // } as DashboardVariables,
-    // variableProperties: {
-    //     project: {
-    //         variable_type: 'MANAGED',
-    //         use: true,
-    //         selection_type: 'MULTI',
-    //         options: ['test1', 'test2', 'test3', 'test4'],
-    //         name: 'Project',
-    //     },
-    //     serviceAccount: {
-    //         variable_type: 'MANAGED',
-    //         use: true,
-    //         selection_type: 'SINGLE',
-    //         options: ['test1', 'test2', 'test3', 'test4'],
-    //         name: 'Service Account',
-    //     },
-    //     provider: {
-    //         variable_type: 'MANAGED',
-    //         use: true,
-    //         selection_type: 'MULTI',
-    //         options: ['test1', 'test2', 'test3', 'test4'],
-    //         name: 'Provider',
-    //     },
-    //     user: {
-    //         variable_type: 'MANAGED',
-    //         use: false,
-    //         selection_type: 'MULTI',
-    //         options: ['test1', 'test2', 'test3', 'test4'],
-    //         name: 'User',
-    //     },
-    //     region: {
-    //         variable_type: 'MANAGED',
-    //         use: false,
-    //         selection_type: 'MULTI',
-    //         options: ['test1', 'test2', 'test3', 'test4'],
-    //         name: 'Region',
-    //     },
-    //     randomkeynode: {
-    //         variable_type: 'CUSTOM',
-    //         use: true,
-    //         selection_type: 'MULTI',
-    //         options: ['test1', 'test2', 'test3', 'test4'],
-    //         name: 'Node',
-    //     },
-    //     randomkeynode2: {
-    //         variable_type: 'CUSTOM',
-    //         use: true,
-    //         selection_type: 'SINGLE',
-    //         options: ['test1', 'test2', 'test3', 'test4'],
-    //         name: 'Node22',
-    //     },
-    // } as DashboardVariablesSchema['properties'],
-    // order: ['project', 'provider', 'serviceAccount', 'region', 'user', 'randomkeynode', 'randomkeynode2'],
     variableData: computed(() => dashboardDetailState.variables),
     variableProperties: computed(() => dashboardDetailState.variables_schema.properties),
     order: computed(() => dashboardDetailState.variables_schema.order),
-    originVariables: { ...dashboardDetailState.variables },
-    originVariablesSchema: { ...dashboardDetailState.variables_schema } as DashboardVariablesSchema,
+    originVariables: {} as DashboardVariables,
+    originVariablesSchema: {} as DashboardVariablesSchema,
 });
 
 /* Api */
 const getDashboardData = async () => {
     try {
         await dashboardDetailStore.getDashboardData(props.dashboardId);
+        console.log('here');
+        variableState.originVariables = { ...dashboardDetailState.variables };
+        variableState.originVariablesSchema = { ...dashboardDetailState.variables_schema };
     } catch (e) {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
@@ -274,33 +216,34 @@ const handleChangeVariable = (variables: DashboardVariablesSchema['properties'],
     dashboardDetailState.variables = _variableData;
 };
 
-const handleResetVariables = () => {
-    const initialPropertiesWithChangedVariable = {} as DashboardVariablesSchema['properties'];
-    const initialDataWithChangedVariable = {} as DashboardVariables;
-    const originSchemaProperties = variableState.originVariablesSchema.properties;
-    const originData = variableState.originVariables;
-    const originOrder = variableState.originVariablesSchema.order;
-
-    // reset variables_schema
-    variableState.order.forEach((d) => {
-        if (originSchemaProperties[d]) {
-            initialPropertiesWithChangedVariable[d] = {
-                ...variableState.variableProperties[d],
-                use: originSchemaProperties[d].use,
-            };
-        } else initialPropertiesWithChangedVariable[d] = variableState.variableProperties[d];
+const resetVariablesSchema = () => {
+    const originProperties = variableState.originVariablesSchema.properties;
+    // variableState.order is current variable properties' name list
+    // result of reset should reflect updated variables schema.
+    variableState.order.forEach((property) => {
+        if (!originProperties[property]) return;
+        dashboardDetailStore.updateVariableUse(property, originProperties[property].use);
     });
+};
 
-    // reset variables
-    originOrder.forEach((d) => {
-        if (!variableState.variableProperties[d]) return;
-        if (!originData[d]) return;
-        if (isEqual(variableState.variableProperties[d], originSchemaProperties[d])) {
-            initialDataWithChangedVariable[d] = originData[d];
+const resetVariables = () => {
+    const originProperties = variableState.originVariablesSchema.properties;
+    const originOrder = variableState.originVariablesSchema.order;
+    const originVariables = variableState.originVariables;
+
+    originOrder.forEach((property) => {
+        // CASE: existing variable is deleted.
+        if (!variableState.variableProperties[property]) return;
+
+        if (isEqual(variableState.variableProperties[property], originProperties[property])) {
+            dashboardDetailState.variables = { ...dashboardDetailState.variables, [property]: originVariables[property] };
         }
     });
-    dashboardDetailState.variables_schema = { ...dashboardDetailState.variables_schema, properties: initialPropertiesWithChangedVariable };
-    dashboardDetailState.variables = initialDataWithChangedVariable;
+};
+
+const handleResetVariables = () => {
+    resetVariablesSchema();
+    resetVariables();
 };
 
 // for preventing refresh

@@ -81,69 +81,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 value: CURRENCY.USD,
             },
         },
-        // TODO: temporary data
-        variables: {
-            project: ['test2', 'test3'],
-            // serviceAccount: 'test4', // undefined case
-            // provider: ['test1', 'test4'], // undefined case
-            user: ['test4'],
-            region: ['test3'],
-            randomkeynode: 'test1',
-            randomkeynode2: 'test5555',
-        },
+        variables: {},
         variables_schema: {
-            properties: {
-                project: {
-                    variable_type: 'MANAGED',
-                    use: true,
-                    selection_type: 'MULTI',
-                    options: ['test1', 'test2', 'test3', 'test4'],
-                    name: 'Project',
-                },
-                serviceAccount: {
-                    variable_type: 'MANAGED',
-                    use: true,
-                    selection_type: 'SINGLE',
-                    options: ['test1', 'test2', 'test3', 'test4'],
-                    name: 'Service Account',
-                },
-                provider: {
-                    variable_type: 'MANAGED',
-                    use: true,
-                    selection_type: 'MULTI',
-                    options: ['1', '2', '3', '4'],
-                    name: 'Provider',
-                },
-                user: {
-                    variable_type: 'MANAGED',
-                    use: false,
-                    selection_type: 'MULTI',
-                    options: ['test1', 'test2', 'test3', 'test4'],
-                    name: 'User',
-                },
-                region: {
-                    variable_type: 'MANAGED',
-                    use: false,
-                    selection_type: 'MULTI',
-                    options: ['test1', 'test2', 'test3', 'test4'],
-                    name: 'Region',
-                },
-                randomkeynode: {
-                    variable_type: 'CUSTOM',
-                    use: true,
-                    selection_type: 'MULTI',
-                    options: ['test1', 'test2', 'test3', 'test4'],
-                    name: 'Node',
-                },
-                randomkeynode2: {
-                    variable_type: 'CUSTOM',
-                    use: true,
-                    selection_type: 'SINGLE',
-                    options: ['test1', 'test2', 'test3', 'test4'],
-                    name: 'Node22',
-                },
-            },
-            order: ['project', 'provider', 'serviceAccount', 'region', 'user', 'randomkeynode', 'randomkeynode2'],
+            properties: {},
+            order: [],
         },
         labels: [],
         // widget info states
@@ -218,22 +159,14 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 value: dashboardInfo.settings.currency?.value ?? CURRENCY.USD,
             },
         };
-        // TODO: temporary code
-        // state.variables_schema = dashboardInfo.variables_schema;
-        // state.variables = dashboardInfo.variables ?? {};
+        state.variables_schema = dashboardInfo.variables_schema;
+        state.variables = dashboardInfo.variables ?? {};
         state.labels = dashboardInfo.labels;
         state.dashboardWidgetInfoList = flattenDeep(dashboardInfo?.layouts ?? []).map((info) => ({
             ...info,
             widgetKey: uuidv4(),
         }));
         state.widgetDataMap = {};
-    };
-
-    const setVariables = (variables: DashboardVariables) => {
-        state.variables = variables;
-    };
-    const setVariablesSchema = (variablesSchema: DashboardVariablesSchema) => {
-        state.variables_schema = variablesSchema;
     };
 
     const getDashboardData = async (dashboardId?: string) => {
@@ -292,6 +225,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const deleteWidget = (widgetKey: string) => {
         state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widgetKey !== widgetKey);
     };
+    const updateVariableUse = (propertyName: string, use: boolean) => {
+        if (!state.variables_schema.properties[propertyName]) return;
+        state.variables_schema.properties[propertyName].use = use;
+    };
 
     store.dispatch('reference/loadAll');
 
@@ -300,8 +237,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         getDashboardData,
         resetDashboardSettings,
         setDashboardInfo,
-        setVariables,
-        setVariablesSchema,
         toggleWidgetSize,
         initiateAllWidgets,
         // getter
@@ -309,6 +244,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         // action
         updateWidgetInfo,
         deleteWidget,
+        updateVariableUse,
     };
 });
 
