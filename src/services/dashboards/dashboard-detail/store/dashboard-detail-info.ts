@@ -82,7 +82,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
         },
         variables: {},
-        variables_schema: { properties: {}, order: [] },
+        variables_schema: {
+            properties: {},
+            order: [],
+        },
         labels: [],
         // widget info states
         dashboardWidgetInfoList: [],
@@ -222,6 +225,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const deleteWidget = (widgetKey: string) => {
         state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widgetKey !== widgetKey);
     };
+    const updateVariableUse = (propertyName: string, use: boolean) => {
+        if (!state.variables_schema.properties[propertyName]) return;
+        state.variables_schema.properties[propertyName].use = use;
+    };
 
     store.dispatch('reference/loadAll');
 
@@ -237,6 +244,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         // action
         updateWidgetInfo,
         deleteWidget,
+        updateVariableUse,
     };
 });
 

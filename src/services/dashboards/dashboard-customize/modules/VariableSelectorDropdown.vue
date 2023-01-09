@@ -41,13 +41,15 @@
                         class="options-menu"
                         searchable
                         use-fixed-menu-style
+                        :search-text="searchText"
                         :style="fixedMenuStyle"
                         :menu="reorderedMenu"
-                        :selected.sync="selected"
-                        :multi-selectable="selectionType === 'MULTI'"
-                        :show-radio-icon="selectionType === 'SINGLE'"
-                        :show-clear-selection="selectionType === 'MULTI'"
-                        @update-search-input="handleChangeContextMenuInput"
+                        :selected="selected"
+                        :multi-selectable="variableSchema.selection_type === 'MULTI'"
+                        :show-radio-icon="variableSchema.selection_type === 'SINGLE'"
+                        :show-clear-selection="variableSchema.selection_type === 'MULTI'"
+                        @update:selected="handleSelectOption"
+                        @update:search-text="handleChangeContextMenuInput"
         />
     </div>
 </template>
@@ -56,42 +58,57 @@
 // CAUTION: this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    onMounted,
-    reactive, toRefs, watch,
+    computed,
+    reactive, toRefs,
 } from 'vue';
 
 import {
     PBadge, PContextMenu, PI, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { cloneDeep } from 'lodash';
 
-import type { VariableSelectionType } from '@/services/dashboards/config';
+import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 
 interface Props {
-    variableName: string;
-    defaultSelected?: string| string[];
-    variableOptions: string[];
-    selectionType: VariableSelectionType;
-}
-interface EmitFn {
-    (e: 'change', value: string|string[]): void;
+    propertyName: string;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<EmitFn>();
 
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as typeof PContextMenu | null,
     searchText: '',
-    selected: [] as MenuItem[],
-    options: [] as MenuItem[],
+    variableSchema: computed<DashboardVariableSchemaProperty>(() => dashboardDetailState.variables_schema.properties[props.propertyName]),
+    variableSelectedOptions: computed<undefined|string|string[]>(() => dashboardDetailState.variables[props.propertyName]),
+    variableName: computed(() => state.variableSchema?.name),
+    selected: computed<MenuItem[]>(() => {
+        const option = state.variableSelectedOptions;
+        if (!option) return [];
+        let arrayOfSelectedOptions;
+        if (Array.isArray(option)) {
+            arrayOfSelectedOptions = option;
+        } else arrayOfSelectedOptions = [option];
+
+        return arrayOfSelectedOptions.map((d) => ({ name: d, label: d }));
+    }),
+    options: computed<MenuItem[]>(() => {
+        const defaultOptions = state.variableSchema.options as string[];
+        return defaultOptions.map((d) => ({ name: d, label: d }));
+    }),
 });
 
 const {
     targetRef,
     contextMenuRef,
+    variableSchema,
+    variableName,
+    searchText,
     selected,
     options,
 } = toRefs(state);
@@ -113,7 +130,7 @@ const {
 
 // event
 const handleClearSelected = () => {
-    state.selected = [];
+    changeVariables([]);
 };
 const handleChangeVisible = () => {
     if (visibleMenu.value) {
@@ -123,38 +140,27 @@ const handleChangeVisible = () => {
     }
 };
 // TODO: search text binding
-const handleChangeContextMenuInput = (): void => {
-    // state.searchText = value;
+const handleChangeContextMenuInput = (text: string): void => {
+    state.searchText = text;
 };
 
-// reconvert to string | string[]
-watch(() => state.selected, (_selected) => {
-    let reconvertedSelected;
-    if (props.selectionType === 'SINGLE') {
-        reconvertedSelected = _selected[0].name;
-    } else reconvertedSelected = _selected.map((d) => d.name);
-    emit('change', reconvertedSelected);
-});
+const handleSelectOption = (_selected: MenuItem[]) => {
+    changeVariables(_selected);
+};
 
-onMounted(() => {
-    // convert to MenuItem for selected
-    if (props.defaultSelected) {
-        const defaultSelected = [] as MenuItem[];
-        if (Array.isArray(props.defaultSelected)) {
-            props.defaultSelected.forEach((d) => {
-                defaultSelected.push({ name: d, label: d });
-            });
-        } else defaultSelected.push({ name: props.defaultSelected, label: props.defaultSelected });
-        state.selected = defaultSelected;
+// helper
+const changeVariables = (changedSelected: MenuItem[]) => {
+    const variables = cloneDeep(dashboardDetailState.variables);
+    const reconvertedSelected = changedSelected.map((d) => d.name) as string[];
+    if (reconvertedSelected.length === 0) {
+        delete variables[props.propertyName];
+    } else if (state.variableSchema.selection_type === 'SINGLE') {
+        variables[props.propertyName] = reconvertedSelected[0];
+    } else {
+        variables[props.propertyName] = reconvertedSelected;
     }
-
-    // convert to MenuItem for variable options
-    const defaultMenu = [] as MenuItem[];
-    props.variableOptions.forEach((d) => {
-        defaultMenu.push({ name: d, label: d });
-    });
-    state.options = defaultMenu;
-});
+    dashboardDetailState.variables = variables;
+};
 
 </script>
 
