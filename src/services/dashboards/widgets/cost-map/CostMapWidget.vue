@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   :error-mode="false"
+                  :widget-location="state.widgetLocation"
                   @refresh="handleRefresh"
     >
         <div class="cost-map">
@@ -26,6 +27,7 @@ import {
     defineExpose,
     defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
@@ -33,6 +35,8 @@ import dayjs from 'dayjs';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setTreemapLabelText } from '@/common/composables/amcharts5/tree-map-helper';
@@ -42,6 +46,7 @@ import {
     gray, palette, transparent, white,
 } from '@/styles/colors';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { GroupBy, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
@@ -78,16 +83,16 @@ const state = reactive({
         const start = state.settings?.date_range?.start ?? dayjs.utc(end).subtract(11, 'month').format('YYYY-MM');
         return { start, end };
     }),
-    // Todo: Link to target
-    // widgetLink: computed(() => ({
-    //     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-    //     params: {},
-    //     query: {
-    //         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-    //         groupBy: arrayToQueryString([state.groupBy]),
-    //         period: objectToQueryString(state.dateRange),
-    //     },
-    // })),
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        params: {},
+        query: {
+            granularity: primitiveToQueryString(state.granularity),
+            group_by: arrayToQueryString([state.groupBy]),
+            period: objectToQueryString(state.dateRange),
+            filters: objectToQueryString(state.options.filters),
+        },
+    })),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);

@@ -20,7 +20,7 @@ const costByRegionWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.ACCUMULATED,
-        group_by: GROUP_BY.PROVIDER,
+        group_by: GROUP_BY.REGION,
         chart_type: CHART_TYPE.MAP,
         legend_options: {
             enabled: true,

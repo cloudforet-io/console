@@ -1,5 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
+                  class="base-pie-widget"
+                  :widget-location="state.widgetLocation"
                   @refresh="refreshWidget"
     >
         <div class="chart-wrapper">
@@ -39,6 +41,7 @@ import {
     defineExpose,
     defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
@@ -49,9 +52,12 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
 
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
@@ -102,6 +108,16 @@ const state = reactive({
     dateRange: computed<DateRange>(() => ({
         start: dayjs.utc(state.settings?.date_range?.start).format('YYYY-MM'),
         end: dayjs.utc(state.settings?.date_range?.end).format('YYYY-MM'),
+    })),
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        params: {},
+        query: {
+            granularity: primitiveToQueryString(state.granularity),
+            group_by: arrayToQueryString([state.groupBy]),
+            period: objectToQueryString(state.dateRange),
+            filters: objectToQueryString(state.options.filters),
+        },
     })),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);

@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="aws-cloud-front-cost"
+                  :widget-location="state.widgetLocation"
                   @refresh="handleRefresh"
     >
         <template v-if="state.selectorItems.length"
@@ -45,6 +46,7 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
 import bytes from 'bytes';
@@ -59,12 +61,14 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ReferenceType } from '@/store/modules/reference/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
@@ -130,6 +134,16 @@ const state = reactive({
         return { start, end };
     }),
     thisPage: 1,
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        params: {},
+        query: {
+            granularity: primitiveToQueryString(state.granularity),
+            group_by: arrayToQueryString([state.groupBy]),
+            period: objectToQueryString(state.dateRange),
+            filters: objectToQueryString({ ...state.options.filters, provider: ['aws'], product: ['AmazonCloudFront'] }),
+        },
+    })),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
