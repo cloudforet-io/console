@@ -1,4 +1,4 @@
-import type { ComputedRef } from 'vue';
+import type { ComputedRef, UnwrapRef } from 'vue';
 import {
     computed, reactive,
 } from 'vue';
@@ -77,15 +77,15 @@ const convertWidgetFiltersToConsoleFilters = (filters?: WidgetFiltersMap): Conso
 
 export interface WidgetState<Data = any> {
     widgetConfig: ComputedRef<WidgetConfig>;
-    title: ComputedRef<string>;
+    title: ComputedRef<string|undefined>;
     options: ComputedRef<WidgetOptions>;
     currency: ComputedRef<Currency>;
-    groupBy: ComputedRef<GroupBy | string>;
-    granularity: ComputedRef<Granularity>;
+    groupBy: ComputedRef<GroupBy | string | undefined>;
+    granularity: ComputedRef<Granularity|undefined>;
     chartType: ComputedRef<ChartType|undefined>;
-    size: ComputedRef<WidgetSize>;
+    size: ComputedRef<WidgetSize|undefined>;
     loading: boolean;
-    settings: ComputedRef<DashboardSettings>;
+    settings: ComputedRef<DashboardSettings|undefined>;
     data: undefined|Data;
     colorSet: ComputedRef<string[]>;
     selectorItems: ComputedRef<MenuItem[]>;
@@ -98,26 +98,26 @@ export function useWidgetState<Data = any>(
 ) {
     const state = reactive<WidgetState<Data>>({
         widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(props.widgetConfigId)),
-        title: computed<string>(() => props.title ?? state.widgetConfig.title),
+        title: computed(() => props.title ?? state.widgetConfig.title),
         options: computed<WidgetOptions>(() => getRefinedOptions(
             state.widgetConfig.options,
             props.options,
             props.inheritOptions,
             props.dashboardVariables,
         )),
-        currency: computed(() => state.settings.currency?.value ?? CURRENCY.USD),
-        groupBy: computed<GroupBy|string>(() => state.options?.group_by),
-        granularity: computed<Granularity>(() => state.options?.granularity),
+        currency: computed(() => state.settings?.currency?.value ?? CURRENCY.USD),
+        groupBy: computed(() => state.options?.group_by),
+        granularity: computed(() => state.options?.granularity),
         chartType: computed<ChartType|undefined>(() => state.options?.chart_type),
-        size: computed<WidgetSize>(() => {
-            if (state.widgetConfig.sizes.includes(props.size)) return props.size;
+        size: computed(() => {
+            if (props.size && state.widgetConfig.sizes.includes(props.size)) return props.size;
             return state.widgetConfig.sizes[0];
         }),
         loading: true,
-        settings: computed<DashboardSettings>(() => props.dashboardSettings),
+        settings: computed<DashboardSettings|undefined>(() => props.dashboardSettings),
         data: undefined as Data|undefined,
         colorSet: computed<string[]>(() => {
-            if (!props.theme) return [];
+            if (!props.theme || !Array.isArray(state.data)) return [];
             const colorSetType: WidgetColorSetType = state.data?.length > 9 ? 'massive' : 'basic';
             return getColorSet(props.theme, colorSetType);
         }),
@@ -142,7 +142,7 @@ export function useWidgetState<Data = any>(
             return undefined;
         }),
         consoleFilters: computed(() => convertWidgetFiltersToConsoleFilters(state.options?.filters)),
-    });
+    }) as UnwrapRef<WidgetState<Data>>;
 
     return state;
 }

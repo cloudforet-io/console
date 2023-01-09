@@ -25,7 +25,7 @@ interface WidgetFrameProps {
 
 type WidgetFrameBaseProps = WidgetFrameState & WidgetFrameProps;
 
-export const useWidgetFrameProps = (props: WidgetFrameProps, state: WidgetFrameState):ComputedRef => computed<WidgetFrameBaseProps>(() => ({
+export const useWidgetFrameProps = (props: any, state: any):ComputedRef => computed<WidgetFrameBaseProps>(() => ({
     widgetKey: props.widgetKey,
     width: props.width,
     editMode: props.editMode,
