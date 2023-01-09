@@ -1,6 +1,6 @@
 <template>
     <div class="widget-frame"
-         :class="{ full: state.isFull, 'edit-mode': props.editMode }"
+         :class="{ full: state.isFull, 'edit-mode': props.editMode, 'no-height-limit': props.noHeightLimit }"
          :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%' }"
     >
         <div class="widget-header">
@@ -132,6 +132,7 @@ interface Props {
     title: TranslateResult;
     size: WidgetSize;
     width?: number;
+    noHeightLimit?: boolean;
     widgetLink?: string;
     widgetLocation?: Location;
     widgetConfigId?: string;
@@ -340,6 +341,9 @@ const handleDeleteModalConfirm = () => {
         .button-group {
             @apply flex gap-2 flex-wrap justify-end;
         }
+    }
+    &.no-height-limit {
+        min-height: auto;
     }
 }
 

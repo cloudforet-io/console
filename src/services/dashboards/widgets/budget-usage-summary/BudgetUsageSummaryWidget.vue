@@ -105,7 +105,6 @@ const state = reactive({
         if (!state.data) return [];
 
         const results = [
-            { budget_rate: state.chartSpentBudgetRate },
             {
                 budget_type: 'spent_budget',
                 budget_rate: state.chartSpentBudgetRate,
@@ -253,6 +252,9 @@ defineExpose<WidgetExpose<Data[]>>({
 <style lang="postcss" scoped>
 .budget-usage-summary {
     padding: 0 1.5rem;
+    .full & {
+        @apply block;
+    }
     .budget {
         @apply flex flex-col row-gap-1 text-gray-900;
         line-height: 1.25;
@@ -272,6 +274,7 @@ defineExpose<WidgetExpose<Data[]>>({
         @apply absolute;
         left: 50%;
         top: 50%;
+        z-index: 10;
         transform: translate3d(-50%, -50%, 0);
     }
 }
@@ -285,5 +288,24 @@ defineExpose<WidgetExpose<Data[]>>({
 }
 .chart-loader {
     height: 100%;
+}
+
+@screen desktop {
+    .full {
+        .budget-usage-summary {
+            @apply flex justify-between;
+        }
+    }
+}
+
+@screen laptop {
+    .full {
+        &.no-height-limit {
+            min-height: 29rem;
+        }
+        .budget-usage-summary {
+            @apply block;
+        }
+    }
 }
 </style>
