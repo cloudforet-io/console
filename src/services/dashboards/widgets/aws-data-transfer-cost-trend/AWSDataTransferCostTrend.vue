@@ -254,7 +254,7 @@ defineExpose<WidgetExpose<CostAnalyzeDataModel['results']>>({
 <style lang="postcss" scoped>
 .aws-data-transfer-cost-trend {
     .chart-wrapper {
-        height: 11.5rem;
+        height: 10.75rem;
         .chart-loader {
             height: 100%;
             .chart {

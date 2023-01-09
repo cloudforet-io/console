@@ -273,7 +273,7 @@ defineExpose<WidgetExpose<FullData>>({
 <style lang="postcss" scoped>
 .aws-cloud-front-cost {
     .chart-wrapper {
-        height: 50%;
+        height: 10.75rem;
         .chart-loader {
             height: 100%;
             .chart {

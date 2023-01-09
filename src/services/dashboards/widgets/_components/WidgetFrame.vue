@@ -42,9 +42,9 @@
                 </div>
                 <div class="footer-right">
                     <slot name="footer-right">
-                        <p-anchor v-if="(props.widgetLink || props.widgetRoute) && !props.printMode"
+                        <p-anchor v-if="(props.widgetLink || props.widgetLocation) && !props.printMode"
                                   :href="props.widgetLink"
-                                  :to="props.widgetRoute"
+                                  :to="props.widgetLocation"
                                   class="anchor-button"
                                   icon-name="ic_arrow_right"
                         >
@@ -102,7 +102,7 @@ import {
     reactive, computed,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Route } from 'vue-router';
+import type { Location } from 'vue-router/types/router';
 
 import {
     PAnchor, PButton, PButtonModal, PDivider, PIconButton,
@@ -133,7 +133,7 @@ interface Props {
     size: WidgetSize;
     width?: number;
     widgetLink?: string;
-    widgetRoute?: Route;
+    widgetLocation?: Location;
     widgetConfigId?: string;
     dateRange?: DateRange;
     noData?: boolean;
@@ -162,7 +162,7 @@ const { i18nDayjs } = useI18nDayjs();
 const props = withDefaults(defineProps<Props>(), {
     width: undefined,
     widgetLink: undefined,
-    widgetRoute: undefined,
+    widgetLocation: undefined,
     widgetConfigId: undefined,
     dateRange: () => ({ start: undefined, end: undefined }),
     selectedDates: () => [],
