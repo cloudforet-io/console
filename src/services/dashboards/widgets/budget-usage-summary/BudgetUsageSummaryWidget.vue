@@ -1,7 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   :error-mode="false"
-                  :no-height-limit="true"
+                  no-height-limit
                   @refresh="handleRefresh"
     >
         <div class="budget-usage-summary">
@@ -24,7 +24,7 @@
                     {{ currencyMoneyFormatter(state.totalBudget, state.options.currency) }}
                 </div>
                 <div class="budget-info">
-                    {{ currencyMoneyFormatter(state.leftBudget, state.options.currency) }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE') }}
+                    {{ state.leftBudget }}
                 </div>
             </div>
             <div class="chart-wrapper">
@@ -58,6 +58,8 @@ import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { i18n } from '@/translations';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -123,11 +125,10 @@ const state = reactive({
 
         return results;
     }),
-    dateRange: computed<DateRange>(() => {
-        const end = state.settings?.date_range?.end ?? dayjs.utc().format(DATE_FORMAT);
-        const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
-        return { start, end };
-    }),
+    dateRange: computed<DateRange>(() => ({
+        start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
+        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
+    })),
     totalBudget: computed(() => {
         if (!state.data) return '--';
         return state.data[0].total_budget;
@@ -140,17 +141,15 @@ const state = reactive({
         let totalBudget = state.totalBudget;
         if (totalBudget === 0) totalBudget = 1;
         const budgetRate = (state.totalSpent / totalBudget) * 100;
-
         return (budgetRate.toFixed(2));
     }),
     leftBudget: computed(() => {
         if (!state.data) return '--';
-
-        return state.totalBudget - state.totalSpent;
+        const value = state.totalBudget - state.totalSpent;
+        return `${currencyMoneyFormatter(value, state.options.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE')}`;
     }),
     budgetCount: computed(() => {
         if (!state.data) return '--';
-
         return state.data[0].budget_count;
     }),
 });
@@ -180,7 +179,6 @@ const fetchData = async (): Promise<Data[]> => {
                 },
             },
         });
-        console.log(results);
         return results;
     } catch (e) {
         ErrorHandler.handleError(e);
