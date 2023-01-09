@@ -67,6 +67,7 @@ import {
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -124,8 +125,9 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 /* Api */
 const fetchData = async (): Promise<Data> => {
     try {
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters(state.consoleFilters);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
-            // TODO: inherit from dashboard variables
             query: {
                 granularity: state.options.granularity,
                 start: state.dateRange.start,
@@ -137,7 +139,7 @@ const fetchData = async (): Promise<Data> => {
                     },
                 },
                 field_group: ['date'],
-                // filter: [{ k: 'project_id', v: 'project-18655561c535', o: 'eq' }],
+                ...apiQueryHelper.data,
             },
         });
         return results;
