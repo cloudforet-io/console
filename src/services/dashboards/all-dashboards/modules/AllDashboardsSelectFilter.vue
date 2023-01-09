@@ -1,5 +1,6 @@
 <template>
     <div class="all-dashboards-select-filter">
+        <!--        song-lang?-->
         <span class="filter-header">Viewers</span>
         <p-select-status v-for="(view, idx) in viewerFilterList"
                          :key="`view-${idx}`"
@@ -19,6 +20,7 @@
         <p-divider class="divider"
                    vertical
         />
+        <!--        song-lang?-->
         <span class="filter-header">Scope</span>
         <p-select-status v-for="(scope, idx) in scopeFilterList"
                          :key="`scope-${idx}`"

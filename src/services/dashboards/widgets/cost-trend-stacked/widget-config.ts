@@ -22,6 +22,7 @@ const costTrendStackedWidgetConfig: Partial<WidgetConfig> = {
     },
     options_schema: {
         default_properties: ['group_by'],
+        inheritable_properties: ['group_by'],
         schema: {
             type: 'object',
             properties: {

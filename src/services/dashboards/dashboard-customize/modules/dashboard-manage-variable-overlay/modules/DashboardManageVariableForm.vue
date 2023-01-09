@@ -126,6 +126,7 @@ const {
 }, {
     name(value: string) {
         if (props.variableNames.includes(value)) {
+            // song-lang
             return i18n.t('Name is duplicated');
         }
         // TODO: add invalid text about name length

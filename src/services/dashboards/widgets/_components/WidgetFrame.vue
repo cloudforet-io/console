@@ -1,7 +1,7 @@
 <template>
     <div class="widget-frame"
          :class="{ full: state.isFull, 'edit-mode': props.editMode }"
-         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%' }"
+         :style="{ width: props.width && !state.isFull ? `${props.width}px` : '100%'}"
     >
         <div class="widget-header">
             <h3 class="title">
@@ -42,9 +42,9 @@
                 </div>
                 <div class="footer-right">
                     <slot name="footer-right">
-                        <p-anchor v-if="(props.widgetLink || props.widgetRoute) && !props.printMode"
+                        <p-anchor v-if="(props.widgetLink || props.widgetLocation) && !props.printMode"
                                   :href="props.widgetLink"
-                                  :to="props.widgetRoute"
+                                  :to="props.widgetLocation"
                                   class="anchor-button"
                                   icon-name="ic_arrow_right"
                         >
@@ -102,7 +102,7 @@ import {
     reactive, computed,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Route } from 'vue-router';
+import type { Location } from 'vue-router/types/router';
 
 import {
     PAnchor, PButton, PButtonModal, PDivider, PIconButton,
@@ -132,8 +132,9 @@ interface Props {
     title: TranslateResult;
     size: WidgetSize;
     width?: number;
+    noHeightLimit?: boolean;
     widgetLink?: string;
-    widgetRoute?: Route;
+    widgetLocation?: Location;
     widgetConfigId?: string;
     dateRange?: DateRange;
     noData?: boolean;
@@ -162,7 +163,7 @@ const { i18nDayjs } = useI18nDayjs();
 const props = withDefaults(defineProps<Props>(), {
     width: undefined,
     widgetLink: undefined,
-    widgetRoute: undefined,
+    widgetLocation: undefined,
     widgetConfigId: undefined,
     dateRange: () => ({ start: undefined, end: undefined }),
     selectedDates: () => [],
@@ -181,11 +182,15 @@ const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
         const start = setBasicDateFormat(props.dateRange?.start);
-        const end = setBasicDateFormat(props.dateRange?.end);
-        if (start && end) {
-            return `${start} ~ ${end}`;
+        const endDayjs = props.dateRange?.end ? dayjs.utc(props.dateRange.end) : undefined;
+        if (start && endDayjs) {
+            let endText;
+            const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
+            if (isCurrentMonth) endText = dayjs.utc().format('YYYY-MM-DD');
+            else endText = endDayjs.endOf('month').format('YYYY-MM-DD');
+            return `${start} ~ ${endText}`;
         }
-        if (start && !end) {
+        if (start && !endDayjs) {
             const today = dayjs();
             const diff = today.diff(start, 'day', true);
             if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
@@ -224,7 +229,7 @@ const state = reactive({
     ]),
 });
 
-const setBasicDateFormat = (date) => (date ? dayjs(date).format('YYYY-MM-DD') : undefined);
+const setBasicDateFormat = (date) => (date ? dayjs.utc(date).format('YYYY-MM-DD') : undefined);
 const handleEditButtonClick = () => { state.visibleEditModal = true; };
 const handleEditModalConfirm = () => {
     const widgetInfo: Partial<DashboardContainerWidgetInfo> = {
@@ -326,8 +331,7 @@ const handleDeleteModalConfirm = () => {
         }
     }
     &.full {
-        height: 100%;
-        min-height: 29rem;
+        height: auto;
     }
     &.edit-mode {
         position: relative;
@@ -342,5 +346,4 @@ const handleDeleteModalConfirm = () => {
         }
     }
 }
-
 </style>

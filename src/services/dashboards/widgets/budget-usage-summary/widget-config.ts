@@ -1,4 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 
 const budgetUsageSummaryConfig: WidgetConfig = {
     widget_config_id: 'budgetUsageSummary',
@@ -18,6 +19,9 @@ const budgetUsageSummaryConfig: WidgetConfig = {
         inherit_count: 1,
     },
     sizes: ['sm', 'full'],
+    options: {
+        granularity: GRANULARITY.ACCUMULATED,
+    },
 };
 
 export default budgetUsageSummaryConfig;

@@ -1285,6 +1285,7 @@
 				"AVAILABLE": "",
 				"BUDGETS": "",
 				"DESC": "",
+				"TOTAL_BUDGET": "",
 				"TOTAL_SPENT": ""
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {

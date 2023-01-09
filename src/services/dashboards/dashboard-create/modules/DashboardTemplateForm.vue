@@ -62,6 +62,7 @@
                                     </template>
                                 </p-board>
                                 <p-empty v-show="!existingTemplateState.boardSets.length">
+                                    <!--                                    song-lang-->
                                     No Items
                                 </p-empty>
                             </div>
@@ -107,7 +108,7 @@ const defaultTemplateState = reactive({
         ...d,
         // below values are used only for render
         leftIcon: d.description?.icon ?? '',
-        iconButtonSets: [{
+        iconButtonSets: [!!d.description?.preview_image && {
             iconName: 'ic_external-link',
             // song-lang
             tooltipText: 'Preview',
@@ -126,9 +127,9 @@ const existingTemplateState = reactive({
         ...d,
         // below values are used only for render
         leftIcon: d.description?.preview_image ?? '',
-        // song-lang
         iconButtonSets: [{
             iconName: 'ic_external-link',
+            // song-lang
             tooltipText: 'Preview',
             eventAction: () => {
                 const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');

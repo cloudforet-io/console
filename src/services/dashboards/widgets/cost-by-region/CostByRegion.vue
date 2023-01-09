@@ -45,6 +45,7 @@ import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
@@ -54,15 +55,19 @@ import {
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
@@ -70,7 +75,7 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { CONTINENT_INFO } from '@/services/dashboards/widgets/_configs/continent-config';
-import { getLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -122,6 +127,16 @@ const state = reactive({
     dateRange: computed<DateRange>(() => ({
         start: dayjs.utc(state.settings?.date_range?.start).format('YYYY-MM'),
         end: dayjs.utc(state.settings?.date_range?.end).format('YYYY-MM'),
+    })),
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        params: {},
+        query: {
+            granularity: primitiveToQueryString(state.granularity),
+            group_by: arrayToQueryString([state.groupBy]),
+            period: objectToQueryString(state.dateRange),
+            filters: objectToQueryString(state.options.filters),
+        },
     })),
 });
 const storeState = reactive({
@@ -180,23 +195,25 @@ const getRefinedMapChartData = (results?: Data): MapChartData[] => {
 /* Api */
 const fetchData = async (): Promise<FullData> => {
     try {
-        const query: any = {
-            granularity: state.granularity,
-            group_by: [state.groupBy, GROUP_BY.REGION],
-            start: state.dateRange.start,
-            end: state.dateRange.end,
-            fields: {
-                usd_cost_sum: {
-                    key: 'usd_cost',
-                    operator: 'sum',
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters(state.consoleFilters);
+        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+            query: {
+                granularity: state.granularity,
+                group_by: [state.groupBy, GROUP_BY.PROVIDER],
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                fields: {
+                    usd_cost_sum: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
                 },
+                sort: [{ key: 'usd_cost_sum', desc: true }],
+                ...apiQueryHelper.data,
             },
-            sort: [{ key: 'usd_cost_sum', desc: true }],
-        };
-        if (state.pageSize) {
-            query.page = { start: getPageStart(state.thisPage, state.pageSize), limit: state.pageSize };
-        }
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
+        });
         return { results, more };
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -247,7 +264,7 @@ const drawChart = (chartData: MapChartData[]) => {
 const initWidget = async (data?: FullData) => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.clearChildrenOfRoot();
     drawChart(state.chartData);
@@ -258,7 +275,7 @@ const refreshWidget = async (thisPage = 1) => {
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.clearChildrenOfRoot();
     drawChart(state.chartData);

@@ -19,7 +19,7 @@
                              :key="`status-box-${colIdx}-${rowIdx}`"
                              v-tooltip.bottom="getTooltipText(rowIdx, colIdx)"
                              class="box status-box"
-                             :style="{ 'background-color': state.data?.[colIdx * 10 + rowIdx]?.color }"
+                             :style="{ 'background-color': getColor(rowIdx, colIdx) }"
                         />
                         <div v-else
                              :key="`status-box-${colIdx}-${rowIdx}`"
@@ -50,90 +50,133 @@ import {
     defineExpose,
     defineProps, nextTick, reactive, toRefs,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 import { range } from 'lodash';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import { indigo, red, yellow } from '@/styles/colors';
 
+import { getConvertedBudgetFilter } from '@/services/cost-explorer/lib/helper';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
-import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
-import type { Legend } from '@/services/dashboards/widgets/type';
+import type { Legend, BudgetDataModel } from '@/services/dashboards/widgets/type';
 
+
+type Data = BudgetDataModel['results'];
+
+const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
-
-interface BudgetStatusWidgetState extends WidgetState {
-    data: Data[]|undefined;
-    legends: ComputedRef<Omit<Legend, 'name'>[]>;
-}
 const state = reactive({
-    ...toRefs(useWidgetState<Data[]>(props)),
+    ...toRefs(useWidgetState<Data>(props)),
     legends: computed<Omit<Legend, 'name'>[]>(() => ([
         { label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.OVERSPENT'), color: red[400] },
         { label: '90-100%', color: yellow[500] },
         { label: '70-90%', color: indigo[500] },
         { label: '< 70%', color: indigo[100] },
     ])),
-} as BudgetStatusWidgetState);
+    dateRange: computed<DateRange>(() => ({
+        start: dayjs.utc(state.settings?.date_range?.start).format('YYYY-MM'),
+        end: dayjs.utc(state.settings?.date_range?.end).format('YYYY-MM'),
+    })),
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.BUDGET._NAME,
+        params: {},
+        query: {
+            filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(state.consoleFilters)).rawQueryStrings,
+        },
+    })),
+});
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
-interface Data {
-    budgetId: string;
-    budgetName: string;
-    color: string;
-    usage: number;
-    limit: number;
-    usdCost: number;
-}
-/* Api */
-const SAMPLE_DATA = [
-    ...range(0, 5).map((d) => ({
-        budgetId: `budget${d}`,
-        budgetName: `budget ${d}`,
-        color: red[400],
-        usage: 39,
-        limit: 155,
-        usdCost: 4124,
-    })),
-    ...range(5, 7).map((d) => ({
-        budgetId: `budget${d}`,
-        budgetName: `budget ${d}`,
-        color: yellow[500],
-        usage: 39,
-        limit: 155,
-        usdCost: 4124,
-    })),
-    ...range(7, 15).map((d) => ({
-        budgetId: `budget${d}`,
-        budgetName: `budget ${d}`,
-        color: indigo[500],
-        usage: 39,
-        limit: 155,
-        usdCost: 4124,
-    })),
-];
-const fetchData = async (): Promise<Data[]> => new Promise((resolve) => {
-    setTimeout(() => {
-        resolve(SAMPLE_DATA);
-    }, 1000);
-});
+/* Util */
+const getTooltipText = (rowIdx: number, colIdx: number): string => {
+    const _target = state.data?.[colIdx * 10 + rowIdx];
+    const totalBudget = _target?.total_budget ?? 0;
+    const totalSpent = _target?.total_spent ?? 0;
 
-const initWidget = async (data?: Data[]): Promise<Data[]> => {
+    let percentage;
+    if (totalSpent === 0) percentage = '0%';
+    else if (totalBudget === 0) percentage = '-';
+    else {
+        const usage = totalSpent / totalBudget * 100;
+        percentage = `${usage.toFixed(2)}%`;
+    }
+    return `${_target?.name} (${percentage})`;
+};
+const getColor = (rowIdx: number, colIdx: number): string => {
+    const _target = state.data?.[colIdx * 10 + rowIdx];
+    const totalBudget = _target?.total_budget ?? 0;
+    const totalSpent = _target?.total_spent ?? 0;
+
+    let color;
+    if (totalBudget !== 0) {
+        const usage = totalSpent / totalBudget * 100;
+        if (usage < 70) color = indigo[100];
+        else if (usage < 90) color = indigo[500];
+        else if (usage < 100) color = yellow[500];
+        else color = red[400];
+    } else if (totalSpent > 0) color = red[400];
+    else color = indigo[100];
+    return color;
+};
+
+/* Api */
+const fetchData = async (): Promise<Data> => {
+    try {
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters(state.consoleFilters);
+        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+            query: {
+                granularity: state.granularity,
+                group_by: [state.groupBy, 'name'],
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                fields: {
+                    total_spent: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
+                    total_budget: {
+                        key: 'limit',
+                        operator: 'sum',
+                    },
+                },
+                sort: [{ key: 'total_spent', desc: true }], // TODO: should be changed after api updated
+                page: { limit: 200 },
+                ...apiQueryHelper.data,
+            },
+        });
+        return results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+};
+
+const initWidget = async (data?: Data): Promise<Data> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     await nextTick();
     state.loading = false;
     return state.data;
 };
-
-const refreshWidget = async (): Promise<Data[]> => {
+const refreshWidget = async (): Promise<Data> => {
     state.loading = true;
     state.data = await fetchData();
     await nextTick();
@@ -141,26 +184,11 @@ const refreshWidget = async (): Promise<Data[]> => {
     return state.data;
 };
 
-/* Util */
-const getTooltipText = (rowIdx, colIdx): string => {
-    if (!state.data) return '';
-    const index = colIdx * 10 + rowIdx;
-    const limit = state.data[index].limit;
-    const usdCost = state.data[index].usdCost;
-    const usage = state.data[index].usage;
-
-    let percentage;
-    if (usdCost === 0) percentage = '0%';
-    else if (limit === 0) percentage = '-';
-    else percentage = `${usage.toFixed(2)}%`;
-    return `${state.data[index].budgetName} (${percentage})`;
-};
-
 const handleRefresh = () => {
     refreshWidget();
 };
 
-defineExpose<WidgetExpose<Data[]>>({
+defineExpose<WidgetExpose<Data>>({
     initWidget,
     refreshWidget,
 });
@@ -170,10 +198,11 @@ defineExpose<WidgetExpose<Data[]>>({
     .chart-wrapper {
         width: 100%;
         height: 100%;
-        padding: 0 1.5rem 1.5rem 1.5rem;
+        position: relative;
+        padding: 0 1.5rem 1rem 1.5rem;
         .waffle-chart {
             display: flex;
-            height: 85%;
+            height: 87%;
             gap: 0.25rem;
             .status-col-wrapper {
                 display: grid;
@@ -191,6 +220,8 @@ defineExpose<WidgetExpose<Data[]>>({
         }
         .legend-wrapper {
             @apply text-gray-600;
+            position: absolute;
+            bottom: 0;
             display: flex;
             gap: 0.75rem;
             font-size: 0.75rem;

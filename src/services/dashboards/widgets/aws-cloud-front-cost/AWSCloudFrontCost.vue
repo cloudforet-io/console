@@ -45,6 +45,7 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
 import bytes from 'bytes';
@@ -56,13 +57,17 @@ import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ReferenceType } from '@/store/modules/reference/type';
+
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
@@ -71,8 +76,8 @@ import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components
 import type { UsageType, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
-import { getLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { getXYChartLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { getReferenceTypeOfGroupBy, sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -112,8 +117,10 @@ const state = reactive({
             type: state.fieldsKey === 'usd_cost' ? 'cost' : 'size',
             sourceUnit: USAGE_SOURCE_UNIT,
         };
+        const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
+        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
         return [
-            GROUP_BY_ITEM_MAP[state.groupBy],
+            { name: state.groupBy, label: groupByLabel, textOptions: { type: 'reference', referenceType } },
             { name: `${state.fieldsKey}_sum.0.value`, label: 'Transfer-out', textOptions },
             { name: `${state.fieldsKey}_sum.1.value`, label: 'Requests (HTTP)' },
             { name: `${state.fieldsKey}_sum.2.value`, label: 'Requests (HTTPS)' },
@@ -126,6 +133,16 @@ const state = reactive({
         return { start, end };
     }),
     thisPage: 1,
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        params: {},
+        query: {
+            granularity: primitiveToQueryString(state.granularity),
+            group_by: arrayToQueryString([state.groupBy]),
+            period: objectToQueryString(state.dateRange),
+            filters: objectToQueryString({ ...state.options.filters, provider: ['aws'], product: ['AmazonCloudFront'] }),
+        },
+    })),
 });
 
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
@@ -141,29 +158,29 @@ const fetchData = async (): Promise<FullData> => {
             { k: 'product', v: 'AmazonCloudFront', o: '=' },
             { k: 'usage_type', v: null, o: '!=' },
         ]);
-        const query = {
-            granularity: state.granularity,
-            group_by: [state.groupBy, 'usage_type'],
-            start: state.dateRange.start,
-            end: state.dateRange.end,
-            fields: {
-                usd_cost_sum: {
-                    key: 'usd_cost',
-                    operator: 'sum',
+        apiQueryHelper.addFilter(...state.consoleFilters);
+        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+            query: {
+                granularity: state.granularity,
+                group_by: [state.groupBy, 'usage_type'],
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                fields: {
+                    usd_cost_sum: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
+                    usage_quantity_sum: {
+                        key: 'usage_quantity',
+                        operator: 'sum',
+                    },
                 },
-                usage_quantity_sum: {
-                    key: 'usage_quantity',
-                    operator: 'sum',
-                },
+                sort: [{ key: '_total_usd_cost_sum', desc: true }],
+                field_group: ['usage_type'],
+                ...apiQueryHelper.data,
             },
-            sort: [{ key: '_total_usd_cost_sum', desc: true }],
-            field_group: ['usage_type'],
-            ...apiQueryHelper.data,
-        };
-        if (state.pageSize) {
-            query.page = { start: getPageStart(state.thisPage, state.pageSize), limit: state.pageSize };
-        }
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
+        });
         return { results: sortTableData(results, 'usage_type'), more };
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -224,7 +241,7 @@ const drawChart = (chartData) => {
 const initWidget = async (data?: FullData) => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     drawChart(state.chartData);
     state.loading = false;
@@ -235,7 +252,7 @@ const refreshWidget = async (thisPage = 1) => {
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.refreshRoot();
     drawChart(state.chartData);
@@ -269,7 +286,7 @@ defineExpose<WidgetExpose<FullData>>({
 <style lang="postcss" scoped>
 .aws-cloud-front-cost {
     .chart-wrapper {
-        height: 50%;
+        height: 10.75rem;
         .chart-loader {
             height: 100%;
             .chart {

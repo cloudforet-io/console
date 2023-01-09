@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard-customize-page">
-        <dashboard-customize-page-name :name="dashboardDetailState.dashboardName"
-                                       :dashboard-id="dashboardId"
+        <dashboard-customize-page-name :name.sync="state.name"
+                                       :dashboard-id="props.dashboardId"
                                        @update:name="handleUpdateDashboardName"
         />
         <div class="filters-box">
@@ -62,7 +62,7 @@
 <script setup lang="ts">
 import type Vue from 'vue';
 import {
-    computed, getCurrentInstance, onBeforeUnmount, onMounted, reactive,
+    computed, getCurrentInstance, onBeforeUnmount, onMounted, reactive, watch,
 } from 'vue';
 
 import { PDivider, PI } from '@spaceone/design-system';
@@ -107,6 +107,7 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
+    name: dashboardDetailState.dashboardName,
     refreshInterval: undefined,
     apiParam: computed<Partial<DashboardConfig>>(() => ({
         name: dashboardDetailState.dashboardName,
@@ -134,8 +135,7 @@ const variableState = reactive({
 /* Api */
 const getDashboardData = async () => {
     try {
-        await dashboardDetailStore.getDashboardData(props.dashboardId);
-        console.log('here');
+        await dashboardDetailStore.getDashboardInfo(props.dashboardId);
         variableState.originVariables = { ...dashboardDetailState.variables };
         variableState.originVariablesSchema = { ...dashboardDetailState.variables_schema };
     } catch (e) {
@@ -147,15 +147,18 @@ const updateDashboardData = async () => {
     try {
         if (dashboardDetailState.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
-                project_dashboard_id: props.dashboardId,
                 ...state.apiParam,
+                name: state.name,
+                project_dashboard_id: props.dashboardId,
             });
         } else {
             await SpaceConnector.clientV2.dashboard.domainDashboard.update({
-                domain_dashboard_id: props.dashboardId,
                 ...state.apiParam,
+                name: state.name,
+                domain_dashboard_id: props.dashboardId,
             });
         }
+        await dashboardDetailStore.getDashboardInfo(props.dashboardId, true);
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
@@ -172,16 +175,19 @@ const createDashboard = async () => {
         if (dashboardDetailState.isProjectDashboard) {
             const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
                 ...state.apiParam,
+                name: state.name,
                 viewers: dashboardDetailState.dashboardViewer,
             });
             dashboardDetailState.dashboardId = result.project_dashboard_id;
         } else {
             const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create({
                 ...state.apiParam,
+                name: state.name,
                 viewers: dashboardDetailState.dashboardViewer,
             });
             dashboardDetailState.dashboardId = result.domain_dashboard_id;
         }
+        await dashboardDetailStore.getDashboardInfo(dashboardDetailState.dashboardId, true);
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
@@ -196,7 +202,7 @@ const createDashboard = async () => {
 
 /* Event */
 const handleUpdateDashboardName = (name: string) => {
-    dashboardDetailState.dashboardName = name;
+    state.name = name;
 };
 const handleUpdateLabelList = (labels: Array<string>) => {
     dashboardDetailState.labels = [...labels];
@@ -251,16 +257,17 @@ const handleUnload = (event) => {
     event.preventDefault(); event.returnValue = '';
 };
 
+watch(() => dashboardDetailState.dashboardName, (name: string) => {
+    state.name = name;
+});
+
 onMounted(() => {
+    getDashboardData();
     window.addEventListener('beforeunload', handleUnload);
 });
 
 onBeforeUnmount(() => {
     window.removeEventListener('beforeunload', handleUnload);
-});
-
-onMounted(() => {
-    getDashboardData();
 });
 </script>
 

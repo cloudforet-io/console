@@ -169,8 +169,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.widgetDataMap = {};
     };
 
-    const getDashboardData = async (dashboardId?: string) => {
-        if (dashboardId === state.dashboardId || dashboardId === undefined) return;
+    const getDashboardInfo = async (dashboardId: undefined|string, force = false) => {
+        if (!force && (dashboardId === state.dashboardId || dashboardId === undefined)) return;
 
         state.dashboardId = dashboardId;
         state.loadingDashboard = true;
@@ -234,7 +234,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     return {
         state,
-        getDashboardData,
+        getDashboardInfo,
         resetDashboardSettings,
         setDashboardInfo,
         toggleWidgetSize,

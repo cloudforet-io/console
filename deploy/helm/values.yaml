@@ -10,6 +10,15 @@ image:
     version: latest
 imagePullPolicy: IfNotPresent
 
+resources: {}
+#     grpc: 
+#         requests:
+#             memory: "128Mi"
+#             cpu: "25m"
+#         limits:
+#             memory: "256Mi"
+#             cpu: "50m"
+
 # For production.json (nodejs)
 # console_api: https://console-api.console.spaceone.dev
 # Domain name of console-api (usually ALB of console-api)

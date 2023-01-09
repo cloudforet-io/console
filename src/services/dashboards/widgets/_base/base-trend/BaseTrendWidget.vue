@@ -1,7 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="base-trend-widget"
-                  @refresh="handleRefresh"
+                  @refresh="refreshWidget"
     >
         <template v-if="state.selectorItems.length"
                   #header-right
@@ -46,6 +46,7 @@ import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
@@ -54,12 +55,16 @@ import { cloneDeep } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ReferenceType } from '@/store/modules/reference/type';
+
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
@@ -72,7 +77,7 @@ import type {
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getDateAxisSettings,
-    getLegends,
+    getXYChartLegends,
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import {
@@ -116,37 +121,50 @@ const state = reactive({
         ];
     }),
     dateRange: computed<DateRange>(() => {
-        const end = state.settings?.date_range?.end ?? dayjs.utc().format(DATE_FORMAT);
+        const end = dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT);
         const range = props.size === WIDGET_SIZE.full ? 11 : 3;
         const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
     legends: [] as Legend[],
     thisPage: 1,
+    disableReferenceColor: computed<boolean>(() => !!state.colorSet.length),
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        params: {},
+        query: {
+            granularity: primitiveToQueryString(state.granularity),
+            group_by: arrayToQueryString([state.groupBy]),
+            period: objectToQueryString(state.dateRange),
+            filters: objectToQueryString(state.options.filters),
+        },
+    })),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
 const fetchData = async (): Promise<FullData> => {
     try {
-        const query: any = {
-            granularity: state.granularity,
-            group_by: [state.groupBy],
-            start: state.dateRange.start,
-            end: state.dateRange.end,
-            fields: {
-                usd_cost_sum: {
-                    key: 'usd_cost',
-                    operator: 'sum',
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters(state.consoleFilters);
+        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+            query: {
+                granularity: state.granularity,
+                group_by: [state.groupBy],
+                start: state.dateRange.start,
+                end: state.dateRange.end,
+                fields: {
+                    usd_cost_sum: {
+                        key: 'usd_cost',
+                        operator: 'sum',
+                    },
                 },
+                sort: [{ key: '_total_usd_cost_sum', desc: true }],
+                field_group: ['date'],
+                ...apiQueryHelper.data,
             },
-            sort: [{ key: '_total_usd_cost_sum', desc: true }],
-            field_group: ['date'],
-        };
-        if (state.pageSize) {
-            query.page = { start: getPageStart(state.thisPage, state.pageSize), limit: state.pageSize };
-        }
-        const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({ query });
+        });
         return { results: sortTableData(results), more };
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -200,7 +218,7 @@ const drawChart = (chartData: XYChartData[]) => {
 const initWidget = async (data?: FullData) => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     await nextTick();
     drawChart(state.chartData);
     state.loading = false;
@@ -211,7 +229,7 @@ const refreshWidget = async (thisPage = 1) => {
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
-    state.legends = getLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     await nextTick();
     chartHelper.refreshRoot();
     drawChart(state.chartData);
@@ -231,9 +249,6 @@ const handleUpdateThisPage = (thisPage: number) => {
     state.thisPage = thisPage;
     refreshWidget(thisPage);
 };
-const handleRefresh = () => {
-    refreshWidget();
-};
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
@@ -248,7 +263,7 @@ defineExpose<WidgetExpose<FullData>>({
 <style lang="postcss" scoped>
 .base-trend-widget {
     .chart-wrapper {
-        height: 11.5rem;
+        height: 10.75rem;
         .chart-loader {
             height: 100%;
             .chart {

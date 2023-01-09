@@ -1,10 +1,12 @@
-import type { ComputedRef } from 'vue';
+import type { ComputedRef, UnwrapRef } from 'vue';
 import {
     computed, reactive,
 } from 'vue';
 
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { merge } from 'lodash';
+import { isEmpty, merge } from 'lodash';
+
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
@@ -20,6 +22,7 @@ import type {
     InheritOptions, WidgetProps,
     Granularity, GroupBy,
     SelectorType,
+    WidgetFiltersMap,
 } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { WIDGET_THEMES } from '@/services/dashboards/widgets/_configs/view-config';
@@ -59,48 +62,62 @@ const getColorSet = (theme: WidgetTheme, colorSetType: WidgetColorSetType = 'bas
     return colorSet;
 };
 
+const convertWidgetFiltersToConsoleFilters = (filters?: WidgetFiltersMap): ConsoleFilter[] => {
+    if (!filters || isEmpty(filters)) return [];
+    const results: ConsoleFilter[] = [];
+    Object.entries(filters).forEach(([property, widgetFilters]) => {
+        const values = widgetFilters.map((d) => d.v);
+        if (property && values.length) {
+            results.push({ k: property, v: values, o: '=' });
+        }
+    });
+    return results;
+};
+
+
 export interface WidgetState<Data = any> {
     widgetConfig: ComputedRef<WidgetConfig>;
-    title: ComputedRef<string>;
+    title: ComputedRef<string|undefined>;
     options: ComputedRef<WidgetOptions>;
     currency: ComputedRef<Currency>;
-    groupBy: ComputedRef<GroupBy | string>;
-    granularity: ComputedRef<Granularity>;
+    groupBy: ComputedRef<GroupBy | string | undefined>;
+    granularity: ComputedRef<Granularity|undefined>;
     chartType: ComputedRef<ChartType|undefined>;
-    size: ComputedRef<WidgetSize>;
+    size: ComputedRef<WidgetSize|undefined>;
     loading: boolean;
-    settings: ComputedRef<DashboardSettings>;
+    settings: ComputedRef<DashboardSettings|undefined>;
     data: undefined|Data;
     colorSet: ComputedRef<string[]>;
     selectorItems: ComputedRef<MenuItem[]>;
     selectedSelectorType?: SelectorType;
     pageSize: ComputedRef<number|undefined>;
+    consoleFilters: ComputedRef<ConsoleFilter[]>;
 }
 export function useWidgetState<Data = any>(
     props: WidgetProps,
 ) {
     const state = reactive<WidgetState<Data>>({
         widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(props.widgetConfigId)),
-        title: computed<string>(() => props.title ?? state.widgetConfig.title),
+        title: computed(() => props.title ?? state.widgetConfig.title),
         options: computed<WidgetOptions>(() => getRefinedOptions(
             state.widgetConfig.options,
             props.options,
             props.inheritOptions,
             props.dashboardVariables,
         )),
-        currency: computed(() => state.settings.currency?.value ?? CURRENCY.USD),
-        groupBy: computed<GroupBy|string>(() => state.options?.group_by),
-        granularity: computed<Granularity>(() => state.options?.granularity),
+        currency: computed(() => state.settings?.currency?.value ?? CURRENCY.USD),
+        groupBy: computed(() => state.options?.group_by),
+        granularity: computed(() => state.options?.granularity),
         chartType: computed<ChartType|undefined>(() => state.options?.chart_type),
-        size: computed<WidgetSize>(() => {
-            if (state.widgetConfig.sizes.includes(props.size)) return props.size;
+        size: computed(() => {
+            if (props.size && state.widgetConfig.sizes.includes(props.size)) return props.size;
             return state.widgetConfig.sizes[0];
         }),
         loading: true,
-        settings: computed<DashboardSettings>(() => props.dashboardSettings),
+        settings: computed<DashboardSettings|undefined>(() => props.dashboardSettings),
         data: undefined as Data|undefined,
         colorSet: computed<string[]>(() => {
-            if (!props.theme) return [];
+            if (!props.theme || !Array.isArray(state.data)) return [];
             const colorSetType: WidgetColorSetType = state.data?.length > 9 ? 'massive' : 'basic';
             return getColorSet(props.theme, colorSetType);
         }),
@@ -124,7 +141,8 @@ export function useWidgetState<Data = any>(
             if (state.options?.pagination_options?.enabled) return state.options.pagination_options.page_size;
             return undefined;
         }),
-    });
+        consoleFilters: computed(() => convertWidgetFiltersToConsoleFilters(state.options?.filters)),
+    }) as UnwrapRef<WidgetState<Data>>;
 
     return state;
 }

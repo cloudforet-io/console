@@ -12,6 +12,17 @@ export interface CostAnalyzeDataModel {
             [field_group: string]: any;
             value: number
         }> | number;
+        _total_usd_cost_sum?: number;
+        _total_usage_quantity_sum?: number;
+    }>;
+}
+
+export interface BudgetDataModel {
+    more?: boolean;
+    results: Array<{
+        [groupBy: string]: string | any; // budget_id: 'budget-xxxx'
+        total_spent?: number;
+        total_budget?: number;
     }>;
 }
 
@@ -37,4 +48,10 @@ export interface TreemapChartData {
         background_color?: string;
         font_color?: string;
     }>;
+}
+
+export interface PieChartData {
+    [groupBy: string]: string | any;
+    usd_cost_sum?: number;
+    usage_quantity_sum?: number;
 }

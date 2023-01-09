@@ -42,6 +42,7 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
@@ -50,9 +51,12 @@ import { cloneDeep } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
@@ -62,7 +66,7 @@ import type { WidgetProps, WidgetExpose, UsageType } from '@/services/dashboards
 import { CHART_TYPE, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import {
     getDateAxisSettings,
-    getLegends,
+    getXYChartLegends,
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import {
@@ -114,6 +118,16 @@ const state = reactive({
         return { start, end };
     }),
     legends: [] as Legend[],
+    widgetLocation: computed<Location>(() => ({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+        params: {},
+        query: {
+            granularity: primitiveToQueryString(state.granularity),
+            group_by: arrayToQueryString([state.groupBy]),
+            period: objectToQueryString(state.dateRange),
+            filters: objectToQueryString({ ...state.options.filters, provider: ['aws'], product: ['AWSDataTransfer'] }),
+        },
+    })),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
@@ -132,6 +146,7 @@ const fetchData = async (): Promise<CostAnalyzeDataModel['results']> => {
             { k: 'product', v: 'AWSDataTransfer', o: '=' },
             { k: 'usage_type', v: null, o: '!=' },
         ]);
+        apiQueryHelper.addFilter(...state.consoleFilters);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.granularity,
@@ -211,7 +226,7 @@ const drawChart = (chartData: XYChartData[]) => {
 const initWidget = async (data?: CostAnalyzeDataModel['results']) => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     drawChart(state.chartData);
     state.loading = false;
@@ -221,7 +236,7 @@ const initWidget = async (data?: CostAnalyzeDataModel['results']) => {
 const refreshWidget = async () => {
     state.loading = true;
     state.data = await fetchData();
-    state.legends = getLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
+    state.legends = getXYChartLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
     chartHelper.refreshRoot();
     drawChart(state.chartData);
@@ -253,7 +268,7 @@ defineExpose<WidgetExpose<CostAnalyzeDataModel['results']>>({
 <style lang="postcss" scoped>
 .aws-data-transfer-cost-trend {
     .chart-wrapper {
-        height: 11.5rem;
+        height: 10.75rem;
         .chart-loader {
             height: 100%;
             .chart {

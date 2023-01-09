@@ -83,6 +83,7 @@
                                                 <template v-if="colIndex === 0 && props.showLegend">
                                                     <p-status v-if="props.showLegend"
                                                               class="toggle-button"
+                                                              :class="{ 'disable-toggle': disableToggle }"
                                                               :text="props.showLegendIndex ? ((rowIndex) + 1)?.toString() : ''"
                                                               :icon-color="getLegendIconColor(rowIndex)"
                                                               :text-color="getLegendTextColor(rowIndex)"
@@ -96,7 +97,7 @@
                                                          class="icon"
                                                     />
                                                 </template>
-                                                <slot :name="`col-${colIndex}-text`"
+                                                <slot :name="`col-${field.name}-text`"
                                                       v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                                 >
                                                     <router-link v-if="getHandler(field.link, item)"
@@ -197,6 +198,7 @@ interface Props {
     showNextPage?: boolean;
     allReferenceTypeInfo?: AllReferenceTypeInfo;
     colorSet?: string[];
+    disableToggle?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -268,7 +270,7 @@ const textFormatter = (value:string|number, textOptions: Field['textOptions']) =
     } if (textOptions?.type === 'number') {
         return numberFormatter(value);
     } if (textOptions?.type === 'percent') {
-        return `${value}%`;
+        return `${value.toFixed(1)}%`;
     }
     return value;
 };
@@ -391,6 +393,9 @@ const handleClickRow = (rowData) => {
                 .toggle-button {
                     cursor: pointer;
                     margin-right: -0.25rem;
+                    &.disable-toggle {
+                        cursor: default;
+                    }
                 }
 
                 .rapid-increase {
@@ -416,8 +421,11 @@ const handleClickRow = (rowData) => {
         &.right {
             @apply text-right;
         }
-        &.link-item:hover {
+        &.detail-item:hover {
             @apply bg-blue-100;
+            .detail {
+                @apply underline;
+            }
         }
 
         &.sm {

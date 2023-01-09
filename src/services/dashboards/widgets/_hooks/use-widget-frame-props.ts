@@ -25,7 +25,7 @@ interface WidgetFrameProps {
 
 type WidgetFrameBaseProps = WidgetFrameState & WidgetFrameProps;
 
-export const useWidgetFrameProps = (props: WidgetFrameProps, state: WidgetFrameState):ComputedRef => computed<WidgetFrameBaseProps>(() => ({
+export const useWidgetFrameProps = (props: any, state: any):ComputedRef => computed<WidgetFrameBaseProps>(() => ({
     widgetKey: props.widgetKey,
     width: props.width,
     editMode: props.editMode,
@@ -36,4 +36,5 @@ export const useWidgetFrameProps = (props: WidgetFrameProps, state: WidgetFrameS
     currency: state.currency,
     disableFullSize: !state.widgetConfig?.sizes.includes(WIDGET_SIZE.full),
     isOnlyFullSize: state.widgetConfig?.sizes.length === 1 && state.widgetConfig?.sizes[0] === WIDGET_SIZE.full,
+    widgetLocation: state.widgetLocation,
 }));
