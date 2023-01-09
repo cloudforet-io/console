@@ -25,7 +25,7 @@
     "dayjs": "^1.10.7",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
-    "luxon": "^1.27.0"
+    "luxon": "^1.28.1"
   },
   "devDependencies": {
     "@types/bytes": "^3.1.1",
