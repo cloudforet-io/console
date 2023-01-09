@@ -100,8 +100,7 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 const fetchData = async (): Promise<TreemapChartData[]> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters([{ k: state.groupBy, v: null, o: '!=' }]);
-        apiQueryHelper.addFilter(...state.consoleFilters);
+        apiQueryHelper.setFilters(state.consoleFilters);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.options.granularity,
