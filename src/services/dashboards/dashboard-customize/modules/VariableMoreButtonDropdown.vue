@@ -17,9 +17,10 @@
                         use-fixed-menu-style
                         :style="fixedMenuStyle"
                         :menu="reorderedMenu"
-                        :selected.sync="selected"
+                        :selected="selected"
                         multi-selectable
                         show-clear-selection
+                        @update:selected="handleSelectVariable"
         >
             <template #bottom>
                 <p-button class="manage-variable-button"
@@ -38,35 +39,42 @@
 // CAUTION: this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    reactive, toRefs, watch,
+    computed,
+    reactive, toRefs,
 } from 'vue';
 
 import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 
-interface Props {
-    variables: DashboardVariablesSchema['properties'];
-    variableOrder: string[];
-}
-interface EventEmits {
-    (e: string, value: string): void;
-    (e: 'change', value: DashboardVariablesSchema['properties']): void;
-}
-
-const props = defineProps<Props>();
-const emit = defineEmits<EventEmits>();
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as typeof PContextMenu | null,
-    variableList: [] as MenuItem[],
-    selected: [] as MenuItem[],
+    variableSchema: computed(() => dashboardDetailState.variables_schema),
+    variableList: computed<MenuItem[]>(() => state.variableSchema.order.map((property) => {
+        const currentProperty = state.variableSchema.properties[property];
+        return ({
+            name: property, label: currentProperty.name,
+        });
+    })),
+    selected: computed<MenuItem[]>(() => {
+        const result = [] as MenuItem[];
+        state.variableSchema.order.forEach((property) => {
+            const currentProperty = state.variableSchema.properties[property];
+            if (!currentProperty.use) return;
+            result.push({ name: property, label: currentProperty.name });
+        });
+        return result;
+    }),
+    // Since variable's use changes after the dropdown is closed, create state to store the previous state and use it.
+    selectedForUpdate: [] as MenuItem[],
 });
 
 const {
@@ -91,65 +99,32 @@ const {
     selected,
 });
 
+// helper
+const updateVariablesUse = () => {
+    state.variableSchema.order.forEach((property) => {
+        dashboardDetailStore.updateVariableUse(property, state.selectedForUpdate.some((menu) => menu.name === property));
+    });
+};
+
 // event
 const handleOpenOverlay = () => {
     hideContextMenu();
+    updateVariablesUse();
     SpaceRouter.router.push({ hash: MANAGE_VARIABLES_HASH_NAME });
 };
 const handleClickButton = () => {
     if (visibleMenu.value) {
         hideContextMenu();
+        // Reflect selectedForUpdate changes after the dropdown is closed.
+        updateVariablesUse();
     } else {
+        state.selectedForUpdate = state.selected;
         showContextMenu(true); // update reorderedMenu automatically
     }
 };
-
-// After context menu is hidden, update selected variable's use.
-// TODO: refactor
-watch(() => visibleMenu.value, () => {
-    if (visibleMenu.value) return;
-    const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
-    props.variableOrder.forEach((d) => {
-        properties[d].use = state.selected.some((item) => item.name === d);
-    });
-    emit('change', properties);
-});
-// watch([visibleMenu, reorderedMenu], ([_visibleMenu]) => {
-//     if (_visibleMenu) {
-//         return;
-//     }
-//
-//     // const [, prevReorderedMenu] = prev;
-//     // if (_reorderedMenu === prevReorderedMenu) {
-//     //     return;
-//     // }
-//
-//     const properties = { ...props.variables };
-//     selected.value.forEach((item) => {
-//         if (!item.name) return;
-//         if (!properties[item.name].use) return;
-//         properties[item.name] = { ...props.variables[item.name], use: true };
-//     });
-//     emit('change', properties);
-// });
-
-watch(() => props.variables, (variables) => {
-    const properties = variables;
-    const defaultSelected = [] as MenuItem[];
-    const defaultVariableList = [] as MenuItem[];
-    props.variableOrder.forEach((d) => {
-        const currentProperty = properties[d];
-        defaultVariableList.push({
-            name: d, label: currentProperty.name,
-        });
-        if (!currentProperty?.use) return;
-        defaultSelected.push({
-            name: d, label: currentProperty.name,
-        });
-    });
-    state.variableList = defaultVariableList;
-    state.selected = defaultSelected;
-}, { immediate: true });
+const handleSelectVariable = (changedSelected: MenuItem[]) => {
+    state.selectedForUpdate = changedSelected;
+};
 
 </script>
 

@@ -22,10 +22,7 @@
                                                 :property-name="propertyName"
                     />
                 </template>
-                <variable-more-button-dropdown :variables="variableState.variableProperties"
-                                               :variable-order="variableState.order"
-                                               @change="handleChangeVariable"
-                />
+                <variable-more-button-dropdown />
                 <button class="reset-button"
                         @click="handleResetVariables"
                 >
@@ -217,6 +214,7 @@ const handleChangeVariable = (variables: DashboardVariablesSchema['properties'],
 };
 
 const resetVariablesSchema = () => {
+    // TODO: refactor after store is changed
     const originProperties = variableState.originVariablesSchema.properties;
     // variableState.order is current variable properties' name list
     // result of reset should reflect updated variables schema.
@@ -227,6 +225,7 @@ const resetVariablesSchema = () => {
 };
 
 const resetVariables = () => {
+    // TODO: refactor after store is changed
     const originProperties = variableState.originVariablesSchema.properties;
     const originOrder = variableState.originVariablesSchema.order;
     const originVariables = variableState.originVariables;
