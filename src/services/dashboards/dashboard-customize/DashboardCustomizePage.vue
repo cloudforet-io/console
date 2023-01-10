@@ -20,7 +20,7 @@
                     <variable-selector-dropdown v-if="variableState.variableProperties[propertyName]?.use"
                                                 :key="`${propertyName}-${idx}`"
                                                 :property-name="propertyName"
-                                                :reference-map="variableState.referenceType[propertyName]?.referenceMap"
+                                                :reference-map="variableState.allReferenceTypeInfo[propertyName]?.referenceMap"
                     />
                 </template>
                 <variable-more-button-dropdown />
@@ -116,7 +116,7 @@ const variableState = reactive({
     variableData: computed(() => dashboardDetailState.variables),
     variableProperties: computed(() => dashboardDetailState.variablesSchema.properties),
     order: computed(() => dashboardDetailState.variablesSchema.order),
-    referenceType: computed(() => store.getters['reference/allReferenceTypeInfo']),
+    allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
 });
 
 /* Api */

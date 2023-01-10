@@ -68,12 +68,14 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
 
+import type { ReferenceMap } from '@/store/modules/reference/type';
+
 import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 
 interface Props {
     propertyName: string;
-    referenceMap: any;
+    referenceMap: ReferenceMap;
 }
 
 const props = defineProps<Props>();
@@ -103,8 +105,8 @@ const state = reactive({
     options: computed<MenuItem[]>(() => {
         let result;
         if (state.variableProperty.variable_type === 'MANAGED') {
-            result = Object.keys(props.referenceMap).map((reference) => ({
-                name: props.referenceMap[reference].key, label: props.referenceMap[reference].label,
+            result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
+                name: referenceKey, label: referenceItem.label,
             }));
         } else result = state.variableProperty.options?.map((d) => ({ name: d, label: d }));
         return result;
