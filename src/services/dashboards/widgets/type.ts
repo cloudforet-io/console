@@ -23,6 +23,7 @@ export interface BudgetDataModel {
         [groupBy: string]: string | any; // budget_id: 'budget-xxxx'
         total_spent?: number;
         total_budget?: number;
+        budget_usage?: number;
     }>;
 }
 
