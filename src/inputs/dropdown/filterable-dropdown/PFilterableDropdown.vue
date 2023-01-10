@@ -6,7 +6,7 @@
         <div ref="targetRef"
              class="dropdown-button"
              :tabindex="disabled || readonly ? -1 : 0"
-             @keyup.down="focusMenu"
+             @keyup.down="focusOnContextMenu(0)"
              @keyup.esc.capture.stop="hideMenu"
              @keyup.enter.capture.stop="toggleMenu"
              @click="toggleMenu"
@@ -57,20 +57,20 @@
                         class="dropdown-context-menu"
                         :search-text="proxySearchText"
                         searchable
-                        :menu="displayMenuItems"
-                        :loading="props.loading || handlerLoading"
+                        :menu="refinedMenu"
+                        :loading="props.loading || loading"
                         :readonly="props.readonly"
                         :selected="proxySelected"
                         :multi-selectable="props.multiSelectable"
                         :show-select-header="props.showSelectHeader"
                         :show-select-marker="props.showSelectMarker"
-                        :style="fixedMenuStyle"
+                        :style="contextMenuStyle"
                         :class="{ default: !props.showSelectMarker }"
                         @select="handleSelectMenuItem"
                         @click-done="hideMenu"
                         @click-show-more="handleClickShowMore"
                         @keyup:up:end="focusDropdownButton"
-                        @keyup:down:end="focusMenu"
+                        @keyup:down:end="focusOnContextMenu()"
                         @keyup:esc="hideMenu"
                         @update:selected="handleUpdateSelected"
                         @update:search-text="handleUpdateSearchText"
@@ -95,7 +95,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
-import { reduce } from 'lodash';
+import { debounce, reduce } from 'lodash';
 
 import PBadge from '@/data-display/badges/PBadge.vue';
 import PTag from '@/data-display/tags/PTag.vue';
@@ -103,12 +103,10 @@ import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuController, useProxyValue } from '@/hooks';
 import { useIgnoreWindowArrowKeydownEvents } from '@/hooks/ignore-window-arrow-keydown-events';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import type { MenuItem } from '@/inputs/context-menu/type';
 import {
     useFilterableDropdownButtonDisplay,
 } from '@/inputs/dropdown/filterable-dropdown/composables/filterable-dropdown-button-display';
-import {
-    useFilterableDropdownMenuFiltering,
-} from '@/inputs/dropdown/filterable-dropdown/composables/filterable-dropdown-menu-filtering';
 import type {
     FilterableDropdownMenuItem,
     AutocompleteHandler, FilterableDropdownAppearanceType,
@@ -158,6 +156,26 @@ const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void
     (e: 'click-show-more'): void;
 }>();
 
+
+/* selection */
+const proxySelected = ref<MenuItem[]>(props.selected);
+const updateSelected = (selected: MenuItem[]) => {
+    if (proxySelected.value !== selected && !(proxySelected.value.length === 0 && selected.length === 0)) {
+        proxySelected.value = selected;
+        emit('update:selected', selected);
+    }
+};
+watch(() => props.selected, (selected) => {
+    updateSelected(selected);
+});
+const handleSelectMenuItem = (item: FilterableDropdownMenuItem) => {
+    if (!props.multiSelectable) hideMenu();
+    emit('select', item);
+};
+const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
+    updateSelected(selected);
+};
+
 /* menu visibility */
 const proxyVisibleMenu = useProxyValue<boolean>('visibleMenu', props, emit);
 const hideMenu = () => {
@@ -174,16 +192,30 @@ const toggleMenu = () => {
     else showMenu();
 };
 
-/* context menu style */
+/* context menu controller */
 const menuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement|null>(null);
+const proxySearchText = useProxyValue('searchText', props, emit);
 const {
-    fixedMenuStyle,
+    contextMenuStyle,
+    loading,
+    refinedMenu,
+    focusOnContextMenu,
+    initiateMenu,
+    reloadMenu,
+    showMoreMenu,
 } = useContextMenuController({
     useFixedStyle: computed(() => props.useFixedMenuStyle),
     targetRef,
     contextMenuRef: menuRef,
     visibleMenu: proxyVisibleMenu,
+    useMenuFiltering: true,
+    useReorderBySelection: true,
+    searchText: proxySearchText,
+    selected: proxySelected,
+    handler: toRef(props, 'handler'),
+    menu: toRef(props, 'menu'),
+    pageSize: toRef(props, 'pageSize'),
 });
 
 /* focusing */
@@ -192,53 +224,25 @@ const focusDropdownButton = () => {
     if (focusedOnDropdownButton.value) return;
     focusedOnDropdownButton.value = true;
 };
-const focusMenu = () => {
-    if (!proxyVisibleMenu.value) showMenu();
-    if (menuRef.value) menuRef.value.focus();
-};
 
-/* menu filtering */
-const proxySearchText = useProxyValue('searchText', props, emit);
-const {
-    handlerLoading,
-    displayMenuItems,
-    resetMenu,
-    filterMenu,
-    attachMoreItems,
-} = useFilterableDropdownMenuFiltering({
-    searchText: proxySearchText,
-    disableHandler: toRef(props, 'disableHandler'),
-    handler: toRef(props, 'handler'),
-    menu: toRef(props, 'menu'),
-    pageSize: toRef(props, 'pageSize'),
-});
+/* refining menu */
 const handleClickShowMore = async () => {
-    await attachMoreItems();
+    if (!props.disableHandler) {
+        await showMoreMenu();
+    }
     emit('click-show-more');
 };
-const handleUpdateSearchText = (searchText: string) => {
+const handleUpdateSearchText = debounce(async (searchText: string) => {
     proxySearchText.value = searchText;
-    filterMenu();
-};
-watch([() => props.menu, proxyVisibleMenu], ([, visibleMenu]) => {
-    if (visibleMenu) {
-        resetMenu();
-        filterMenu();
+    if (!props.disableHandler) {
+        await reloadMenu();
+    }
+}, 200);
+watch([() => props.menu, proxyVisibleMenu], async ([, visibleMenu]) => {
+    if (visibleMenu && !props.disableHandler) {
+        await initiateMenu();
     }
 }, { immediate: true });
-
-
-/* selection */
-const proxySelected = useProxyValue<FilterableDropdownMenuItem[]>('selected', props, emit);
-const handleSelectMenuItem = (item: FilterableDropdownMenuItem) => {
-    if (!props.multiSelectable) hideMenu();
-    emit('select', item);
-};
-const handleUpdateSelected = (selectedItems: FilterableDropdownMenuItem[]) => {
-    if (proxySelected.value !== selectedItems && !(proxySelected.value.length === 0 && selectedItems.length === 0)) {
-        proxySelected.value = selectedItems;
-    }
-};
 
 /* deletion */
 const showDeleteAllButton = computed(() => {
@@ -248,13 +252,13 @@ const showDeleteAllButton = computed(() => {
 });
 const handleClickDeleteAll = () => {
     if (proxySelected.value.length) {
-        proxySelected.value = [];
+        updateSelected([]);
     }
 };
 const handleTagDelete = (item: FilterableDropdownMenuItem, idx: number) => {
     const selectedClone = [...proxySelected.value];
     selectedClone.splice(idx, 1);
-    proxySelected.value = selectedClone;
+    updateSelected(selectedClone);
     emit('delete-tag', item, idx);
 };
 

@@ -77,7 +77,7 @@ export const Template = (args, { argTypes }) => ({
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown },
             template: `
-<div>
+<div style="width: 80%;">
         <p-filterable-dropdown :menu="menu"  />
 </div>
 `,
@@ -287,15 +287,18 @@ At this time, 6 is given as the value of the pageStart argument and 10 is given 
             props: Object.keys(getFilterableDropdownArgTypes()),
             components: { PFilterableDropdown, PButton },
             template: `
-            <div>
-                <p class="text-label-lg font-bold my-3">Without custom handler, with page size 5</p>
-                <p-filterable-dropdown :loading="loading" :menu="menu" :page-size="5" />
+            <div style="width: 90%;">
+                <p class="text-label-lg font-bold my-3">Without custom handler, single select, with page size 5</p>
+                <p-filterable-dropdown :menu="menu" :page-size="5" />
                 <br/>
-                <p class="text-label-lg font-bold my-3">With custom handler, with page size 5</p>
+                <p class="text-label-lg font-bold my-3">With custom handler, single select, with page size 5</p>
                 <p-filterable-dropdown :handler="simpleHandler" :page-size="5" />
                 <br/>
-                <p class="text-label-lg font-bold my-3">Disable handler, with page size 5</p>
-                <p-filterable-dropdown :menu="menu" disable-handler :page-size="5" />
+                <p class="text-label-lg font-bold my-3">Without custom handler, multi select, with page size 5</p>
+                <p-filterable-dropdown :menu="menu" multi-selectable :page-size="5" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">With custom handler, multi select, with page size 5</p>
+                <p-filterable-dropdown :handler="simpleHandler" multi-selectable :page-size="5" />
                 <br/>
             </div>
 `,

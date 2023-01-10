@@ -1,7 +1,7 @@
 import {
     computed, nextTick, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
-import type { ComputedRef, Ref } from 'vue';
+import type { Ref } from 'vue';
 import type Vue from 'vue';
 
 import type { ResizeObserverEntry } from '@juggle/resize-observer';
@@ -9,7 +9,7 @@ import { ResizeObserver } from '@juggle/resize-observer';
 import { throttle } from 'lodash';
 
 interface UseContextMenuFixedStyleOptions {
-    useFixedMenuStyle?: Ref<boolean|undefined> | ComputedRef<boolean|undefined> | boolean;
+    useFixedMenuStyle?: Ref<boolean|undefined> | boolean;
     visibleMenu: Ref<boolean|undefined>;
     targetRef?: Ref<Vue|HTMLElement|null>;
 }
@@ -30,7 +30,7 @@ const getScrollableParent = (ele?: Element|null): Element => {
 
 export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu, targetRef }: UseContextMenuFixedStyleOptions) => {
     const state = reactive({
-        useFixedMenuStyle,
+        useFixedMenuStyle: useFixedMenuStyle ?? false,
         visibleMenu,
     });
 
