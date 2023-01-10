@@ -9,7 +9,7 @@
                                           @select="handleSelectSelectorType"
             />
         </template>
-        <div class="content-wrapper">
+        <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
                            :loading="state.loading"
                            :data="state.data"
@@ -21,21 +21,22 @@
                      class="chart"
                 />
             </p-data-loader>
-            <widget-data-table :loading="state.loading"
-                               :fields="state.tableFields"
-                               :items="state.data?.results"
-                               :currency="state.currency"
-                               :currency-rates="props.currencyRates"
-                               :all-reference-type-info="props.allReferenceTypeInfo"
-                               :this-page="state.thisPage"
-                               :show-next-page="state.data?.more"
-                               :legends="state.legends"
-                               :color-set="colorSet"
-                               show-legend
-                               disable-toggle
-                               @update:thisPage="handleUpdateThisPage"
-            />
         </div>
+
+        <widget-data-table :loading="state.loading"
+                           :fields="state.tableFields"
+                           :items="state.data?.results"
+                           :currency="state.currency"
+                           :currency-rates="props.currencyRates"
+                           :all-reference-type-info="props.allReferenceTypeInfo"
+                           :this-page="state.thisPage"
+                           :show-next-page="state.data?.more"
+                           :legends="state.legends"
+                           :color-set="colorSet"
+                           show-legend
+                           disable-toggle
+                           @update:thisPage="handleUpdateThisPage"
+        />
     </widget-frame>
 </template>
 
@@ -282,7 +283,7 @@ defineExpose<WidgetExpose<FullData>>({
 </script>
 <style lang="postcss" scoped>
 .aws-data-transfer-by-region {
-    .content-wrapper {
+    .chart-wrapper {
         height: 10.75rem;
         .chart-loader {
             height: 100%;
@@ -293,6 +294,11 @@ defineExpose<WidgetExpose<FullData>>({
     }
     .widget-data-table {
         height: 50%;
+    }
+    &.full {
+        .widget-data-table {
+            height: auto;
+        }
     }
 }
 </style>
