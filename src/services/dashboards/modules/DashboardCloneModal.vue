@@ -54,6 +54,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -62,7 +63,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import type { DashboardViewer } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
-import type { DashboardModel } from '@/services/dashboards/model';
+import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 interface Props {
@@ -123,16 +124,34 @@ export default defineComponent<Props>({
             name: '',
             viewers: '',
         }, {
-            name(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
+            name(value: string) {
+                if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
+                if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
+                return '';
+            },
             viewers(value: DashboardViewer) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
         });
+
+        const dashboardDetailInfoStore = useDashboardDetailInfoStore();
         const state = reactive({
             proxyVisible: props.visible,
             filteredVisibilityList: computed(() => visibilityList),
+            isProjectDashboard: computed(() => Object.prototype.hasOwnProperty.call(props.dashboard, 'project_id')),
+            dashboardNameList: computed<string[]>(() => {
+                if (state.isProjectDashboard) {
+                    return store.state.dashboard.projectItems
+                        .filter((item) => (item.project_id === (props.dashboard as ProjectDashboardModel).project_id))
+                        .map((_item) => {
+                            if (_item.name !== props.dashboard?.name) return _item.name;
+                            return '';
+                        });
+                }
+                return store.state.dashboard.domainItems.map((item) => {
+                    if (item.name !== props.dashboard?.name) return item.name;
+                    return '';
+                });
+            }),
         });
-        const dashboardDetailInfoStore = useDashboardDetailInfoStore();
-        // const _invalid_unique = 'Dashboard name must be unique'; i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE')
-        // const _invalid_input = 'Please input dashboard name'; i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT')
 
         const handleUpdateVisible = (visible) => {
             state.proxyVisible = visible;
@@ -165,14 +184,13 @@ export default defineComponent<Props>({
 
         const handleConfirm = async () => {
             if (!isAllValid) return;
-            const isProjectDashboard = Object.prototype.hasOwnProperty.call(props.dashboard, 'project_id');
-            const clonedDashboardId = isProjectDashboard ? await createDomainDashboard() : await createProjectDashboard();
+            const clonedDashboardId = state.isProjectDashboard ? await createDomainDashboard() : await createProjectDashboard();
             // TODO:: connect dashboard store
             await dashboardDetailInfoStore.getDashboardInfo(clonedDashboardId);
             if (clonedDashboardId) {
                 await SpaceRouter.router.push({
                     name: DASHBOARDS_ROUTE.DETAIL._NAME,
-                    params: { dashboardScope: isProjectDashboard ? 'project' : 'domain', dashboardId: clonedDashboardId },
+                    params: { dashboardScope: state.isProjectDashboard ? 'project' : 'domain', dashboardId: clonedDashboardId },
                 });
             }
             emit('update:visible', false);
