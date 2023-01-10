@@ -161,7 +161,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
         };
         state.variables = {};
-        state.variables_schema = { properties: {}, order: [] };
+        state.variablesSchema = { properties: {}, order: [] };
         state.labels = [];
     };
 

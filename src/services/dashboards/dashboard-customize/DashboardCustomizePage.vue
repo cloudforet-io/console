@@ -47,11 +47,7 @@
                                      :enable-currency.sync="dashboardDetailState.settings.currency.enabled"
                                      @save="handleSave"
         />
-        <dashboard-manage-variable-overlay :visible="variableState.showOverlay"
-                                           :variables="variableState.variableProperties"
-                                           :order="variableState.order"
-                                           @change="handleChangeVariable"
-        />
+        <dashboard-manage-variable-overlay :visible="variableState.showOverlay" />
     </div>
 </template>
 
@@ -62,7 +58,7 @@ import {
 } from 'vue';
 
 import { PDivider, PI } from '@spaceone/design-system';
-import { cloneDeep, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -73,8 +69,7 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type {
-    DashboardConfig, DashboardVariablesSchema,
-    DashboardVariables,
+    DashboardConfig,
 } from '@/services/dashboards/config';
 import { DASHBOARD_SCOPE, MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
@@ -110,25 +105,21 @@ const state = reactive({
         settings: dashboardDetailState.settings,
         layouts: [dashboardDetailState.dashboardWidgetInfoList],
         variables: dashboardDetailState.variables,
-        variables_schema: dashboardDetailState.variables_schema,
+        variables_schema: dashboardDetailState.variablesSchema,
     })),
 });
 const vm = getCurrentInstance()?.proxy as Vue;
 const variableState = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
     variableData: computed(() => dashboardDetailState.variables),
-    variableProperties: computed(() => dashboardDetailState.variables_schema.properties),
-    order: computed(() => dashboardDetailState.variables_schema.order),
-    originVariables: {} as DashboardVariables,
-    originVariablesSchema: {} as DashboardVariablesSchema,
+    variableProperties: computed(() => dashboardDetailState.variablesSchema.properties),
+    order: computed(() => dashboardDetailState.variablesSchema.order),
 });
 
 /* Api */
 const getDashboardData = async () => {
     try {
         await dashboardDetailStore.getDashboardInfo(props.dashboardId);
-        variableState.originVariables = { ...dashboardDetailState.variables };
-        variableState.originVariablesSchema = { ...dashboardDetailState.variables_schema };
     } catch (e) {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
@@ -202,22 +193,12 @@ const handleSave = async () => {
     if (dashboardDetailState.dashboardId) await updateDashboardData();
     if (dashboardDetailState.dashboardId === undefined) await createDashboard();
 };
-const handleChangeVariable = (variables: DashboardVariablesSchema['properties'], order?: string[]) => {
-    dashboardDetailState.variables_schema.properties = variables;
-    if (order) dashboardDetailState.variables_schema.order = order;
-    const _variableData = cloneDeep(dashboardDetailState.variables);
-    variableState.order.forEach((d) => {
-        if (variables[d].use) return;
-        if (dashboardDetailState.variables[d]) delete _variableData[d];
-    });
-    dashboardDetailState.variables = _variableData;
-};
 
 const resetVariablesSchema = () => {
-    // TODO: refactor after store is changed
-    const originProperties = variableState.originVariablesSchema.properties;
+    const originProperties = dashboardDetailOriginState.dashboardInfo.variables_schema.properties;
     // variableState.order is current variable properties' name list
     // result of reset should reflect updated variables schema.
+    console.log(originProperties);
     variableState.order.forEach((property) => {
         if (!originProperties[property]) return;
         dashboardDetailStore.updateVariableUse(property, originProperties[property].use);
@@ -225,10 +206,9 @@ const resetVariablesSchema = () => {
 };
 
 const resetVariables = () => {
-    // TODO: refactor after store is changed
-    const originProperties = variableState.originVariablesSchema.properties;
-    const originOrder = variableState.originVariablesSchema.order;
-    const originVariables = variableState.originVariables;
+    const originProperties = dashboardDetailOriginState.dashboardInfo.variables_schema.properties;
+    const originOrder = dashboardDetailOriginState.dashboardInfo.variables_schema.order;
+    const originVariables = dashboardDetailOriginState.dashboardInfo.variables;
 
     originOrder.forEach((property) => {
         // CASE: existing variable is deleted.

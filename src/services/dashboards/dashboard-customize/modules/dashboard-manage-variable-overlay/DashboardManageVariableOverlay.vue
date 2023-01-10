@@ -8,7 +8,7 @@
         />
         <div class="content-wrapper">
             <p-panel-top :use-total-count="contentType === 'LIST'"
-                         :total-count="1"
+                         :total-count="variableSchema.order.length"
             >
                 <template #default>
                     {{ titleSet[contentType] }}
@@ -33,8 +33,8 @@
             </p-panel-top>
             <dashboard-manage-variable-table v-if="contentType === 'LIST'"
                                              :content-type.sync="contentType"
-                                             :variables="variables"
-                                             :order="order"
+                                             :variables="variableSchema.properties"
+                                             :order="variableSchema.order"
                                              @use-change="handleChangeVariableUse"
                                              @delete="handleOpenDeleteModal"
                                              @edit="handleChangeEditContent"
@@ -42,7 +42,7 @@
             <dashboard-manage-variable-form v-else
                                             :content-type.sync="contentType"
                                             :variable-names="variableNames"
-                                            :selected-variable="variables[selectedVariable]"
+                                            :selected-variable="variableSchema.properties[selectedVariable]"
                                             @save-click="handleSaveVariable"
                                             @cancel-click="handleClickCancel"
             />
@@ -85,18 +85,17 @@ import DashboardManageVariableTable
 import type {
     OverlayStatus,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 
 interface Props {
     visible: boolean;
-    variables: DashboardVariablesSchema['properties'];
-    order: string[];
-}
-interface EmitFn {
-    (e: 'change', variables: DashboardVariablesSchema['properties'], order?: string[]): void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<Props>();
-const emit = defineEmits<EmitFn>();
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     contentType: 'LIST' as OverlayStatus,
@@ -105,10 +104,11 @@ const state = reactive({
         ADD: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD'),
         EDIT: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SUB_TITLE_EDIT'),
     })),
+    variableSchema: computed(() => dashboardDetailState.variablesSchema),
     selectedVariable: '' as string,
     variableNames: computed<string[]>(() => {
-        const properties = props.variables;
-        return props.order.map((d) => properties[d].name).filter((name) => name !== properties[state.selectedVariable]?.name);
+        const properties = state.variableSchema.properties;
+        return state.variableSchema.order.map((d) => properties[d].name).filter((name) => name !== properties[state.selectedVariable]?.name);
     }),
 });
 
@@ -128,10 +128,11 @@ const deleteModalState = reactive({
 
 /* Helper */
 const deleteVariable = () => {
-    const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
+    const properties = cloneDeep(state.variableSchema.properties) as DashboardVariablesSchema['properties'];
     delete properties[state.selectedVariable];
-    const changedOrder = props.order.filter((d) => d !== state.selectedVariable);
-    emit('change', properties, changedOrder);
+    const order = state.variableSchema.order.filter((d) => d !== state.selectedVariable);
+    dashboardDetailState.variablesSchema = { properties, order };
+    delete dashboardDetailState.variables[state.selectedVariable];
 };
 const resetDeleteModalState = () => {
     deleteModalState.visible = false;
@@ -157,23 +158,25 @@ const handleConfirmModalAction = () => {
     resetDeleteModalState();
 };
 const handleChangeVariableUse = (name: string, value: boolean) => {
-    const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
+    const properties = cloneDeep(state.variableSchema.properties) as DashboardVariablesSchema['properties'];
     properties[name].use = value;
-    emit('change', properties);
+    dashboardDetailState.variablesSchema = { ...dashboardDetailState.variablesSchema, properties };
 };
 const handleChangeEditContent = (propertyName: string) => {
     state.selectedVariable = propertyName;
     state.contentType = 'EDIT';
 };
 const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
-    const properties = cloneDeep(props.variables) as DashboardVariablesSchema['properties'];
+    const properties = cloneDeep(state.variableSchema.properties) as DashboardVariablesSchema['properties'];
     if (state.contentType === 'ADD') {
         const variableKey = getUUID();
         properties[variableKey] = variable;
-        emit('change', properties, [...props.order, variableKey]);
+        dashboardDetailState.variablesSchema = { properties, order: [...state.variableSchema.order, variableKey] };
     } else {
-        properties[state.selectedVariable] = variable;
-        emit('change', properties);
+        const selectedProperty = state.selectedVariable;
+        properties[selectedProperty] = variable;
+        dashboardDetailState.variablesSchema = { ...dashboardDetailState.variablesSchema, properties };
+        delete dashboardDetailState.variables[selectedProperty];
     }
     state.selectedVariable = '';
     state.contentType = 'LIST';
@@ -192,7 +195,7 @@ const handleClickCancel = () => {
 };
 
 const {
-    contentType, titleSet, selectedVariable, variableNames,
+    contentType, titleSet, selectedVariable, variableNames, variableSchema,
 } = toRefs(state);
 
 </script>
