@@ -329,9 +329,6 @@ const handleDeleteModalConfirm = () => {
             }
         }
     }
-    &.full {
-        height: auto;
-    }
     &.edit-mode {
         position: relative;
     }

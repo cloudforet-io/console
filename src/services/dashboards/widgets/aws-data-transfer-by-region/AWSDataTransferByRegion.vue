@@ -291,5 +291,8 @@ defineExpose<WidgetExpose<FullData>>({
             }
         }
     }
+    .widget-data-table {
+        height: 50%;
+    }
 }
 </style>
