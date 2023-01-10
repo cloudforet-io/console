@@ -5,12 +5,12 @@
         <template v-for="(widget, idx) in widgetInfoList">
             <component :is="getWidgetComponent(widget.widget_name)"
                        v-if="widget"
-                       :id="widget.widgetKey"
-                       :key="widget.widgetKey"
+                       :id="widget.widget_key"
+                       :key="widget.widget_key"
                        ref="widgetRef"
                        v-intersection-observer="handleIntersectionObserver"
                        :widget-config-id="widget.widget_name"
-                       :widget-key="widget.widgetKey"
+                       :widget-key="widget.widget_key"
                        :title="widget.title"
                        :options="widget.widget_options"
                        :inherit-options="widget.inherit_options"
@@ -149,7 +149,7 @@ export default defineComponent<Props>({
             state.widgetSizeList = widgetInfoList.map((widget) => widget.size);
             const initiatedWidgetMap = {};
             widgetInfoList.forEach((widget) => {
-                initiatedWidgetMap[widget.widgetKey] = state.initiatedWidgetMap[widget.widgetKey];
+                initiatedWidgetMap[widget.widget_key] = state.initiatedWidgetMap[widget.widget_key];
             });
             state.initiatedWidgetMap = initiatedWidgetMap;
         }, { immediate: true, deep: true });

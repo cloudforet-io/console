@@ -33,7 +33,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardDefaultWidgetTab from '@/services/dashboards/dashboard-customize/modules/DashboardDefaultWidgetTab.vue';
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
-import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 
@@ -70,8 +70,8 @@ export default defineComponent<Props>({
         const handleConfirm = () => {
             if (!widgetFormState.widgetConfigId || !widgetFormState.widgetTitle) return;
             const widgetConfig = getWidgetConfig(widgetFormState.widgetConfigId);
-            const dashboardLayoutWidgetInfo: DashboardContainerWidgetInfo = {
-                widgetKey: uuidv4(),
+            const dashboardLayoutWidgetInfo: DashboardLayoutWidgetInfo = {
+                widget_key: uuidv4(),
                 widget_name: widgetFormState.widgetConfigId,
                 title: widgetFormState.widgetTitle,
                 size: widgetConfig.sizes[0],

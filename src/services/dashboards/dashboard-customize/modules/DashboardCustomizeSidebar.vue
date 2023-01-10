@@ -83,10 +83,10 @@ import { store } from '@/store';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardAddWidgetModal from '@/services/dashboards/dashboard-customize/modules/DashboardAddWidgetModal.vue';
-import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {
-    widgetInfoList: DashboardContainerWidgetInfo[];
+    widgetInfoList: DashboardLayoutWidgetInfo[];
     dashboardId?: string;
 }
 
@@ -119,7 +119,7 @@ const handleClickCancelButton = () => {
 const handleClickSaveButton = () => {
     emit('save');
 };
-const handleAddWidget = (newWidget: DashboardContainerWidgetInfo) => {
+const handleAddWidget = (newWidget: DashboardLayoutWidgetInfo) => {
     state.proxyWidgetInfoList = state.proxyWidgetInfoList.concat([newWidget]);
 };
 

@@ -73,7 +73,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     };
 
     const initWidgetForm = (widgetKey: string) => {
-        state.widgetInfo = dashboardDetailInfoStore.dashboardWidgetInfoList.find((w) => w.widgetKey === widgetKey);
+        state.widgetInfo = dashboardDetailInfoStore.dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
     };
 
     return {
