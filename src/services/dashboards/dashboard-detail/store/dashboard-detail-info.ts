@@ -4,7 +4,9 @@ import {
 } from 'vue';
 
 import dayjs from 'dayjs';
-import { cloneDeep, flattenDeep, union } from 'lodash';
+import {
+    cloneDeep, flattenDeep, isEqual, union,
+} from 'lodash';
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -167,11 +169,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     };
 
     const setDashboardInfo = (dashboardInfo: DashboardModel) => {
-        dashboardInfo.variables_schema = {
-            properties: { ...managedDashboardVariablesSchema.properties, ...dashboardInfo.variables_schema.properties },
-            order: union(managedDashboardVariablesSchema.order, dashboardInfo.variables_schema.order),
-        };
-
         originState.dashboardInfo = dashboardInfo;
 
         const _dashboardInfo = cloneDeep(dashboardInfo);
@@ -193,8 +190,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
         };
         state.variablesSchema = {
-            properties: _dashboardInfo.variables_schema?.properties ?? {},
-            order: _dashboardInfo.variables_schema?.order ?? [],
+            properties: { ...managedDashboardVariablesSchema.properties, ..._dashboardInfo.variables_schema?.properties },
+            order: union(managedDashboardVariablesSchema.order, _dashboardInfo.variables_schema?.order),
         };
         state.variables = _dashboardInfo.variables ?? {};
         state.labels = _dashboardInfo.labels;
@@ -259,6 +256,27 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         if (!state.variablesSchema.properties[propertyName]) return;
         state.variablesSchema.properties[propertyName].use = use;
     };
+    const resetVariables = () => {
+        const originProperties = { ...managedDashboardVariablesSchema.properties, ...originState.dashboardInfo.variables_schema.properties };
+        const originOrder = union(managedDashboardVariablesSchema.order, originState.dashboardInfo.variables_schema.order);
+        const originVariables = originState.dashboardInfo.variables;
+
+        // reset variables schema
+        state.variablesSchema.order.forEach((property) => {
+            if (!originProperties[property]) return;
+            updateVariableUse(property, originProperties[property].use);
+        });
+
+        // reset variables
+        originOrder.forEach((property) => {
+            // CASE: existing variable is deleted.
+            if (!state.variablesSchema.properties[property]) return;
+
+            if (isEqual(state.variablesSchema.properties[property], originProperties[property])) {
+                state.variables = { ...state.variables, [property]: originVariables[property] };
+            }
+        });
+    };
 
     store.dispatch('reference/loadAll');
 
@@ -276,6 +294,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         updateWidgetInfo,
         deleteWidget,
         updateVariableUse,
+        resetVariables,
     };
 });
 

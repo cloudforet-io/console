@@ -25,7 +25,7 @@
                 </template>
                 <variable-more-button-dropdown />
                 <button class="reset-button"
-                        @click="handleResetVariables"
+                        @click="resetVariables"
                 >
                     <p-i name="ic_refresh"
                          width="1rem"
@@ -59,7 +59,6 @@ import {
 } from 'vue';
 
 import { PDivider, PI } from '@spaceone/design-system';
-import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -95,6 +94,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const { resetVariables } = dashboardDetailStore;
 const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailOriginState = dashboardDetailStore.originState;
 
@@ -195,37 +195,6 @@ const handleUpdateLabelList = (labels: Array<string>) => {
 const handleSave = async () => {
     if (dashboardDetailState.dashboardId) await updateDashboardData();
     if (dashboardDetailState.dashboardId === undefined) await createDashboard();
-};
-
-const resetVariablesSchema = () => {
-    const originProperties = dashboardDetailOriginState.dashboardInfo.variables_schema.properties;
-    // variableState.order is current variable properties' name list
-    // result of reset should reflect updated variables schema.
-    console.log(originProperties);
-    variableState.order.forEach((property) => {
-        if (!originProperties[property]) return;
-        dashboardDetailStore.updateVariableUse(property, originProperties[property].use);
-    });
-};
-
-const resetVariables = () => {
-    const originProperties = dashboardDetailOriginState.dashboardInfo.variables_schema.properties;
-    const originOrder = dashboardDetailOriginState.dashboardInfo.variables_schema.order;
-    const originVariables = dashboardDetailOriginState.dashboardInfo.variables;
-
-    originOrder.forEach((property) => {
-        // CASE: existing variable is deleted.
-        if (!variableState.variableProperties[property]) return;
-
-        if (isEqual(variableState.variableProperties[property], originProperties[property])) {
-            dashboardDetailState.variables = { ...dashboardDetailState.variables, [property]: originVariables[property] };
-        }
-    });
-};
-
-const handleResetVariables = () => {
-    resetVariablesSchema();
-    resetVariables();
 };
 
 // for preventing refresh
