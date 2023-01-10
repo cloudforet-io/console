@@ -19,17 +19,17 @@
                 />
             </p-field-group>
             <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_VIEWERS')"
-                           :invalid="invalidState.visibility"
-                           :invalid-text="invalidTexts.visibility"
+                           :invalid="invalidState.viewers"
+                           :invalid-text="invalidTexts.viewers"
                            required
                            class="mt-6"
             >
                 <p-radio v-for="{ name: visibilityName, label } in filteredVisibilityList"
                          :key="visibilityName"
                          :value="visibilityName"
-                         :selected="visibility"
+                         :selected="viewers"
                          class="radio-group"
-                         @change="setForm('visibility', $event)"
+                         @change="setForm('viewers', $event)"
                 >
                     <span class="capitalize ml-1">{{ label.toLowerCase() }}</span>
                 </p-radio>
@@ -40,6 +40,7 @@
 
 <script lang="ts">
 
+import type { PropType, SetupContext } from 'vue';
 import {
     computed,
     defineComponent,
@@ -50,34 +51,34 @@ import {
     PButtonModal, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type {
-    DashboardInfo,
-    DashboardPrivacyType,
-} from '@/services/cost-explorer/cost-dashboard/type';
-import {
-    DASHBOARD_PRIVACY_TYPE,
-} from '@/services/cost-explorer/cost-dashboard/type';
+import type { DashboardViewer } from '@/services/dashboards/config';
+import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 interface Props {
     visible: boolean;
-    dashboard: DashboardInfo;
+    dashboard: DashboardModel;
     manageDisabled: boolean;
 }
 
 const visibilityList = [
     {
-        name: DASHBOARD_PRIVACY_TYPE.USER,
+        name: DASHBOARD_VIEWER.PRIVATE,
         label: i18n.t('DASHBOARDS.FORM.LABEL_PRIVATE'),
     },
     {
-        name: DASHBOARD_PRIVACY_TYPE.PUBLIC,
+        name: DASHBOARD_VIEWER.PUBLIC,
         label: i18n.t('DASHBOARDS.FORM.LABEL_PUBLIC'),
     },
 ];
@@ -96,22 +97,22 @@ export default defineComponent<Props>({
     props: {
         visible: {
             type: Boolean,
-            required: true,
+            required: undefined,
         },
         dashboard: {
-            type: Object as () => DashboardInfo,
-            default: () => {},
+            type: Object as PropType<DashboardModel>,
+            default: () => ({}),
         },
         manageDisabled: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit }: SetupContext) {
         const {
             forms: {
                 name,
-                visibility,
+                viewers,
             },
             setForm,
             initForm,
@@ -121,52 +122,61 @@ export default defineComponent<Props>({
             isAllValid,
         } = useFormValidator({
             name: '',
-            visibility: '',
+            viewers: '',
         }, {
-            name(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
-            visibility(value: DashboardPrivacyType) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
+            name(value: string) {
+                if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
+                if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
+                return '';
+            },
+            viewers(value: DashboardViewer) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
         });
+
+        const dashboardDetailInfoStore = useDashboardDetailInfoStore();
         const state = reactive({
             proxyVisible: props.visible,
-            filteredVisibilityList: computed(() => (props.manageDisabled ? visibilityList.filter((item) => item.name === DASHBOARD_PRIVACY_TYPE.USER) : visibilityList)),
+            filteredVisibilityList: computed(() => visibilityList),
+            isProjectDashboard: computed(() => Object.prototype.hasOwnProperty.call(props.dashboard, 'project_id')),
+            dashboardNameList: computed<string[]>(() => {
+                if (state.isProjectDashboard) {
+                    return store.state.dashboard.projectItems
+                        .filter((item) => (
+                            item.project_id === (props.dashboard as ProjectDashboardModel).project_id)
+                            && item.name !== props.dashboard?.name)
+                        .map((_item) => _item.name);
+                }
+                return store.state.dashboard.domainItems.map((item) => {
+                    if (item.name !== props.dashboard?.name) return item.name;
+                    return '';
+                });
+            }),
         });
-        // const _invalid_unique = 'Dashboard name must be unique'; i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE')
-        // const _invalid_input = 'Please input dashboard name'; i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT')
 
         const handleUpdateVisible = (visible) => {
             state.proxyVisible = visible;
             emit('update:visible', visible);
         };
 
-        // const getCustomLayouts = async () => {
-        //     const hasDefaultId = Object.prototype.hasOwnProperty.call(props.dashboard, 'default_layout_id');
-        //     if (hasDefaultId && (!props.dashboard.custom_layouts || props.dashboard.custom_layouts.length === 0)) {
-        //         return await fetchDefaultLayoutData(props.dashboard.default_layout_id as string) as CustomLayout[];
-        //     }
-        //     return props.dashboard.custom_layouts as CustomLayout[];
-        // };
-
-        // const makeDashboardCreateParam = async (): Promise<DashboardCreateParam> => ({
-        //     name: name.value,
-        //     custom_layouts: await getCustomLayouts(),
-        //     period_type: props.dashboard.period_type as PeriodType ?? PERIOD_TYPE.AUTO,
-        //     period: props.dashboard.period,
-        // });
-
-        const createPublicDashboard = async (): Promise<string|undefined> => {
+        const createDomainDashboard = async (): Promise<string|undefined> => {
             try {
-                // const res = await SpaceConnector.client.costAnalysis.publicDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
-                // return res.public_dashboard_id;
+                const res = await SpaceConnector.clientV2.dashboard.domainDashboard.create({
+                    // viewers: viewers.value
+                    // TODO:: parameters here
+                });
+                return res.domain_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
             }
             return undefined;
         };
 
-        const createUserDashboard = async (): Promise<string|undefined> => {
+        const createProjectDashboard = async (): Promise<string|undefined> => {
             try {
-                // const res = await SpaceConnector.client.costAnalysis.userDashboard.create(await makeDashboardCreateParam() as DashboardCreateParam);
-                // return res.user_dashboard_id;
+                const res = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
+                    // viewers: viewers.value
+                    // TODO:: parameters here
+                });
+                return res.project_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
             }
@@ -175,13 +185,12 @@ export default defineComponent<Props>({
 
         const handleConfirm = async () => {
             if (!isAllValid) return;
-            const clonedDashboardId = visibility.value === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
-            // TODO:: connect dashboard store
-            // await costExplorerStore.dispatch('setDashboardList');
+            const clonedDashboardId = state.isProjectDashboard ? await createDomainDashboard() : await createProjectDashboard();
+            await dashboardDetailInfoStore.getDashboardInfo(clonedDashboardId);
             if (clonedDashboardId) {
                 await SpaceRouter.router.push({
-                    name: DASHBOARDS_ROUTE._NAME,
-                    params: { dashboardId: clonedDashboardId },
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    params: { dashboardScope: state.isProjectDashboard ? 'project' : 'domain', dashboardId: clonedDashboardId },
                 });
             }
             emit('update:visible', false);
@@ -189,7 +198,7 @@ export default defineComponent<Props>({
 
         const init = () => {
             initForm('name', `Clone - ${props.dashboard.name}`);
-            initForm('visibility', '');
+            initForm('viewers', '');
         };
 
         watch(() => props.visible, (visible) => {
@@ -198,7 +207,7 @@ export default defineComponent<Props>({
         });
         return {
             name,
-            visibility,
+            viewers,
             invalidState,
             invalidTexts,
             setForm,
