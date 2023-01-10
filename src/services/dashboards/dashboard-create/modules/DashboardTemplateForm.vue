@@ -62,8 +62,7 @@
                                     </template>
                                 </p-board>
                                 <p-empty v-show="!existingTemplateState.boardSets.length">
-                                    <!--                                    song-lang-->
-                                    No Items
+                                    {{ $t('DASHBOARDS.CREATE.NO_ITEMS') }}
                                 </p-empty>
                             </div>
                             <p-text-pagination
@@ -88,7 +87,7 @@ import {
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-
+import { i18n } from '@/translations';
 
 import type { DashboardConfig } from '@/services/dashboards/config';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
@@ -110,8 +109,7 @@ const defaultTemplateState = reactive({
         leftIcon: d.description?.icon ?? '',
         iconButtonSets: [!!d.description?.preview_image && {
             iconName: 'ic_external-link',
-            // song-lang
-            tooltipText: 'Preview',
+            tooltipText: i18n.t('DASHBOARDS.CREATE.PREVIEW'),
             eventAction: () => {
                 const href = `/images/dashboard-previews/dashboard-img_${d.description?.preview_image}--thumbnail.png`;
                 window.open(href, '_blank');
@@ -129,8 +127,7 @@ const existingTemplateState = reactive({
         leftIcon: d.description?.preview_image ?? '',
         iconButtonSets: [{
             iconName: 'ic_external-link',
-            // song-lang
-            tooltipText: 'Preview',
+            tooltipText: i18n.t('DASHBOARDS.CREATE.PREVIEW'),
             eventAction: () => {
                 const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');
                 const { href } = SpaceRouter.router.resolve({

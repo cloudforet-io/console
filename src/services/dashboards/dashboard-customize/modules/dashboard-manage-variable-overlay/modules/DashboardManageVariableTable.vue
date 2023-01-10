@@ -123,10 +123,8 @@ const state = reactive({
         { name: 'managable', label: ' ', width: '164px' },
     ],
     selectionType: computed(() => ({
-        // song-lang
-        SINGLE: i18n.t('Single select'),
-        // song-lang
-        MULTI: i18n.t('Multi select'),
+        SINGLE: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT'),
+        MULTI: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT'),
     })),
     variableType: computed(() => ({
         MANAGED: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),

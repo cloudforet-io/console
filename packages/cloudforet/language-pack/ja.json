@@ -1120,7 +1120,7 @@
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
-			"CREAT": "",
+			"CREATE": "",
 			"CREAT_NEW_DASHBOARD": "",
 			"DASHBOARDS_TITLE": "",
 			"ENTIRE_WORKSPACE": "",
@@ -1130,6 +1130,9 @@
 			"FILTER_PUBLIC": "",
 			"FILTER_SINGLE_PROJECT": "",
 			"HELP_TEXT_CREATE": "",
+			"LABEL_SCOPE": "",
+			"LABEL_VIWERS": "",
+			"PROJECT": "",
 			"SINGLE_PROJECT": "",
 			"TOOLTIP_CLONE": "",
 			"TOOLTIP_DELETE": "",
@@ -1145,6 +1148,8 @@
 			"LABEL_SCOPE": "",
 			"LABEL_START_FROM": "",
 			"LABEL_VIEWERS": "",
+			"NO_ITEMS": "",
+			"PREVIEW": "",
 			"PRIVATE": "",
 			"PRIVATE_DESC": "",
 			"PUBLIC": "",
@@ -1187,11 +1192,15 @@
 			"REFRESH_INTERVAL_30S": "",
 			"REFRESH_INTERVAL_5M": "",
 			"REFRESH_OFF": "",
+			"RESET": "",
 			"SAVE": "",
+			"VALIDATION_DUPLICATED_LABEL": "",
 			"VARIABLES": {
 				"ADD": "",
 				"ADD_OPTIONS": "",
 				"CANCEL": "",
+				"CHECK_MODAL_CONTENTS": "",
+				"CHECK_MODAL_DELETE_TITLE": "",
 				"DELETE": "",
 				"DELETE_TITLE": "",
 				"EDIT": "",
@@ -1203,11 +1212,14 @@
 				"LABEL_OPTIONS": "",
 				"LABEL_SELECTION_TYPE": "",
 				"MORE": "",
+				"MULTI_SELECT": "",
 				"PLACEHOLDER_OPTIONS": "",
 				"SAVE": "",
+				"SINGLE_SELECT": "",
 				"SUB_TITLE": "",
 				"SUB_TITLE_EDIT": "",
-				"TITLE": ""
+				"TITLE": "",
+				"VALIDATION_NAME_REQUIRED": ""
 			}
 		},
 		"DETAIL": {
@@ -1219,6 +1231,9 @@
 			"DEFAULT": "",
 			"DELETE": "",
 			"EXPORT": "",
+			"PDF_EXPORT": {
+				"APPLIED_FILTERS": ""
+			},
 			"PERIOD_CUSTOM": "",
 			"PERIOD_LAST_14_DAYS": "",
 			"PERIOD_LAST_3_MONTHS": "",
@@ -1248,7 +1263,9 @@
 			"LABEL_PUBLIC": "",
 			"LABEL_VIEWERS": "",
 			"REQUIRED": "",
-			"UPDATE_TITLE": ""
+			"UPDATE_TITLE": "",
+			"VALIDATION_DASHBOARD_NAME_INPUT": "",
+			"VALIDATION_DASHBOARD_NAME_UNIQUE": ""
 		},
 		"LNB": {
 			"ONLY_FAVORITE": ""
@@ -1273,7 +1290,11 @@
 				"DESC": ""
 			},
 			"AWS_PERSONAL_HEALTH_DASHBOARD": {
-				"DESC": ""
+				"DESC": "",
+				"TAB_OPEN_ISSUES": "",
+				"TAB_OTHER_NOTIFICATIONS": "",
+				"TAB_SCHEDULED_CHANGES": "",
+				"TITLE_AFFECTED_RESOURCES": ""
 			},
 			"AWS_TRUSTED_ADVISOR": {
 				"DESC": ""

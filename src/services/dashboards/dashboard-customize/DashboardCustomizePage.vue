@@ -34,8 +34,7 @@
                          height="1rem"
                          color="inherit"
                     />
-                    <!--song-lang-->
-                    <span>{{ $t('Reset') }}</span>
+                    <span>{{ $t('DASHBOARDS.CUSTOMIZE.RESET') }}</span>
                 </button>
             </div>
             <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
