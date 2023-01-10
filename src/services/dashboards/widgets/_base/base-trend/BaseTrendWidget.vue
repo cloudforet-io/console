@@ -106,7 +106,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
-    dataSize: computed(() => state.chartData?.length ?? 0),
+    dataSize: computed(() => state.legends?.length ?? 0),
 });
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
@@ -134,7 +134,7 @@ const state = reactive({
     }),
     legends: [] as Legend[],
     thisPage: 1,
-    disableReferenceColor: computed<boolean>(() => !!colorSet.value?.length),
+    disableReferenceColor: computed<boolean>(() => !!props.theme),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         params: {},

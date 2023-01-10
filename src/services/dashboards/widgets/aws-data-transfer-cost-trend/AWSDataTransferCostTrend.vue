@@ -98,7 +98,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
-    dataSize: computed(() => state.chartData?.length ?? 0),
+    dataSize: computed(() => state.data?.length ?? 0),
 });
 const state = reactive({
     ...toRefs(useWidgetState<Data>(props)),
