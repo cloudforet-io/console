@@ -78,11 +78,9 @@ const state = reactive({
     dashboardNameList: computed<string[]>(() => {
         if (dashboardDetailState.projectId) {
             return store.state.dashboard.projectItems
-                .filter((item) => (item.project_id === dashboardDetailState.projectId))
-                .map((_item) => {
-                    if (_item.name !== dashboardDetailState.dashboardName) return _item.name;
-                    return '';
-                });
+                .filter((item) => (item.project_id === dashboardDetailState.projectId)
+                && item.name !== dashboardDetailState.dashboardName)
+                .map((_item) => _item.name);
         }
         return store.state.dashboard.domainItems.map((item) => {
             if (item.name !== dashboardDetailState.dashboardName) return item.name;

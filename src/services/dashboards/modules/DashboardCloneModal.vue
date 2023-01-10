@@ -140,11 +140,10 @@ export default defineComponent<Props>({
             dashboardNameList: computed<string[]>(() => {
                 if (state.isProjectDashboard) {
                     return store.state.dashboard.projectItems
-                        .filter((item) => (item.project_id === (props.dashboard as ProjectDashboardModel).project_id))
-                        .map((_item) => {
-                            if (_item.name !== props.dashboard?.name) return _item.name;
-                            return '';
-                        });
+                        .filter((item) => (
+                            item.project_id === (props.dashboard as ProjectDashboardModel).project_id)
+                            && item.name !== props.dashboard?.name)
+                        .map((_item) => _item.name);
                 }
                 return store.state.dashboard.domainItems.map((item) => {
                     if (item.name !== props.dashboard?.name) return item.name;
@@ -162,6 +161,7 @@ export default defineComponent<Props>({
             try {
                 const res = await SpaceConnector.clientV2.dashboard.domainDashboard.create({
                     // viewers: viewers.value
+                    // TODO:: parameters here
                 });
                 return res.domain_dashboard_id;
             } catch (e) {
@@ -174,6 +174,7 @@ export default defineComponent<Props>({
             try {
                 const res = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
                     // viewers: viewers.value
+                    // TODO:: parameters here
                 });
                 return res.project_dashboard_id;
             } catch (e) {
@@ -185,7 +186,6 @@ export default defineComponent<Props>({
         const handleConfirm = async () => {
             if (!isAllValid) return;
             const clonedDashboardId = state.isProjectDashboard ? await createDomainDashboard() : await createProjectDashboard();
-            // TODO:: connect dashboard store
             await dashboardDetailInfoStore.getDashboardInfo(clonedDashboardId);
             if (clonedDashboardId) {
                 await SpaceRouter.router.push({
