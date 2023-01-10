@@ -8,6 +8,7 @@
                 <p-data-loader class="chart-loader"
                                :loading="state.loading"
                                :data="state.data"
+                               :loader-backdrop-opacity="1"
                                loader-type="skeleton"
                 >
                     <div ref="chartContext"

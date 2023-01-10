@@ -4,7 +4,12 @@
                   no-height-limit
                   @refresh="handleRefresh"
     >
-        <div class="budget-usage-summary">
+        <p-data-loader class="budget-usage-summary"
+                       :loading="state.loading"
+                       :data="state.data"
+                       :loader-backdrop-opacity="1"
+                       loader-type="skeleton"
+        >
             <div class="budget">
                 <p class="budget-label">
                     {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_SPENT') }}
@@ -28,20 +33,31 @@
                 </div>
             </div>
             <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               loader-type="skeleton"
-                               show-data-from-scratch
+                <div ref="chartContext"
+                     class="chart"
                 >
-                    <div ref="chartContext"
-                         class="chart"
-                    >
-                        <span class="budget-usage">{{ state.spentBudgetRate }}%</span>
-                    </div>
-                </p-data-loader>
+                    <span class="budget-usage">{{ state.spentBudgetRate }}%</span>
+                </div>
             </div>
-        </div>
+
+            <template #loader>
+                <div v-for="(_, idx) in state.skeletons"
+                     :key="`skeleton-${idx}`"
+                     class="skeleton-wrapper mt-4"
+                >
+                    <p-skeleton width="10rem"
+                                height="1.875rem"
+                                class="mb-1"
+                    />
+                    <p-skeleton width="7.5rem"
+                                height="1.5rem"
+                    />
+                </div>
+                <p-skeleton width="9rem"
+                            height="100%"
+                />
+            </template>
+        </p-data-loader>
     </widget-frame>
 </template>
 
@@ -53,7 +69,7 @@ import {
 } from 'vue';
 
 import { color } from '@amcharts/amcharts5';
-import { PDataLoader } from '@spaceone/design-system';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -100,6 +116,7 @@ const {
 } = useAmcharts5(chartContext);
 const state = reactive({
     ...toRefs(useWidgetState<Data[]>(props)),
+    skeletons: [1, 2],
     chart: null as null|ReturnType<typeof createPieChart>,
     series: null as null|ReturnType<typeof createPieSeries>,
     chartData: computed(() => {
@@ -269,11 +286,11 @@ defineExpose<WidgetExpose<Data[]>>({
         }
     }
     .budget-usage {
-        @apply absolute;
+        @apply inline-block absolute;
         left: 50%;
         top: 50%;
-        z-index: 10;
         transform: translate3d(-50%, -50%, 0);
+        max-width: 65%;
     }
 }
 .chart-wrapper {
@@ -283,9 +300,6 @@ defineExpose<WidgetExpose<Data[]>>({
     .chart {
         height: 100%;
     }
-}
-.chart-loader {
-    height: 100%;
 }
 .full {
     @screen desktop {
@@ -298,6 +312,18 @@ defineExpose<WidgetExpose<Data[]>>({
         .budget-usage-summary {
             @apply block;
             height: 23.625rem;
+        }
+    }
+}
+:deep(.data-loader-container) {
+    > .loader-wrapper > .loader {
+        @apply flex-col items-start justify-start;
+    }
+    .skeleton-wrapper {
+        @apply flex flex-col;
+        &:last-of-type {
+            margin-top: 3.8125rem;
+            margin-bottom: 1.875rem;
         }
     }
 }
