@@ -10,7 +10,7 @@
                     {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_SPENT') }}
                 </p>
                 <div class="budget-value">
-                    {{ currencyMoneyFormatter(state.totalSpent, state.options.currency) }}
+                    {{ currencyMoneyFormatter(state.totalSpent, state.currency) }}
                 </div>
                 <div class="budget-info">
                     {{ state.budgetCount }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETS') }}
@@ -21,7 +21,7 @@
                     {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET') }}
                 </p>
                 <div class="budget-value">
-                    {{ currencyMoneyFormatter(state.totalBudget, state.options.currency) }}
+                    {{ currencyMoneyFormatter(state.totalBudget, state.currency) }}
                 </div>
                 <div class="budget-info">
                     {{ state.leftBudget }}
@@ -145,7 +145,7 @@ const state = reactive({
     leftBudget: computed(() => {
         if (!state.data) return '--';
         const value = state.totalBudget - state.totalSpent;
-        return `${currencyMoneyFormatter(value, state.options.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE')}`;
+        return `${currencyMoneyFormatter(value, state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE')}`;
     }),
     budgetCount: computed(() => {
         if (!state.data) return '--';
