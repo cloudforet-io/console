@@ -1,3 +1,10 @@
+# [2.0.0-beta.2](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2023-01-10)
+
+
+### Features
+
+* **context-menu-item:** add icon prop ([#225](https://github.com/cloudforet-io/mirinae/issues/225)) ([2e128b7](https://github.com/cloudforet-io/mirinae/commit/2e128b7801ce44973ecd5911fe5fc3966bbbaccf))
+
 # [2.0.0-beta.1](https://github.com/cloudforet-io/mirinae/compare/v1.1.0-beta.510...v2.0.0-beta.1) (2023-01-05)
 
 
