@@ -11,6 +11,12 @@
              width="1em"
              height="1em"
         />
+        <p-i v-if="icon"
+             class="left-icon"
+             :name="icon"
+             width="1rem"
+             height="1rem"
+        />
         <span class="label-wrapper"
               :class="{ellipsis}"
         >
@@ -72,6 +78,7 @@ export interface ContextMenuItemProps {
     ellipsis?: boolean;
     highlightTerm?: string;
     readonly?: boolean;
+    icon?: string;
 }
 
 export default defineComponent<ContextMenuItemProps>({
@@ -123,6 +130,10 @@ export default defineComponent<ContextMenuItemProps>({
         readonly: {
             type: Boolean,
             default: false,
+        },
+        icon: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props) {
@@ -190,6 +201,11 @@ export default defineComponent<ContextMenuItemProps>({
         flex-shrink: 0;
         margin-right: 0.25rem;
         font-size: 1.25rem;
+    }
+    > .left-icon {
+        margin-right: 0.25rem;
+        margin-top: 0.25rem;
+        flex-shrink: 0;
     }
     > .label-wrapper {
         flex-grow: 1;

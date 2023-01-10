@@ -27,6 +27,7 @@ export const Template = (args, { argTypes }) => ({
             :select-marker="selectMarker"
             :ellipsis="ellipsis"
             :highlightTerm="highlightTerm"
+            :icon="icon"
             @click.stop="onClick"
         ></PContextMenuItem>
     `,
@@ -80,6 +81,30 @@ export const Template = (args, { argTypes }) => ({
             <p-context-menu-item label="link, selected" link="http://google.com" selected />
             <p-context-menu-item label="link, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" link="http://google.com" />
             <p-context-menu-item label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" link="http://google.com" ellipsis />
+        </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Icon Case
+
+<Canvas>
+    <Story name="Icon Case">
+        {{
+            components: { PContextMenuItem },
+            template: `
+        <div class="border border-primary-1 p-4">
+            <p-context-menu-item icon="ic_refresh" label="to (style is the same with the basic case)" />
+            <p-context-menu-item icon="ic_refresh" label="link" />
+            <p-context-menu-item icon="ic_refresh" label="link, disabled" disabled />
+            <p-context-menu-item icon="ic_refresh" label="link, selected" selected />
+            <p-context-menu-item icon="ic_refresh" label="link, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" />
+            <p-context-menu-item icon="ic_refresh" label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" ellipsis />
+            <p-context-menu-item icon="ic_refresh" label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" select-marker="radio" />
         </div>
     `,
         }}
