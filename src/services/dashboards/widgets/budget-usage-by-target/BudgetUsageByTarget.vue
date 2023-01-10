@@ -1,7 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="budget-usage-by-target"
-                  :widget-location="state.widgetLocation"
                   @refresh="refreshWidget"
     >
         <widget-data-table :loading="state.loading"

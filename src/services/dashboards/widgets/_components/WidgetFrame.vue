@@ -148,6 +148,7 @@ interface Props {
     isOnlyFullSize?: boolean;
     widgetKey: string;
     overflowY?: string;
+    refreshOnResize?: boolean;
 }
 
 interface IconConfig {
@@ -167,8 +168,6 @@ const props = withDefaults(defineProps<Props>(), {
     selectedDates: () => [],
     currency: CURRENCY.USD,
     overflowY: undefined,
-    disableFullSize: false,
-    isOnlyFullSize: false,
 });
 
 const emit = defineEmits(['refresh']);
@@ -205,9 +204,10 @@ const state = reactive({
         {
             isAvailable: !props.disableExpandIcon,
             name: state.isFull ? 'ic_collapse-angle' : 'ic_expand-angle',
-            disabled: props.disableFullSize || props.isOnlyFullSize,
+            disabled: !!props.disableFullSize || !!props.isOnlyFullSize,
             handleClick: () => {
                 dashboardDetailStore.toggleWidgetSize(props.widgetKey);
+                if (props.refreshOnResize) emit('refresh');
             },
         },
         {

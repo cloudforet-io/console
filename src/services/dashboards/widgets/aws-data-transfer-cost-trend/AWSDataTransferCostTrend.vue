@@ -1,5 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
+                  refresh-on-resize
                   class="aws-data-transfer-cost-trend"
                   @refresh="handleRefresh"
     >
@@ -97,7 +98,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
-    dataSize: computed(() => state.chartData?.length ?? 0),
+    dataSize: computed(() => state.data?.length ?? 0),
 });
 const state = reactive({
     ...toRefs(useWidgetState<Data>(props)),
@@ -232,6 +233,7 @@ const drawChart = (chartData: XYChartData[]) => {
 
 const initWidget = async (data?: Data) => {
     state.loading = true;
+    await nextTick();
     state.data = data ?? await fetchData();
     state.legends = getXYChartLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
@@ -242,6 +244,7 @@ const initWidget = async (data?: Data) => {
 
 const refreshWidget = async () => {
     state.loading = true;
+    await nextTick();
     state.data = await fetchData();
     state.legends = getXYChartLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();

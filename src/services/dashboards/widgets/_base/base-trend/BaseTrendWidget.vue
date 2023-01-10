@@ -1,5 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
+                  refresh-on-resize
                   class="base-trend-widget"
                   @refresh="refreshWidget"
     >
@@ -105,7 +106,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
-    dataSize: computed(() => state.chartData?.length ?? 0),
+    dataSize: computed(() => state.legends?.length ?? 0),
 });
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
@@ -133,7 +134,7 @@ const state = reactive({
     }),
     legends: [] as Legend[],
     thisPage: 1,
-    disableReferenceColor: computed<boolean>(() => !!colorSet.value?.length),
+    disableReferenceColor: computed<boolean>(() => !!props.theme),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         params: {},
@@ -222,6 +223,7 @@ const drawChart = (chartData: XYChartData[]) => {
 
 const initWidget = async (data?: FullData) => {
     state.loading = true;
+    await nextTick();
     state.data = data ?? await fetchData();
     state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     await nextTick();
@@ -233,6 +235,7 @@ const initWidget = async (data?: FullData) => {
 const refreshWidget = async (thisPage = 1) => {
     state.loading = true;
     state.thisPage = thisPage;
+    await nextTick();
     state.data = await fetchData();
     state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     await nextTick();
