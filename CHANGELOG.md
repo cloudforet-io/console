@@ -1,3 +1,10 @@
+# [2.0.0-beta.3](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2023-01-10)
+
+
+### Features
+
+* **use-context-menu-controller:** update options and features ([#226](https://github.com/cloudforet-io/mirinae/issues/226)) ([b31dc13](https://github.com/cloudforet-io/mirinae/commit/b31dc13f17516acc89340d8c88235aa2c7abd92f))
+
 # [2.0.0-beta.2](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2023-01-10)
 
 
