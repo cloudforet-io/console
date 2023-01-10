@@ -44,13 +44,13 @@ const handleVisibleCloneModal = () => {
 
 const props = defineProps<{
     dashboardId: string;
-    dashboardName?: string;
+    name?: string;
 }>();
 
 // const state = reactive({
 //     visiblePdfDownload: false,
 //     previewItems: [] as Item[],
-//     pdfFileName: computed<string>(() => `${props.dashboardName ?? 'Cost_Dashboard'}_${dayjs().format('YYYYMMDD')}`),
+//     pdfFileName: computed<string>(() => `${props.name ?? 'Cost_Dashboard'}_${dayjs().format('YYYYMMDD')}`),
 // });
 
 // const handlePreviewRendered = (elements) => {

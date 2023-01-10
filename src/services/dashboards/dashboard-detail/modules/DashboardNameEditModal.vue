@@ -9,13 +9,13 @@
     >
         <template #body>
             <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_DASHBOARD_NAME')"
-                           :invalid="invalidState.name"
-                           :invalid-text="invalidTexts.name"
+                           :invalid="invalidState._name"
+                           :invalid-text="invalidTexts._name"
                            required
             >
                 <p-text-input :value="name"
-                              :invalid="invalidState.name"
-                              @input="setForm('name', $event)"
+                              :invalid="invalidState._name"
+                              @input="setForm('_name', $event)"
                 />
             </p-field-group>
         </template>
@@ -43,7 +43,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 interface Props {
     visible: boolean;
     dashboardId: string;
-    dashboardName: string;
+    name: string;
 }
 export default defineComponent<Props>({
     name: 'DashboardNameEditModal',
@@ -66,7 +66,7 @@ export default defineComponent<Props>({
             required: true,
             default: '',
         },
-        dashboardName: {
+        name: {
             type: String,
             required: true,
             default: '',
@@ -75,7 +75,7 @@ export default defineComponent<Props>({
     setup(props, { emit }: SetupContext) {
         const {
             forms: {
-                name,
+                _name,
             },
             setForm,
             initForm,
@@ -84,9 +84,9 @@ export default defineComponent<Props>({
             validate,
             isAllValid,
         } = useFormValidator({
-            name: '',
+            _name: '',
         }, {
-            name(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
+            _name(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
         });
         const state = reactive({
             proxyVisible: props.visible,
@@ -102,12 +102,12 @@ export default defineComponent<Props>({
                 if (isProjectDashboard) {
                     await SpaceConnector.clientV2.dashboard.projectDashboard.update({
                         project_dashboard_id: props.dashboardId,
-                        name: name.value,
+                        name: _name.value,
                     });
                 } else {
                     await SpaceConnector.clientV2.dashboard.domainDashboard.update({
                         domain_dashboard_id: props.dashboardId,
-                        name: name.value,
+                        name: _name.value,
                     });
                 }
             } catch (e) {
@@ -127,7 +127,7 @@ export default defineComponent<Props>({
             await updateDashboard();
             await loadDashboard();
             emit('update:visible', false);
-            emit('confirm', name.value);
+            emit('confirm', _name.value);
         };
 
         const handleUpdateVisible = (visible) => {
@@ -136,7 +136,7 @@ export default defineComponent<Props>({
         };
 
         const init = () => {
-            initForm('name', props.dashboardName);
+            initForm('_name', props.name);
         };
 
         watch(() => props.visible, (visible) => {
@@ -144,7 +144,7 @@ export default defineComponent<Props>({
             init();
         });
         return {
-            name,
+            _name,
             invalidState,
             invalidTexts,
             setForm,

@@ -46,7 +46,7 @@ interface DashboardDetailInfoStoreState {
     loadingDashboard: boolean;
     dashboardId: string | undefined;
     projectId: string;
-    dashboardName: string;
+    name: string;
     settings: DashboardSettings;
     variables: DashboardVariables;
     variablesSchema: DashboardVariablesSchema;
@@ -57,7 +57,7 @@ interface DashboardDetailInfoStoreState {
     widgetDataMap: WidgetDataMap;
 }
 interface ValidationState {
-    isDashboardNameValid?: boolean;
+    isNameValid?: boolean;
     isWidgetLayoutValid: ComputedRef<Record<string, boolean>>;
     widgetInheritVariablesValidMap: ComputedRef<WidgetInheritVariablesValidMap>;
 }
@@ -90,7 +90,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         loadingDashboard: false,
         dashboardId: '',
         projectId: '',
-        dashboardName: '',
+        name: '',
         settings: DASHBOARD_DEFAULT.settings,
         variables: {},
         variablesSchema: {
@@ -104,7 +104,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         widgetDataMap: {},
     }) as UnwrapRef<DashboardDetailInfoStoreState>;
     const validationState = reactive<ValidationState>({
-        isDashboardNameValid: undefined,
+        isNameValid: undefined,
         isWidgetLayoutValid: computed(() => ({})), // is all widgets valid
         widgetInheritVariablesValidMap: computed(() => {
             const result = {};
@@ -117,7 +117,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     const resetDashboardData = () => {
         originState.dashboardInfo = null;
-        state.dashboardName = '';
+        state.name = '';
         state.projectId = '';
         state.settings = DASHBOARD_DEFAULT.settings;
         state.variables = {};
@@ -129,7 +129,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         originState.dashboardInfo = dashboardInfo;
 
         const _dashboardInfo = cloneDeep(dashboardInfo);
-        state.dashboardName = _dashboardInfo.name;
+        state.name = _dashboardInfo.name;
         state.projectId = (_dashboardInfo as ProjectDashboardModel).project_id ?? '';
         state.settings = {
             date_range: {

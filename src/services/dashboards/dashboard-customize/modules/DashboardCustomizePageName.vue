@@ -79,11 +79,11 @@ const state = reactive({
         if (dashboardDetailState.projectId) {
             return store.state.dashboard.projectItems
                 .filter((item) => (item.project_id === dashboardDetailState.projectId)
-                && item.name !== dashboardDetailState.dashboardName)
+                && item.name !== dashboardDetailState.name)
                 .map((_item) => _item.name);
         }
         return store.state.dashboard.domainItems.map((item) => {
-            if (item.name !== dashboardDetailState.dashboardName) return item.name;
+            if (item.name !== dashboardDetailState.name) return item.name;
             return '';
         });
     }),

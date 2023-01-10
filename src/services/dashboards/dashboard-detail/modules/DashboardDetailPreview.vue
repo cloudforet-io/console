@@ -4,7 +4,7 @@
          class="dashboard-detail-preview"
     >
         <p-page-title ref="dashboardTitleRef"
-                      :title="state.dashboardName"
+                      :title="state.name"
         >
             <template #extra>
                 <dashboard-toolset />
@@ -55,7 +55,7 @@ const state = reactive({
     hasManagePermission: useManagePermissionState(),
     dashboardInfo: DASHBOARD_TEMPLATES.monthlyCostSummary as DashboardModel, // TODO: should be changed to api data
     dashboardViewer: computed<DashboardViewer>(() => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE),
-    dashboardName: '',
+    name: '',
     labelList: computed<string[]>(() => state.dashboardInfo?.labels ?? []),
     dashboardWidgetLayouts: computed<DashboardLayoutWidgetInfo[][]>(() => state.dashboardInfo?.layouts ?? []),
     //
@@ -87,7 +87,7 @@ const getDashboardData = async () => {
             result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ project_dashboard_id: props.dashboardId });
         }
         // state.dashboardInfo = result;
-        state.dashboardName = result.name;
+        state.name = result.name;
     } catch (e) {
         state.dashboardInfo = {};
         ErrorHandler.handleError(e);

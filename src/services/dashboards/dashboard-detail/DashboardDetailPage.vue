@@ -1,6 +1,6 @@
 <template>
     <div class="dashboard-detail-page">
-        <p-page-title :title="dashboardDetailState.dashboardName">
+        <p-page-title :title="dashboardDetailState.name">
             <template v-if="dashboardDetailState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
@@ -32,7 +32,7 @@
             </template>
             <template #extra>
                 <dashboard-control-buttons :dashboard-id="props.dashboardId"
-                                           :dashboard-name="dashboardDetailState.dashboardName"
+                                           :name="dashboardDetailState.name"
                                            @update:visible-clone-modal="handleVisibleCloneModal"
                 />
             </template>
@@ -57,7 +57,7 @@
         <dashboard-widget-container ref="widgetContainerRef" />
         <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
                                    :dashboard-id="props.dashboardId"
-                                   :dashboard-name="dashboardDetailState.dashboardName"
+                                   :name="dashboardDetailState.name"
                                    @confirm="handleNameUpdate"
         />
         <dashboard-delete-modal :visible.sync="state.deleteModalVisible"
@@ -134,7 +134,7 @@ const handleVisibleNameEditModal = () => {
     state.nameEditModalVisible = true;
 };
 const handleNameUpdate = (name: string) => {
-    dashboardDetailState.dashboardName = name;
+    dashboardDetailState.name = name;
 };
 
 // delete dashboard
