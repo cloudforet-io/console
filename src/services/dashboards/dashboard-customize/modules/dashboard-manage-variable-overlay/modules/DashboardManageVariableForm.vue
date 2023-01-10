@@ -126,8 +126,7 @@ const {
 }, {
     name(value: string) {
         if (props.variableNames.includes(value)) {
-            // song-lang
-            return i18n.t('Name is duplicated');
+            return i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.VALIDATION_NAME_REQUIRED');
         }
         // TODO: add invalid text about name length
         return value.trim().length > 0;

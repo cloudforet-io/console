@@ -46,6 +46,8 @@ import {
     PFieldGroup, PIconButton, PLabel, PTextInput,
 } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
 import { useFormValidator } from '@/common/composables/form-validator';
 
 
@@ -67,8 +69,7 @@ const {
 } = useFormValidator({
     inputText: '',
 }, {
-    // song-lang
-    inputText(value: string) { return !state.labelList.find((d) => d === value) ? '' : 'Duplicated label'; },
+    inputText(value: string) { return !state.labelList.find((d) => d === value) ? '' : i18n.t('DASHBOARDS.CUSTOMIZE.VALIDATION_DUPLICATED_LABEL'); },
 });
 
 const state = reactive({

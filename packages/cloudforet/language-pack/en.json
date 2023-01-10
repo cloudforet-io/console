@@ -1120,7 +1120,7 @@
 	},
 	"DASHBOARDS": {
 		"ALL_DASHBOARDS": {
-			"CREAT": "Create",
+			"CREATE": "Create",
 			"CREAT_NEW_DASHBOARD": "Create New Dashboard",
 			"DASHBOARDS_TITLE": "Dashboards",
 			"ENTIRE_WORKSPACE": "Entire Workspace",
@@ -1130,6 +1130,9 @@
 			"FILTER_PUBLIC": "Pubilc",
 			"FILTER_SINGLE_PROJECT": "Single Project",
 			"HELP_TEXT_CREATE": "Create a dashboard to get insights at a glance.",
+			"LABEL_SCOPE": "Scope",
+			"LABEL_VIWERS": "Viewers",
+			"PROJECT": "",
 			"SINGLE_PROJECT": "Single Project",
 			"TOOLTIP_CLONE": "Clone",
 			"TOOLTIP_DELETE": "Delete",
@@ -1145,6 +1148,8 @@
 			"LABEL_SCOPE": "Dashboard Scope",
 			"LABEL_START_FROM": "Start From",
 			"LABEL_VIEWERS": "Viewers",
+			"NO_ITEMS": "No Items",
+			"PREVIEW": "Preview",
 			"PRIVATE": "Private",
 			"PRIVATE_DESC": "Only you",
 			"PUBLIC": "Public",
@@ -1187,11 +1192,15 @@
 			"REFRESH_INTERVAL_30S": "30s",
 			"REFRESH_INTERVAL_5M": "5m",
 			"REFRESH_OFF": "off",
+			"RESET": "Reset",
 			"SAVE": "Save",
+			"VALIDATION_DUPLICATED_LABEL": "Duplicated label",
 			"VARIABLES": {
 				"ADD": "Add Variable",
 				"ADD_OPTIONS": "Add",
 				"CANCEL": "Cancel",
+				"CHECK_MODAL_CONTENTS": "Changes will not be saved.",
+				"CHECK_MODAL_DELETE_TITLE": "Are you sure you want to discard changes?",
 				"DELETE": "Delete",
 				"DELETE_TITLE": "Are you sure you want to cancel this variable?",
 				"EDIT": "Edit",
@@ -1203,11 +1212,14 @@
 				"LABEL_OPTIONS": "Options",
 				"LABEL_SELECTION_TYPE": "Selection Type",
 				"MORE": "More",
+				"MULTI_SELECT": "Multi select",
 				"PLACEHOLDER_OPTIONS": "Input data source",
 				"SAVE": "Save",
+				"SINGLE_SELECT": "Single select",
 				"SUB_TITLE": "Variables",
 				"SUB_TITLE_EDIT": "Edit Variable",
-				"TITLE": "Manage Variables"
+				"TITLE": "Manage Variables",
+				"VALIDATION_NAME_REQUIRED": ""
 			}
 		},
 		"DETAIL": {
@@ -1219,6 +1231,9 @@
 			"DEFAULT": "Default",
 			"DELETE": "Delete",
 			"EXPORT": "Export",
+			"PDF_EXPORT": {
+				"APPLIED_FILTERS": "Applied Filters"
+			},
 			"PERIOD_CUSTOM": "Custom",
 			"PERIOD_LAST_14_DAYS": "Last 14 days",
 			"PERIOD_LAST_3_MONTHS": "Last 3 months",
@@ -1248,7 +1263,9 @@
 			"LABEL_PUBLIC": "Public (Anyone who has 'view' access to 'dashboards')",
 			"LABEL_VIEWERS": "Viewers",
 			"REQUIRED": "Required Field",
-			"UPDATE_TITLE": "Update Dashboard"
+			"UPDATE_TITLE": "Update Dashboard",
+			"VALIDATION_DASHBOARD_NAME_INPUT": "Please input dashboard name",
+			"VALIDATION_DASHBOARD_NAME_UNIQUE": "Dashboard name must be unique"
 		},
 		"LNB": {
 			"ONLY_FAVORITE": "Show favorites only"
@@ -1273,7 +1290,11 @@
 				"DESC": "Displays AWS Data-Transfer cost trend during the selected period. "
 			},
 			"AWS_PERSONAL_HEALTH_DASHBOARD": {
-				"DESC": "Displays the status of specific operational issues that affect cloud service resources."
+				"DESC": "Displays the status of specific operational issues that affect cloud service resources.",
+				"TAB_OPEN_ISSUES": "Open issues",
+				"TAB_OTHER_NOTIFICATIONS": "Other notifications",
+				"TAB_SCHEDULED_CHANGES": "Scheduled changes",
+				"TITLE_AFFECTED_RESOURCES": "Affected resources"
 			},
 			"AWS_TRUSTED_ADVISOR": {
 				"DESC": "Displays the inspection and analysis status of each project through AWS Trusted Advisor."

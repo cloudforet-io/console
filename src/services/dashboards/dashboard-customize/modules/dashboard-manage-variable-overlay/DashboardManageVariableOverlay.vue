@@ -112,18 +112,15 @@ const state = reactive({
     }),
 });
 
-// song-lang
 const deleteModalState = reactive({
     type: 'DELETE' as 'DELETE' | 'ESCAPE' | 'CANCEL',
     headerTitle: computed<TranslateResult>(() => {
         if (deleteModalState.type === 'DELETE') return i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE_TITLE');
-        // song-lang
-        return i18n.t('Are you sure you want to discard changes?');
+        return i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.CHECK_MODAL_DELETE_TITLE');
     }),
     contents: computed<TranslateResult>(() => {
         if (deleteModalState.type === 'DELETE') return '';
-        // song-lang
-        return i18n.t('Changes will not be saved.');
+        return i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.CHECK_MODAL_CONTENTS');
     }),
     visible: false,
     loading: false,

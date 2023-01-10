@@ -19,9 +19,8 @@
                 </template>
                 <template #detail-affected_projects="{value}">
                     <div class="popover-container">
-                        <!--song-lang-->
                         <div class="popover-title">
-                            {{ $t('Affected resources') }}
+                            {{ $t('DASHBOARDS.WIDGET.AWS_PERSONAL_HEALTH_DASHBOARD.TITLE_AFFECTED_RESOURCES') }}
                         </div>
                         <p-divider class="divider" />
                         <div v-for="item in value"
@@ -72,9 +71,9 @@ const props = defineProps<WidgetProps>();
 const state = reactive({
     ...toRefs(useWidgetState<Data[]>(props)),
     tabs: [
-        { name: 'open_issues', label: i18n.t('Open issues') }, // song-lang
-        { name: 'scheduled_changes', label: i18n.t('Scheduled changes') }, // song-lang
-        { name: 'other_notifications', label: i18n.t('Other notifications') }, // song-lang
+        { name: 'open_issues', label: i18n.t('DASHBOARDS.WIDGET.AWS_PERSONAL_HEALTH_DASHBOARD.TAB_OPEN_ISSUES') },
+        { name: 'scheduled_changes', label: i18n.t('DASHBOARDS.WIDGET.AWS_PERSONAL_HEALTH_DASHBOARD.TAB_SCHEDULED_CHANGES') },
+        { name: 'other_notifications', label: i18n.t('DASHBOARDS.WIDGET.AWS_PERSONAL_HEALTH_DASHBOARD.TAB_OTHER_NOTIFICATIONS') },
     ],
     activeTab: 'open_issues',
     tableFields: computed<Field[]>(() => [

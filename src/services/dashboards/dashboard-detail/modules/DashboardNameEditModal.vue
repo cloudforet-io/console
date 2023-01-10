@@ -92,10 +92,8 @@ export default defineComponent<Props>({
             proxyVisible: props.visible,
         });
 
-        // song-lang
-        // const _invalid_unique = 'Dashboard name must be unique';
-        // song-lang
-        // const _invalid_input = 'Please input dashboard name';
+        // const _invalid_unique = 'Dashboard name must be unique'; i18n.t('VALIDATION_DASHBOARD_NAME_UNIQUE')
+        // const _invalid_input = 'Please input dashboard name'; i18n.t('VALIDATION_DASHBOARD_NAME_INPUT')
 
         const isProjectDashboard = props.dashboardId?.startsWith('project');
 

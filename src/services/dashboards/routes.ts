@@ -51,9 +51,8 @@ const dashboardsRoute: RouteConfig = {
                     path: ':dashboardScope',
                     meta: {
                         translationId: ({ params }) => {
-                            // song-lang
-                            if (params.dashboardScope === 'project') return 'Project';
-                            return 'Entire Workspaces';
+                            if (params.dashboardScope === 'project') return 'DASHBOARDS.ALL_DASHBOARDS.PROJECT';
+                            return 'DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE';
                         },
                         copiable: true,
                     },
@@ -75,8 +74,7 @@ const dashboardsRoute: RouteConfig = {
                                 breadcrumbs: ({ params }) => {
                                     const breadcrumbs: Breadcrumb[] = [
                                         {
-                                            // song-lang
-                                            name: i18n.t('Customize'),
+                                            name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
                                             to: {
                                                 name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
                                             },

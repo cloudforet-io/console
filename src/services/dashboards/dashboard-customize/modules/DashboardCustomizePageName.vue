@@ -55,6 +55,7 @@ import { computed, reactive } from 'vue';
 import { PFieldGroup, PPageTitle, PTextInput } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -100,10 +101,8 @@ const {
     nameInput: props.dashboardId ? props.name : '',
 }, {
     nameInput(value: string) {
-        // song-lang
-        if (!value.trim().length) return 'Please input dashboard name';
-        // song-lang
-        if (state.dashboardNameList.find((d) => d === value)) return 'Dashboard name must be unique';
+        if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
+        if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
         return '';
     },
 });
