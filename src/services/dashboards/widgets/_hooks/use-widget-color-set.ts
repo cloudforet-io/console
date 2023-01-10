@@ -1,4 +1,4 @@
-import type { ComputedRef } from 'vue';
+import type { Ref } from 'vue';
 import { computed } from 'vue';
 
 import { palette } from '@/styles/colors';
@@ -24,16 +24,16 @@ const getColorSet = (theme: WidgetTheme, colorSetType: WidgetColorSetType = 'bas
 };
 
 interface UseWidgetColorSetOptions {
-    theme: ComputedRef<WidgetTheme | undefined>;
-    data: ComputedRef<any[] | undefined>;
+    theme: Ref<WidgetTheme | undefined>;
+    dataSize: Ref<number>;
 }
 export const useWidgetColorSet = ({
-    theme, data,
+    theme, dataSize,
 }: UseWidgetColorSetOptions) => ({
     colorSet: computed<string[]>(() => {
         if (!theme?.value) return [];
-        if (!data || !Array.isArray(data.value)) return [];
-        const colorSetType: WidgetColorSetType = data.value.length > 9 ? 'massive' : 'basic';
+        if (!dataSize.value) return [];
+        const colorSetType: WidgetColorSetType = dataSize.value > 9 ? 'massive' : 'basic';
         return getColorSet(theme.value, colorSetType);
     }),
 });

@@ -57,8 +57,7 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed,
-    defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 
 import {
@@ -98,7 +97,6 @@ const props = defineProps<WidgetProps>();
 type Data = CostAnalyzeDataModel['results'];
 const state = reactive({
     ...toRefs(useWidgetState<Data>(props)),
-    ...useWidgetColorSet({ theme: computed(() => props.theme), data: computed(() => state.chartData) }),
     chartData: computed(() => getRefinedXYChartData(state.data)),
     dateRange: computed<DateRange>(() => {
         const end = dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT);
@@ -158,6 +156,10 @@ const getMonthlyCost = (month) => {
     return monthlyCost;
 };
 
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.data?.length ?? 0),
+});
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
@@ -173,7 +175,7 @@ const drawChart = (chartData: XYChartData[]) => {
         fillOpacity: 0.5,
         strokeOpacity: 0,
     });
-    chartHelper.setChartColors(chart, state.colorSet);
+    chartHelper.setChartColors(chart, colorSet.value);
     chart.setAll({
         paddingTop: 0,
         paddingRight: 0,

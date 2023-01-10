@@ -24,7 +24,7 @@
                            :currency-rates="props.currencyRates"
                            :this-page="state.thisPage"
                            :show-next-page="state.data?.more"
-                           :color-set="state.colorSet"
+                           :color-set="colorSet"
                            :all-reference-type-info="props.allReferenceTypeInfo"
                            show-legend
                            @toggle-legend="handleToggleLegend"
@@ -38,7 +38,7 @@ import type { ComputedRef } from 'vue';
 import {
     computed,
     defineExpose,
-    defineProps, nextTick, reactive, ref, toRefs,
+    defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
@@ -83,11 +83,13 @@ interface FullData {
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
-
 const props = defineProps<WidgetProps>();
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.data?.results?.length ?? 0),
+});
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
-    ...useWidgetColorSet({ theme: computed(() => props.theme), data: computed(() => state.chartData) }),
     chart: null as null|ReturnType<typeof chartHelper.createPieChart | typeof chartHelper.createDonutChart>,
     series: null as null|ReturnType<typeof chartHelper.createPieSeries>,
     chartData: computed<PieChartData[]>(() => {
@@ -161,7 +163,7 @@ const drawChart = (chartData: PieChartData[]) => {
     };
     const series = chartHelper.createPieSeries(seriesSettings);
     chart.series.push(series);
-    chartHelper.setChartColors(chart, state.colorSet);
+    chartHelper.setChartColors(chart, colorSet.value);
 
     const tooltip = chartHelper.createTooltip();
     chartHelper.setPieTooltipText(series, tooltip, state.currency, props.currencyRates);

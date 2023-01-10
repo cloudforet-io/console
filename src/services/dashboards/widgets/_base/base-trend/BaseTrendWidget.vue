@@ -31,7 +31,7 @@
                            :currency-rates="props.currencyRates"
                            :all-reference-type-info="props.allReferenceTypeInfo"
                            :legends.sync="state.legends"
-                           :color-set="state.colorSet"
+                           :color-set="colorSet"
                            :this-page="state.thisPage"
                            :show-next-page="state.data?.more"
                            show-legend
@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
@@ -102,10 +102,12 @@ const props = defineProps<WidgetProps>();
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
-
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.data?.results?.length ?? 0),
+});
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
-    ...useWidgetColorSet({ theme: computed(() => props.theme), data: computed(() => state.chartData) }),
     chart: null as null | XYChart,
     chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data?.results, state.groupBy)),
     tableFields: computed<Field[]>(() => {
@@ -130,7 +132,7 @@ const state = reactive({
     }),
     legends: [] as Legend[],
     thisPage: 1,
-    disableReferenceColor: computed<boolean>(() => !!state.colorSet.length),
+    disableReferenceColor: computed<boolean>(() => !!colorSet.value?.length),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         params: {},
@@ -178,7 +180,7 @@ const fetchData = async (): Promise<FullData> => {
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
-    chartHelper.setChartColors(chart, state.colorSet);
+    chartHelper.setChartColors(chart, colorSet.value);
 
     if (state.chartType === CHART_TYPE.LINE) {
         chart.get('cursor')?.lineX.setAll({

@@ -31,7 +31,7 @@
                            :currency-rates="props.currencyRates"
                            :all-reference-type-info="props.allReferenceTypeInfo"
                            :legends.sync="state.legends"
-                           :color-set="state.colorSet"
+                           :color-set="colorSet"
                            :this-page="state.thisPage"
                            :show-next-page="state.data?.more"
                            @update:thisPage="handleUpdateThisPage"
@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
@@ -100,10 +100,12 @@ const USAGE_TYPE_LABEL_MAP: Record<Extract<UsageType, 'data-transfer.out'|'reque
 const props = defineProps<WidgetProps>();
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
-
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.data?.results?.length ?? 0),
+});
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
-    ...useWidgetColorSet({ theme: computed(() => props.theme), data: computed(() => state.chartData) }),
     fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost' : 'usage_quantity')),
     legends: [] as Legend[],
     chartData: computed(() => {
@@ -189,7 +191,7 @@ const fetchData = async (): Promise<FullData> => {
 const drawChart = (chartData) => {
     if (!state.groupBy) return;
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
-    chartHelper.setChartColors(chart, state.colorSet);
+    chartHelper.setChartColors(chart, colorSet.value);
     yAxis.set('categoryField', state.groupBy);
     yAxis.data.setAll(cloneDeep(chartData));
     // legend

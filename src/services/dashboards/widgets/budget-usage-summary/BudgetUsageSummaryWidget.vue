@@ -49,7 +49,7 @@
 import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose,
-    defineProps, nextTick, reactive, ref, toRefs,
+    defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 
 import { color } from '@amcharts/amcharts5';
@@ -100,7 +100,6 @@ const {
 } = useAmcharts5(chartContext);
 const state = reactive({
     ...toRefs(useWidgetState<Data[]>(props)),
-    ...useWidgetColorSet({ theme: computed(() => props.theme), data: computed(() => state.chartData) }),
     chart: null as null|ReturnType<typeof createPieChart>,
     series: null as null|ReturnType<typeof createPieSeries>,
     chartData: computed(() => {
@@ -190,6 +189,10 @@ const fetchData = async (): Promise<Data[]> => {
 };
 
 /* Util */
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.data?.length ?? 0),
+});
 const drawChart = (chartData) => {
     const chart = createDonutChart();
     const seriesSettings = {
@@ -198,7 +201,7 @@ const drawChart = (chartData) => {
     };
     const series = createPieSeries(seriesSettings);
     chart.series.push(series);
-    setChartColors(chart, state.colorSet);
+    setChartColors(chart, colorSet.value);
 
     series.labels.template.set('forceHidden', true);
     series.ticks.template.set('visible', false);

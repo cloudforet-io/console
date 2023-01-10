@@ -31,7 +31,7 @@
                            :currency-rates="props.currencyRates"
                            :all-reference-type-info="allReferenceTypeInfo"
                            :legends.sync="state.legends"
-                           :color-set="state.colorSet"
+                           :color-set="colorSet"
         />
     </widget-frame>
 </template>
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
@@ -79,6 +79,7 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 import type { CostAnalyzeDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
 
+type Data = CostAnalyzeDataModel['results'];
 
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
@@ -93,10 +94,12 @@ const props = defineProps<WidgetProps>();
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
-
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.data?.length ?? 0),
+});
 const state = reactive({
-    ...toRefs(useWidgetState<CostAnalyzeDataModel['results']>(props)),
-    ...useWidgetColorSet({ theme: computed(() => props.theme), data: computed(() => state.chartData) }),
+    ...toRefs(useWidgetState<Data>(props)),
     fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost' : 'usage_quantity')),
     chartData: computed<XYChartData[]>(() => {
         const valueKey = `${state.fieldsKey}_sum`;
@@ -135,13 +138,13 @@ const state = reactive({
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Util */
-const getRefinedTableData = (results: CostAnalyzeDataModel['results']): CostAnalyzeDataModel['results'] => results.map((result) => ({
+const getRefinedTableData = (results: Data): Data => results.map((result) => ({
     ...result,
     [state.groupBy]: USAGE_TYPE_LABEL_MAP[result[state.groupBy]],
 }));
 
 /* Api */
-const fetchData = async (): Promise<CostAnalyzeDataModel['results']> => {
+const fetchData = async (): Promise<Data> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters([
@@ -183,7 +186,7 @@ const fetchData = async (): Promise<CostAnalyzeDataModel['results']> => {
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
-    chartHelper.setChartColors(chart, state.colorSet);
+    chartHelper.setChartColors(chart, colorSet.value);
 
     if (state.chartType === CHART_TYPE.LINE) {
         chart.get('cursor')?.lineX.setAll({
@@ -226,7 +229,7 @@ const drawChart = (chartData: XYChartData[]) => {
     state.chart = chart;
 };
 
-const initWidget = async (data?: CostAnalyzeDataModel['results']) => {
+const initWidget = async (data?: Data) => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.legends = getXYChartLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
@@ -262,7 +265,7 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
 });
 
-defineExpose<WidgetExpose<CostAnalyzeDataModel['results']>>({
+defineExpose<WidgetExpose<Data>>({
     initWidget,
     refreshWidget,
 });
