@@ -68,6 +68,7 @@
 
 <script setup lang="ts">
 import {
+    computed,
     defineEmits,
     onMounted, onUnmounted, reactive,
 } from 'vue';
@@ -83,6 +84,7 @@ import { store } from '@/store';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardAddWidgetModal from '@/services/dashboards/dashboard-customize/modules/DashboardAddWidgetModal.vue';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {
@@ -93,28 +95,30 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: string, value: string): void,
     (e: 'save'): void,
-    (e: 'change:dateRangeToggle', value: boolean): void,
-    (e: 'change:currencyToggle', value: boolean): void,
 }>();
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
-    enableDateRange: useProxyValue('enableDateRange', props, emit),
-    enableCurrency: useProxyValue('enableCurrency', props, emit),
+    enableDateRange: computed(() => dashboardDetailState.settings.date_range?.enabled ?? false),
+    enableCurrency: computed(() => dashboardDetailState.settings.currency?.enabled ?? false),
     proxyWidgetInfoList: useProxyValue('widgetInfoList', props, emit),
     addWidgetModalVisible: false,
 });
 
 /* Event */
 const handleChangeDateRangeToggle = () => {
-    state.enableDateRange = !state.enableDateRange;
+    dashboardDetailState.settings.date_range.enabled = !dashboardDetailState.settings.date_range.enabled;
 };
 const handleChangeCurrencyToggle = () => {
-    state.enableCurrency = !state.enableCurrency;
+    dashboardDetailState.settings.currency.enabled = !dashboardDetailState.settings.currency.enabled;
 };
 const handleClickAddWidget = () => {
     state.addWidgetModalVisible = true;
 };
 const handleClickCancelButton = () => {
     SpaceRouter.router.back();
+    // TODO: revert dashboardState here
 };
 const handleClickSaveButton = () => {
     emit('save');
