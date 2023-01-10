@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="budget-usage-by-target"
+                  :widget-location="state.widgetLocation"
                   @refresh="refreshWidget"
     >
         <widget-data-table :loading="state.loading"
@@ -59,7 +60,6 @@ import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-
 import type { BudgetDataModel } from '@/services/dashboards/widgets/type';
 
 
-
 type Data = BudgetDataModel['results'];
 interface FullData {
     results: Data;
@@ -77,7 +77,7 @@ const state = reactive({
         { label: ' ', name: 'progress' },
         { label: 'Rate', name: 'budget_usage', textOptions: { type: 'percent' } },
     ]),
-    tableItems: computed<Data[]>(() => state.data?.map((d) => ({
+    tableItems: computed<Partial<Data>>(() => state.data?.results?.map((d) => ({
         ...d,
         target: d.project_id ?? d.project_group_id,
         progress: d.budget_usage,
@@ -91,7 +91,7 @@ const state = reactive({
         name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         params: {},
         query: {
-            filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(state.consoleFilters)).rawQueryStrings,
+            filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(state.options?.filters ?? {})).rawQueryStrings,
         },
     })),
 });
@@ -114,7 +114,7 @@ const fetchData = async (): Promise<FullData> => {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+        const { results, more } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, GROUP_BY.PROJECT_GROUP, GROUP_BY.PROJECT],
@@ -131,9 +131,9 @@ const fetchData = async (): Promise<FullData> => {
                     },
                 },
                 select: {
-                    budget_id: 'budget_id',
-                    project_group_id: 'project_group_id',
-                    project_id: 'project_id',
+                    [state.groupBy]: state.groupBy,
+                    [GROUP_BY.PROJECT_GROUP]: GROUP_BY.PROJECT_GROUP,
+                    [GROUP_BY.PROJECT]: GROUP_BY.PROJECT,
                     total_spent: 'total_spent',
                     total_budget: 'total_budget',
                     budget_usage: {
@@ -151,7 +151,7 @@ const fetchData = async (): Promise<FullData> => {
                 ...apiQueryHelper.data,
             },
         });
-        return results;
+        return { results, more };
     } catch (e) {
         ErrorHandler.handleError(e);
         return { results: [], more: false };

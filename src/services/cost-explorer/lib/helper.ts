@@ -45,7 +45,7 @@ export const getConvertedBudgetFilter = (filters: CostFiltersMap): ConsoleFilter
                 v: filterItems.map((d) => d.v),
                 o: '=',
             });
-        } else {
+        } else if (filterItems.length) {
             const values = [] as Array<string|null>;
             filterItems.forEach((f) => {
                 values.push(f.v);
