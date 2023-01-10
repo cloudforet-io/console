@@ -133,7 +133,7 @@ export default {
                     params: {},
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                        groupBy: arrayToQueryString([state.groupBy]),
+                        group_by: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(_period),
                         filters: objectToQueryString(props.filters),
                     },

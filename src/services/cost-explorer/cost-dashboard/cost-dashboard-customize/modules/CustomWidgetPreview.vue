@@ -116,7 +116,7 @@ export default {
                 params: {},
                 query: {
                     granularity: primitiveToQueryString(state.granularity),
-                    groupBy: arrayToQueryString([state.groupBy]),
+                    group_by: arrayToQueryString([state.groupBy]),
                     filters: objectToQueryString(state.filters),
                     stack: primitiveToQueryString(state.stack),
                 },
