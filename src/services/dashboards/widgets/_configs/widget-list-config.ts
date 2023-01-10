@@ -6,9 +6,8 @@ import dashboardCommon from '@/services/dashboards/widgets/_base/dashboard-commo
 import awsCloudFrontCost from '@/services/dashboards/widgets/aws-cloud-front-cost/widget-config';
 import awsDataTransferByRegion from '@/services/dashboards/widgets/aws-data-transfer-by-region/widget-config';
 import awsDataTransferCostTrend from '@/services/dashboards/widgets/aws-data-transfer-cost-trend/widget-config';
-import awsPersonalHealthDashboard from '@/services/dashboards/widgets/aws-personal-health-dashboard/widget-config';
 import budgetStatus from '@/services/dashboards/widgets/budget-status/widget-config';
-import budgetUsageWithForecast from '@/services/dashboards/widgets/budget-usage-by-target/widget-config';
+import budgetUsageByTarget from '@/services/dashboards/widgets/budget-usage-by-target/widget-config';
 import budgetUsageSummary from '@/services/dashboards/widgets/budget-usage-summary/widget-config';
 import costByRegion from '@/services/dashboards/widgets/cost-by-region/widget-config';
 import costDonut from '@/services/dashboards/widgets/cost-donut/widget-config';
@@ -18,6 +17,7 @@ import costTrendStacked from '@/services/dashboards/widgets/cost-trend-stacked/w
 import costTrend from '@/services/dashboards/widgets/cost-trend/widget-config';
 import monthlyCost from '@/services/dashboards/widgets/monthly-cost/widget-config';
 // assets widget configs
+// import awsPersonalHealthDashboard from '@/services/dashboards/widgets/aws-personal-health-dashboard/widget-config';
 // import assetSummaryByRegions from '@/services/dashboards/widgets/asset-summary-by-regions/widget-config';
 // import awsTrustedAdvisorProject from '@/services/dashboards/widgets/aws-trusted-advisor/project-scope/widget-config';
 // import awsTrustedAdvisorWorkspace from '@/services/dashboards/widgets/aws-trusted-advisor/workspace-scope/widget-config';
@@ -41,7 +41,7 @@ export const CONSOLE_WIDGET_ORDER = [
     'costByRegion',
     'awsDataTransferByRegion',
     'budgetStatus',
-    'budgetUsageWithForecast',
+    'budgetUsageByTarget',
 ];
 
 export const CONSOLE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {
@@ -57,8 +57,8 @@ export const CONSOLE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {
     costByRegion,
     awsDataTransferByRegion,
     budgetStatus,
-    budgetUsageWithForecast,
-    awsPersonalHealthDashboard,
+    budgetUsageByTarget,
+    // awsPersonalHealthDashboard,
     // assetSummaryByRegions,
     // awsTrustedAdvisorProject,
     // awsTrustedAdvisorWorkspace,

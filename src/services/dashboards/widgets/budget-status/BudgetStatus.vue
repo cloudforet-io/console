@@ -105,17 +105,8 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 /* Util */
 const getTooltipText = (rowIdx: number, colIdx: number): string => {
     const _target = state.data?.[colIdx * 10 + rowIdx];
-    const totalBudget = _target?.total_budget ?? 0;
-    const totalSpent = _target?.total_spent ?? 0;
-
-    let percentage;
-    if (totalSpent === 0) percentage = '0%';
-    else if (totalBudget === 0) percentage = '-';
-    else {
-        const usage = totalSpent / totalBudget * 100;
-        percentage = `${usage.toFixed(2)}%`;
-    }
-    return `${_target?.name} (${percentage})`;
+    const budgetUsage = _target?.budget_usage ?? 0;
+    return `${_target?.name} (${budgetUsage.toFixed(2)}%)`;
 };
 const getColor = (rowIdx: number, colIdx: number): string => {
     const _target = state.data?.[colIdx * 10 + rowIdx];
@@ -155,7 +146,23 @@ const fetchData = async (): Promise<Data> => {
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'total_spent', desc: true }], // TODO: should be changed after api updated
+                select: {
+                    budget_id: 'budget_id',
+                    name: 'name',
+                    total_spent: 'total_spent',
+                    total_budget: 'total_budget',
+                    budget_usage: {
+                        operator: 'multiply',
+                        fields: [
+                            {
+                                operator: 'divide',
+                                fields: ['total_spent', 'total_budget'],
+                            },
+                            100,
+                        ],
+                    },
+                },
+                sort: [{ key: 'budget_usage', desc: true }],
                 page: { limit: 200 },
                 ...apiQueryHelper.data,
             },

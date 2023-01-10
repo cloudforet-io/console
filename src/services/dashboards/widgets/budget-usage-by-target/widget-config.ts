@@ -3,7 +3,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 
 const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetUsageByTarget',
-    title: 'Budget Usage With Forecast',
+    title: 'Budget Usage By Target',
     base_configs: [{ config_id: 'dashboardCommon' }],
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/budget-usage-by-target/BudgetUsageByTarget.vue'),

@@ -75,17 +75,13 @@ const state = reactive({
         { label: 'Total spent', name: 'total_spent', textOptions: { type: 'cost' } },
         { label: 'Total budget', name: 'total_budget', textOptions: { type: 'cost' } },
         { label: ' ', name: 'progress' },
-        { label: 'Rate', name: 'rate', textOptions: { type: 'percent' } },
+        { label: 'Rate', name: 'budget_usage', textOptions: { type: 'percent' } },
     ]),
-    tableItems: computed<Data[]>(() => state.data?.map((d) => {
-        const percentage = d.total_spent / d.total_budget * 100;
-        return {
-            ...d,
-            target: d.project_id ?? d.project_group_id,
-            progress: percentage,
-            rate: percentage,
-        };
-    }) ?? []),
+    tableItems: computed<Data[]>(() => state.data?.map((d) => ({
+        ...d,
+        target: d.project_id ?? d.project_group_id,
+        progress: d.budget_usage,
+    })) ?? []),
     dateRange: computed<DateRange>(() => ({
         start: state.settings?.date_range?.start,
         end: state.settings?.date_range?.end,
@@ -122,7 +118,7 @@ const fetchData = async (): Promise<FullData> => {
             query: {
                 granularity: state.granularity,
                 group_by: [state.groupBy, GROUP_BY.PROJECT_GROUP, GROUP_BY.PROJECT],
-                start: '2022-02', // TODO: should be change to state.dateRange.start
+                start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
                     total_spent: {
@@ -134,7 +130,24 @@ const fetchData = async (): Promise<FullData> => {
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'total_spent', desc: true }], // TODO: should be changed after api updated
+                select: {
+                    budget_id: 'budget_id',
+                    project_group_id: 'project_group_id',
+                    project_id: 'project_id',
+                    total_spent: 'total_spent',
+                    total_budget: 'total_budget',
+                    budget_usage: {
+                        operator: 'multiply',
+                        fields: [
+                            {
+                                operator: 'divide',
+                                fields: ['total_spent', 'total_budget'],
+                            },
+                            100,
+                        ],
+                    },
+                },
+                sort: [{ key: 'budget_usage', desc: true }],
                 ...apiQueryHelper.data,
             },
         });
