@@ -1,6 +1,7 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="budget-status-widget"
+                  :widget-location="state.widgetLocation"
                   @refresh="handleRefresh"
     >
         <p-data-loader :loading="state.loading"
@@ -95,7 +96,7 @@ const state = reactive({
         name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         params: {},
         query: {
-            filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(state.consoleFilters)).rawQueryStrings,
+            filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(state.options?.filters ?? {})).rawQueryStrings,
         },
     })),
 });
