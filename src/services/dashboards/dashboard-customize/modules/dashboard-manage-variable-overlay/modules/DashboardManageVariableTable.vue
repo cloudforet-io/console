@@ -74,6 +74,7 @@ import {
     PBadge, PDataTable, PSelectStatus, PToggleButton, PButton, PCollapsiblePanel,
 } from '@spaceone/design-system';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { VariableType, DashboardVariablesSchema } from '@/services/dashboards/config';
@@ -94,19 +95,21 @@ const emit = defineEmits<EmitFn>();
 const state = reactive({
     orderedVariables: computed(() => {
         const convertedVariables = props.order.map((d) => {
-            const currentVariable = {
+            if (props.variables[d].variable_type === 'MANAGED') {
+                return {
+                    ...props.variables[d],
+                    propertyName: d,
+                    options: Object.keys(state.allReferenceTypeInfo[d].referenceMap),
+                };
+            }
+            return {
                 ...props.variables[d],
                 propertyName: d,
-            };
-            if (currentVariable.variable_type === 'MANAGED') return currentVariable;
-            return {
-                ...currentVariable,
                 managable: d,
             };
         });
         if (state.selectedVariableType === 'ALL') return convertedVariables;
-        const variablesFilteredByType = convertedVariables.filter((d) => d.variable_type === state.selectedVariableType);
-        return variablesFilteredByType;
+        return convertedVariables.filter((d) => d.variable_type === state.selectedVariableType);
     }),
     variableFilterList: computed(() => [
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_ALL'), name: 'ALL' },
@@ -130,6 +133,7 @@ const state = reactive({
         MANAGED: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
         CUSTOM: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
     })),
+    allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
 });
 
 /* Helper */
