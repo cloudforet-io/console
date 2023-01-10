@@ -40,14 +40,14 @@ const state = reactive({
     proxyCurrency: useProxyValue('currency', props, emit),
 });
 
-const handleUpdateDateRange = (dateRange) => {
+const handleUpdateDateRange = (dateRange: DashboardSettings['date_range']) => {
     state.proxyDateRange = {
         ...state.proxyDateRange,
         start: dateRange.start,
         end: dateRange.end,
     };
 };
-const handleUpdateCurrency = (currency) => {
+const handleUpdateCurrency = (currency: DashboardSettings['currency']) => {
     state.proxyCurrency = {
         ...state.proxyCurrency,
         value: currency,

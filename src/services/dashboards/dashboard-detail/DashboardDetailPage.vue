@@ -40,8 +40,8 @@
         <div class="filter-box">
             <dashboard-labels :label-list="dashboardDetailState.labels" />
             <dashboard-toolset
-                :currency.sync="dashboardDetailState.currency"
-                :date-range.sync="dashboardDetailState.dateRange"
+                :currency.sync="dashboardDetailState.settings.currency"
+                :date-range.sync="dashboardDetailState.settings.date_range"
                 @update:dateRange="handleUpdateURLParam"
                 @update:currency="handleUpdateURLParam"
             />
