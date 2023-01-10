@@ -99,7 +99,7 @@ const state = reactive({
         } else arrayOfSelectedOptions = [option];
 
         if (state.variableProperty.variable_type === 'MANAGED') {
-            return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d].label }));
+            return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
         } return arrayOfSelectedOptions.map((d) => ({ name: d, label: d }));
     }),
     options: computed<MenuItem[]>(() => {

@@ -45,6 +45,7 @@ import {
 
 import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { cloneDeep } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
@@ -102,9 +103,11 @@ const {
 
 // helper
 const updateVariablesUse = () => {
+    const _varialbesSchema = cloneDeep(state.variableSchema);
     state.variableSchema.order.forEach((property) => {
-        dashboardDetailStore.updateVariableUse(property, state.selectedForUpdate.some((menu) => menu.name === property));
+        _varialbesSchema.properties[property].use = state.selectedForUpdate.some((menu) => menu.name === property);
     });
+    dashboardDetailState.variablesSchema = _varialbesSchema;
 };
 
 // event

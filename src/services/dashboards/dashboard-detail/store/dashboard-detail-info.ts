@@ -252,30 +252,29 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const deleteWidget = (widgetKey: string) => {
         state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widget_key !== widgetKey);
     };
-    const updateVariableUse = (propertyName: string, use: boolean) => {
-        if (!state.variablesSchema.properties[propertyName]) return;
-        state.variablesSchema.properties[propertyName].use = use;
-    };
     const resetVariables = () => {
         const originProperties = { ...managedDashboardVariablesSchema.properties, ...originState.dashboardInfo.variables_schema.properties };
         const originOrder = union(managedDashboardVariablesSchema.order, originState.dashboardInfo.variables_schema.order);
         const originVariables = originState.dashboardInfo.variables;
 
         // reset variables schema
+        const _variableSchema = cloneDeep(state.variablesSchema);
         state.variablesSchema.order.forEach((property) => {
             if (!originProperties[property]) return;
-            updateVariableUse(property, originProperties[property].use);
+            _variableSchema.properties[property].use = originProperties[property].use;
         });
+        state.variablesSchema = _variableSchema;
 
         // reset variables
+        const _variables = cloneDeep(state.variables);
         originOrder.forEach((property) => {
             // CASE: existing variable is deleted.
             if (!state.variablesSchema.properties[property]) return;
-
             if (isEqual(state.variablesSchema.properties[property], originProperties[property])) {
-                state.variables = { ...state.variables, [property]: originVariables[property] };
+                _variables[property] = originVariables[property];
             }
         });
+        state.variables = _variables;
     };
 
     store.dispatch('reference/loadAll');
@@ -293,7 +292,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         // action
         updateWidgetInfo,
         deleteWidget,
-        updateVariableUse,
         resetVariables,
     };
 });
