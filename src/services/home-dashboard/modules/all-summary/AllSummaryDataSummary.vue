@@ -152,7 +152,7 @@ export default {
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                 query: {
                     granularity: primitiveToQueryString(props.selectedDateType),
-                    groupBy: arrayToQueryString([GROUP_BY.PRODUCT]),
+                    group_by: arrayToQueryString([GROUP_BY.PRODUCT]),
                     period: objectToQueryString(period),
                 },
             };

@@ -148,7 +148,7 @@ export default defineComponent<WidgetProps>({
                     query: {
                         chartType: primitiveToQueryString(CHART_TYPE.DONUT),
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-                        groupBy: arrayToQueryString([state.groupBy]),
+                        group_by: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(props.period),
                         filters: objectToQueryString(props.filters),
                     },

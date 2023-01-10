@@ -187,7 +187,7 @@ export default {
                 params: {},
                 query: {
                     granularity: primitiveToQueryString(props.options?.granularity),
-                    groupBy: arrayToQueryString([props.options?.group_by]),
+                    group_by: arrayToQueryString([props.options?.group_by]),
                     period: objectToQueryString(state.convertedPeriod),
                     filters: objectToQueryString(state.filters),
                     stack: primitiveToQueryString(props.options?.stack),

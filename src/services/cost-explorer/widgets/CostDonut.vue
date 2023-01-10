@@ -134,7 +134,7 @@ export default defineComponent<WidgetProps>({
                     params: {},
                     query: {
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
-                        groupBy: arrayToQueryString([state.groupBy]),
+                        group_by: arrayToQueryString([state.groupBy]),
                         period: objectToQueryString(props.period),
                         filters: objectToQueryString(props.filters),
                     },

@@ -166,7 +166,7 @@ export default {
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
                     params: {},
                     query: {
-                        groupBy: arrayToQueryString([GROUP_BY.REGION]),
+                        group_by: arrayToQueryString([GROUP_BY.REGION]),
                         granularity: primitiveToQueryString(GRANULARITY.ACCUMULATED),
                         period: objectToQueryString(props.period),
                         filters: objectToQueryString({ ...props.filters, provider: ['aws'], product: ['AWSDataTransfer'] }),
