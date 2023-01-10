@@ -223,6 +223,7 @@ const drawChart = (chartData: XYChartData[]) => {
 
 const initWidget = async (data?: FullData) => {
     state.loading = true;
+    await nextTick();
     state.data = data ?? await fetchData();
     state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     await nextTick();
@@ -234,6 +235,7 @@ const initWidget = async (data?: FullData) => {
 const refreshWidget = async (thisPage = 1) => {
     state.loading = true;
     state.thisPage = thisPage;
+    await nextTick();
     state.data = await fetchData();
     state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor);
     await nextTick();
