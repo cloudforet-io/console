@@ -177,8 +177,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.settings = {
             date_range: {
                 enabled: dashboardInfo.settings?.date_range?.enabled ?? false,
-                start: dashboardInfo.settings?.date_range?.start,
-                end: dashboardInfo.settings?.date_range?.end,
+                start: dashboardInfo.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM-01'),
+                end: dashboardInfo.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM-DD'),
             },
             currency: {
                 enabled: dashboardInfo.settings?.currency?.enabled ?? false,
