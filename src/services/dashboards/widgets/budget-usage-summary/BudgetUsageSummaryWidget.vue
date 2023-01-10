@@ -58,6 +58,7 @@ import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 
@@ -92,13 +93,11 @@ interface Data {
 const DATE_FORMAT = 'YYYY-MM';
 
 const props = defineProps<WidgetProps>();
-
 const chartContext = ref<HTMLElement|null>(null);
 const {
     createDonutChart, createPieSeries,
     disposeRoot, refreshRoot, setChartColors,
 } = useAmcharts5(chartContext);
-
 const state = reactive({
     ...toRefs(useWidgetState<Data[]>(props)),
     chart: null as null|ReturnType<typeof createPieChart>,
@@ -159,6 +158,8 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 /* Api */
 const fetchData = async (): Promise<Data[]> => {
     try {
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters(state.consoleFilters);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.options.granularity,
@@ -177,6 +178,7 @@ const fetchData = async (): Promise<Data[]> => {
                         operator: 'count',
                     },
                 },
+                ...apiQueryHelper.data,
             },
         });
         return results;
