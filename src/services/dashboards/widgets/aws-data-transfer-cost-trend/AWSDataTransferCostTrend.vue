@@ -16,6 +16,7 @@
                            :loading="state.loading"
                            :data="state.chartData"
                            loader-type="skeleton"
+                           :loader-backdrop-opacity="1"
                            show-data-from-scratch
             >
                 <div ref="chartContext"

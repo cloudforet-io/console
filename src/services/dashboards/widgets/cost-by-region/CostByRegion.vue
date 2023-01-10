@@ -7,6 +7,7 @@
             <p-data-loader class="chart-loader"
                            :loading="state.loading"
                            :data="state.chartData"
+                           :loader-backdrop-opacity="1"
                            loader-type="skeleton"
                            show-data-from-scratch
             >

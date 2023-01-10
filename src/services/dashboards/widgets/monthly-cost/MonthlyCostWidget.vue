@@ -2,7 +2,12 @@
     <widget-frame v-bind="widgetFrameProps"
                   @refresh="handleRefresh"
     >
-        <div class="monthly-cost">
+        <p-data-loader class="monthly-cost"
+                       :loading="state.loading"
+                       :data="state.data"
+                       :loader-backdrop-opacity="1"
+                       loader-type="skeleton"
+        >
             <div class="cost">
                 <p class="cost-label">
                     {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.CURRENT_MONTH') }}
@@ -40,17 +45,28 @@
                 </div>
             </div>
             <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               loader-type="skeleton"
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
+                <div ref="chartContext"
+                     class="chart"
+                />
             </div>
-        </div>
+            <template #loader>
+                <div v-for="(_, idx) in state.skeletons"
+                     :key="`skeleton-${idx}`"
+                     class="skeleton-wrapper mt-4"
+                >
+                    <p-skeleton width="10rem"
+                                height="1.875rem"
+                                class="mb-1"
+                    />
+                    <p-skeleton width="7.5rem"
+                                height="1.5rem"
+                    />
+                </div>
+                <p-skeleton width="100%"
+                            height="100%"
+                />
+            </template>
+        </p-data-loader>
     </widget-frame>
 </template>
 
@@ -61,7 +77,7 @@ import {
 } from 'vue';
 
 import {
-    PDivider, PDataLoader, PBadge, PI,
+    PDivider, PDataLoader, PBadge, PI, PSkeleton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -97,6 +113,7 @@ const props = defineProps<WidgetProps>();
 type Data = CostAnalyzeDataModel['results'];
 const state = reactive({
     ...toRefs(useWidgetState<Data>(props)),
+    skeletons: [1, 2],
     chartData: computed(() => getRefinedXYChartData(state.data)),
     dateRange: computed<DateRange>(() => {
         const end = dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT);
@@ -264,11 +281,20 @@ defineExpose<WidgetExpose<Data>>({
         height: 6.25rem;
         margin-top: 1.5rem;
         width: 100%;
-        .chart-loader {
+        .chart {
             height: 100%;
-            .chart {
-                height: 100%;
-            }
+        }
+    }
+}
+:deep(.data-loader-container) {
+    > .loader-wrapper > .loader {
+        @apply flex-col items-start justify-start;
+    }
+    .skeleton-wrapper {
+        @apply flex flex-col;
+        &:last-of-type {
+            margin-top: 3.8125rem;
+            margin-bottom: 1.875rem;
         }
     }
 }
