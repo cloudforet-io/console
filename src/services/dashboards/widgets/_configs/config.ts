@@ -133,6 +133,7 @@ export interface WidgetOptions {
 
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
+    widget_key: string; // widget unique key
     title: string; // widget title
     widget_options: WidgetOptions;
     size: WidgetSize;
