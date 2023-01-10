@@ -89,14 +89,12 @@ import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize
 import VariableMoreButtonDropdown
     from '@/services/dashboards/dashboard-customize/modules/VariableMoreButtonDropdown.vue';
 import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
-import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {
     dashboardId?: string;
@@ -105,6 +103,7 @@ interface Props {
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailOriginState = dashboardDetailStore.originState;
 
 const state = reactive({
     name: dashboardDetailState.dashboardName,
@@ -113,11 +112,7 @@ const state = reactive({
         name: dashboardDetailState.dashboardName,
         labels: dashboardDetailState.labels,
         settings: dashboardDetailState.settings,
-        layouts: [dashboardDetailState.dashboardWidgetInfoList.map((widget) => {
-            const result: Partial<DashboardContainerWidgetInfo> = { ...widget };
-            delete result.widgetKey;
-            return result as DashboardLayoutWidgetInfo;
-        })],
+        layouts: [dashboardDetailState.dashboardWidgetInfoList],
         variables: dashboardDetailState.variables,
         variables_schema: dashboardDetailState.variables_schema,
     })),
@@ -145,7 +140,7 @@ const getDashboardData = async () => {
 };
 const updateDashboardData = async () => {
     try {
-        if (dashboardDetailState.isProjectDashboard) {
+        if (dashboardDetailOriginState.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
                 ...state.apiParam,
                 name: state.name,
@@ -163,7 +158,7 @@ const updateDashboardData = async () => {
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: props.dashboardId as string,
-                dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
+                dashboardScope: dashboardDetailOriginState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
     } catch (e) {
@@ -172,18 +167,18 @@ const updateDashboardData = async () => {
 };
 const createDashboard = async () => {
     try {
-        if (dashboardDetailState.isProjectDashboard) {
+        if (dashboardDetailOriginState.isProjectDashboard) {
             const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
                 ...state.apiParam,
                 name: state.name,
-                viewers: dashboardDetailState.dashboardViewer,
+                viewers: dashboardDetailOriginState.dashboardViewer,
             });
             dashboardDetailState.dashboardId = result.project_dashboard_id;
         } else {
             const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create({
                 ...state.apiParam,
                 name: state.name,
-                viewers: dashboardDetailState.dashboardViewer,
+                viewers: dashboardDetailOriginState.dashboardViewer,
             });
             dashboardDetailState.dashboardId = result.domain_dashboard_id;
         }
@@ -192,7 +187,7 @@ const createDashboard = async () => {
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: dashboardDetailState.dashboardId as string,
-                dashboardScope: dashboardDetailState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
+                dashboardScope: dashboardDetailOriginState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
     } catch (e) {

@@ -123,9 +123,8 @@ import type { DateRange } from '@/services/dashboards/config';
 import DashboardAddDefaultWidgetRightArea
     from '@/services/dashboards/dashboard-customize/modules/DashboardAddDefaultWidgetRightArea.vue';
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
-import type { DashboardContainerWidgetInfo } from '@/services/dashboards/dashboard-detail/lib/type';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
-import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetSize, DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {
@@ -232,7 +231,7 @@ const state = reactive({
 const setBasicDateFormat = (date) => (date ? dayjs.utc(date).format('YYYY-MM-DD') : undefined);
 const handleEditButtonClick = () => { state.visibleEditModal = true; };
 const handleEditModalConfirm = () => {
-    const widgetInfo: Partial<DashboardContainerWidgetInfo> = {
+    const widgetInfo: Partial<DashboardLayoutWidgetInfo> = {
         widget_name: widgetFormState.widgetConfigId ?? '',
         title: widgetFormState.widgetTitle ?? '',
         inherit_options: widgetFormState.inheritOptions ?? {},
