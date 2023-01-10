@@ -1,5 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
+                  refresh-on-resize
                   class="base-trend-widget"
                   @refresh="refreshWidget"
     >

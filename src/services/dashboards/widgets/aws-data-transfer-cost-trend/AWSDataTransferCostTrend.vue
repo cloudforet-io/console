@@ -1,5 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
+                  refresh-on-resize
                   class="aws-data-transfer-cost-trend"
                   @refresh="handleRefresh"
     >
