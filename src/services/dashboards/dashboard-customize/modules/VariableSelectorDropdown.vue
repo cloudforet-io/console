@@ -45,9 +45,9 @@
                         :style="fixedMenuStyle"
                         :menu="reorderedMenu"
                         :selected="selected"
-                        :multi-selectable="variableSchema.selection_type === 'MULTI'"
-                        :show-radio-icon="variableSchema.selection_type === 'SINGLE'"
-                        :show-clear-selection="variableSchema.selection_type === 'MULTI'"
+                        :multi-selectable="variableProperty.selection_type === 'MULTI'"
+                        :show-radio-icon="variableProperty.selection_type === 'SINGLE'"
+                        :show-clear-selection="variableProperty.selection_type === 'MULTI'"
                         @update:selected="handleSelectOption"
                         @update:search-text="handleChangeContextMenuInput"
         />
@@ -68,11 +68,14 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { cloneDeep } from 'lodash';
 
+import type { ReferenceMap } from '@/store/modules/reference/type';
+
 import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 
 interface Props {
     propertyName: string;
+    referenceMap: ReferenceMap;
 }
 
 const props = defineProps<Props>();
@@ -84,9 +87,9 @@ const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as typeof PContextMenu | null,
     searchText: '',
-    variableSchema: computed<DashboardVariableSchemaProperty>(() => dashboardDetailState.variablesSchema.properties[props.propertyName]),
+    variableProperty: computed<DashboardVariableSchemaProperty>(() => dashboardDetailState.variablesSchema.properties[props.propertyName]),
     variableSelectedOptions: computed<undefined|string|string[]>(() => dashboardDetailState.variables[props.propertyName]),
-    variableName: computed(() => state.variableSchema?.name),
+    variableName: computed(() => state.variableProperty?.name),
     selected: computed<MenuItem[]>(() => {
         const option = state.variableSelectedOptions;
         if (!option) return [];
@@ -95,18 +98,25 @@ const state = reactive({
             arrayOfSelectedOptions = option;
         } else arrayOfSelectedOptions = [option];
 
-        return arrayOfSelectedOptions.map((d) => ({ name: d, label: d }));
+        if (state.variableProperty.variable_type === 'MANAGED') {
+            return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
+        } return arrayOfSelectedOptions.map((d) => ({ name: d, label: d }));
     }),
     options: computed<MenuItem[]>(() => {
-        const defaultOptions = state.variableSchema.options as string[];
-        return defaultOptions.map((d) => ({ name: d, label: d }));
+        let result;
+        if (state.variableProperty.variable_type === 'MANAGED') {
+            result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
+                name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
+            }));
+        } else result = state.variableProperty.options?.map((d) => ({ name: d, label: d }));
+        return result;
     }),
 });
 
 const {
     targetRef,
     contextMenuRef,
-    variableSchema,
+    variableProperty,
     variableName,
     searchText,
     selected,
@@ -154,7 +164,7 @@ const changeVariables = (changedSelected: MenuItem[]) => {
     const reconvertedSelected = changedSelected.map((d) => d.name) as string[];
     if (reconvertedSelected.length === 0) {
         delete variables[props.propertyName];
-    } else if (state.variableSchema.selection_type === 'SINGLE') {
+    } else if (state.variableProperty.selection_type === 'SINGLE') {
         variables[props.propertyName] = reconvertedSelected[0];
     } else {
         variables[props.propertyName] = reconvertedSelected;

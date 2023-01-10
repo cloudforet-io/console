@@ -2,39 +2,42 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 
 export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
     properties: {
-        project_id: {
+        project: {
             name: 'Project',
             variable_type: 'MANAGED',
-            default_use: true,
+            use: true,
             selection_type: 'MULTI',
         },
         provider: {
             name: 'Provider',
             variable_type: 'MANAGED',
-            default_use: true,
+            use: true,
             selection_type: 'SINGLE',
         },
-        service_account_id: {
+        serviceAccount: {
             name: 'Service Account',
             variable_type: 'MANAGED',
-            default_use: true,
+            use: true,
             selection_type: 'MULTI',
         },
-        user_id: {
+        user: {
             name: 'User',
             variable_type: 'MANAGED',
+            use: false,
             selection_type: 'MULTI',
         },
-        cloud_service_type_id: {
+        cloudServiceType: {
             name: 'Cloud Service Type',
             variable_type: 'MANAGED',
+            use: false,
             selection_type: 'MULTI',
         },
-        region_code: {
+        region: {
             name: 'Region',
             variable_type: 'MANAGED',
+            use: false,
             selection_type: 'MULTI',
         },
     },
-    order: ['project_id', 'provider', 'service_account_id', 'user_id', 'cloud_service_type_id', 'region_code'],
+    order: ['project', 'provider', 'serviceAccount', 'user', 'cloudServiceType', 'region'],
 };
