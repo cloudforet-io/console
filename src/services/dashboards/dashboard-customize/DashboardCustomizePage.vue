@@ -20,7 +20,7 @@
                     <variable-selector-dropdown v-if="variableState.variableProperties[propertyName]?.use"
                                                 :key="`${propertyName}-${idx}`"
                                                 :property-name="propertyName"
-                                                :reference-map="variableState.referenceType[propertyName].referenceMap"
+                                                :reference-map="variableState.referenceType[propertyName]?.referenceMap"
                     />
                 </template>
                 <variable-more-button-dropdown />
