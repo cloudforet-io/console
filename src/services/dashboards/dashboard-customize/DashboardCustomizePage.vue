@@ -20,6 +20,7 @@
                     <variable-selector-dropdown v-if="variableState.variableProperties[propertyName]?.use"
                                                 :key="`${propertyName}-${idx}`"
                                                 :property-name="propertyName"
+                                                :reference-map="variableState.referenceType[propertyName].referenceMap"
                     />
                 </template>
                 <variable-more-button-dropdown />
@@ -63,6 +64,7 @@ import { isEqual } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 
@@ -114,6 +116,7 @@ const variableState = reactive({
     variableData: computed(() => dashboardDetailState.variables),
     variableProperties: computed(() => dashboardDetailState.variablesSchema.properties),
     order: computed(() => dashboardDetailState.variablesSchema.order),
+    referenceType: computed(() => store.getters['reference/allReferenceTypeInfo']),
 });
 
 /* Api */

@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import dayjs from 'dayjs';
-import { cloneDeep, flattenDeep } from 'lodash';
+import { cloneDeep, flattenDeep, union } from 'lodash';
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -20,6 +20,7 @@ import type {
     DateRange, DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
 } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
+import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
@@ -166,6 +167,11 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     };
 
     const setDashboardInfo = (dashboardInfo: DashboardModel) => {
+        dashboardInfo.variables_schema = {
+            properties: { ...managedDashboardVariablesSchema.properties, ...dashboardInfo.variables_schema.properties },
+            order: union(managedDashboardVariablesSchema.order, dashboardInfo.variables_schema.order),
+        };
+
         originState.dashboardInfo = dashboardInfo;
 
         const _dashboardInfo = cloneDeep(dashboardInfo);
