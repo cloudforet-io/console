@@ -1,4 +1,4 @@
-import type { ComputedRef } from 'vue';
+import type { ComputedRef, UnwrapRef } from 'vue';
 import {
     computed, reactive,
 } from 'vue';
@@ -15,11 +15,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
-import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 
 import type {
-    DateRange, DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
+    DashboardViewer, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
 } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
@@ -48,10 +47,6 @@ interface DashboardDetailInfoStoreState {
     dashboardId: string | undefined;
     projectId: string;
     dashboardName: string;
-    enableCurrency: boolean;
-    currency: Currency;
-    enableDateRange: boolean;
-    dateRange: DateRange;
     settings: DashboardSettings;
     variables: DashboardVariables;
     variablesSchema: DashboardVariablesSchema;
@@ -66,6 +61,20 @@ interface ValidationState {
     isWidgetLayoutValid: ComputedRef<Record<string, boolean>>;
     widgetInheritVariablesValidMap: ComputedRef<WidgetInheritVariablesValidMap>;
 }
+
+const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
+    settings: {
+        date_range: {
+            start: dayjs.utc().format('YYYY-MM-01'),
+            end: dayjs.utc().format('YYYY-MM-DD'),
+            enabled: false,
+        },
+        currency: {
+            enabled: false,
+            value: CURRENCY.USD,
+        },
+    },
+});
 
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
     const originState = reactive<DashboardDetailInfoOriginState>({
@@ -82,24 +91,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         dashboardId: '',
         projectId: '',
         dashboardName: '',
-        enableCurrency: false,
-        currency: CURRENCY.USD,
-        enableDateRange: false,
-        dateRange: {
-            start: dayjs.utc().format('YYYY-MM-01'),
-            end: dayjs.utc().format('YYYY-MM-DD'),
-        },
-        settings: {
-            date_range: {
-                enabled: false,
-                start: dayjs.utc().format('YYYY-MM-01'),
-                end: dayjs.utc().format('YYYY-MM-DD'),
-            },
-            currency: {
-                enabled: false,
-                value: CURRENCY.USD,
-            },
-        },
+        settings: DASHBOARD_DEFAULT.settings,
         variables: {},
         variablesSchema: {
             properties: {},
@@ -110,7 +102,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         dashboardWidgetInfoList: [],
         loadingWidgets: false,
         widgetDataMap: {},
-    });
+    }) as UnwrapRef<DashboardDetailInfoStoreState>;
     const validationState = reactive<ValidationState>({
         isDashboardNameValid: undefined,
         isWidgetLayoutValid: computed(() => ({})), // is all widgets valid
@@ -123,46 +115,11 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         }),
     });
 
-    const resetDashboardSettings = () => {
-        state.dateRange = {
-            start: dayjs.utc().format('YYYY-MM-01'),
-            end: dayjs.utc().format('YYYY-MM-DD'),
-        };
-        state.settings = {
-            date_range: {
-                enabled: false,
-                start: dayjs.utc().format('YYYY-MM-01'),
-                end: dayjs.utc().format('YYYY-MM-DD'),
-            },
-            currency: {
-                enabled: false,
-                value: CURRENCY.USD,
-            },
-        };
-    };
-
     const resetDashboardData = () => {
         originState.dashboardInfo = null;
         state.dashboardName = '';
         state.projectId = '';
-        state.enableCurrency = false;
-        state.currency = CURRENCY.USD;
-        state.enableDateRange = false;
-        state.dateRange = {
-            start: dayjs.utc().format('YYYY-MM-01'),
-            end: dayjs.utc().format('YYYY-MM-DD'),
-        };
-        state.settings = {
-            date_range: {
-                enabled: false,
-                start: dayjs.utc().format('YYYY-MM-01'),
-                end: dayjs.utc().format('YYYY-MM-DD'),
-            },
-            currency: {
-                enabled: false,
-                value: CURRENCY.USD,
-            },
-        };
+        state.settings = DASHBOARD_DEFAULT.settings;
         state.variables = {};
         state.variablesSchema = { properties: {}, order: [] };
         state.labels = [];
@@ -174,10 +131,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         const _dashboardInfo = cloneDeep(dashboardInfo);
         state.dashboardName = _dashboardInfo.name;
         state.projectId = (_dashboardInfo as ProjectDashboardModel).project_id ?? '';
-        state.enableCurrency = _dashboardInfo.settings?.currency?.enabled ?? false;
-        state.currency = _dashboardInfo.settings.currency?.value ?? CURRENCY.USD;
-        state.enableDateRange = _dashboardInfo.settings?.date_range?.enabled ?? false;
-        state.dateRange = _dashboardInfo.settings.date_range;
         state.settings = {
             date_range: {
                 enabled: _dashboardInfo.settings?.date_range?.enabled ?? false,
@@ -284,7 +237,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         originState,
         validationState,
         getDashboardInfo,
-        resetDashboardSettings,
         setDashboardInfo,
         toggleWidgetSize,
         // getter

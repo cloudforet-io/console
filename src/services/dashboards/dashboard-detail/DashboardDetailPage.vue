@@ -39,12 +39,11 @@
         </p-page-title>
         <div class="filter-box">
             <dashboard-labels :label-list="dashboardDetailState.labels" />
-            <dashboard-toolset :enable-currency="dashboardDetailState.enableCurrency"
-                               :currency.sync="dashboardDetailState.currency"
-                               :enable-date-range="dashboardDetailState.enableDateRange"
-                               :date-range.sync="dashboardDetailState.dateRange"
-                               @update:dateRange="handleUpdateURLParam"
-                               @update:currency="handleUpdateURLParam"
+            <dashboard-toolset
+                :currency.sync="dashboardDetailState.currency"
+                :date-range.sync="dashboardDetailState.dateRange"
+                @update:dateRange="handleUpdateURLParam"
+                @update:currency="handleUpdateURLParam"
             />
         </div>
         <p-divider class="divider" />
