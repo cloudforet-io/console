@@ -1,6 +1,5 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
-                  :error-mode="false"
                   @refresh="handleRefresh"
     >
         <div class="cost-map">
@@ -50,7 +49,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { GroupBy, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { getRefinedTreemapChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
@@ -102,6 +101,7 @@ const fetchData = async (): Promise<TreemapChartData[]> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
         apiQueryHelper.setFilters(state.consoleFilters);
+        const LIMIT_DATA = props.size === WIDGET_SIZE.md ? 10 : 15;
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.options.granularity,
@@ -115,6 +115,7 @@ const fetchData = async (): Promise<TreemapChartData[]> => {
                     },
                 },
                 sort: [{ key: 'usd_cost_sum', desc: true }],
+                page: { limit: LIMIT_DATA },
                 ...apiQueryHelper.data,
             },
         });
