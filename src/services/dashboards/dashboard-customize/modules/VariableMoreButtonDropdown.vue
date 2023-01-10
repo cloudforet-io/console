@@ -48,6 +48,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { SpaceRouter } from '@/router';
 
+import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 
@@ -57,7 +58,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
     targetRef: null as HTMLElement | null,
     contextMenuRef: null as typeof PContextMenu | null,
-    variableSchema: computed(() => dashboardDetailState.variables_schema),
+    variableSchema: computed<DashboardVariablesSchema>(() => dashboardDetailState.variablesSchema),
     variableList: computed<MenuItem[]>(() => state.variableSchema.order.map((property) => {
         const currentProperty = state.variableSchema.properties[property];
         return ({
