@@ -158,7 +158,7 @@ const getMonthlyCost = (month) => {
 
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
-    dataSize: computed(() => state.data?.length ?? 0),
+    dataSize: computed(() => state.chartData?.length ?? 0),
 });
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));

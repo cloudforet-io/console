@@ -191,7 +191,7 @@ const fetchData = async (): Promise<Data[]> => {
 /* Util */
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
-    dataSize: computed(() => state.data?.length ?? 0),
+    dataSize: computed(() => state.chartData?.length ?? 0),
 });
 const drawChart = (chartData) => {
     const chart = createDonutChart();
