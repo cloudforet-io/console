@@ -46,11 +46,10 @@
 </template>
 
 <script setup lang="ts">
-
 import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose,
-    defineProps, nextTick, reactive, ref, toRefs,
+    defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 
 import { color } from '@amcharts/amcharts5';
@@ -73,6 +72,7 @@ import { gray } from '@/styles/colors';
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -189,6 +189,10 @@ const fetchData = async (): Promise<Data[]> => {
 };
 
 /* Util */
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.chartData?.length ?? 0),
+});
 const drawChart = (chartData) => {
     const chart = createDonutChart();
     const seriesSettings = {
@@ -197,7 +201,7 @@ const drawChart = (chartData) => {
     };
     const series = createPieSeries(seriesSettings);
     chart.series.push(series);
-    setChartColors(chart, state.colorSet);
+    setChartColors(chart, colorSet.value);
 
     series.labels.template.set('forceHidden', true);
     series.ticks.template.set('visible', false);

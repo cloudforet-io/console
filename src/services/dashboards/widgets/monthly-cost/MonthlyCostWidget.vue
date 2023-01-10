@@ -57,8 +57,7 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed,
-    defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 
 import {
@@ -80,6 +79,7 @@ import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { getDateAxisSettings, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -156,6 +156,10 @@ const getMonthlyCost = (month) => {
     return monthlyCost;
 };
 
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.chartData?.length ?? 0),
+});
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
@@ -171,7 +175,7 @@ const drawChart = (chartData: XYChartData[]) => {
         fillOpacity: 0.5,
         strokeOpacity: 0,
     });
-    chartHelper.setChartColors(chart, state.colorSet);
+    chartHelper.setChartColors(chart, colorSet.value);
     chart.setAll({
         paddingTop: 0,
         paddingRight: 0,

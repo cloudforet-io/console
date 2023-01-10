@@ -31,7 +31,7 @@
                            :currency-rates="props.currencyRates"
                            :all-reference-type-info="props.allReferenceTypeInfo"
                            :legends.sync="state.legends"
-                           :color-set="state.colorSet"
+                           :color-set="colorSet"
                            :this-page="state.thisPage"
                            :show-next-page="state.data?.more"
                            show-legend
@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
@@ -83,6 +83,7 @@ import {
 import {
     getReferenceTypeOfGroupBy, getWidgetTableDateFields, sortTableData,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -101,7 +102,10 @@ const props = defineProps<WidgetProps>();
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
-
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.chartData?.length ?? 0),
+});
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
     chart: null as null | XYChart,
@@ -128,7 +132,7 @@ const state = reactive({
     }),
     legends: [] as Legend[],
     thisPage: 1,
-    disableReferenceColor: computed<boolean>(() => !!state.colorSet.length),
+    disableReferenceColor: computed<boolean>(() => !!colorSet.value?.length),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
         params: {},
@@ -176,7 +180,7 @@ const fetchData = async (): Promise<FullData> => {
 const drawChart = (chartData: XYChartData[]) => {
     const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(state.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
-    chartHelper.setChartColors(chart, state.colorSet);
+    chartHelper.setChartColors(chart, colorSet.value);
 
     if (state.chartType === CHART_TYPE.LINE) {
         chart.get('cursor')?.lineX.setAll({

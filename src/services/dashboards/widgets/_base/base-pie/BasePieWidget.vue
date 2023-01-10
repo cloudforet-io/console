@@ -24,7 +24,7 @@
                            :currency-rates="props.currencyRates"
                            :this-page="state.thisPage"
                            :show-next-page="state.data?.more"
-                           :color-set="state.colorSet"
+                           :color-set="colorSet"
                            :all-reference-type-info="props.allReferenceTypeInfo"
                            show-legend
                            @toggle-legend="handleToggleLegend"
@@ -38,12 +38,11 @@ import type { ComputedRef } from 'vue';
 import {
     computed,
     defineExpose,
-    defineProps, nextTick, reactive, ref, toRefs,
+    defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -68,6 +67,7 @@ import {
     getPieChartLegends, getRefinedPieChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getReferenceTypeOfGroupBy } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -83,8 +83,11 @@ interface FullData {
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
-
 const props = defineProps<WidgetProps>();
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.chartData?.length ?? 0),
+});
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
     chart: null as null|ReturnType<typeof chartHelper.createPieChart | typeof chartHelper.createDonutChart>,
@@ -105,8 +108,8 @@ const state = reactive({
     legends: [] as Legend[],
     thisPage: 1,
     dateRange: computed<DateRange>(() => ({
-        start: dayjs.utc(state.settings?.date_range?.start).format('YYYY-MM'),
-        end: dayjs.utc(state.settings?.date_range?.end).format('YYYY-MM'),
+        start: state.settings?.date_range?.start,
+        end: state.settings?.date_range?.end,
     })),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
@@ -160,7 +163,7 @@ const drawChart = (chartData: PieChartData[]) => {
     };
     const series = chartHelper.createPieSeries(seriesSettings);
     chart.series.push(series);
-    chartHelper.setChartColors(chart, state.colorSet);
+    chartHelper.setChartColors(chart, colorSet.value);
 
     const tooltip = chartHelper.createTooltip();
     chartHelper.setPieTooltipText(series, tooltip, state.currency, props.currencyRates);

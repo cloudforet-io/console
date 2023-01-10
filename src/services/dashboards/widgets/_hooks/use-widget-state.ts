@@ -11,10 +11,6 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 
-import {
-    palette,
-} from '@/styles/colors';
-
 import type { ChartType } from '@/services/cost-explorer/cost-dashboard/type';
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import type {
@@ -24,8 +20,6 @@ import type {
     SelectorType,
     WidgetFiltersMap,
 } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
-import { WIDGET_THEMES } from '@/services/dashboards/widgets/_configs/view-config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 const getRefinedOptions = (
@@ -44,22 +38,6 @@ const getRefinedOptions = (
         }
     });
     return merge({}, mergedOptions, parentOptions);
-};
-
-const getColorSet = (theme: WidgetTheme, colorSetType: WidgetColorSetType = 'basic'): string[] => {
-    let colorSet = WIDGET_THEMES.map((d) => palette[d][400]);
-    if (colorSetType === 'massive') {
-        const colors1 = WIDGET_THEMES.map((d) => [palette[d][400], palette[d][600]]).flat();
-        const colors2 = WIDGET_THEMES.map((d) => [palette[d][500], palette[d][700]]).flat();
-        colorSet = colors1.concat(colors2);
-    }
-    const themeIndex = WIDGET_THEMES.findIndex((d) => d === theme);
-    if (themeIndex > -1) {
-        const arr1 = colorSet.slice(themeIndex, colorSet.length);
-        const arr2 = colorSet.slice(0, themeIndex);
-        return arr1.concat(arr2);
-    }
-    return colorSet;
 };
 
 const convertWidgetFiltersToConsoleFilters = (filters?: WidgetFiltersMap): ConsoleFilter[] => {
@@ -87,7 +65,6 @@ export interface WidgetState<Data = any> {
     loading: boolean;
     settings: ComputedRef<DashboardSettings|undefined>;
     data: undefined|Data;
-    colorSet: ComputedRef<string[]>;
     selectorItems: ComputedRef<MenuItem[]>;
     selectedSelectorType?: SelectorType;
     pageSize: ComputedRef<number|undefined>;
@@ -116,11 +93,6 @@ export function useWidgetState<Data = any>(
         loading: true,
         settings: computed<DashboardSettings|undefined>(() => props.dashboardSettings),
         data: undefined as Data|undefined,
-        colorSet: computed<string[]>(() => {
-            if (!props.theme || !Array.isArray(state.data)) return [];
-            const colorSetType: WidgetColorSetType = state.data?.length > 9 ? 'massive' : 'basic';
-            return getColorSet(props.theme, colorSetType);
-        }),
         selectorItems: computed<MenuItem[]>(() => {
             if (!state.options?.selector_options?.enabled) return [];
             if (state.options?.selector_options.type === 'cost-usage') {
