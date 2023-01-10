@@ -168,27 +168,31 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setDashboardInfo = (dashboardInfo: DashboardModel) => {
         originState.dashboardInfo = dashboardInfo;
 
-        state.dashboardName = dashboardInfo.name;
-        state.projectId = (dashboardInfo as ProjectDashboardModel).project_id ?? '';
-        state.enableCurrency = dashboardInfo.settings?.currency?.enabled ?? false;
-        state.currency = dashboardInfo.settings.currency?.value ?? CURRENCY.USD;
-        state.enableDateRange = dashboardInfo.settings?.date_range?.enabled ?? false;
-        state.dateRange = dashboardInfo.settings.date_range;
+        const _dashboardInfo = cloneDeep(dashboardInfo);
+        state.dashboardName = _dashboardInfo.name;
+        state.projectId = (_dashboardInfo as ProjectDashboardModel).project_id ?? '';
+        state.enableCurrency = _dashboardInfo.settings?.currency?.enabled ?? false;
+        state.currency = _dashboardInfo.settings.currency?.value ?? CURRENCY.USD;
+        state.enableDateRange = _dashboardInfo.settings?.date_range?.enabled ?? false;
+        state.dateRange = _dashboardInfo.settings.date_range;
         state.settings = {
             date_range: {
-                enabled: dashboardInfo.settings?.date_range?.enabled ?? false,
-                start: dashboardInfo.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM-01'),
-                end: dashboardInfo.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM-DD'),
+                enabled: _dashboardInfo.settings?.date_range?.enabled ?? false,
+                start: _dashboardInfo.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM-01'),
+                end: _dashboardInfo.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM-DD'),
             },
             currency: {
-                enabled: dashboardInfo.settings?.currency?.enabled ?? false,
-                value: dashboardInfo.settings.currency?.value ?? CURRENCY.USD,
+                enabled: _dashboardInfo.settings?.currency?.enabled ?? false,
+                value: _dashboardInfo.settings.currency?.value ?? CURRENCY.USD,
             },
         };
-        state.variables_schema = dashboardInfo.variables_schema;
-        state.variables = dashboardInfo.variables ?? {};
-        state.labels = dashboardInfo.labels;
-        state.dashboardWidgetInfoList = flattenDeep(dashboardInfo?.layouts ?? []).map((info) => ({
+        state.variables_schema = {
+            properties: _dashboardInfo.variables_schema?.properties ?? {},
+            order: _dashboardInfo.variables_schema?.order ?? [],
+        };
+        state.variables = _dashboardInfo.variables ?? {};
+        state.labels = _dashboardInfo.labels;
+        state.dashboardWidgetInfoList = flattenDeep(_dashboardInfo?.layouts ?? []).map((info) => ({
             ...info,
             widget_key: uuidv4(),
         }));
