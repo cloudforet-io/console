@@ -1,7 +1,6 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="budget-status-widget"
-                  :widget-location="state.widgetLocation"
                   @refresh="handleRefresh"
     >
         <p-data-loader :loading="state.loading"
