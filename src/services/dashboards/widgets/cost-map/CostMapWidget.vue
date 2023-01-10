@@ -1,6 +1,5 @@
 <template>
     <widget-frame v-bind="widgetFrameProps"
-                  :error-mode="false"
                   @refresh="handleRefresh"
     >
         <div class="cost-map">

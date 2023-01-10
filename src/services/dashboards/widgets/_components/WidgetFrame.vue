@@ -131,7 +131,6 @@ interface Props {
     title: TranslateResult;
     size: WidgetSize;
     width?: number;
-    noHeightLimit?: boolean;
     widgetLink?: string;
     widgetLocation?: Location;
     widgetConfigId?: string;
