@@ -106,7 +106,7 @@ const state = reactive({
         let result;
         if (state.variableProperty.variable_type === 'MANAGED') {
             result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
-                name: referenceKey, label: referenceItem.label,
+                name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
             }));
         } else result = state.variableProperty.options?.map((d) => ({ name: d, label: d }));
         return result;
