@@ -192,8 +192,15 @@ defineExpose<WidgetExpose<FullData>>({
 </script>
 
 <style lang="postcss" scoped>
-.widget-data-table {
-    width: 100%;
-    height: 100%;
+.budget-usage-by-target {
+    .widget-data-table {
+        width: 100%;
+        height: 100%;
+    }
+    &.full {
+        .widget-data-table {
+            height: auto;
+        }
+    }
 }
 </style>

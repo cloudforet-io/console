@@ -217,16 +217,23 @@ defineExpose<WidgetExpose<FullData>>({
 </script>
 
 <style scoped lang="postcss">
-.chart-wrapper {
-    height: 155px;
-    .chart {
+.base-pie-widget {
+    .chart-wrapper {
+        height: 11.5rem;
+        .chart {
+            height: 100%;
+        }
+    }
+    .chart-loader {
         height: 100%;
     }
-}
-.chart-loader {
-    height: 100%;
-}
-.widget-data-table {
-    height: 50%;
+    .widget-data-table {
+        height: 50%;
+    }
+    &.full {
+        .widget-data-table {
+            height: auto;
+        }
+    }
 }
 </style>
