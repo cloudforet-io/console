@@ -46,14 +46,11 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed,
-    defineExpose,
-    defineProps, nextTick, reactive, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -90,8 +87,8 @@ const state = reactive({
         { label: '< 70%', color: indigo[100] },
     ])),
     dateRange: computed<DateRange>(() => ({
-        start: dayjs.utc(state.settings?.date_range?.start).format('YYYY-MM'),
-        end: dayjs.utc(state.settings?.date_range?.end).format('YYYY-MM'),
+        start: state.settings?.date_range?.start,
+        end: state.settings?.date_range?.end,
     })),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.BUDGET._NAME,

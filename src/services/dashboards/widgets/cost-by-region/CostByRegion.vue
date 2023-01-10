@@ -48,7 +48,6 @@ import {
 import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import {
     groupBy, isEqual, sum, uniqWith,
 } from 'lodash';
@@ -125,8 +124,8 @@ const state = reactive({
     chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results)),
     thisPage: 1,
     dateRange: computed<DateRange>(() => ({
-        start: dayjs.utc(state.settings?.date_range?.start).format('YYYY-MM'),
-        end: dayjs.utc(state.settings?.date_range?.end).format('YYYY-MM'),
+        start: state.settings?.date_range?.start,
+        end: state.settings?.date_range?.end,
     })),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,

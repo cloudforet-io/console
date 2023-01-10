@@ -72,11 +72,13 @@ import {
 import {
     getWidgetTableDateFields, sortTableData,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 import type { CostAnalyzeDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
+
 
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
@@ -94,6 +96,7 @@ const chartHelper = useAmcharts5(chartContext);
 
 const state = reactive({
     ...toRefs(useWidgetState<CostAnalyzeDataModel['results']>(props)),
+    ...useWidgetColorSet({ theme: computed(() => props.theme), data: computed(() => state.chartData) }),
     fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost' : 'usage_quantity')),
     chartData: computed<XYChartData[]>(() => {
         const valueKey = `${state.fieldsKey}_sum`;

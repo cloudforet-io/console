@@ -48,7 +48,6 @@ import type { Location } from 'vue-router/types/router';
 import type { Circle } from '@amcharts/amcharts5';
 import { Template } from '@amcharts/amcharts5';
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -73,6 +72,7 @@ import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_c
 import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { getPieChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -104,6 +104,7 @@ const chartHelper = useAmcharts5(chartContext);
 const props = defineProps<WidgetProps>();
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
+    ...useWidgetColorSet({ theme: computed(() => props.theme), data: computed(() => state.chartData) }),
     fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost' : 'usage_quantity')),
     legends: [] as Legend[],
     chartData: computed<CircleData[]>(() => getRefinedCircleData(state.data?.results)),
@@ -121,8 +122,8 @@ const state = reactive({
     }),
     thisPage: 1,
     dateRange: computed<DateRange>(() => ({
-        start: dayjs.utc(state.settings?.date_range?.start).format('YYYY-MM'),
-        end: dayjs.utc(state.settings?.date_range?.end).format('YYYY-MM'),
+        start: state.settings?.date_range?.start,
+        end: state.settings?.date_range?.end,
     })),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,

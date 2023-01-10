@@ -46,7 +46,6 @@
 </template>
 
 <script setup lang="ts">
-
 import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose,
@@ -73,6 +72,7 @@ import { gray } from '@/styles/colors';
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -100,6 +100,7 @@ const {
 } = useAmcharts5(chartContext);
 const state = reactive({
     ...toRefs(useWidgetState<Data[]>(props)),
+    ...useWidgetColorSet({ theme: computed(() => props.theme), data: computed(() => state.chartData) }),
     chart: null as null|ReturnType<typeof createPieChart>,
     series: null as null|ReturnType<typeof createPieSeries>,
     chartData: computed(() => {

@@ -83,6 +83,7 @@ import {
 import {
     getReferenceTypeOfGroupBy, getWidgetTableDateFields, sortTableData,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -104,6 +105,7 @@ const chartHelper = useAmcharts5(chartContext);
 
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
+    ...useWidgetColorSet({ theme: computed(() => props.theme), data: computed(() => state.chartData) }),
     chart: null as null | XYChart,
     chartData: computed<XYChartData[]>(() => getRefinedXYChartData(state.data?.results, state.groupBy)),
     tableFields: computed<Field[]>(() => {

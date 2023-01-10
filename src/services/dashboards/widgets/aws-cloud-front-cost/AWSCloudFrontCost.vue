@@ -49,7 +49,6 @@ import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
 import bytes from 'bytes';
-import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { byteFormatter } from '@cloudforet/core-lib';
@@ -74,10 +73,10 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import type { UsageType, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getXYChartLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getReferenceTypeOfGroupBy, sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -104,6 +103,7 @@ const chartHelper = useAmcharts5(chartContext);
 
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
+    ...useWidgetColorSet({ theme: computed(() => props.theme), data: computed(() => state.chartData) }),
     fieldsKey: computed<string>(() => (state.selectedSelectorType === 'cost' ? 'usd_cost' : 'usage_quantity')),
     legends: [] as Legend[],
     chartData: computed(() => {
@@ -126,12 +126,10 @@ const state = reactive({
             { name: `${state.fieldsKey}_sum.2.value`, label: 'Requests (HTTPS)' },
         ];
     }),
-    dateRange: computed<DateRange>(() => {
-        const end = state.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM');
-        const range = props.size === WIDGET_SIZE.full ? 11 : 3;
-        const start = dayjs.utc(end).subtract(range, 'month').format('YYYY-MM');
-        return { start, end };
-    }),
+    dateRange: computed<DateRange>(() => ({
+        start: state.settings?.date_range?.start,
+        end: state.settings?.date_range?.end,
+    })),
     thisPage: 1,
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
