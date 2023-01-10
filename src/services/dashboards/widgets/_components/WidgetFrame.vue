@@ -270,6 +270,7 @@ const handleDeleteModalConfirm = () => {
     }
     .body {
         height: auto;
+        overflow-y: auto;
         flex: 1 1;
     }
     .error-container {
