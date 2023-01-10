@@ -5,6 +5,7 @@
     >
         <p-data-loader :loading="state.loading"
                        class="chart-wrapper"
+                       :loader-backdrop-opacity="1"
         >
             <template #loader>
                 <p-skeleton height="100%" />
