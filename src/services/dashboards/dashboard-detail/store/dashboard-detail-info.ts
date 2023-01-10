@@ -51,7 +51,7 @@ interface DashboardDetailInfoStoreState {
     dateRange: DateRange;
     settings: DashboardSettings;
     variables: DashboardVariables;
-    variables_schema: DashboardVariablesSchema;
+    variablesSchema: DashboardVariablesSchema;
     labels: string[];
     // widget info states
     dashboardWidgetInfoList: DashboardLayoutWidgetInfo[];
@@ -98,7 +98,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
         },
         variables: {},
-        variables_schema: {
+        variablesSchema: {
             properties: {},
             order: [],
         },
@@ -186,7 +186,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 value: _dashboardInfo.settings.currency?.value ?? CURRENCY.USD,
             },
         };
-        state.variables_schema = {
+        state.variablesSchema = {
             properties: _dashboardInfo.variables_schema?.properties ?? {},
             order: _dashboardInfo.variables_schema?.order ?? [],
         };
@@ -250,8 +250,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widget_key !== widgetKey);
     };
     const updateVariableUse = (propertyName: string, use: boolean) => {
-        if (!state.variables_schema.properties[propertyName]) return;
-        state.variables_schema.properties[propertyName].use = use;
+        if (!state.variablesSchema.properties[propertyName]) return;
+        state.variablesSchema.properties[propertyName].use = use;
     };
 
     store.dispatch('reference/loadAll');
