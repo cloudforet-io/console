@@ -39,7 +39,7 @@ export const setTreemapLabelText = (series: am5hierarchy.Treemap, settings?: am5
         paddingLeft: 4,
         paddingRight: 4,
         width: new Percent(100),
-        oversizedBehavior: 'fit',
+        oversizedBehavior: 'wrap',
         textAlign: 'center',
         fontSize: 14,
         ...settings,
