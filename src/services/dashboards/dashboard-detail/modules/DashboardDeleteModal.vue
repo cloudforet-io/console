@@ -7,7 +7,7 @@
 </template>
 <script lang="ts">
 import type { SetupContext } from 'vue';
-import { reactive, toRefs } from 'vue';
+import { computed, reactive, toRefs } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -42,22 +42,23 @@ export default {
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
+            dashboardId: computed(() => props.dashboardId),
+            isProjectDashboard: computed(() => state.dashboardId.startsWith('project')),
             loading: false,
         });
-        const isProjectDashboard = props.dashboardId.startsWith('project');
 
 
         const handleDeleteDashboardConfirm = async () => {
             try {
                 state.loading = true;
-                if (isProjectDashboard) {
+                if (state.isProjectDashboard) {
                     await SpaceConnector.clientV2.dashboard.projectDashboard.delete({
-                        project_dashboard_id: props.dashboardId,
+                        project_dashboard_id: state.dashboardId,
                     });
                     await store.dispatch('dashboard/loadProjectDashboard');
                 } else {
                     await SpaceConnector.clientV2.dashboard.domainDashboard.delete({
-                        domain_dashboard_id: props.dashboardId,
+                        domain_dashboard_id: state.dashboardId,
                     });
                     await store.dispatch('dashboard/loadDomainDashboard');
                 }
