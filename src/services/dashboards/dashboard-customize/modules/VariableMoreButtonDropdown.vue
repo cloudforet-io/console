@@ -116,7 +116,6 @@ const {
 
 // helper
 const updateVariablesUse = () => {
-    console.log('hehe');
     const _varialbesSchema = cloneDeep(state.variableSchema);
     state.variableSchema.order.forEach((property) => {
         _varialbesSchema.properties[property].use = state.selectedForUpdate.some((menu) => menu.name === property);
