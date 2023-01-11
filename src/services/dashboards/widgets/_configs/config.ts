@@ -11,7 +11,7 @@ import type { ConsoleFilterOperator } from '@/query/type';
 import type { CurrencyRates } from '@/store/modules/display/type';
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
-import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
+import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 export const WIDGET_SIZE = {
@@ -98,7 +98,7 @@ interface LegendOptions {
     show_at?: 'table'|'chart';
 }
 
-interface WidgetFilter {
+export interface WidgetFilter {
     k?: string;
     v: null|string|boolean|number;
     o?: ConsoleFilterOperator;
@@ -162,6 +162,7 @@ export interface WidgetProps {
     options?: WidgetOptions;
     inheritOptions?: InheritOptions;
     dashboardVariables?: DashboardVariables;
+    dashboardVariablesSchema?: DashboardVariablesSchema;
     dashboardSettings: DashboardSettings;
     size?: WidgetSize;
     width?: number;
