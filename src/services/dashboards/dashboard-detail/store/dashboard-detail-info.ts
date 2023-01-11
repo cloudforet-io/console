@@ -143,8 +143,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
         };
         state.variablesSchema = {
-            properties: { ...managedDashboardVariablesSchema.properties, ..._dashboardInfo.variables_schema?.properties },
-            order: union(managedDashboardVariablesSchema.order, _dashboardInfo.variables_schema?.order),
+            properties: { ...managedDashboardVariablesSchema.properties, ..._dashboardInfo.variables_schema?.properties ?? {} },
+            order: union(managedDashboardVariablesSchema.order, _dashboardInfo.variables_schema?.order ?? []),
         };
         state.variables = _dashboardInfo.variables ?? {};
         state.labels = _dashboardInfo.labels;

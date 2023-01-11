@@ -12,7 +12,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             name: 'Provider',
             variable_type: 'MANAGED',
             use: true,
-            selection_type: 'SINGLE',
+            selection_type: 'MULTI',
         },
         serviceAccount: {
             name: 'Service Account',

@@ -5,19 +5,19 @@
     >
         <button ref="targetRef"
                 class="dropdown-box"
-                :class="{ 'is-visible': visibleMenu, 'filled-value': selected.length }"
-                @click="handleChangeVisible"
+                :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
+                @click="toggleContextMenu"
         >
             <span class="variable-label">{{ variableName }}</span>
-            <span v-if="selected.length"
+            <span v-if="state.selected.length"
                   class="selected-items"
             >
-                <span class="item-for-display">{{ selected[0].label }}</span>
-                <p-badge v-if="selected.length > 1"
+                <span class="item-for-display">{{ state.selected[0].label }}</span>
+                <p-badge v-if="state.selected.length > 1"
                          class="selected-count"
                          style-type="blue300"
                 >
-                    +{{ selected.length - 1 }}
+                    +{{ state.selected.length - 1 }}
                 </p-badge>
                 <button class="option-delete-button"
                         @click.stop="handleClearSelected"
@@ -41,15 +41,17 @@
                         class="options-menu"
                         searchable
                         use-fixed-menu-style
-                        :search-text="searchText"
-                        :style="fixedMenuStyle"
-                        :menu="reorderedMenu"
-                        :selected="selected"
+                        :search-text="state.searchText"
+                        :style="contextMenuStyle"
+                        :menu="refinedMenu"
+                        :selected="state.selected"
                         :multi-selectable="variableProperty.selection_type === 'MULTI'"
-                        :show-radio-icon="variableProperty.selection_type === 'SINGLE'"
+                        show-select-marker
                         :show-clear-selection="variableProperty.selection_type === 'MULTI'"
+                        @click-show-more="showMoreMenu"
+                        @keyup:down:end="focusOnContextMenu()"
                         @update:selected="handleSelectOption"
-                        @update:search-text="handleChangeContextMenuInput"
+                        @update:search-text="handleUpdateSearchText"
         />
     </div>
 </template>
@@ -59,14 +61,14 @@
 import { vOnClickOutside } from '@vueuse/components';
 import {
     computed,
-    reactive, toRefs,
+    reactive, toRef, toRefs, watch,
 } from 'vue';
 
 import {
     PBadge, PContextMenu, PI, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, debounce } from 'lodash';
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
@@ -85,7 +87,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     targetRef: null as HTMLElement | null,
-    contextMenuRef: null as typeof PContextMenu | null,
+    contextMenuRef: null as any|null,
     searchText: '',
     variableProperty: computed<DashboardVariableSchemaProperty>(() => dashboardDetailState.variablesSchema.properties[props.propertyName]),
     variableSelectedOptions: computed<undefined|string|string[]>(() => dashboardDetailState.variables[props.propertyName]),
@@ -113,45 +115,33 @@ const state = reactive({
     }),
 });
 
-const {
-    targetRef,
-    contextMenuRef,
-    variableProperty,
-    variableName,
-    searchText,
-    selected,
-    options,
-} = toRefs(state);
+
 
 const {
     visibleMenu,
-    showContextMenu,
+    refinedMenu,
+    contextMenuStyle,
+    toggleContextMenu,
     hideContextMenu,
-    fixedMenuStyle,
-    reorderedMenu,
+    focusOnContextMenu,
+    initiateMenu,
+    reloadMenu,
+    showMoreMenu,
 } = useContextMenuController({
-    targetRef,
-    contextMenuRef,
-    useReorderBySelection: true,
     useFixedStyle: true,
-    originMenu: options,
-    selected,
+    targetRef: toRef(state, 'targetRef'),
+    contextMenuRef: toRef(state, 'contextMenuRef'),
+    useMenuFiltering: true,
+    useReorderBySelection: true,
+    searchText: toRef(state, 'searchText'),
+    selected: toRef(state, 'selected'),
+    menu: toRef(state, 'options'),
+    pageSize: 10,
 });
 
 // event
 const handleClearSelected = () => {
     changeVariables([]);
-};
-const handleChangeVisible = () => {
-    if (visibleMenu.value) {
-        hideContextMenu();
-    } else {
-        showContextMenu(true); // update reorderedMenu automatically
-    }
-};
-// TODO: search text binding
-const handleChangeContextMenuInput = (text: string): void => {
-    state.searchText = text;
 };
 
 const handleSelectOption = (_selected: MenuItem[]) => {
@@ -172,11 +162,29 @@ const changeVariables = (changedSelected: MenuItem[]) => {
     dashboardDetailState.variables = variables;
 };
 
+const handleUpdateSearchText = debounce((text: string) => {
+    state.searchText = text;
+    reloadMenu();
+}, 200);
+
+watch(visibleMenu, (_visibleMenu) => {
+    if (_visibleMenu) {
+        initiateMenu();
+    }
+}, { immediate: true });
+
+const {
+    targetRef,
+    contextMenuRef,
+    variableProperty,
+    variableName,
+} = toRefs(state);
+
 </script>
 
 <style lang="postcss" scoped>
 .dashboard-variable-dropdown {
-    @apply inline-block relative;
+    @apply inline-block;
     max-width: 20rem;
     &.open-menu {
         @apply relative;
