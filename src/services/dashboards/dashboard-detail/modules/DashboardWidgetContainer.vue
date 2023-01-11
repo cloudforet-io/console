@@ -15,6 +15,7 @@
                        :options="widget.widget_options"
                        :inherit-options="widget.inherit_options"
                        :dashboard-variables="dashboardVariables"
+                       :dashboard-variables-schema="dashboardVariablesSchema"
                        :dashboard-settings="dashboardSettings"
                        :size="widgetSizeList[idx]"
                        :width="widgetWidthList[idx]"
@@ -79,6 +80,7 @@ export default defineComponent<Props>({
             dashboardId: computed(() => dashboardDetailState.dashboardId),
             widgetInfoList: computed(() => dashboardDetailState.dashboardWidgetInfoList),
             dashboardVariables: computed(() => dashboardDetailState.variables),
+            dashboardVariablesSchema: computed(() => dashboardDetailState.variablesSchema),
             dashboardSettings: computed(() => dashboardDetailState.settings),
             widgetDataMap: computed({
                 get() { return dashboardDetailState.widgetDataMap; },
