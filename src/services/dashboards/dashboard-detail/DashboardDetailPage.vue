@@ -71,6 +71,7 @@
 
 <script setup lang="ts">
 import {
+    onUnmounted,
     reactive, ref, watch,
 } from 'vue';
 
@@ -112,7 +113,6 @@ const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
-    //
     nameEditModalVisible: false,
     deleteModalVisible: false,
     cloneModalVisible: false,
@@ -163,7 +163,9 @@ watch(() => props.dashboardId, (_dashboardId) => {
     getDashboardData(_dashboardId);
 }, { immediate: true });
 
-
+onUnmounted(() => {
+    dashboardDetailStore.revertDashboardData();
+});
 </script>
 
 <style lang="postcss" scoped>

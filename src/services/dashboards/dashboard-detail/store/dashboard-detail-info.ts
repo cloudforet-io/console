@@ -125,6 +125,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.labels = [];
     };
 
+    const revertDashboardData = () => {
+        setDashboardInfo(originState.dashboardInfo);
+    };
+
     const setDashboardInfo = (dashboardInfo: DashboardModel) => {
         originState.dashboardInfo = dashboardInfo;
 
@@ -237,6 +241,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state,
         originState,
         validationState,
+        revertDashboardData,
         getDashboardInfo,
         setDashboardInfo,
         toggleWidgetSize,

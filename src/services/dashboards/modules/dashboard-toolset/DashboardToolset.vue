@@ -8,7 +8,6 @@
                                  @update:date-range="handleUpdateDateRange"
         />
         <currency-select-dropdown v-show="props.currency.enabled"
-                                  :default-currency="DEFAULT_CURRENCY"
                                   :currency="state.proxyCurrency.value"
                                   @update:currency="handleUpdateCurrency"
         />
@@ -18,8 +17,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
-import { CURRENCY } from '@/store/modules/display/config';
-
 import { useProxyValue } from '@/common/composables/proxy-state';
 import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 
@@ -27,7 +24,6 @@ import type { DashboardSettings } from '@/services/dashboards/config';
 import DashboardDateDropdown from '@/services/dashboards/modules/dashboard-toolset/DashboardDateDropdown.vue';
 import DashboardDateRangeBadge from '@/services/dashboards/modules/dashboard-toolset/DashboardDateRangeBadge.vue';
 
-const DEFAULT_CURRENCY = CURRENCY.USD;
 
 const props = defineProps<{
     dateRange: DashboardSettings['date_range'];
