@@ -23,7 +23,6 @@
                        :currency-rates="currencyRates"
                        :edit-mode="editMode"
                        :all-reference-type-info="allReferenceTypeInfo"
-                       @validate="handleValidate($event, widget.widget_key)"
             />
         </template>
     </div>
@@ -36,7 +35,7 @@ import {
     defineComponent, reactive, toRefs, ref, onMounted, watch, onBeforeUnmount, computed,
 } from 'vue';
 
-import { flattenDeep } from 'lodash';
+import { flattenDeep, isEmpty } from 'lodash';
 
 import { store } from '@/store';
 
@@ -50,9 +49,14 @@ import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type {
     WidgetSize, WidgetConfig, WidgetExpose, WidgetProps,
+    DashboardLayoutWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
-import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import {
+    getWidgetComponent,
+    getWidgetConfig,
+    getWidgetSchemaErrorMap,
+} from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface Props {
     editMode?: boolean;
@@ -77,16 +81,24 @@ export default defineComponent<Props>({
     setup(props, { expose }: SetupContext) {
         const dashboardDetailStore = useDashboardDetailInfoStore();
         const dashboardDetailState = dashboardDetailStore.state;
+        const dashboardDetailValidationState = dashboardDetailStore.validationState;
 
         const state = reactive({
             dashboardId: computed(() => dashboardDetailState.dashboardId),
-            widgetInfoList: computed(() => dashboardDetailState.dashboardWidgetInfoList),
+            widgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => dashboardDetailState.dashboardWidgetInfoList),
             dashboardVariables: computed(() => dashboardDetailState.variables),
             dashboardVariablesSchema: computed(() => dashboardDetailState.variablesSchema),
             dashboardSettings: computed(() => dashboardDetailState.settings),
             widgetDataMap: computed({
                 get() { return dashboardDetailState.widgetDataMap; },
                 set(val) { dashboardDetailState.widgetDataMap = val; },
+            }),
+            widgetConfigMap: computed<Record<string, WidgetConfig>>(() => {
+                const _configMap: Record<string, WidgetConfig> = {};
+                state.widgetInfoList.forEach((d) => {
+                    _configMap[d.widget_key] = getWidgetConfig(d.widget_name);
+                });
+                return _configMap;
             }),
             // width
             containerWidth: WIDGET_CONTAINER_MIN_WIDTH,
@@ -95,9 +107,8 @@ export default defineComponent<Props>({
             // theme
             widgetThemeList: computed<Array<WidgetTheme | undefined>>(() => {
                 const widgetThemeOptions: Array<WidgetConfig['theme']> = [];
-                state.widgetInfoList.forEach((widget) => {
-                    const widgetConfig = getWidgetConfig(widget.widget_name);
-                    widgetThemeOptions.push(widgetConfig.theme);
+                state.widgetInfoList.forEach((widgetInfo) => {
+                    widgetThemeOptions.push(state.widgetConfigMap[widgetInfo.widget_key].theme);
                 });
                 return widgetThemeAssigner(widgetThemeOptions);
             }),
@@ -128,6 +139,21 @@ export default defineComponent<Props>({
             }
         };
 
+        const validateAllWidget = () => {
+            const _widgetValidMap: Record<string, boolean> = {};
+            state.widgetInfoList.forEach((widgetInfo: DashboardLayoutWidgetInfo) => {
+                const _widgetConfig = state.widgetConfigMap[widgetInfo.widget_key];
+                const _widgetSchemaErrorMap = getWidgetSchemaErrorMap(
+                    widgetInfo.inherit_options,
+                    _widgetConfig.options_schema.schema,
+                    dashboardDetailState.variables,
+                    dashboardDetailState.variablesSchema,
+                );
+                _widgetValidMap[widgetInfo.widget_key] = isEmpty(_widgetSchemaErrorMap);
+            });
+            dashboardDetailValidationState.widgetValidMap = _widgetValidMap;
+        };
+
         let timer: undefined|number;
         const handleResizeObserve = () => {
             // timeouts for throttle
@@ -137,9 +163,6 @@ export default defineComponent<Props>({
                 state.containerWidth = refineContainerWidth(containerRef.value?.clientWidth);
                 // for less throttle, change below timeout ms
             }, 500);
-        };
-        const handleValidate = (isValid: boolean, widgetKey: string) => {
-            dashboardDetailStore.updateWidgetValidation(isValid, widgetKey);
         };
 
         const observeInstance = new ResizeObserver(handleResizeObserve);
@@ -161,6 +184,9 @@ export default defineComponent<Props>({
             });
             state.initiatedWidgetMap = initiatedWidgetMap;
         }, { immediate: true, deep: true });
+        watch(() => state.dashboardVariablesSchema, () => {
+            if (props.editMode) validateAllWidget();
+        }, { immediate: true });
 
 
         const refreshAllWidget = async () => {
@@ -196,7 +222,6 @@ export default defineComponent<Props>({
             ...toRefs(state),
             getWidgetComponent,
             handleIntersectionObserver,
-            handleValidate,
         };
     },
 });
