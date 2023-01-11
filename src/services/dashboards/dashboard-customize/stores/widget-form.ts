@@ -48,7 +48,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             const _propertyName = key.replace('filters.', '');
             if (inheritItemMap[key]) {
                 if (!val) return;
-                inheritOptions[_propertyName] = {
+                inheritOptions[key] = {
                     enabled: true,
                     variable_info: {
                         key: val as string,
@@ -62,7 +62,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
                     });
                 } else if (val) widgetFiltersMap[_propertyName].push({ k: _propertyName, v: val, o: '' });
             } else {
-                widgetOptions[_propertyName] = val;
+                widgetOptions[key] = val;
             }
         });
         widgetOptions.filters = widgetFiltersMap;
