@@ -323,6 +323,7 @@ defineExpose<WidgetExpose<Data[]>>({
 .full {
     @screen desktop {
         .budget-usage-summary {
+            /* custom design-system component - p-data-loader-container */
             :deep(.data-loader-container) {
                 > .loader-wrapper > .loader {
                     @apply flex-row justify-between;
@@ -342,6 +343,8 @@ defineExpose<WidgetExpose<Data[]>>({
     @screen laptop {
         .budget-usage-summary {
             height: 23.625rem;
+
+            /* custom design-system component - p-data-loader-container */
             :deep(.data-loader-container) {
                 .data-wrapper {
                     @apply block h-full;
