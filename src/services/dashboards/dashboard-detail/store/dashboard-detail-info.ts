@@ -42,7 +42,7 @@ interface DashboardDetailInfoOriginState {
     dashboardInfo: DashboardModel|null;
     dashboardWidgetInfoList: ComputedRef<DashboardLayoutWidgetInfo[]>;
 }
-interface DashboardDetailInfoStoreState {
+export interface DashboardDetailInfoStoreState {
     loadingDashboard: boolean;
     dashboardId: string | undefined;
     projectId: string;
@@ -158,11 +158,12 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const getDashboardInfo = async (dashboardId: undefined|string, force = false) => {
         if (!force && (dashboardId === state.dashboardId || dashboardId === undefined)) return;
 
+        // WARN:: from under this line, beware using originState. originState could reference irrelevant dashboard data
         state.dashboardId = dashboardId;
         state.loadingDashboard = true;
         try {
             let result: DashboardModel;
-            if (originState.isProjectDashboard) {
+            if (dashboardId?.startsWith('project')) {
                 result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: state.dashboardId });
             } else {
                 result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: state.dashboardId });

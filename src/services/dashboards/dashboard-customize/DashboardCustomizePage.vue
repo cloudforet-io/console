@@ -162,6 +162,7 @@ const createDashboard = async () => {
                 ...state.apiParam,
                 name: state.name,
                 viewers: dashboardDetailOriginState.dashboardViewer,
+                project_id: dashboardDetailState.projectId,
             });
             dashboardDetailState.dashboardId = result.project_dashboard_id;
         } else {
