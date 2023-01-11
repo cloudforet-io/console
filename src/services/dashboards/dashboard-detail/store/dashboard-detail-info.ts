@@ -30,7 +30,7 @@ import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-h
 interface WidgetDataMap {
     [widgetKey: string]: any;
 }
-interface WidgetInheritVariablesValidMap {
+interface WidgetValidMap {
     [widgetKey: string]: boolean;
 }
 
@@ -57,7 +57,7 @@ interface DashboardDetailInfoStoreState {
 interface ValidationState {
     isNameValid?: boolean;
     isWidgetLayoutValid: ComputedRef<boolean>;
-    widgetInheritVariablesValidMap: WidgetInheritVariablesValidMap;
+    widgetValidMap: WidgetValidMap;
 }
 
 const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
@@ -103,8 +103,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     }) as UnwrapRef<DashboardDetailInfoStoreState>;
     const validationState = reactive<ValidationState>({
         isNameValid: undefined,
-        isWidgetLayoutValid: computed(() => Object.values(validationState.widgetInheritVariablesValidMap).every((d) => d === true)),
-        widgetInheritVariablesValidMap: {},
+        isWidgetLayoutValid: computed(() => Object.values(validationState.widgetValidMap).every((d) => d === true)),
+        widgetValidMap: {},
     }) as UnwrapRef<ValidationState>;
 
     const resetDashboardData = () => {
@@ -196,7 +196,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     const deleteWidget = (widgetKey: string) => {
         state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widget_key !== widgetKey);
-        delete validationState.widgetInheritVariablesValidMap[widgetKey];
+        delete validationState.widgetValidMap[widgetKey];
     };
     const resetVariables = () => {
         const originProperties = { ...managedDashboardVariablesSchema.properties, ...originState.dashboardInfo.variables_schema.properties };
@@ -224,7 +224,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     };
 
     const updateWidgetValidation = (isValid: boolean, widgetKey: string) => {
-        validationState.widgetInheritVariablesValidMap[widgetKey] = isValid;
+        validationState.widgetValidMap[widgetKey] = isValid;
     };
 
     store.dispatch('reference/loadAll');
