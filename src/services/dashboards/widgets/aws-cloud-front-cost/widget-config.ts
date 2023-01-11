@@ -28,6 +28,7 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
+        group_by: GROUP_BY.PROJECT,
         chart_type: CHART_TYPE.STACKED_COLUMN,
         granularity: GRANULARITY.ACCUMULATED,
         legend_options: {
