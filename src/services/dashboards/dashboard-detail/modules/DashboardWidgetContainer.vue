@@ -20,6 +20,7 @@
                        :size="widgetSizeList[idx]"
                        :width="widgetWidthList[idx]"
                        :theme="widgetThemeList[idx]"
+                       :currency-rates="currencyRates"
                        :edit-mode="editMode"
                        :all-reference-type-info="allReferenceTypeInfo"
             />
@@ -102,6 +103,7 @@ export default defineComponent<Props>({
             widgetRef: [] as Array<WidgetComponent|null>,
             initiatedWidgetMap: {} as Record<string, any>,
             allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => store.getters['reference/allReferenceTypeInfo']),
+            currencyRates: computed(() => store.state.display.currencyRates),
         });
         const containerRef = ref<HTMLElement|null>(null);
 
