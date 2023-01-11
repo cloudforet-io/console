@@ -305,7 +305,7 @@ const getColSlotProps = (item, field, colIndex, rowIndex) => ({
 });
 const isEllipsisActive = (rowIndex:number, colIndex:number):boolean => {
     const tdIndex = props.fields.length * rowIndex + colIndex;
-    if ((labelRef.value ?? []).length && labelRef.value) {
+    if (labelRef.value?.length && labelRef.value) {
         return (labelRef.value[tdIndex]?.offsetWidth < labelRef.value[tdIndex]?.scrollWidth);
     } return false;
 };
