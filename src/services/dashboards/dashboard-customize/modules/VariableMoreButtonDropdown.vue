@@ -15,6 +15,7 @@
                         class="variables-menu"
                         searchable
                         use-fixed-menu-style
+                        :search-text="searchText"
                         :style="contextMenuStyle"
                         :menu="refinedMenu"
                         :selected="selected"
