@@ -34,6 +34,7 @@
                            :all-reference-type-info="allReferenceTypeInfo"
                            :legends.sync="state.legends"
                            :color-set="colorSet"
+                           disable-ellipsis
         />
     </widget-frame>
 </template>

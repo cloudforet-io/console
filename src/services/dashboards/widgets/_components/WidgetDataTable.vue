@@ -8,7 +8,7 @@
                        disable-empty-case
         >
             <template #default="{isEmpty}">
-                <table>
+                <table :class="{'ellipsis-table': !props.disableEllipsis }">
                     <thead>
                         <tr>
                             <th v-for="(field, fieldColIndex) in props.fields"
@@ -79,57 +79,65 @@
                                     <slot :name="`col-${field.name}`"
                                           v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                     >
-                                        <div class="detail-item-wrapper">
-                                            <span class="td-contents">
-                                                <template v-if="colIndex === 0 && props.showLegend">
-                                                    <p-status v-if="props.showLegend"
-                                                              class="toggle-button"
-                                                              :class="{ 'disable-toggle': disableToggle }"
-                                                              :text="props.showLegendIndex ? ((rowIndex) + 1)?.toString() : ''"
-                                                              :icon-color="getLegendIconColor(rowIndex)"
-                                                              :text-color="getLegendTextColor(rowIndex)"
-                                                              @click.stop="handleClickLegend(rowIndex)"
-                                                    />
-                                                </template>
-                                                <template v-if="field?.icon">
-                                                    <p-i :name="getHandler(field.icon, item)"
-                                                         width="1rem"
-                                                         height="1rem"
-                                                         class="icon"
-                                                    />
-                                                </template>
-                                                <slot :name="`col-${field.name}-text`"
-                                                      v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
-                                                >
-                                                    <router-link v-if="getHandler(field.link, item)"
-                                                                 :to="getHandler(field.link, item)"
-                                                                 class="link"
-                                                    >
-                                                        {{ getValue(item, field) }}
-                                                    </router-link>
-                                                    <div v-else-if="getHandler(field.rapidIncrease, item)"
-                                                         class="rapid-increase"
-                                                    ><span>{{ getValue(item, field) }}</span> <p-i name="ic_bold-arrow-up"
-                                                                                                   width="1rem"
-                                                                                                   height="1rem"
-                                                    />
-                                                    </div>
-                                                    <span v-else>{{ getValue(item, field) }}</span>
-                                                </slot>
-                                            </span>
-                                            <template v-if="field?.detailOptions?.enabled">
-                                                <p-popover position="bottom">
-                                                    <span class="detail">{{ $t('DASHBOARDS.WIDGET.DETAILS') }}</span>
-                                                    <template #content>
-                                                        <div class="popover-content">
-                                                            <slot :name="`detail-${field.name}`"
-                                                                  v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
-                                                            />
-                                                        </div>
+                                        <p-tooltip position="bottom"
+                                                   :contents="isEllipsisActive(rowIndex, colIndex) ? getTooltipContents(item, field) : undefined"
+                                        >
+                                            <div class="detail-item-wrapper">
+                                                <span class="td-contents">
+                                                    <template v-if="colIndex === 0 && props.showLegend">
+                                                        <p-status v-if="props.showLegend"
+                                                                  class="toggle-button"
+                                                                  :class="{ 'disable-toggle': disableToggle }"
+                                                                  :text="props.showLegendIndex ? ((rowIndex) + 1)?.toString() : ''"
+                                                                  :icon-color="getLegendIconColor(rowIndex)"
+                                                                  :text-color="getLegendTextColor(rowIndex)"
+                                                                  @click.stop="handleClickLegend(rowIndex)"
+                                                        />
                                                     </template>
-                                                </p-popover>
-                                            </template>
-                                        </div>
+                                                    <template v-if="field?.icon">
+                                                        <p-i :name="getHandler(field.icon, item)"
+                                                             width="1rem"
+                                                             height="1rem"
+                                                             class="icon"
+                                                        />
+                                                    </template>
+                                                    <slot :name="`col-${field.name}-text`"
+                                                          v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                                    >
+                                                        <router-link v-if="getHandler(field.link, item)"
+                                                                     :to="getHandler(field.link, item)"
+                                                                     class="link"
+                                                                     :class="{'ellipsis-box': !props.disableEllipsis }"
+                                                        >
+                                                            {{ getValue(item, field) }}
+                                                        </router-link>
+                                                        <div v-else-if="getHandler(field.rapidIncrease, item)"
+                                                             class="rapid-increase"
+                                                        ><span>{{ getValue(item, field) }}</span> <p-i name="ic_bold-arrow-up"
+                                                                                                       width="1rem"
+                                                                                                       height="1rem"
+                                                        />
+                                                        </div>
+                                                        <span v-else
+                                                              ref="labelRef"
+                                                              :class="{'ellipsis-box': !props.disableEllipsis }"
+                                                        >{{ getValue(item, field) }}</span>
+                                                    </slot>
+                                                </span>
+                                                <template v-if="field?.detailOptions?.enabled">
+                                                    <p-popover position="bottom">
+                                                        <span class="detail">{{ $t('DASHBOARDS.WIDGET.DETAILS') }}</span>
+                                                        <template #content>
+                                                            <div class="popover-content">
+                                                                <slot :name="`detail-${field.name}`"
+                                                                      v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
+                                                                />
+                                                            </div>
+                                                        </template>
+                                                    </p-popover>
+                                                </template>
+                                            </div>
+                                        </p-tooltip>
                                     </slot>
                                 </td>
                             </tr>
@@ -154,7 +162,7 @@
 <script setup lang="ts">
 
 import {
-    defineProps, reactive,
+    defineProps, reactive, ref,
 } from 'vue';
 
 import {
@@ -200,6 +208,7 @@ interface Props {
     allReferenceTypeInfo?: AllReferenceTypeInfo;
     colorSet?: string[];
     disableToggle?: boolean;
+    disableEllipsis?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -213,12 +222,15 @@ const props = withDefaults(defineProps<Props>(), {
     size: TABLE_SIZE.sm,
     allReferenceTypeInfo: () => ({}) as AllReferenceTypeInfo,
     colorSet: () => [],
+    disableEllipsis: false,
 });
 const emit = defineEmits<{(e: string, value: any): void}>();
 const state = reactive({
     proxyThisPage: useProxyValue('thisPage', props, emit),
     proxyLegend: useProxyValue('legends', props, emit),
 });
+
+const labelRef = ref<HTMLElement[]|null>(null);
 
 /* util */
 const getLegendIconColor = (index): string => {
@@ -291,6 +303,17 @@ const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], 
 const getColSlotProps = (item, field, colIndex, rowIndex) => ({
     item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
 });
+const isEllipsisActive = (rowIndex:number, colIndex:number):boolean => {
+    const tdIndex = props.fields.length * rowIndex + colIndex;
+    if (labelRef.value?.length && labelRef.value) {
+        return (labelRef.value[tdIndex]?.offsetWidth < labelRef.value[tdIndex]?.scrollWidth);
+    } return false;
+};
+
+const getTooltipContents = (item, field:Field):string => {
+    const value = getValue(item, field);
+    return (typeof value === 'number') ? value.toString() : value;
+};
 
 /* event */
 const handleClickLegend = (index) => {
@@ -322,6 +345,9 @@ const handleClickRow = (rowData) => {
         border-collapse: separate;
         border-spacing: 0;
         table-layout: fixed;
+    }
+    .ellipsis-table {
+        @apply w-full;
     }
     thead {
         tr {
@@ -390,6 +416,7 @@ const handleClickRow = (rowData) => {
 
             .td-contents {
                 @apply inline-flex gap-2;
+                width: 100%;
 
                 .toggle-button {
                     cursor: pointer;
@@ -457,6 +484,10 @@ const handleClickRow = (rowData) => {
             min-width: 2rem;
             padding: 0.125rem 0;
         }
+    }
+    .ellipsis-box {
+        @apply truncate;
+        width: 100%;
     }
 }
 </style>
