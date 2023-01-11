@@ -1,5 +1,5 @@
 <template>
-    <div v-on-click-outside="hideContextMenu"
+    <div v-on-click-outside="handleHideMenu"
          class="variable-more-button-dropdown"
          :class="{'open-menu': visibleMenu}"
     >
@@ -15,12 +15,16 @@
                         class="variables-menu"
                         searchable
                         use-fixed-menu-style
-                        :style="fixedMenuStyle"
-                        :menu="reorderedMenu"
+                        :style="contextMenuStyle"
+                        :menu="refinedMenu"
                         :selected="selected"
                         multi-selectable
+                        show-select-marker
                         show-clear-selection
+                        @click-show-more="showMoreMenu"
+                        @keyup:down:end="focusOnContextMenu()"
                         @update:selected="handleSelectVariable"
+                        @update:search-text="handleUpdateSearchText"
         >
             <template #bottom>
                 <p-button class="manage-variable-button"
@@ -40,12 +44,12 @@
 import { vOnClickOutside } from '@vueuse/components';
 import {
     computed,
-    reactive, toRefs,
+    reactive, toRefs, watch,
 } from 'vue';
 
 import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, debounce } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
@@ -58,7 +62,8 @@ const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     targetRef: null as HTMLElement | null,
-    contextMenuRef: null as typeof PContextMenu | null,
+    contextMenuRef: null as any | null,
+    searchText: '',
     variableSchema: computed<DashboardVariablesSchema>(() => dashboardDetailState.variablesSchema),
     variableList: computed<MenuItem[]>(() => state.variableSchema.order.map((property) => {
         const currentProperty = state.variableSchema.properties[property];
@@ -82,27 +87,36 @@ const state = reactive({
 const {
     targetRef,
     contextMenuRef,
+    searchText,
     variableList,
     selected,
 } = toRefs(state);
 
 const {
     visibleMenu,
-    hideContextMenu,
+    refinedMenu,
+    contextMenuStyle,
     showContextMenu,
-    fixedMenuStyle,
-    reorderedMenu,
+    hideContextMenu,
+    focusOnContextMenu,
+    initiateMenu,
+    reloadMenu,
+    showMoreMenu,
 } = useContextMenuController({
+    useFixedStyle: true,
     targetRef,
     contextMenuRef,
+    useMenuFiltering: true,
     useReorderBySelection: true,
-    useFixedStyle: true,
-    originMenu: variableList,
+    searchText,
     selected,
+    menu: variableList,
+    pageSize: 5,
 });
 
 // helper
 const updateVariablesUse = () => {
+    console.log('hehe');
     const _varialbesSchema = cloneDeep(state.variableSchema);
     state.variableSchema.order.forEach((property) => {
         _varialbesSchema.properties[property].use = state.selectedForUpdate.some((menu) => menu.name === property);
@@ -118,17 +132,33 @@ const handleOpenOverlay = () => {
 };
 const handleClickButton = () => {
     if (visibleMenu.value) {
-        hideContextMenu();
-        // Reflect selectedForUpdate changes after the dropdown is closed.
-        updateVariablesUse();
+        handleHideMenu();
     } else {
         state.selectedForUpdate = state.selected;
-        showContextMenu(true); // update reorderedMenu automatically
+        showContextMenu(); // update reorderedMenu automatically
     }
 };
+
+const handleHideMenu = () => {
+    hideContextMenu();
+    // Reflect selectedForUpdate changes after the dropdown is closed.
+    updateVariablesUse();
+};
+
 const handleSelectVariable = (changedSelected: MenuItem[]) => {
     state.selectedForUpdate = changedSelected;
 };
+
+const handleUpdateSearchText = debounce((text: string) => {
+    searchText.value = text;
+    reloadMenu();
+}, 200);
+
+watch(visibleMenu, (_visibleMenu) => {
+    if (_visibleMenu) {
+        initiateMenu();
+    }
+}, { immediate: true });
 
 </script>
 
