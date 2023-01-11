@@ -42,8 +42,8 @@ export default {
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
-            dashboardId: computed(() => props.dashboardId),
-            isProjectDashboard: computed(() => state.dashboardId.startsWith('project')),
+            dashboardId: computed<string>(() => props.dashboardId),
+            isProjectDashboard: computed<boolean>(() => state.dashboardId.startsWith('project')),
             loading: false,
         });
 
