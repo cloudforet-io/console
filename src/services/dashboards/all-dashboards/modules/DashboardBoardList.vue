@@ -175,7 +175,6 @@ export default defineComponent<DashboardBoardListProps>({
                 iconName: 'ic_duplicate',
                 tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
                 eventAction: () => {
-                    cloneModalState.visible = true;
                     cloneModalState.dashboardConfig = {
                         name: dashboardItem.name,
                         layouts: dashboardItem.layouts,
@@ -185,6 +184,7 @@ export default defineComponent<DashboardBoardListProps>({
                         labels: dashboardItem.labels,
                         version: dashboardItem.version,
                     };
+                    cloneModalState.visible = true;
                 },
             },
             {
@@ -205,7 +205,7 @@ export default defineComponent<DashboardBoardListProps>({
                 },
             });
         };
-        const handleUpdateCloneModal = (visible) => {
+        const handleUpdateCloneModal = (visible: boolean) => {
             if (visible) return;
             cloneModalState.dashboardConfig = {} as DashboardConfig;
         };

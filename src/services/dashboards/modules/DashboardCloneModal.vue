@@ -97,7 +97,8 @@ export default defineComponent<Props>({
     props: {
         visible: {
             type: Boolean,
-            required: undefined,
+            default: undefined,
+            required: true,
         },
         dashboard: {
             type: Object as PropType<DashboardModel>,
@@ -136,7 +137,7 @@ export default defineComponent<Props>({
         const state = reactive({
             proxyVisible: props.visible,
             filteredVisibilityList: computed(() => visibilityList),
-            isProjectDashboard: computed(() => Object.prototype.hasOwnProperty.call(props.dashboard, 'project_id')),
+            isProjectDashboard: computed(() => Object.prototype.hasOwnProperty.call(props.dashboard ?? {}, 'project_id')),
             dashboardNameList: computed<string[]>(() => {
                 if (state.isProjectDashboard) {
                     return store.state.dashboard.projectItems

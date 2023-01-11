@@ -63,7 +63,9 @@
         <dashboard-delete-modal :visible.sync="state.deleteModalVisible"
                                 :dashboard-id="props.dashboardId"
         />
-        <dashboard-clone-modal :visible.sync="state.cloneModalVisible" />
+        <dashboard-clone-modal :visible.sync="state.cloneModalVisible"
+                               :dashboard="dashboardDetailState.state"
+        />
     </div>
 </template>
 
