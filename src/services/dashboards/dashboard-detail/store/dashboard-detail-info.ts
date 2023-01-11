@@ -115,6 +115,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.variables = {};
         state.variablesSchema = { properties: {}, order: [] };
         state.labels = [];
+        //
+        validationState.isNameValid = undefined;
+        validationState.widgetValidMap = {};
     };
 
     const revertDashboardData = () => {
