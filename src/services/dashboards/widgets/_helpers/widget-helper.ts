@@ -1,11 +1,20 @@
 import type { AsyncComponent } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
-import { mergeWith } from 'lodash';
+import { isEmpty, mergeWith } from 'lodash';
 
+import { i18n } from '@/translations';
+
+import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
     BaseConfigInfo, WidgetConfig,
+    InheritOptions, WidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_configs/config';
 import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-list-config';
+
+interface InheritOptionsErrorMap {
+    [propertyName: string]: TranslateResult;
+}
 
 const mergeCustomizer = (val1, val2) => {
     if (Array.isArray(val1)) return [...new Set(val1.concat(val2))];
@@ -72,4 +81,32 @@ export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {
     if (!widgetComponent) throw new Error(`No matching widget component found. ${widgetComponent} does not exist.`);
 
     return widgetComponent;
+};
+
+export const getWidgetSchemaErrorMap = (
+    inheritOptions?: InheritOptions,
+    widgetOptionsSchema?: WidgetOptionsSchema['schema'],
+    dashboardVariables?: DashboardVariables,
+    dashboardVariablesSchema?: DashboardVariablesSchema,
+): InheritOptionsErrorMap => {
+    if (!inheritOptions || isEmpty(inheritOptions)) {
+        return {};
+    }
+    const errorMap: InheritOptionsErrorMap = {};
+    Object.entries(inheritOptions).forEach(([propertyName, inheritOption]) => {
+        if (!inheritOption?.enabled) return;
+
+        const variableKey = inheritOption?.variable_info?.key;
+        if (!variableKey || !dashboardVariablesSchema?.properties?.[variableKey] || !dashboardVariables?.[variableKey]) {
+            errorMap[propertyName] = i18n.t('This property does not exist on the dashboard variables.');
+            return;
+        }
+
+        const variableType = dashboardVariablesSchema.properties[variableKey].selection_type === 'MULTI' ? 'array' : 'string';
+        const widgetPropertyType = widgetOptionsSchema.properties[propertyName].type;
+        if (variableType !== widgetPropertyType) {
+            errorMap[propertyName] = i18n.t('This property has a different type from the dashboard variable.');
+        }
+    });
+    return errorMap;
 };
