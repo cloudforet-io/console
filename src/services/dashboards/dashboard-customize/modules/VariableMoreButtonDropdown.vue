@@ -104,7 +104,7 @@ const {
     searchText: toRef(state, 'searchText'),
     selected: toRef(state, 'selected'),
     menu: toRef(state, 'variableList'),
-    pageSize: 5,
+    pageSize: 10,
 });
 
 // helper

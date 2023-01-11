@@ -136,7 +136,7 @@ const {
     searchText: toRef(state, 'searchText'),
     selected: toRef(state, 'selected'),
     menu: toRef(state, 'options'),
-    pageSize: 5,
+    pageSize: 10,
 });
 
 // event
