@@ -83,7 +83,7 @@ export const getWidgetComponent = (widgetConfigId: string): AsyncComponent => {
     return widgetComponent;
 };
 
-export const getWidgetSchemaErrorMap = (
+export const getWidgetInheritOptionsErrorMap = (
     inheritOptions?: InheritOptions,
     widgetOptionsSchema?: WidgetOptionsSchema['schema'],
     dashboardVariables?: DashboardVariables,

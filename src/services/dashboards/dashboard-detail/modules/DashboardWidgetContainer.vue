@@ -55,7 +55,7 @@ import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-co
 import {
     getWidgetComponent,
     getWidgetConfig,
-    getWidgetSchemaErrorMap,
+    getWidgetInheritOptionsErrorMap,
 } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface Props {
@@ -143,7 +143,7 @@ export default defineComponent<Props>({
             const _widgetValidMap: Record<string, boolean> = {};
             state.widgetInfoList.forEach((widgetInfo: DashboardLayoutWidgetInfo) => {
                 const _widgetConfig = state.widgetConfigMap[widgetInfo.widget_key];
-                const _widgetSchemaErrorMap = getWidgetSchemaErrorMap(
+                const _widgetSchemaErrorMap = getWidgetInheritOptionsErrorMap(
                     widgetInfo.inherit_options,
                     _widgetConfig.options_schema.schema,
                     dashboardDetailState.variables,
