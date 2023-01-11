@@ -219,7 +219,7 @@ defineExpose<WidgetExpose<FullData>>({
 <style scoped lang="postcss">
 .base-pie-widget {
     .chart-wrapper {
-        height: 11.5rem;
+        height: 10.75rem;
         .chart {
             height: 100%;
         }
