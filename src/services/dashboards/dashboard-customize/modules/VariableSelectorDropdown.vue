@@ -5,19 +5,19 @@
     >
         <button ref="targetRef"
                 class="dropdown-box"
-                :class="{ 'is-visible': visibleMenu, 'filled-value': selected.length }"
+                :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
                 @click="toggleContextMenu"
         >
             <span class="variable-label">{{ variableName }}</span>
-            <span v-if="selected.length"
+            <span v-if="state.selected.length"
                   class="selected-items"
             >
-                <span class="item-for-display">{{ selected[0].label }}</span>
-                <p-badge v-if="selected.length > 1"
+                <span class="item-for-display">{{ state.selected[0].label }}</span>
+                <p-badge v-if="state.selected.length > 1"
                          class="selected-count"
                          style-type="blue300"
                 >
-                    +{{ selected.length - 1 }}
+                    +{{ state.selected.length - 1 }}
                 </p-badge>
                 <button class="option-delete-button"
                         @click.stop="handleClearSelected"
@@ -41,10 +41,10 @@
                         class="options-menu"
                         searchable
                         use-fixed-menu-style
-                        :search-text="searchText"
+                        :search-text="state.searchText"
                         :style="contextMenuStyle"
                         :menu="refinedMenu"
-                        :selected="selected"
+                        :selected="state.selected"
                         :multi-selectable="variableProperty.selection_type === 'MULTI'"
                         show-select-marker
                         :show-clear-selection="variableProperty.selection_type === 'MULTI'"
@@ -61,7 +61,7 @@
 import { vOnClickOutside } from '@vueuse/components';
 import {
     computed,
-    reactive, toRefs, watch,
+    reactive, toRef, toRefs, watch,
 } from 'vue';
 
 import {
@@ -115,15 +115,7 @@ const state = reactive({
     }),
 });
 
-const {
-    targetRef,
-    contextMenuRef,
-    variableProperty,
-    variableName,
-    searchText,
-    selected,
-    options,
-} = toRefs(state);
+
 
 const {
     visibleMenu,
@@ -137,13 +129,13 @@ const {
     showMoreMenu,
 } = useContextMenuController({
     useFixedStyle: true,
-    targetRef,
-    contextMenuRef,
+    targetRef: toRef(state, 'targetRef'),
+    contextMenuRef: toRef(state, 'contextMenuRef'),
     useMenuFiltering: true,
     useReorderBySelection: true,
-    searchText,
-    selected,
-    menu: options,
+    searchText: toRef(state, 'searchText'),
+    selected: toRef(state, 'selected'),
+    menu: toRef(state, 'options'),
     pageSize: 5,
 });
 
@@ -171,15 +163,22 @@ const changeVariables = (changedSelected: MenuItem[]) => {
 };
 
 const handleUpdateSearchText = debounce((text: string) => {
-    searchText.value = text;
+    state.searchText = text;
     reloadMenu();
 }, 200);
 
-watch([options, visibleMenu], ([, _visibleMenu]) => {
+watch(visibleMenu, (_visibleMenu) => {
     if (_visibleMenu) {
         initiateMenu();
     }
 }, { immediate: true });
+
+const {
+    targetRef,
+    contextMenuRef,
+    variableProperty,
+    variableName,
+} = toRefs(state);
 
 </script>
 

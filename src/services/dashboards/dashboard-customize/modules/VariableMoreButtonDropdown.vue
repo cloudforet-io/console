@@ -15,10 +15,10 @@
                         class="variables-menu"
                         searchable
                         use-fixed-menu-style
-                        :search-text="searchText"
+                        :search-text="state.searchText"
                         :style="contextMenuStyle"
                         :menu="refinedMenu"
-                        :selected="selected"
+                        :selected="state.selected"
                         multi-selectable
                         show-select-marker
                         show-clear-selection
@@ -45,7 +45,7 @@
 import { vOnClickOutside } from '@vueuse/components';
 import {
     computed,
-    reactive, toRefs, watch,
+    reactive, toRef, toRefs, watch,
 } from 'vue';
 
 import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
@@ -86,14 +86,6 @@ const state = reactive({
 });
 
 const {
-    targetRef,
-    contextMenuRef,
-    searchText,
-    variableList,
-    selected,
-} = toRefs(state);
-
-const {
     visibleMenu,
     refinedMenu,
     contextMenuStyle,
@@ -105,13 +97,13 @@ const {
     showMoreMenu,
 } = useContextMenuController({
     useFixedStyle: true,
-    targetRef,
-    contextMenuRef,
+    targetRef: toRef(state, 'targetRef'),
+    contextMenuRef: toRef(state, 'contextMenuRef'),
     useMenuFiltering: true,
     useReorderBySelection: true,
-    searchText,
-    selected,
-    menu: variableList,
+    searchText: toRef(state, 'searchText'),
+    selected: toRef(state, 'selected'),
+    menu: toRef(state, 'variableList'),
     pageSize: 5,
 });
 
@@ -150,7 +142,7 @@ const handleSelectVariable = (changedSelected: MenuItem[]) => {
 };
 
 const handleUpdateSearchText = debounce((text: string) => {
-    searchText.value = text;
+    state.searchText = text;
     reloadMenu();
 }, 200);
 
@@ -159,6 +151,11 @@ watch(visibleMenu, (_visibleMenu) => {
         initiateMenu();
     }
 }, { immediate: true });
+
+const {
+    targetRef,
+    contextMenuRef,
+} = toRefs(state);
 
 </script>
 
