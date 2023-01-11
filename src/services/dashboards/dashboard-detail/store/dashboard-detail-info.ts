@@ -31,9 +31,7 @@ interface WidgetDataMap {
     [widgetKey: string]: any;
 }
 interface WidgetInheritVariablesValidMap {
-    [widgetKey: string]: {
-        [propertyName: string]: boolean;
-    }
+    [widgetKey: string]: boolean;
 }
 
 interface DashboardDetailInfoOriginState {
@@ -58,8 +56,8 @@ interface DashboardDetailInfoStoreState {
 }
 interface ValidationState {
     isNameValid?: boolean;
-    isWidgetLayoutValid: ComputedRef<Record<string, boolean>>;
-    widgetInheritVariablesValidMap: ComputedRef<WidgetInheritVariablesValidMap>;
+    isWidgetLayoutValid: ComputedRef<boolean>;
+    widgetInheritVariablesValidMap: WidgetInheritVariablesValidMap;
 }
 
 const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
@@ -105,15 +103,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     }) as UnwrapRef<DashboardDetailInfoStoreState>;
     const validationState = reactive<ValidationState>({
         isNameValid: undefined,
-        isWidgetLayoutValid: computed(() => ({})), // is all widgets valid
-        widgetInheritVariablesValidMap: computed(() => {
-            const result = {};
-            // originState.dashboardWidgetInfoList.forEach(() => {
-            //     result[d.widget_key] = isWidgetValid(d, state.variables_schema);
-            // });
-            return result;
-        }),
-    });
+        isWidgetLayoutValid: computed(() => Object.values(validationState.widgetInheritVariablesValidMap).every((d) => d === true)),
+        widgetInheritVariablesValidMap: {},
+    }) as UnwrapRef<ValidationState>;
 
     const resetDashboardData = () => {
         originState.dashboardInfo = null;
@@ -204,6 +196,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     const deleteWidget = (widgetKey: string) => {
         state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widget_key !== widgetKey);
+        delete validationState.widgetInheritVariablesValidMap[widgetKey];
     };
     const resetVariables = () => {
         const originProperties = { ...managedDashboardVariablesSchema.properties, ...originState.dashboardInfo.variables_schema.properties };
@@ -230,6 +223,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.variables = _variables;
     };
 
+    const updateWidgetValidation = (isValid: boolean, widgetKey: string) => {
+        validationState.widgetInheritVariablesValidMap[widgetKey] = isValid;
+    };
+
     store.dispatch('reference/loadAll');
 
     return {
@@ -245,6 +242,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         updateWidgetInfo,
         deleteWidget,
         resetVariables,
+        updateWidgetValidation,
     };
 });
 
