@@ -23,6 +23,7 @@
                        :currency-rates="currencyRates"
                        :edit-mode="editMode"
                        :all-reference-type-info="allReferenceTypeInfo"
+                       @validate="handleValidate($event, widget.widget_key)"
             />
         </template>
     </div>
@@ -137,6 +138,9 @@ export default defineComponent<Props>({
                 // for less throttle, change below timeout ms
             }, 500);
         };
+        const handleValidate = (isValid: boolean, widgetKey: string) => {
+            dashboardDetailStore.updateWidgetValidation(isValid, widgetKey);
+        };
 
         const observeInstance = new ResizeObserver(handleResizeObserve);
         onMounted(() => {
@@ -192,6 +196,7 @@ export default defineComponent<Props>({
             ...toRefs(state),
             getWidgetComponent,
             handleIntersectionObserver,
+            handleValidate,
         };
     },
 });
