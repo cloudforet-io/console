@@ -64,7 +64,7 @@
                                 :dashboard-id="props.dashboardId"
         />
         <dashboard-clone-modal :visible.sync="state.cloneModalVisible"
-                               :dashboard="dashboardDetailState.state"
+                               :dashboard="dashboardDetailState"
         />
     </div>
 </template>
