@@ -99,10 +99,10 @@ const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailOriginState = dashboardDetailStore.originState;
 
 const state = reactive({
-    name: dashboardDetailState.dashboardName,
+    name: dashboardDetailState.name,
     refreshInterval: undefined,
     apiParam: computed<Partial<DashboardConfig>>(() => ({
-        name: dashboardDetailState.dashboardName,
+        name: dashboardDetailState.name,
         labels: dashboardDetailState.labels,
         settings: dashboardDetailState.settings,
         layouts: [dashboardDetailState.dashboardWidgetInfoList],
@@ -202,7 +202,7 @@ const handleUnload = (event) => {
     event.preventDefault(); event.returnValue = '';
 };
 
-watch(() => dashboardDetailState.dashboardName, (name: string) => {
+watch(() => dashboardDetailState.name, (name: string) => {
     state.name = name;
 });
 
