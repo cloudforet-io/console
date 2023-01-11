@@ -272,7 +272,7 @@ defineExpose<WidgetExpose<FullData>>({
 <style lang="postcss" scoped>
 .base-trend-widget {
     .chart-wrapper {
-        height: 11.75rem;
+        height: 10.75rem;
         .chart-loader {
             height: 100%;
             .chart {

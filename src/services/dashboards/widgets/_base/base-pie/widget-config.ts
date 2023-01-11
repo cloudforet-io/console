@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 
 const basePieWidgetConfig: WidgetConfig = {
     widget_config_id: 'basePie',
@@ -13,6 +13,7 @@ const basePieWidgetConfig: WidgetConfig = {
     sizes: ['sm', 'full'],
     options: {
         granularity: GRANULARITY.ACCUMULATED,
+        group_by: GROUP_BY.PROVIDER,
         chart_type: CHART_TYPE.PIE,
         legend_options: {
             enabled: true,
