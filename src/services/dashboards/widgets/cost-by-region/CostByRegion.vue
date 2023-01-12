@@ -261,23 +261,23 @@ const drawChart = (chartData: MapChartData[]) => {
     });
 };
 
-const initWidget = async (data?: FullData) => {
+const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.legends = getXYChartLegends(state.data.results, GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
-    await nextTick();
     chartHelper.clearChildrenOfRoot();
-    drawChart(state.chartData);
+    await nextTick();
+    if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1) => {
+const refreshWidget = async (thisPage = 1): Promise<FullData> => {
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
     state.legends = getXYChartLegends(state.data.results, GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
-    await nextTick();
     chartHelper.clearChildrenOfRoot();
+    await nextTick();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
@@ -303,6 +303,8 @@ const handleRefresh = () => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    refreshWidget,
+    props,
 });
 
 defineExpose<WidgetExpose<FullData>>({

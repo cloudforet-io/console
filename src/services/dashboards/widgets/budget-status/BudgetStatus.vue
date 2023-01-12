@@ -47,7 +47,7 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, toRefs,
+    computed, defineExpose, defineProps, reactive, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
@@ -177,14 +177,12 @@ const fetchData = async (): Promise<Data> => {
 const initWidget = async (data?: Data): Promise<Data> => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    await nextTick();
     state.loading = false;
     return state.data;
 };
 const refreshWidget = async (): Promise<Data> => {
     state.loading = true;
     state.data = await fetchData();
-    await nextTick();
     state.loading = false;
     return state.data;
 };

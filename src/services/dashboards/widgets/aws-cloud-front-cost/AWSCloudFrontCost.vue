@@ -45,9 +45,9 @@ import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
+import type * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
 import bytes from 'bytes';
 import { cloneDeep } from 'lodash';
@@ -92,7 +92,7 @@ interface FullData {
 }
 
 const USAGE_SOURCE_UNIT = 'GB';
-const USAGE_TYPE_LABEL_MAP: Record<Extract<UsageType, 'data-transfer.out'|'requests.http'|'requests.https'>, TranslateResult> = {
+const USAGE_TYPE_LABEL_MAP: Record<Extract<UsageType, 'data-transfer.out'|'requests.http'|'requests.https'>, string> = {
     'data-transfer.out': 'Transfer-out',
     'requests.http': 'Requests (HTTP)',
     'requests.https': 'Requests (HTTPS)',
@@ -150,7 +150,6 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
 const fetchData = async (): Promise<FullData> => {
-    // TODO: If there's no groupBy(required field), widget has to show invalid text.
     if (!state.groupBy) return { results: [], more: false };
     try {
         const apiQueryHelper = new ApiQueryHelper();
@@ -202,7 +201,7 @@ const drawChart = (chartData) => {
     chart.children.push(legend);
 
     Object.entries(USAGE_TYPE_LABEL_MAP).forEach(([name, label]) => {
-        const seriesSettings = {
+        const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
             name: label,
             valueXField: name,
             categoryYField: state.groupBy,
@@ -239,23 +238,23 @@ const drawChart = (chartData) => {
     if (legend) legend.data.setAll(chart.series.values);
 };
 
-const initWidget = async (data?: FullData) => {
+const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
-    drawChart(state.chartData);
+    if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
 
-const refreshWidget = async (thisPage = 1) => {
+const refreshWidget = async (thisPage = 1): Promise<FullData> => {
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();
     state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
+    chartHelper.refreshRoot();
     await nextTick();
-    if (chartHelper.root.value) chartHelper.refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
@@ -277,6 +276,8 @@ const handleRefresh = () => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    refreshWidget,
+    props,
 });
 
 defineExpose<WidgetExpose<FullData>>({
