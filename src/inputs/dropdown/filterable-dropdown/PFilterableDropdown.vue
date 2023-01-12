@@ -95,7 +95,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
-import { debounce, reduce } from 'lodash';
+import { debounce, isEqual, reduce } from 'lodash';
 
 import PBadge from '@/data-display/badges/PBadge.vue';
 import PTag from '@/data-display/tags/PTag.vue';
@@ -160,7 +160,7 @@ const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void
 /* selection */
 const proxySelected = ref<MenuItem[]>(props.selected);
 const updateSelected = (selected: MenuItem[]) => {
-    if (proxySelected.value !== selected && !(proxySelected.value.length === 0 && selected.length === 0)) {
+    if (proxySelected.value !== selected && !isEqual(proxySelected.value, selected)) {
         proxySelected.value = selected;
         emit('update:selected', selected);
     }

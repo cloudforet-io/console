@@ -10,7 +10,7 @@ import { i18n } from '@/translations';
 interface UseDropdownButtonDisplay {
     multiSelectable: Ref<boolean|undefined>;
     selected: Ref<FilterableDropdownMenuItem[]>;
-    appearanceType: Ref<FilterableDropdownAppearanceType>;
+    appearanceType: Ref<FilterableDropdownAppearanceType|undefined>;
     placeholder: Ref<string|undefined>;
 }
 export const useFilterableDropdownButtonDisplay = ({

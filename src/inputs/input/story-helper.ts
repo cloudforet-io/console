@@ -1,7 +1,7 @@
 import type { ArgTypes } from '@storybook/addons';
 
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
-import { INPUT_SIZE } from '@/inputs/input/type';
+import { INPUT_APPEARANCE_TYPES, INPUT_SIZE, INPUT_MODES } from '@/inputs/input/type';
 
 const initContextMenuArgTypes = (): ArgTypes => {
     const contextMenuArgTypes = getContextMenuArgTypes();
@@ -31,6 +31,25 @@ export const getTextInputArgTypes = (): ArgTypes => {
             },
             control: {
                 type: 'text',
+            },
+        },
+        size: {
+            name: 'size',
+            type: { name: 'string' },
+            description: `TextInput size. ${Object.values(INPUT_SIZE)} are available.`,
+            defaultValue: INPUT_SIZE.md,
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: `"${INPUT_SIZE.md}"`,
+                },
+            },
+            control: {
+                type: 'select',
+                options: Object.values(INPUT_SIZE),
             },
         },
         disabled: {
@@ -212,24 +231,6 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
-        exactMode: {
-            name: 'exactMode',
-            type: { name: 'boolean' },
-            description: 'If it is `true` and there is no exact match for the menu item, the search text will be blank.',
-            defaultValue: true,
-            table: {
-                type: {
-                    summary: 'boolean',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'true',
-                },
-            },
-            control: {
-                type: 'boolean',
-            },
-        },
         useAutoComplete: {
             name: 'useAutoComplete',
             type: { name: 'boolean' },
@@ -284,23 +285,61 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
-        size: {
-            name: 'size',
+        appearanceType: {
+            name: 'appearanceType',
             type: { name: 'string' },
-            description: `TextInput size. ${Object.values(INPUT_SIZE)} are available.`,
-            defaultValue: INPUT_SIZE.md,
+            description: 'Appearance type to display selected items.',
+            defaultValue: INPUT_APPEARANCE_TYPES[0],
             table: {
                 type: {
                     summary: 'string',
                 },
                 category: 'props',
                 defaultValue: {
-                    summary: `"${INPUT_SIZE.md}"`,
+                    summary: `'${INPUT_APPEARANCE_TYPES[0]}'`,
                 },
             },
             control: {
                 type: 'select',
-                options: Object.values(INPUT_SIZE),
+                options: INPUT_APPEARANCE_TYPES,
+            },
+        },
+        inputMode: {
+            name: 'inputMode',
+            type: { name: 'string' },
+            description: 'Input type.',
+            defaultValue: INPUT_MODES[0],
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: `'${INPUT_MODES[0]}'`,
+                },
+            },
+            control: {
+                type: 'select',
+                options: INPUT_MODES,
+            },
+        },
+        pageSize: {
+            name: 'pageSize',
+            type: { name: 'number' },
+            description: 'Page size to show items.',
+            defaultValue: 10,
+            table: {
+                type: {
+                    summary: 'number',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'undefined',
+                },
+            },
+            control: {
+                type: 'number',
+                options: { min: 0 },
             },
         },
         // attrs
@@ -406,9 +445,23 @@ export const getTextInputArgTypes = (): ArgTypes => {
             },
         },
         // events
-        onInput: {
-            name: 'input',
-            description: 'Event emitted when input something. Works with v-model.',
+        onUpdateValue: {
+            name: 'update:value',
+            description: 'Event emitted when value is updated. Works with v-model, sync.',
+            table: {
+                type: {
+                    summary: null,
+                },
+                defaultValue: {
+                    summary: null,
+                },
+                category: 'events',
+            },
+        },
+        onUpdate: {
+            name: 'update',
+            description: 'Event emitted when selected and duplication check validation is updated. '
+                + 'Selected items are for the first argument, and validation result(boolean) is for the second argument. ',
             table: {
                 type: {
                     summary: null,

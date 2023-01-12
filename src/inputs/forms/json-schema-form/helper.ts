@@ -2,6 +2,7 @@ import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type'
 import type {
     ComponentName, InnerJsonSchema, JsonSchema, TextInputType,
 } from '@/inputs/forms/json-schema-form/type';
+import type { InputAppearanceType } from '@/inputs/input/type';
 
 export const NUMERIC_TYPES = ['number', 'integer'];
 
@@ -157,4 +158,13 @@ export const getMenuItemsBySchemaProperty = (schemaProperty: InnerJsonSchema): S
 export const getMultiInputMode = (schemaProperty: InnerJsonSchema): boolean => {
     if (schemaProperty.type !== 'array') return false;
     return schemaProperty?.maxItems !== 1;
+};
+
+export const getAppearanceType = (schemaProperty: InnerJsonSchema): InputAppearanceType|undefined => {
+    if (getInputTypeBySchemaProperty(schemaProperty) === 'password') return 'masking';
+    if (getComponentNameBySchemaProperty(schemaProperty) === 'PTextInput') {
+        if (schemaProperty.type === 'array') return 'stack';
+        return 'basic';
+    }
+    return undefined;
 };

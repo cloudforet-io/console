@@ -1,51 +1,58 @@
 <template>
-    <div
-        class="p-text-input"
-        :class="{block, focused: isFocused, [size]: true}"
+    <div v-on-click-outside="() => hideMenu(false)"
+         class="p-text-input"
+         :class="{block, focused: isInputFocused, [size]: true}"
     >
         <div ref="targetRef"
              class="input-container"
-             :class="{invalid: isInvalid || invalid, disabled}"
+             :tabindex="disabled || $attrs.readonly ? -1 : 0"
+             :class="{invalid: isSelectedInvalid || invalid, disabled}"
+             @keyup.down="focusOnContextMenu(0)"
+             @keyup.esc.capture.stop="hideMenu"
+             @click.stop="showMenu(true)"
         >
-            <div v-if="proxySelectedValue.length && multiInput"
-                 class="tag-container"
-            >
-                <p-tag v-for="(tag, index) in proxySelectedValue"
-                       :key="index"
-                       :deletable="!disabled"
-                       :selected="index === deleteTargetIdx"
-                       :invalid="tag.invalid"
-                       class="tag"
-                       @delete="handleDeleteTag(tag, index)"
-                >
-                    {{ tag.label || tag.value }}
-                </p-tag>
+            <div class="tag-container">
+                <template v-if="proxySelected.length > 0 && multiInput">
+                    <template v-if="appearanceType === 'stack'">
+                        <p-tag v-for="(tag, index) in proxySelected"
+                               :key="index"
+                               :deletable="!disabled"
+                               :selected="index === deleteTargetIdx"
+                               :invalid="isSelectedItemInvalid(tag, index)"
+                               class="tag"
+                               @delete="handleDeleteTag(tag, index)"
+                        >
+                            {{ tag.label || tag.name }}
+                        </p-tag>
+                    </template>
+                    <span v-else-if="appearanceType === 'badge' && !isInputFocused"
+                          class="selected-text"
+                    >
+                        {{ proxySelected[0].label || proxySelected[0].name }}
+                        <p-badge v-if="proxySelected.length > 1">
+                            +{{ proxySelected.length - 1 }}
+                        </p-badge>
+                    </span>
+                </template>
                 <slot name="default"
                       v-bind="{ value }"
                 >
                     <input v-bind="$attrs"
+                           ref="inputRef"
                            :type="inputType"
-                           :value="proxyValue"
+                           :value="displayedInputValue"
                            :disabled="disabled"
                            :placeholder="placeholder"
+                           :autocomplete="!$attrs.autocomplete ? 'off' : $attrs.autocomplete"
                            size="1"
-                           v-on="inputListeners"
+                           v-on="$listeners"
+                           @input="handleInput"
+                           @focus="handleInputFocus"
+                           @keyup="handleInputKeyup"
+                           @keydown="handleInputKeydown"
                     >
                 </slot>
             </div>
-            <slot v-else
-                  name="default"
-                  v-bind="{ value }"
-            >
-                <input v-bind="$attrs"
-                       :type="inputType"
-                       :value="proxyValue"
-                       :disabled="disabled"
-                       :placeholder="placeholder"
-                       size="1"
-                       v-on="inputListeners"
-                >
-            </slot>
             <!-- right-extra slot will be deprecated. use input-right slot. -->
             <span v-if="$slots['right-extra']"
                   class="right-extra"
@@ -70,14 +77,14 @@
                 {{ !proxyShowPassword ? $t('COMPONENT.TEXT_INPUT.HIDE') : $t('COMPONENT.TEXT_INPUT.SHOW') }}
             </p-button>
             <p-i v-else
-                 v-show="(isFocused || isInvalid)"
+                 v-show="(isInputFocused || isSelectedInvalid)"
                  class="delete-all-icon"
                  name="ic_delete"
                  height="1rem"
                  width="1rem"
                  color="inherit transparent"
                  @mousedown.native.prevent
-                 @click="handleDeleteAllTags"
+                 @click.stop="handleDeleteAllTags"
             />
             <span v-if="$slots['right-edge']"
                   class="right-edge"
@@ -87,74 +94,90 @@
                 />
             </span>
         </div>
-        <p-context-menu v-if="proxyVisibleMenu && useAutoComplete"
+        <p-context-menu v-if="useAutoComplete"
+                        v-show="proxyVisibleMenu && refinedMenu.length > 0"
                         ref="menuRef"
-                        :menu="bindingMenu"
-                        :highlight-term="proxyValue"
-                        :loading="loading"
+                        :menu="refinedMenu"
+                        :highlight-term="typeof proxyInputValue === 'string' ? proxyInputValue : undefined"
+                        :loading="loading || contextMenuLoading"
                         :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
-                        @select="handleSelectMenuItem"
+                        :selected="proxySelected"
+                        :multi-selectable="multiInput"
+                        @update:selected="handleUpdateSelected"
                         @focus="handleFocusMenuItem"
+                        @keyup:up:end="focusOnInput()"
+                        @keyup:down:end="focusOnContextMenu()"
+                        @click-show-more="showMoreMenu"
         />
     </div>
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
+import type { DirectiveFunction, PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, toRef, toRefs, watch,
+    computed, defineComponent, ref, toRef, watch,
 } from 'vue';
 
-import vClickOutside from 'v-click-outside';
-import { focus } from 'vue-focus';
+import { vOnClickOutside } from '@vueuse/components';
+import { useFocus } from '@vueuse/core';
+import { unionBy } from 'lodash';
+import type { TranslateResult } from 'vue-i18n';
 
+import PBadge from '@/data-display/badges/PBadge.vue';
 import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
+import { useIgnoreWindowArrowKeydownEvents } from '@/hooks';
+import { useContextMenuController } from '@/hooks/context-menu-controller';
 import { useProxyValue } from '@/hooks/proxy-state';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
-import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
-import { INPUT_SIZE } from '@/inputs/input/type';
-import type { SelectedItem, TextInputHandler, InputSize } from '@/inputs/input/type';
+import { useInputDeletion } from '@/inputs/input/composables/use-input-deletion';
+import { useSelectedValidation } from '@/inputs/input/composables/use-selected-validation';
+import { INPUT_APPEARANCE_TYPES, INPUT_SIZE, INPUT_MODES } from '@/inputs/input/type';
+import type {
+    InputItem, TextInputHandler, InputSize, InputAppearanceType,
+    InputMode,
+} from '@/inputs/input/type';
 
 
 interface TextInputProps {
     value?: string|number;
+    size?: InputSize;
     disabled: boolean;
     block: boolean;
     invalid: boolean;
     placeholder: string;
     multiInput: boolean;
-    selected: SelectedItem[];
+    selected: InputItem[];
     visibleMenu?: boolean;
     useFixedMenuStyle: boolean;
     menu: MenuItem[];
     loading: boolean;
     handler?: TextInputHandler;
     disableHandler: boolean;
-    exactMode: boolean;
     useAutoComplete: boolean;
-    maskingMode: boolean;
-    size?: InputSize;
+    showPassword: boolean;
+    appearanceType?: InputAppearanceType;
+    inputMode?: InputMode;
+    pageSize?: number;
 }
 
 export default defineComponent<TextInputProps>({
     name: 'PTextInput',
     components: {
+        PBadge,
         PTag,
         PI,
         PContextMenu,
         PButton,
     },
     directives: {
-        focus,
-        clickOutside: vClickOutside.directive,
+        onClickOutside: vOnClickOutside as DirectiveFunction,
     },
     model: {
         prop: 'value',
-        event: 'input',
+        event: 'update:value',
     },
     props: {
         value: {
@@ -189,7 +212,7 @@ export default defineComponent<TextInputProps>({
             default: false,
         },
         selected: {
-            type: Array as PropType<SelectedItem[]>,
+            type: Array as PropType<InputItem[]>,
             default: () => [],
         },
         /* context menu fixed style props */
@@ -212,22 +235,14 @@ export default defineComponent<TextInputProps>({
         },
         /* extra props */
         handler: {
-            type: Function,
+            type: Function as PropType<TextInputHandler>,
             default: undefined,
         },
         disableHandler: {
             type: Boolean,
             default: false,
         },
-        exactMode: {
-            type: Boolean,
-            default: true,
-        },
         useAutoComplete: {
-            type: Boolean,
-            default: false,
-        },
-        maskingMode: {
             type: Boolean,
             default: false,
         },
@@ -235,204 +250,270 @@ export default defineComponent<TextInputProps>({
             type: Boolean,
             default: true,
         },
+        appearanceType: {
+            type: String as PropType<InputAppearanceType>,
+            default: INPUT_APPEARANCE_TYPES[0],
+            validator(appearanceType: InputAppearanceType) {
+                return INPUT_APPEARANCE_TYPES.includes(appearanceType);
+            },
+        },
+        inputMode: {
+            type: String as PropType<InputMode>,
+            default: INPUT_MODES[0],
+            validator(inputMode: InputMode) {
+                return INPUT_MODES.includes(inputMode);
+            },
+        },
+        pageSize: {
+            type: Number,
+            default: undefined,
+        },
     },
 
-    setup(props, { emit, listeners, attrs }) {
-        const state = reactive({
-            proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
-            menuRef: null,
-            targetRef: null,
-            isFocused: false,
-            proxyShowPassword: useProxyValue('showPassword', props, emit),
-            inputType: computed(() => {
-                if (props.maskingMode) {
-                    if (attrs.type === 'password') return state.proxyShowPassword ? 'password' : 'text';
-                    return attrs.type;
-                }
-                return attrs.type;
-            }),
-            proxyValue: useProxyValue('value', props, emit),
-            proxySelectedValue: useProxyValue('selected', props, emit),
-            deleteTarget: undefined as string | undefined,
-            deleteTargetIdx: -1,
-            isTagDeletable: false,
-            isInvalid: props.selected.some((item) => item.invalid),
-            searchableItems: computed<MenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),
-            filteredMenu: [] as MenuItem[],
-            bindingMenu: computed<FilterableDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
+    setup(props, { emit, attrs }) {
+        /* input focusing */
+        const inputRef = ref<HTMLElement|null>(null);
+        const { focused: isInputFocused } = useFocus(inputRef);
+        const focusOnInput = () => {
+            if (isInputFocused.value) return;
+            isInputFocused.value = true;
+        };
+
+        /* selected */
+        const proxySelected = ref<InputItem[]>(props.selected);
+        const updateSelected = (selected: InputItem[]) => {
+            proxySelected.value = selected;
+            emit('update:selected', selected);
+        };
+        watch(() => props.selected, (selected) => {
+            if (selected === proxySelected.value) return;
+            updateSelected(selected);
         });
+
+        /* selected validation */
+        const { isSelectedInvalid, isSelectedItemInvalid } = useSelectedValidation({ selected: proxySelected });
+
+        /* input value */
+        const proxyInputValue = ref<string|number|undefined>(props.value);
+        const updateInputValue = (value?: string|number) => {
+            proxyInputValue.value = value;
+            emit('update:value', value);
+        };
+        const displayedInputValue = computed<TranslateResult|number|undefined>(() => {
+            if (props.multiInput) return proxyInputValue.value;
+            if (props.useAutoComplete) {
+                const item = proxySelected.value[0];
+                if (item) return item.label ?? item.name;
+            }
+            return proxyInputValue.value;
+        });
+        const isInputValueEmpty = computed(() => {
+            if (typeof proxyInputValue.value === 'string') return !proxyInputValue.value.length;
+            return proxyInputValue.value === undefined;
+        });
+        watch(() => props.value, (value) => {
+            if (value === proxyInputValue.value) return;
+            updateInputValue(value);
+        });
+
+        /* query input mode */
+        const proxyVisibleMenu = useProxyValue<boolean>('visibleMenu', props, emit);
+        // TODO
+
+        /* menu visibility */
+        const hideMenu = (focusInput?: boolean) => {
+            if (proxyVisibleMenu.value) {
+                proxyVisibleMenu.value = false;
+                emit('hide-menu');
+            }
+            if (focusInput) focusOnInput();
+        };
+        const showMenu = (focusInput?: boolean) => {
+            if (props.useAutoComplete && !proxyVisibleMenu.value) {
+                proxyVisibleMenu.value = true;
+                emit('show-menu');
+            }
+            if (focusInput) focusOnInput();
+        };
+        const toggleMenu = (focusInput?: boolean) => {
+            if (props.useAutoComplete) {
+                if (proxyVisibleMenu.value) hideMenu(focusInput);
+                else showMenu(focusInput);
+            }
+        };
+
+        /* context menu controller */
+        const unionSelected = computed<InputItem[]>(() => unionBy<InputItem>(proxySelected.value, 'name'));
+        const menuRef = ref<null|typeof PContextMenu>(null);
+        const targetRef = ref<null|HTMLElement>(null);
         const {
-            targetRef, targetElement, contextMenuStyle,
-        } = useContextMenuFixedStyle({
-            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
-            visibleMenu: toRef(state, 'proxyVisibleMenu'),
+            contextMenuStyle, loading: contextMenuLoading, refinedMenu,
+            focusOnContextMenu, initiateMenu, reloadMenu, showMoreMenu,
+        } = useContextMenuController({
+            useFixedStyle: toRef(props, 'useFixedMenuStyle'),
+            targetRef,
+            contextMenuRef: menuRef,
+            visibleMenu: proxyVisibleMenu,
+            useMenuFiltering: true,
+            useReorderBySelection: true,
+            searchText: computed(() => {
+                if (proxyInputValue.value === undefined) return '';
+                return typeof proxyInputValue.value === 'string' ? proxyInputValue.value : `${proxyInputValue.value}`;
+            }),
+            selected: unionSelected,
+            handler: toRef(props, 'handler'),
+            menu: toRef(props, 'menu'),
+            pageSize: toRef(props, 'pageSize'),
         });
-        const contextMenuFixedStyleState = reactive({
-            targetRef, targetElement, contextMenuStyle,
+
+        /* selected deletion */
+        const {
+            deleteTargetIdx, deleteSelectedValue, deleteTargetTag, deleteTag, deleteAll,
+        } = useInputDeletion({
+            selected: proxySelected,
+            updateInputValue,
+            updateSelected,
+            isInputValueEmpty,
         });
-
-        const handleDeleteTag = (val, idx) => {
-            const _selectedItems: SelectedItem[] = [...state.proxySelectedValue];
-            _selectedItems.splice(idx, 1);
-
-            const _selectedValues = _selectedItems.map((d) => d.value);
-            _selectedItems.forEach((selected, sIdx) => {
-                selected.duplicated = _selectedValues.slice(0, sIdx).includes(selected.value);
-            });
-            state.proxySelectedValue = _selectedItems;
-            state.deleteTargetIdx = -1;
-            state.deleteTarget = undefined;
-            emit('delete-tag', val, idx);
+        const handleDeleteTag = (tag: InputItem, idx: number) => {
+            deleteTag(tag, idx);
+            emit('delete-tag', tag, idx);
         };
-
-        const hideMenu = () => {
-            state.proxyVisibleMenu = false;
-            emit('hide-menu');
-        };
-
-        const showMenu = () => {
-            state.proxyVisibleMenu = true;
-            emit('show-menu');
-        };
-
         const handleDeleteAllTags = () => {
-            state.proxySelectedValue = [];
-            state.proxyValue = '';
-            hideMenu();
+            deleteAll();
+            reloadMenu();
+            showMenu();
             emit('delete-all-tags');
         };
 
-        const defaultHandler = (inputText: string, list: MenuItem[]) => {
-            let results: MenuItem[] = [...list];
-            const trimmed = inputText.trim();
-            if (trimmed) {
-                const regex = new RegExp(inputText, 'i');
-                results = results.filter((d) => regex.test(d.label as string));
-            }
-            return { results };
-        };
-
-        const filterMenu = async (val: string) => {
-            if (props.disableHandler) return;
-
-            if (props.handler) {
-                let res = props.handler(val, state.searchableItems);
-                if (res instanceof Promise) res = await res;
-                state.filteredMenu = res.results;
-            } else {
-                const results = defaultHandler(val, state.searchableItems).results;
-
-                const filtered = props.menu.filter((item) => {
-                    if (item.type && item.type !== 'item') return true;
-                    return !!results.find((d) => d.label === item.label);
-                });
-                if (filtered[filtered.length - 1]?.type === 'divider') filtered.pop();
-                state.filteredMenu = filtered;
-            }
-        };
-
+        /* context menu event listeners */
         const handleFocusMenuItem = (idx: string) => {
             emit('focus-menu', idx);
         };
-
-        const handleSelectMenuItem = ({ label, name }: FilterableDropdownMenuItem) => {
-            const _selectedItems = [...state.proxySelectedValue, { label, value: name }];
-            const _selectedValues = _selectedItems.map((d) => d.value);
-            _selectedItems.forEach((selected, idx) => {
-                selected.duplicated = _selectedValues.slice(0, idx).includes(selected.value);
-            });
-            state.proxySelectedValue = _selectedItems;
-            state.proxyValue = '';
-            hideMenu();
-        };
-
-        const handleTogglePassword = () => {
-            state.proxyShowPassword = !state.proxyShowPassword;
-        };
-
-        const deleteSelectedTags = () => {
-            if (state.proxyValue?.length > 0) return;
-            const lastIdx = state.proxySelectedValue.length - 1;
-            if (state.deleteTargetIdx === -1) { // Select the item if there is no selection
-                state.deleteTargetIdx = lastIdx;
-                state.deleteTarget = state.proxySelectedValue[lastIdx];
-                return;
+        const handleUpdateSelected = (items: InputItem[]) => {
+            updateSelected(items);
+            if (props.multiInput) {
+                updateInputValue('');
+            } else {
+                hideMenu(false);
             }
-
-            const deleteTargetIdx = state.deleteTargetIdx;
-            const deleteTargetTag = state.proxySelectedValue[deleteTargetIdx];
-
-            if (!deleteTargetTag) state.proxySelectedValue = [];
-            handleDeleteTag(deleteTargetTag, deleteTargetIdx);
         };
 
-        const inputListeners = {
-            ...listeners,
-            input(event) {
-                state.proxyValue = event.target.value;
-                if (state.proxyValue?.length && props.useAutoComplete) {
-                    showMenu();
-                    filterMenu(state.proxyValue);
-                }
-                emit('input', event.target.value);
-            },
-            focus() {
-                state.isFocused = true;
-                emit('focus');
-            },
-            blur() {
-                state.isFocused = false;
-                emit('blur');
-            },
-            keyup(event) {
-                if ((event.key === 'ArrowDown' || event.key === 'Down') && props.useAutoComplete) {
-                    if (state.bindingMenu.length === 0) return;
-                    if (state.menuRef) state.menuRef.focus();
-                }
-                if (event.code === 'Enter') {
-                    if (event.target.value?.length > 0 && props.multiInput) {
-                        handleSelectMenuItem({ label: event.target.value, name: event.target.value });
+        /* input password & masking */
+        const proxyShowPassword = useProxyValue('showPassword', props, emit);
+        const handleTogglePassword = () => {
+            proxyShowPassword.value = !proxyShowPassword.value;
+        };
+        const maskingMode = computed(() => props.appearanceType === 'masking');
+        watch(maskingMode, (masking) => {
+            if (masking) proxyShowPassword.value = true;
+        });
+
+        /* input type */
+        const inputType = computed(() => {
+            if (maskingMode.value) {
+                if (attrs.type === 'password') return proxyShowPassword.value ? 'password' : 'text';
+                return attrs.type;
+            }
+            return attrs.type;
+        });
+
+        /* input event listeners */
+        const handleInput = (event) => {
+            updateInputValue(event.target.value);
+            if (props.useAutoComplete) {
+                showMenu();
+                reloadMenu();
+            }
+        };
+        const handleInputFocus = () => {
+            if (props.useAutoComplete) {
+                initiateMenu();
+            }
+        };
+        const handleInputKeyup = (event) => {
+            if ((event.key === 'ArrowDown' || event.key === 'Down') && props.useAutoComplete) {
+                if (refinedMenu.value.length === 0) return;
+                if (menuRef.value) focusOnContextMenu(0);
+            }
+            if (event.key === 'Enter') {
+                if (event.target.value?.length > 0) {
+                    if (props.multiInput) {
+                        updateSelected([...proxySelected.value, { label: event.target.value, name: event.target.value }]);
+                        updateInputValue('');
+                    } else {
+                        updateSelected([{ label: event.target.value, name: event.target.value }]);
                     }
                 }
-                emit('keyup', event);
-            },
-            keydown(event) {
-                if (event.code === 'Backspace') {
-                    const isInputEmpty = state.proxySelectedValue.length <= 1 && state.proxyValue?.length <= 1;
-                    if (isInputEmpty && props.useAutoComplete) hideMenu();
-                    if (props.multiInput) deleteSelectedTags();
-                }
-                emit('keydown', event);
-            },
+            }
         };
-
-        watch(() => props.menu, (menu) => {
-            state.filteredMenu = menu;
-            filterMenu(state.proxyValue);
-        });
-        watch(() => props.maskingMode, (maskingMode) => {
-            if (maskingMode) state.proxyShowPassword = true;
-        });
-
-        const init = () => {
-            state.filteredMenu = props.menu;
-            if (props.selected && props.multiInput) {
-                if (!Array.isArray(props.selected)) {
-                    state.proxySelectedValue = [props.selected];
+        const handleInputKeydown = (event) => {
+            if (event.key === 'Backspace') {
+                if (proxySelected.value.length) {
+                    if (props.multiInput) deleteTargetTag();
+                    else deleteSelectedValue();
+                } else if (isInputValueEmpty.value) {
+                    hideMenu(true);
                 }
             }
         };
-        init();
+
+
+        watch(() => proxySelected.value, (selected) => {
+            emit('update', selected, !isSelectedInvalid.value);
+        });
+        watch(() => props.menu, () => {
+            initiateMenu();
+        });
+
+
+        /* ignore window arrow keydown event */
+        useIgnoreWindowArrowKeydownEvents({ predicate: computed(() => !!proxyVisibleMenu.value) });
 
         return {
-            ...toRefs(state),
-            ...toRefs(contextMenuFixedStyleState),
-            inputListeners,
+            proxySelected,
+            /* selected validation */
+            isSelectedInvalid,
+            isSelectedItemInvalid,
+            /* input value */
+            proxyInputValue,
+            displayedInputValue,
+            isInputValueEmpty,
+            /* input focusing */
+            inputRef,
+            isInputFocused,
+            focusOnInput,
+            /* context menu controller */
+            menuRef,
+            targetRef,
+            contextMenuStyle,
+            contextMenuLoading,
+            refinedMenu,
+            showMoreMenu,
+            focusOnContextMenu,
+            /* menu visibility */
+            proxyVisibleMenu,
+            showMenu,
+            hideMenu,
+            toggleMenu,
+            /* selected deletion */
+            deleteTargetIdx,
             handleDeleteTag,
             handleDeleteAllTags,
+            /* context menu event listeners */
             handleFocusMenuItem,
-            handleSelectMenuItem,
+            handleUpdateSelected,
+            /* input password & masking */
+            proxyShowPassword,
             handleTogglePassword,
+            maskingMode,
+            /* input type */
+            inputType,
+            /* input event listeners */
+            handleInput,
+            handleInputFocus,
+            handleInputKeyup,
+            handleInputKeydown,
         };
     },
 });
@@ -527,11 +608,7 @@ export default defineComponent<TextInputProps>({
         }
     }
     .p-context-menu {
-        position: absolute;
-        margin-top: -1px;
         z-index: 1000;
-        min-width: 100%;
-        width: 100%;
     }
 
     @define-mixin size $input-height, $font-size, $line-height {

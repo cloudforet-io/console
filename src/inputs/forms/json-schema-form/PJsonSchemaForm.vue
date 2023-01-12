@@ -102,7 +102,7 @@
                                       :type="schemaProperty.inputType"
                                       :invalid="invalid"
                                       :placeholder="schemaProperty.inputPlaceholder"
-                                      :masking-mode="schemaProperty.inputType === 'password'"
+                                      :appearance-type="schemaProperty.appearanceType"
                                       :autocomplete="false"
                                       :disabled="schemaProperty.disabled"
                                       :multi-input="schemaProperty.multiInputMode"
@@ -136,6 +136,7 @@ import { useLocalize } from '@/inputs/forms/json-schema-form/composables/localiz
 import { useValidation } from '@/inputs/forms/json-schema-form/composables/validation';
 import { addCustomFormats, addCustomKeywords } from '@/inputs/forms/json-schema-form/custom-schema';
 import {
+    getAppearanceType,
     getComponentNameBySchemaProperty,
     getInputPlaceholderBySchemaProperty,
     getInputTypeBySchemaProperty, getMenuItemsBySchemaProperty, getMultiInputMode,
@@ -226,6 +227,7 @@ export default defineComponent<JsonSchemaFormProps>({
                             inputPlaceholder: getInputPlaceholderBySchemaProperty(schemaProperty),
                             menuItems: getMenuItemsBySchemaProperty(schemaProperty),
                             multiInputMode: getMultiInputMode(schemaProperty),
+                            appearanceType: getAppearanceType(schemaProperty),
                         };
                         return refined;
                     }).sort((a, b) => {

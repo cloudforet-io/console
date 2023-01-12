@@ -1,4 +1,5 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import Fuse from 'fuse.js'
 import PTextInput from '@/inputs/input/PTextInput.vue';
 import PButton from "@/inputs/buttons/button/PButton";
 import PTextEditor from "@/inputs/text-editor/PTextEditor";
@@ -7,7 +8,7 @@ import { reactive, toRefs } from 'vue';
 import {
     getTextInputArgTypes
 } from "@/inputs/input/story-helper";
-import {getTextInputMenu} from "@/inputs/input/mock";
+import {getTextInputMenu, getTextInputMenuWithMultiTypes} from "@/inputs/input/mock";
 import {INPUT_SIZE} from "@/inputs/input/type";
 
 
@@ -23,14 +24,18 @@ export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PTextInput },
     template: `
-        <p-text-input v-bind="inputAttrs"
-                      :value="value" :invalid="invalid"
-                      :disabled="disabled" :block="block"
-                      :menu="menu" :use-fixed-menu-style="useFixedMenuStyle"
-                      :loading="loading"
-                      :masking-mode="maskingMode"
-                      :show-password="showPassword"
-                      :size="size"
+        <p-text-input
+                    v-bind="inputAttrs"
+                    :value="value"
+                    :size="size"
+                    :invalid="invalid"
+                    :disabled="disabled" :block="block"
+                    :menu="menu" :use-fixed-menu-style="useFixedMenuStyle"
+                    :loading="loading"
+                    :show-password="showPassword"
+                    :appearance-type="appearanceType"
+                    :input-mode="inputMode"
+                    :page-size="pageSize"
         >
             <template v-if="inputRightSlot" #input-right>
                 <span v-html="inputRightSlot"></span>
@@ -74,14 +79,21 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Autocomplete Multiple Input
+## Autocomplete
 <Canvas>
-    <Story name="Autocomplete Multiple Input">
+    <Story name="Autocomplete">
         {{
             components: { PTextInput },
             template: `
-                <div>
-                    <p-text-input :menu="menu" :selected.sync="selected" multi-input use-fixed-menu-style use-auto-complete />
+                <div style="width: 90%">
+                    <p class="text-label-lg font-bold my-3">With single input</p>
+                    <p-text-input :menu="menu" :selected.sync="selected" use-auto-complete use-fixed-menu-style />
+                    <br/>
+                    <br/>
+                    <p class="text-label-lg font-bold my-3">With multi input</p>
+                    <p-text-input :menu="menu" :selected.sync="selected" multi-input use-auto-complete use-fixed-menu-style />
+                    <br/>
+                    <br/>
                     <div class="flex mt-4">
                         <div class="mr-4 p-4 bg-blue-100 w-full max-h-64 overflow-y-auto">
                             <p class="font-lg font-bold">menu: </p>
@@ -100,6 +112,134 @@ export const Template = (args, { argTypes }) => ({
                     selected: []
                 })
                 return toRefs(state)
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Multi Input Duplicate Checks
+
+If there are duplicated items in `selected`, It shows invalid style to the duplicated tags. <br/>
+It does not perform duplicate checks on `item.label`. <br/>
+Please note that only `item.name` is checked for duplicates. <br/>
+If you want to get the result of duplicate check, use `update` event. <br/>
+`update` event's first argument is updated `selected` and the second argument is `boolean` which indicates is valid(no duplicated items) or not. <br/>
+
+
+<Canvas>
+    <Story name="Multi Input Duplicate Checks">
+        {{
+            components: { PTextInput },
+            template: `
+                <div style="width: 80%">
+                    <p-text-input :selected.sync="selected" multi-input use-fixed-menu-style @update="handleUpdate" />
+                    <div class="flex mt-4">
+                        <div class="p-4 w-full max-h-64 overflow-y-auto" :class="isValid ? 'bg-green-200' : 'bg-coral-200'">
+                            <p class="font-lg font-bold">isValid: </p>
+                            <pre>{{isValid}}</pre>
+                        </div>
+                        <div class="p-4 bg-blue-200 w-full max-h-64 overflow-y-auto">
+                            <p class="font-lg font-bold">selected: </p>
+                            <pre>{{selected}}</pre>
+                        </div>
+                    </div>
+                </div>
+            `,
+            setup() {
+                const state = reactive({
+                    selected: [{name: 'a', label: 'A'}, {name: 'b', label: 'B'}, {name: 'a', label: 'A'}, {name: 'bb', label: 'B'}],
+                    isValid: false,
+                })
+                const handleUpdate = (_, isValid) => {
+                    state.isValid = isValid;
+                }
+                return {
+                    ...toRefs(state),
+                    handleUpdate
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Autocomplete with Page Size
+When using the `handler` prop, the first argument of the handler is the input text, the second argument is the pageStart value, and the third argument is the pageLimit. <br/>
+pageStart and pageLimit are calculated based on the value given to the `pageSize` prop. <br/>
+
+For example, if `pageSize` is 5, pageStart is initially given 1 and pageLimit is given 5. <br/>
+If the value of more in the result of executing the handler is true, the show more button is displayed. <br/>
+When the user presses the show more button, the handler runs again. <br/>
+At this time, 6 is given as the value of the pageStart argument and 10 is given as the value of the pageLimit argument. <br/>
+
+<Canvas>
+    <Story name="Autocomplete with Page Size">
+        {{
+            components: { PTextInput },
+            template: `
+                <div>
+                    <p class="text-label-lg font-bold my-3">With page size 5</p>
+                    <p-text-input :menu="menu" :selected.sync="selected" use-auto-complete :page-size="5" use-fixed-menu-style />
+                    <br/>
+                    <br/>
+                    <p class="text-label-lg font-bold my-3">With multi input, page size 5</p>
+                    <p-text-input :menu="menu" :selected.sync="selected" use-auto-complete multi-input :page-size="5" use-fixed-menu-style />
+                    <br/>
+                    <br/>
+                    <p class="text-label-lg font-bold my-3">With custom handler, page size 5</p>
+                    <p-text-input :selected.sync="selected" :handler="simpleHandler" use-auto-complete :page-size="5" use-fixed-menu-style />
+                    <br/>
+                    <br/>
+                    <p class="text-label-lg font-bold my-3">With custom handler, multi input, page size 5</p>
+                    <p-text-input :selected.sync="selected" :handler="simpleHandler" use-auto-complete multi-input :page-size="5" use-fixed-menu-style />
+                    <br/>
+                    <br/>
+                    <div class="p-4 bg-blue-200 w-full max-h-64 overflow-y-auto">
+                        <p class="font-lg font-bold">selected: </p>
+                        <pre>{{selected}}</pre>
+                    </div>
+                </div>
+            `,
+            setup() {
+                const state = reactive({
+                    menu: getTextInputMenu(),
+                    selected: []
+                })
+                const menu = getTextInputMenuWithMultiTypes()
+                let allResults = []
+                const simpleHandler = async (inputText) => {
+                    state.loading = true;
+                    allResults = await new Promise(resolve => {
+                        setTimeout(() => {
+                            let filtered;
+                            const trimmed = inputText.trim();
+                            if (trimmed) {
+                                filtered = new Fuse(menu, {
+                                    keys: ['label'],
+                                    distance: 100,
+                                    threshold: 0.1,
+                                    ignoreLocation: true,
+                                }).search(trimmed);
+                            } else {
+                                filtered = [...menu]
+                            }
+                            resolve(filtered)
+                        }, 500)
+                    })
+                    state.loading = false;
+                    const results = allResults.slice(0, 5)
+                    return { results, more: allResults.length > results.length }
+                }
+                return {
+                    ...toRefs(state),
+                    simpleHandler
+                }
             }
         }}
     </Story>
@@ -163,7 +303,17 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: { PTextInput },
             template: `
-                <p-text-input v-model="value" type="password" />
+            <div>
+                <p class="text-label-lg font-bold my-3">With 'password' input type</p>
+                <p-text-input value="password" type="password" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">With 'password' input type, with 'masking' appearance type</p>
+                <p-text-input value="password" type="password" appearance-type="masking" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">With 'password' input type, with 'masking' appearance type, with \`showPassword\` false</p>
+                <p-text-input value="password" type="password" appearance-type="masking" :show-password="false" />
+                <br/>
+            </div>
             `,
             setup() {
                 const state = reactive({
@@ -177,18 +327,42 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-#### Masking Mode
+<br/>
+<br/>
+
+## Appearance Type
 
 <Canvas>
-    <Story name="Masking Mode">
+    <Story name="Appearance Type">
         {{
             components: { PTextInput },
             template: `
-                <p-text-input v-model="value" type="password" masking-mode />
+            <div>
+                <p class="text-label-lg font-bold my-3">Single input with 'basic', 'badge', 'stack' appearance type</p>
+                <p-text-input value="hello" appearance-type="basic" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Single input with 'masking' appearance type, 'password' input type</p>
+                <p-text-input value="password" appearance-type="masking" type="password" />
+                <br/>
+                <br/>
+                <hr/>
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi input with 'badge' appearance type</p>
+                <p-text-input :menu="menu" :selected="selected" multi-input use-auto-complete appearance-type="badge" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi input with 'stack' appearance type</p>
+                <p-text-input :menu="menu" :selected="selected" multi-input use-auto-complete appearance-type="stack" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi input with 'basic', 'masking' appearance type - it doesn't work</p>
+                <p-text-input :menu="menu" :selected="selected" multi-input appearance-type="masking" />
+                <br/>
+            </div>
             `,
             setup() {
+                const items = getTextInputMenu()
                 const state = reactive({
-                    value: 'password'
+                    menu: items,
+                    selected: items.slice(0, 3)
                 })
                 return {
                     ...toRefs(state)

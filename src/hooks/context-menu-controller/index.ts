@@ -102,11 +102,7 @@ export const useContextMenuController = ({
     /* menu capturing */
     const selectedSnapshot = ref<MenuItem[]>([]);
     const capture = () => {
-        if (useMenuFiltering) {
-            selectedSnapshot.value = filterItemsBySearchText(state.searchText, state.selected);
-        } else {
-            selectedSnapshot.value = [...state.selected];
-        }
+        selectedSnapshot.value = [...state.selected];
     };
 
     /* menu attaching */
@@ -114,7 +110,7 @@ export const useContextMenuController = ({
     const {
         attachedMenu,
         attachLoading,
-        resetMenuAndPagination,
+        resetMenuAndPagination: resetAttachedMenuAndPagination,
         attachMenuItems,
     } = useContextMenuAttach({
         attachHandler: handler,
@@ -161,12 +157,12 @@ export const useContextMenuController = ({
         }
     };
     const initiateMenu = async () => {
-        resetMenuAndPagination();
+        resetAttachedMenuAndPagination();
         capture();
         await attachMenuItems();
     };
     const reloadMenu = async () => {
-        resetMenuAndPagination();
+        resetAttachedMenuAndPagination();
         await attachMenuItems();
     };
 

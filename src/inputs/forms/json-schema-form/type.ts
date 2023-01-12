@@ -1,6 +1,7 @@
 import type { JSONSchemaType } from 'ajv';
 
 import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
+import type { InputAppearanceType } from '@/inputs/input/type';
 import type { SupportLanguage } from '@/translations';
 
 const TEXT_INPUT_TYPES = ['password', 'text', 'number'] as const;
@@ -26,6 +27,7 @@ export type InnerJsonSchema = JsonSchema & {
     inputPlaceholder?: string;
     menuItems?: SelectDropdownMenu[];
     multiInputMode?: boolean;
+    appearanceType?: InputAppearanceType;
 };
 
 export interface JsonSchemaFormProps {
