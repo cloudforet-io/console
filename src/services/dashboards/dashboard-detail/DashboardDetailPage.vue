@@ -142,8 +142,8 @@ const variablesState = reactive({
 });
 
 const queryState = reactive({
-    variables: computed(() => dashboardDetailState.variables),
     settings: computed(() => dashboardDetailState.settings),
+    variables: computed(() => dashboardDetailState.variables),
     urlQueryString: computed(() => ({
         settings: objectToQueryString(queryState.settings),
         variables: objectToQueryString(queryState.variables),

@@ -1,5 +1,5 @@
 <template>
-    <div v-on-click-outside="handleHideMenu"
+    <div v-on-click-outside="hideContextMenu"
          class="variable-more-button-dropdown"
          :class="{'open-menu': visibleMenu}"
     >
@@ -124,17 +124,11 @@ const handleOpenOverlay = () => {
 };
 const handleClickButton = () => {
     if (visibleMenu.value) {
-        handleHideMenu();
+        hideContextMenu();
     } else {
         state.selectedForUpdate = state.selected;
         showContextMenu(); // update reorderedMenu automatically
     }
-};
-
-const handleHideMenu = () => {
-    hideContextMenu();
-    // Reflect selectedForUpdate changes after the dropdown is closed.
-    updateVariablesUse();
 };
 
 const handleSelectVariable = (changedSelected: MenuItem[]) => {
@@ -149,7 +143,8 @@ const handleUpdateSearchText = debounce((text: string) => {
 watch(visibleMenu, (_visibleMenu) => {
     if (_visibleMenu) {
         initiateMenu();
-    }
+    } else updateVariablesUse();
+    // Reflect selectedForUpdate changes after the dropdown is closed.
 }, { immediate: true });
 
 const {
