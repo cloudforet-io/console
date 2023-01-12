@@ -8,6 +8,7 @@
                                  @update:date-range="handleUpdateDateRange"
         />
         <currency-select-dropdown v-show="props.currency.enabled"
+                                  default-currency-mode
                                   :currency="state.proxyCurrency.value"
                                   @update:currency="handleUpdateCurrency"
         />
