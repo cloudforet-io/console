@@ -14,8 +14,7 @@
             <template #item-content="{board}">
                 <div class="board-item-title-wrapper">
                     <div class="favorite-button-wrapper">
-                        <!--TODO: implementation about id-->
-                        <favorite-button :item-id="board[`${dashboardScopeType}_dashboard_id`]"
+                        <favorite-button :item-id="board[dashboardScopeKey]"
                                          :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                          scale="0.666"
                         />
@@ -23,12 +22,15 @@
                     <span class="board-item-title">{{ board.name }}</span>
                 </div>
                 <div class="board-item-description">
-                    <span>{{ board.user_id }}</span>
-                    <p-i name="ic_divider-dot"
-                         width="0.125rem"
-                         height="0.125rem"
-                    />
-                    <span>{{ dashboardScopeTypeForView }}</span>
+                    <template v-if="board.user_id">
+                        <span>{{ board.user_id }}</span>
+                        <p-i name="ic_divider-dot"
+                             width="0.125rem"
+                             height="0.125rem"
+                        />
+                    </template>
+                    <span v-if="scopeType === DASHBOARD_SCOPE.DOMAIN">{{ DOMAIN_SCOPE_NAME }}</span>
+                    <span v-else>{{ board.groupLabel }}</span>
                 </div>
                 <div class="label-wrapper">
                     <p-label :class="{'viewers-label': true, 'private-label': board.viewers === DASHBOARD_VIEWER.PRIVATE}"
@@ -99,11 +101,13 @@ import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneMod
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const PAGE_SIZE = 10;
+const DOMAIN_SCOPE_KEY = 'domain_dashboard_id';
+const PROJECT_SCOPE_KEY = 'project_dashboard_id';
+const DOMAIN_SCOPE_NAME = 'Workspace';
 
 interface DashboardBoardListProps {
     scopeType: DashboardScope;
     fieldTitle: string;
-    // TODO: implementation
     dashboardList: DashboardModel[];
 }
 
@@ -136,16 +140,26 @@ export default defineComponent<DashboardBoardListProps>({
     setup(props) {
         const state = reactive({
             thisPage: 1,
-            dashboardScopeType: computed(() => DASHBOARD_SCOPE[props.scopeType]),
-            dashboardScopeTypeForView: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? 'Workspace' : 'Project')),
+            dashboardScopeKey: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? DOMAIN_SCOPE_KEY : PROJECT_SCOPE_KEY)),
+            projectItems: computed(() => store.getters['reference/projectItems']),
             dashboardListByBoardSets: computed<BoardSet[]>(() => props.dashboardList
                 .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
-                .map((d) => (
-                    {
+                .map((d) => {
+                    const dashboardWithBoardSet = {
                         ...d,
                         iconButtonSets: convertBoardItemButtonSet(d),
+                    };
+                    const projectId = 'project_id';
+                    if (d[projectId]) {
+                        return (
+                            {
+                                ...dashboardWithBoardSet,
+                                groupLabel: state.projectItems[d[projectId]]?.label,
+                            }
+                        );
                     }
-                ))),
+                    return dashboardWithBoardSet;
+                })),
         });
 
         const deleteModalState = reactive({
@@ -167,7 +181,7 @@ export default defineComponent<DashboardBoardListProps>({
                 eventAction: () => {
                     SpaceRouter.router.push({
                         name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-                        params: { dashboardId: dashboardItem[`${state.dashboardScopeType}_dashboard_id`] },
+                        params: { dashboardId: dashboardItem[state.dashboardScopeKey] },
                     });
                 },
             },
@@ -183,7 +197,7 @@ export default defineComponent<DashboardBoardListProps>({
                 iconName: 'ic_trashcan',
                 tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
                 /* TODO: Implementation */
-                eventAction: () => handleClickDeleteDashboard(dashboardItem[`${state.dashboardScopeType}_dashboard_id`]),
+                eventAction: () => handleClickDeleteDashboard(dashboardItem[state.dashboardScopeKey]),
             },
         ];
 
@@ -192,8 +206,8 @@ export default defineComponent<DashboardBoardListProps>({
             SpaceRouter.router.push({
                 name: DASHBOARDS_ROUTE.DETAIL._NAME,
                 params: {
-                    dashboardScope: state.dashboardScopeType,
-                    dashboardId: item[`${state.dashboardScopeType}_dashboard_id`],
+                    dashboardScope: props.scopeType,
+                    dashboardId: item[state.dashboardScopeKey],
                 },
             });
         };
@@ -210,7 +224,7 @@ export default defineComponent<DashboardBoardListProps>({
         const handleDeleteDashboardConfirm = async () => {
             try {
                 deleteModalState.loading = true;
-                if (state.dashboardScopeType === 'domain') {
+                if (props.scopeType === 'domain') {
                     await SpaceConnector.clientV2.dashboard.domainDashboard.delete({
                         domain_dashboard_id: deleteModalState.selectedId,
                     });
@@ -258,6 +272,7 @@ export default defineComponent<DashboardBoardListProps>({
             DASHBOARD_SCOPE,
             DASHBOARD_VIEWER,
             PAGE_SIZE,
+            DOMAIN_SCOPE_NAME,
         };
     },
 });

@@ -72,7 +72,7 @@ export default defineComponent({
                 favoriteType: FAVORITE_TYPE.DASHBOARD,
             }))),
             projectDashboardList: computed<ProjectDashboardModel[]>(() => store.state.dashboard.projectItems),
-            projectItems: computed(() => store.state.reference.project.items),
+            projectItems: computed(() => store.getters['reference/projectItems']),
             projectMenuSet: computed<LNBMenu[]>(() => mashUpProjectGroup(state.projectDashboardList)),
             menuSet: computed<LNBMenu[]>(() => [
                 {
