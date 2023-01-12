@@ -132,7 +132,7 @@ export default defineComponent<Props>({
             if (state.initiatedWidgetMap[target.id]) return;
             if (isIntersecting) {
                 const targetWidgetRef: WidgetComponent|null = state.widgetRef.find((d) => d?.$el?.id === target.id);
-                if (typeof targetWidgetRef?.initWidget === 'function') {
+                if (typeof targetWidgetRef?.initWidget === 'function' && dashboardDetailValidationState.widgetValidMap[target.id] !== false) {
                     const prevData = props.reusePreviousData ? state.widgetDataMap[target.id] : undefined;
                     const data = await targetWidgetRef.initWidget(prevData);
                     state.widgetDataMap[target.id] = data;
