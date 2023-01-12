@@ -143,7 +143,6 @@ const updateDashboardData = async () => {
                 domain_dashboard_id: props.dashboardId,
             });
         }
-        await dashboardDetailStore.getDashboardInfo(props.dashboardId, true);
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
@@ -173,7 +172,6 @@ const createDashboard = async () => {
             });
             dashboardDetailState.dashboardId = result.domain_dashboard_id;
         }
-        await dashboardDetailStore.getDashboardInfo(dashboardDetailState.dashboardId, true);
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {

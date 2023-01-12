@@ -152,9 +152,9 @@ const queryState = reactive({
 
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
-const getDashboardData = async (dashboardId: string) => {
+const getDashboardData = async (dashboardId: string, force = false) => {
     try {
-        await dashboardDetailStore.getDashboardInfo(dashboardId);
+        await dashboardDetailStore.getDashboardInfo(dashboardId, force);
     } catch (e) {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
@@ -207,7 +207,7 @@ const init = async () => {
 };
 
 (async () => {
-    await getDashboardData(props.dashboardId);
+    await getDashboardData(props.dashboardId, true);
     await init();
 })();
 
