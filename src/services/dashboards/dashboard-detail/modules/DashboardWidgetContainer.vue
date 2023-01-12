@@ -188,9 +188,6 @@ export default defineComponent<Props>({
         watch(() => state.dashboardVariablesSchema, () => {
             if (props.editMode) validateAllWidget();
         }, { immediate: true });
-        watch(() => state.dashboardVariables, () => {
-            refreshAllWidget();
-        });
 
 
         const refreshAllWidget = async () => {
