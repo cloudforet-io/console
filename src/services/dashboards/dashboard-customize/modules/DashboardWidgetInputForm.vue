@@ -151,17 +151,6 @@ export default defineComponent<Props>({
             widgetOptionsJsonSchema: {} as JsonSchema,
             requiredProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.schema?.required ?? []),
             inheritableProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.inheritable_properties || []),
-            dashboardVariablesSchema: computed(() => {
-                const enabledVariables = Object.entries(dashboardDetailState.variablesSchema.properties).filter(([, d]) => d.use === true);
-                return {
-                    type: 'string',
-                    enum: enabledVariables.map(([key]) => key),
-                    menuItems: enabledVariables.map(([key, val]) => ({
-                        name: key, label: val.name,
-                    })),
-                    default: undefined,
-                };
-            }),
             //
             schemaFormData: {},
             isSchemaFormValid: undefined,
@@ -212,13 +201,29 @@ export default defineComponent<Props>({
             if (Array.isArray(selectedItem)) return !!selectedItem.length;
             return selectedItem && !isEmpty(selectedItem);
         };
+        const getDashboardVariablesSchema = (propertySchema: JsonSchema['properties']) => {
+            const enabledVariables = Object.entries(dashboardDetailState.variablesSchema.properties)
+                .filter(([, d]) => {
+                    if (!d.use) return false;
+                    const variableType = d.selection_type === 'MULTI' ? 'array' : 'string';
+                    return propertySchema.type === variableType;
+                });
+            const _enum = enabledVariables.map(([key]) => key);
+            return {
+                type: 'string',
+                enum: _enum.length ? _enum : [null],
+                menuItems: enabledVariables.map(([key, val]) => ({
+                    name: key, label: val.name,
+                })),
+                default: undefined,
+            };
+        };
         const refineJsonSchemaProperties = (propertyName: string, propertySchema: JsonSchema['properties'], isInherit = false): JsonSchema['properties'] => {
             // 1. if (inherit === true) return dashboard variables
             if (isInherit) {
-                // TODO: exclude types which is not matched with variable property
                 return {
                     title: propertySchema.title,
-                    ...state.dashboardVariablesSchema,
+                    ...getDashboardVariablesSchema(propertySchema),
                     default: undefined,
                 };
             }
@@ -234,16 +239,17 @@ export default defineComponent<Props>({
                 }));
             }
             let refinedJsonSchemaProperties: JsonSchema['properties'];
+            const _enum = Object.keys(storeData);
             if (propertySchema.type === 'array') {
                 refinedJsonSchemaProperties = {
                     ...propertySchema,
-                    items: { enum: Object.keys(storeData) },
+                    items: { enum: _enum.length ? _enum : [null] },
                     menuItems,
                 };
             } else {
                 refinedJsonSchemaProperties = {
                     ...propertySchema,
-                    enum: Object.keys(storeData),
+                    enum: _enum.length ? _enum : [null],
                     menuItems,
                 };
             }
