@@ -49,12 +49,10 @@ import {
 import { PBadge, PSelectStatus } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
@@ -62,6 +60,15 @@ import {
     CLOUD_SERVICE_TAG_TYPE,
     CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/config';
+import type {
+    CloudServiceTagTableItem,
+} from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/type';
+
+type Tag = Record<string, string>;
+
+interface CloudServiceTags {
+    [provider: string]: Tag;
+}
 
 export default {
     name: 'CloudServiceTagsPanel',
@@ -80,6 +87,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        provider: {
+            type: String,
+            default: '',
+        },
     },
     setup(props) {
         const state = reactive({
@@ -90,7 +101,6 @@ export default {
             ]),
             providers: computed(() => store.getters['reference/provider/fieldItems']?.options),
             selectedTagType: 'all',
-            cloudServiceTagList: [],
             fields: computed(() => [
                 { name: 'key', label: i18n.t('COMMON.TAGS.KEY'), type: 'item' },
                 { name: 'value', label: i18n.t('COMMON.TAGS.VALUE'), type: 'item' },
@@ -101,35 +111,45 @@ export default {
                     name: 'provider', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.PROVIDER'), type: 'item', disableCopy: true,
                 },
             ]),
-            items: computed(() => state.cloudServiceTagList?.map((k) => ({
-                key: k.key,
-                value: k.value,
-                type: k.type,
-                provider: k.provider,
-            }))),
-            customTags: computed<Tag>(() => {
-                const tagObject = {};
-                (state.cloudServiceTagList ?? []).forEach((tag) => {
-                    if (tag.type === CLOUD_SERVICE_TAG_TYPE.CUSTOM) {
-                        tagObject[tag.key] = tag.value;
-                    }
-                });
-                return tagObject;
+            cloudServiceTags: {} as CloudServiceTags,
+            items: computed<CloudServiceTagTableItem[]>(() => {
+                if (state.selectedTagType === 'all') {
+                    const items:CloudServiceTagTableItem[] = [];
+                    Object.entries<Tag>(state.cloudServiceTags).forEach(([provider, tags]) => {
+                        Object.keys(tags).forEach((key) => {
+                            console.log(tags, key, tags[key]);
+                            items.push({
+                                key,
+                                value: tags[key],
+                                type: (provider === CLOUD_SERVICE_TAG_TYPE.CUSTOM ? CLOUD_SERVICE_TAG_TYPE.CUSTOM : CLOUD_SERVICE_TAG_TYPE.MANAGED),
+                                provider: provider === CLOUD_SERVICE_TAG_TYPE.CUSTOM ? undefined : provider,
+                            });
+                        });
+                    });
+                    return items;
+                }
+                const isCustomTag = state.selectedTagType === CLOUD_SERVICE_TAG_TYPE.CUSTOM;
+                const tags = isCustomTag ? state.customTags : state.manageTags;
+                return Object.keys(tags).map((key) => ({
+                    key,
+                    value: tags[key],
+                    type: state.selectedTagType,
+                    provider: isCustomTag ? undefined : props.provider,
+                }));
             }),
+            customTags: computed<Tag>(() => (state.cloudServiceTags?.custom ?? {})),
+            manageTags: computed<Tag>(() => (state.cloudServiceTags[props.provider] ?? {})),
         });
         /* event handler */
         const handleSelectTagType = (tagType) => { state.selectedTagType = tagType; };
         const handleTagsUpdated = async () => { await getCloudServiceTags(); };
 
-        const apiQuery = new ApiQueryHelper();
         const getCloudServiceTags = async () => {
             try {
-                apiQuery.setFilters([{ k: 'type', v: state.selectedTagType, o: '=' }]);
-                const { results } = await SpaceConnector.client.inventory.cloudServiceTag.list({
+                const { tags } = await SpaceConnector.clientV2.inventory.cloudService.get({
                     cloud_service_id: props.resourceId,
-                    ...((state.selectedTagType !== 'all') && { query: apiQuery.data }),
                 });
-                state.cloudServiceTagList = results;
+                state.cloudServiceTags = tags;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
@@ -141,7 +161,7 @@ export default {
             label: state.providers[provider]?.name,
         });
 
-        watch([() => state.selectedTagType, () => props.resourceId], () => { getCloudServiceTags(); }, {
+        watch([() => props.resourceId, () => props.resourceId], () => { getCloudServiceTags(); }, {
             immediate: true,
         });
         return {
