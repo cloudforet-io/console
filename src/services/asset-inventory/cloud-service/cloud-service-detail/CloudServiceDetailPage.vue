@@ -90,6 +90,7 @@
             <template #tag>
                 <cloud-service-tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
                                           :disabled="!tableState.hasManagePermission"
+                                          :provider="tableState.selectedItems[0].provider"
                 />
             </template>
             <template #member>

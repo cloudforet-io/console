@@ -71,6 +71,10 @@ import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vue';
 
+import type {
+    CloudServiceTagTableItem,
+} from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/type';
+
 export default {
     name: 'TagsPanel',
     components: {
@@ -112,7 +116,7 @@ export default {
             default: undefined,
         },
         customItems: {
-            type: Array,
+            type: Array as PropType<CloudServiceTagTableItem[]>,
             default: undefined,
         },
         customTags: {
@@ -122,7 +126,12 @@ export default {
     },
     setup(props, { emit }: SetupContext) {
         const apiKeys = computed(() => props.resourceType.split('.').map((d) => camelCase(d)));
-        const api = computed(() => get(SpaceConnector.client, apiKeys.value));
+        const api = computed(() => {
+            if (props.resourceType === 'inventory.CloudService') {
+                return get(SpaceConnector.clientV2, apiKeys.value);
+            }
+            return get(SpaceConnector.client, apiKeys.value);
+        });
 
         const state = reactive({
             loading: true,
