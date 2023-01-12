@@ -371,6 +371,7 @@ export default defineComponent<Props>({
         watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, widgetKey]) => {
             widgetFormStore.$reset();
             widgetFormStore.setWidgetConfigId(widgetConfigId);
+            state.inheritItemMap = {};
             if (widgetConfigId && widgetKey) {
                 setInitialValueForEditMode(widgetKey);
             } else {
