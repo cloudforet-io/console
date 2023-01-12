@@ -14,7 +14,7 @@
                     <p-text-input class="role-name-input input"
                                   :value="roleName"
                                   :invalid="invalid"
-                                  @input="setForm('roleName', $event)"
+                                  @update:value="setForm('roleName', $event)"
                     />
                 </template>
             </p-field-group>

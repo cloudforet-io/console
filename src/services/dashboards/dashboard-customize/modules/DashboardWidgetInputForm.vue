@@ -9,7 +9,7 @@
                           :invalid="invalidState.name"
                           :placeholder="widgetConfig?.title"
                           class="input"
-                          @input="handleInputName"
+                          @update:value="handleInputName"
             />
         </p-field-group>
         <div v-if="widgetConfig?.description?.translation_id"

@@ -10,7 +10,7 @@
                               class="account-name-input block"
                               :invalid="invalid"
                               :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_NAME_PLACEHOLDER')"
-                              @input="setForm('serviceAccountName', $event)"
+                              @update:value="setForm('serviceAccountName', $event)"
                 />
             </template>
         </p-field-group>

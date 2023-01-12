@@ -20,7 +20,7 @@
                     :invalid="showValidation && !isNameValid"
                     :placeholder="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_PLACEHOLDER')"
                     :disabled="loading"
-                    @input.once="onFirstInputName"
+                    @update:value.once="onFirstInputName"
                 />
             </p-field-group>
             <p-field-group

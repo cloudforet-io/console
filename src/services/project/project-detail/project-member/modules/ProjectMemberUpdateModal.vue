@@ -50,6 +50,7 @@
                         <p-text-input :selected="labels"
                                       :invalid="invalid"
                                       multi-input
+                                      appearance-type="stack"
                                       block
                                       @update:selected="handleUpdateLabel"
                         />

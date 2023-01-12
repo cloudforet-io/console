@@ -15,7 +15,7 @@
             >
                 <p-text-input :value="name"
                               :invalid="invalidState._name"
-                              @input="setForm('_name', $event)"
+                              @update:value="setForm('_name', $event)"
                 />
             </p-field-group>
         </template>

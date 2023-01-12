@@ -20,7 +20,7 @@
                                   class="block w-full"
                                   :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MY_QUERY')"
                                   :invalid="!isQueryNameValid"
-                                  @input.once="handleFirstQueryNameInput"
+                                  @update:value.once="handleFirstQueryNameInput"
                     />
                 </template>
             </p-field-group>

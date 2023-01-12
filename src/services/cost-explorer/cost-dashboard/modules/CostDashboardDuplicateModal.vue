@@ -15,7 +15,7 @@
             >
                 <p-text-input :value="name"
                               :invalid="invalidState.name"
-                              @input="setForm('name', $event)"
+                              @update:value="setForm('name', $event)"
                 />
             </p-field-group>
             <p-check-box v-model="includesFilter">

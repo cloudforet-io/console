@@ -20,7 +20,7 @@
                               class="w-full"
                               :invalid="showValidation && !!titleInvalidText"
                               block
-                              @input.once="handleFirstInputTitle"
+                              @update:value.once="handleFirstInputTitle"
                 />
             </p-field-group>
             <p-field-group class="schedule-field"

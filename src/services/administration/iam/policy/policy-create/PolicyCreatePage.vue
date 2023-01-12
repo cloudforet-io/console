@@ -26,7 +26,7 @@
                         <p-text-input
                             :value="policyName"
                             :invalid="invalid"
-                            @input="setForm('policyName', $event)"
+                            @update:value="setForm('policyName', $event)"
                         />
                     </template>
                 </p-field-group>

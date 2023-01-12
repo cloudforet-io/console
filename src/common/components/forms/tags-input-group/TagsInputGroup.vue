@@ -36,7 +36,7 @@
                                       :invalid="invalid"
                                       :placeholder="$t('COMMON.COMPONENTS.TAGS.KEY')"
                                       :disabled="disabled"
-                                      @input="handleInputKey(idx, ...arguments)"
+                                      @update:value="handleInputKey(idx, ...arguments)"
                         />
                     </template>
                 </p-field-group>
@@ -50,7 +50,7 @@
                                       :invalid="invalid"
                                       :placeholder="$t('COMMON.COMPONENTS.TAGS.VALUE')"
                                       :disabled="disabled"
-                                      @input="handleInputValue(idx, ...arguments)"
+                                      @update:value="handleInputValue(idx, ...arguments)"
                         />
                     </template>
                 </p-field-group>

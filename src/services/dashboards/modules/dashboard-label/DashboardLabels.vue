@@ -26,7 +26,7 @@
             <p-text-input
                 :value="inputText"
                 :invalid="invalidState.inputText"
-                @input="setForm('inputText', $event)"
+                @update:value="setForm('inputText', $event)"
             />
         </p-field-group>
         <span v-if="!state.inputMode && !state.labelList.length && props.editable"

@@ -55,7 +55,7 @@
                                       :placeholder="condition.unit === NOTIFICATION_UNIT.ACTUAL_COST
                                           ? '$1000' : '50'"
                                       :invalid="thresholdValidations[idx] === false"
-                                      @input="handleThresholdInput(idx, $event)"
+                                      @update:value="handleThresholdInput(idx, $event)"
                         >
                             <template #right-extra>
                                 <span v-if="condition.unit === NOTIFICATION_UNIT.PERCENT"

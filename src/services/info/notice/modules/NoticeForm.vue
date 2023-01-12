@@ -9,7 +9,7 @@
                     <p-text-input :value="writerName"
                                   :invalid="invalid"
                                   :placeholder="$store.state.user.name || $t('INFO.NOTICE.FORM.PLACEHOLDER_REQUIRED')"
-                                  @input="setForm('writerName', $event)"
+                                  @update:value="setForm('writerName', $event)"
                     />
                 </template>
             </p-field-group>
@@ -50,7 +50,7 @@
                     <p-text-input :value="noticeTitle"
                                   :invalid="invalid"
                                   class="!w-full"
-                                  @input="setForm('noticeTitle', $event)"
+                                  @update:value="setForm('noticeTitle', $event)"
                     />
                 </template>
             </p-field-group>
