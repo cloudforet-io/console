@@ -797,7 +797,8 @@
 		},
 		"FNB": {
 			"PRIVACY": "Privacy Policy",
-			"PRIVACY_MSG": "Will be updated"
+			"PRIVACY_MSG": "Will be updated",
+			"PROJECT_POLICIES": "Project Policies"
 		},
 		"GNB": {
 			"ACCOUNT": {
