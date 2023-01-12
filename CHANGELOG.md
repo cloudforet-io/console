@@ -1,3 +1,10 @@
+# [2.0.0-beta.4](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2023-01-12)
+
+
+### Features
+
+* **text-input:** add appearance type and use context-menu-controller ([#227](https://github.com/cloudforet-io/mirinae/issues/227)) ([0a8a25d](https://github.com/cloudforet-io/mirinae/commit/0a8a25d1354882c69077fd7f01319289a364bc9e))
+
 # [2.0.0-beta.3](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2023-01-10)
 
 
