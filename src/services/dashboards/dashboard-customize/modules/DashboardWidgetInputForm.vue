@@ -208,9 +208,10 @@ export default defineComponent<Props>({
                     const variableType = d.selection_type === 'MULTI' ? 'array' : 'string';
                     return propertySchema.type === variableType;
                 });
+            const _enum = enabledVariables.map(([key]) => key);
             return {
                 type: 'string',
-                enum: enabledVariables.map(([key]) => key),
+                enum: _enum.length ? _enum : [null],
                 menuItems: enabledVariables.map(([key, val]) => ({
                     name: key, label: val.name,
                 })),
@@ -238,16 +239,17 @@ export default defineComponent<Props>({
                 }));
             }
             let refinedJsonSchemaProperties: JsonSchema['properties'];
+            const _enum = Object.keys(storeData);
             if (propertySchema.type === 'array') {
                 refinedJsonSchemaProperties = {
                     ...propertySchema,
-                    items: { enum: Object.keys(storeData) },
+                    items: { enum: _enum.length ? _enum : [null] },
                     menuItems,
                 };
             } else {
                 refinedJsonSchemaProperties = {
                     ...propertySchema,
-                    enum: Object.keys(storeData),
+                    enum: _enum.length ? _enum : [null],
                     menuItems,
                 };
             }
