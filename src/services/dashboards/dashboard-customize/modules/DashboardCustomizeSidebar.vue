@@ -54,6 +54,7 @@
                     {{ $t('DASHBOARDS.CUSTOMIZE.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary"
+                          :disabled="!dashboardDetailValidationState.isWidgetLayoutValid"
                           @click="handleClickSaveButton"
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
@@ -99,6 +100,7 @@ const emit = defineEmits<{(e: string, value: string): void,
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailValidationState = dashboardDetailStore.validationState;
 const state = reactive({
     enableDateRange: computed(() => dashboardDetailState.settings.date_range?.enabled ?? false),
     enableCurrency: computed(() => dashboardDetailState.settings.currency?.enabled ?? false),

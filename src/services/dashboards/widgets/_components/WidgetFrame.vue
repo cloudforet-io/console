@@ -256,11 +256,12 @@ const handleDeleteModalConfirm = () => {
         .error-message {
             @apply text-gray-700;
             text-align: center;
-            margin-top: 3.625rem;
+            margin-top: 2rem;
             line-height: 1.25;
             font-size: 0.875rem;
         }
         .edit-button {
+            z-index: 10;
             margin-top: 1rem;
         }
     }
