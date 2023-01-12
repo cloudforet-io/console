@@ -54,6 +54,7 @@ const handleEditModalConfirm = () => {
         widget_options: widgetFormState.widgetOptions ?? {},
     };
     dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
+    dashboardDetailStore.updateWidgetValidation(true, props.widgetKey);
     state.proxyVisible = false;
     emit('refresh');
 };
