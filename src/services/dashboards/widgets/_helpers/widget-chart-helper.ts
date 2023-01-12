@@ -121,23 +121,20 @@ export const getRefinedTreemapChartData = (rawData: TreemapChartData['children']
         value: '',
         children: [],
     }];
-    if (!rawData || !groupBy || !allReferenceTypeInfo || false) return [];
+    if (!rawData || !groupBy) return [];
 
-    const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
-    if (referenceTypeInfo) {
-        const referenceMap = referenceTypeInfo.referenceMap;
-        rawData.forEach((d) => {
-            const _name = d[groupBy];
-            let _label = d[groupBy];
-            if (_name) _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
-            else if (!_name) _label = 'Unknown';
+    const referenceMap = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy)?.referenceMap;
+    rawData.forEach((d) => {
+        const _name = d[groupBy];
+        let _label = d[groupBy];
+        if (_name) _label = referenceMap?.[_name]?.label ?? referenceMap?.[_name]?.name ?? _name;
+        else if (!_name) _label = 'Unknown';
 
-            chartData[0].children.push({
-                ...d,
-                value: _label,
-            });
+        chartData[0].children.push({
+            ...d,
+            value: _label,
         });
-    }
+    });
     return chartData;
 };
 
