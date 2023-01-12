@@ -16,16 +16,10 @@
                     >support@cloudforet.io</a>
                 </span>
                 <span class="divider" />
-                <span class="policy"
-                      @click="showTemp"
-                >{{ $t('COMMON.FNB.PRIVACY') }}</span>
-                <transition name="fade">
-                    <span v-if="temp"
-                          class="footerMsg"
-                          transition="expand"
-                          @click="showTemp"
-                    >{{ $t('COMMON.FNB.PRIVACY_MSG') }}</span>
-                </transition>
+                <a class="policy"
+                   href="https://lfprojects.org/"
+                   target="_blank"
+                >{{ $t('COMMON.FNB.PROJECT_POLICIES') }}</a>
             </div>
         </div>
     </div>

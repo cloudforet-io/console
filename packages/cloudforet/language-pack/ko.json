@@ -797,7 +797,8 @@
 		},
 		"FNB": {
 			"PRIVACY": "개인정보처리방침 ",
-			"PRIVACY_MSG": "준비 중입니다."
+			"PRIVACY_MSG": "준비 중입니다.",
+			"PROJECT_POLICIES": ""
 		},
 		"GNB": {
 			"ACCOUNT": {
