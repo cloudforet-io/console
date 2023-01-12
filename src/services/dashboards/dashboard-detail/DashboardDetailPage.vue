@@ -47,8 +47,16 @@
             />
         </div>
         <p-divider class="divider" />
-        <div class="filter-box">
-            <div>filters</div>
+        <div class="dashboard-selectors">
+            <div class="variable-selector-wrapper">
+                <template v-for="(propertyName, idx) in variablesState.order">
+                    <variable-selector-dropdown v-if="variablesState.properties[propertyName]?.use"
+                                                :key="`${propertyName}-${idx}`"
+                                                :property-name="propertyName"
+                                                :reference-map="variablesState.allReferenceTypeInfo[propertyName]?.referenceMap"
+                    />
+                </template>
+            </div>
             <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
                                         :loading="dashboardDetailState.loadingWidgets"
                                         @refresh="handleRefresh"
@@ -71,7 +79,7 @@
 
 <script setup lang="ts">
 import {
-    onUnmounted,
+    computed, onUnmounted,
     reactive, ref, watch,
 } from 'vue';
 
@@ -80,8 +88,15 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
+import {
+    objectToQueryString,
+    queryStringToObject,
+    replaceUrlQuery,
+} from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -90,6 +105,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { gray } from '@/styles/colors';
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
+import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
@@ -119,8 +135,22 @@ const state = reactive({
     refreshInterval: '15s',
 });
 
-const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
+const variablesState = reactive({
+    properties: computed(() => dashboardDetailState.variablesSchema.properties),
+    order: computed(() => dashboardDetailState.variablesSchema.order),
+    allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
+});
 
+const queryState = reactive({
+    variables: computed(() => dashboardDetailState.variables),
+    settings: computed(() => dashboardDetailState.settings),
+    urlQueryString: computed(() => ({
+        settings: objectToQueryString(queryState.settings),
+        variables: objectToQueryString(queryState.variables),
+    })),
+});
+
+const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
 const getDashboardData = async (dashboardId: string) => {
     try {
@@ -159,9 +189,35 @@ const handleUpdateURLParam = () => {
     // TODO: write currency/dateRange data in url parameters
 };
 
+/* init */
+let urlQueryStringWatcherStop;
+const init = async () => {
+    const currentQuery = SpaceRouter.router.currentRoute.query;
+    const useQueryValue = {
+        settings: queryStringToObject(currentQuery.settings),
+        variables: queryStringToObject(currentQuery.variables),
+    };
+
+    if (useQueryValue.variables) dashboardDetailState.variables = useQueryValue.variables;
+    if (useQueryValue.settings) dashboardDetailState.settings = useQueryValue.settings;
+
+    urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
+        replaceUrlQuery(urlQueryString);
+    }, { immediate: true });
+};
+
+(async () => {
+    await getDashboardData(props.dashboardId);
+    await init();
+})();
+
+onUnmounted(() => {
+    if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
+});
+
 watch(() => props.dashboardId, (_dashboardId) => {
     getDashboardData(_dashboardId);
-}, { immediate: true });
+});
 
 onUnmounted(() => {
     dashboardDetailStore.revertDashboardData();
@@ -180,5 +236,14 @@ onUnmounted(() => {
 }
 .filter-box {
     @apply flex justify-between items-start mt-5;
+}
+.dashboard-selectors {
+    @apply relative flex justify-between items-start z-10;
+    padding-bottom: 1.25rem;
+
+    .variable-selector-wrapper {
+        @apply relative flex items-center flex-wrap;
+        gap: 0.5rem;
+    }
 }
 </style>
