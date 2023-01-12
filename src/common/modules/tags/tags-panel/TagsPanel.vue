@@ -186,9 +186,7 @@ export default {
                 state.loading = true;
                 await api.value.update({
                     [props.resourceKey]: props.resourceId,
-                    tags: {
-                        custom: newTags,
-                    },
+                    tags: newTags,
                 });
                 showSuccessMessage(i18n.t('COMMON.TAGS.ALT_S_UPDATE'), '');
             } catch (e) {

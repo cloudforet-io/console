@@ -129,9 +129,9 @@ export default {
                 }
                 const isCustomTag = state.selectedTagType === CLOUD_SERVICE_TAG_TYPE.CUSTOM;
                 const tags = isCustomTag ? state.customTags : state.manageTags;
-                return Object.keys(tags).map((key) => ({
+                return Object.entries(tags).map(([key, value]) => ({
                     key,
-                    value: tags[key],
+                    value,
                     type: state.selectedTagType,
                     provider: isCustomTag ? undefined : props.provider,
                 }));
