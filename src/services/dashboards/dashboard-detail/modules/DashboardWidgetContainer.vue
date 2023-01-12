@@ -22,7 +22,7 @@
                        :theme="widgetThemeList[idx]"
                        :currency-rates="currencyRates"
                        :edit-mode="editMode"
-                       :error-mode="!dashboardDetailValidationState.widgetValidMap[widget.widget_key]"
+                       :error-mode="dashboardDetailValidationState.widgetValidMap[widget.widget_key] === false"
                        :all-reference-type-info="allReferenceTypeInfo"
             />
         </template>
@@ -189,6 +189,9 @@ export default defineComponent<Props>({
         watch(() => state.dashboardVariablesSchema, () => {
             if (props.editMode) validateAllWidget();
         }, { immediate: true });
+        watch(() => state.dashboardVariables, () => {
+            refreshAllWidget();
+        });
 
 
         const refreshAllWidget = async () => {
