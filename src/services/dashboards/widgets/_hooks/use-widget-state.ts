@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { isEmpty, merge } from 'lodash';
+import { flattenDeep, isEmpty, merge } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
@@ -21,37 +21,49 @@ import type {
     WidgetFiltersMap,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
+import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 
 const getRefinedOptions = (
     configOptions?: WidgetOptions,
     optionsData?: WidgetOptions,
     inheritOptions?: InheritOptions,
     dashboardVariables?: DashboardVariables,
+    optionsErrorMap?: InheritOptionsErrorMap,
 ): WidgetOptions => {
     const mergedOptions = merge({}, configOptions, optionsData);
     if (!inheritOptions || !dashboardVariables) return mergedOptions;
 
-    const parentOptions = {};
-    Object.keys(inheritOptions).forEach((key) => {
-        if (inheritOptions[key].enabled && inheritOptions[key].variable_info?.key === key) {
-            parentOptions[key] = dashboardVariables[key];
-        }
-    });
+    const parentOptions: Partial<WidgetOptions> = {
+        filters: convertInheritOptionsToWidgetFiltersMap(inheritOptions, dashboardVariables, optionsErrorMap),
+    };
     return merge({}, mergedOptions, parentOptions);
 };
 
-const convertWidgetFiltersToConsoleFilters = (filters?: WidgetFiltersMap): ConsoleFilter[] => {
-    if (!filters || isEmpty(filters)) return [];
-    const results: ConsoleFilter[] = [];
-    Object.entries(filters).forEach(([property, widgetFilters]) => {
-        const values = widgetFilters.map((d) => d.v);
-        if (property && values.length) {
-            results.push({ k: property, v: values, o: '=' });
+const convertInheritOptionsToWidgetFiltersMap = (
+    inheritOptions: InheritOptions,
+    dashboardVariables: DashboardVariables,
+    optionsErrorMap?: InheritOptionsErrorMap,
+): WidgetFiltersMap => {
+    const result: WidgetFiltersMap = {};
+    Object.entries(inheritOptions).forEach(([filterKey, inheritOption]) => {
+        if (optionsErrorMap?.[filterKey]) return;
+
+        const variableKey = inheritOption?.variable_info?.key;
+        if (!inheritOption?.enabled || !variableKey) return;
+
+        const variableValue = dashboardVariables[variableKey];
+        if (!variableValue || !variableValue?.length) return;
+
+        const _filterKey = filterKey.replace('filters.', '');
+        if (Array.isArray(variableValue)) {
+            result[_filterKey] = [{ k: _filterKey, v: variableValue, o: '' }];
+        } else {
+            result[_filterKey] = [{ k: _filterKey, v: variableValue, o: '=' }];
         }
     });
-    return results;
+    return result;
 };
-
 
 export interface WidgetState<Data = any> {
     widgetConfig: ComputedRef<WidgetConfig>;
@@ -69,6 +81,7 @@ export interface WidgetState<Data = any> {
     selectedSelectorType?: SelectorType;
     pageSize: ComputedRef<number|undefined>;
     consoleFilters: ComputedRef<ConsoleFilter[]>;
+    optionsErrorMap: ComputedRef<InheritOptionsErrorMap>;
 }
 export function useWidgetState<Data = any>(
     props: WidgetProps,
@@ -81,6 +94,7 @@ export function useWidgetState<Data = any>(
             props.options,
             props.inheritOptions,
             props.dashboardVariables,
+            state.optionsErrorMap,
         )),
         currency: computed(() => state.settings?.currency?.value ?? CURRENCY.USD),
         groupBy: computed(() => state.options?.group_by),
@@ -113,7 +127,16 @@ export function useWidgetState<Data = any>(
             if (state.options?.pagination_options?.enabled) return state.options.pagination_options.page_size;
             return undefined;
         }),
-        consoleFilters: computed(() => convertWidgetFiltersToConsoleFilters(state.options?.filters)),
+        consoleFilters: computed(() => {
+            if (!state.options?.filters || isEmpty(state.options.filters)) return [];
+            return flattenDeep(Object.values(state.options.filters));
+        }),
+        optionsErrorMap: computed(() => getWidgetInheritOptionsErrorMap(
+            props.inheritOptions,
+            state.widgetConfig?.options_schema?.schema,
+            props.dashboardVariables,
+            props.dashboardVariablesSchema,
+        )),
     }) as UnwrapRef<WidgetState<Data>>;
 
     return state;

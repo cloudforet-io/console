@@ -8,7 +8,7 @@ import type { DashboardVariables, DashboardVariablesSchema } from '@/services/da
 import type { InheritOptions, WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/config';
 
 
-interface InheritOptionsErrorMap {
+export interface InheritOptionsErrorMap {
     [propertyName: string]: TranslateResult;
 }
 
