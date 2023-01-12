@@ -168,7 +168,7 @@ const fetchData = async (): Promise<Data> => {
 
 /* Util */
 const getMonthlyCost = (month) => {
-    if (!state.data) return '--';
+    if (!state.data?.length) return '--';
     const monthlyCost = state.data[0].usd_cost_sum.find((costData) => costData.date === month.format(DATE_FORMAT))?.value || 0;
     return monthlyCost;
 };
