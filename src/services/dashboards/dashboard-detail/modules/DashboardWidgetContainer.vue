@@ -55,8 +55,9 @@ import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-co
 import {
     getWidgetComponent,
     getWidgetConfig,
-    getWidgetInheritOptionsErrorMap,
 } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
+
 
 interface Props {
     editMode?: boolean;
