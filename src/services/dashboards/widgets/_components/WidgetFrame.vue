@@ -261,7 +261,7 @@ const handleDeleteModalConfirm = () => {
             font-size: 0.875rem;
         }
         .edit-button {
-            z-index: 10;
+            z-index: 1;
             margin: 1rem 0;
         }
     }
