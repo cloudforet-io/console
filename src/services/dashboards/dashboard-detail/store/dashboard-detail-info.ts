@@ -30,10 +30,8 @@ import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-h
 interface WidgetDataMap {
     [widgetKey: string]: any;
 }
-interface WidgetInheritVariablesValidMap {
-    [widgetKey: string]: {
-        [propertyName: string]: boolean;
-    }
+interface WidgetValidMap {
+    [widgetKey: string]: boolean;
 }
 
 interface DashboardDetailInfoOriginState {
@@ -42,7 +40,7 @@ interface DashboardDetailInfoOriginState {
     dashboardInfo: DashboardModel|null;
     dashboardWidgetInfoList: ComputedRef<DashboardLayoutWidgetInfo[]>;
 }
-interface DashboardDetailInfoStoreState {
+export interface DashboardDetailInfoStoreState {
     loadingDashboard: boolean;
     dashboardId: string | undefined;
     projectId: string;
@@ -58,8 +56,8 @@ interface DashboardDetailInfoStoreState {
 }
 interface ValidationState {
     isNameValid?: boolean;
-    isWidgetLayoutValid: ComputedRef<Record<string, boolean>>;
-    widgetInheritVariablesValidMap: ComputedRef<WidgetInheritVariablesValidMap>;
+    isWidgetLayoutValid: ComputedRef<boolean>;
+    widgetValidMap: WidgetValidMap;
 }
 
 const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
@@ -105,15 +103,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     }) as UnwrapRef<DashboardDetailInfoStoreState>;
     const validationState = reactive<ValidationState>({
         isNameValid: undefined,
-        isWidgetLayoutValid: computed(() => ({})), // is all widgets valid
-        widgetInheritVariablesValidMap: computed(() => {
-            const result = {};
-            // originState.dashboardWidgetInfoList.forEach(() => {
-            //     result[d.widget_key] = isWidgetValid(d, state.variables_schema);
-            // });
-            return result;
-        }),
-    });
+        isWidgetLayoutValid: computed(() => Object.values(validationState.widgetValidMap).every((d) => d === true)),
+        widgetValidMap: {},
+    }) as UnwrapRef<ValidationState>;
 
     const resetDashboardData = () => {
         originState.dashboardInfo = null;
@@ -123,6 +115,13 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.variables = {};
         state.variablesSchema = { properties: {}, order: [] };
         state.labels = [];
+        //
+        validationState.isNameValid = undefined;
+        validationState.widgetValidMap = {};
+    };
+
+    const revertDashboardData = () => {
+        setDashboardInfo(originState.dashboardInfo);
     };
 
     const setDashboardInfo = (dashboardInfo: DashboardModel) => {
@@ -158,11 +157,12 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const getDashboardInfo = async (dashboardId: undefined|string, force = false) => {
         if (!force && (dashboardId === state.dashboardId || dashboardId === undefined)) return;
 
+        // WARN:: from under this line, beware using originState. originState could reference irrelevant dashboard data
         state.dashboardId = dashboardId;
         state.loadingDashboard = true;
         try {
             let result: DashboardModel;
-            if (originState.isProjectDashboard) {
+            if (dashboardId?.startsWith('project')) {
                 result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: state.dashboardId });
             } else {
                 result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: state.dashboardId });
@@ -204,6 +204,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     const deleteWidget = (widgetKey: string) => {
         state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widget_key !== widgetKey);
+        delete validationState.widgetValidMap[widgetKey];
     };
     const resetVariables = () => {
         const originProperties = { ...managedDashboardVariablesSchema.properties, ...originState.dashboardInfo.variables_schema.properties };
@@ -230,12 +231,17 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.variables = _variables;
     };
 
+    const updateWidgetValidation = (isValid: boolean, widgetKey: string) => {
+        validationState.widgetValidMap[widgetKey] = isValid;
+    };
+
     store.dispatch('reference/loadAll');
 
     return {
         state,
         originState,
         validationState,
+        revertDashboardData,
         getDashboardInfo,
         setDashboardInfo,
         toggleWidgetSize,
@@ -245,6 +251,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         updateWidgetInfo,
         deleteWidget,
         resetVariables,
+        updateWidgetValidation,
     };
 });
 

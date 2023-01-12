@@ -60,9 +60,9 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { DashboardViewer } from '@/services/dashboards/config';
+import type { DashboardViewer, DashboardConfig } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import type { DashboardDetailInfoStoreState } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
@@ -101,7 +101,7 @@ export default defineComponent<Props>({
             required: true,
         },
         dashboard: {
-            type: Object as PropType<DashboardModel>,
+            type: Object as PropType<DashboardModel|DashboardDetailInfoStoreState>,
             default: () => ({}),
         },
         manageDisabled: {
@@ -133,16 +133,21 @@ export default defineComponent<Props>({
             viewers(value: DashboardViewer) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
         });
 
-        const dashboardDetailInfoStore = useDashboardDetailInfoStore();
         const state = reactive({
             proxyVisible: props.visible,
             filteredVisibilityList: computed(() => visibilityList),
-            isProjectDashboard: computed(() => Object.prototype.hasOwnProperty.call(props.dashboard ?? {}, 'project_id')),
+            projectId: computed(() => {
+                if (Object.prototype.hasOwnProperty.call(props.dashboard ?? {}, 'projectId')) {
+                    return (props.dashboard as unknown as DashboardDetailInfoStoreState).projectId;
+                } if (Object.prototype.hasOwnProperty.call(props.dashboard ?? {}, 'project_id')) {
+                    return (props.dashboard as ProjectDashboardModel).project_id;
+                } return '';
+            }),
             dashboardNameList: computed<string[]>(() => {
-                if (state.isProjectDashboard) {
+                if (state.projectId) {
                     return store.state.dashboard.projectItems
                         .filter((item) => (
-                            item.project_id === (props.dashboard as ProjectDashboardModel).project_id)
+                            item.project_id === state.projectId)
                             && item.name !== props.dashboard?.name)
                         .map((_item) => _item.name);
                 }
@@ -151,6 +156,15 @@ export default defineComponent<Props>({
                     return '';
                 });
             }),
+            apiParam: computed<Partial<DashboardConfig>>(() => ({
+                name: name.value,
+                viewers: viewers.value,
+                labels: props.dashboard?.labels,
+                settings: props.dashboard?.settings,
+                layouts: props.dashboard?.layouts,
+                variables: props.dashboard?.variables,
+                variables_schema: props.dashboard?.variables_schema,
+            })),
         });
 
         const handleUpdateVisible = (visible) => {
@@ -160,10 +174,7 @@ export default defineComponent<Props>({
 
         const createDomainDashboard = async (): Promise<string|undefined> => {
             try {
-                const res = await SpaceConnector.clientV2.dashboard.domainDashboard.create({
-                    // viewers: viewers.value
-                    // TODO:: parameters here
-                });
+                const res = await SpaceConnector.clientV2.dashboard.domainDashboard.create(state.apiParam);
                 return res.domain_dashboard_id;
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
@@ -174,8 +185,8 @@ export default defineComponent<Props>({
         const createProjectDashboard = async (): Promise<string|undefined> => {
             try {
                 const res = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
-                    // viewers: viewers.value
-                    // TODO:: parameters here
+                    ...state.apiParam,
+                    project_id: state.projectId,
                 });
                 return res.project_dashboard_id;
             } catch (e) {
@@ -186,13 +197,16 @@ export default defineComponent<Props>({
 
         const handleConfirm = async () => {
             if (!isAllValid) return;
-            const clonedDashboardId = state.isProjectDashboard ? await createDomainDashboard() : await createProjectDashboard();
-            await dashboardDetailInfoStore.getDashboardInfo(clonedDashboardId);
+            const clonedDashboardId = state.projectId ? await createProjectDashboard() : await createDomainDashboard();
             if (clonedDashboardId) {
                 await SpaceRouter.router.push({
                     name: DASHBOARDS_ROUTE.DETAIL._NAME,
-                    params: { dashboardScope: state.isProjectDashboard ? 'project' : 'domain', dashboardId: clonedDashboardId },
+                    params: { dashboardScope: state.projectId ? 'project' : 'domain', dashboardId: clonedDashboardId },
                 });
+                await Promise.allSettled([
+                    store.dispatch('dashboard/loadProjectDashboard'),
+                    store.dispatch('dashboard/loadDomainDashboard'),
+                ]);
             }
             emit('update:visible', false);
         };

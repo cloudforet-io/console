@@ -48,7 +48,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/display/config';
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 export default {
     name: 'CurrencySelectDropdown',
@@ -61,10 +61,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        defaultCurrency: {
-            type: String as PropType<Currency>,
-            default: undefined,
-        },
         currency: {
             type: String as PropType<Currency>,
             default: undefined,
@@ -72,14 +68,15 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            currency: props.currency || props.defaultCurrency || computed(() => store.state.display.currency),
+            currency: computed(() => props.currency || store.state.display.currency),
             currencyItems: computed<MenuItem[]>(() => Object.keys(store.state.display.currencyRates).map((currency) => ({
                 type: 'item',
                 name: currency,
                 label: `${CURRENCY_SYMBOL[currency]}${currency}`,
-                badge: currency === props.defaultCurrency ? i18n.t('DASHBOARDS.DETAIL.DEFAULT') : '',
+                badge: currency === DEFAULT_CURRENCY ? i18n.t('DASHBOARDS.DETAIL.DEFAULT') : '',
             }))),
         });
+        const DEFAULT_CURRENCY = CURRENCY.USD;
 
         const handleSelectCurrency = (currency: Currency) => {
             store.commit('display/setCurrency', currency);

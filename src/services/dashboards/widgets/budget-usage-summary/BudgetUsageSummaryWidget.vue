@@ -35,7 +35,9 @@
                 <div ref="chartContext"
                      class="chart"
                 >
-                    <span class="budget-usage">{{ state.spentBudgetRate }}%</span>
+                    <span class="budget-usage">
+                        {{ state.spentBudget.rate.toFixed(2) }}%{{ state.spentBudget.isOver ? '+' : '' }}
+                    </span>
                 </div>
             </div>
 
@@ -121,7 +123,7 @@ const state = reactive({
     chartData: computed(() => {
         if (!state.data) return [];
 
-        let chartSpentBudgetRate = state.spentBudgetRate;
+        let chartSpentBudgetRate = state.spentBudget.rate;
         if (chartSpentBudgetRate > 100) chartSpentBudgetRate = 100;
 
         const results = [
@@ -152,11 +154,18 @@ const state = reactive({
         if (!state.data) return '--';
         return state.data[0].total_spent;
     }),
-    spentBudgetRate: computed(() => {
+    spentBudget: computed(() => {
+        let isOver = false;
         let totalBudget = state.totalBudget;
         if (totalBudget === 0) totalBudget = 1;
-        const budgetRate = (state.totalSpent / totalBudget) * 100;
-        return (budgetRate.toFixed(2));
+
+        let rate = (state.totalSpent / totalBudget) * 100;
+        if (rate > 9999.99) {
+            rate = 9999.99;
+            isOver = true;
+        }
+
+        return { rate, isOver };
     }),
     leftBudget: computed(() => {
         if (!state.data) return '--';
@@ -289,7 +298,6 @@ defineExpose<WidgetExpose<Data[]>>({
         left: 50%;
         top: 50%;
         transform: translate3d(-50%, -50%, 0);
-        max-width: 65%;
     }
 }
 .chart-wrapper {
@@ -298,20 +306,6 @@ defineExpose<WidgetExpose<Data[]>>({
     height: 9rem;
     .chart {
         height: 100%;
-    }
-}
-.full {
-    @screen desktop {
-        .budget-usage-summary {
-            @apply flex justify-between;
-        }
-    }
-
-    @screen laptop {
-        .budget-usage-summary {
-            @apply block;
-            height: 23.625rem;
-        }
     }
 }
 :deep(.data-loader-container) {
@@ -323,6 +317,39 @@ defineExpose<WidgetExpose<Data[]>>({
         &:last-of-type {
             margin-top: 3.8125rem;
             margin-bottom: 1.875rem;
+        }
+    }
+}
+.full {
+    @screen desktop {
+        .budget-usage-summary {
+            /* custom design-system component - p-data-loader-container */
+            :deep(.data-loader-container) {
+                > .loader-wrapper > .loader {
+                    @apply flex-row justify-between;
+                }
+                .skeleton-wrapper {
+                    &:last-of-type {
+                        margin-top: 0;
+                    }
+                }
+                .data-wrapper {
+                    @apply flex justify-between;
+                }
+            }
+        }
+    }
+
+    @screen laptop {
+        .budget-usage-summary {
+            height: 23.625rem;
+
+            /* custom design-system component - p-data-loader-container */
+            :deep(.data-loader-container) {
+                .data-wrapper {
+                    @apply block h-full;
+                }
+            }
         }
     }
 }

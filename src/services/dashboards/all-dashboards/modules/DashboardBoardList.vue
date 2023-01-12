@@ -93,7 +93,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import type { DashboardScope, DashboardConfig } from '@/services/dashboards/config';
+import type { DashboardScope } from '@/services/dashboards/config';
 import type { DashboardModel } from '@/services/dashboards/model';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
@@ -157,10 +157,10 @@ export default defineComponent<DashboardBoardListProps>({
 
         const cloneModalState = reactive({
             visible: false,
-            dashboardConfig: null as DashboardConfig|null,
+            dashboardConfig: {} as Partial<DashboardModel>,
         });
 
-        const convertBoardItemButtonSet = (dashboardItem) => [
+        const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
             {
                 iconName: 'ic_edit',
                 tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
@@ -175,15 +175,7 @@ export default defineComponent<DashboardBoardListProps>({
                 iconName: 'ic_duplicate',
                 tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_CLONE'),
                 eventAction: () => {
-                    cloneModalState.dashboardConfig = {
-                        name: dashboardItem.name,
-                        layouts: dashboardItem.layouts,
-                        settings: dashboardItem.settings,
-                        variables: dashboardItem.variables,
-                        variables_schema: dashboardItem.variables_schema,
-                        labels: dashboardItem.labels,
-                        version: dashboardItem.version,
-                    };
+                    cloneModalState.dashboardConfig = { ...dashboardItem };
                     cloneModalState.visible = true;
                 },
             },
@@ -207,7 +199,7 @@ export default defineComponent<DashboardBoardListProps>({
         };
         const handleUpdateCloneModal = (visible: boolean) => {
             if (visible) return;
-            cloneModalState.dashboardConfig = {} as DashboardConfig;
+            cloneModalState.dashboardConfig = {};
         };
 
         const handleClickDeleteDashboard = (dashboardId) => {
