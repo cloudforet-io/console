@@ -1,8 +1,8 @@
 import { i18n } from '@/translations';
 
 export const CLOUD_SERVICE_TAG_TYPE = {
-    CUSTOM: 'CUSTOM',
-    MANAGED: 'MANAGED',
+    CUSTOM: 'custom',
+    MANAGED: 'manage',
 } as const;
 
 export type TagType = typeof CLOUD_SERVICE_TAG_TYPE[keyof typeof CLOUD_SERVICE_TAG_TYPE];
