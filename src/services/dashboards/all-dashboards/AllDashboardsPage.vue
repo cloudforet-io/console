@@ -30,13 +30,13 @@
              class="dashboard-list-wrapper"
         >
             <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.PROJECT && workspaceDashboardList.length > 0"
-                                  :scope-type="SCOPE_TYPE.DOMAIN"
+                                  :scope-type="DASHBOARD_SCOPE.DOMAIN"
                                   class="dashboard-list"
                                   :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE')"
                                   :dashboard-list="workspaceDashboardList"
             />
             <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.DOMAIN && projectDashboardList.length > 0"
-                                  :scope-type="SCOPE_TYPE.PROJECT"
+                                  :scope-type="DASHBOARD_SCOPE.PROJECT"
                                   class="dashboard-list"
                                   :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT')"
                                   :dashboard-list="projectDashboardList"
@@ -66,6 +66,7 @@ import {
     reactive, toRefs, watch,
 } from 'vue';
 
+
 import {
     PPageTitle, PDivider, PButton, PToolbox, PEmpty,
 } from '@spaceone/design-system';
@@ -82,6 +83,7 @@ import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/
 import AllDashboardsSelectFilter from '@/services/dashboards/all-dashboards/modules/AllDashboardsSelectFilter.vue';
 import DashboardBoardList from '@/services/dashboards/all-dashboards/modules/DashboardBoardList.vue';
 import { SCOPE_TYPE } from '@/services/dashboards/all-dashboards/type';
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 export default {
@@ -169,6 +171,7 @@ export default {
             handleQueryChange,
             queryState,
             SCOPE_TYPE,
+            DASHBOARD_SCOPE,
         };
     },
 };

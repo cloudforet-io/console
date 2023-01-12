@@ -229,6 +229,7 @@ onBeforeUnmount(() => {
         .variable-selector-wrapper {
             @apply relative flex items-center flex-wrap;
             gap: 0.5rem;
+            padding-right: 1rem;
 
             .reset-button {
                 @apply flex items-center text-label-md text-blue-700;

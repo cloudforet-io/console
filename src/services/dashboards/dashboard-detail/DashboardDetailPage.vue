@@ -142,11 +142,11 @@ const variablesState = reactive({
 });
 
 const queryState = reactive({
-    settings: computed(() => dashboardDetailState.settings),
     variables: computed(() => dashboardDetailState.variables),
+    settings: computed(() => dashboardDetailState.settings),
     urlQueryString: computed(() => ({
-        settings: objectToQueryString(queryState.settings),
         variables: objectToQueryString(queryState.variables),
+        settings: objectToQueryString(queryState.settings),
     })),
 });
 
@@ -194,8 +194,8 @@ let urlQueryStringWatcherStop;
 const init = async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
     const useQueryValue = {
-        settings: queryStringToObject(currentQuery.settings),
         variables: queryStringToObject(currentQuery.variables),
+        settings: queryStringToObject(currentQuery.settings),
     };
 
     if (useQueryValue.variables) dashboardDetailState.variables = useQueryValue.variables;
@@ -244,6 +244,7 @@ onUnmounted(() => {
     .variable-selector-wrapper {
         @apply relative flex items-center flex-wrap;
         gap: 0.5rem;
+        padding-right: 1rem;
     }
 }
 </style>
