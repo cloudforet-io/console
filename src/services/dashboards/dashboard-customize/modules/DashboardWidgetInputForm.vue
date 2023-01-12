@@ -95,6 +95,7 @@ import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type {
     DashboardLayoutWidgetInfo,
     WidgetFiltersMap,
@@ -108,20 +109,6 @@ interface Props {
     widgetKey?: string;
 }
 
-const SAMPLE_DASHBOARD_VARIABLES = [
-    { name: 'provider', label: 'Provider' },
-    { name: 'project', label: 'Project' },
-    { name: 'service_account_id', label: 'Service Account' },
-    { name: 'user', label: 'User' },
-    { name: 'cloud_service_type', label: 'Cloud Service Type' },
-    { name: 'region', label: 'Region' },
-];
-const SAMPLE_DASHBOARD_VARIABLES_SCHEMA = {
-    type: 'string',
-    enum: SAMPLE_DASHBOARD_VARIABLES.map((d) => d.name),
-    menuItems: SAMPLE_DASHBOARD_VARIABLES,
-    default: undefined,
-};
 export default defineComponent<Props>({
     name: 'DashboardWidgetInputForm',
     components: {
@@ -146,6 +133,8 @@ export default defineComponent<Props>({
         },
     },
     setup(props) {
+        const dashboardDetailStore = useDashboardDetailInfoStore();
+        const dashboardDetailState = dashboardDetailStore.state;
         const widgetFormStore = useWidgetFormStore();
         const widgetFormState = widgetFormStore.state;
         const storeState = reactive({
@@ -162,6 +151,17 @@ export default defineComponent<Props>({
             widgetOptionsJsonSchema: {} as JsonSchema,
             requiredProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.schema?.required ?? []),
             inheritableProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.inheritable_properties || []),
+            dashboardVariablesSchema: computed(() => {
+                const enabledVariables = Object.entries(dashboardDetailState.variablesSchema.properties).filter(([, d]) => d.use === true);
+                return {
+                    type: 'string',
+                    enum: enabledVariables.map(([key]) => key),
+                    menuItems: enabledVariables.map(([key, val]) => ({
+                        name: key, label: val.name,
+                    })),
+                    default: undefined,
+                };
+            }),
             //
             schemaFormData: {},
             isSchemaFormValid: undefined,
@@ -215,9 +215,10 @@ export default defineComponent<Props>({
         const refineJsonSchemaProperties = (propertyName: string, propertySchema: JsonSchema['properties'], isInherit = false): JsonSchema['properties'] => {
             // 1. if (inherit === true) return dashboard variables
             if (isInherit) {
+                // TODO: exclude types which is not matched with variable property
                 return {
                     title: propertySchema.title,
-                    ...SAMPLE_DASHBOARD_VARIABLES_SCHEMA, // TODO: temp data
+                    ...state.dashboardVariablesSchema,
                     default: undefined,
                 };
             }

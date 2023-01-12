@@ -76,7 +76,7 @@
                       @confirm="handleDeleteModalConfirm"
         />
         <dashboard-widget-edit-modal :widget-config-id="props.widgetConfigId"
-                                     :visible="state.visibleEditModal"
+                                     :visible.sync="state.visibleEditModal"
                                      :widget-key="props.widgetKey"
                                      @refresh="emit('refresh')"
         />
@@ -262,7 +262,7 @@ const handleDeleteModalConfirm = () => {
         }
         .edit-button {
             z-index: 10;
-            margin-top: 1rem;
+            margin: 1rem 0;
         }
     }
     .widget-footer {
