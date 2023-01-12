@@ -141,7 +141,7 @@ export default defineComponent<DashboardBoardListProps>({
         const state = reactive({
             thisPage: 1,
             dashboardScopeKey: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? DOMAIN_SCOPE_KEY : PROJECT_SCOPE_KEY)),
-            projectItems: computed(() => store.state.reference.project.items),
+            projectItems: computed(() => store.getters['reference/projectItems']),
             dashboardListByBoardSets: computed<BoardSet[]>(() => props.dashboardList
                 .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
                 .map((d) => {
