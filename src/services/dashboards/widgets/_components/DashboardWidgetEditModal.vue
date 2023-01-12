@@ -7,8 +7,8 @@
                     @confirm="handleEditModalConfirm"
     >
         <template #body>
-            <dashboard-add-default-widget-right-area :widget-config-id="props.widgetConfigId"
-                                                     :widget-key="props.widgetKey"
+            <dashboard-widget-input-form :widget-config-id="props.widgetConfigId"
+                                         :widget-key="props.widgetKey"
             />
         </template>
     </p-button-modal>
@@ -22,8 +22,7 @@ import {
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import DashboardAddDefaultWidgetRightArea
-    from '@/services/dashboards/dashboard-customize/modules/DashboardAddDefaultWidgetRightArea.vue';
+import DashboardWidgetInputForm from '@/services/dashboards/dashboard-customize/modules/DashboardWidgetInputForm.vue';
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
