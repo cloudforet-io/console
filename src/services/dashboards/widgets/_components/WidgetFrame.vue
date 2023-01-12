@@ -75,25 +75,11 @@
                       :contents="$t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
                       @confirm="handleDeleteModalConfirm"
         />
-        <p-button-modal :visible.sync="state.visibleEditModal"
-                        :header-title="$t('DASHBOARDS.WIDGET.UPDATE_TITLE')"
-                        :disabled="!widgetFormState.isValid"
-                        size="sm"
-                        @confirm="handleEditModalConfirm"
-        >
-            <template #body>
-                <div v-if="!props.widgetConfigId"
-                     class="no-selected-wrapper"
-                >
-                    <span class="title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED') }}</span>
-                    <span class="text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED_HELP_TEXT') }}</span>
-                </div>
-                <dashboard-add-default-widget-right-area v-else
-                                                         :widget-config-id="props.widgetConfigId"
-                                                         :widget-key="props.widgetKey"
-                />
-            </template>
-        </p-button-modal>
+        <dashboard-widget-edit-modal :widget-config-id="props.widgetConfigId"
+                                     :visible="state.visibleEditModal"
+                                     :widget-key="props.widgetKey"
+                                     @refresh="emit('refresh')"
+        />
     </div>
 </template>
 
@@ -105,7 +91,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
 import {
-    PAnchor, PButton, PButtonModal, PDivider, PIconButton,
+    PAnchor, PButton, PDivider, PIconButton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -120,11 +106,9 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { DateRange } from '@/services/dashboards/config';
-import DashboardAddDefaultWidgetRightArea
-    from '@/services/dashboards/dashboard-customize/modules/DashboardAddDefaultWidgetRightArea.vue';
-import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
-import type { WidgetSize, DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
+import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
 export interface WidgetFrameProps {
@@ -173,8 +157,6 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
 const emit = defineEmits(['refresh']);
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.state;
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
@@ -229,17 +211,6 @@ const state = reactive({
 
 const setBasicDateFormat = (date) => (date ? dayjs.utc(date).format('YYYY-MM-DD') : undefined);
 const handleEditButtonClick = () => { state.visibleEditModal = true; };
-const handleEditModalConfirm = () => {
-    const widgetInfo: Partial<DashboardLayoutWidgetInfo> = {
-        widget_name: widgetFormState.widgetConfigId ?? '',
-        title: widgetFormState.widgetTitle ?? '',
-        inherit_options: widgetFormState.inheritOptions ?? {},
-        widget_options: widgetFormState.widgetOptions ?? {},
-    };
-    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
-    state.visibleEditModal = false;
-    emit('refresh');
-};
 const handleDeleteModalConfirm = () => {
     dashboardDetailStore.deleteWidget(props.widgetKey);
     state.visibleDeleteModal = false;

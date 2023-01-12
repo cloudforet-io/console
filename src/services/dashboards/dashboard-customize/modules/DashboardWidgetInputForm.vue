@@ -1,5 +1,5 @@
 <template>
-    <div class="dashboard-add-default-widget-right-area">
+    <div class="dashboard-widget-input-form">
         <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
                        :invalid="invalidState.name"
                        :invalid-text="invalidTexts.name"
@@ -123,7 +123,7 @@ const SAMPLE_DASHBOARD_VARIABLES_SCHEMA = {
     default: undefined,
 };
 export default defineComponent<Props>({
-    name: 'DashboardAddDefaultWidgetRightArea',
+    name: 'DashboardWidgetInputForm',
     components: {
         PContextMenu,
         PTextInput,
@@ -406,7 +406,7 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
-.dashboard-add-default-widget-right-area {
+.dashboard-widget-input-form {
     @apply flex flex-col overflow-hidden;
     height: 100%;
     gap: 1rem;
