@@ -172,6 +172,7 @@ export interface WidgetProps {
     editMode?: boolean;
     errorMode?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
+    initiated?: boolean;
 }
 
 export interface WidgetExpose<Data = any> {
