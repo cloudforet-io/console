@@ -62,11 +62,12 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { DashboardViewer, DashboardConfig } from '@/services/dashboards/config';
+import type { DashboardViewer, DashboardConfig, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardDetailInfoStoreState } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {
     visible: boolean;
@@ -158,15 +159,32 @@ export default defineComponent<Props>({
                     return '';
                 });
             }),
-            apiParam: computed<Partial<DashboardConfig>>(() => ({
-                name: name.value,
-                viewers: viewers.value,
-                labels: props.dashboard?.labels,
-                settings: props.dashboard?.settings,
-                layouts: props.dashboard?.layouts,
-                variables: props.dashboard?.variables,
-                variables_schema: props.dashboard?.variables_schema,
-            })),
+            layouts: computed<DashboardLayoutWidgetInfo[]|DashboardLayoutWidgetInfo[][]>(() => {
+                if (props.dashboard?.layouts) return props.dashboard?.layouts;
+                if ((props.dashboard as unknown as DashboardDetailInfoStoreState)?.dashboardWidgetInfoList) {
+                    return (props.dashboard as unknown as DashboardDetailInfoStoreState)?.dashboardWidgetInfoList;
+                }
+                return [];
+            }),
+            variablesSchema: computed<DashboardVariablesSchema>(() => {
+                if (props.dashboard?.variables_schema) return props.dashboard?.variables_schema;
+                if ((props.dashboard as unknown as DashboardDetailInfoStoreState)?.variablesSchema) {
+                    return (props.dashboard as unknown as DashboardDetailInfoStoreState)?.variablesSchema;
+                }
+                return { properties: {}, order: [] };
+            }),
+            apiParam: computed<Partial<DashboardConfig>>(() => {
+                console.log(props.dashboard);
+                return {
+                    name: name.value,
+                    viewers: viewers.value,
+                    layouts: state.layouts,
+                    labels: props.dashboard?.labels,
+                    settings: props.dashboard?.settings,
+                    variables: props.dashboard?.variables,
+                    variables_schema: state.variablesSchema,
+                };
+            }),
         });
 
         const handleUpdateVisible = (visible) => {
