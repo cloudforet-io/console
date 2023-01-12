@@ -104,6 +104,8 @@ export default defineComponent<Props>({
             required: true,
         },
         dashboard: {
+            // NOTE:: coming from data of DashboardDetailPage / DashboardBoardList have different object.
+            // checking types would be good to reading codes.
             type: Object as PropType<DashboardModel|DashboardDetailInfoStoreState>,
             default: () => ({}),
         },
