@@ -336,6 +336,10 @@ const handleClickRow = (rowData) => {
     .p-data-loader {
         flex-grow: 1;
         flex-shrink: 0;
+
+        .full & {
+            min-height: 8rem;
+        }
     }
     .table-container {
         @apply overflow-auto w-full;

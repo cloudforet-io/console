@@ -14,12 +14,12 @@
                 <span class="dashboard-title-icon-buttons-wrapper">
                     <favorite-button :item-id="props.dashboardId"
                                      :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                     scale="0.8"
                     />
                     <p-icon-button name="ic_edit-text"
                                    width="1.5rem"
                                    height="1.5rem"
                                    :disabled="!state.hasManagePermission && dashboardDetailState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
-                                   class="ml-1"
                                    @click="handleVisibleNameEditModal"
                     />
                     <p-icon-button name="ic_trashcan"
