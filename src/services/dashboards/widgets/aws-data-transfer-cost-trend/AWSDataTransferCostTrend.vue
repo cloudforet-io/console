@@ -249,7 +249,7 @@ const refreshWidget = async () => {
     state.data = await fetchData();
     state.legends = getXYChartLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
-    chartHelper.refreshRoot();
+    if (chartHelper.root.value) chartHelper.refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
@@ -258,7 +258,7 @@ const refreshWidget = async () => {
 /* Event */
 const handleSelectSelectorType = (selected: string) => {
     state.selectedSelectorType = selected;
-    chartHelper.refreshRoot();
+    if (chartHelper.root.value) chartHelper.refreshRoot();
     drawChart(state.chartData);
 };
 

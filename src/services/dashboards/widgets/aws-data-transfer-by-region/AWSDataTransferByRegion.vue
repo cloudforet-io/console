@@ -257,7 +257,7 @@ const refreshWidget = async (thisPage = 1): Promise<FullData> => {
 /* Event */
 const handleSelectSelectorType = (selected: string) => {
     state.selectedSelectorType = selected;
-    chartHelper.refreshRoot();
+    if (chartHelper.root.value) chartHelper.refreshRoot();
     drawChart(state.chartData);
 };
 const handleUpdateThisPage = (thisPage: number) => {
