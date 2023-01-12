@@ -148,7 +148,6 @@ export default defineComponent<Props>({
                 const _widgetSchemaErrorMap = getWidgetInheritOptionsErrorMap(
                     widgetInfo.inherit_options,
                     _widgetConfig.options_schema.schema,
-                    dashboardDetailState.variables,
                     dashboardDetailState.variablesSchema,
                 );
                 _widgetValidMap[widgetInfo.widget_key] = isEmpty(_widgetSchemaErrorMap);
