@@ -53,5 +53,6 @@ const handleUpdateCurrency = (currency: DashboardSettings['currency']) => {
 
 <style scoped>
 .dashboard-toolset {
-    @apply flex items-center flex-wrap; }
+    @apply flex items-center flex-wrap;
+}
 </style>
