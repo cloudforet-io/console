@@ -44,16 +44,6 @@ export default {
             temp: false,
         };
     },
-    methods: {
-        showTemp() {
-            this.temp = !this.temp;
-            // eslint-disable-next-line @typescript-eslint/no-this-alias
-            const self = this;
-            setTimeout(() => {
-                self.temp = false;
-            }, 1500);
-        },
-    },
 };
 </script>
 
