@@ -173,18 +173,15 @@ export default defineComponent<Props>({
                 }
                 return { properties: {}, order: [] };
             }),
-            apiParam: computed<Partial<DashboardConfig>>(() => {
-                console.log(props.dashboard);
-                return {
-                    name: name.value,
-                    viewers: viewers.value,
-                    layouts: state.layouts,
-                    labels: props.dashboard?.labels,
-                    settings: props.dashboard?.settings,
-                    variables: props.dashboard?.variables,
-                    variables_schema: state.variablesSchema,
-                };
-            }),
+            apiParam: computed<Partial<DashboardConfig>>(() => ({
+                name: name.value,
+                viewers: viewers.value,
+                layouts: state.layouts,
+                labels: props.dashboard?.labels,
+                settings: props.dashboard?.settings,
+                variables: props.dashboard?.variables,
+                variables_schema: state.variablesSchema,
+            })),
         });
 
         const handleUpdateVisible = (visible) => {
