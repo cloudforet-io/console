@@ -127,7 +127,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-det
 import type { WidgetSize, DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
-interface Props {
+export interface WidgetFrameProps {
     title: TranslateResult;
     size: WidgetSize;
     width?: number;
@@ -159,7 +159,7 @@ interface IconConfig {
 }
 const { i18nDayjs } = useI18nDayjs();
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<WidgetFrameProps>(), {
     width: undefined,
     widgetLink: undefined,
     widgetLocation: undefined,

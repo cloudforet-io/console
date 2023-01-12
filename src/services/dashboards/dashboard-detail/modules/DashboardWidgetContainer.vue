@@ -22,6 +22,7 @@
                        :theme="widgetThemeList[idx]"
                        :currency-rates="currencyRates"
                        :edit-mode="editMode"
+                       :error-mode="!dashboardDetailValidationState.widgetValidMap[widget.widget_key]"
                        :all-reference-type-info="allReferenceTypeInfo"
             />
         </template>
@@ -221,6 +222,7 @@ export default defineComponent<Props>({
         return {
             containerRef,
             ...toRefs(state),
+            dashboardDetailValidationState,
             getWidgetComponent,
             handleIntersectionObserver,
         };
