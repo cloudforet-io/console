@@ -7,7 +7,7 @@
         >
             <p-text-input :value="name"
                           :invalid="invalidState.name"
-                          @input="handleName"
+                          @update:value="handleName"
             />
         </p-field-group>
         <p v-if="selectedWidgetDesc"

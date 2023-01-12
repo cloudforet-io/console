@@ -21,7 +21,7 @@
                         <p-text-input :value="password"
                                       type="password"
                                       :invalid="invalid"
-                                      @input="setForm('password', $event)"
+                                      @update:value="setForm('password', $event)"
                         />
                     </template>
                 </p-field-group>
@@ -34,7 +34,7 @@
                         <p-text-input :value="confirmPassword"
                                       type="password"
                                       :invalid="invalid"
-                                      @input="setForm('confirmPassword', $event)"
+                                      @update:value="setForm('confirmPassword', $event)"
                         />
                     </template>
                 </p-field-group>

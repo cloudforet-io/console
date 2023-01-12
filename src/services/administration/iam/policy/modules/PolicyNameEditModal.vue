@@ -11,7 +11,7 @@
                                required
                 >
                     <p-text-input :value="policyNameInput"
-                                  @input="handleNameEditInput"
+                                  @update:value="handleNameEditInput"
                     />
                 </p-field-group>
             </template>

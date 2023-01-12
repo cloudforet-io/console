@@ -23,6 +23,8 @@
                                :invalid="!disableValidation && invalidState.selectedResources"
                                :selected="selectedResources"
                                multi-selectable
+                               show-select-marker
+                               appearance-type="stack"
                                class="mt-2"
                                @update:selected="setForm('selectedResources', $event)"
         />

@@ -10,7 +10,7 @@
                                   placeholder="User ID"
                                   :invalid="invalid"
                                   block
-                                  @input="checkUserId"
+                                  @update:value="checkUserId"
                     />
                 </template>
             </p-field-group>
@@ -24,7 +24,7 @@
                                   placeholder="Password"
                                   :invalid="invalid"
                                   block
-                                  @input="checkPassword"
+                                  @update:value="checkPassword"
                                   @keyup.enter.native="signIn"
                     />
                 </template>

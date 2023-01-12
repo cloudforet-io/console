@@ -45,9 +45,11 @@
                 <span class="text-gray-500"> ({{ responderState.selectedMemberItems.length }})</span>
             </p>
             <p-filterable-dropdown :menu="responderState.allMemberItems"
-                                   :selected.sync="responderState.selectedMemberItems"
+                                   :selected="responderState.selectedMemberItems"
                                    :disabled="manageDisabled"
                                    multi-selectable
+                                   show-select-marker
+                                   appearance-type="stack"
                                    @update:selected="handleUpdateSelected"
             />
         </article>
@@ -64,6 +66,7 @@ import {
     PBadge, PCollapsibleList, PPaneLayout, PPanelTop, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import { differenceBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -215,8 +218,8 @@ export default {
         };
 
         const handleUpdateSelected = (selected) => {
-            const addedItems = differenceBy(selected, responderState.prevSelectedMemberItems, 'name');
-            const deletedItems = differenceBy(responderState.prevSelectedMemberItems, selected, 'name');
+            const addedItems: FilterableDropdownMenuItem[] = differenceBy(selected, responderState.prevSelectedMemberItems, 'name');
+            const deletedItems: FilterableDropdownMenuItem[] = differenceBy(responderState.prevSelectedMemberItems, selected, 'name');
 
             if (addedItems.length) {
                 addedItems.forEach((item) => addResponder(item.name));

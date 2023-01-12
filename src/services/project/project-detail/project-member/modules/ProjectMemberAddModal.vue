@@ -5,7 +5,7 @@
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
-        :disabled="!isAllValid"
+        :disabled="!isAllValid || isLabelDuplicated || externalItemsInvalidTexts.length"
         @confirm="handleConfirm"
     >
         <template #body>
@@ -30,6 +30,8 @@
                             :menu="internalUserItems"
                             :selected="selectedInternalUserItems"
                             multi-selectable
+                            appearance-type="stack"
+                            show-select-marker
                             use-fixed-menu-style
                             :invalid="invalid"
                             @update:selected="setForm('selectedInternalUserItems', $event)"
@@ -39,9 +41,14 @@
                 <p-field-group v-show="activeTab !== AUTH_TYPE.INTERNAL_USER"
                                :label="$t('PROJECT.DETAIL.MEMBER.MEMBER')"
                                required
-                               :invalid="invalidState.selectedExternalUserItems"
-                               :invalid-text="invalidTexts.selectedExternalUserItems"
+                               :invalid="externalItemsInvalidTexts.length > 0"
                 >
+                    <template #invalid>
+                        <template v-for="(text, idx) in externalItemsInvalidTexts">
+                            <span :key="idx">{{ text }}</span>
+                            <br :key="`br-${idx}`">
+                        </template>
+                    </template>
                     <template #default="{invalid}">
                         <p-text-input :menu="externalUserItems"
                                       :value="searchText"
@@ -50,12 +57,13 @@
                                       :exact-mode="false"
                                       :invalid="invalid"
                                       multi-input
+                                      appearance-type="stack"
                                       disable-handler
                                       use-fixed-menu-style
                                       use-auto-complete
                                       block
-                                      @input="handleSearchExternalUser"
-                                      @update:selected="handleUpdateExternalUser"
+                                      @update:value="handleSearchExternalUser"
+                                      @update="handleUpdateExternalUser"
                         />
                     </template>
                 </p-field-group>
@@ -84,7 +92,7 @@
                         <p-filterable-dropdown
                             :menu="roleItems"
                             :selected="selectedRoleItems"
-                            type="radioButton"
+                            show-select-marker
                             use-fixed-menu-style
                             :invalid="invalid"
                             @update:selected="handleSelectRoleItems"
@@ -94,15 +102,16 @@
                 <p-field-group
                     :label="$t('PROJECT.DETAIL.MEMBER.LABEL_LABEL')"
                     :help-text="$t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT')"
-                    :invalid="invalidState.labels"
-                    :invalid-text="invalidTexts.labels"
+                    :invalid="invalidState.labels || isLabelDuplicated"
+                    :invalid-text="invalidTexts.labels || $t('PROJECT.DETAIL.MEMBER.DUPLICATED_VALUE')"
                 >
                     <template #default="{invalid}">
                         <p-text-input :selected="labels"
                                       :invalid="invalid"
                                       multi-input
+                                      appearance-type="stack"
                                       block
-                                      @update:selected="handleUpdateLabel"
+                                      @update="handleUpdateLabel"
                         />
                     </template>
                 </p-field-group>
@@ -114,16 +123,15 @@
 <script lang="ts">
 import type { SetupContext } from 'vue';
 import {
-    reactive, toRefs, computed, watch,
+    reactive, toRefs, computed, watch, ref,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButtonModal, PFieldGroup, PBoxTab, PFilterableDropdown, PTooltip, PI, PTextInput,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { SelectedItem as InputItem } from '@spaceone/design-system/types/inputs/input/type';
-import { debounce } from 'lodash';
+import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { InputItem } from '@spaceone/design-system/types/inputs/input/type';
+import { debounce, union } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -132,6 +140,7 @@ import { i18n } from '@/translations';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
+import type { RawPagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import { getPagePermissionMapFromRaw } from '@/lib/access-control/page-permission-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -144,6 +153,14 @@ import { checkEmailFormat } from '@/services/administration/iam/user/lib/user-fo
 import type { MemberItem } from '@/services/project/project-detail/project-member/type';
 import { AUTH_TYPE } from '@/services/project/project-detail/project-member/type';
 
+type ExternalItemErrorCode = 'DUPLICATED'|'EMAIL_FORMAT'|'ALREADY_EXIST'|'NOT_FOUND';
+interface ExternalItemsError {
+    all?: ExternalItemErrorCode;
+    [selectedIndex: number]: ExternalItemErrorCode
+}
+interface RoleMenuItem extends FilterableDropdownMenuItem {
+    pagePermissions: RawPagePermission[]
+}
 export default {
     name: 'ProjectMemberAddModal',
     components: {
@@ -204,18 +221,31 @@ export default {
                 return tabs;
             }),
             activeTab: AUTH_TYPE.INTERNAL_USER,
-            roleItems: [] as MenuItem[],
-            internalUserItems: [] as MenuItem[],
-            externalUserItems: [] as MenuItem[],
+            roleItems: [] as RoleMenuItem[],
+            internalUserItems: [] as FilterableDropdownMenuItem[],
+            externalUserItems: [] as InputItem[],
             invalidUserList: [] as string[],
             existingMemberList: [] as string[],
             searchText: '',
             labelText: '',
             showRoleWarning: false,
         });
+        const isLabelDuplicated = ref<boolean>(false);
+        const externalItemsErrors = ref<ExternalItemsError>({});
+        const externalItemsInvalidTexts = computed(() => {
+            const errorCodes = union(Object.values(externalItemsErrors.value)).filter((code) => !!code);
+            return errorCodes.map((code) => {
+                if (code === 'DUPLICATED') return i18n.t('PROJECT.DETAIL.MEMBER.DUPLICATED_VALUE');
+                if (code === 'EMAIL_FORMAT') return i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID');
+                if (code === 'ALREADY_EXIST') return i18n.t('PROJECT.DETAIL.MEMBER.ALREADY_EXISTING');
+                if (code === 'NOT_FOUND') return i18n.t('PROJECT.DETAIL.MEMBER.INVALID');
+                return undefined;
+            });
+        });
+        const selectedExternalUserItems = ref<InputItem[]>([]);
         const {
             forms: {
-                labels, selectedRoleItems, selectedInternalUserItems, selectedExternalUserItems,
+                labels, selectedRoleItems, selectedInternalUserItems,
             },
             invalidState,
             invalidTexts,
@@ -223,26 +253,18 @@ export default {
             initForm,
         } = useFormValidator({
             labels: [] as InputItem[],
-            selectedRoleItems: [] as MenuItem[],
-            selectedInternalUserItems: [] as MenuItem[],
-            selectedExternalUserItems: [] as InputItem[],
+            selectedRoleItems: [] as RoleMenuItem[],
+            selectedInternalUserItems: [] as FilterableDropdownMenuItem[],
         }, {
-            selectedInternalUserItems: (val: MenuItem[]) => {
+            selectedInternalUserItems: (val: FilterableDropdownMenuItem[]) => {
                 if (!val.length) return i18n.t('PROJECT.DETAIL.MEMBER.MODAL_VALIDATION_REQUIRED');
                 return true;
             },
-            selectedExternalUserItems: (val: InputItem[]) => {
-                const invalidItems = val.filter((d) => d.invalid);
-                if (invalidItems.length) return invalidItems[invalidItems.length - 1]?.invalidText || '';
-                return true;
-            },
-            selectedRoleItems: (val: MenuItem[]) => {
+            selectedRoleItems: (val: RoleMenuItem[]) => {
                 if (!val.length) return i18n.t('PROJECT.DETAIL.MEMBER.MODAL_VALIDATION_REQUIRED');
                 return true;
             },
             labels: (val: InputItem[]) => {
-                const invalidItems = val.filter((d) => d.invalid);
-                if (invalidItems.length) return invalidItems[invalidItems.length - 1]?.invalidText || '';
                 if (val.length > 5) return i18n.t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT');
                 return true;
             },
@@ -265,8 +287,8 @@ export default {
                 state.internalUserItems.push(singleItem);
             });
         };
-        const _getExternalMenuItems = (users): MenuItem[] => {
-            const externalUserItems: MenuItem[] = [];
+        const _getExternalMenuItems = (users: {user_id: string; name: string;}[]): InputItem[] => {
+            const externalUserItems: InputItem[] = [];
             const memberIdList = state.members.map((d) => d.resource_id);
             users.forEach((user) => {
                 const singleItem = {
@@ -289,28 +311,25 @@ export default {
                 return false;
             }
         };
-        const _getInvalidText = async (userItem: InputItem): Promise<undefined | string | TranslateResult> => {
-            /* 1. check duplicated */
-            if (userItem.duplicated) {
-                return i18n.t('PROJECT.DETAIL.MEMBER.DUPLICATED_VALUE');
-            }
-
-            /* 2. check email validation */
-            const emailFormValidation = checkEmailFormat(userItem.value);
+        const setExternalItemsInvalidTexts = async (userItem: InputItem): Promise<ExternalItemErrorCode|undefined> => {
+            /* 1. check email validation */
+            const emailFormValidation = checkEmailFormat(userItem.name ?? '');
             if (!emailFormValidation.isValid) {
-                return emailFormValidation.invalidText;
+                return 'EMAIL_FORMAT';
             }
 
-            /* 3. check member list */
+            /* 2. check member list */
             const memberIdList: string[] = state.members.map((d) => d.resource_id);
-            if (memberIdList.includes(userItem.value)) {
-                return i18n.t('PROJECT.DETAIL.MEMBER.ALREADY_EXISTING');
+            if (memberIdList.includes(userItem.name ?? '')) {
+                return 'ALREADY_EXIST';
             }
 
-            const isExternalUserExist = await findExternalUser(userItem.value);
+            /* check if external user exist */
+            const isExternalUserExist = await findExternalUser(userItem.name ?? '');
             if (!isExternalUserExist) {
-                return i18n.t('PROJECT.DETAIL.MEMBER.INVALID');
+                return 'NOT_FOUND';
             }
+
             return undefined;
         };
 
@@ -330,8 +349,8 @@ export default {
             try {
                 const params: any = {
                     role_id: selectedRoleItems.value[0].name,
-                    users: state.activeTab === AUTH_TYPE.INTERNAL_USER ? selectedInternalUserItems.value.map((d) => d.name) : selectedExternalUserItems.value.map((d) => d.value),
-                    labels: labels.value.map((d) => d.value),
+                    users: state.activeTab === AUTH_TYPE.INTERNAL_USER ? selectedInternalUserItems.value.map((d) => d.name) : selectedExternalUserItems.value.map((d) => d.name),
+                    labels: labels.value.map((d) => d.name),
                     is_external_user: state.activeTab !== AUTH_TYPE.INTERNAL_USER,
                 };
                 if (props.isProjectGroup) {
@@ -397,41 +416,41 @@ export default {
             state.searchText = text;
             if (text.trim().length) listExternalUser();
         };
-        const handleUpdateLabel = (inputLabels: InputItem[]) => {
-            const _labels = [...inputLabels];
-            _labels.forEach((label) => {
-                label.invalid = label.duplicated;
-                label.invalidText = i18n.t('PROJECT.DETAIL.MEMBER.DUPLICATED_VALUE');
-            });
+        const handleUpdateLabel = (inputLabels: InputItem[], isValid: boolean) => {
+            isLabelDuplicated.value = !isValid;
             setForm('labels', inputLabels);
         };
-        const handleUpdateExternalUser = async (inputUserItems: InputItem[]) => {
+        const handleUpdateExternalUser = async (inputUserItems: InputItem[], isValid: boolean) => {
             if (inputUserItems.length === selectedExternalUserItems.value.length) return;
 
             // when input deleted
             if (inputUserItems.length < selectedExternalUserItems.value.length) {
-                const _inputUserItems: InputItem[] = [...inputUserItems];
-                await Promise.all(_inputUserItems.map(async (userItem) => {
-                    const _invalidText = await _getInvalidText(userItem);
-                    userItem.invalid = !!_invalidText;
-                    userItem.invalidText = _invalidText;
-                }));
-                setForm('selectedExternalUserItems', _inputUserItems);
+                const errorCodes = await Promise.all(inputUserItems.map((item) => setExternalItemsInvalidTexts(item)));
+                const errors: ExternalItemsError = { all: !isValid ? 'DUPLICATED' : undefined };
+                errorCodes.forEach((code, idx) => {
+                    if (code) errors[idx] = code;
+                });
+                selectedExternalUserItems.value = [...inputUserItems];
+                externalItemsErrors.value = errors;
                 return;
             }
-
             // when input added
-            const _addedUserItem = inputUserItems[inputUserItems.length - 1];
-            const _invalidText = await _getInvalidText(_addedUserItem);
-            _addedUserItem.invalid = !!_invalidText;
-            _addedUserItem.invalidText = _invalidText;
-            setForm('selectedExternalUserItems', [...selectedExternalUserItems.value, _addedUserItem]);
+            const addedIdx = inputUserItems.length - 1;
+            const _addedUserItem = inputUserItems[addedIdx];
+            const errors: ExternalItemsError = { ...externalItemsErrors.value, all: !isValid ? 'DUPLICATED' : undefined };
+            const errorCode = await setExternalItemsInvalidTexts(_addedUserItem);
+            if (errorCode) {
+                _addedUserItem.error = true;
+                errors[addedIdx] = errorCode;
+            }
+            selectedExternalUserItems.value = [...selectedExternalUserItems.value, _addedUserItem];
+            externalItemsErrors.value = errors;
         };
-        const handleSelectRoleItems = (roleItems) => {
+        const handleSelectRoleItems = (roleItems: RoleMenuItem[]) => {
             if (!roleItems.length) return;
-            const roleItem: any = state.roleItems.find((d) => d?.name === roleItems[0]?.name);
+            const roleItem = { ...roleItems[0] };
             const pagePermissionMap = getPagePermissionMapFromRaw(roleItem.pagePermissions);
-            setForm('selectedRoleItems', [roleItem]);
+            setForm('selectedRoleItems', roleItems);
             state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
         };
 
@@ -458,6 +477,8 @@ export default {
             selectedExternalUserItems,
             selectedRoleItems,
             labels,
+            isLabelDuplicated,
+            externalItemsInvalidTexts,
             invalidState,
             invalidTexts,
             setForm,

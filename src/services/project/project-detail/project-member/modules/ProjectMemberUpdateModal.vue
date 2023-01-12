@@ -28,7 +28,7 @@
                         <p-filterable-dropdown
                             :menu="roleItems"
                             :selected="selectedRoleItems"
-                            type="radioButton"
+                            show-select-marker
                             use-fixed-menu-style
                             :invalid="invalid"
                             @update:selected="handleSelectRoleItems"
@@ -50,6 +50,7 @@
                         <p-text-input :selected="labels"
                                       :invalid="invalid"
                                       multi-input
+                                      appearance-type="stack"
                                       block
                                       @update:selected="handleUpdateLabel"
                         />

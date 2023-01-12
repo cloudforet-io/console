@@ -18,6 +18,8 @@
             :selected="selectedItems"
             multi-selectable
             use-fixed-menu-style
+            appearance-type="stack"
+            show-select-marker
             @update:selected="handleUpdateSelected"
         />
         <p-filterable-query-dropdown
@@ -37,7 +39,8 @@
             :loading="menuLoading"
             multi-selectable
             use-fixed-menu-style
-            :exact-mode="false"
+            appearance-type="stack"
+            show-select-marker
             @update:selected="handleUpdateSelected"
         />
     </div>

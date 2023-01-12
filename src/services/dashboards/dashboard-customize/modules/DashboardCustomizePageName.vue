@@ -40,7 +40,7 @@
                         :invalid="invalid"
                         :placeholder="state.name"
                         :value="nameInput"
-                        @input="handlePTextInput"
+                        @update:value="handlePTextInput"
                     />
                 </template>
             </p-field-group>

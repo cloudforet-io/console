@@ -81,7 +81,7 @@
                     <p-text-input
                         v-model="description"
                         :disabled="!hasManagePermission"
-                        @input="handleDescriptionUpdate"
+                        @update:value="handleDescriptionUpdate"
                     />
                 </p-field-group>
             </div>

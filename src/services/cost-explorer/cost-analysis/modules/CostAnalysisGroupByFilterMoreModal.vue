@@ -18,6 +18,8 @@
                     :selected.sync="selectedTags"
                     use-fixed-menu-style
                     multi-selectable
+                    appearance-type="stack"
+                    show-select-marker
                 />
             </p-field-group>
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ADDITIONAL_INFO')"

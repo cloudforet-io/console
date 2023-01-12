@@ -55,6 +55,7 @@
                                            :selected.sync="formState.timezone"
                                            :invalid="invalid"
                                            :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
+                                           :page-size="10"
                     />
                 </template>
             </p-field-group>

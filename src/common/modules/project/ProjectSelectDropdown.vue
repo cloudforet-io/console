@@ -1,18 +1,18 @@
 <template>
     <div class="project-select-dropdown">
         <p-filterable-dropdown :loading="loading"
-                               :visible-menu.sync="visibleMenu"
-                               :is-focused.sync="isFocused"
-                               :type="multiSelectable ? undefined : 'radioButton'"
+                               :visible-menu="visibleMenu"
+                               show-select-marker
                                :multi-selectable="multiSelectable"
-                               :exact-mode="false"
                                :use-fixed-menu-style="useFixedMenuStyle"
                                :invalid="invalid"
                                :disabled="disabled"
                                :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
                                :selected.sync="selectedItems"
-                               :readonly="true"
-                               :disable-delete-all="true"
+                               readonly
+                               disable-delete-all
+                               disable-handler
+                               appearance-type="stack"
                                @update:visible-menu="handleUpdateVisibleMenu"
                                @delete-tag="handleDeleteTag"
         >
@@ -83,7 +83,7 @@ import {
 import {
     PCheckBox, PI, PRadio, PFilterableDropdown, PSelectDropdown, PTag, PTree, PButton,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -150,13 +150,12 @@ export default {
         const state = reactive({
             loading: true,
             visibleMenu: false,
-            isFocused: false,
             root: null as ProjectTreeRoot|null,
             // selected states
             selectedProjectItems: [] as ProjectTreeItem[],
             selectedProjects: computed<ProjectItemResp[]>(() => state.selectedProjectItems.map((d) => d.node.data)),
             _selectedProjectIds: [...props.selectedProjectIds] as string[],
-            selectedItems: computed<MenuItem[]>({
+            selectedItems: computed<FilterableDropdownMenuItem[]>({
                 get() {
                     const items: ReferenceMap = {
                         ...storeState.projects,
@@ -260,7 +259,6 @@ export default {
 
             if (!props.multiSelectable) {
                 if (state.visibleMenu) state.visibleMenu = false;
-                if (state.isFocused) state.isFocused = false;
             }
 
             emit('select', state.selectedProjects);
@@ -278,6 +276,7 @@ export default {
         };
 
         const handleUpdateVisibleMenu = (value) => {
+            state.visibleMenu = value;
             if (!value) emit('close');
         };
 
@@ -342,16 +341,13 @@ export default {
 
 <style lang="postcss" scoped>
 .project-select-dropdown {
-    /* custom design-system component - p-filterable-dropdown */
-    :deep(.p-filterable-dropdown) {
-        .button-wrapper {
-            padding: 0.5rem;
-            &.top {
-                padding-bottom: 0.25rem;
-            }
-            .create-button {
-                width: 100%;
-            }
+    .button-wrapper {
+        padding: 0.5rem;
+        &.top {
+            padding-bottom: 0.25rem;
+        }
+        .create-button {
+            width: 100%;
         }
     }
 

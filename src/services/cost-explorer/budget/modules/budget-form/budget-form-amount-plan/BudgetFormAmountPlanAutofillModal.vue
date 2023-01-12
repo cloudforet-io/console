@@ -31,7 +31,7 @@
                     <p-text-input :value="growth"
                                   placeholder="10"
                                   type="number"
-                                  @input="setForm('growth', $event)"
+                                  @update:value="setForm('growth', $event)"
                     >
                         <template #right-extra>
                             %

@@ -12,7 +12,7 @@
                 <p-text-input class="name-input"
                               :value="name"
                               :invalid="invalid"
-                              @input="setForm('name', $event)"
+                              @update:value="setForm('name', $event)"
                 />
             </template>
         </p-field-group>

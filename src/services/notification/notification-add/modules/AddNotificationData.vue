@@ -12,7 +12,7 @@
                               class="block w-full"
                               :invalid="isNameInvalid"
                               :placeholder="$t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')"
-                              @input="onChangeChannelName"
+                              @update:value="onChangeChannelName"
                 />
             </template>
         </p-field-group>
