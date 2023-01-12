@@ -341,8 +341,8 @@ export default defineComponent<Props>({
                 }
             });
             Object.entries(_inheritOptions).forEach(([optionKey, optionValue]) => {
-                _formData[`filters.${optionKey}`] = optionValue?.variable_info?.key;
-                _inheritItemMap[`filters.${optionKey}`] = optionValue?.enabled;
+                _formData[optionKey] = optionValue?.variable_info?.key;
+                _inheritItemMap[optionKey] = optionValue?.enabled;
             });
             return { schemaFormData: _formData, inheritItemMap: _inheritItemMap };
         };
