@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash';
 
 import { i18n } from '@/translations';
 
-import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { InheritOptions, WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/config';
 
 
@@ -15,7 +15,6 @@ export interface InheritOptionsErrorMap {
 export const getWidgetInheritOptionsErrorMap = (
     inheritOptions?: InheritOptions,
     widgetOptionsSchema?: WidgetOptionsSchema['schema'],
-    dashboardVariables?: DashboardVariables,
     dashboardVariablesSchema?: DashboardVariablesSchema,
 ): InheritOptionsErrorMap => {
     if (!inheritOptions || isEmpty(inheritOptions)) {
@@ -26,7 +25,7 @@ export const getWidgetInheritOptionsErrorMap = (
         if (!inheritOption?.enabled) return;
 
         const variableKey = inheritOption?.variable_info?.key;
-        if (!variableKey || !dashboardVariablesSchema?.properties?.[variableKey] || !dashboardVariables?.[variableKey]) {
+        if (!variableKey || !dashboardVariablesSchema?.properties?.[variableKey]?.use) {
             errorMap[propertyName] = i18n.t('This property does not exist on the dashboard variables.');
             return;
         }

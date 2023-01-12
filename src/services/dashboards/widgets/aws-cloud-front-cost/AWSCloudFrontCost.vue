@@ -255,7 +255,7 @@ const refreshWidget = async (thisPage = 1) => {
     state.data = await fetchData();
     state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
-    chartHelper.refreshRoot();
+    if (chartHelper.root.value) chartHelper.refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;

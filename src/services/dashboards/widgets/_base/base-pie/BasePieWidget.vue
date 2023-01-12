@@ -191,7 +191,7 @@ const refreshWidget = async (thisPage = 1): Promise<FullData> => {
     state.data = await fetchData();
     state.legends = getPieChartLegends(state.data.results, state.groupBy);
     await nextTick();
-    chartHelper.refreshRoot();
+    if (chartHelper.root.value) chartHelper.refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;

@@ -229,7 +229,7 @@ const refreshWidget = async (): Promise<Data> => {
     state.loading = true;
     state.data = await fetchData();
     await nextTick();
-    chartHelper.refreshRoot();
+    if (chartHelper.root.value) chartHelper.refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;

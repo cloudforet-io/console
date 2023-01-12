@@ -134,7 +134,6 @@ export function useWidgetState<Data = any>(
         optionsErrorMap: computed(() => getWidgetInheritOptionsErrorMap(
             props.inheritOptions,
             state.widgetConfig?.options_schema?.schema,
-            props.dashboardVariables,
             props.dashboardVariablesSchema,
         )),
     }) as UnwrapRef<WidgetState<Data>>;

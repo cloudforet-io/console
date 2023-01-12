@@ -113,7 +113,7 @@ const props = defineProps<WidgetProps>();
 const chartContext = ref<HTMLElement|null>(null);
 const {
     createDonutChart, createPieSeries,
-    disposeRoot, refreshRoot, setChartColors,
+    disposeRoot, refreshRoot, setChartColors, root,
 } = useAmcharts5(chartContext);
 const state = reactive({
     ...toRefs(useWidgetState<Data[]>(props)),
@@ -255,7 +255,7 @@ const refreshWidget = async (): Promise<Data[]> => {
     state.loading = true;
     state.data = await fetchData();
     await nextTick();
-    refreshRoot();
+    if (root.value) refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
