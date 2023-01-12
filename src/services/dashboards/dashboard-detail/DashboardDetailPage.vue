@@ -42,8 +42,6 @@
             <dashboard-toolset
                 :currency.sync="dashboardDetailState.settings.currency"
                 :date-range.sync="dashboardDetailState.settings.date_range"
-                @update:dateRange="handleUpdateURLParam"
-                @update:currency="handleUpdateURLParam"
             />
         </div>
         <p-divider class="divider" />
@@ -184,9 +182,6 @@ const handleRefresh = async () => {
     dashboardDetailState.loadingWidgets = true;
     if (widgetContainerRef.value) await widgetContainerRef.value.refreshAllWidget();
     dashboardDetailState.loadingWidgets = false;
-};
-const handleUpdateURLParam = () => {
-    // TODO: write currency/dateRange data in url parameters
 };
 
 /* init */
