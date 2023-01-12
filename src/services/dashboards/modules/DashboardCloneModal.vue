@@ -13,10 +13,12 @@
                            :invalid-text="invalidTexts.name"
                            required
             >
-                <p-text-input :value="name"
-                              :invalid="invalidState.name"
-                              @input="setForm('name', $event)"
-                />
+                <template #default="{ invalid }">
+                    <p-text-input :value="name"
+                                  :invalid="invalid"
+                                  @input="setForm('name', $event)"
+                    />
+                </template>
             </p-field-group>
             <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_VIEWERS')"
                            :invalid="invalidState.viewers"
@@ -212,7 +214,7 @@ export default defineComponent<Props>({
         };
 
         const init = () => {
-            initForm('name', `Clone - ${props.dashboard.name}`);
+            setForm('name', `Clone - ${props.dashboard.name}`);
             initForm('viewers', '');
         };
 
@@ -220,6 +222,7 @@ export default defineComponent<Props>({
             if (visible !== state.proxyVisible) state.proxyVisible = visible;
             init();
         });
+
         return {
             name,
             viewers,
