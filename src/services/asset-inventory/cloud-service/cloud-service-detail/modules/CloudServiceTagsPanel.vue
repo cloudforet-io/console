@@ -117,7 +117,6 @@ export default {
                     const items:CloudServiceTagTableItem[] = [];
                     Object.entries<Tag>(state.cloudServiceTags).forEach(([provider, tags]) => {
                         Object.keys(tags).forEach((key) => {
-                            console.log(tags, key, tags[key]);
                             items.push({
                                 key,
                                 value: tags[key],
