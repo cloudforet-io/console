@@ -152,11 +152,11 @@ export default defineComponent<Props>({
             requiredProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.schema?.required ?? []),
             inheritableProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.inheritable_properties || []),
             dashboardVariablesSchema: computed(() => {
-                const enablesVariables = Object.entries(dashboardDetailState.variablesSchema.properties).filter(([, d]) => d.use === true);
+                const enabledVariables = Object.entries(dashboardDetailState.variablesSchema.properties).filter(([, d]) => d.use === true);
                 return {
                     type: 'string',
-                    enum: enablesVariables.map(([key]) => key),
-                    menuItems: enablesVariables.map(([key, val]) => ({
+                    enum: enabledVariables.map(([key]) => key),
+                    menuItems: enabledVariables.map(([key, val]) => ({
                         name: key, label: val.name,
                     })),
                     default: undefined,
