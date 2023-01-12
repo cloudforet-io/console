@@ -7,7 +7,7 @@
                        :class="{ 'print-mode': printMode }"
                        @select="handleSelectCurrency"
     >
-        <template v-if="defaultCurrency"
+        <template v-if="defaultCurrencyMode"
                   #default="{ item }"
         >
             <span>
@@ -15,10 +15,12 @@
                 <p-badge v-if="item.badge"
                          style-type="primary3"
                          shape="round"
-                >{{ item.badge }}</p-badge>
+                >
+                    {{ item.badge }}
+                </p-badge>
             </span>
         </template>
-        <template v-if="defaultCurrency"
+        <template v-if="defaultCurrencyMode"
                   #menu-item--format="{ item }"
         >
             <span>
@@ -58,6 +60,10 @@ export default {
     },
     props: {
         printMode: {
+            type: Boolean,
+            default: false,
+        },
+        defaultCurrencyMode: {
             type: Boolean,
             default: false,
         },
