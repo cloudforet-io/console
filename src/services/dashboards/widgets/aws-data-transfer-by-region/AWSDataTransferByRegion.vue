@@ -236,9 +236,9 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.legends = getPieChartLegends(state.data.results, state.groupBy);
-    await nextTick();
     chartHelper.clearChildrenOfRoot();
-    drawChart(state.chartData);
+    await nextTick();
+    if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
@@ -247,8 +247,8 @@ const refreshWidget = async (thisPage = 1): Promise<FullData> => {
     state.thisPage = thisPage;
     state.data = await fetchData();
     state.legends = getPieChartLegends(state.data.results, state.groupBy);
-    await nextTick();
     chartHelper.clearChildrenOfRoot();
+    await nextTick();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
@@ -274,6 +274,8 @@ const handleUpdateThisPage = (thisPage: number) => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    refreshWidget,
+    props,
 });
 
 defineExpose<WidgetExpose<FullData>>({

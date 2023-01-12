@@ -232,24 +232,22 @@ const drawChart = (chartData: XYChartData[]) => {
     state.chart = chart;
 };
 
-const initWidget = async (data?: Data) => {
+const initWidget = async (data?: Data): Promise<Data> => {
     state.loading = true;
-    await nextTick();
     state.data = data ?? await fetchData();
     state.legends = getXYChartLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
     await nextTick();
-    drawChart(state.chartData);
+    if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
 
-const refreshWidget = async () => {
+const refreshWidget = async (): Promise<Data> => {
     state.loading = true;
-    await nextTick();
     state.data = await fetchData();
     state.legends = getXYChartLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
+    chartHelper.refreshRoot();
     await nextTick();
-    if (chartHelper.root.value) chartHelper.refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
@@ -268,6 +266,8 @@ const handleRefresh = () => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    refreshWidget,
+    props,
 });
 
 defineExpose<WidgetExpose<Data>>({

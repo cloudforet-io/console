@@ -246,7 +246,7 @@ const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     await nextTick();
-    drawChart(state.chartData);
+    if (root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
@@ -254,8 +254,8 @@ const initWidget = async (data?: Data[]): Promise<Data[]> => {
 const refreshWidget = async (): Promise<Data[]> => {
     state.loading = true;
     state.data = await fetchData();
+    refreshRoot();
     await nextTick();
-    if (root.value) refreshRoot();
     drawChart(state.chartData);
     state.loading = false;
     return state.data;
@@ -267,6 +267,8 @@ const handleRefresh = () => {
 
 useWidgetLifecycle({
     disposeWidget: disposeRoot,
+    refreshWidget,
+    props,
 });
 
 defineExpose<WidgetExpose<Data[]>>({
