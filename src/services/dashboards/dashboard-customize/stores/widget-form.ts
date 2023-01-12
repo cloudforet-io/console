@@ -57,10 +57,8 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             } else if (key.startsWith('filters.')) {
                 widgetFiltersMap[_propertyName] = [];
                 if (Array.isArray(val)) {
-                    val.forEach((v) => {
-                        if (v) widgetFiltersMap[_propertyName].push({ k: _propertyName, v, o: '' });
-                    });
-                } else if (val) widgetFiltersMap[_propertyName].push({ k: _propertyName, v: val, o: '' });
+                    widgetFiltersMap[_propertyName].push({ k: _propertyName, v: val, o: '' });
+                } else if (val) widgetFiltersMap[_propertyName].push({ k: _propertyName, v: val, o: '=' });
             } else {
                 widgetOptions[key] = val;
             }
