@@ -114,8 +114,18 @@ const handleDelete = (index: number) => {
     @apply text-gray-500 text-xs pt-1;
 }
 
-.p-label {
+/* custom design-system component - p-label */
+:deep(.p-label) {
     margin-bottom: 0.375rem;
+    max-width: 100%;
+    .label-content {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+    }
 }
 .p-field-group {
     height: 2.75rem;
