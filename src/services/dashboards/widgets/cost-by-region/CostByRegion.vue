@@ -272,6 +272,7 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     return state.data;
 };
 const refreshWidget = async (thisPage = 1): Promise<FullData> => {
+    await nextTick();
     state.loading = true;
     state.thisPage = thisPage;
     state.data = await fetchData();

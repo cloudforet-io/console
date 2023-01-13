@@ -200,6 +200,7 @@ const initWidget = async (data?: TreemapChartData['children']): Promise<TreemapC
 };
 
 const refreshWidget = async (): Promise<TreemapChartData['children']> => {
+    await nextTick();
     state.loading = true;
     state.data = await fetchData();
     chartHelper.refreshRoot();
