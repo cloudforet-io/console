@@ -70,7 +70,7 @@ import {
     PButtonModal, PFieldGroup, PFilterableDropdown, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { SelectedItem as InputItem } from '@spaceone/design-system/types/inputs/input/type';
+import type { SelectedItem as InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 

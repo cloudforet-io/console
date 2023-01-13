@@ -130,7 +130,7 @@ import {
     PButtonModal, PFieldGroup, PBoxTab, PFilterableDropdown, PTooltip, PI, PTextInput,
 } from '@spaceone/design-system';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
-import type { InputItem } from '@spaceone/design-system/types/inputs/input/type';
+import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
 import { debounce, union } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
