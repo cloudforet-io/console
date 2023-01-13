@@ -26,14 +26,14 @@ export const getWidgetInheritOptionsErrorMap = (
 
         const variableKey = inheritOption?.variable_info?.key;
         if (!variableKey || !dashboardVariablesSchema?.properties?.[variableKey]?.use) {
-            errorMap[propertyName] = i18n.t('This property does not exist on the dashboard variables.');
+            errorMap[propertyName] = i18n.t('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST');
             return;
         }
 
         const variableType = dashboardVariablesSchema.properties[variableKey].selection_type === 'MULTI' ? 'array' : 'string';
         const widgetPropertyType = widgetOptionsSchema.properties[propertyName].type;
         if (variableType !== widgetPropertyType) {
-            errorMap[propertyName] = i18n.t('This property has a different type from the dashboard variable.');
+            errorMap[propertyName] = i18n.t('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_DIFFERENT_TYPE');
         }
     });
     return errorMap;
