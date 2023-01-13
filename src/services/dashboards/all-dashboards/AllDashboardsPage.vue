@@ -26,18 +26,20 @@
                    @change="handleQueryChange"
                    @refresh="handleQueryChange()"
         />
-        <div v-if="projectDashboardList.length || workspaceDashboardList.length"
+        <div v-if="(projectDashboardList.length && scopeStatus !== SCOPE_TYPE.DOMAIN) || (workspaceDashboardList.length && scopeStatus !== SCOPE_TYPE.PROJECT)"
              class="dashboard-list-wrapper"
         >
-            <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.PROJECT && workspaceDashboardList.length > 0"
+            <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.PROJECT && workspaceDashboardList.length"
                                   :scope-type="DASHBOARD_SCOPE.DOMAIN"
                                   class="dashboard-list"
+                                  :class="{'full-mode': scopeStatus === SCOPE_TYPE.DOMAIN}"
                                   :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE')"
                                   :dashboard-list="workspaceDashboardList"
             />
-            <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.DOMAIN && projectDashboardList.length > 0"
+            <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.DOMAIN && projectDashboardList.length"
                                   :scope-type="DASHBOARD_SCOPE.PROJECT"
                                   class="dashboard-list"
+                                  :class="{'full-mode': scopeStatus === SCOPE_TYPE.PROJECT}"
                                   :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT')"
                                   :dashboard-list="projectDashboardList"
             />
@@ -179,12 +181,18 @@ export default {
 
 <style lang="postcss" scoped>
 .all-dashboards-page {
+    @apply w-full;
+
     .dashboard-list-wrapper {
-        @apply flex;
+        @apply flex w-full;
         gap: 0.5rem;
 
         .dashboard-list {
-            flex-grow: 1;
+            @apply flex-grow;
+
+            &.full-mode {
+                @apply w-full;
+            }
         }
     }
 

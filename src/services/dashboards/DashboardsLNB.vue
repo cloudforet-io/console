@@ -81,6 +81,7 @@ export default defineComponent({
                     id: MENU_ID.DASHBOARDS,
                     foldable: false,
                     to: { name: DASHBOARDS_ROUTE.ALL._NAME },
+                    hideFavorite: true,
                 },
                 { type: 'divider' },
                 { type: 'favorite-only' },
