@@ -97,6 +97,7 @@ export default defineComponent<Props>({
                 const recentItemList = [] as RecentItem[];
                 state.recents.forEach((recent) => {
                     props.dashboardList.forEach((dashboard) => {
+                        if (recentItemList.length === 10) return;
                         if (recent.itemId === dashboard.dashboardId) {
                             recentItemList.push({
                                 itemId: dashboard.dashboardId,
