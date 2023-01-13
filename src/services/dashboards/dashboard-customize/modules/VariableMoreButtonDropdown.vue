@@ -171,5 +171,12 @@ const {
             @apply w-full;
         }
     }
+
+    /* custom design-system component - p-context-menu */
+    :deep(.variables-menu) {
+        .label-wrapper {
+            max-width: 22.5rem;
+        }
+    }
 }
 </style>

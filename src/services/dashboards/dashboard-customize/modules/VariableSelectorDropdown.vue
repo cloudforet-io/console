@@ -8,11 +8,13 @@
                 :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
                 @click="toggleContextMenu"
         >
-            <span class="variable-label">{{ variableName }}</span>
-            <span v-if="state.selected.length"
-                  class="selected-items"
-            >
-                <span class="item-for-display">{{ state.selected[0].label }}</span>
+            <span class="variable-contents">
+                <span class="variable-label">{{ variableName }}</span>
+                <span v-if="state.selected.length"
+                      class="item-for-display"
+                >{{ state.selected[0].label }}</span>
+            </span>
+            <template v-if="state.selected.length">
                 <p-badge v-if="state.selected.length > 1"
                          class="selected-count"
                          style-type="blue300"
@@ -28,7 +30,7 @@
                          color="inherit"
                     />
                 </button>
-            </span>
+            </template>
 
             <p-i :name="visibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                  :activated="visibleMenu"
@@ -185,48 +187,73 @@ const {
 <style lang="postcss" scoped>
 .dashboard-variable-dropdown {
     @apply inline-block;
-    max-width: 20rem;
+    max-width: 22.5rem;
+
     &.open-menu {
         @apply relative;
     }
 
     .dropdown-box {
-        @apply flex items-center border border-solid border-gray-300 bg-white rounded-md;
+        @apply flex items-center border border-solid border-gray-300 bg-white rounded-md w-full;
         height: 2rem;
         padding: 0 0.25rem 0 0.75rem;
 
-        .variable-label {
-            @apply text-gray-900 text-label-md;
-        }
+        .variable-contents {
+            @apply inline-flex text-gray-900 text-label-md flex-shrink w-full;
+            max-width: 16.375rem;
 
-        .selected-items {
-            @apply inline-flex items-center;
-            padding-left: 0.5rem;
+            .variable-label {
+                @apply flex-shrink-0;
+                max-width: 11rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
 
             .item-for-display {
-                @apply text-gray-900 text-label-md font-bold;
+                @apply font-bold flex-shrink;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                padding-left: 0.5rem;
             }
-            .selected-count {
-                margin-left: 0.25rem;
-            }
-            .option-delete-button {
-                @apply flex items-center justify-center text-gray-400 rounded-full;
-                margin-left: 0.5rem;
+        }
 
-                &:hover {
-                    @apply bg-gray-200 text-gray-900;
-                }
+        .selected-count {
+            @apply flex-shrink-0;
+            margin-left: 0.25rem;
+        }
+
+        .option-delete-button {
+            @apply flex items-center flex-shrink-0 justify-center text-gray-400 rounded-full;
+            margin-left: 0.5rem;
+
+            &:hover {
+                @apply bg-gray-200 text-gray-900;
             }
+        }
+
+        .dropdown-icon {
+            @apply flex-shrink-0;
         }
 
         &:hover {
             @apply border-blue-600 bg-blue-100;
         }
+
         &.filled-value {
             @apply border-blue-400 bg-blue-200;
+
             &.is-visible {
                 @apply border-blue-600;
             }
+        }
+    }
+
+    /* custom design-system component - p-context-menu */
+    :deep(.options-menu) {
+        .label-wrapper {
+            max-width: 22.5rem;
         }
     }
 }
