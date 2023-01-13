@@ -55,7 +55,7 @@
                     />
                 </template>
             </div>
-            <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
+            <dashboard-refresh-dropdown :interval-option.sync="dashboardDetailState.settings.refresh_interval_option"
                                         :loading="dashboardDetailState.loadingWidgets"
                                         @refresh="handleRefresh"
             />
@@ -92,8 +92,8 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 import {
-    objectToQueryString,
-    queryStringToObject,
+    objectToQueryString, primitiveToQueryString,
+    queryStringToObject, queryStringToString,
     replaceUrlQuery,
 } from '@/lib/router-query-string';
 
@@ -103,6 +103,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 
 import { gray } from '@/styles/colors';
 
+import type { RefreshIntervalOption } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
@@ -131,7 +132,6 @@ const state = reactive({
     nameEditModalVisible: false,
     deleteModalVisible: false,
     cloneModalVisible: false,
-    refreshInterval: '15s',
 });
 
 const variablesState = reactive({
@@ -155,6 +155,9 @@ const queryState = reactive({
             result.currency = objectToQueryString({
                 value: queryState.settings.currency.value,
             });
+        }
+        if (queryState.settings.refresh_interval_option) {
+            result.refresh_interval_option = primitiveToQueryString(queryState.settings.refresh_interval_option);
         }
         return result;
     }),
@@ -204,6 +207,7 @@ const init = async () => {
         variables: queryStringToObject(currentQuery.variables),
         dateRange: queryStringToObject(currentQuery.dateRange),
         currency: queryStringToObject(currentQuery.currency),
+        refresh_interval_option: queryStringToString(currentQuery.refresh_interval_option) as RefreshIntervalOption,
     };
 
     if (useQueryValue.variables) dashboardDetailState.variables = useQueryValue.variables;
@@ -223,6 +227,12 @@ const init = async () => {
                 enabled: true,
                 ...useQueryValue.currency,
             },
+        };
+    }
+    if (useQueryValue.refresh_interval_option) {
+        dashboardDetailState.settings = {
+            ...dashboardDetailState.settings,
+            refresh_interval_option: useQueryValue.refresh_interval_option,
         };
     }
 

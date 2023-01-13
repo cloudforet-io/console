@@ -35,7 +35,7 @@
                     <span>{{ $t('DASHBOARDS.CUSTOMIZE.RESET') }}</span>
                 </button>
             </div>
-            <dashboard-refresh-dropdown :interval-option.sync="state.refreshInterval"
+            <dashboard-refresh-dropdown :interval-option.sync="dashboardDetailState.settings.refresh_interval_option"
                                         refresh-disabled
             />
         </div>
@@ -100,7 +100,6 @@ const dashboardDetailOriginState = dashboardDetailStore.originState;
 
 const state = reactive({
     name: dashboardDetailState.name,
-    refreshInterval: undefined,
     apiParam: computed<Partial<DashboardConfig>>(() => ({
         name: dashboardDetailState.name,
         labels: dashboardDetailState.labels,

@@ -52,7 +52,8 @@ export interface DashboardSettings {
     currency: {
         enabled: boolean;
         value?: Currency;
-    }
+    };
+    refresh_interval_option: RefreshIntervalOption;
 }
 
 export interface DashboardConfig {
