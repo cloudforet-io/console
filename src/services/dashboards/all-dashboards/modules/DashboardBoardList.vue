@@ -33,12 +33,13 @@
                     <span v-else>{{ board.groupLabel }}</span>
                 </div>
                 <div class="label-wrapper">
-                    <p-label :class="{'viewers-label': true, 'private-label': board.viewers === DASHBOARD_VIEWER.PRIVATE}"
+                    <p-label :class="{'item-label': true, 'viewers-label': true, 'private-label': board.viewers === DASHBOARD_VIEWER.PRIVATE}"
                              :text="board.viewers === DASHBOARD_VIEWER.PUBLIC ? 'Public' : 'Private'"
                              :left-icon="board.viewers === DASHBOARD_VIEWER.PUBLIC ? 'ic_public' : 'ic_private'"
                     />
                     <p-label v-for="(label, idx) in board.labels"
                              :key="`${board.name}-label-${idx}`"
+                             class="item-label"
                              :text="label"
                              clickable
                              @item-click="handleSetQuery(label)"
@@ -294,7 +295,7 @@ export default defineComponent<DashboardBoardListProps>({
     .board {
         .board-item-title-wrapper {
             @apply flex items-center;
-            height: 1.25rem;
+            min-height: 1.25rem;
             .favorite-button-wrapper {
                 @apply flex items-center justify-center;
                 width: 1.25rem;
@@ -308,7 +309,7 @@ export default defineComponent<DashboardBoardListProps>({
             }
         }
         .board-item-description {
-            @apply flex items-center;
+            @apply flex items-center flex-wrap;
             gap: 0.5rem;
             font-size: 0.75rem;
             line-height: 1.25;
@@ -317,12 +318,15 @@ export default defineComponent<DashboardBoardListProps>({
         }
 
         .label-wrapper {
-            @apply flex items-center;
+            @apply flex items-center flex-wrap;
+            row-gap: 0.375rem;
         }
 
         /* custom design-system component - p-label */
-        :deep(.viewers-label) {
-            @apply border-0 bg-violet-200;
+        :deep(.item-label) {
+            &.viewers-label {
+                @apply border-0 bg-violet-200;
+            }
             &.private-label {
                 @apply bg-gray-200;
             }
