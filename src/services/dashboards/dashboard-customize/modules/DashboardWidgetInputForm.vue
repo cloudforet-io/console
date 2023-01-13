@@ -351,7 +351,8 @@ export default defineComponent<Props>({
         };
         const handleClickAddOptions = () => {
             initiateMenu();
-            showContextMenu();
+            if (visibleContextMenu.value) hideContextMenu();
+            else showContextMenu();
         };
         const handleFormValidate = (isValid) => {
             state.isSchemaFormValid = isValid;
