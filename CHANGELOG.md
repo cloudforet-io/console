@@ -1,3 +1,10 @@
+# [2.0.0-beta.7](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2023-01-13)
+
+
+### Bug Fixes
+
+* **p-content-menu-item:** add icon prop for left area ([#232](https://github.com/cloudforet-io/mirinae/issues/232)) ([daf9bed](https://github.com/cloudforet-io/mirinae/commit/daf9bed804d16bc379e2a080cc10af3865a59679))
+
 # [2.0.0-beta.6](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.5...v2.0.0-beta.6) (2023-01-13)
 
 
