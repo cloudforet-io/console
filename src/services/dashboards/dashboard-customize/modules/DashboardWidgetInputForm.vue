@@ -272,6 +272,44 @@ export default defineComponent<Props>({
             });
             return refinedJsonSchema;
         };
+        const convertWidgetInfoToJsonSchemaForm = (widgetInfo:DashboardLayoutWidgetInfo) => {
+            const { widget_options, inherit_options } = widgetInfo;
+            const _widgetOptions = cloneDeep(widget_options);
+            const _inheritOptions = cloneDeep(inherit_options);
+            const _formData = {};
+            const _inheritItemMap = {};
+            Object.entries(_widgetOptions).forEach(([optionKey, optionValue]) => {
+                if (optionKey === 'filters') {
+                    Object.entries((optionValue ?? {}) as WidgetFiltersMap).forEach(([key, value]) => {
+                        if (Array.isArray(value)) {
+                            _formData[`filters.${key}`] = value.map((filter) => filter.v);
+                        } else {
+                            _formData[`filters.${key}`] = value.v;
+                        }
+                    });
+                } else {
+                    _formData[optionKey] = optionValue;
+                }
+            });
+            Object.entries(_inheritOptions).forEach(([optionKey, optionValue]) => {
+                _formData[optionKey] = optionValue?.variable_info?.key;
+                _inheritItemMap[optionKey] = optionValue?.enabled;
+            });
+            return { schemaFormData: _formData, inheritItemMap: _inheritItemMap };
+        };
+        const setInitialValueForEditMode = (widgetKey: string) => {
+            state.widgetOptionsJsonSchema = initJsonSchema(state.widgetConfig.options_schema);
+            widgetFormStore.initWidgetForm(widgetKey);
+            const widgetInfo:DashboardLayoutWidgetInfo|undefined = widgetFormState.widgetInfo;
+            if (!widgetInfo) return;
+            handleInputName(widgetInfo.title);
+            const { schemaFormData, inheritItemMap } = convertWidgetInfoToJsonSchemaForm(widgetInfo);
+            state.inheritItemMap = inheritItemMap;
+            Object.entries(inheritItemMap).forEach(([key, value]) => {
+                handleChangeInheritToggle(key, { value });
+            });
+            state.schemaFormData = schemaFormData;
+        };
 
         /* Event */
         const hideOptionsMenu = () => {
@@ -329,44 +367,6 @@ export default defineComponent<Props>({
             storeState.loading = false;
         })();
 
-        const convertWidgetInfoToJsonSchemaForm = (widgetInfo:DashboardLayoutWidgetInfo) => {
-            const { widget_options, inherit_options } = widgetInfo;
-            const _widgetOptions = cloneDeep(widget_options);
-            const _inheritOptions = cloneDeep(inherit_options);
-            const _formData = {};
-            const _inheritItemMap = {};
-            Object.entries(_widgetOptions).forEach(([optionKey, optionValue]) => {
-                if (optionKey === 'filters') {
-                    Object.entries((optionValue ?? {}) as WidgetFiltersMap).forEach(([key, value]) => {
-                        if (Array.isArray(value)) {
-                            _formData[`filters.${key}`] = value.map((filter) => filter.v);
-                        } else {
-                            _formData[`filters.${key}`] = value.v;
-                        }
-                    });
-                } else {
-                    _formData[optionKey] = optionValue;
-                }
-            });
-            Object.entries(_inheritOptions).forEach(([optionKey, optionValue]) => {
-                _formData[optionKey] = optionValue?.variable_info?.key;
-                _inheritItemMap[optionKey] = optionValue?.enabled;
-            });
-            return { schemaFormData: _formData, inheritItemMap: _inheritItemMap };
-        };
-        const setInitialValueForEditMode = (widgetKey: string) => {
-            state.widgetOptionsJsonSchema = initJsonSchema(state.widgetConfig.options_schema);
-            widgetFormStore.initWidgetForm(widgetKey);
-            const widgetInfo:DashboardLayoutWidgetInfo|undefined = widgetFormState.widgetInfo;
-            if (!widgetInfo) return;
-            handleInputName(widgetInfo.title);
-            const { schemaFormData, inheritItemMap } = convertWidgetInfoToJsonSchemaForm(widgetInfo);
-            state.inheritItemMap = inheritItemMap;
-            Object.entries(inheritItemMap).forEach(([key, value]) => {
-                handleChangeInheritToggle(key, { value });
-            });
-            state.schemaFormData = schemaFormData;
-        };
         /* Watcher */
         watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, widgetKey]) => {
             widgetFormStore.$reset();
