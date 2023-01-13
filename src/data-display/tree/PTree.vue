@@ -121,7 +121,7 @@ import type {
 } from '@/data-display/tree/type';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import PI from '@/foundation/icons/PI.vue';
-import PTextInput from '@/inputs/input/PTextInput.vue';
+import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 
 import OriginTree from './he-tree-vue/components/Tree.vue';
 import DraggablePlugin from './he-tree-vue/plugins/draggable/Draggable.vue';

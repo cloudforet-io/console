@@ -63,9 +63,10 @@ export interface HandlerResponse {
     totalCount?: number;
     dataType?: KeyDataType;
     operators?: OperatorType[];
+    more?: boolean;
 }
 export interface ValueHandler {
-    (inputText: string,
+    (inputText: string|number,
      rootKey: KeyItem,
      dataType?: KeyDataType,
      subPath?: string,

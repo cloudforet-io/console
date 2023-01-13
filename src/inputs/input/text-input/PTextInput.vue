@@ -132,13 +132,13 @@ import { useProxyValue } from '@/hooks/proxy-state';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
-import { useInputDeletion } from '@/inputs/input/composables/use-input-deletion';
-import { useSelectedValidation } from '@/inputs/input/composables/use-selected-validation';
-import { INPUT_APPEARANCE_TYPES, INPUT_SIZE, INPUT_MODES } from '@/inputs/input/type';
+import { useInputDeletion } from '@/inputs/input/text-input/composables/use-input-deletion';
+import { useSelectedValidation } from '@/inputs/input/text-input/composables/use-selected-validation';
+import { INPUT_APPEARANCE_TYPES, INPUT_SIZE, INPUT_MODES } from '@/inputs/input/text-input/type';
 import type {
     InputItem, TextInputHandler, InputSize, InputAppearanceType,
     InputMode,
-} from '@/inputs/input/type';
+} from '@/inputs/input/text-input/type';
 
 
 interface TextInputProps {
@@ -503,6 +503,7 @@ export default defineComponent<TextInputProps>({
             /* context menu event listeners */
             handleFocusMenuItem,
             handleUpdateSelected,
+            handleSelect,
             /* input password & masking */
             proxyShowPassword,
             handleTogglePassword,

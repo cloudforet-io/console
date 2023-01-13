@@ -7,7 +7,10 @@
         >
             {{ $t('COMPONENT.JSON_SCHEMA_FORM.GENERATE') }}
         </p-button>
-        <p-text-input :value="value" :invalid="invalid" @update:value="handleUpdateValue">
+        <p-text-input :value="value"
+                      :invalid="invalid"
+                      @update:value="handleUpdateValue"
+        >
             <template #right-edge>
                 <p-copy-button :value="value" />
             </template>
@@ -25,7 +28,7 @@ import { v4 as uuidV4 } from 'uuid';
 
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
-import PTextInput from '@/inputs/input/PTextInput.vue';
+import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 
 interface Props {
     value?: string;

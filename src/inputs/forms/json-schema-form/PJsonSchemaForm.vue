@@ -150,7 +150,7 @@ import type {
     ValidationMode,
 } from '@/inputs/forms/json-schema-form/type';
 import { VALIDATION_MODES } from '@/inputs/forms/json-schema-form/type';
-import PTextInput from '@/inputs/input/PTextInput.vue';
+import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 import type { SupportLanguage } from '@/translations';
 import { supportLanguages } from '@/translations';

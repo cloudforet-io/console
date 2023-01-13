@@ -1,7 +1,7 @@
 import type { JSONSchemaType } from 'ajv';
 
 import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
-import type { InputAppearanceType } from '@/inputs/input/type';
+import type { InputAppearanceType } from '@/inputs/input/text-input/type';
 import type { SupportLanguage } from '@/translations';
 
 const TEXT_INPUT_TYPES = ['password', 'text', 'number'] as const;

@@ -5,7 +5,7 @@ export { default as PTextButton } from './inputs/buttons/text-button/PTextButton
 export { default as PEmpty } from './data-display/empty/PEmpty.vue';
 export { default as PDivider } from './layouts/divider/PDivider.vue';
 export { default as PI } from './foundation/icons/PI.vue';
-export { default as PTextInput } from './inputs/input/PTextInput.vue';
+export { default as PTextInput } from './inputs/input/text-input/PTextInput.vue';
 export { default as PFieldTitle } from './data-display/field-title/PFieldTitle.vue';
 export { default as PSkeleton } from './feedbacks/loading/skeleton/PSkeleton.vue';
 export { default as PSpinner } from './feedbacks/loading/spinner/PSpinner.vue';

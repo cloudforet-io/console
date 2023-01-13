@@ -1,7 +1,7 @@
 import type { Ref } from 'vue';
 import { ref } from 'vue';
 
-import type { InputItem } from '@/inputs/input/type';
+import type { InputItem } from '@/inputs/input/text-input/type';
 
 interface UseInputDeletionOption {
     selected: Ref<InputItem[]>;
