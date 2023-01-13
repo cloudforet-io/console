@@ -40,9 +40,9 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
@@ -64,6 +64,12 @@ export default defineComponent({
         DashboardDateCustomRangeModal,
         PBadge,
         PSelectDropdown,
+    },
+    props: {
+        dateRange: {
+            type: Object as PropType<DateRange>,
+            default: undefined,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const { i18nDayjs } = useI18nDayjs();
@@ -128,6 +134,51 @@ export default defineComponent({
             state.customRangeModalVisible = false;
         };
 
+        const setInitialDateRange = () => {
+            const _start = props.dateRange?.start ?? '';
+            const _end = props.dateRange?.end ?? '';
+            const start = {
+                y: _start.split('-')[0],
+                m: _start.split('-')[1],
+                d: _start.split('-')[2],
+            };
+            const end = {
+                y: _end.split('-')[0],
+                m: _end.split('-')[1],
+                d: _end.split('-')[2],
+            };
+            const current = {
+                y: dayjs.utc().format('YYYY'),
+                m: dayjs.utc().format('MM'),
+                d: dayjs.utc().format('DD'),
+            };
+
+            // 1. default month => start is (month 'current' + day '1'), end is (month 'current + day 'today')
+            // Index 0 is 'Current' menu index
+            if (!start.d || !end.d
+            || (_start === `${current.y}-${current.m}-01`
+            && _end === `${current.y}-${current.m}-${current.d}`)
+            ) {
+                return 0;
+            }
+
+            // 2. some month => start is (month 'n' + day '1'), end is (month 'n' + day '{last day}')
+            if (start.y === end.y
+            && start.m === end.m
+            && start.d === '01'
+            && (Number(end.d) === dayjs(`${end.y}-${end.m}`).daysInMonth())
+            ) {
+                return state.monthMenuItems.findIndex((d) => d.name === `${start.y}-${start.m}`);
+            }
+
+            // 3. custom => else cases.
+            // Index 14 is 'Custom' menu index.
+            return 14;
+        };
+
+        watch(() => props.dateRange, () => {
+            state.selectedMonthMenuIndex = setInitialDateRange();
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
