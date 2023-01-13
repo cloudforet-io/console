@@ -1133,7 +1133,7 @@
 			"HELP_TEXT_CREATE": "Create a dashboard to get insights at a glance.",
 			"LABEL_SCOPE": "Scope",
 			"LABEL_VIWERS": "Viewers",
-			"PROJECT": "",
+			"PROJECT": "Project",
 			"SINGLE_PROJECT": "Single Project",
 			"TOOLTIP_CLONE": "Clone",
 			"TOOLTIP_DELETE": "Delete",
@@ -1360,7 +1360,9 @@
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "Displays the top project list that used resources of compute, database, storage the most.   "
 			},
-			"UPDATE_TITLE": "Update Widget"
+			"UPDATE_TITLE": "Update Widget",
+			"VALIDATION_PROPERTY_DIFFERENT_TYPE": "This property has a different type from the dashboard variable.",
+			"VALIDATION_PROPERTY_NOT_EXIST": "This property does not exist on the dashboard variables."
 		}
 	},
 	"IAM": {
