@@ -1,5 +1,5 @@
 import type { Ref } from 'vue';
-import { computed, ref } from 'vue';
+import { computed, isRef, ref } from 'vue';
 
 import type { MenuItem } from '@/inputs/context-menu/type';
 
@@ -16,12 +16,12 @@ interface UseContextMenuAttachOptions {
     attachHandler?: Ref<MenuAttachHandler|undefined>; // custom handler
     menu?: Ref<MenuItem[]>;
     searchText?: Ref<string>;
-    pageSize?: Ref<number|undefined>;
+    pageSize?: Ref<number|undefined>|number;
     filterItems?: Ref<MenuItem[]>;
 }
 
 export const useContextMenuAttach = ({
-    attachHandler, menu, searchText, pageSize, filterItems,
+    attachHandler, menu, searchText, pageSize: _pageSize, filterItems,
 }: UseContextMenuAttachOptions) => {
     const accumulatedItemsByAttachHandler = ref<MenuItem[]>([]);
     const hasNextItemsByAttachHandler = ref<boolean>(false);
@@ -37,6 +37,7 @@ export const useContextMenuAttach = ({
 
     // pagination
     const pageNumber = ref<number>(0);
+    const pageSize = isRef(_pageSize) ? _pageSize : ref(_pageSize);
     const pageStart = computed(() => (pageNumber.value) * (pageSize?.value ?? 0) + 1);
     const pageLimit = computed(() => (pageNumber.value + 1) * (pageSize?.value ?? 0));
 

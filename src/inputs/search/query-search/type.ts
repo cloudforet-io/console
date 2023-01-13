@@ -46,6 +46,7 @@ export interface QueryItem {
     key?: KeyItem;
     operator?: OperatorType;
     value: ValueItem;
+    error?: boolean;
 }
 
 export type MenuType ='ROOT_KEY'|'KEY'|'VALUE'|'OPERATOR';

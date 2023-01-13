@@ -16,7 +16,7 @@
                                :key-item="selectedItem.key"
                                :value-item="selectedItem.value"
                                :selected="deleteTargetIdx === index"
-                               :invalid="isSelectedItemInvalid(selectedItem, index)"
+                               :invalid="selectedItem.error || isSelectedItemInvalid(selectedItem, index)"
                                @delete="handleTagDelete(selectedItem, index)"
                         />
                     </template>
@@ -98,6 +98,7 @@ import {
 
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
+import { isEqual } from 'lodash';
 
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
@@ -188,7 +189,7 @@ const {
 } = toRefs(querySearchState);
 
 /* selection */
-const proxySelected = useProxyValue<QueryItem[]>('selected', props, emit);
+const proxySelected = ref<QueryItem[]>(props.selected);
 const addToSelected = (queryItem: QueryItem) => {
     if (props.multiInput) {
         proxySelected.value = [...proxySelected.value, queryItem];
@@ -236,7 +237,12 @@ const { isSelectedInvalid, isSelectedItemInvalid } = useSelectedValidation<Query
     itemKey: (item) => `${item.key?.name ?? ''}:${item.value?.name ?? ''}`,
 });
 watch(() => proxySelected.value, (selected) => {
+    emit('update:selected', selected);
     emit('update', selected, !isSelectedInvalid.value);
+});
+watch(() => props.selected, (selected) => {
+    if (isEqual(selected, proxySelected.value)) return;
+    proxySelected.value = selected;
 });
 
 /* UI Display */
