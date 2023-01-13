@@ -212,7 +212,6 @@ const {
 
             .item-for-display {
                 @apply font-bold flex-shrink;
-                flex-shrink: 1;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
