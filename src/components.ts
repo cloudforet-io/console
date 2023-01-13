@@ -105,3 +105,4 @@ export { default as PDynamicWidget } from './data-display/dynamic/dynamic-widget
 export { default as PPopover } from './data-display/popover/PPopover.vue';
 export { default as PTextHighlighting } from './data-display/text-highlighting/PTextHighlighting.vue';
 export { default as PTextBeautifier } from './data-display/text-beautifier/PTextBeautifier.vue';
+export { default as PQueryInput } from './inputs/input/query-input/PQueryInput.vue';

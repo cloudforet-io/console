@@ -1,0 +1,344 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import PQueryInput
+    from "@/inputs/input/query-input/PQueryInput.vue";
+import { reactive, toRefs } from "vue";
+import {getKeyItemSets, getValueHandlerMap, getValueItems} from '@/inputs/input/query-input/mock';
+import {
+    getQueryInputArgTypes
+} from "@/inputs/input/query-input/story-helper";
+import {INPUT_SIZE} from "@/inputs/input/text-input/type";
+import {useProxyValue} from "@/hooks/proxy-state";
+
+<Meta title='Inputs/Input/Query Input' parameters={{
+    design: {
+        type: 'figma',
+        url: 'figma url',
+    }
+}} argTypes={getQueryInputArgTypes()}/>
+
+
+export const Template = (args, {argTypes}) => ({
+    props: Object.keys(argTypes),
+    components: { PQueryInput },
+    template: `
+        <div class="h-full w-full overflow p-8">
+            <p-query-input :value="value"
+                           :size="size"
+                           :disabled="disabled"
+                           :block="block"
+                           :invalid="invalid"
+                           :placeholder="placeholder"
+                           :multi-input="multiInput"
+                           :selected.sync="proxySelected"
+                           :keyItemSets="keyItemSets"
+                           :valueHandlerMap="valueHandlerMap"
+                           :visible-menu="proxyVisibleMenu"
+                           :use-fixed-menu-style="useFixedMenuStyle"
+                           :appearance-type="appearanceType"
+            ></p-query-input>
+        </div>
+    `,
+    setup(props, {emit}) {
+        return {
+            proxyVisibleMenu: useProxyValue('visibleMenu', props, emit),
+            proxySelected: useProxyValue('selected', props, emit),
+        }
+    }
+});
+
+# Query Input
+<br/>
+
+Query Input supports <b>```key:value``` format input.</b> <br/>
+
+
+## Basic
+<Canvas>
+    <Story name="Basic" height="300px">
+        {{
+            components: { PQueryInput },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p-query-input
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+    ></p-query-input>
+</div>
+    `,
+            setup() {
+                const keyItemSets = getKeyItemSets(5, 1)
+                const valueHandlerMap = getValueHandlerMap(keyItemSets)
+                return {
+                    keyItemSets,
+                    valueHandlerMap
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+<br/>
+<br/>
+
+
+## Multi Input
+<Canvas>
+    <Story name="Multi Input">
+        {{
+            components: { PQueryInput },
+            template: `
+<div class="w-full overflow p-8" style="height: 500px">
+    <p-query-input
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+        multi-input
+        use-fixed-menu-style
+    ></p-query-input>
+    <br/>
+</div>
+    `,
+            setup() {
+                const keyItemSets = [{
+                    title: 'Keys',
+                    items: [
+                        {label: 'Root Key', name: 'root', dataType: 'object'},
+                    ]
+                }]
+                const valueItemsMap = {
+                    nested: [
+                        {label: 'Nested', name: 'nested'},
+                        {label: 'Last', name: 'last'},
+                    ],
+                    last: getValueItems(30)
+                }
+                const valueHandler = (inputText, rootKey, dataType, subPath) => {
+                    const nextDataType = subPath && subPath.endsWith('last') ? 'string' : 'object'
+                    let results;
+                    if (nextDataType === 'object') {
+                        results = valueItemsMap.nested;
+                    } else {
+                        results = valueItemsMap.last;
+                    };
+                    if (inputText) {
+                        const regex = new RegExp(inputText, 'i');
+                        results = results.filter(d => regex.test(d.label));
+                    }
+                    return {
+                        results,
+                        dataType: nextDataType,
+                        more: true
+                    };
+                }
+                const valueHandlerMap = {
+                    root: valueHandler,
+                }
+                return {
+                    keyItemSets,
+                    valueHandlerMap
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Use Fixed Menu Style
+<Canvas>
+    <Story name="Use Fixed Menu Style">
+        {{
+            components: { PQueryInput },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p-query-input
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+        use-fixed-menu-style
+        multi-input
+    ></p-query-input>
+</div>
+    `,
+            setup() {
+                const keyItemSets = getKeyItemSets(5, 1)
+                const valueHandlerMap = getValueHandlerMap(keyItemSets)
+                return {
+                    keyItemSets,
+                    valueHandlerMap
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Placeholder
+<Canvas>
+    <Story name="Placeholder" >
+        {{
+            components: { PQueryInput },
+            template: `
+                <p-query-input placeholder="Placeholder" />
+            `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Appearance Type
+
+<Canvas>
+    <Story name="Appearance Type">
+        {{
+            components: { PQueryInput },
+            template: `
+            <div>
+                <p class="text-label-lg font-bold my-3">Single input with 'basic', 'badge', 'stack' appearance type</p>
+                <p-query-input :key-item-sets="keyItemSets" :value-handler-map="valueHandlerMap" :selected.sync="selected" block appearance-type="basic" />
+                <br/>
+                <hr/>
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi input with 'basic' appearance type</p>
+                <p-query-input :key-item-sets="keyItemSets" :value-handler-map="valueHandlerMap" :selected.sync="selected" multi-input block />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi input with 'badge' appearance type</p>
+                <p-query-input :key-item-sets="keyItemSets" :value-handler-map="valueHandlerMap" :selected.sync="selected" multi-input block appearance-type="badge" />
+                <br/>
+                <p class="text-label-lg font-bold my-3">Multi input with 'stack' appearance type</p>
+                <p-query-input :key-item-sets="keyItemSets" :value-handler-map="valueHandlerMap" :selected.sync="selected" multi-input block appearance-type="stack" />
+                <br/>
+                <br/>
+                <div class="p-4 bg-blue-200 w-full max-h-64 overflow-y-auto">
+                    <p class="font-lg font-bold">selected: </p>
+                    <pre>{{selected}}</pre>
+                </div>
+            </div>
+            `,
+            setup() {
+                const keyItemSets = getKeyItemSets(5, 1)
+                const state = reactive({
+                    keyItemSets,
+                    valueHandlerMap: getValueHandlerMap(keyItemSets),
+                    selected: [
+                        {key: {label: 'Hello', name: 'hello'}, value: {label: 'Hi', name: 'hi'}},
+                        {key: {label: 'Tags', name: 'tags.aws.Environment'}, value: {label: 'Dev', name: 'dev'}}
+                    ]
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disabled
+<Canvas>
+    <Story name="Disabled">
+        {{
+            components: { PQueryInput },
+            template: `
+                <p-query-input :value="value" disabled />
+            `,
+            setup() {
+                const state = reactive({
+                    value: 'value'
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Block
+<Canvas>
+    <Story name="Block">
+        {{
+            components: { PQueryInput },
+            template: `
+                <div>
+                    <p-query-input block />
+                </div>
+            `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Invalid
+<Canvas>
+    <Story name="Invalid">
+        {{
+            components: { PQueryInput },
+            template: `
+                <p-query-input :value="value" invalid />
+            `,
+            setup() {
+                const state = reactive({
+                    value: 'value'
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Size
+<Canvas>
+    <Story name="Size" >
+        {{
+            components: { PQueryInput },
+            template: `
+                <div  style="display:flex; flex-direction: column; row-gap: 1.5rem;">
+                    <p-query-input v-for="size in sizes" :key="size" :size="size"  :placeholder="size" />
+                </div>
+            `,
+            setup() {
+                const state = reactive({
+                    value: '',
+                    sizes: Object.values(INPUT_SIZE)
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" height="300px">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
