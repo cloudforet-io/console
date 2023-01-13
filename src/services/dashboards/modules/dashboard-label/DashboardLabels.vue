@@ -18,6 +18,12 @@
                        shape="square"
                        @click="handleClickPlus"
         />
+        <span v-if="!state.inputMode && !state.labelList.length && props.editable"
+              class="dashboard-labels-add-info"
+              @click="handleClickPlus"
+        >
+            {{ $t('DASHBOARDS.CUSTOMIZE.ADD_LABEL') }}
+        </span>
         <p-field-group
             v-if="state.inputMode"
             :invalid="invalidState.inputText"
@@ -29,11 +35,6 @@
                 @update:value="setForm('inputText', $event)"
             />
         </p-field-group>
-        <span v-if="!state.inputMode && !state.labelList.length && props.editable"
-              class="dashboard-labels-add-info"
-        >
-            {{ $t('DASHBOARDS.CUSTOMIZE.ADD_LABEL') }}
-        </span>
     </div>
 </template>
 
@@ -116,7 +117,7 @@ const handleDelete = (index: number) => {
 }
 
 .dashboard-labels-add-info {
-    @apply text-gray-500 text-xs pt-1;
+    @apply text-gray-500 text-xs pt-1 cursor-pointer;
 }
 
 /* custom design-system component - p-label */
