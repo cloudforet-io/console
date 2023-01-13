@@ -147,11 +147,11 @@ const state = reactive({
         end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
     totalBudget: computed(() => {
-        if (!state.data) return '--';
+        if (!state.data?.length) return '--';
         return state.data[0].total_budget;
     }),
     totalSpent: computed(() => {
-        if (!state.data) return '--';
+        if (!state.data?.length) return '--';
         return state.data[0].total_spent;
     }),
     spentBudget: computed(() => {
@@ -168,12 +168,12 @@ const state = reactive({
         return { rate, isOver };
     }),
     leftBudget: computed(() => {
-        if (!state.data) return '--';
+        if (!state.data?.length) return '--';
         const value = state.totalBudget - state.totalSpent;
         return `${currencyMoneyFormatter(value, state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE')}`;
     }),
     budgetCount: computed(() => {
-        if (!state.data) return '--';
+        if (!state.data?.length) return '--';
         return state.data[0].budget_count;
     }),
 });
