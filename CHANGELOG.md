@@ -1,3 +1,10 @@
+# [2.0.0-beta.8](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.7...v2.0.0-beta.8) (2023-01-13)
+
+
+### Features
+
+* **query-input:** add query input component ([#231](https://github.com/cloudforet-io/mirinae/issues/231)) ([172aec2](https://github.com/cloudforet-io/mirinae/commit/172aec22f79fc738b097fb5655ca0f80fde86f9c))
+
 # [2.0.0-beta.7](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.6...v2.0.0-beta.7) (2023-01-13)
 
 
