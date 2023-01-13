@@ -187,7 +187,8 @@ const {
 <style lang="postcss" scoped>
 .dashboard-variable-dropdown {
     @apply inline-block;
-    max-width: 20rem;
+    max-width: 22.5rem;
+
     &.open-menu {
         @apply relative;
     }
@@ -199,7 +200,7 @@ const {
 
         .variable-contents {
             @apply inline-flex text-gray-900 text-label-md flex-shrink w-full;
-            max-width: 13.875rem;
+            max-width: 16.375rem;
 
             .variable-label {
                 @apply flex-shrink-0;
@@ -208,6 +209,7 @@ const {
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
+
             .item-for-display {
                 @apply font-bold flex-shrink;
                 flex-shrink: 1;
@@ -222,6 +224,7 @@ const {
             @apply flex-shrink-0;
             margin-left: 0.25rem;
         }
+
         .option-delete-button {
             @apply flex items-center flex-shrink-0 justify-center text-gray-400 rounded-full;
             margin-left: 0.5rem;
@@ -230,6 +233,7 @@ const {
                 @apply bg-gray-200 text-gray-900;
             }
         }
+
         .dropdown-icon {
             @apply flex-shrink-0;
         }
@@ -237,11 +241,20 @@ const {
         &:hover {
             @apply border-blue-600 bg-blue-100;
         }
+
         &.filled-value {
             @apply border-blue-400 bg-blue-200;
+
             &.is-visible {
                 @apply border-blue-600;
             }
+        }
+    }
+
+    /* custom design-system component - p-context-menu */
+    :deep(.options-menu) {
+        .label-wrapper {
+            max-width: 22.5rem;
         }
     }
 }
