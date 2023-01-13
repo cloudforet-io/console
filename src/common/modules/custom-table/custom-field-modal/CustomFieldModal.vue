@@ -79,7 +79,14 @@
                             </p-button>
                         </h3>
                         <keep-alive>
-                            <select-tag-columns :resource-type="resourceType"
+                            <select-cloud-service-tag-columns v-if="resourceType === 'inventory.CloudService'"
+                                                              :options="options"
+                                                              :is-server-page="isServerPage"
+                                                              :selected-tag-keys="selectedTagKeys"
+                                                              @update:selected-tag-keys="handleUpdatedSelectedTagKeys"
+                            />
+                            <select-tag-columns v-else
+                                                :resource-type="resourceType"
                                                 :options="options"
                                                 :is-server-page="isServerPage"
                                                 :selected-tag-keys="selectedTagKeys"
@@ -117,6 +124,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
 
+const SelectCloudServiceTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectCloudServiceTagColumns.vue');
 const SelectTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue');
 
 interface Props {
@@ -149,6 +157,7 @@ const mergeFields = (fieldsA: DynamicField[], fieldsB: DynamicField[]): DynamicF
 export default defineComponent<Props>({
     name: 'CustomFieldModal',
     components: {
+        SelectCloudServiceTagColumns,
         ColumnItem,
         SelectTagColumns,
         PButtonModal,
