@@ -59,9 +59,10 @@
                             >
                                 <column-item v-for="(column, idx) in allColumns"
                                              :key="`${column.key}-${idx}`"
-                                             v-model="selectedAllColumnKeys"
+                                             :selected-keys="selectedAllColumnKeys"
                                              :item="column"
                                              :search-text="search"
+                                             @update:selectedKeys="handleUpdateSelectedKeys"
                                 />
                             </draggable>
                         </div>
@@ -78,9 +79,11 @@
                             </p-button>
                         </h3>
                         <keep-alive>
-                            <select-tag-columns :all-tags="tagState.allTags"
-                                                :loading="tagState.loading"
-                                                :selected-keys.sync="selectedAllColumnKeys"
+                            <select-tag-columns :resource-type="resourceType"
+                                                :options="options"
+                                                :is-server-page="isServerPage"
+                                                :selected-tag-keys="selectedTagKeys"
+                                                @update:selected-tag-keys="handleUpdatedSelectedTagKeys"
                             />
                         </keep-alive>
                     </section>
@@ -103,7 +106,6 @@ import {
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
@@ -114,7 +116,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
-import SelectTagColumns from '@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue';
+
+const SelectTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue');
 
 interface Props {
     visible: boolean;
@@ -205,15 +208,9 @@ export default defineComponent<Props>({
                     state.selectedColumnMap = selectedMap;
                 },
             }),
-            selectedAllColumnKeys: computed<string[]>({
-                get: () => state.selectedColumns.map((d) => d.key),
-                set: (val: string[]) => {
-                    state.selectedColumns = val.map((key) => {
-                        if (key.startsWith(TAGS_PREFIX)) return { key, name: key, options: TAGS_OPTIONS } as DynamicField;
-                        return state.availableColumns.find((col) => col.key === key) ?? { key, name: key } as DynamicField;
-                    });
-                },
-            }),
+            selectedAllColumnKeys: computed<string[]>(() => state.selectedColumns.map((d) => d.key)),
+            selectedNonTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => !key.startsWith(TAGS_PREFIX))),
+            selectedTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => key.startsWith(TAGS_PREFIX))),
             recommendedSequenceMap: computed<Record<string, number>>(() => {
                 const orderMap: Record<string, number> = {};
                 state.availableColumns.forEach((d, i) => {
@@ -317,6 +314,28 @@ export default defineComponent<Props>({
             }
         };
 
+
+        const updateSelectedKeys = (keys: string[]) => {
+            state.selectedColumns = keys.map((key) => {
+                if (key.startsWith(TAGS_PREFIX)) return { key, name: key.slice(TAGS_PREFIX.length), options: TAGS_OPTIONS } as DynamicField;
+                return state.availableColumns.find((col) => col.key === key) ?? { key, name: key } as DynamicField;
+            });
+        };
+
+        const handleUpdateSelectedKeys = (keys: string[]) => {
+            updateSelectedKeys(keys);
+        };
+
+        /* Tags */
+        const clearSelectedTags = () => {
+            const tagKeys = state.selectedAllColumnKeys.filter((d) => !d.startsWith(TAGS_PREFIX));
+            updateSelectedKeys(tagKeys);
+        };
+        const handleUpdatedSelectedTagKeys = (tagKeys: string[]) => {
+            updateSelectedKeys(tagKeys.concat(state.selectedNonTagKeys));
+        };
+
+        /* Init */
         const initColumns = async () => {
             state.loading = true;
             const [availableColumnRes, currentColumnRes] = await Promise.allSettled([getColumns(true), getColumns(false)]);
@@ -326,64 +345,13 @@ export default defineComponent<Props>({
             state.selectedColumns = [...state.currentColumns];
             state.loading = false;
         };
-
-        /* Tags */
-        const clearSelectedTags = () => {
-            state.selectedAllColumnKeys = state.selectedAllColumnKeys.filter((d) => !d.startsWith(TAGS_PREFIX));
-        };
-
-        const tagState = reactive({
-            loading: true,
-            allTags: [] as string[],
-        });
-
-        const tagsQueryHelper = new QueryHelper();
-        const getTags = async () => {
-            tagState.loading = true;
-            try {
-                tagsQueryHelper.setFilters([]);
-                const { provider, cloudServiceGroup, cloudServiceType } = props.options;
-                if (provider) tagsQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
-                if (cloudServiceGroup) tagsQueryHelper.addFilter({ k: 'cloud_service_group', v: cloudServiceGroup, o: '=' });
-                if (cloudServiceType) tagsQueryHelper.addFilter({ k: 'cloud_service_type', v: cloudServiceType, o: '=' });
-                if (props.isServerPage) tagsQueryHelper.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
-
-                const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
-                    resource_type: props.resourceType,
-                    distinct_key: 'tags',
-                    options: {
-                        search_type: 'key',
-                        filter: tagsQueryHelper.apiQuery.filter,
-                    },
-                });
-
-                tagState.allTags = results.map((d) => d.name);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                tagState.allTags = [];
-            } finally {
-                tagState.loading = false;
-            }
-        };
-
-        watch([() => props.visible, () => props.resourceType, () => props.options], ([visible, resourceType, options], prev) => {
+        watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
             if (visible && resourceType) {
                 initColumns();
-                if (!prev && tagState.allTags.length === 0) {
-                    getTags();
-                    return;
-                }
-
-                const [, prevResourceType, prevOptions] = prev;
-                if (tagState.allTags.length === 0
-                    || resourceType !== prevResourceType
-                    || options !== prevOptions) getTags();
             }
         }, { immediate: true });
-
         return {
             ...toRefs(state),
-            tagState,
             sortByRecommendation,
             sortByAlphabet,
             onChangeAllSelect,
@@ -391,6 +359,8 @@ export default defineComponent<Props>({
             clearSelectedTags,
             updatePageSchema,
             TAGS_PREFIX,
+            handleUpdateSelectedKeys,
+            handleUpdatedSelectedTagKeys,
         };
     },
 });
