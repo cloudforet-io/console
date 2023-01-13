@@ -40,9 +40,9 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
@@ -64,6 +64,12 @@ export default defineComponent({
         DashboardDateCustomRangeModal,
         PBadge,
         PSelectDropdown,
+    },
+    props: {
+        dateRange: {
+            type: Object as PropType<DateRange>,
+            default: undefined,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const { i18nDayjs } = useI18nDayjs();
@@ -128,6 +134,38 @@ export default defineComponent({
             state.customRangeModalVisible = false;
         };
 
+        const setInitialDateRange = () => {
+            const _current = dayjs.utc();
+            const _start = dayjs.utc(props.dateRange?.start);
+            const _end = dayjs.utc(props.dateRange?.end);
+
+            // 1. default month => start is (month 'current' + day '1'), end is (month 'current + day 'today')
+            // Index 0 is 'Current' menu index
+
+            if (!props.dateRange?.start
+                || !props.dateRange?.end
+                || (_start.isSame(_current.startOf('month'), 'day')
+                && _end.isSame(_current, 'day'))
+            ) {
+                return 0;
+            }
+
+            // 2. some month => start is (month 'n' + day '1'), end is (month 'n' + day '{last day}')
+            if (_start.isSame(_end, 'month')
+                && _start.isSame(_start.startOf('month'), 'day')
+                && _end.isSame(_end.endOf('month'), 'day')
+            ) {
+                return state.monthMenuItems.findIndex((d) => d.name === _start.format('YYYY-MM'));
+            }
+
+            // 3. custom => else cases.
+            // The Last index is 'Custom' menu index.
+            return state.monthMenuItems.length - 1;
+        };
+
+        watch(() => props.dateRange, () => {
+            state.selectedMonthMenuIndex = setInitialDateRange();
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
