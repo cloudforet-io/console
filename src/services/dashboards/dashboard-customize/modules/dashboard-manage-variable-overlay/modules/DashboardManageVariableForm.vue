@@ -41,7 +41,7 @@
                            class="draggable-wrapper"
                            ghost-class="ghost"
                 >
-                    <div v-for="(option) in options"
+                    <div v-for="(option, index) in options"
                          :key="`drag-item-${option.key}`"
                          class="draggable-item"
                     >
@@ -50,9 +50,11 @@
                              width="1rem"
                              height="1rem"
                         />
-                        <p-text-input v-model="option.value"
+                        <p-text-input :value="option.value"
                                       class="option-input"
                                       :placeholder="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.PLACEHOLDER_OPTIONS')"
+                                      :invalid="option.error"
+                                      @update:value="handleChangeOptionValue(index, $event)"
                         />
                         <div class="option-delete-area">
                             <p-icon-button v-if="options.length > 1"
@@ -110,6 +112,11 @@ interface EmitFn {
     (e: 'save-click', value: DashboardVariableSchemaProperty): void;
     (e: 'cancel-click'): void;
 }
+type OptionItem = {
+    key: string;
+    value: string;
+    error?: boolean;
+};
 
 const props = defineProps<Props>();
 const emit = defineEmits<EmitFn>();
@@ -146,7 +153,7 @@ const state = reactive({
     selectionType: 'MULTI',
     options: [
         { key: getUUID(), value: '' },
-    ],
+    ] as OptionItem[],
     selectionMenu: computed(() => [
         { name: 'MULTI', label: 'Multi select' },
         { name: 'SINGLE', label: 'Single select' },
@@ -155,7 +162,7 @@ const state = reactive({
 });
 
 const formInvalidState = reactive({
-    baseInvalid: computed<boolean>(() => (invalidState.name ?? true) || (state.options.filter((d) => d.value !== '').length === 0)),
+    baseInvalid: computed<boolean>(() => (invalidState.name ?? true) || (state.options.filter((d) => d.value !== '').length === 0) || state.options.some((option) => option.error)),
     isChanged: computed<boolean>(() => {
         const isNameChanged = (props.selectedVariable?.name ?? '') === name.value;
         const isSelectionTypeChanged = (props.selectedVariable?.selection_type ?? 'MULTI') === state.selectionType;
@@ -197,11 +204,19 @@ const handleSave = () => {
     emit('save-click', variableToSave);
 };
 
+const handleChangeOptionValue = (index: number, value: string) => {
+    state.options[index].error = state.options.some((option, _index) => {
+        if (index === _index || value === '') return false;
+        return option.value === value;
+    });
+    state.options[index].value = value;
+};
+
 onMounted(() => {
     if (props.contentType === 'EDIT') {
         setForm('name', props.selectedVariable?.name ?? '');
         state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
-        state.options = props.selectedVariable?.options.map((d) => ({ key: getUUID(), value: d })) ?? [{ key: getUUID(), value: '' }];
+        state.options = (props.selectedVariable?.options ?? []).map((d) => ({ key: getUUID(), value: d })) ?? [{ key: getUUID(), value: '' }];
     }
 });
 
