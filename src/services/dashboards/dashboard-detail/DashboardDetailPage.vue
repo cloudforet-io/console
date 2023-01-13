@@ -90,6 +90,7 @@ import { store } from '@/store';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
+import type { RouteQueryString } from '@/lib/router-query-string';
 import {
     objectToQueryString,
     queryStringToObject,
@@ -142,10 +143,21 @@ const variablesState = reactive({
 const queryState = reactive({
     variables: computed(() => dashboardDetailState.variables),
     settings: computed(() => dashboardDetailState.settings),
-    urlQueryString: computed(() => ({
-        variables: objectToQueryString(queryState.variables),
-        settings: objectToQueryString(queryState.settings),
-    })),
+    urlQueryString: computed(() => {
+        const result = { variables: objectToQueryString(queryState.variables) } as Record<string, RouteQueryString>;
+        if (queryState.settings.date_range.enabled) {
+            result.dateRange = objectToQueryString({
+                start: queryState.settings.date_range.start,
+                end: queryState.settings.date_range.end,
+            });
+        }
+        if (queryState.settings.currency.enabled) {
+            result.currency = objectToQueryString({
+                value: queryState.settings.currency.value,
+            });
+        }
+        return result;
+    }),
 });
 
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
@@ -190,11 +202,29 @@ const init = async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
     const useQueryValue = {
         variables: queryStringToObject(currentQuery.variables),
-        settings: queryStringToObject(currentQuery.settings),
+        dateRange: queryStringToObject(currentQuery.dateRange),
+        currency: queryStringToObject(currentQuery.currency),
     };
 
     if (useQueryValue.variables) dashboardDetailState.variables = useQueryValue.variables;
-    if (useQueryValue.settings) dashboardDetailState.settings = useQueryValue.settings;
+    if (useQueryValue.dateRange) {
+        dashboardDetailState.settings = {
+            ...dashboardDetailState.settings,
+            date_range: {
+                enabled: true,
+                ...useQueryValue.dateRange,
+            },
+        };
+    }
+    if (useQueryValue.currency) {
+        dashboardDetailState.settings = {
+            ...dashboardDetailState.settings,
+            currency: {
+                enabled: true,
+                ...useQueryValue.currency,
+            },
+        };
+    }
 
     urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
         replaceUrlQuery(urlQueryString);
