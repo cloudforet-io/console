@@ -43,6 +43,7 @@ import { store } from '@/store';
 
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
+import type { DashboardSettings } from '@/services/dashboards/config';
 import {
     WIDGET_CONTAINER_MAX_WIDTH, WIDGET_CONTAINER_MIN_WIDTH,
 } from '@/services/dashboards/dashboard-detail/lib/config';
@@ -91,7 +92,7 @@ export default defineComponent<Props>({
             widgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => dashboardDetailState.dashboardWidgetInfoList),
             dashboardVariables: computed(() => dashboardDetailState.variables),
             dashboardVariablesSchema: computed(() => dashboardDetailState.variablesSchema),
-            dashboardSettings: computed(() => dashboardDetailState.settings),
+            dashboardSettings: computed<DashboardSettings>(() => dashboardDetailState.settings),
             widgetDataMap: computed({
                 get() { return dashboardDetailState.widgetDataMap; },
                 set(val) { dashboardDetailState.widgetDataMap = val; },
@@ -189,6 +190,9 @@ export default defineComponent<Props>({
         watch(() => state.dashboardVariablesSchema, () => {
             if (props.editMode) validateAllWidget();
         }, { immediate: true });
+        watch(() => state.dashboardSettings.date_range, () => {
+            refreshAllWidget();
+        });
 
 
         const refreshAllWidget = async () => {
