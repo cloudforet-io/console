@@ -31,7 +31,7 @@
                           :class="{inherit: inheritItemMap[propertyName]}"
                     >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                     <p-toggle-button :value="inheritItemMap[propertyName]"
-                                     @change="handleChangeInheritToggle(propertyName, ...arguments)"
+                                     @change="handleChangeInheritToggle(propertyName, $event)"
                     />
                 </div>
             </template>
@@ -42,7 +42,7 @@
                 </div>
             </template>
         </p-json-schema-form>
-        <div v-click-outside="hideOptionsMenu"
+        <div v-click-outside="hideContextMenu"
              class="add-options-wrapper"
         >
             <p-button ref="targetRef"
@@ -53,14 +53,14 @@
             >
                 {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD_OPTIONS') }}
             </p-button>
-            <p-context-menu v-show="addOptionsMenuVisible"
-                            ref="menuRef"
-                            :menu="optionsMenuItems"
+            <p-context-menu v-show="visibleContextMenu"
+                            ref="contextMenuRef"
+                            :menu="refinedMenu"
                             :selected.sync="selectedOptions"
-                            :style="{...contextMenuStyle}"
+                            :style="contextMenuStyle"
+                            use-fixed-menu-style
                             multi-selectable
                             item-height-fixed
-                            show-select-header
                             show-select-marker
                             @select="handleSelectOption"
             />
@@ -75,7 +75,8 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PButton, PContextMenu, useContextMenuFixedStyle,
+    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PButton, PContextMenu,
+    useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
@@ -157,7 +158,9 @@ export default defineComponent<Props>({
             isSchemaFormValid: undefined,
             isAllValid: computed(() => state.isSchemaFormValid && isAllValid.value),
             inheritItemMap: {} as {[propertyName: string]: boolean},
-            addOptionsMenuVisible: false,
+            //
+            targetRef: null as HTMLElement | null,
+            contextMenuRef: null as HTMLElement | null,
             optionsMenuItems: computed<MenuItem[]>(() => {
                 const menuItems: MenuItem[] = [];
                 const schemaProperties = state.widgetConfig?.options_schema?.schema.properties;
@@ -188,13 +191,19 @@ export default defineComponent<Props>({
         });
 
         const {
-            targetRef, targetElement, contextMenuStyle,
-        } = useContextMenuFixedStyle({
-            useFixedMenuStyle: true,
-            visibleMenu: toRef(state, 'addOptionsMenuVisible'),
-        });
-        const contextMenuFixedStyleState = reactive({
-            targetRef, targetElement, contextMenuStyle,
+            visibleMenu: visibleContextMenu,
+            refinedMenu,
+            contextMenuStyle,
+            showContextMenu,
+            hideContextMenu,
+            initiateMenu,
+        } = useContextMenuController({
+            useFixedStyle: true,
+            targetRef: toRef(state, 'targetRef'),
+            contextMenuRef: toRef(state, 'contextMenuRef'),
+            useReorderBySelection: true,
+            selected: toRef(state, 'selectedOptions'),
+            menu: toRef(state, 'optionsMenuItems'),
         });
 
         /* Util */
@@ -272,63 +281,6 @@ export default defineComponent<Props>({
             });
             return refinedJsonSchema;
         };
-
-        /* Event */
-        const hideOptionsMenu = () => {
-            state.addOptionsMenuVisible = false;
-        };
-        const handleChangeInheritToggle = (propertyName: string, { value }) => {
-            // init form data
-            const _formData = cloneDeep(state.schemaFormData);
-            _formData[propertyName] = undefined;
-            state.schemaFormData = _formData;
-            // update inherit data and json schema
-            const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
-            state.inheritItemMap[propertyName] = value;
-            // refine json schema of property
-            const propertySchema = cloneDeep(state.widgetConfig?.options_schema.schema)?.properties[propertyName];
-            _widgetOptionsJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema, value);
-            state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
-        };
-        const handleSelectOption = (item) => {
-            const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
-            const propertyName = item.name;
-            if (state.selectedOptions.find((d) => d.name === propertyName)) {
-                // add property schema
-                const propertySchema = cloneDeep(state.widgetConfig?.options_schema.schema)?.properties[propertyName];
-                _widgetOptionsJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema);
-            } else {
-                // delete property schema
-                delete _widgetOptionsJsonSchema.properties[propertyName];
-            }
-            state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
-            hideOptionsMenu();
-        };
-        const handleClickAddOptions = () => {
-            state.addOptionsMenuVisible = true;
-        };
-        const handleFormValidate = (isValid) => {
-            state.isSchemaFormValid = isValid;
-        };
-        const handleInputName = (val) => {
-            setForm('name', val);
-            widgetFormStore.setWidgetTitle(val);
-        };
-
-        /* Init */
-        (async () => {
-            storeState.loading = true;
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/serviceAccount/load'),
-                store.dispatch('reference/cloudServiceType/load'),
-                store.dispatch('reference/region/load'),
-                store.dispatch('reference/user/load'),
-            ]);
-            storeState.loading = false;
-        })();
-
         const convertWidgetInfoToJsonSchemaForm = (widgetInfo:DashboardLayoutWidgetInfo) => {
             const { widget_options, inherit_options } = widgetInfo;
             const _widgetOptions = cloneDeep(widget_options);
@@ -367,6 +319,63 @@ export default defineComponent<Props>({
             });
             state.schemaFormData = schemaFormData;
         };
+
+        /* Event */
+        const handleChangeInheritToggle = (propertyName: string, { value }) => {
+            // init form data
+            const _formData = cloneDeep(state.schemaFormData);
+            _formData[propertyName] = undefined;
+            state.schemaFormData = _formData;
+            // update inherit data and json schema
+            const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
+            state.inheritItemMap[propertyName] = value;
+            // refine json schema of property
+            const propertySchema = cloneDeep(state.widgetConfig?.options_schema.schema)?.properties[propertyName];
+            _widgetOptionsJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema, value);
+            state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
+        };
+        const handleSelectOption = (item) => {
+            const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
+            const propertyName = item.name;
+            if (state.selectedOptions.find((d) => d.name === propertyName)) {
+                // add property schema
+                const propertySchema = cloneDeep(state.widgetConfig?.options_schema.schema)?.properties[propertyName];
+                _widgetOptionsJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema);
+            } else {
+                // delete property schema
+                delete _widgetOptionsJsonSchema.properties[propertyName];
+                delete state.inheritItemMap[propertyName];
+            }
+            state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
+            hideContextMenu();
+        };
+        const handleClickAddOptions = () => {
+            initiateMenu();
+            if (visibleContextMenu.value) hideContextMenu();
+            else showContextMenu();
+        };
+        const handleFormValidate = (isValid) => {
+            state.isSchemaFormValid = isValid;
+        };
+        const handleInputName = (val) => {
+            setForm('name', val);
+            widgetFormStore.setWidgetTitle(val);
+        };
+
+        /* Init */
+        (async () => {
+            storeState.loading = true;
+            await Promise.allSettled([
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/project/load'),
+                store.dispatch('reference/serviceAccount/load'),
+                store.dispatch('reference/cloudServiceType/load'),
+                store.dispatch('reference/region/load'),
+                store.dispatch('reference/user/load'),
+            ]);
+            storeState.loading = false;
+        })();
+
         /* Watcher */
         watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, widgetKey]) => {
             widgetFormStore.$reset();
@@ -397,18 +406,22 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            ...toRefs(contextMenuFixedStyleState),
             name,
             setForm,
             invalidState,
             invalidTexts,
+            //
+            refinedMenu,
+            contextMenuStyle,
+            visibleContextMenu,
             isSelected,
             handleChangeInheritToggle,
             handleClickAddOptions,
             handleSelectOption,
-            hideOptionsMenu,
             handleFormValidate,
             handleInputName,
+            hideContextMenu,
+            showContextMenu,
         };
     },
 });
