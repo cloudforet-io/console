@@ -59,7 +59,7 @@ interface ValidationState {
     isWidgetLayoutValid: ComputedRef<boolean>;
     widgetValidMap: WidgetValidMap;
 }
-
+const DEFAULT_REFRESH_INTERVAL = '15s';
 const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
     settings: {
         date_range: {
@@ -71,6 +71,7 @@ const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
             enabled: false,
             value: CURRENCY.USD,
         },
+        refresh_interval_option: DEFAULT_REFRESH_INTERVAL,
     },
 });
 
@@ -140,6 +141,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 enabled: _dashboardInfo.settings?.currency?.enabled ?? false,
                 value: _dashboardInfo.settings.currency?.value ?? CURRENCY.USD,
             },
+            refresh_interval_option: _dashboardInfo.settings?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
         state.variablesSchema = {
             properties: { ...managedDashboardVariablesSchema.properties, ..._dashboardInfo.variables_schema?.properties ?? {} },
