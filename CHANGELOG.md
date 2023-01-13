@@ -1,3 +1,10 @@
+# [2.0.0-beta.9](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.8...v2.0.0-beta.9) (2023-01-13)
+
+
+### Bug Fixes
+
+* **query-input:** add error to QueryItem type and apply to query-input ([#233](https://github.com/cloudforet-io/mirinae/issues/233)) ([7febd97](https://github.com/cloudforet-io/mirinae/commit/7febd974ca48f45ad7b3845edf7206cbea8f1500))
+
 # [2.0.0-beta.8](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.7...v2.0.0-beta.8) (2023-01-13)
 
 
