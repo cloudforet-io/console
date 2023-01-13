@@ -14,9 +14,6 @@ export type InputSize = typeof INPUT_SIZE[keyof typeof INPUT_SIZE];
 export const INPUT_APPEARANCE_TYPES = ['basic', 'stack', 'badge', 'masking'] as const;
 export type InputAppearanceType = typeof INPUT_APPEARANCE_TYPES[number];
 
-export const INPUT_MODES = ['plain', 'query'] as const;
-export type InputMode = typeof INPUT_MODES[number];
-
 export interface HandlerRes {
     results: MenuItem[];
     totalCount?: number;

@@ -1,31 +1,31 @@
-import type { Ref } from 'vue';
+import type { Ref, UnwrapRef } from 'vue';
 import { ref } from 'vue';
 
 import type { InputItem } from '@/inputs/input/text-input/type';
 
-interface UseInputDeletionOption {
-    selected: Ref<InputItem[]>;
-    updateInputValue: (value?: string|number) => void;
-    updateSelected: (selected: InputItem[]) => void;
+interface UseInputDeletionOption<Item = InputItem> {
+    selected: Ref<Item[]>;
+    updateValueAfterDeletion?: (item?: Item) => void;
+    updateSelected: (selected: Item[]) => void;
     isInputValueEmpty: Ref<boolean>;
 }
-export const useInputDeletion = ({
-    selected, updateInputValue, updateSelected, isInputValueEmpty,
-}: UseInputDeletionOption) => {
-    const deleteTarget = ref<InputItem|undefined>(undefined);
+export function useInputDeletion<Item extends object = InputItem>({
+    selected, updateValueAfterDeletion, updateSelected, isInputValueEmpty,
+}: UseInputDeletionOption<Item>) {
+    const deleteTarget = ref<Item|undefined>(undefined);
     const deleteTargetIdx = ref<number>(-1);
-    const deleteSelectedValue = () => {
+    const deleteSingleSelectedValue = () => {
         const item = selected.value[0];
         if (!item) return;
-        updateInputValue(['string', 'number'].includes(typeof item.label) ? item.label as string : item.name);
         updateSelected([]);
+        if (updateValueAfterDeletion) updateValueAfterDeletion(item);
     };
     const deleteTargetTag = () => {
         if (!isInputValueEmpty.value) return;
         const lastIdx = selected.value.length - 1;
         if (deleteTargetIdx.value === -1) { // Select the item if there is no selection
             deleteTargetIdx.value = lastIdx;
-            deleteTarget.value = selected.value[lastIdx];
+            deleteTarget.value = selected.value[lastIdx] as UnwrapRef<Item>;
             return;
         }
 
@@ -35,8 +35,8 @@ export const useInputDeletion = ({
         if (!targetTag) updateSelected([]);
         deleteTag(targetTag, targetIdx);
     };
-    const deleteTag = (tag: InputItem, idx: number) => {
-        const _selectedItems: InputItem[] = [...selected.value];
+    const deleteTag = (tag: Item, idx: number) => {
+        const _selectedItems: Item[] = [...selected.value];
         _selectedItems.splice(idx, 1);
         updateSelected(_selectedItems);
         deleteTargetIdx.value = -1;
@@ -44,13 +44,13 @@ export const useInputDeletion = ({
     };
     const deleteAll = () => {
         updateSelected([]);
-        updateInputValue('');
+        if (updateValueAfterDeletion) updateValueAfterDeletion();
     };
     return {
         deleteTargetIdx,
-        deleteSelectedValue,
+        deleteSingleSelectedValue,
         deleteTargetTag,
         deleteTag,
         deleteAll,
     };
-};
+}

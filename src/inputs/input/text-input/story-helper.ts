@@ -1,7 +1,7 @@
 import type { ArgTypes } from '@storybook/addons';
 
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
-import { INPUT_APPEARANCE_TYPES, INPUT_SIZE, INPUT_MODES } from '@/inputs/input/text-input/type';
+import { INPUT_APPEARANCE_TYPES, INPUT_SIZE } from '@/inputs/input/text-input/type';
 
 const initContextMenuArgTypes = (): ArgTypes => {
     const contextMenuArgTypes = getContextMenuArgTypes();
@@ -302,25 +302,6 @@ export const getTextInputArgTypes = (): ArgTypes => {
             control: {
                 type: 'select',
                 options: INPUT_APPEARANCE_TYPES,
-            },
-        },
-        inputMode: {
-            name: 'inputMode',
-            type: { name: 'string' },
-            description: 'Input type.',
-            defaultValue: INPUT_MODES[0],
-            table: {
-                type: {
-                    summary: 'string',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: `'${INPUT_MODES[0]}'`,
-                },
-            },
-            control: {
-                type: 'select',
-                options: INPUT_MODES,
             },
         },
         pageSize: {

@@ -7,6 +7,7 @@ import {
     cloneDeep, debounce, find, throttle,
 } from 'lodash';
 
+import type PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import {
     defaultHandlerMap, formatterMap,
     inputTypeMap, inputValidatorMap,
@@ -32,16 +33,17 @@ interface QuerySearchOptions {
 }
 
 export interface QuerySearchStateArgs {
-    focused: boolean;
+    focused: boolean|Ref<boolean>;
     value?: Ref<string>;
     keyItemSets: Ref<KeyItemSet[]>;
     valueHandlerMap: Ref<ValueHandlerMap>;
     visibleMenu: Ref<boolean | undefined>;
+    menuRef?: Ref<null|typeof PContextMenu>;
 }
 
 export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySearchOptions = {}) => {
     const {
-        value, focused, visibleMenu, valueHandlerMap, keyItemSets,
+        value, focused, visibleMenu, valueHandlerMap, keyItemSets, menuRef,
     } = stateArgs;
     const { strict } = options;
     const state = reactive({
@@ -75,7 +77,7 @@ export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySe
         }),
 
         /* Menu */
-        menuRef: null as any,
+        menuRef,
         visibleMenu,
         menuType: computed<MenuType>(() => {
             if (!state.rootKey) return 'ROOT_KEY';
@@ -113,9 +115,9 @@ export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySe
         if (state.menuRef) state.menuRef.focus(idx);
         else {
             if (offMenuFocusWatch) offMenuFocusWatch();
-            offMenuFocusWatch = watch(() => state.menuRef, (menuRef) => {
-                if (menuRef) {
-                    menuRef.focus(idx);
+            offMenuFocusWatch = watch(() => state.menuRef, (_menuRef) => {
+                if (_menuRef) {
+                    _menuRef.focus(idx);
                     if (offMenuFocusWatch) offMenuFocusWatch();
                 }
             });
@@ -140,7 +142,10 @@ export const useQuerySearch = (stateArgs: QuerySearchStateArgs, options: QuerySe
         }
     };
     const findAndSetKey = async (val: string, isRootKey = true) => {
-        let item = findKey(val, state.handlerResp.results) || null;
+        let item: KeyItem|undefined = findKey(val, state.handlerResp.results);
+        if (!item && !strict) {
+            item = { label: val, name: val };
+        }
         if (isRootKey) {
             if (item) {
                 clearAll();
