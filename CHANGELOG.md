@@ -1,3 +1,10 @@
+# [2.0.0-beta.5](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2023-01-13)
+
+
+### Bug Fixes
+
+* **p-context-menu-item:** change icon prop to imageUrl prop ([#228](https://github.com/cloudforet-io/mirinae/issues/228)) ([019f405](https://github.com/cloudforet-io/mirinae/commit/019f4052cc9a2e16aaa1c74d5c642dae1e01a5f1))
+
 # [2.0.0-beta.4](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2023-01-12)
 
 
