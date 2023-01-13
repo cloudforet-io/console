@@ -250,16 +250,17 @@ const refreshWidget = async (thisPage = 1): Promise<FullData> => {
     state.legends = getPieChartLegends(state.data.results, state.groupBy);
     chartHelper.clearChildrenOfRoot();
     await nextTick();
-    drawChart(state.chartData);
+    if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
 
 /* Event */
-const handleSelectSelectorType = (selected: string) => {
+const handleSelectSelectorType = async (selected: string) => {
     state.selectedSelectorType = selected;
-    if (chartHelper.root.value) chartHelper.refreshRoot();
-    drawChart(state.chartData);
+    chartHelper.refreshRoot();
+    await nextTick();
+    if (chartHelper.root.value) drawChart(state.chartData);
 };
 const handleUpdateThisPage = (thisPage: number) => {
     state.thisPage = thisPage;

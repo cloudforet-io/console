@@ -38,9 +38,11 @@ export const useAmcharts5 = (
 
     const refreshRoot = () => {
         disposeRoot();
-        const root = am5.Root.new(state.chartContext as HTMLElement);
-        state.root = root;
-        initRoot(root);
+        if (state.chartContext) {
+            const root = am5.Root.new(state.chartContext as HTMLElement);
+            state.root = root;
+            initRoot(root);
+        }
     };
 
     const initRoot = (root: Root) => {

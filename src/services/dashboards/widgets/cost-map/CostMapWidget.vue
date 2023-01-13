@@ -205,7 +205,7 @@ const refreshWidget = async (): Promise<TreemapChartData['children']> => {
     state.data = await fetchData();
     chartHelper.refreshRoot();
     await nextTick();
-    drawChart(state.chartData);
+    if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
