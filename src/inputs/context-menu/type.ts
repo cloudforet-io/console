@@ -19,4 +19,5 @@ export interface MenuItem {
     target?: string;
     icon?: string;
     error?: boolean;
+    imageUrl?: string;
 }

@@ -61,7 +61,7 @@
                                              :target="item.target"
                                              :disabled="item.disabled"
                                              :readonly="readonly"
-                                             :icon="item.icon"
+                                             :image-url="item.imageUrl"
                                              :selected="!props.noSelectIndication && state.selectedNameMap[item.name] !== undefined"
                                              :select-marker="props.showSelectMarker ? props.multiSelectable ? 'checkbox' : 'radio' : undefined"
                                              :ellipsis="props.itemHeightFixed"

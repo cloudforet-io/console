@@ -28,6 +28,8 @@ export interface CategoryItem {
 export interface ValueItem {
     label: string;
     name: any;
+    icon?: string;
+    imageUrl?: string;
 }
 
 export type ValueSet = Record<string, ValueItem>;

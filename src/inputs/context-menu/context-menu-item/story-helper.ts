@@ -1,5 +1,4 @@
 import type { ArgTypes } from '@storybook/addons';
-import icon from 'vue-svgicon';
 
 import { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/config';
 
@@ -200,10 +199,10 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
-    icon: {
-        name: 'icon',
+    imageUrl: {
+        name: 'imageUrl',
         type: { name: 'string' },
-        description: 'Icon name in Left Content Area.',
+        description: 'Image url in Left Content Area.',
         defaultValue: undefined,
         table: {
             type: {
@@ -215,8 +214,7 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
             },
         },
         control: {
-            type: 'select',
-            options: Object.keys(icon.icons),
+            type: 'text',
         },
     },
     ...getArgTypes('slots', slots),

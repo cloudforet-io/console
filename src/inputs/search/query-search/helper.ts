@@ -56,6 +56,8 @@ export const getKeyMenuForm = ({ menuResponse, selectedKeys, subPath }: MenuForm
         ...menuResponse.results.map((d) => ({
             label: d.label,
             name: d.name,
+            icon: d.icon,
+            imageUrl: d.imageUrl,
             type: (d as ValueMenuItem).type || 'item' as const,
             data: d,
         })),

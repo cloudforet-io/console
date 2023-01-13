@@ -27,7 +27,7 @@ export const Template = (args, { argTypes }) => ({
             :select-marker="selectMarker"
             :ellipsis="ellipsis"
             :highlightTerm="highlightTerm"
-            :icon="icon"
+            :image-url="imageUrl"
             @click.stop="onClick"
         ></PContextMenuItem>
     `,
@@ -90,21 +90,21 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Icon Case
+## Image Icon Case
 
 <Canvas>
-    <Story name="Icon Case">
+    <Story name="Image Icon Case">
         {{
             components: { PContextMenuItem },
             template: `
         <div class="border border-primary-1 p-4">
-            <p-context-menu-item icon="ic_refresh" label="to (style is the same with the basic case)" />
-            <p-context-menu-item icon="ic_refresh" label="link" />
-            <p-context-menu-item icon="ic_refresh" label="link, disabled" disabled />
-            <p-context-menu-item icon="ic_refresh" label="link, selected" selected />
-            <p-context-menu-item icon="ic_refresh" label="link, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" />
-            <p-context-menu-item icon="ic_refresh" label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" ellipsis />
-            <p-context-menu-item icon="ic_refresh" label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" select-marker="radio" />
+            <p-context-menu-item image-url="ic_refresh" label="to (style is the same with the basic case)" />
+            <p-context-menu-item image-url="ic_refresh" label="link" />
+            <p-context-menu-item image-url="ic_refresh" label="link, disabled" disabled />
+            <p-context-menu-item image-url="ic_refresh" label="link, selected" selected />
+            <p-context-menu-item image-url="ic_refresh" label="link, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" />
+            <p-context-menu-item image-url="ic_refresh" label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" ellipsis />
+            <p-context-menu-item image-url="ic_refresh" label="link, ellipsis, long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long label case" select-marker="radio" />
         </div>
     `,
         }}

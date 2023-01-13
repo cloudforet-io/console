@@ -11,11 +11,11 @@
              width="1em"
              height="1em"
         />
-        <p-i v-if="icon"
-             class="left-icon"
-             :name="icon"
-             width="1rem"
-             height="1rem"
+        <p-lazy-img v-if="imageUrl"
+                    class="left-icon"
+                    :src="imageUrl"
+                    width="1rem"
+                    height="1rem"
         />
         <span class="label-wrapper"
               :class="{ellipsis}"
@@ -62,6 +62,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 
 import PTextHighlighting from '@/data-display/text-highlighting/PTextHighlighting.vue';
+import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { SELECT_MARKERS } from '@/inputs/context-menu/context-menu-item/config';
 
@@ -78,12 +79,13 @@ export interface ContextMenuItemProps {
     ellipsis?: boolean;
     highlightTerm?: string;
     readonly?: boolean;
-    icon?: string;
+    imageUrl?: string;
 }
 
 export default defineComponent<ContextMenuItemProps>({
     name: 'PContextMenuItem',
     components: {
+        PLazyImg,
         PTextHighlighting,
         PI,
     },
@@ -131,7 +133,7 @@ export default defineComponent<ContextMenuItemProps>({
             type: Boolean,
             default: false,
         },
-        icon: {
+        imageUrl: {
             type: String,
             default: undefined,
         },

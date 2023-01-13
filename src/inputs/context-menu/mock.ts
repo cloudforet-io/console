@@ -14,7 +14,7 @@ export const menuItems: MenuItem[] = [
         label: 'Create', name: 'create',
     },
     {
-        label: 'Update', name: 'update',
+        label: 'Update', name: 'update', imageUrl: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/spaceone.svg',
     },
     {
         label: 'Delete', name: 'delete', disabled: true,
