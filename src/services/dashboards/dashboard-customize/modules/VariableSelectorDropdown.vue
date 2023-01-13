@@ -170,7 +170,7 @@ const handleUpdateSearchText = debounce((text: string) => {
 watch(visibleMenu, (_visibleMenu) => {
     if (_visibleMenu) {
         initiateMenu();
-    }
+    } else state.searchText = '';
 }, { immediate: true });
 
 const {
