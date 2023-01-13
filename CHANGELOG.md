@@ -1,3 +1,10 @@
+# [2.0.0-beta.6](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.5...v2.0.0-beta.6) (2023-01-13)
+
+
+### Bug Fixes
+
+* **use-query-search:** allow not included item in unstrict mode ([#230](https://github.com/cloudforet-io/mirinae/issues/230)) ([2bdac7c](https://github.com/cloudforet-io/mirinae/commit/2bdac7c3221f7db846e7efb7519640943431f8b3))
+
 # [2.0.0-beta.5](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2023-01-13)
 
 
