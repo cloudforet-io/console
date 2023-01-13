@@ -98,7 +98,6 @@ const filters = computed<ApiFilter[]>(() => {
 });
 const getTags: ValueHandler = async (search, rootKey) => {
     try {
-        console.debug('rootKey.name', rootKey.name, 'search', search);
         const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
             search,
             resource_type: 'inventory.CloudService',
