@@ -1,7 +1,9 @@
-import type { Ref, SetupContext } from 'vue';
+import type { Ref } from 'vue';
 import {
     computed, ref, watch,
 } from 'vue';
+
+import { kebabCase } from 'lodash';
 
 /**
  * @description It detects changes in prop and creates a state that is automatically reflected.
@@ -14,20 +16,26 @@ import {
 export function useProxyValue<T = any, Prop = any>(
     name: string,
     props: Prop,
-    emit: SetupContext['emit'],
+    emit: any,
     additionalEvents?: string|string[],
 ): Ref<T> {
-    const emitEvents = (value: T) => {
-        emit(`update:${name}`, value);
-        if (!additionalEvents) return;
-        if (typeof additionalEvents === 'string') emit(additionalEvents, value);
-        else if (Array.isArray(additionalEvents)) additionalEvents.forEach((eventName) => emit(eventName, value));
-    };
-
     const proxyValue = ref<T>(props[name]);
+    const kebabCaseName = kebabCase(name);
     const setProxyValue = (value: T) => {
         (proxyValue.value as T) = value;
-        emitEvents(value);
+        if (!additionalEvents) {
+            emit(`update:${name}`, value); // will be deprecated
+            emit(`update:${kebabCaseName}`, value);
+            return;
+        }
+
+        if (Array.isArray(additionalEvents)) {
+            additionalEvents.forEach((eventName) => {
+                emit(eventName, value);
+            });
+        } else {
+            emit(additionalEvents, value);
+        }
     };
 
     watch(() => props[name], (value) => {
