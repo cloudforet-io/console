@@ -317,7 +317,7 @@ defineExpose<WidgetExpose<FullData>>({
     .content-wrapper {
         @apply grid grid-cols-12;
         height: 100%;
-        padding-left: 1.5rem;
+        padding: 0 1.5rem;
         .chart-loader {
             @apply col-span-5;
             height: 100%;
