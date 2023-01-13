@@ -6,11 +6,16 @@ import type { ComputedRef } from 'vue';
 
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
-import { makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import {
+    makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler, makeCloudServiceTagValueHandler,
+} from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItem, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import { store } from '@/store';
+
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import type { ConsoleSearchSchema } from '@/lib/component-util/dynamic-layout/type';
 
@@ -43,7 +48,7 @@ const getKeyItemSets = (schemaList: ConsoleSearchSchema[], storeState): KeyItemS
     });
     return keyItemSets;
 };
-const getValueHandlerMap = (schemaList: ConsoleSearchSchema[], resourceType: string, filters?: ApiFilter[]): ValueHandlerMap => {
+const getValueHandlerMap = (schemaList: ConsoleSearchSchema[], resourceType: string, filters?: ApiFilter[], providers?: ProviderReferenceMap): ValueHandlerMap => {
     const valueHandlerMap: ValueHandlerMap = {};
     schemaList.forEach((schema) => {
         schema.items.forEach((item) => {
@@ -52,7 +57,10 @@ const getValueHandlerMap = (schemaList: ConsoleSearchSchema[], resourceType: str
             } else if (item.reference) {
                 valueHandlerMap[item.key] = makeReferenceValueHandler(item.reference, item.data_type);
             } else {
-                valueHandlerMap[item.key] = makeDistinctValueHandler(resourceType, item.key, item.data_type, filters);
+                const isCloudServiceResourceTags = resourceType === 'inventory.CloudService' && item.key === 'tags';
+                if (isCloudServiceResourceTags) {
+                    valueHandlerMap[item.key] = makeCloudServiceTagValueHandler(resourceType, item.key, item.data_type, filters, undefined, providers);
+                } else valueHandlerMap[item.key] = makeDistinctValueHandler(resourceType, item.key, item.data_type, filters);
             }
         });
     });
@@ -102,7 +110,7 @@ export function useQuerySearchPropsWithSearchSchema(
         const [schema, isAllLoaded] = watchValue;
         if (isAllLoaded && schema.length) {
             state.keyItemSets = getKeyItemSets(schema, storeState);
-            state.valueHandlerMap = getValueHandlerMap(searchSchema.value, resourceType, filters?.value);
+            state.valueHandlerMap = getValueHandlerMap(searchSchema.value, resourceType, filters?.value, storeState.Provider);
         }
     }, { immediate: true, debounce: 200 });
 

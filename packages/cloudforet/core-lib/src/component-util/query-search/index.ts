@@ -13,27 +13,28 @@ import type {
 import { SpaceConnector } from '@/space-connector';
 import type { ApiFilter } from '@/space-connector/type';
 
+
 type KeyTuple = [string, string|undefined, KeyDataType|undefined]; // name, label, dataType
 type KeyParam = Array<KeyTuple | string | KeyItemSet>;
 
-const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, dataType?: KeyDataType) => {
-    if (d === undefined || d === null) {
+const getHandlerResp = (data: any, results: ValueItem[] = [], totalCount?: number, dataType?: KeyDataType) => {
+    if (data === undefined || data === null) {
         return {
             results: [],
             totalCount: undefined,
             dataType: dataType || undefined,
         };
     }
-    if (typeof d === 'string' || typeof d === 'boolean') {
+    if (typeof data === 'string' || typeof data === 'boolean') {
         return {
             results,
             totalCount,
-            dataType: dataType || typeof d,
+            dataType: dataType || typeof data,
         };
     }
-    if (typeof d === 'number') {
+    if (typeof data === 'number') {
         let type;
-        if (Math.floor(d) !== d) type = 'float';
+        if (Math.floor(data) !== data) type = 'float';
         else type = 'integer';
 
         return {
@@ -44,30 +45,41 @@ const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, 
     }
 
     /* array case */
-    if (Array.isArray(d)) {
-        if (typeof d[0] === 'object') {
+    if (Array.isArray(data)) {
+        if (typeof data[0] === 'object') {
             /* when first item is array */
-            if (Array.isArray(d[0])) {
-                const next = uniq(flatten(d));
-                return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), d.length, 'object');
+            if (Array.isArray(data[0])) {
+                const next = uniq(flatten(data));
+                return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), data.length, 'object');
             }
             /* when first item is object */
-            const next = uniq(flatMap(d, ((t) => Object.keys(t))));
-            return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), d.length, 'object');
+            const next = uniq(flatMap(data, ((t) => Object.keys(t))));
+            return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), data.length, 'object');
         }
 
         /* when first item is primitive type */
-        return getHandlerResp(d, d.map((t) => ({ label: t, name: t })), d.length, 'object');
+        return getHandlerResp(data, data.map((t) => ({ label: t, name: t })), data.length, 'object');
     }
 
     /* object case */
-    const keys = Object.keys(d);
+    const keys = Object.keys(data);
     return {
         results: keys.map((k) => ({ label: k, name: k })),
         totalCount: keys.length,
         dataType: dataType || 'object',
     };
 };
+
+interface ProvidersReferenceItems {
+    [provider: string]: {
+        color: string;
+        icon: string;
+        key: string;
+        label: string;
+        linkTemplate: string;
+        name: string;
+    };
+}
 
 /**
  * @name makeDistinctValueHandler
@@ -210,4 +222,84 @@ export function makeDistinctValueHandlerMap(keys: KeyParam, resourceType: string
         }
     });
     return res;
+}
+
+/**
+ * @name makeCloudServiceTagValueHandler
+ * @description A helper function that returns ValueHandler necessary for CloudService Tag QuerySearch component.
+ * @param resourceType
+ * @param distinct
+ * @param dataType
+ * @param limit
+ * @param providers
+ */
+export function makeCloudServiceTagValueHandler(
+    resourceType: string,
+    distinct: string,
+    dataType?: KeyDataType,
+    filters?: ApiFilter[],
+    limit?: number,
+    providers?: ProvidersReferenceItems,
+): ValueHandler|undefined {
+    if (['datetime', 'boolean'].includes(dataType || '')) return undefined;
+
+    const staticParam: any = {
+        resource_type: resourceType,
+        options: { limit: limit || 10 },
+        distinct_key: distinct,
+    };
+
+    return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
+        if (!subPath) {
+            return {
+                results: [
+                    ...Object.values(providers ?? {}).map((provider) => ({
+                        label: provider.label,
+                        name: provider.key,
+                        imageUrl: provider.icon,
+                    })),
+                    {
+                        label: 'Custom',
+                        name: 'custom',
+                        icon: 'ic_provider_other',
+                    },
+                ],
+                totalCount: size(providers) + 1,
+                dataType: 'object',
+            };
+        }
+        const param = cloneDeep(staticParam);
+        param.search = inputText;
+        if (currentDataType === 'object') {
+            param.options.search_type = currentDataType === 'object' ? 'key' : 'value';
+        }
+        if (subPath) {
+            param.distinct_key = `${distinct}.${subPath}`;
+            if (param.distinct_key.split('.').length === 2) param.distinct_key = `tag_keys.${subPath}`;
+        }
+        if (filters) {
+            param.options.filter = filters;
+        }
+
+        try {
+            const res = await SpaceConnector.client.addOns.autocomplete.distinct(param);
+
+            const isTagKeysParam = param.distinct_key.split('.')[0] === 'tag_keys';
+            if (isTagKeysParam) return getHandlerResp(res.results[0]?.key, res.results.map((d) => ({ label: d.name, name: d.key })), res.total_count, 'object');
+            if (keyItem.dataType === 'object') return getHandlerResp(res.results[0]?.key, res.results.map((d) => ({ label: d.name, name: d.key })), res.total_count);
+
+            return {
+                results: res.results.reduce((results, d) => {
+                    if (d.name !== '' && d.name !== undefined && d.name !== null) results.push({ label: d.name, name: d.key });
+                    return results;
+                }, []),
+                totalCount: res.total_count,
+            };
+        } catch (e) {
+            return {
+                results: [],
+                totalCount: 0,
+            };
+        }
+    };
 }
