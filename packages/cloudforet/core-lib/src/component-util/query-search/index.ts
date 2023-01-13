@@ -69,6 +69,17 @@ const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, 
     };
 };
 
+interface ProvidersReferenceItems {
+    [provider: string]: {
+        color: string;
+        icon: string;
+        key: string;
+        label: string;
+        linkTemplate: string;
+        name: string;
+    };
+}
+
 /**
  * @name makeDistinctValueHandler
  * @description A helper function that returns ValueHandler necessary for QuerySearch component.
@@ -210,4 +221,84 @@ export function makeDistinctValueHandlerMap(keys: KeyParam, resourceType: string
         }
     });
     return res;
+}
+
+/**
+ * @name makeCloudServiceTagValueHandler
+ * @description A helper function that returns ValueHandler necessary for CloudService Tag QuerySearch component.
+ * @param resourceType
+ * @param distinct
+ * @param dataType
+ * @param limit
+ * @param providers
+ */
+export function makeCloudServiceTagValueHandler(
+    resourceType: string,
+    distinct: string,
+    dataType?: KeyDataType,
+    filters?: ApiFilter[],
+    limit?: number,
+    providers?: ProvidersReferenceItems,
+): ValueHandler|undefined {
+    if (['datetime', 'boolean'].includes(dataType || '')) return undefined;
+
+    const staticParam: any = {
+        resource_type: resourceType,
+        options: { limit: limit || 10 },
+        distinct_key: distinct,
+    };
+
+    return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
+        if (!subPath) {
+            return {
+                results: [
+                    ...Object.values(providers ?? {}).map((provider) => ({
+                        label: provider.label,
+                        name: provider.key,
+                        imageUrl: provider.icon,
+                    })),
+                    {
+                        label: 'Custom',
+                        name: 'custom',
+                        icon: 'ic_provider_other',
+                    },
+                ],
+                totalCount: size(providers) + 1,
+                dataType: 'object',
+            };
+        }
+        const param = cloneDeep(staticParam);
+        param.search = inputText;
+        if (currentDataType === 'object') {
+            param.options.search_type = currentDataType === 'object' ? 'key' : 'value';
+        }
+        if (subPath) {
+            param.distinct_key = `${distinct}.${subPath}`;
+            if (param.distinct_key.split('.').length === 2) param.distinct_key = `tag_keys.${subPath}`;
+        }
+        if (filters) {
+            param.options.filter = filters;
+        }
+
+        try {
+            const res = await SpaceConnector.client.addOns.autocomplete.distinct(param);
+
+            const isTagKeysParam = param.distinct_key.split('.')[0] === 'tag_keys';
+            if (isTagKeysParam) return getHandlerResp(res.results[0]?.key, res.results.map((d) => ({ label: d.name, name: d.key })), res.total_count, 'object');
+            if (keyItem.dataType === 'object') return getHandlerResp(res.results[0]?.key, res.results.map((d) => ({ label: d.name, name: d.key })), res.total_count);
+
+            return {
+                results: res.results.reduce((results, d) => {
+                    if (d.name !== '' && d.name !== undefined && d.name !== null) results.push({ label: d.name, name: d.key });
+                    return results;
+                }, []),
+                totalCount: res.total_count,
+            };
+        } catch (e) {
+            return {
+                results: [],
+                totalCount: 0,
+            };
+        }
+    };
 }
