@@ -38,7 +38,7 @@
                 <template #default="{invalid}">
                     <p-text-input
                         :invalid="invalid"
-                        :placeholder="state.name"
+                        :placeholder="state.placeHolder"
                         :value="nameInput"
                         @update:value="handlePTextInput"
                     />
@@ -74,6 +74,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     name: useProxyValue('name', props, emit),
+    placeHolder: dashboardDetailState.name,
     editMode: false,
     dashboardNameList: computed<string[]>(() => {
         if (dashboardDetailState.projectId) {
