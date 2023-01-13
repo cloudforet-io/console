@@ -22,14 +22,16 @@
             show-select-marker
             @update:selected="handleUpdateSelected"
         />
-        <p-filterable-query-dropdown
+        <p-query-input
             v-else-if="category === FILTER.TAGS || category === FILTER.ADDITIONAL_INFO"
             class="filterable-query-dropdown"
             :key-item-sets="querySearchHandlerState.keyItemSets"
             :value-handler-map="querySearchHandlerState.valueHandlerMap"
             :selected="querySearchHandlerState.selectedQueryItems"
             use-fixed-menu-style
-            multi-selectable
+            multi-input
+            block
+            appearance-type="stack"
             @update:selected="handleUpdateSelectedQueryItems"
         />
         <p-filterable-dropdown
@@ -52,7 +54,7 @@ import {
 } from 'vue';
 
 import {
-    PFilterableQueryDropdown,
+    PQueryInput,
     PFilterableDropdown,
 } from '@spaceone/design-system';
 import type {
@@ -86,7 +88,7 @@ interface Props {
 export default {
     name: 'CostExplorerFilterItem',
     components: {
-        PFilterableQueryDropdown,
+        PQueryInput,
         ProjectSelectDropdown,
         PFilterableDropdown,
     },
