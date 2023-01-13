@@ -13,27 +13,28 @@ import type {
 import { SpaceConnector } from '@/space-connector';
 import type { ApiFilter } from '@/space-connector/type';
 
+
 type KeyTuple = [string, string|undefined, KeyDataType|undefined]; // name, label, dataType
 type KeyParam = Array<KeyTuple | string | KeyItemSet>;
 
-const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, dataType?: KeyDataType) => {
-    if (d === undefined || d === null) {
+const getHandlerResp = (data: any, results: ValueItem[] = [], totalCount?: number, dataType?: KeyDataType) => {
+    if (data === undefined || data === null) {
         return {
             results: [],
             totalCount: undefined,
             dataType: dataType || undefined,
         };
     }
-    if (typeof d === 'string' || typeof d === 'boolean') {
+    if (typeof data === 'string' || typeof data === 'boolean') {
         return {
             results,
             totalCount,
-            dataType: dataType || typeof d,
+            dataType: dataType || typeof data,
         };
     }
-    if (typeof d === 'number') {
+    if (typeof data === 'number') {
         let type;
-        if (Math.floor(d) !== d) type = 'float';
+        if (Math.floor(data) !== data) type = 'float';
         else type = 'integer';
 
         return {
@@ -44,24 +45,24 @@ const getHandlerResp = (d: any, results: ValueItem[] = [], totalCount?: number, 
     }
 
     /* array case */
-    if (Array.isArray(d)) {
-        if (typeof d[0] === 'object') {
+    if (Array.isArray(data)) {
+        if (typeof data[0] === 'object') {
             /* when first item is array */
-            if (Array.isArray(d[0])) {
-                const next = uniq(flatten(d));
-                return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), d.length, 'object');
+            if (Array.isArray(data[0])) {
+                const next = uniq(flatten(data));
+                return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), data.length, 'object');
             }
             /* when first item is object */
-            const next = uniq(flatMap(d, ((t) => Object.keys(t))));
-            return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), d.length, 'object');
+            const next = uniq(flatMap(data, ((t) => Object.keys(t))));
+            return getHandlerResp(next, next.map((t) => ({ label: t, name: t })), data.length, 'object');
         }
 
         /* when first item is primitive type */
-        return getHandlerResp(d, d.map((t) => ({ label: t, name: t })), d.length, 'object');
+        return getHandlerResp(data, data.map((t) => ({ label: t, name: t })), data.length, 'object');
     }
 
     /* object case */
-    const keys = Object.keys(d);
+    const keys = Object.keys(data);
     return {
         results: keys.map((k) => ({ label: k, name: k })),
         totalCount: keys.length,
