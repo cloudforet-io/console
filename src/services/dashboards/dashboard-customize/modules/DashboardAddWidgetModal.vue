@@ -101,7 +101,7 @@ export default defineComponent<Props>({
         $modal-hedaer: 3.5rem;
         $modal-padding: 8rem;
         $modal-footer: 4rem;
-        $tab-bar: 3rem;
+        $tab-bar: 4rem;
 
         /* custom design-system component - p-button-modal */
         :deep(.modal-body) {
