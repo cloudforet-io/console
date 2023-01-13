@@ -143,7 +143,10 @@ const handleUpdateSearchText = debounce((text: string) => {
 watch(visibleMenu, (_visibleMenu) => {
     if (_visibleMenu) {
         initiateMenu();
-    } else updateVariablesUse();
+    } else {
+        updateVariablesUse();
+        state.searchText = '';
+    }
     // Reflect selectedForUpdate changes after the dropdown is closed.
 }, { immediate: true });
 
