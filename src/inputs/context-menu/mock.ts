@@ -14,10 +14,16 @@ export const menuItems: MenuItem[] = [
         label: 'Create', name: 'create',
     },
     {
-        label: 'Update', name: 'update', imageUrl: 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/spaceone.svg',
+        label: 'Update', name: 'update',
     },
     {
         label: 'Delete', name: 'delete', disabled: true,
+    },
+    {
+        label: 'ImageUrl', name: 'image-url', imageUrl: 'test',
+    },
+    {
+        label: 'Icon', name: 'icon', icon: 'ic_trashcan',
     },
     { type: 'divider', name: 'collect-divider' },
     {

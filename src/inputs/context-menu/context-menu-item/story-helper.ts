@@ -199,6 +199,24 @@ export const getContextMenuItemArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
+    icon: {
+        name: 'icon',
+        type: { name: 'string' },
+        description: 'Icon in Left Content Area.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '',
+            },
+        },
+        control: {
+            type: 'text',
+        },
+    },
     imageUrl: {
         name: 'imageUrl',
         type: { name: 'string' },

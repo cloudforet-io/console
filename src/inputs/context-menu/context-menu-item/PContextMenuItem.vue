@@ -11,7 +11,13 @@
              width="1em"
              height="1em"
         />
-        <p-lazy-img v-if="imageUrl"
+        <p-i v-if="icon"
+             class="left-icon"
+             :name="icon"
+             width="1rem"
+             height="1rem"
+        />
+        <p-lazy-img v-if="!icon && imageUrl"
                     class="left-icon"
                     :src="imageUrl"
                     width="1rem"
@@ -79,6 +85,7 @@ export interface ContextMenuItemProps {
     ellipsis?: boolean;
     highlightTerm?: string;
     readonly?: boolean;
+    icon?: string;
     imageUrl?: string;
 }
 
@@ -132,6 +139,10 @@ export default defineComponent<ContextMenuItemProps>({
         readonly: {
             type: Boolean,
             default: false,
+        },
+        icon: {
+            type: String,
+            default: undefined,
         },
         imageUrl: {
             type: String,
