@@ -141,6 +141,7 @@ const handleDelete = (index: number) => {
 :deep(.p-text-input) {
     .input-container {
         min-height: 1.5rem;
+        height: 1.5rem;
     }
 }
 </style>
