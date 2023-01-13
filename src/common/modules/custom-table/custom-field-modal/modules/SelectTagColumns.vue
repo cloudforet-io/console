@@ -1,163 +1,113 @@
 <template>
-    <fragment>
-        <p-autocomplete-search v-model="search"
-                               :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_TAG')"
-                               :menu="allTagsMenuItems"
-                               :loading="loading"
-                               use-fixed-menu-style
-                               @select-menu="onSelectTag"
-        >
-            <template #menu-item--format="{item, id}">
-                <p-check-box :id="id"
-                             v-model="selectedTagKeys"
-                             class="tag-menu-item"
-                             :value="item.name"
-                >
-                    {{ item.label }}
-                </p-check-box>
-            </template>
-            <template #menu-no-data-format>
-                <div v-if="loading"
-                     class="fake-no-data"
-                />
-            </template>
-        </p-autocomplete-search>
-        <div class="tag-box">
-            <p-tag v-for="(tag, i) in selectedTagKeys"
-                   :key="tag"
-                   @delete="onDeleteTag(i)"
-            >
-                {{ tag ? tag.slice(TAGS_PREFIX.length) : '' }}
-            </p-tag>
-        </div>
-    </fragment>
+    <p-text-input :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_TAG')"
+                  :handler="handler"
+                  :selected="selected"
+                  multi-input
+                  use-auto-complete
+                  use-fixed-menu-style
+                  appearance-type="stack"
+                  block
+                  @update:selected="handleUpdateSelected"
+    />
 </template>
 
-<script lang="ts">
-import type { PropType, SetupContext } from 'vue';
+<script setup lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs,
+    computed, ref, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
-    PAutocompleteSearch, PCheckBox, PTag,
+    PTextInput,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { TextInputHandler, InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 
-interface Props {
-    selectedKeys: string[];
-    allTags: string[];
-    loading: boolean;
-}
+const props = withDefaults(defineProps<{
+    resourceType?: string;
+    selectedTagKeys?: string[];
+    options?: {
+        provider?: string;
+        cloudServiceGroup?: string;
+        cloudServiceType?: string;
+    };
+    isServerPage?: boolean;
+}>(), {
+    selectedTagKeys: () => [],
+    options: () => ({}),
+    isServerPage: false,
+    resourceType: '',
+});
+const emit = defineEmits<{(e: 'update:selected-tag-keys', tagKeys: string[]): void}>();
 
-export default defineComponent<Props>({
-    name: 'SelectTagColumns',
-    components: {
-        PAutocompleteSearch,
-        PCheckBox,
-        PTag,
-    },
-    props: {
-        selectedKeys: {
-            type: Array as PropType<string[]>,
-            default: () => [],
-        },
-        allTags: {
-            type: Array as PropType<string[]>,
-            default: () => [],
-        },
-        loading: {
-            type: Boolean,
-            default: true,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
-        const state = reactive({
-            search: '',
-            proxySelectedKeys: useProxyValue('selectedKeys', props, emit),
-            selectedTagKeys: computed<string[]>({
-                get: () => props.selectedKeys.filter((key) => key.startsWith(TAGS_PREFIX)),
-                set: (val: string[]) => {
-                    state.proxySelectedKeys = props.selectedKeys
-                        .filter((key) => !key.startsWith(TAGS_PREFIX))
-                        .concat(val);
-                },
-            }),
-            allTagsMenuItems: computed(() => props.allTags.map((d) => ({
-                name: `${TAGS_PREFIX}${d}`,
-                label: d,
-                type: 'item',
-            }))),
+/* handler */
+const tagsQueryHelper = new QueryHelper();
+const filters = computed<ApiFilter[]>(() => {
+    tagsQueryHelper.setFilters([]);
+    const { provider, cloudServiceGroup, cloudServiceType } = props.options;
+    if (provider) tagsQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
+    if (cloudServiceGroup) tagsQueryHelper.addFilter({ k: 'cloud_service_group', v: cloudServiceGroup, o: '=' });
+    if (cloudServiceType) tagsQueryHelper.addFilter({ k: 'cloud_service_type', v: cloudServiceType, o: '=' });
+    if (props.isServerPage) tagsQueryHelper.addFilter({ k: 'ref_cloud_service_type.labels', v: 'Server', o: '=' });
+    return tagsQueryHelper.apiQuery.filter;
+});
+const handler: TextInputHandler = async (search) => {
+    try {
+        const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
+            search,
+            resource_type: props.resourceType,
+            distinct_key: 'tags',
+            options: {
+                search_type: 'key',
+                filter: filters.value,
+                limit: 10,
+            },
         });
 
-        const onDeleteTag = (idx) => {
-            state.selectedTagKeys.splice(idx, 1);
-            vm.$nextTick(() => {
-                state.selectedTagKeys = [...state.selectedTagKeys];
-            });
-        };
-
-        const onSelectTag = (item: Required<MenuItem>) => {
-            state.search = '';
-            const idx = state.selectedTagKeys.findIndex((k) => k === item.name);
-            if (idx !== -1) {
-                onDeleteTag(idx);
-            } else {
-                state.selectedTagKeys = [...state.selectedTagKeys, item.name];
-            }
-        };
-
-        const clearSelectedTags = () => {
-            state.selectedTagKeys = [];
-            state.search = '';
-        };
-
         return {
-            ...toRefs(state),
-            onDeleteTag,
-            onSelectTag,
-            clearSelectedTags,
-            TAGS_PREFIX,
+            results: results.map((data) => ({ label: data.name, name: `${TAGS_PREFIX}${data.key}` })),
         };
-    },
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return {
+            results: [],
+        };
+    }
+};
+
+/* converters: string[] <-> InputItem[] */
+const getInputItemsFromTagKeys = (keys: string[]): InputItem[] => keys.map((key) => {
+    if (key.startsWith(TAGS_PREFIX)) {
+        return { label: key.slice(TAGS_PREFIX.length), name: key };
+    }
+    return { label: key, name: `${TAGS_PREFIX}${key}` };
 });
+const getTagKeysFromInputItems = (items: InputItem[]): string[] => items.map((item) => {
+    const key = item.name;
+    if (key.startsWith(TAGS_PREFIX)) {
+        return key;
+    }
+    return `${TAGS_PREFIX}${key}`;
+});
+
+/* selection */
+const selected = ref<InputItem[]>(getInputItemsFromTagKeys(props.selectedTagKeys));
+const handleUpdateSelected = (items: InputItem[]) => {
+    selected.value = items;
+    const tagKeys = getTagKeysFromInputItems(items);
+    emit('update:selected-tag-keys', tagKeys);
+};
+watch(() => props.selectedTagKeys, (tagKeys) => {
+    const currentKeys = getTagKeysFromInputItems(selected.value);
+    if (JSON.stringify(currentKeys) !== JSON.stringify(tagKeys)) {
+        const items = getInputItemsFromTagKeys(tagKeys);
+        selected.value = items;
+    }
+});
+
 </script>
-
-<style lang="postcss" scoped>
-
-/* custom design-system component - p-checkbox */
-:deep(.tag-menu-item.p-checkbox) {
-    @apply bg-transparent;
-    display: flex;
-    width: 100%;
-    .check-icon {
-        flex-shrink: 0;
-        margin-right: 0.5rem;
-        margin-top: 0.125rem;
-    }
-    .text {
-        word-break: break-word;
-        white-space: normal;
-    }
-}
-.tag-box {
-    @apply text-gray-900;
-    margin-top: 0.625rem;
-    .p-tag {
-        margin-bottom: 0.5rem;
-    }
-}
-
-/* custom design-system component - p-autocomplete-search */
-:deep(.p-autocomplete-search) {
-    .p-context-menu {
-        max-height: 50vh;
-    }
-}
-</style>
