@@ -257,7 +257,7 @@ const refreshWidget = async (): Promise<Data[]> => {
     state.data = await fetchData();
     refreshRoot();
     await nextTick();
-    drawChart(state.chartData);
+    if (root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
