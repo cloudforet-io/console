@@ -44,7 +44,7 @@ import {
 } from 'vue';
 
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
-import { find } from 'lodash';
+import { find, isEqual } from 'lodash';
 
 import type { RawPagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
@@ -234,7 +234,8 @@ export default {
         };
 
         /* Watcher */
-        watch(() => state.pagePermissions, (pagePermissions) => {
+        watch(() => state.pagePermissions, (pagePermissions, prevPagePermissions) => {
+            if (isEqual(pagePermissions, prevPagePermissions)) return;
             emit('update-form', pagePermissions);
         });
         watch(() => props.initialPagePermissions, (initialPagePermissions) => {
