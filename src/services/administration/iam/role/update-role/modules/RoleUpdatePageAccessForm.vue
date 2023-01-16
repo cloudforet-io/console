@@ -51,6 +51,8 @@ import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
     getPagePermissionMapFromRaw,
 } from '@/lib/access-control/page-permission-helper';
+import config from '@/lib/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import type { RoleType } from '@/services/administration/iam/role/config';
 import { ROLE_TYPE } from '@/services/administration/iam/role/config';
@@ -58,6 +60,7 @@ import { getPageAccessMenuList } from '@/services/administration/iam/role/lib/pa
 import type { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
+
 
 const getIndividualPagePermissions = (menuItem: PageAccessMenuItem): RawPagePermission[] => {
     if (menuItem.id === 'all') return [];
@@ -169,7 +172,12 @@ export default {
                 isViewed: false,
                 isManaged: false,
                 hideMenu: false,
-            }]),
+            }]).filter((menu) => {
+                if (menu.id === MENU_ID.DASHBOARDS) {
+                    return config.get('DASHBOARD_ENABLED');
+                }
+                return true;
+            }),
         });
         const state = reactive({
             hideAllMenu: computed(() => formState.menuItems.find((d) => d.id === 'all')?.hideMenu),
