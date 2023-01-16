@@ -26,9 +26,27 @@
                    @change="handleQueryChange"
                    @refresh="handleQueryChange()"
         />
-        <div v-if="(projectDashboardList.length && scopeStatus !== SCOPE_TYPE.DOMAIN) || (workspaceDashboardList.length && scopeStatus !== SCOPE_TYPE.PROJECT)"
-             class="dashboard-list-wrapper"
+        <p-data-loader :loading="loading"
+                       :data="Boolean(dashboardTotalCount)"
+                       class="dashboard-list-wrapper"
         >
+            <template #no-data>
+                <div class="empty-case">
+                    {{ projectDashboardList }}
+                    {{ workspaceDashboardList.length }}
+                    <img class="empty-image"
+                         src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
+                    >
+                    <p-empty class="empty-text">
+                        {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
+                    </p-empty>
+                    <p-button icon-left="ic_plus"
+                              @click="handleCreateDashboard"
+                    >
+                        {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREAT_NEW_DASHBOARD') }}
+                    </p-button>
+                </div>
+            </template>
             <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.PROJECT && workspaceDashboardList.length"
                                   :scope-type="DASHBOARD_SCOPE.DOMAIN"
                                   class="dashboard-list"
@@ -43,22 +61,7 @@
                                   :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT')"
                                   :dashboard-list="projectDashboardList"
             />
-        </div>
-        <div v-else
-             class="empty-case"
-        >
-            <img class="empty-image"
-                 src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
-            >
-            <p-empty class="empty-text">
-                {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
-            </p-empty>
-            <p-button icon-left="ic_plus"
-                      @click="handleCreateDashboard"
-            >
-                {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREAT_NEW_DASHBOARD') }}
-            </p-button>
-        </div>
+        </p-data-loader>
     </div>
 </template>
 
@@ -70,7 +73,7 @@ import {
 
 
 import {
-    PPageTitle, PDivider, PButton, PToolbox, PEmpty,
+    PPageTitle, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
@@ -91,6 +94,7 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 export default {
     name: 'AllDashboardsPage',
     components: {
+        PDataLoader,
         PEmpty,
         PToolbox,
         DashboardBoardList,
@@ -103,6 +107,7 @@ export default {
         const state = reactive({
             viewersStatus: computed(() => store.state.dashboard.viewers),
             scopeStatus: computed(() => store.state.dashboard.scope),
+            loading: computed(() => store.state.dashboard.loading),
             workspaceDashboardList: computed(() => store.getters['dashboard/getDomainItems']),
             projectDashboardList: computed(() => store.getters['dashboard/getProjectItems']),
             dashboardTotalCount: computed(() => store.getters['dashboard/getDashboardCount']),
@@ -186,6 +191,7 @@ export default {
     .dashboard-list-wrapper {
         @apply flex w-full;
         gap: 0.5rem;
+        min-height: 16.875rem;
 
         .dashboard-list {
             @apply flex-grow;

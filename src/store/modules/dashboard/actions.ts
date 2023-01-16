@@ -30,6 +30,15 @@ export const loadProjectDashboard: Action<DashboardState, any> = async ({ commit
     }
 };
 
+export const loadAllDashboard: Action<DashboardState, any> = async ({ dispatch, commit }): Promise<void> => {
+    commit('setLoading', true);
+    await Promise.allSettled([
+        await dispatch('loadDomainDashboard'),
+        await dispatch('loadProjectDashboard'),
+    ]);
+    commit('setLoading', false);
+};
+
 export const setSearchFilters: Action<DashboardState, any> = ({ commit }, searchFilters: ConsoleFilter[] = []): void => {
     commit('setSearchFilters', searchFilters);
 };

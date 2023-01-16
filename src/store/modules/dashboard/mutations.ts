@@ -29,3 +29,7 @@ export const setSelectedViewers: Mutation<DashboardState> = (state, viewers: str
 export const setSelectedScope: Mutation<DashboardState> = (state, scope: string): void => {
     state.scope = scope;
 };
+
+export const setLoading: Mutation<DashboardState> = (state, loading: boolean): void => {
+    state.loading = loading;
+};
