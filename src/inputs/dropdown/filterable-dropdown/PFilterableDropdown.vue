@@ -5,7 +5,7 @@
     >
         <div ref="targetRef"
              class="dropdown-button"
-             :tabindex="disabled || readonly ? -1 : 0"
+             :tabindex="(disabled || readonly) ? -1 : 0"
              @keyup.down="focusOnContextMenu(0)"
              @keyup.esc.capture.stop="hideMenu"
              @keyup.enter.capture.stop="toggleMenu"
@@ -64,6 +64,7 @@
                         :multi-selectable="props.multiSelectable"
                         :show-select-header="props.showSelectHeader"
                         :show-select-marker="props.showSelectMarker"
+                        show-clear-selection
                         :style="contextMenuStyle"
                         :class="{ default: !props.showSelectMarker }"
                         @select="handleSelectMenuItem"
@@ -160,13 +161,13 @@ const emit = defineEmits<{(e: 'update:visible-menu', visibleMenu: boolean): void
 /* selection */
 const proxySelected = ref<MenuItem[]>(props.selected);
 const updateSelected = (selected: MenuItem[]) => {
-    if (proxySelected.value !== selected && !isEqual(proxySelected.value, selected)) {
-        proxySelected.value = selected;
-        emit('update:selected', selected);
-    }
+    proxySelected.value = selected;
+    emit('update:selected', selected);
 };
 watch(() => props.selected, (selected) => {
-    updateSelected(selected);
+    if (proxySelected.value !== selected && !isEqual(proxySelected.value, selected)) {
+        updateSelected(selected);
+    }
 });
 const handleSelectMenuItem = (item: FilterableDropdownMenuItem) => {
     if (!props.multiSelectable) hideMenu();
@@ -175,6 +176,7 @@ const handleSelectMenuItem = (item: FilterableDropdownMenuItem) => {
 const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
     updateSelected(selected);
 };
+
 
 /* menu visibility */
 const proxyVisibleMenu = useProxyValue<boolean>('visibleMenu', props, emit);

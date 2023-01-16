@@ -22,7 +22,7 @@
             </template>
         </p-field-group>
         <template v-else-if="typeof rawFormData === 'object'">
-            <p-field-group v-for="schemaProperty in schemaProperties"
+            <p-field-group v-for="(schemaProperty, propertyIdx) in schemaProperties"
                            :key="`field-${contextKey}-${schemaProperty.propertyName}`"
                            class="input-form-wrapper"
                            :label="schemaProperty.title"
@@ -58,13 +58,13 @@
                                         :disabled="schemaProperty.disabled"
                                         :invalid="invalid"
                                         class="input-form"
-                                        @update:value="handleUpdateFormValue(schemaProperty, ...arguments)"
+                                        @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                     />
                     <p-json-schema-form v-else-if="schemaProperty.componentName === 'PJsonSchemaForm'"
                                         :form-data="rawFormData[schemaProperty.propertyName]"
                                         :schema="schemaProperty"
                                         :is-root="false"
-                                        @update:form-data="handleUpdateFormValue(schemaProperty, ...arguments)"
+                                        @update:form-data="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                     />
                     <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
                                        :selected="rawFormData[schemaProperty.propertyName]"
@@ -72,7 +72,7 @@
                                        :disabled="schemaProperty.disabled"
                                        use-fixed-menu-style
                                        class="input-form"
-                                       @update:selected="handleUpdateFormValue(schemaProperty, ...arguments)"
+                                       @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                     >
                         <template #default="{ item }">
                             <slot name="dropdown-extra"
@@ -88,7 +88,7 @@
                                            use-fixed-menu-style
                                            :invalid="invalid"
                                            class="input-form"
-                                           @update:selected="handleUpdateFormValue(schemaProperty, ...arguments)"
+                                           @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                     >
                         <template #selected-extra="{ items }">
                             <slot name="dropdown-extra"
@@ -107,8 +107,8 @@
                                       :disabled="schemaProperty.disabled"
                                       :multi-input="schemaProperty.multiInputMode"
                                       class="input-form"
-                                      @update:value="!schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, ...arguments)"
-                                      @update:selected="schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, ...arguments)"
+                                      @update:value="!schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                                      @update:selected="schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                         />
                     </template>
                 </template>
@@ -288,8 +288,15 @@ export default defineComponent<JsonSchemaFormProps>({
 
         /* Event Handlers */
         // form input case
-        const handleUpdateFormValue = (property: InnerJsonSchema, val?: any) => {
-            const { propertyName } = property;
+        const handleUpdateFormValue = (property: InnerJsonSchema, propertyIdx: number, val?: any) => {
+            const { propertyName, componentName } = property;
+
+            /*
+            If the schema is changed, the component to which rawFormData is bound may change.
+            Don't handle events from other components and return early.
+             */
+            if (state.schemaProperties[propertyIdx].componentName !== componentName) return;
+
             state.rawFormData[propertyName] = val;
             state.refinedFormData = {
                 ...state.refinedFormData,
