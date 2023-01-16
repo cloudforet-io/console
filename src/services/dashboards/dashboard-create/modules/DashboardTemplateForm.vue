@@ -14,6 +14,7 @@
                                 style-type="cards"
                                 :style-options="{ column: 2 }"
                                 :board-sets="defaultTemplateState.boardSets"
+                                :selected-item="state.selectedTemplateName"
                                 @item-click="handleSelectTemplate"
                             >
                                 <template #item-content="{board}">
@@ -22,6 +23,7 @@
                                         <p-label v-for="(label, idx) in board.labels"
                                                  :key="`board-${board.name}-label-${idx}`"
                                                  :text="label"
+                                                 :click-stop="false"
                                         />
                                     </div>
                                 </template>
@@ -49,6 +51,7 @@
                                     style-type="cards"
                                     :style-options="{ column: 2 }"
                                     :board-sets="existingTemplateState.boardSets"
+                                    :selected-item="state.selectedTemplateName"
                                     @item-click="handleSelectTemplate"
                                 >
                                     <template #item-content="{board}">
@@ -57,6 +60,7 @@
                                             <p-label v-for="(label, idx) in board.labels"
                                                      :key="`board-${board.name}-label-${idx}`"
                                                      :text="label"
+                                                     :click-stop="false"
                                             />
                                         </div>
                                     </template>
@@ -100,6 +104,9 @@ const emit = defineEmits(['set-template']);
 
 type DashboardTemplateBoardSet = DashboardConfig & { leftIcon: string, iconButtonSets: Array<any> };
 
+const state = reactive({
+    selectedTemplateName: '',
+});
 const defaultTemplateState = reactive({
     thisPage: 1,
     allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
@@ -145,6 +152,7 @@ const existingTemplateState = reactive({
 });
 
 const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
+    state.selectedTemplateName = selectedTemplate.name;
     const _selectedTemplate: Partial<DashboardTemplateBoardSet> = { ...selectedTemplate };
     delete _selectedTemplate.leftIcon;
     delete _selectedTemplate.iconButtonSets;
