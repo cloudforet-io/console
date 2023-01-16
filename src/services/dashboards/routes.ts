@@ -1,7 +1,10 @@
 import type { RouteConfig } from 'vue-router';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
@@ -14,20 +17,17 @@ const DashboardCreatePage = () => import('@/services/dashboards/dashboard-create
 const DashboardCustomizePage = () => import('@/services/dashboards/dashboard-customize/DashboardCustomizePage.vue');
 const DashboardDetailPage = () => import('@/services/dashboards/dashboard-detail/DashboardDetailPage.vue');
 
-// TODO: remove after test
-const WidgetPreviewPage = () => import('@/services/dashboards/widgets/WidgetsPreviewPage.vue');
-
 const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
     name: DASHBOARDS_ROUTE._NAME,
-    redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
+    meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+    redirect: () => getRedirectRouteByPagePermission(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionMap']),
     component: DashboardsContainer,
     children: [
         {
             path: '/',
             component: { template: '<router-view/>' },
             redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
-            meta: { menuId: MENU_ID.DASHBOARDS },
             children: [
                 {
                     path: 'all',
@@ -40,12 +40,6 @@ const dashboardsRoute: RouteConfig = {
                     name: DASHBOARDS_ROUTE.CREATE._NAME,
                     meta: { translationId: 'DASHBOARDS.CREATE.TITLE' },
                     component: DashboardCreatePage,
-                },
-                // TODO: remove after test
-                {
-                    path: 'widgets/:widgetId',
-                    props: true,
-                    component: WidgetPreviewPage,
                 },
                 {
                     path: ':dashboardScope',
