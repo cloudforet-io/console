@@ -71,10 +71,16 @@ const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
     tableFields: computed<Field[]>(() => [
         { label: 'Target', name: 'target', textOptions: { type: 'reference', referenceType: 'projectGroup' } },
-        { label: 'Total spent', name: 'total_spent', textOptions: { type: 'cost' } },
-        { label: 'Total budget', name: 'total_budget', textOptions: { type: 'cost' } },
+        {
+            label: 'Total spent', name: 'total_spent', textOptions: { type: 'cost' }, textAlign: 'right',
+        },
+        {
+            label: 'Total budget', name: 'total_budget', textOptions: { type: 'cost' }, textAlign: 'right',
+        },
         { label: ' ', name: 'progress' },
-        { label: 'Rate', name: 'budget_usage', textOptions: { type: 'percent' } },
+        {
+            label: 'Rate', name: 'budget_usage', textOptions: { type: 'percent' }, textAlign: 'right',
+        },
     ]),
     tableItems: computed<Partial<Data>>(() => state.data?.results?.map((d) => ({
         ...d,

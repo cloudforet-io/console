@@ -452,6 +452,9 @@ const handleClickRow = (rowData) => {
         }
         &.right {
             @apply text-right;
+            .td-contents {
+                @apply justify-end;
+            }
         }
         &.detail-item:hover {
             @apply bg-blue-100;

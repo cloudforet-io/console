@@ -116,9 +116,15 @@ const state = reactive({
         };
         return [
             { label: 'Region', name: GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' } },
-            { name: `${state.fieldsKey}_sum.0.value`, label: 'Transfer-out', textOptions },
-            { name: `${state.fieldsKey}_sum.1.value`, label: 'Transfer-in', textOptions },
-            { name: `${state.fieldsKey}_sum.2.value`, label: 'etc.', textOptions },
+            {
+                name: `${state.fieldsKey}_sum.0.value`, label: 'Transfer-out', textOptions, textAlign: 'right',
+            },
+            {
+                name: `${state.fieldsKey}_sum.1.value`, label: 'Transfer-in', textOptions, textAlign: 'right',
+            },
+            {
+                name: `${state.fieldsKey}_sum.2.value`, label: 'etc.', textOptions, textAlign: 'right',
+            },
         ];
     }),
     thisPage: 1,

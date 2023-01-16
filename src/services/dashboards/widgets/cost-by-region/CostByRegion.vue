@@ -116,9 +116,15 @@ const props = defineProps<WidgetProps>();
 const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
     tableFields: computed<Field[]>(() => [
-        { label: 'Provider', name: GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' } },
-        { label: 'Region', name: GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' } },
-        { label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' } },
+        {
+            label: 'Provider', name: GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' },
+        },
+        {
+            label: 'Region', name: GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' },
+        },
+        {
+            label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' }, textAlign: 'right',
+        },
     ]),
     legends: [] as Legend[],
     chartLegends: computed(() => uniqWith(state.legends, isEqual)),

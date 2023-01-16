@@ -124,9 +124,11 @@ const state = reactive({
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
         return [
             { name: state.groupBy, label: groupByLabel, textOptions: { type: 'reference', referenceType } },
-            { name: `${state.fieldsKey}_sum.0.value`, label: 'Transfer-out', textOptions },
-            { name: `${state.fieldsKey}_sum.1.value`, label: 'Requests (HTTP)' },
-            { name: `${state.fieldsKey}_sum.2.value`, label: 'Requests (HTTPS)' },
+            {
+                name: `${state.fieldsKey}_sum.0.value`, label: 'Transfer-out', textOptions, textAlign: 'right',
+            },
+            { name: `${state.fieldsKey}_sum.1.value`, label: 'Requests (HTTP)', textAlign: 'right' },
+            { name: `${state.fieldsKey}_sum.2.value`, label: 'Requests (HTTPS)', textAlign: 'right' },
         ];
     }),
     dateRange: computed<DateRange>(() => ({

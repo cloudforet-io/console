@@ -102,8 +102,17 @@ const state = reactive({
         const groupByLabel = GROUP_BY_ITEM_MAP[state.groupBy]?.label ?? state.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.groupBy) as ReferenceType;
         return [
-            { name: state.groupBy, label: groupByLabel, textOptions: { type: 'reference', referenceType } },
-            { label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' } },
+            {
+                name: state.groupBy,
+                label: groupByLabel,
+                textOptions: { type: 'reference', referenceType },
+            },
+            {
+                label: 'Cost',
+                name: 'usd_cost_sum',
+                textOptions: { type: 'cost' },
+                textAlign: 'right',
+            },
         ];
     }),
     legends: [] as Legend[],
