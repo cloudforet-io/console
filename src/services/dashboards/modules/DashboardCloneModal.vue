@@ -218,9 +218,10 @@ export default defineComponent<Props>({
             if (!isAllValid) return;
             const clonedDashboardId = state.projectId ? await createProjectDashboard() : await createDomainDashboard();
             if (clonedDashboardId) {
+                const routeName = state.projectId ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
                 await SpaceRouter.router.push({
-                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
-                    params: { dashboardScope: state.projectId ? 'project' : 'domain', dashboardId: clonedDashboardId },
+                    name: routeName,
+                    params: { dashboardId: clonedDashboardId },
                 });
                 await Promise.allSettled([
                     store.dispatch('dashboard/loadProjectDashboard'),

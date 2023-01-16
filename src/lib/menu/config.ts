@@ -2,6 +2,8 @@
 export const MENU_ID = Object.freeze({
     HOME_DASHBOARD: 'home-dashboard',
     DASHBOARDS: 'dashboards',
+    DASHBOARDS_PROJECT: 'dashboards.project',
+    DASHBOARDS_WORKSPACE: 'dashboards.workspace',
     PROJECT: 'project',
     ASSET_INVENTORY: 'asset_inventory',
     ASSET_INVENTORY_CLOUD_SERVICE: 'asset_inventory.cloud_service',
