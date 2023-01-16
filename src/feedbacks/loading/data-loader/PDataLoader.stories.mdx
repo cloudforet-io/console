@@ -452,6 +452,27 @@ e.g. `gray.900`
 <br/>
 <br/>
 
+## No Data
+<Canvas>
+    <Story name="No Data" >
+        {{
+            components: { PDataLoader, PButton },
+            template: `
+<div class="w-full">
+    <p-data-loader :data="false" :loading="false"
+        class="p-3 bg-gray-100 border border-gray-200"
+        style="width: 100%; height: 300px;"
+    >
+    </p-data-loader>
+</div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Playground
 
 <Canvas>
