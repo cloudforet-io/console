@@ -9,8 +9,7 @@
                                :disabled="disabled"
                                :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
                                :selected.sync="selectedItems"
-                               readonly
-                               disable-delete-all
+                               :readonly="readonly"
                                disable-handler
                                appearance-type="stack"
                                @update:visible-menu="handleUpdateVisibleMenu"
@@ -126,6 +125,10 @@ export default {
             default: false,
         },
         disabled: {
+            type: Boolean,
+            default: false,
+        },
+        readonly: {
             type: Boolean,
             default: false,
         },
