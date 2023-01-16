@@ -25,14 +25,16 @@
                 />
             </span>
 
-            <div v-show="isOpened && hasCustomMenu"
+            <div v-if="hasCustomMenu"
+                 v-show="isOpened"
                  class="custom-menu-wrapper"
             >
                 <g-n-b-dashboard-menu v-show="menuId === MENU_ID.DASHBOARDS"
                                       @close="hideMenu"
                 />
             </div>
-            <div v-if="isOpened && hasSubMenu"
+            <div v-if="hasSubMenu"
+                 v-show="isOpened"
                  class="sub-menu-wrapper"
                  @click="hideMenu"
             >
