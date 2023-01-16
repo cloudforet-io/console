@@ -55,7 +55,7 @@
                     />
                 </div>
                 <p-skeleton width="9rem"
-                            height="100%"
+                            height="9rem"
                 />
             </template>
         </p-data-loader>
@@ -281,6 +281,8 @@ defineExpose<WidgetExpose<Data[]>>({
 <style lang="postcss" scoped>
 .budget-usage-summary {
     padding: 0 1.5rem;
+    height: 100%;
+    min-height: 10rem;
     .budget {
         @apply flex flex-col row-gap-1 text-gray-900;
         line-height: 1.25;
@@ -311,14 +313,19 @@ defineExpose<WidgetExpose<Data[]>>({
         height: 100%;
     }
 }
+
+/* custom design-system component - p-data-loader-container */
 :deep(.data-loader-container) {
+    > .no-data-wrapper {
+        min-height: 100%;
+    }
     > .loader-wrapper > .loader {
         @apply flex-col items-start justify-start;
     }
     .skeleton-wrapper {
         @apply flex flex-col;
         &:last-of-type {
-            margin-top: 3.8125rem;
+            margin-top: 2.5rem;
             margin-bottom: 1.875rem;
         }
     }
