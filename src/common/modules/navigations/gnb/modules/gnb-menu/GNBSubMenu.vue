@@ -135,6 +135,7 @@ export default defineComponent<Props>({
                 @apply truncate;
                 display: inline-block;
                 width: 100%;
+                line-height: 1.25;
             }
         }
         .is-exist-extra-mark {
