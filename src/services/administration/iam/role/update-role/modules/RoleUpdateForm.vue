@@ -6,6 +6,7 @@
                                            @update-form="handleUpdateBaseInfoForm"
         />
         <role-update-page-access-form :initial-page-permissions="pageAccessFormData"
+                                      :role-type="baseInfoFormData.roleType"
                                       @update-form="handleUpdatePageAccessForm"
         />
         <policy-list-data-table class="policy-list-data-table"

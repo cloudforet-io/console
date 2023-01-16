@@ -52,29 +52,92 @@ import {
     getPagePermissionMapFromRaw,
 } from '@/lib/access-control/page-permission-helper';
 
+import type { RoleType } from '@/services/administration/iam/role/config';
+import { ROLE_TYPE } from '@/services/administration/iam/role/config';
 import { getPageAccessMenuList } from '@/services/administration/iam/role/lib/page-access-menu-list';
 import type { PageAccessMenuItem } from '@/services/administration/iam/role/type';
 import RoleUpdatePageAccessMenuItem
     from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
 
-const getPagePermissions = (menuItems: PageAccessMenuItem[]): RawPagePermission[] => {
-    const allItem = find(menuItems, { id: 'all' });
-    if (allItem && allItem.isManaged) return [{ page: '*', permission: PAGE_PERMISSION_TYPE.MANAGE }];
+const getIndividualPagePermissions = (menuItem: PageAccessMenuItem): RawPagePermission[] => {
+    if (menuItem.id === 'all') return [];
 
-    const results: RawPagePermission[] = [];
-    menuItems.forEach((menu) => {
-        if (menu.id === 'all' && menu.isViewed) results.push({ page: '*', permission: PAGE_PERMISSION_TYPE.VIEW });
-        else if (menu.isManaged) results.push({ page: `${menu.id}.*`, permission: PAGE_PERMISSION_TYPE.MANAGE });
-        else if (menu.isViewed) results.push({ page: `${menu.id}.*`, permission: PAGE_PERMISSION_TYPE.VIEW });
-        if (menu.subMenuList?.length) {
-            menu.subMenuList.forEach((subMenu) => {
-                if (!menu.isManaged) {
-                    if (subMenu.isManaged) results.push({ page: subMenu.id, permission: PAGE_PERMISSION_TYPE.MANAGE });
-                    else if (!menu.isViewed && subMenu.isViewed) results.push({ page: subMenu.id, permission: PAGE_PERMISSION_TYPE.VIEW });
-                }
-            });
+    // MANAGE permission for menu group
+    if (menuItem.isManaged) {
+        if (menuItem.subMenuList?.length) {
+            return menuItem.subMenuList.map((subMenu) => ({ page: subMenu.id, permission: PAGE_PERMISSION_TYPE.MANAGE }));
         }
+        return [{ page: menuItem.id, permission: PAGE_PERMISSION_TYPE.MANAGE }];
+    }
+
+    // VIEW permission for menu group
+    if (menuItem.isViewed) {
+        if (menuItem.subMenuList?.length) {
+            // Menu group with VIEW permission can contain sub menu whose permission is MANAGE.
+            return menuItem.subMenuList.map((subMenu) => ({ page: subMenu.id, permission: subMenu.isManaged ? PAGE_PERMISSION_TYPE.MANAGE : PAGE_PERMISSION_TYPE.VIEW }));
+        }
+        return [{ page: menuItem.id, permission: PAGE_PERMISSION_TYPE.VIEW }];
+    }
+
+    // each individual menu case
+    if (menuItem.subMenuList?.length) {
+        const results: RawPagePermission[] = [];
+        menuItem.subMenuList.forEach((subMenu) => {
+            if (!subMenu.isManaged && !subMenu.isViewed) return;
+            const permission = subMenu.isManaged ? PAGE_PERMISSION_TYPE.MANAGE : PAGE_PERMISSION_TYPE.VIEW;
+            results.push({ page: subMenu.id, permission });
+        });
+        return results;
+    }
+
+    return [];
+};
+
+
+const getPagePermissions = (menuItems: PageAccessMenuItem[], roleType: RoleType): RawPagePermission[] => {
+    // all case
+    const allItem = find(menuItems, { id: 'all' });
+    if (allItem && (allItem.isManaged || allItem.isViewed)) {
+        const permission = allItem.isManaged ? PAGE_PERMISSION_TYPE.MANAGE : PAGE_PERMISSION_TYPE.VIEW;
+        if (roleType === ROLE_TYPE.PROJECT) {
+            // wildcard is not available for PROJECT role type
+            return menuItems.map((menuItem) => getIndividualPagePermissions(menuItem)).flat();
+        }
+        return [{ page: '*', permission }];
+    }
+
+    let results: RawPagePermission[] = [];
+    menuItems.forEach((menu) => {
+        // PROJECT role type case
+        if (roleType === ROLE_TYPE.PROJECT) {
+            results = results.concat(getIndividualPagePermissions(menu));
+            return;
+        }
+
+        // MANAGE permission for menu group
+        if (menu.isManaged) {
+            results.push({ page: `${menu.id}.*`, permission: PAGE_PERMISSION_TYPE.MANAGE });
+            return;
+        }
+
+        // VIEW permission for menu group
+        if (menu.isViewed) {
+            results.push({ page: `${menu.id}.*`, permission: PAGE_PERMISSION_TYPE.VIEW });
+            // Menu group with VIEW permission can contain sub menu whose permission is MANAGE.
+            menu.subMenuList?.forEach((subMenu) => {
+                if (subMenu.isManaged) results.push({ page: subMenu.id, permission: PAGE_PERMISSION_TYPE.MANAGE });
+            });
+            return;
+        }
+
+        // each individual menu case
+        menu.subMenuList?.forEach((subMenu) => {
+            if (!subMenu.isManaged && !subMenu.isViewed) return;
+            const permission = subMenu.isManaged ? PAGE_PERMISSION_TYPE.MANAGE : PAGE_PERMISSION_TYPE.VIEW;
+            results.push({ page: subMenu.id, permission });
+        });
     });
+
     return results;
 };
 
@@ -90,6 +153,13 @@ export default {
             type: Array as PropType<RawPagePermission[]>,
             default: () => ([]),
         },
+        roleType: {
+            type: String as PropType<RoleType>,
+            default: ROLE_TYPE.PROJECT,
+            validator(roleType: RoleType) {
+                return Object.values(ROLE_TYPE).includes(roleType);
+            },
+        },
     },
     setup(props, { emit }) {
         const formState = reactive({
@@ -103,7 +173,7 @@ export default {
         });
         const state = reactive({
             hideAllMenu: computed(() => formState.menuItems.find((d) => d.id === 'all')?.hideMenu),
-            pagePermissions: computed<RawPagePermission[]>(() => getPagePermissions(formState.menuItems)),
+            pagePermissions: computed<RawPagePermission[]>(() => getPagePermissions(formState.menuItems, props.roleType)),
         });
 
         /* Util */
@@ -156,8 +226,8 @@ export default {
         };
 
         /* Watcher */
-        watch(() => state.pagePermissions, (after) => {
-            emit('update-form', after);
+        watch(() => state.pagePermissions, (pagePermissions) => {
+            emit('update-form', pagePermissions);
         });
         watch(() => props.initialPagePermissions, (initialPagePermissions) => {
             // init formState.menuItems

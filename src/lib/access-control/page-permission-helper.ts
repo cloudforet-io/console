@@ -10,7 +10,9 @@ import {
     PAGE_PERMISSION_TYPE,
     SYSTEM_USER_DEFAULT_PERMISSIONS,
 } from '@/lib/access-control/config';
+import config from '@/lib/config';
 import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
@@ -31,7 +33,12 @@ export const getProperPermissionType = (permissionA: PagePermissionType = PAGE_P
 };
 
 const menuIdList = Object.keys(MENU_INFO_MAP) as MenuId[];
-export const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter((id) => MENU_INFO_MAP[id]?.needPermissionByRole);
+export const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter((id) => {
+    const menu = MENU_INFO_MAP[id];
+    if (!menu) return false;
+    if (id === MENU_ID.DASHBOARDS && menu.needPermissionByRole) return config.get('DASHBOARD_ENABLED');
+    return menu.needPermissionByRole;
+});
 
 const permissionRequiredMenuIds: MenuId[] = getPermissionRequiredMenuIds();
 export const getPagePermissionMapFromRaw = (pagePermissions: RawPagePermission[]): PagePermissionMap => {
