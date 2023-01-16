@@ -87,6 +87,7 @@ interface ProvidersReferenceItems {
  * @param resourceType
  * @param distinct
  * @param dataType
+ * @param filters
  * @param limit
  */
 export function makeDistinctValueHandler(resourceType: string, distinct: string, dataType?: KeyDataType, filters?: ApiFilter[], limit?: number): ValueHandler|undefined {
@@ -230,6 +231,7 @@ export function makeDistinctValueHandlerMap(keys: KeyParam, resourceType: string
  * @param resourceType
  * @param distinct
  * @param dataType
+ * @param filters
  * @param limit
  * @param providers
  */
@@ -251,20 +253,22 @@ export function makeCloudServiceTagValueHandler(
 
     return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
         if (!subPath) {
+            let providerMenuItemList = [
+                ...Object.values(providers ?? {}).map((provider) => ({
+                    label: provider.label,
+                    name: provider.key,
+                    imageUrl: provider.icon,
+                })),
+                {
+                    label: 'Custom',
+                    name: 'custom',
+                    icon: 'ic_provider_other',
+                },
+            ];
+            providerMenuItemList = providerMenuItemList.filter((item) => item.label.toLowerCase().includes(inputText));
             return {
-                results: [
-                    ...Object.values(providers ?? {}).map((provider) => ({
-                        label: provider.label,
-                        name: provider.key,
-                        imageUrl: provider.icon,
-                    })),
-                    {
-                        label: 'Custom',
-                        name: 'custom',
-                        icon: 'ic_provider_other',
-                    },
-                ],
-                totalCount: size(providers) + 1,
+                results: providerMenuItemList,
+                totalCount: providerMenuItemList.length,
                 dataType: 'object',
             };
         }
