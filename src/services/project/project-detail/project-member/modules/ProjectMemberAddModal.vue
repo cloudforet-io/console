@@ -5,7 +5,7 @@
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
-        :disabled="!isAllValid || isLabelDuplicated || externalItemsInvalidTexts.length"
+        :disabled="!isAllValid || isLabelDuplicated || !!externalItemsInvalidTexts.length"
         @confirm="handleConfirm"
     >
         <template #body>
