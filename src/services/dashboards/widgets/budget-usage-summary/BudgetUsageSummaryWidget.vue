@@ -9,54 +9,57 @@
                        :loader-backdrop-opacity="1"
                        loader-type="skeleton"
         >
-            <div class="budget">
-                <p class="budget-label">
-                    {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_SPENT') }}
-                </p>
-                <div class="budget-value">
-                    {{ currencyMoneyFormatter(state.totalSpent, state.currency) }}
+            <div class="data-container">
+                <div class="budget">
+                    <p class="budget-label">
+                        {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_SPENT') }}
+                    </p>
+                    <div class="budget-value">
+                        {{ currencyMoneyFormatter(state.totalSpent, state.currency) }}
+                    </div>
+                    <div class="budget-info">
+                        {{ state.budgetCount }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETS') }}
+                    </div>
                 </div>
-                <div class="budget-info">
-                    {{ state.budgetCount }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETS') }}
+                <div class="budget">
+                    <p class="budget-label">
+                        {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET') }}
+                    </p>
+                    <div class="budget-value">
+                        {{ currencyMoneyFormatter(state.totalBudget, state.currency) }}
+                    </div>
+                    <div class="budget-info">
+                        {{ state.leftBudget }}
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <div ref="chartContext"
+                         class="chart"
+                    >
+                        <span class="budget-usage">
+                            {{ state.spentBudget.rate.toFixed(2) }}%{{ state.spentBudget.isOver ? '+' : '' }}
+                        </span>
+                    </div>
                 </div>
             </div>
-            <div class="budget">
-                <p class="budget-label">
-                    {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET') }}
-                </p>
-                <div class="budget-value">
-                    {{ currencyMoneyFormatter(state.totalBudget, state.currency) }}
-                </div>
-                <div class="budget-info">
-                    {{ state.leftBudget }}
-                </div>
-            </div>
-            <div class="chart-wrapper">
-                <div ref="chartContext"
-                     class="chart"
-                >
-                    <span class="budget-usage">
-                        {{ state.spentBudget.rate.toFixed(2) }}%{{ state.spentBudget.isOver ? '+' : '' }}
-                    </span>
-                </div>
-            </div>
-
             <template #loader>
-                <div v-for="(_, idx) in state.skeletons"
-                     :key="`skeleton-${idx}`"
-                     class="skeleton-wrapper mt-4"
-                >
-                    <p-skeleton width="10rem"
-                                height="1.875rem"
-                                class="mb-1"
-                    />
-                    <p-skeleton width="7.5rem"
-                                height="1.5rem"
+                <div class="skeleton-container">
+                    <div v-for="(_, idx) in state.skeletons"
+                         :key="`skeleton-${idx}`"
+                         class="skeleton-wrapper mt-4"
+                    >
+                        <p-skeleton width="10rem"
+                                    height="1.875rem"
+                                    class="mb-1"
+                        />
+                        <p-skeleton width="7.5rem"
+                                    height="1.5rem"
+                        />
+                    </div>
+                    <p-skeleton width="9rem"
+                                height="9rem"
                     />
                 </div>
-                <p-skeleton width="9rem"
-                            height="9rem"
-                />
             </template>
         </p-data-loader>
     </widget-frame>
@@ -313,15 +316,9 @@ defineExpose<WidgetExpose<Data[]>>({
         height: 100%;
     }
 }
-
-/* custom design-system component - p-data-loader-container */
-:deep(.data-loader-container) {
-    > .no-data-wrapper {
-        min-height: 100%;
-    }
-    > .loader-wrapper > .loader {
-        @apply flex-col items-start justify-start;
-    }
+.skeleton-container {
+    @apply flex-col items-start justify-start;
+    width: 100%;
     .skeleton-wrapper {
         @apply flex flex-col;
         &:last-of-type {
@@ -330,21 +327,19 @@ defineExpose<WidgetExpose<Data[]>>({
         }
     }
 }
+
 .full {
     @screen desktop {
         .budget-usage-summary {
-            /* custom design-system component - p-data-loader-container */
-            :deep(.data-loader-container) {
-                > .loader-wrapper > .loader {
-                    @apply flex-row justify-between;
-                }
+            .data-container {
+                @apply flex justify-between;
+            }
+            .skeleton-container {
+                @apply flex-row justify-between;
                 .skeleton-wrapper {
                     &:last-of-type {
                         margin-top: 0;
                     }
-                }
-                .data-wrapper {
-                    @apply flex justify-between;
                 }
             }
         }
@@ -353,12 +348,8 @@ defineExpose<WidgetExpose<Data[]>>({
     @screen laptop {
         .budget-usage-summary {
             height: 23.625rem;
-
-            /* custom design-system component - p-data-loader-container */
-            :deep(.data-loader-container) {
-                .data-wrapper {
-                    @apply block h-full;
-                }
+            .data-container {
+                @apply block h-full;
             }
         }
     }
