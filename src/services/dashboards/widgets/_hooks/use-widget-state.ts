@@ -20,6 +20,7 @@ import type {
     SelectorType,
     WidgetFiltersMap,
 } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
@@ -61,6 +62,27 @@ const convertInheritOptionsToWidgetFiltersMap = (
     return result;
 };
 
+const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): ConsoleFilter[] => {
+    const results: ConsoleFilter[] = [];
+    Object.entries(widgetFiltersMap).forEach(([filterKey, filterItems]) => {
+        if (!filterItems?.length) return;
+        if ((filterKey === GROUP_BY.PROJECT || filterKey === GROUP_BY.PROJECT_GROUP)) {
+            filterItems.forEach((d) => {
+                results.push(d);
+            });
+        } else {
+            filterItems.forEach((d) => {
+                results.push({
+                    k: `cost_types.${filterKey}`,
+                    v: [null, ...d.v],
+                    o: d.o,
+                });
+            });
+        }
+    });
+    return results;
+};
+
 export interface WidgetState<Data = any> {
     widgetConfig: ComputedRef<WidgetConfig>;
     title: ComputedRef<string|undefined>;
@@ -77,6 +99,7 @@ export interface WidgetState<Data = any> {
     selectedSelectorType?: SelectorType;
     pageSize: ComputedRef<number|undefined>;
     consoleFilters: ComputedRef<ConsoleFilter[]>;
+    budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
     optionsErrorMap: ComputedRef<InheritOptionsErrorMap>;
 }
 export function useWidgetState<Data = any>(
@@ -126,6 +149,10 @@ export function useWidgetState<Data = any>(
         consoleFilters: computed(() => {
             if (!state.options?.filters || isEmpty(state.options.filters)) return [];
             return flattenDeep(Object.values(state.options.filters));
+        }),
+        budgetConsoleFilters: computed(() => {
+            if (!state.options?.filters || isEmpty(state.options.filters)) return [];
+            return getConvertedBudgetConsoleFilters(state.options.filters);
         }),
         optionsErrorMap: computed(() => getWidgetInheritOptionsErrorMap(
             props.inheritOptions,

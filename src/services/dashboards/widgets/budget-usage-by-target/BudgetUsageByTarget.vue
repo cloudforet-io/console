@@ -45,7 +45,6 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getConvertedBudgetFilter } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
@@ -54,6 +53,7 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 import type { BudgetDataModel } from '@/services/dashboards/widgets/type';
@@ -96,7 +96,7 @@ const state = reactive({
         name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         params: {},
         query: {
-            filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(state.options?.filters ?? {})).rawQueryStrings,
+            filters: budgetQueryHelper.setFilters(state.budgetConsoleFilters).rawQueryStrings,
         },
     })),
 });
@@ -117,7 +117,7 @@ const targetTextFormatter = (value: string): string => {
 const fetchData = async (): Promise<FullData> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters(state.consoleFilters);
+        apiQueryHelper.setFilters(state.budgetConsoleFilters);
         if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
             query: {
@@ -190,6 +190,12 @@ const handleUpdateThisPage = (thisPage: number) => {
         store.dispatch('reference/projectGroup/load'),
     ]);
 })();
+
+useWidgetLifecycle({
+    disposeWidget: undefined,
+    refreshWidget,
+    props,
+});
 
 defineExpose<WidgetExpose<FullData>>({
     initWidget,
