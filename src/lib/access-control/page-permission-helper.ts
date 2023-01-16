@@ -36,7 +36,7 @@ const menuIdList = Object.keys(MENU_INFO_MAP) as MenuId[];
 export const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter((id) => {
     const menu = MENU_INFO_MAP[id];
     if (!menu) return false;
-    if (id === MENU_ID.DASHBOARDS && config.get('DASHBOARD_ENABLED')) return menu.needPermissionByRole;
+    if (id === MENU_ID.DASHBOARDS && menu.needPermissionByRole) return config.get('DASHBOARD_ENABLED');
     return menu.needPermissionByRole;
 });
 
