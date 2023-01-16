@@ -19,7 +19,9 @@
                                          scale="0.666"
                         />
                     </div>
-                    <span class="board-item-title">{{ board.name }}</span>
+                    <p class="board-item-title">
+                        {{ board.name }}
+                    </p>
                 </div>
                 <div class="board-item-description">
                     <template v-if="board.user_id">
@@ -281,7 +283,7 @@ export default defineComponent<DashboardBoardListProps>({
 
 <style lang="postcss" scoped>
 .dashboard-board-list {
-    flex-grow: 1;
+    @apply w-full flex-grow;
     margin-top: 0.5rem;
 
     /* custom design-system component - p-field-title */
@@ -294,7 +296,7 @@ export default defineComponent<DashboardBoardListProps>({
     }
     .board {
         .board-item-title-wrapper {
-            @apply flex items-center;
+            @apply flex w-full;
             min-height: 1.25rem;
             .favorite-button-wrapper {
                 @apply flex items-center justify-center;
@@ -302,10 +304,12 @@ export default defineComponent<DashboardBoardListProps>({
                 height: 1.25rem;
             }
             .board-item-title {
+                @apply flex-grow w-full;
                 margin-left: 0.125rem;
                 font-size: 1rem;
                 font-weight: bold;
                 line-height: 1.25;
+                word-break: break-all;
             }
         }
         .board-item-description {
