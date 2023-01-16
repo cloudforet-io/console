@@ -25,8 +25,8 @@
                 />
             </span>
 
-            <div v-if="hasCustomMenu"
-                 v-show="isOpened"
+            <!-- use opacity because of GNBSubMenu's ref access  -->
+            <div :style="{'opacity': isOpened && hasCustomMenu ? 1 : 0}"
                  class="custom-menu-wrapper"
             >
                 <g-n-b-dashboard-menu v-show="menuId === MENU_ID.DASHBOARDS"
