@@ -144,11 +144,11 @@ watch(visibleMenu, (_visibleMenu) => {
     if (_visibleMenu) {
         initiateMenu();
     } else {
+        // Reflect selectedForUpdate changes after the dropdown is closed.
         updateVariablesUse();
         state.searchText = '';
     }
-    // Reflect selectedForUpdate changes after the dropdown is closed.
-}, { immediate: true });
+});
 
 const {
     targetRef,
