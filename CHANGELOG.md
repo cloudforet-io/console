@@ -1,3 +1,10 @@
+# [2.0.0-beta.11](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.10...v2.0.0-beta.11) (2023-01-16)
+
+
+### Features
+
+* useSelect on p-board & label event prevent ([#235](https://github.com/cloudforet-io/mirinae/issues/235)) ([837e863](https://github.com/cloudforet-io/mirinae/commit/837e86343fda1dfae45f3e43b7d716542c77af2a))
+
 # [2.0.0-beta.10](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.9...v2.0.0-beta.10) (2023-01-16)
 
 
