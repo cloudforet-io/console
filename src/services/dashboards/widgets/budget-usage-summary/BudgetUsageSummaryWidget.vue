@@ -187,8 +187,8 @@ const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 const fetchData = async (): Promise<Data[]> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters(state.consoleFilters);
-        const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+        apiQueryHelper.setFilters(state.budgetConsoleFilters);
+        const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
             query: {
                 granularity: state.options.granularity,
                 start: state.dateRange.start,

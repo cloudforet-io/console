@@ -64,12 +64,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo, red, yellow } from '@/styles/colors';
 
-import { getConvertedBudgetFilter } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+// eslint-disable-next-line import/no-cycle
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 import type { Legend, BudgetDataModel } from '@/services/dashboards/widgets/type';
@@ -95,7 +96,7 @@ const state = reactive({
         name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         params: {},
         query: {
-            filters: budgetQueryHelper.setFilters(getConvertedBudgetFilter(state.options?.filters ?? {})).rawQueryStrings,
+            filters: budgetQueryHelper.setFilters(state.budgetConsoleFilters).rawQueryStrings,
         },
     })),
 });
@@ -129,7 +130,7 @@ const getColor = (rowIdx: number, colIdx: number): string => {
 const fetchData = async (): Promise<Data> => {
     try {
         const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters(state.consoleFilters);
+        apiQueryHelper.setFilters(state.budgetConsoleFilters);
         const { results } = await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
             query: {
                 granularity: state.granularity,
@@ -191,6 +192,12 @@ const refreshWidget = async (): Promise<Data> => {
 const handleRefresh = () => {
     refreshWidget();
 };
+
+useWidgetLifecycle({
+    disposeWidget: undefined,
+    refreshWidget,
+    props,
+});
 
 defineExpose<WidgetExpose<Data>>({
     initWidget,
