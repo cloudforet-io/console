@@ -33,7 +33,7 @@
                                       @close="hideMenu"
                 />
             </div>
-            <div v-if="hasSubMenu"
+            <div v-else-if="hasSubMenu"
                  v-show="isOpened"
                  class="sub-menu-wrapper"
                  @click="hideMenu"
