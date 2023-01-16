@@ -284,8 +284,7 @@ export default defineComponent<DashboardBoardListProps>({
     flex-grow: 1;
     margin-top: 0.5rem;
 
-    /* custom design-system component - p-field-title */
-    :deep(.p-field-title) {
+    .p-field-title {
         margin-bottom: 0.5rem;
     }
     .board-count {
@@ -322,8 +321,7 @@ export default defineComponent<DashboardBoardListProps>({
             row-gap: 0.375rem;
         }
 
-        /* custom design-system component - p-label */
-        :deep(.item-label) {
+        .item-label {
             &.viewers-label {
                 @apply border-0 bg-violet-200;
             }

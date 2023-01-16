@@ -5,7 +5,6 @@
         <p-data-loader :data="sortedFavoriteList"
                        :loading="loading"
                        class="gnb-dashboard-favorite-context"
-                       :class="{ loading }"
         >
             <div ref="listContainerRef">
                 <draggable
@@ -215,18 +214,11 @@ export default defineComponent<Props>({
 .gnb-dashboard-favorite {
     .gnb-dashboard-favorite-context {
         max-height: calc(85vh - 9rem);
-        overflow-y: scroll;
+        overflow-y: auto;
+        padding: 0.5rem;
+        min-height: 15rem;
     }
 
-    /* custom design-system component - p-data-loader */
-    :deep(.p-data-loader) {
-        &.loading {
-            height: 15rem;
-        }
-        .data-loader-container {
-            padding: 0.5rem;
-        }
-    }
     .no-data {
         text-align: center;
         padding: 1.875rem 3.25rem;
