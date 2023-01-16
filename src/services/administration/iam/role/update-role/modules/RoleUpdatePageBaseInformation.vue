@@ -106,9 +106,12 @@ export default {
             invalidTexts,
             isAllValid,
         } = useFormValidator({
-            roleName: '',
+            roleName: undefined,
         }, {
-            roleName(value: string) { return value.trim().length > 2 ? '' : i18n.t('IAM.ROLE.FORM.VALIDATION_ROLE_NAME'); },
+            roleName(value?: string) {
+                if (value === undefined) return '';
+                return value.trim().length > 2 ? '' : i18n.t('IAM.ROLE.FORM.VALIDATION_ROLE_NAME');
+            },
         });
 
         const state = reactive({
@@ -128,7 +131,7 @@ export default {
         }, { immediate: true });
         watch([() => state.selectedRoleType, () => state.roleDescription, () => roleName.value], ([selectedRoleType, roleDescription, roleNameValue]) => {
             emit('update-form', { roleName: roleNameValue, roleDescription, roleType: selectedRoleType });
-        });
+        }, { immediate: true });
         watch(() => props.initialFormData, (initialFormData) => {
             setForm('roleName', initialFormData.roleName);
             state.roleDescription = initialFormData.roleDescription;
