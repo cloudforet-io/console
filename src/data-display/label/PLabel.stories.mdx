@@ -3,7 +3,8 @@ import {i18n} from '@/translations';
 
 import PLabel from '@/data-display/label/PLabel';
 
-import { getLabelArgTypes } from '@/data-display/label/story-helper'; import {computed, reactive, toRefs} from "vue";
+import { getLabelArgTypes } from '@/data-display/label/story-helper';
+import {computed, reactive, toRefs} from "vue";
 
 <Meta title='Data Display/Label' parameters={{
     design: {
@@ -85,19 +86,42 @@ export const Template = (args, {argTypes}) => ({
         {{
             components: { PLabel },
             template: `
-<div class="h-full w-full overflow p-8">
-<div class="flex items-center">
-    <span>Default : &nbsp;</span>
-    <p-label text="Default"/>
-</div>
+                <div class="h-full w-full overflow p-8">
+                    <div class="flex items-center">
+                        <span>Clickable : &nbsp;</span>
+                        <p-label text="Click me" @item-click="handleItemClick" clickable/>
+                        <h1 v-show="state.showEl">Hi~~ You clicked me~~</h1>
+                    </div>
+                </div>
+            `,
+            setup() {
+                const state = reactive({ showEl: false });
+                const handleItemClick = () => { state.showEl = !state.showEl };
+                return { state, handleItemClick }
+            }
+        }}
+    </Story>
+</Canvas>
+
 <br/>
-<div class="flex items-center">
-    <span>Clickable : &nbsp;</span>
-    <p-label text="Click me" clickable/>
-    <p-label text="Mouse hover" clickable/>
-</div>
-</div>
-`
+<br/>
+
+## ClickStop
+
+<br/>
+
+<Canvas>
+    <Story name="ClickStop">
+        {{
+            components: { PLabel },
+            template: `
+                <div class="h-full w-full overflow p-8">
+                    <h1>ClickStop prop for event.stopPropagation()</h1>
+                    <br />
+                    <p-label text="I am not clickable" :click-stop="false" />
+                </div>
+            `,
+            setup() {}
         }}
     </Story>
 </Canvas>

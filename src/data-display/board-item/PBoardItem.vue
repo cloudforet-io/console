@@ -1,6 +1,6 @@
 <template>
     <div class="p-board-item"
-         :class="{'rounded': rounded, 'selected': selected}"
+         :class="{'rounded': rounded, 'selected': isSelected}"
          v-on="$listeners"
     >
         <div class="content-area">
@@ -83,6 +83,7 @@ import type { PropType } from 'vue';
 import type { BoardItemProps, IconSet } from '@/data-display/board-item/type';
 import PTooltip from '@/data-display/tooltips/PTooltip.vue';
 import PI from '@/foundation/icons/PI.vue';
+import { useSelect } from '@/hooks';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 
@@ -91,13 +92,17 @@ export default defineComponent<BoardItemProps>({
     components: {
         PTooltip, PIconButton, PSelectDropdown, PI,
     },
+    model: {
+        prop: 'selected',
+        event: 'change',
+    },
     props: {
         leftIcon: {
             type: String,
             default: undefined,
         },
         selected: {
-            type: Boolean,
+            type: String,
             default: undefined,
         },
         rounded: {
@@ -108,14 +113,25 @@ export default defineComponent<BoardItemProps>({
             type: Array as PropType<IconSet[]>,
             default: () => [],
         },
+        value: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props) {
         const state = reactive({
             iconSetList: computed(() => props.iconButtonSets ?? []),
         });
 
+        const {
+            isSelected,
+        } = useSelect({
+            selected: computed(() => props.selected),
+            value: computed(() => props.value),
+        });
 
         return {
+            isSelected,
             ...toRefs(state),
         };
     },

@@ -17,6 +17,7 @@ export interface BoardProps {
     boardSets: BoardItemProps[];
     pageLimit?: number;
     selectable?: boolean;
+    selectedItem?: string;
 }
 
 export interface BoardSet extends BoardItemProps {

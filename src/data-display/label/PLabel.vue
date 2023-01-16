@@ -1,7 +1,7 @@
 <template>
     <div class="p-label"
          :class="{ clickable, 'icon-label': leftIcon }"
-         @click.stop="handleClickLabel"
+         @click="handleClickLabel"
     >
         <span class="label-content">
             <slot name="label-content">
@@ -39,6 +39,7 @@ interface LabelProps {
     leftIcon?: string;
     text?: string;
     clickable?: boolean;
+    clickStop?: boolean;
     deletable?: boolean;
     active?: boolean;
 }
@@ -61,6 +62,10 @@ export default defineComponent<LabelProps>({
             type: Boolean,
             default: false,
         },
+        clickStop: {
+            type: Boolean,
+            default: true,
+        },
         deletable: {
             type: Boolean,
             default: false,
@@ -71,7 +76,8 @@ export default defineComponent<LabelProps>({
         },
     },
     setup(props, { emit }: SetupContext) {
-        const handleClickLabel = () => {
+        const handleClickLabel = (e: Event) => {
+            if (props.clickStop) e.stopPropagation();
             if (!props.clickable) return;
             emit('item-click');
         };

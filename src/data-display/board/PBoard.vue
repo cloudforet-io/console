@@ -4,17 +4,18 @@
          :style="styleVariableByOptions"
     >
         <template v-for="(board, index) in boardList">
-            <p-board-item :key="`board-${index}`"
+            <p-board-item :key="`board-${board.name}-${index}`"
                           class="p-board-item"
                           :class="{
                               'first-list-item': index === 0,
                               'last-list-item': index === boardList.length - 1,
                               'selectable': selectable
                           }"
+                          :value="board.name"
                           :left-icon="board.leftIcon"
                           :icon-button-sets="board.iconButtonSets"
                           :rounded="board.rounded"
-                          :selected="selected === index"
+                          :selected.sync="selectedItem"
                           @click.stop="handleClickBoardItem(board, index)"
             >
                 <template #left-content>
@@ -76,6 +77,10 @@ export default defineComponent<BoardProps>({
             type: Boolean,
             default: false,
         },
+        selectedItem: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -90,12 +95,10 @@ export default defineComponent<BoardProps>({
                 }
                 return styles;
             }),
-            selected: undefined as undefined|number,
         });
 
 
         const handleClickBoardItem = (item: BoardSet, index: number) => {
-            if (props.selectable) state.selected = index;
             emit('item-click', item, index);
         };
 
