@@ -1,3 +1,10 @@
+# [2.0.0-beta.10](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.9...v2.0.0-beta.10) (2023-01-16)
+
+
+### Bug Fixes
+
+* **json-schema-form:** do not receive old component's event ([#234](https://github.com/cloudforet-io/mirinae/issues/234)) ([da7e9be](https://github.com/cloudforet-io/mirinae/commit/da7e9be23dedb36e0c0eecd486700e0521715f1a))
+
 # [2.0.0-beta.9](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.8...v2.0.0-beta.9) (2023-01-13)
 
 
