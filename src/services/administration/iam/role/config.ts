@@ -30,6 +30,26 @@ export const FORM_TYPE = Object.freeze({
 } as const);
 
 export const MANAGE_FEATURE_MAP = {
+    [MENU_ID.DASHBOARDS_WORKSPACE]: {
+        title: 'IAM.ROLE.FORM.TOOLTIP_ADMIN_FEATURES',
+        // song-lang
+        features: [
+            'Create',
+            'Customize',
+            'Delete',
+            'Clone',
+        ],
+    },
+    [MENU_ID.DASHBOARDS_PROJECT]: {
+        title: 'IAM.ROLE.FORM.TOOLTIP_ADMIN_FEATURES',
+        // song-lang
+        features: [
+            'Create',
+            'Customize',
+            'Delete',
+            'Clone',
+        ],
+    },
     [MENU_ID.PROJECT]: {
         title: 'IAM.ROLE.FORM.TOOLTIP_ADMIN_FEATURES',
         features: [

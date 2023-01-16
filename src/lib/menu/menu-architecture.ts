@@ -8,7 +8,10 @@ export const MENU_LIST: Menu[] = [
     },
     {
         id: MENU_ID.DASHBOARDS,
-        subMenuList: [],
+        subMenuList: [
+            { id: MENU_ID.DASHBOARDS_WORKSPACE },
+            { id: MENU_ID.DASHBOARDS_PROJECT },
+        ],
     },
     { id: MENU_ID.PROJECT },
     {

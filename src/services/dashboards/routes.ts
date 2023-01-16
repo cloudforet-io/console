@@ -43,6 +43,7 @@ const dashboardsRoute: RouteConfig = {
                 },
                 {
                     path: 'project',
+                    name: DASHBOARDS_ROUTE.PROJECT._NAME,
                     meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.PROJECT' },
                     redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
                     props: true,
@@ -90,6 +91,7 @@ const dashboardsRoute: RouteConfig = {
                 },
                 {
                     path: 'workspace',
+                    name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
                     meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE' },
                     redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
                     props: true,
