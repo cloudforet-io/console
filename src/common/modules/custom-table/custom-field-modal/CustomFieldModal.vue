@@ -18,7 +18,7 @@
                             <span v-else
                                   class="invalid-text"
                             >{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_REQUIRED') }}</span>
-                            <p-button style-type="tertiary"
+                            <p-button style-type="secondary"
                                       size="sm"
                                       @click="setColumnsDefault"
                             >
@@ -71,7 +71,7 @@
                     <section>
                         <h3 class="section-title">
                             {{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG_COL') }}
-                            <p-button style-type="tertiary"
+                            <p-button style-type="secondary"
                                       size="sm"
                                       @click="clearSelectedTags"
                             >
