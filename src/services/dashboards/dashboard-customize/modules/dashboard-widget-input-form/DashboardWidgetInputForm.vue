@@ -1,15 +1,15 @@
 <template>
     <div class="dashboard-widget-input-form">
         <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
-                       :invalid="isNameInvalid"
-                       :invalid-text="nameInvalidText"
+                       :invalid="isTitleInvalid"
+                       :invalid-text="titleInvalidText"
                        required
         >
-            <p-text-input :value="name"
-                          :invalid="isNameInvalid"
+            <p-text-input :value="title"
+                          :invalid="isTitleInvalid"
                           :placeholder="widgetConfig?.title"
                           class="input"
-                          @update:value="updateName"
+                          @update:value="updateTitle"
             />
         </p-field-group>
         <div v-if="widgetConfig?.description?.translation_id"
@@ -17,65 +17,69 @@
         >
             {{ $t(widgetConfig.description.translation_id) }}
         </div>
-        <p-json-schema-form v-if="widgetOptionsJsonSchema.properties"
-                            :schema="widgetOptionsJsonSchema"
-                            :form-data.sync="schemaFormData"
-                            class="widget-options-form"
-                            @validate="handleFormValidate"
+        <p-data-loader :loading="referenceStoreState.loading"
+                       class="widget-options-form-wrapper"
         >
-            <template #label-extra="{ propertyName }">
-                <div v-if="inheritableProperties.includes(propertyName)"
-                     class="inherit-toggle-button"
-                >
-                    <span class="text"
-                          :class="{inherit: inheritItemMap[propertyName]}"
-                    >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
-                    <p-toggle-button :value="inheritItemMap[propertyName]"
-                                     @change="handleChangeInheritToggle(propertyName, $event)"
-                    />
-                </div>
-            </template>
-            <template #dropdown-extra="{ propertyName, selectedItem }">
-                <div v-if="isSelected(selectedItem) && inheritItemMap[propertyName]">
-                    <span>{{ selectedItem.label }}</span>
-                    <span class="suffix-text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
-                </div>
-            </template>
-        </p-json-schema-form>
-        <div v-click-outside="hideContextMenu"
-             class="add-options-wrapper"
-        >
-            <p-button ref="targetRef"
-                      style-type="secondary"
-                      icon-left="ic_plus_bold"
-                      block
-                      @click="handleClickAddOptions"
+            <p-json-schema-form v-if="widgetOptionsJsonSchema.properties"
+                                :schema="widgetOptionsJsonSchema"
+                                :form-data.sync="schemaFormData"
+                                class="widget-options-form"
+                                @validate="handleFormValidate"
             >
-                {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD_OPTIONS') }}
-            </p-button>
-            <p-context-menu v-show="visibleContextMenu"
-                            ref="contextMenuRef"
-                            :menu="refinedMenu"
-                            :selected.sync="selectedOptions"
-                            :style="contextMenuStyle"
-                            use-fixed-menu-style
-                            multi-selectable
-                            item-height-fixed
-                            show-select-marker
-                            @select="handleSelectOption"
-            />
-        </div>
+                <template #label-extra="{ propertyName }">
+                    <div v-if="inheritableProperties.includes(propertyName)"
+                         class="inherit-toggle-button"
+                    >
+                        <span class="text"
+                              :class="{inherit: inheritItemMap[propertyName]}"
+                        >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
+                        <p-toggle-button :value="inheritItemMap[propertyName]"
+                                         @change="handleChangeInheritToggle(propertyName, $event)"
+                        />
+                    </div>
+                </template>
+                <template #dropdown-extra="{ propertyName, selectedItem }">
+                    <div v-if="isSelected(selectedItem) && inheritItemMap[propertyName]">
+                        <span>{{ selectedItem.label }}</span>
+                        <span class="suffix-text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
+                    </div>
+                </template>
+            </p-json-schema-form>
+            <div v-click-outside="hideContextMenu"
+                 class="add-options-wrapper"
+            >
+                <p-button ref="targetRef"
+                          style-type="secondary"
+                          icon-left="ic_plus_bold"
+                          block
+                          @click="handleClickAddOptions"
+                >
+                    {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD_OPTIONS') }}
+                </p-button>
+                <p-context-menu v-show="visibleContextMenu"
+                                ref="contextMenuRef"
+                                :menu="refinedMenu"
+                                :selected.sync="selectedOptions"
+                                :style="contextMenuStyle"
+                                use-fixed-menu-style
+                                multi-selectable
+                                item-height-fixed
+                                show-select-marker
+                                @select="handleSelectOption"
+                />
+            </div>
+        </p-data-loader>
     </div>
 </template>
 <script lang="ts">
 import { vOnClickOutside } from '@vueuse/components';
 import type { DirectiveFunction } from 'vue';
 import {
-    computed, defineComponent, reactive, ref, toRef, toRefs, watch,
+    computed, defineComponent, reactive, ref, toRefs, watch,
 } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PButton, PContextMenu,
+    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PButton, PContextMenu, PDataLoader,
     useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -91,8 +95,8 @@ import {
     useReferenceStore,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/composables/use-reference-store';
 import {
-    useWidgetNameInput,
-} from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/composables/use-widget-name-input';
+    useWidgetTitleInput,
+} from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/composables/use-widget-title-input';
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type {
@@ -117,6 +121,7 @@ export default defineComponent<Props>({
         PJsonSchemaForm,
         PToggleButton,
         PButton,
+        PDataLoader,
     },
     directives: {
         clickOutside: vOnClickOutside as DirectiveFunction,
@@ -145,46 +150,14 @@ export default defineComponent<Props>({
             //
             schemaFormData: {},
             isSchemaFormValid: undefined,
-            isAllValid: computed(() => state.isSchemaFormValid && isNameValid.value),
+            isAllValid: computed(() => state.isSchemaFormValid && isTitleValid.value),
             inheritItemMap: {} as {[propertyName: string]: boolean},
-            //
-            optionsMenuItems: computed<MenuItem[]>(() => {
-                const menuItems: MenuItem[] = [];
-                const schemaProperties = state.widgetConfig?.options_schema?.schema.properties;
-                if (isEmpty(schemaProperties)) return [];
-                Object.entries(schemaProperties).forEach(([key, val]) => {
-                    if (!state.requiredProperties.includes(key)) {
-                        menuItems.push({ name: key, label: (val as JsonSchema).title });
-                    }
-                });
-                return menuItems;
-            }),
-            selectedOptions: [] as MenuItem[],
         });
 
-        /* name form validation */
+        /* title form validation */
         const {
-            name, resetName, updateName, isNameValid, isNameInvalid, nameInvalidText,
-        } = useWidgetNameInput();
-
-        /* context menu controller */
-        const targetRef = ref<any|null>(null);
-        const contextMenuRef = ref<any|null>(null);
-        const {
-            visibleMenu: visibleContextMenu,
-            refinedMenu,
-            contextMenuStyle,
-            showContextMenu,
-            hideContextMenu,
-            initiateMenu,
-        } = useContextMenuController({
-            useFixedStyle: true,
-            targetRef,
-            contextMenuRef,
-            useReorderBySelection: true,
-            selected: toRef(state, 'selectedOptions'),
-            menu: toRef(state, 'optionsMenuItems'),
-        });
+            title, resetTitle, updateTitle, isTitleValid, isTitleInvalid, titleInvalidText,
+        } = useWidgetTitleInput();
 
         /* reference store */
         const { referenceStoreState } = useReferenceStore();
@@ -248,7 +221,7 @@ export default defineComponent<Props>({
             }
             return refinedJsonSchemaProperties;
         };
-        const initJsonSchema = (widgetOptionsSchema: WidgetOptionsSchema): JsonSchema => {
+        const getRefinedWidgetOptionsSchema = (widgetOptionsSchema: WidgetOptionsSchema): JsonSchema => {
             const defaultProperties = widgetOptionsSchema?.default_properties ?? [];
             const _jsonSchema = cloneDeep(widgetOptionsSchema?.schema);
             const refinedJsonSchema = {
@@ -289,38 +262,42 @@ export default defineComponent<Props>({
             });
             return { schemaFormData: _formData, inheritItemMap: _inheritItemMap };
         };
-        const setInitialValueForEditMode = (widgetKey: string) => {
-            state.widgetOptionsJsonSchema = initJsonSchema(state.widgetConfig.options_schema);
-            widgetFormStore.initWidgetForm(widgetKey);
-            const widgetInfo:DashboardLayoutWidgetInfo|undefined = widgetFormState.widgetInfo;
-            if (!widgetInfo) return;
-            updateName(widgetInfo.title);
-            const { schemaFormData, inheritItemMap } = convertWidgetInfoToJsonSchemaForm(widgetInfo);
-            state.inheritItemMap = inheritItemMap;
-            Object.entries(inheritItemMap).forEach(([key, value]) => {
-                handleChangeInheritToggle(key, { value });
-            });
-            state.schemaFormData = schemaFormData;
-        };
 
-        /* Event */
-        const handleChangeInheritToggle = (propertyName: string, { value }) => {
-            // init form data
-            const _formData = cloneDeep(state.schemaFormData);
-            _formData[propertyName] = undefined;
-            state.schemaFormData = _formData;
-            // update inherit data and json schema
-            const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
-            state.inheritItemMap[propertyName] = value;
-            // refine json schema of property
-            const propertySchema = cloneDeep(state.widgetConfig?.options_schema.schema)?.properties[propertyName];
-            _widgetOptionsJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema, value);
-            state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
-        };
+
+        /* add options */
+        const targetRef = ref<any|null>(null);
+        const contextMenuRef = ref<any|null>(null);
+        const optionsMenuItems = computed<MenuItem[]>(() => {
+            const menuItems: MenuItem[] = [];
+            const schemaProperties = state.widgetConfig?.options_schema?.schema.properties;
+            if (isEmpty(schemaProperties)) return [];
+            Object.entries(schemaProperties).forEach(([key, val]) => {
+                if (!state.requiredProperties.includes(key)) {
+                    menuItems.push({ name: key, label: (val as JsonSchema).title });
+                }
+            });
+            return menuItems;
+        });
+        const selectedOptions = ref<MenuItem[]>([]);
+        const {
+            visibleMenu: visibleContextMenu,
+            refinedMenu,
+            contextMenuStyle,
+            showContextMenu,
+            hideContextMenu,
+            initiateMenu,
+        } = useContextMenuController({
+            useFixedStyle: true,
+            targetRef,
+            contextMenuRef,
+            useReorderBySelection: true,
+            selected: selectedOptions,
+            menu: optionsMenuItems,
+        });
         const handleSelectOption = (item) => {
             const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
             const propertyName = item.name;
-            if (state.selectedOptions.find((d) => d.name === propertyName)) {
+            if (selectedOptions.value.find((d) => d.name === propertyName)) {
                 // add property schema
                 const propertySchema = cloneDeep(state.widgetConfig?.options_schema.schema)?.properties[propertyName];
                 _widgetOptionsJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema);
@@ -337,33 +314,78 @@ export default defineComponent<Props>({
             if (visibleContextMenu.value) hideContextMenu();
             else showContextMenu();
         };
+        const getRefinedSelectedOptions = () => {
+            const defaultProperties = state.widgetConfig.options_schema?.default_properties ?? [];
+            return optionsMenuItems.value.filter((d) => !state.requiredProperties.includes(d.name) && defaultProperties.includes(d.name));
+        };
+
+        /* inherit */
+        const handleChangeInheritToggle = (propertyName: string, { value }) => {
+            // init form data
+            const _formData = cloneDeep(state.schemaFormData);
+            _formData[propertyName] = undefined;
+            state.schemaFormData = _formData;
+            // update inherit data and json schema
+            const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
+            state.inheritItemMap[propertyName] = value;
+            // refine json schema of property
+            const propertySchema = cloneDeep(state.widgetConfig?.options_schema.schema)?.properties[propertyName];
+            _widgetOptionsJsonSchema.properties[propertyName] = refineJsonSchemaProperties(propertyName, propertySchema, value);
+            state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
+        };
+
+        /* states settings */
+        const resetStates = () => {
+            widgetFormStore.$reset();
+            state.inheritItemMap = {};
+            state.widgetOptionsJsonSchema = {
+                type: 'object',
+                properties: {},
+                required: [],
+            };
+            state.schemaFormData = {};
+            resetTitle();
+            selectedOptions.value = [];
+        };
+        const initStates = (widgetConfigId: string) => {
+            widgetFormStore.setWidgetConfigId(widgetConfigId);
+            state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(state.widgetConfig.options_schema);
+            selectedOptions.value = getRefinedSelectedOptions();
+        };
+        const setInitialValueForEditMode = (widgetKey: string) => {
+            widgetFormStore.initWidgetForm(widgetKey);
+            const widgetInfo:DashboardLayoutWidgetInfo|undefined = widgetFormState.widgetInfo;
+            if (!widgetInfo) return;
+            updateTitle(widgetInfo.title);
+            const { schemaFormData, inheritItemMap } = convertWidgetInfoToJsonSchemaForm(widgetInfo);
+            state.inheritItemMap = inheritItemMap;
+            Object.entries(inheritItemMap).forEach(([key, value]) => {
+                handleChangeInheritToggle(key, { value });
+            });
+            state.schemaFormData = schemaFormData;
+        };
+        watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreState.loading], ([widgetConfigId, widgetKey, loading]) => {
+            // do nothing if still loading
+            if (loading) return;
+
+            // reset all states if required props are not given
+            if (!widgetConfigId) {
+                resetStates();
+                return;
+            }
+
+            // initiate schema, options, etc.
+            initStates(widgetConfigId);
+
+            // set data if widget key exists. this is for updating widget case.
+            if (widgetKey) setInitialValueForEditMode(widgetKey);
+        }, { immediate: true });
+
+
+        /* validation */
         const handleFormValidate = (isValid) => {
             state.isSchemaFormValid = isValid;
         };
-
-
-
-        /* Watcher */
-        watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, widgetKey]) => {
-            widgetFormStore.$reset();
-            widgetFormStore.setWidgetConfigId(widgetConfigId);
-            state.inheritItemMap = {};
-            if (widgetConfigId && widgetKey) {
-                setInitialValueForEditMode(widgetKey);
-            } else {
-                state.schemaFormData = {};
-                resetName();
-            }
-        }, { immediate: true });
-        watch([() => state.widgetConfig, () => referenceStoreState.loading], ([widgetConfig, storeLoading]) => {
-            if (widgetConfig) {
-                const defaultProperties = widgetConfig.options_schema?.default_properties ?? [];
-                state.selectedOptions = state.optionsMenuItems.filter((d) => !state.requiredProperties.includes(d.name) && defaultProperties.includes(d.name));
-                if (!storeLoading && !props.widgetKey) {
-                    state.widgetOptionsJsonSchema = initJsonSchema(widgetConfig.options_schema);
-                }
-            }
-        });
         watch(() => state.schemaFormData, (schemaFormData) => {
             widgetFormStore.setFormData(schemaFormData, state.inheritItemMap);
         }, { immediate: true });
@@ -373,23 +395,28 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
+            /* widget title input */
+            title,
+            updateTitle,
+            isTitleInvalid,
+            titleInvalidText,
+            /* add options */
             targetRef,
             contextMenuRef,
-            name,
-            updateName,
-            isNameInvalid,
-            nameInvalidText,
-            //
+            selectedOptions,
+            hideContextMenu,
+            showContextMenu,
             refinedMenu,
             contextMenuStyle,
             visibleContextMenu,
-            isSelected,
-            handleChangeInheritToggle,
             handleClickAddOptions,
             handleSelectOption,
+            /* reference store */
+            referenceStoreState,
+            //
+            isSelected,
+            handleChangeInheritToggle,
             handleFormValidate,
-            hideContextMenu,
-            showContextMenu,
         };
     },
 });
@@ -412,6 +439,11 @@ export default defineComponent<Props>({
         font-size: 0.875rem;
         font-weight: 400;
         padding: 0.75rem;
+    }
+
+    .widget-options-form-wrapper {
+        height: 100%;
+        min-height: 15rem;
     }
 
     /* custom design-system component - p-field-group */
