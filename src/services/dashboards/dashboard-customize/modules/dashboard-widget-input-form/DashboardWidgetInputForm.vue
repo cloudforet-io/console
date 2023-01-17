@@ -84,16 +84,12 @@ import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dr
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { cloneDeep, isEmpty } from 'lodash';
 
-import { store } from '@/store';
-
-import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
-import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import type { ReferenceItem } from '@/store/modules/reference/type';
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 
+import {
+    useReferenceStore,
+} from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/composables/use-reference-store';
 import {
     useWidgetNameInput,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/composables/use-widget-name-input';
@@ -140,15 +136,7 @@ export default defineComponent<Props>({
         const dashboardDetailState = dashboardDetailStore.state;
         const widgetFormStore = useWidgetFormStore();
         const widgetFormState = widgetFormStore.state;
-        const storeState = reactive({
-            loading: true,
-            provider: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            project_id: computed(() => store.getters['reference/projectItems']),
-            service_account_id: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
-            user_id: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-            cloud_service_type_id: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
-            region_code: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-        });
+
         const state = reactive({
             widgetConfig: computed(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
             widgetOptionsJsonSchema: {} as JsonSchema,
@@ -198,6 +186,9 @@ export default defineComponent<Props>({
             menu: toRef(state, 'optionsMenuItems'),
         });
 
+        /* reference store */
+        const { referenceStoreState } = useReferenceStore();
+
         /* Util */
         const isSelected = (selectedItem: SelectDropdownMenu | FilterableDropdownMenuItem[]): boolean => {
             if (Array.isArray(selectedItem)) return !!selectedItem.length;
@@ -233,7 +224,7 @@ export default defineComponent<Props>({
             const _propertyName = propertyName.replace('filters.', '');
             if (_propertyName === 'group_by') return propertySchema;
             // 3. return store data
-            const storeData: ReferenceItem = storeState[_propertyName];
+            const storeData: ReferenceItem = referenceStoreState[_propertyName];
             let menuItems: MenuItem[] = [];
             if (storeData && !isEmpty(storeData)) {
                 menuItems = Object.values(storeData).map((d) => ({
@@ -351,19 +342,6 @@ export default defineComponent<Props>({
         };
 
 
-        /* Init */
-        (async () => {
-            storeState.loading = true;
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/serviceAccount/load'),
-                store.dispatch('reference/cloudServiceType/load'),
-                store.dispatch('reference/region/load'),
-                store.dispatch('reference/user/load'),
-            ]);
-            storeState.loading = false;
-        })();
 
         /* Watcher */
         watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, widgetKey]) => {
@@ -377,7 +355,7 @@ export default defineComponent<Props>({
                 resetName();
             }
         }, { immediate: true });
-        watch([() => state.widgetConfig, () => storeState.loading], ([widgetConfig, storeLoading]) => {
+        watch([() => state.widgetConfig, () => referenceStoreState.loading], ([widgetConfig, storeLoading]) => {
             if (widgetConfig) {
                 const defaultProperties = widgetConfig.options_schema?.default_properties ?? [];
                 state.selectedOptions = state.optionsMenuItems.filter((d) => !state.requiredProperties.includes(d.name) && defaultProperties.includes(d.name));
