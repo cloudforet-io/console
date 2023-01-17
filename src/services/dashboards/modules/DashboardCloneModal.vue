@@ -156,10 +156,7 @@ export default defineComponent<Props>({
                             && item.name !== props.dashboard?.name)
                         .map((_item) => _item.name);
                 }
-                return store.state.dashboard.domainItems.map((item) => {
-                    if (item.name !== props.dashboard?.name) return item.name;
-                    return '';
-                });
+                return store.state.dashboard.domainItems.map((item) => item.name);
             }),
             layouts: computed<DashboardLayoutWidgetInfo[]|DashboardLayoutWidgetInfo[][]>(() => {
                 if (props.dashboard?.layouts) return props.dashboard?.layouts;
