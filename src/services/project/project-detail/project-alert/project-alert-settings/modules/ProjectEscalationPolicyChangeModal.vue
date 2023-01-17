@@ -23,14 +23,9 @@
                         />
                     </template>
                     <template #create>
-                        <escalation-policy-form
-                            v-if="activeTab === FORM_MODE.create"
-                            :mode="activeTab"
-                            :show-scope="false"
-                            :show-validation="formState.showValidation"
-                            :is-all-valid.sync="formState.isAllValid"
-                            :project-id="projectId"
-                            @change="handleChangeInputModel"
+                        <escalation-policy-form v-if="activeTab === FORM_MODE.create"
+                                                :show-scope="false"
+                                                :mode="activeTab"
                         />
                     </template>
                 </p-box-tab>
@@ -65,7 +60,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import EscalationPolicyDataTable from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyDataTable.vue';
 import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
-import type { EscalationPolicyFormModel } from '@/services/alert-manager/type';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
 
 enum FORM_MODE {
     select = 'select',
@@ -95,15 +90,12 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
+        const escalationPolicyFormStore = useEscalationPolicyFormStore();
+        const escalationPolicyFormState = escalationPolicyFormStore.state;
         const tableState = reactive({
             loading: true,
             items: [] as any,
             selectIndex: [] as number[],
-        });
-        const formState = reactive({
-            inputModel: {} as EscalationPolicyFormModel,
-            showValidation: false,
-            isAllValid: false,
         });
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
@@ -122,7 +114,7 @@ export default {
             selectedEscalationPolicyId: undefined,
             isModalValid: computed(() => {
                 if (state.activeTab === FORM_MODE.select) return tableState.selectIndex.length;
-                return formState.isAllValid;
+                return escalationPolicyFormState.isAllValid;
             }),
         });
 
@@ -169,7 +161,11 @@ export default {
         const createEscalationPolicy = async (): Promise<string | undefined> => {
             try {
                 const { escalation_policy_id } = await SpaceConnector.client.monitoring.escalationPolicy.create({
-                    ...formState.inputModel,
+                    name: escalationPolicyFormState.name,
+                    rules: escalationPolicyFormState.rules,
+                    scope: escalationPolicyFormState.scope,
+                    finish_condition: escalationPolicyFormState.finishCondition,
+                    repeat_count: escalationPolicyFormState.repeatCount,
                     project_id: props.projectId,
                 });
                 return escalation_policy_id;
@@ -193,8 +189,7 @@ export default {
         const handleClickConfirm = async () => {
             let newEscalationPolicyId;
             if (state.activeTab === FORM_MODE.create) {
-                formState.showValidation = true;
-                if (!formState.isAllValid) return;
+                if (!escalationPolicyFormState.isAllValid) return;
                 newEscalationPolicyId = await createEscalationPolicy();
             } else {
                 newEscalationPolicyId = tableState.items[tableState.selectIndex[0]].escalation_policy_id;
@@ -205,9 +200,6 @@ export default {
             }
             emit('confirm');
             state.proxyVisible = false;
-        };
-        const handleChangeInputModel = (inputModel) => {
-            formState.inputModel = inputModel;
         };
         const handleChangeDataTable = async (options: any = {}) => {
             escalationPolicyApiQuery = getApiQueryWithToolboxOptions(escalationPolicyApiQueryHelper, options) ?? escalationPolicyApiQuery;
@@ -222,10 +214,8 @@ export default {
         return {
             ...toRefs(state),
             tableState,
-            formState,
             FORM_MODE,
             handleClickConfirm,
-            handleChangeInputModel,
             handleChangeDataTable,
         };
     },

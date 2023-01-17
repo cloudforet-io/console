@@ -6,15 +6,12 @@
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
-        :disabled="!isAllValid"
-        @confirm="onClickPolicyConfirm"
+        :disabled="!escalationPolicyFormState.isAllValid"
+        @confirm="handleConfirm"
     >
         <template #body>
-            <escalation-policy-form
-                :mode="mode"
-                :escalation-policy="escalationPolicy"
-                :is-all-valid.sync="isAllValid"
-                @change="onChangeInputModel"
+            <escalation-policy-form :escalation-policy-data="escalationPolicy"
+                                    :mode="mode"
             />
         </template>
         <template #confirm-button>
@@ -24,10 +21,9 @@
 </template>
 
 <script lang="ts">
-
-import type { SetupContext } from 'vue';
+import type { PropType, SetupContext } from 'vue';
 import {
-    reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
@@ -42,8 +38,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
 import { ACTION } from '@/services/alert-manager/lib/config';
-import type { EscalationPolicyFormModel } from '@/services/alert-manager/type';
+import type { EscalationPolicyDataModel } from '@/services/alert-manager/type';
+
 
 export default {
     name: 'EscalationPolicyFormModal',
@@ -61,21 +59,37 @@ export default {
             default: '',
         },
         escalationPolicy: {
-            type: Object,
+            type: Object as PropType<EscalationPolicyDataModel>,
             default: undefined,
         },
     },
     setup(props, { emit }: SetupContext) {
+        const escalationPolicyFormStore = useEscalationPolicyFormStore();
+        const escalationPolicyFormOriginState = escalationPolicyFormStore.originState;
+        const escalationPolicyFormState = escalationPolicyFormStore.state;
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
-            inputModel: {} as EscalationPolicyFormModel,
-            isAllValid: false,
+            inputModel: computed<Partial<EscalationPolicyDataModel>>(() => ({
+                name: escalationPolicyFormState.name,
+                rules: escalationPolicyFormState.rules,
+                scope: escalationPolicyFormState.scope,
+                finish_condition: escalationPolicyFormState.finishCondition,
+                repeat_count: escalationPolicyFormState.repeatCount,
+                project_id: escalationPolicyFormState.projectId,
+            })),
         });
 
         /* api */
         const createEscalationPolicy = async () => {
             try {
-                await SpaceConnector.client.monitoring.escalationPolicy.create(state.inputModel);
+                await SpaceConnector.client.monitoring.escalationPolicy.create({
+                    name: escalationPolicyFormState.name,
+                    rules: escalationPolicyFormState.rules,
+                    scope: escalationPolicyFormState.scope,
+                    finish_condition: escalationPolicyFormState.finishCondition,
+                    repeat_count: escalationPolicyFormState.repeatCount,
+                    project_id: escalationPolicyFormState.projectId,
+                });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_CREATE_POLICY'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_CREATE_POLICY'));
@@ -86,11 +100,11 @@ export default {
         const updateEscalationPolicy = async () => {
             try {
                 await SpaceConnector.client.monitoring.escalationPolicy.update({
-                    escalation_policy_id: props.escalationPolicy.escalation_policy_id,
-                    name: state.inputModel.name,
-                    rules: state.inputModel.rules,
-                    repeat_count: state.inputModel.repeat_count,
-                    finish_condition: state.inputModel.finish_condition,
+                    escalation_policy_id: escalationPolicyFormOriginState?.escalationPolicyData?.escalation_policy_id,
+                    name: escalationPolicyFormState.name,
+                    rules: escalationPolicyFormState.rules,
+                    repeat_count: escalationPolicyFormState.repeatCount,
+                    finish_condition: escalationPolicyFormState.finishCondition,
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_UPDATE_POLICY'), '');
             } catch (e) {
@@ -101,11 +115,8 @@ export default {
         };
 
         /* event */
-        const onChangeInputModel = (inputModel: EscalationPolicyFormModel) => {
-            state.inputModel = inputModel;
-        };
-        const onClickPolicyConfirm = async () => {
-            if (!state.isAllValid) return;
+        const handleConfirm = async () => {
+            if (!escalationPolicyFormState.isAllValid) return;
 
             if (props.mode === ACTION.create) await createEscalationPolicy();
             else if (props.mode === ACTION.update) await updateEscalationPolicy();
@@ -114,9 +125,9 @@ export default {
 
         return {
             ...toRefs(state),
+            escalationPolicyFormState,
             ACTION,
-            onClickPolicyConfirm,
-            onChangeInputModel,
+            handleConfirm,
             createEscalationPolicy,
         };
     },
