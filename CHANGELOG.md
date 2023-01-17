@@ -1,3 +1,18 @@
+# [2.0.0-beta.13](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.12...v2.0.0-beta.13) (2023-01-17)
+
+
+### Bug Fixes
+
+* **filterable-dropdown:** fix css style ([c96fb4f](https://github.com/cloudforet-io/mirinae/commit/c96fb4f88eab194323d9db03240322e84d7b9907))
+* **json-schema-form:** check undefined case ([486c776](https://github.com/cloudforet-io/mirinae/commit/486c776e814c96c3b7b33358f42a684a4216fdfb))
+* **query-search, context-menu-controller:** apply escape regex ([76d64d8](https://github.com/cloudforet-io/mirinae/commit/76d64d8c77b3730765e3ab2b0f16fdbce242b77e))
+* **text-highlighting:** make spans word-break all ([b888205](https://github.com/cloudforet-io/mirinae/commit/b8882055a7aa758132fcaa3fa5c04b3cb05e68ba))
+
+
+### Features
+
+* **utils:** rename, export utils and add getTextHighlightRegex to utils ([9c2430d](https://github.com/cloudforet-io/mirinae/commit/9c2430d14b404571772089cae252d98897c11ce7))
+
 # [2.0.0-beta.12](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.11...v2.0.0-beta.12) (2023-01-17)
 
 
