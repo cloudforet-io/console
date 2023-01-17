@@ -190,9 +190,9 @@ export default defineComponent<Props>({
         watch(() => state.dashboardVariablesSchema, () => {
             if (props.editMode) validateAllWidget();
         }, { immediate: true });
-        watch(() => state.dashboardSettings.date_range, () => {
+        watch([() => state.dashboardSettings.date_range, () => state.dashboardSettings.currency], () => {
             refreshAllWidget();
-        });
+        }, { deep: true });
 
 
         const refreshAllWidget = async () => {
