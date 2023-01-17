@@ -35,7 +35,6 @@
                                              :content-type.sync="contentType"
                                              :variables="variableSchema.properties"
                                              :order="variableSchema.order"
-                                             @use-change="handleChangeVariableUse"
                                              @delete="handleOpenDeleteModal"
                                              @edit="handleChangeEditContent"
             />
@@ -156,11 +155,6 @@ const handleConfirmModalAction = () => {
         SpaceRouter.router.go(-1);
     }
     resetDeleteModalState();
-};
-const handleChangeVariableUse = (name: string, value: boolean) => {
-    const properties = cloneDeep(state.variableSchema.properties) as DashboardVariablesSchema['properties'];
-    properties[name].use = value;
-    dashboardDetailState.variablesSchema = { ...dashboardDetailState.variablesSchema, properties };
 };
 const handleChangeEditContent = (propertyName: string) => {
     state.selectedVariable = propertyName;

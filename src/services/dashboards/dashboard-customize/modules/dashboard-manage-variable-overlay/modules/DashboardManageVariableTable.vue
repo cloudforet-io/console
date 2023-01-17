@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, onMounted, reactive, toRefs,
 } from 'vue';
 
 import {
@@ -77,40 +77,26 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { VariableType, DashboardVariablesSchema } from '@/services/dashboards/config';
 
-interface Props {
-    variables: DashboardVariablesSchema['properties'];
-    order: string[];
+import type { VariableType, DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+
+interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
+    propertyName: string;
+    managable?: string;
 }
 interface EmitFn {
     (e: 'delete', value: string): void;
-    (e: 'use-change', name: string, value: boolean): void;
     (e: 'edit', name: string): void;
 }
 
-const props = defineProps<Props>();
 const emit = defineEmits<EmitFn>();
 
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+
 const state = reactive({
-    orderedVariables: computed(() => {
-        const convertedVariables = props.order.map((d) => {
-            if (props.variables[d].variable_type === 'MANAGED') {
-                return {
-                    ...props.variables[d],
-                    propertyName: d,
-                    options: Object.keys(state.allReferenceTypeInfo[d].referenceMap),
-                };
-            }
-            return {
-                ...props.variables[d],
-                propertyName: d,
-                managable: d,
-            };
-        });
-        if (state.selectedVariableType === 'ALL') return convertedVariables;
-        return convertedVariables.filter((d) => d.variable_type === state.selectedVariableType);
-    }),
+    orderedVariables: [] as VariablesPropertiesForManage[],
     variableFilterList: computed(() => [
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_ALL'), name: 'ALL' },
         { label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'), name: 'MANAGED' },
@@ -152,8 +138,37 @@ const handleDeleteVariable = (propertyName: string) => {
     emit('delete', propertyName);
 };
 const handleToggleUse = (propertyName: string, value: boolean) => {
-    emit('use-change', propertyName, !value);
+    // change use in state.orderedVariables
+    const selectedIndex = state.orderedVariables.findIndex((variable) => variable.propertyName === propertyName);
+    if (selectedIndex === -1) return;
+    state.orderedVariables[selectedIndex].use = !value;
+
+    // change use in store
+    dashboardDetailState.variablesSchema.properties[propertyName].use = !value;
 };
+
+onMounted(() => {
+    const properties = dashboardDetailState.variablesSchema.properties;
+    const order = dashboardDetailState.variablesSchema.order;
+    const convertedVariables = order.map((d) => {
+        if (properties[d].variable_type === 'MANAGED') {
+            return {
+                ...properties[d],
+                propertyName: d,
+                options: Object.keys(state.allReferenceTypeInfo[d].referenceMap),
+            };
+        }
+        return {
+            ...properties[d],
+            propertyName: d,
+            managable: d,
+        };
+    });
+    if (state.selectedVariableType === 'ALL') {
+        state.orderedVariables = convertedVariables;
+    } else state.orderedVariables = convertedVariables.filter((d) => d.variable_type === state.selectedVariableType);
+});
+
 const {
     orderedVariables,
     variableFilterList,
