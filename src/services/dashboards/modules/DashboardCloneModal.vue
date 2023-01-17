@@ -65,6 +65,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import type { DashboardViewer, DashboardConfig, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardDetailInfoStoreState } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
@@ -138,6 +139,8 @@ export default defineComponent<Props>({
             viewers(value: DashboardViewer) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
         });
 
+        const dashboardDetailStore = useDashboardDetailInfoStore();
+        const dashboardDetailOriginState = dashboardDetailStore.originState;
         const state = reactive({
             proxyVisible: props.visible,
             filteredVisibilityList: computed(() => visibilityList),
@@ -176,10 +179,10 @@ export default defineComponent<Props>({
                 name: name.value,
                 viewers: viewers.value,
                 layouts: state.layouts,
-                labels: props.dashboard?.labels,
-                settings: props.dashboard?.settings,
-                variables: props.dashboard?.variables,
-                variables_schema: state.variablesSchema,
+                labels: dashboardDetailOriginState.dashboardInfo?.labels,
+                settings: dashboardDetailOriginState.dashboardInfo?.settings,
+                variables: dashboardDetailOriginState.dashboardInfo?.variables,
+                variables_schema: dashboardDetailOriginState.dashboardInfo?.variablesSchema,
             })),
         });
 
