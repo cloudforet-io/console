@@ -27,13 +27,11 @@
                    @refresh="handleQueryChange()"
         />
         <p-data-loader :loading="loading"
-                       :data="Boolean(dashboardTotalCount)"
+                       :data="filteredDashboardStatus"
                        class="dashboard-list-wrapper"
         >
             <template #no-data>
                 <div class="empty-case">
-                    {{ projectDashboardList }}
-                    {{ workspaceDashboardList.length }}
                     <img class="empty-image"
                          src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
                     >
@@ -47,7 +45,7 @@
                     </p-button>
                 </div>
             </template>
-            <dashboard-board-list v-if="scopeStatus !== SCOPE_TYPE.PROJECT && workspaceDashboardList.length"
+            <dashboard-board-list v-if="(scopeStatus !== SCOPE_TYPE.PROJECT) && workspaceDashboardList.length"
                                   :scope-type="DASHBOARD_SCOPE.DOMAIN"
                                   class="dashboard-list"
                                   :class="{'full-mode': scopeStatus === SCOPE_TYPE.DOMAIN}"
@@ -111,6 +109,15 @@ export default {
             workspaceDashboardList: computed(() => store.getters['dashboard/getDomainItems']),
             projectDashboardList: computed(() => store.getters['dashboard/getProjectItems']),
             dashboardTotalCount: computed(() => store.getters['dashboard/getDashboardCount']),
+            filteredDashboardStatus: computed(() => {
+                if (state.scopeStatus === SCOPE_TYPE.DOMAIN) {
+                    return !!(state.workspaceDashboardList.length);
+                }
+                if (state.scopeStatus === SCOPE_TYPE.PROJECT) {
+                    return !!(state.projectDashboardList.length);
+                }
+                return !!(state.dashboardTotalCount);
+            }),
         });
 
         const searchQueryHelper = new QueryHelper();
