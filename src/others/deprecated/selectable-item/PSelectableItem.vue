@@ -1,30 +1,46 @@
 <template>
-    <div class="item-container" :class="{
-        active: active,
-        [theme]: true,
-        disabled: disabled
-    }" v-on="itemListeners"
+    <div class="item-container"
+         :class="{
+             active: active,
+             [theme]: true,
+             disabled: disabled
+         }"
+         v-on="itemListeners"
     >
-        <div v-if="color" class="bar" :style="{color}" />
+        <div v-if="color"
+             class="bar"
+             :style="{color}"
+        />
         <div class="contents">
-            <slot name="side" v-bind="$props">
+            <slot name="side"
+                  v-bind="$props"
+            >
                 <p-lazy-img :src="iconUrl"
                             :error-icon="defaultIcon"
-                            :width="iconSize" :height="iconSize"
+                            :width="iconSize"
+                            :height="iconSize"
                             class="flex-shrink-0 mr-2"
                 />
             </slot>
             <div class="flex-grow overflow-hidden">
-                <slot name="contents" v-bind="$props">
-                    <slot name="title" v-bind="$props">
+                <slot name="contents"
+                      v-bind="$props"
+                >
+                    <slot name="title"
+                          v-bind="$props"
+                    >
                         <p class="title">
                             {{ title }}
                         </p>
                     </slot>
-                    <slot name="contents-bottom" v-bind="$props" />
+                    <slot name="contents-bottom"
+                          v-bind="$props"
+                    />
                 </slot>
             </div>
-            <slot name="extra" v-bind="$props" />
+            <slot name="extra"
+                  v-bind="$props"
+            />
         </div>
     </div>
 </template>
@@ -37,7 +53,7 @@ import {
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import { themes } from '@/others/deprecated/selectable-item/config';
 import type { SelectableItemPropsType } from '@/others/deprecated/selectable-item/type';
-import { makeByPassListeners } from '@/util/composition-helpers';
+import { makeByPassListeners } from '@/utils/composition-helpers';
 
 export default {
     name: 'PSelectableItem',

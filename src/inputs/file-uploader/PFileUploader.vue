@@ -24,7 +24,7 @@ import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import vueFilePond from 'vue-filepond';
 
 import type { FileUploaderProps } from '@/inputs/file-uploader/type';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 
 const FilePond = vueFilePond(

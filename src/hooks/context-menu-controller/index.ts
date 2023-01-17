@@ -8,6 +8,7 @@ import type { MenuAttachHandler } from '@/hooks/context-menu-controller/context-
 import { useContextMenuAttach } from '@/hooks/context-menu-controller/context-menu-attach';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import type { MenuItem } from '@/inputs/context-menu/type';
+import { getTextHighlightRegex } from '@/utils/helpers';
 
 export interface UseContextMenuControllerOptions {
     targetRef: Ref<HTMLElement|Vue|null>; // required for style
@@ -87,7 +88,7 @@ export const useContextMenuController = ({
         let results: MenuItem[];
         const trimmed = text.trim();
         if (trimmed) {
-            const regex = new RegExp(trimmed, 'i');
+            const regex = getTextHighlightRegex(trimmed);
             results = items.filter((d) => {
                 if (d.type === undefined || d.type === 'item') return regex.test(d.label as string);
                 return true;

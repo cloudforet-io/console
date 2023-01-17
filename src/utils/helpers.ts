@@ -1,4 +1,6 @@
-import _, { get, toString } from 'lodash';
+import {
+    isEmpty, get, toString,
+} from 'lodash';
 
 import colors from '@/styles/colors.cjs';
 
@@ -33,7 +35,7 @@ export const copyAnyData = (value) => {
 export const isNotEmpty = (value): boolean => {
     if (['boolean', 'number'].includes(typeof value)) return true;
     if (value instanceof Array) return !!value.length;
-    return !_.isEmpty(value); // String, Object
+    return !isEmpty(value); // String, Object
 };
 
 export const getColor = (col?: string|null) => {
@@ -54,3 +56,27 @@ export const getPageStart = (thisPage: number, pageSize: number) => ((thisPage -
 export const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
 
 export const getContextKey = (): string => Math.floor(Math.random() * Date.now()).toString();
+
+// if additional exception words are found, must be added.
+const searchInputRegex = ['[', '?', '\\', '^', '+', '$', '*', '.', '|'];
+export const getTextHighlightRegex = (term?: string|number) => {
+    let regex = '';
+    if (typeof term === 'string') {
+        // remove spaces in the search term
+        const text = term.replace(/\s/g, '');
+        for (let i = 0; i < text.length; i++) {
+            const currentIndexText = text[i];
+            if (searchInputRegex.includes(currentIndexText)) {
+                // add escape character in '[?\^+$*.|', because RegExp can't accept just that words.
+                regex += `\\${currentIndexText}`;
+            } else {
+                regex += currentIndexText;
+            }
+            // add space regex after every single character to find matching keywords ignoring spaces
+            if (i < text.length - 1) regex += '\\s*';
+        }
+    } else if (typeof term === 'number') {
+        regex = `${term}`;
+    }
+    return new RegExp(regex, 'i');
+};

@@ -1,8 +1,12 @@
 <template>
-    <span class="p-text-highlighting" :class="styleType" v-on="$listeners">
+    <span class="p-text-highlighting"
+          :class="styleType"
+          v-on="$listeners"
+    >
         <span v-for="(x, i) in textList"
               :key="`label-${(x.text)}-${i}`"
               :class="{'matched-character': x.matched}"
+              class="text"
         >
             <slot v-bind="{ textList, text:x.text, matched:x.matched, index: i, regex }">{{ x.text }}</slot>
         </span>
@@ -22,8 +26,7 @@ import type {
 import {
     TEXT_HIGHLIGHTING_STYLE_TYPE,
 } from '@/data-display/text-highlighting/type';
-
-import { getTextHighlightRegex } from './helper';
+import { getTextHighlightRegex } from '@/utils/helpers';
 
 interface TextItem {
     text: string;
@@ -111,6 +114,9 @@ export default defineComponent<TextHighlightingProps>({
     color: inherit;
     font-weight: inherit;
     font-size: inherit;
+    > .text {
+        word-break: break-all;
+    }
     &.primary {
         .matched-character {
             @apply text-blue-700 bg-blue-200;

@@ -295,7 +295,7 @@ export default defineComponent<JsonSchemaFormProps>({
             If the schema is changed, the component to which rawFormData is bound may change.
             Don't handle events from other components and return early.
              */
-            if (state.schemaProperties[propertyIdx].componentName !== componentName) return;
+            if (!state.schemaProperties[propertyIdx] || state.schemaProperties[propertyIdx].componentName !== componentName) return;
 
             state.rawFormData[propertyName] = val;
             state.refinedFormData = {

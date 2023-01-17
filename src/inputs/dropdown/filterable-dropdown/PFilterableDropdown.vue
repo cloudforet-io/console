@@ -327,7 +327,7 @@ useIgnoreWindowArrowKeydownEvents({ predicate: proxyVisibleMenu });
                 display: inline-flex;
                 align-items: center;
                 cursor: pointer;
-                height: 2rem;
+                max-height: 2rem;
                 width: 1rem;
             }
         }
@@ -337,8 +337,8 @@ useIgnoreWindowArrowKeydownEvents({ predicate: proxyVisibleMenu });
             display: inline-flex;
             align-items: center;
             cursor: pointer;
-            height: 2rem;
-            width: 2rem;
+            max-height: 2rem;
+            width: 1.75rem;
         }
     }
     > .dropdown-context-menu {

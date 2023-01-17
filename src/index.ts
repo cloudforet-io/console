@@ -22,5 +22,8 @@ export { default as fonts } from './styles/web-fonts.cjs';
 /* Components */
 export * from './components';
 
-/* Hooks */
+/* Composables */
 export * from './hooks';
+
+/* Utils */
+export * from './utils';

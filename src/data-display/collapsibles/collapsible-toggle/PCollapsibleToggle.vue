@@ -1,12 +1,15 @@
 <template>
     <span class="p-collapsible-toggle">
-        <span v-if="toggleType === COLLAPSIBLE_TOGGLE_TYPE.text" @click="handleToggle">
+        <span v-if="toggleType === COLLAPSIBLE_TOGGLE_TYPE.text"
+              @click="handleToggle"
+        >
             <span>
                 <slot :is-collapsed="proxyIsCollapsed">
                     {{ proxyIsCollapsed ? $t('COMPONENT.COLLAPSIBLE_TOGGLE.SHOW_MORE') : $t('COMPONENT.COLLAPSIBLE_TOGGLE.HIDE') }}
                 </slot>
             </span>
-            <p-i width="0.875rem" height="0.875rem"
+            <p-i width="0.875rem"
+                 height="0.875rem"
                  :name="proxyIsCollapsed ? 'ic_arrow_bottom' : 'ic_arrow_top'"
                  color="inherit"
             />
@@ -32,7 +35,7 @@ import {
 } from '@/data-display/collapsibles/collapsible-toggle/type';
 import PI from '@/foundation/icons/PI.vue';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton.vue';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 export default defineComponent<CollapsibleToggleProps>({
     name: 'PCollapsibleToggle',

@@ -200,7 +200,7 @@ import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-displa
 import type { DataTableField, DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { useProxyValue } from '@/hooks';
-import { copyAnyData } from '@/util/helpers';
+import { copyAnyData } from '@/utils/helpers';
 
 const PCheckBox = () => import('@/inputs/checkbox/PCheckBox.vue');
 const PTextBeautifier = () => import('@/data-display/text-beautifier/PTextBeautifier.vue');

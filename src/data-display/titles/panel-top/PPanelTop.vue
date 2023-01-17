@@ -5,7 +5,9 @@
                 {{ title }}
             </slot>
         </span>
-        <span v-if="useTotalCount" class="total-count">
+        <span v-if="useTotalCount"
+              class="total-count"
+        >
             &nbsp;({{ commaFormatter(totalCount) }})
         </span>
         <span class="extra">
@@ -17,7 +19,7 @@
 import { defineComponent } from 'vue';
 
 import type { PanelTopProps } from '@/data-display/titles/panel-top/type';
-import { commaFormatter } from '@/util/helpers';
+import { commaFormatter } from '@/utils/helpers';
 
 export default defineComponent<PanelTopProps>({
     name: 'PPanelTop',

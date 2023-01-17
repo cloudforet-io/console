@@ -5,6 +5,7 @@ import type {
     KeyItemSet,
     ValueHandler, ValueHandlerMap,
 } from '@/inputs/search/query-search/type';
+import { getTextHighlightRegex } from '@/utils/helpers';
 
 const getKeyItem = () => ({
     label: faker.random.word(),
@@ -24,7 +25,7 @@ export const getValueItems = (length = 20) => range(length).map(() => ({ label: 
 export const getValueHandler = (items = getValueItems()): ValueHandler => (inputText: string) => {
     let results = items;
     if (inputText) {
-        const regex = new RegExp(inputText, 'i');
+        const regex = getTextHighlightRegex(inputText);
         results = results.filter((d) => regex.test(d.label));
     }
 

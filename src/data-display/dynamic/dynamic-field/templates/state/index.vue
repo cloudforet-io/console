@@ -21,7 +21,7 @@ import type { StateDynamicFieldProps } from '@/data-display/dynamic/dynamic-fiel
 import PStatus from '@/data-display/status/PStatus.vue';
 import type { StatusProps } from '@/data-display/status/type';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
-import { getColor } from '@/util/helpers';
+import { getColor } from '@/utils/helpers';
 
 
 export default defineComponent<StateDynamicFieldProps>({

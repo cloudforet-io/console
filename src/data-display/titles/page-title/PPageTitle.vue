@@ -1,7 +1,9 @@
 <template>
     <div class="p-page-title">
         <div class="title-wrapper">
-            <span v-if="child" class="back-btn">
+            <span v-if="child"
+                  class="back-btn"
+            >
                 <p-icon-button name="ic_back"
                                @click="$emit('goBack',$event)"
                 />
@@ -14,13 +16,21 @@
                     </slot>
                 </slot>
             </h2>
-            <slot v-if="useTotalCount" name="total-count">
-                <span v-if="useSelectedCount && selectedCount" class="total-count">({{ $t('COMPONENT.PAGE_TITLE.SELECTED_OF',{ selectedCount, totalCount }) }})</span>
-                <span v-else class="total-count">({{ commaFormatter(totalCount) }})</span>
+            <slot v-if="useTotalCount"
+                  name="total-count"
+            >
+                <span v-if="useSelectedCount && selectedCount"
+                      class="total-count"
+                >({{ $t('COMPONENT.PAGE_TITLE.SELECTED_OF',{ selectedCount, totalCount }) }})</span>
+                <span v-else
+                      class="total-count"
+                >({{ commaFormatter(totalCount) }})</span>
             </slot>
             <slot name="title-right-extra" />
         </div>
-        <div v-if="$slots['extra']" class="extra">
+        <div v-if="$slots['extra']"
+             class="extra"
+        >
             <slot name="extra" />
         </div>
     </div>
@@ -30,7 +40,7 @@
 import { defineComponent } from 'vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import { commaFormatter } from '@/util/helpers';
+import { commaFormatter } from '@/utils/helpers';
 
 interface Props {
     title?: string;

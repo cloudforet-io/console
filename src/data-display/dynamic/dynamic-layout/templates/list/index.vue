@@ -1,6 +1,7 @@
 <template>
     <div>
-        <p-dynamic-layout v-for="(layout, idx) in layouts" :key="idx"
+        <p-dynamic-layout v-for="(layout, idx) in layouts"
+                          :key="idx"
                           :name="layout.name"
                           :type="layout.type"
                           :options="layout.options"
@@ -10,8 +11,12 @@
                           :field-handler="fieldHandler"
                           v-on="getListeners(layout.name, idx)"
         >
-            <template v-for="(slot) of slotNames" #[slot]="scope">
-                <slot :name="`${name}-${slot}`" v-bind="scope" />
+            <template v-for="(slot) of slotNames"
+                      #[slot]="scope"
+            >
+                <slot :name="`${name}-${slot}`"
+                      v-bind="scope"
+                />
             </template>
         </p-dynamic-layout>
     </div>
@@ -30,7 +35,7 @@ import type {
 } from '@/data-display/dynamic/dynamic-layout/templates/list/type';
 import type { DynamicLayout } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
-import { makeByPassListeners } from '@/util/composition-helpers';
+import { makeByPassListeners } from '@/utils/composition-helpers';
 
 export default {
     name: 'PDynamicLayoutList',

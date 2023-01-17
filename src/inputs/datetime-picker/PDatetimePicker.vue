@@ -40,7 +40,7 @@ import PI from '@/foundation/icons/PI.vue';
 import type { DatetimePickerProps } from '@/inputs/datetime-picker/type';
 import { DATA_TYPE, SELECT_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
 import { i18n } from '@/translations';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 import { getLocaleFile } from '@/translations/vendors/flatpickr';
 

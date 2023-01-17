@@ -107,7 +107,7 @@ import PSearch from '@/inputs/search/search/PSearch.vue';
 import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import type { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 
 export default defineComponent<ToolboxProps>({

@@ -26,8 +26,12 @@
                      @export="emitExport()"
                      @rowLeftClick="byPassEvent('rowLeftClick', ...arguments)"
     >
-        <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
-            <slot :name="slot" v-bind="scope" />
+        <template v-for="(_, slot) of $scopedSlots"
+                  #[slot]="scope"
+        >
+            <slot :name="slot"
+                  v-bind="scope"
+            />
         </template>
     </p-toolbox-table>
 </template>
@@ -40,7 +44,7 @@ import type { Vue } from 'vue/types/vue';
 
 import type { Options, SearchTableProps } from '@/data-display/tables/search-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 
 export default {

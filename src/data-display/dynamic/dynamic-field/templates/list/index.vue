@@ -22,7 +22,7 @@ import { computed, reactive, toRefs } from 'vue';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { ListDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/list/type';
 import PTextList from '@/others/console/text-list/PTextList.vue';
-import { isNotEmpty } from '@/util/helpers';
+import { isNotEmpty } from '@/utils/helpers';
 
 export default {
     name: 'PDynamicFieldList',

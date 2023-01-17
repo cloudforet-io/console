@@ -56,7 +56,7 @@ import type {
     AutocompleteHandler,
 } from '@/inputs/search/autocomplete-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
-import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpers';
+import { makeByPassListeners, makeOptionalProxy } from '@/utils/composition-helpers';
 
 
 interface AutocompleteSearchProps {

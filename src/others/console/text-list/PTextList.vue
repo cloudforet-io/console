@@ -1,16 +1,25 @@
 <template>
     <span class="p-text-list">
-        <component :is="component" v-for="(item, i) in displayItems"
-                   :key="i" class="list-item"
+        <component :is="component"
+                   v-for="(item, i) in displayItems"
+                   :key="i"
+                   class="list-item"
                    :class="{'line-break': isLineBreak && i < displayItems.length - 1}"
                    :href="getHref(item, i)"
                    :target="target || undefined"
         >
-            <slot name="default" v-bind="{...$props, index: i, item, value: item || ''}">
+            <slot name="default"
+                  v-bind="{...$props, index: i, item, value: item || ''}"
+            >
                 {{ item || '' }}
             </slot>
-            <slot v-if="i < displayItems.length - 1" name="delimiter" v-bind="{...$props, index: i, item, value: item || ''}">
-                <span v-if="!isLineBreak" class="delimiter">{{ delimiter }}</span>
+            <slot v-if="i < displayItems.length - 1"
+                  name="delimiter"
+                  v-bind="{...$props, index: i, item, value: item || ''}"
+            >
+                <span v-if="!isLineBreak"
+                      class="delimiter"
+                >{{ delimiter }}</span>
             </slot>
         </component>
     </span>
@@ -26,7 +35,7 @@ import { get } from 'lodash';
 
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
 import type { TextListItem } from '@/others/console/text-list/type';
-import { isNotEmpty } from '@/util/helpers';
+import { isNotEmpty } from '@/utils/helpers';
 
 export default defineComponent({
     name: 'PTextList',

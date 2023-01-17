@@ -53,7 +53,7 @@ import type {
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PProgressBar from '@/data-display/progress-bar/PProgressBar.vue';
-import { getContextKey } from '@/util/helpers';
+import { getContextKey } from '@/utils/helpers';
 
 import { palette } from '@/styles/colors.cjs';
 

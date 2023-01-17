@@ -20,13 +20,22 @@
                         </slot>
                     </h4>
                 </slot>
-                <div class="overflow-auto" :style="{'max-height': '300px'}">
+                <div class="overflow-auto"
+                     :style="{'max-height': '300px'}"
+                >
                     <slot v-bind="$props">
-                        <p-data-table :sortable="true" :items="sortedItems" :fields="fields"
-                                      :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
+                        <p-data-table :sortable="true"
+                                      :items="sortedItems"
+                                      :fields="fields"
+                                      :sort-by.sync="sortBy"
+                                      :sort-desc.sync="sortDesc"
                         >
-                            <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
-                                <slot :name="slot" v-bind="scope" />
+                            <template v-for="(_, slot) of $scopedSlots"
+                                      #[slot]="scope"
+                            >
+                                <slot :name="slot"
+                                      v-bind="scope"
+                                />
                             </template>
                         </p-data-table>
                     </slot>
@@ -45,7 +54,7 @@ import { orderBy } from 'lodash';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import { SizeMapping } from '@/feedbacks/modals/type';
-import { makeByEvent, makeProxy } from '@/util/composition-helpers';
+import { makeByEvent, makeProxy } from '@/utils/composition-helpers';
 
 
 export default defineComponent({

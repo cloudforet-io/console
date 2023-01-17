@@ -1,7 +1,9 @@
 <template>
     <div class="p-notification-bar">
         <transition name="slide">
-            <div v-if="proxyVisible" class="notification-wrapper">
+            <div v-if="proxyVisible"
+                 class="notification-wrapper"
+            >
                 <div class="contents-wrapper">
                     <slot />
                 </div>
@@ -20,7 +22,7 @@ import { defineComponent, reactive, toRefs } from 'vue';
 
 import { styleTypes } from '@/feedbacks/notification/config';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import { makeProxy } from '@/util/composition-helpers';
+import { makeProxy } from '@/utils/composition-helpers';
 
 export default defineComponent({
     name: 'PNotificationBar',

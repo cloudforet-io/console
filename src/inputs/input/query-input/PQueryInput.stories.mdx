@@ -9,6 +9,7 @@ import {
 } from "@/inputs/input/query-input/story-helper";
 import {INPUT_SIZE} from "@/inputs/input/text-input/type";
 import {useProxyValue} from "@/hooks/proxy-state";
+import {getTextHighlightRegex} from "@/utils/helpers";
 
 <Meta title='Inputs/Input/Query Input' parameters={{
     design: {
@@ -122,7 +123,7 @@ Query Input supports <b>```key:value``` format input.</b> <br/>
                         results = valueItemsMap.last;
                     };
                     if (inputText) {
-                        const regex = new RegExp(inputText, 'i');
+                        const regex = getTextHighlightRegex(inputText);
                         results = results.filter(d => regex.test(d.label));
                     }
                     return {

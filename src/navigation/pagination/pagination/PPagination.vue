@@ -36,7 +36,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 export default {
     name: 'PBottomPagination',
