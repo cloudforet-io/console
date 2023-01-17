@@ -6,6 +6,7 @@
         <span v-for="(x, i) in textList"
               :key="`label-${(x.text)}-${i}`"
               :class="{'matched-character': x.matched}"
+              class="text"
         >
             <slot v-bind="{ textList, text:x.text, matched:x.matched, index: i, regex }">{{ x.text }}</slot>
         </span>
@@ -113,6 +114,9 @@ export default defineComponent<TextHighlightingProps>({
     color: inherit;
     font-weight: inherit;
     font-size: inherit;
+    > .text {
+        word-break: break-all;
+    }
     &.primary {
         .matched-character {
             @apply text-blue-700 bg-blue-200;
