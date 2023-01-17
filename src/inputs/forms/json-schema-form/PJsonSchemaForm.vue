@@ -23,7 +23,7 @@
         </p-field-group>
         <template v-else-if="typeof rawFormData === 'object'">
             <p-field-group v-for="(schemaProperty, propertyIdx) in schemaProperties"
-                           :key="`field-${contextKey}-${schemaProperty.propertyName}`"
+                           :key="`field-${schemaProperty.propertyName}`"
                            class="input-form-wrapper"
                            :label="schemaProperty.title"
                            :required="requiredList.includes(schemaProperty.propertyName)"
@@ -54,6 +54,7 @@
                 </template>
                 <template #default="{invalid}">
                     <generate-id-format v-if="schemaProperty.componentName === 'GenerateIdFormat'"
+                                        :key="`GenerateIdFormat-${schemaProperty.propertyName}`"
                                         :value="rawFormData[schemaProperty.propertyName]"
                                         :disabled="schemaProperty.disabled"
                                         :invalid="invalid"
@@ -61,12 +62,14 @@
                                         @update:value="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                     />
                     <p-json-schema-form v-else-if="schemaProperty.componentName === 'PJsonSchemaForm'"
+                                        :key="`PJsonSchemaForm-${schemaProperty.propertyName}`"
                                         :form-data="rawFormData[schemaProperty.propertyName]"
                                         :schema="schemaProperty"
                                         :is-root="false"
                                         @update:form-data="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                     />
                     <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
+                                       :key="`PSelectDropdown-${schemaProperty.propertyName}`"
                                        :selected="rawFormData[schemaProperty.propertyName]"
                                        :items="schemaProperty.menuItems"
                                        :disabled="schemaProperty.disabled"
@@ -81,9 +84,11 @@
                         </template>
                     </p-select-dropdown>
                     <p-filterable-dropdown v-else-if="schemaProperty.componentName === 'PFilterableDropdown'"
+                                           :key="`PFilterableDropdown-${schemaProperty.propertyName}`"
                                            :menu="schemaProperty.menuItems"
                                            :selected="rawFormData[schemaProperty.propertyName]"
                                            :multi-selectable="schemaProperty.multiInputMode"
+                                           :appearance-type="schemaProperty.appearanceType"
                                            show-select-marker
                                            use-fixed-menu-style
                                            :invalid="invalid"
@@ -97,7 +102,8 @@
                         </template>
                     </p-filterable-dropdown>
                     <template v-else>
-                        <p-text-input :value="schemaProperty.multiInputMode ? undefined : rawFormData[schemaProperty.propertyName]"
+                        <p-text-input :key="`PTextInput-${schemaProperty.propertyName}`"
+                                      :value="schemaProperty.multiInputMode ? undefined : rawFormData[schemaProperty.propertyName]"
                                       :selected="schemaProperty.multiInputMode ? rawFormData[schemaProperty.propertyName] : undefined"
                                       :type="schemaProperty.inputType"
                                       :invalid="invalid"
@@ -258,8 +264,6 @@ export default defineComponent<JsonSchemaFormProps>({
             jsonInputData: initJsonInputDataWithSchema(props.schema, props.formData) as string|undefined,
             // For all cases. In root case, it can be only an object.
             refinedFormData: initRefinedFormData(props.schema, props.formData, props.isRoot) as any,
-            //
-            contextKey: Math.floor(Math.random() * Date.now()),
         });
 
         const { localize } = useLocalize(props);
@@ -334,7 +338,6 @@ export default defineComponent<JsonSchemaFormProps>({
 
         /* Watchers */
         watch(() => props.schema, () => {
-            state.contextKey = Math.floor(Math.random() * Date.now());
             if (props.resetOnSchemaChange) reset();
         });
         watch(() => props.formData, (formData) => {
