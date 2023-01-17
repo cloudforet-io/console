@@ -15,7 +15,7 @@ import type { PropType } from 'vue';
 
 import { BADGE_STYLE } from '@/data-display/badges/type';
 import type { Badge, BadgeStyleType } from '@/data-display/badges/type';
-import { getColor } from '@/util/helpers';
+import { getColor } from '@/utils/helpers';
 
 export default defineComponent<Badge>({
     name: 'PBadge',

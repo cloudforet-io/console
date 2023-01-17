@@ -4,11 +4,11 @@ import {
     computed, isRef, reactive, ref, toRef,
 } from 'vue';
 
-import { getTextHighlightRegex } from '@/data-display/text-highlighting/helper';
 import type { MenuAttachHandler } from '@/hooks/context-menu-controller/context-menu-attach';
 import { useContextMenuAttach } from '@/hooks/context-menu-controller/context-menu-attach';
 import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import type { MenuItem } from '@/inputs/context-menu/type';
+import { getTextHighlightRegex } from '@/utils/helpers';
 
 export interface UseContextMenuControllerOptions {
     targetRef: Ref<HTMLElement|Vue|null>; // required for style

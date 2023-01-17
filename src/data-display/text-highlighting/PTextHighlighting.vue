@@ -1,5 +1,8 @@
 <template>
-    <span class="p-text-highlighting" :class="styleType" v-on="$listeners">
+    <span class="p-text-highlighting"
+          :class="styleType"
+          v-on="$listeners"
+    >
         <span v-for="(x, i) in textList"
               :key="`label-${(x.text)}-${i}`"
               :class="{'matched-character': x.matched}"
@@ -22,8 +25,7 @@ import type {
 import {
     TEXT_HIGHLIGHTING_STYLE_TYPE,
 } from '@/data-display/text-highlighting/type';
-
-import { getTextHighlightRegex } from './helper';
+import { getTextHighlightRegex } from '@/utils/helpers';
 
 interface TextItem {
     text: string;

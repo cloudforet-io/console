@@ -8,6 +8,7 @@ import type {
     KeyDataType,
     ValueMenuItem,
 } from '@/inputs/search/query-search/type';
+import { getTextHighlightRegex } from '@/utils/helpers';
 
 const getKeyItem = (dataType?: KeyDataType): KeyItem => {
     const result: KeyItem = {
@@ -43,7 +44,7 @@ export const getValueHandler = (dataTypes: KeyDataType[] = []): ValueHandler => 
     let results: ValueMenuItem[] = items;
     if (inputText !== undefined && inputText !== '') {
         const text = typeof inputText === 'number' ? `${inputText}` : inputText;
-        const regex = new RegExp(text, 'i');
+        const regex = getTextHighlightRegex(text);
         results = results.filter((d) => regex.test(d.label));
     }
 

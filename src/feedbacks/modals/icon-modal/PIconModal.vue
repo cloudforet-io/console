@@ -68,7 +68,7 @@ import PI from '@/foundation/icons/PI.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import '../modal.pcss';
-import { makeProxy } from '@/util/composition-helpers';
+import { makeProxy } from '@/utils/composition-helpers';
 
 import { primaryDark } from '@/styles/colors.cjs';
 

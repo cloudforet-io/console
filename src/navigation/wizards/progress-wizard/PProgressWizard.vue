@@ -15,18 +15,25 @@
                     >
                         <span class="triangle-bg" />
                         <span class="triangle" />
-                        <slot :name="`progress-${tab.name}`" :tab="tab">
+                        <slot :name="`progress-${tab.name}`"
+                              :tab="tab"
+                        >
                             <span>{{ Number(idx) + 1 }}.
                                 {{ tab.label || tab.name }} {{ tab.optional ? `(${$t('COMPONENT.PROGRESS_WIZARD.OPTIONAL')})`: '' }}
                             </span>
                         </slot>
 
-                        <slot :name="`help-${tab.name}`" :tab="tab">
+                        <slot :name="`help-${tab.name}`"
+                              :tab="tab"
+                        >
                             <p-tooltip-button v-if="tab.help"
-                                              class="help" :tooltip="tab.help" position="top"
+                                              class="help"
+                                              :tooltip="tab.help"
+                                              position="top"
                             >
                                 <template #button>
-                                    <p-i name="ic_tooltip" width="1rem"
+                                    <p-i name="ic_tooltip"
+                                         width="1rem"
                                          height="1rem"
                                     />
                                 </template>
@@ -36,12 +43,21 @@
                 </div>
             </slot>
             <template v-if="activeTab">
-                <aside v-if="activeTab.alert" class="caution">
-                    <p-i name="ic_alert" height="1rem" width="1rem" />
+                <aside v-if="activeTab.alert"
+                       class="caution"
+                >
+                    <p-i name="ic_alert"
+                         height="1rem"
+                         width="1rem"
+                    />
                     {{ activeTab.alert }}
                 </aside>
-                <aside v-if="activeTab.warning" class="caution warning">
-                    <p-i name="ic_alert" height="1rem" width="1rem"
+                <aside v-if="activeTab.warning"
+                       class="caution warning"
+                >
+                    <p-i name="ic_alert"
+                         height="1rem"
+                         width="1rem"
                          color="inherit"
                     />
                     {{ activeTab.warning }}
@@ -64,7 +80,9 @@
             <!--            </div>-->
             <div class="contents">
                 <keep-alive>
-                    <slot :name="`contents-${activeTab.name}`" :tab="activeTab" />
+                    <slot :name="`contents-${activeTab.name}`"
+                          :tab="activeTab"
+                    />
                 </keep-alive>
             </div>
         </template>
@@ -74,7 +92,8 @@
                 <p-button style-type="tertiary"
                           :disabled="loading"
                           size="lg"
-                          class="txt-btn" @click="$emit('cancel', $event)"
+                          class="txt-btn"
+                          @click="$emit('cancel', $event)"
                 >
                     {{ $t('COMPONENT.PROGRESS_WIZARD.CANCEL') }}
                 </p-button>
@@ -85,7 +104,9 @@
                               size="lg"
                               @click="onClickPrev"
                     >
-                        <p-i name="ic_back" color="inherit" />{{ $t('COMPONENT.PROGRESS_WIZARD.PREV') }}
+                        <p-i name="ic_back"
+                             color="inherit"
+                        />{{ $t('COMPONENT.PROGRESS_WIZARD.PREV') }}
                     </p-button>
                     <p-button v-if="!isLastTab"
                               :disabled="loading"
@@ -93,7 +114,10 @@
                               size="lg"
                               @click="onClickNext"
                     >
-                        {{ $t('COMPONENT.PROGRESS_WIZARD.NEXT') }}<p-i name="ic_back" color="inherit" dir="down" />
+                        {{ $t('COMPONENT.PROGRESS_WIZARD.NEXT') }}<p-i name="ic_back"
+                                                                       color="inherit"
+                                                                       dir="down"
+                        />
                     </p-button>
                     <p-button :loading="loading"
                               :disabled="disabled"
@@ -125,7 +149,7 @@ import type {
     ProgressWizardProps,
 } from '@/navigation/wizards/progress-wizard/type';
 import PTooltipButton from '@/others/deprecated/tooltip-button/PTooltipButton.vue';
-import { makeProxy } from '@/util/composition-helpers';
+import { makeProxy } from '@/utils/composition-helpers';
 
 
 export default {

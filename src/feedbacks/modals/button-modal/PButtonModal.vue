@@ -116,7 +116,7 @@ import PLottie from '@/foundation/lottie/PLottie.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import { makeProxy } from '@/util/composition-helpers';
+import { makeProxy } from '@/utils/composition-helpers';
 
 
 export default defineComponent<ButtonModalProps>({

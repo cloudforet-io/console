@@ -1,9 +1,9 @@
 import { find } from 'lodash';
 
-import { getTextHighlightRegex } from '@/data-display/text-highlighting/helper';
 import type {
     KeyItem, KeyItemSet, KeyMenuItem, ValueHandler, ValueItem, ValueMenuItem, MenuFormatterArgs,
 } from '@/inputs/search/query-search/type';
+import { getTextHighlightRegex } from '@/utils/helpers';
 
 
 export const getRootKeyItemHandler = (keyItemSets: KeyItemSet[]): ValueHandler => (val: string|number) => {

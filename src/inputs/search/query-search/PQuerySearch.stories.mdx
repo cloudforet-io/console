@@ -1,9 +1,12 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import { getCurrentInstance, reactive, toRefs } from 'vue';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/utils/composition-helpers';
 import PQuerySearch from './PQuerySearch.vue';
 import { getQuerySearchArgTypes } from '@/inputs/search/query-search/story-helper';
 import { getKeyItems, getKeyItemSets, getValueHandlerMap, getValueItems } from '@/inputs/search/query-search/mock';
+import {
+    getTextHighlightRegex
+} from "@/utils/helpers";
 
 
 
@@ -263,7 +266,7 @@ interface ValueHandlerMap {
                 const valueHandler = (inputText, rootKey) => {
                     let results = valueItemsMap[rootKey.name];
                     if (inputText) {
-                        const regex = new RegExp(inputText, 'i');
+                        const regex = getTextHighlightRegex(inputText);
                         results = results.filter(d => regex.test(d.label));
                     }
                     return {
@@ -342,7 +345,7 @@ This component supports not only ```key:value``` search, but also ```key.a.b.c:v
                 results = valueItemsMap.last;
             };
             if (inputText) {
-                const regex = new RegExp(inputText, 'i');
+                const regex = getTextHighlightRegex(inputText);
                 results = results.filter(d => regex.test(d.label));
             }
             return {
@@ -444,7 +447,7 @@ It's NOT used for validation. It's only for input form determination. <br/>
                 const valueHandler = (inputText, rootKey, dataType, subPath) => {
                     let results = valueItemsMap[rootKey.name]
                     if (inputText) {
-                        const regex = new RegExp(inputText, 'i');
+                        const regex = getTextHighlightRegex(inputText);
                         results = results.filter(d => regex.test(d.label));
                     }
                     return {
@@ -532,7 +535,7 @@ Be careful when using them as they have the highest priority in the order they a
                 const valueHandler = (inputText, rootKey) => {
                     let results = valueItems;
                     if (inputText) {
-                        const regex = new RegExp(inputText, 'i');
+                        const regex = getTextHighlightRegex(inputText);
                         results = results.filter(d => regex.test(d.label));
                     }
                     return {

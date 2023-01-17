@@ -1,6 +1,9 @@
 <template>
-    <span class="p-copy-button" :class="size">
-        <span v-if="$scopedSlots.default" ref="textRef"
+    <span class="p-copy-button"
+          :class="size"
+    >
+        <span v-if="$scopedSlots.default"
+              ref="textRef"
               class="copy-text"
         >
             <slot name="default" />
@@ -18,10 +21,14 @@
              @mouseup.native="copyText()"
         />
         <transition name="fade">
-            <div v-if="isAlertVisible" ref="alertRef" class="copy-button-alert"
+            <div v-if="isAlertVisible"
+                 ref="alertRef"
+                 class="copy-button-alert"
                  :style="alertStyle"
             >
-                <p-i name="ic_state_active" color="white" width="1rem"
+                <p-i name="ic_state_active"
+                     color="white"
+                     width="1rem"
                      height="1rem"
                 />
                 <span>{{ $t('COMPONENT.COPY_BUTTON.COPIED') }}</span>
@@ -41,7 +48,7 @@ import type Vue from 'vue';
 import PI from '@/foundation/icons/PI.vue';
 import type { Size } from '@/inputs/buttons/copy-button/type';
 import { SIZE } from '@/inputs/buttons/copy-button/type';
-import { copyAnyData, isNotEmpty } from '@/util/helpers';
+import { copyAnyData, isNotEmpty } from '@/utils/helpers';
 
 
 interface Props {

@@ -9,6 +9,7 @@ import PI from '@/foundation/icons/PI.vue';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 import PButton from "@/inputs/buttons/button/PButton.vue";
 import PTextEditor from "@/inputs/text-editor/PTextEditor";
+import {getTextHighlightRegex} from "@/utils/helpers";
 
 import {contextMenuSlots, getContextMenuArgTypes} from '@/inputs/context-menu/story-helper';
 import {menuItems, longMenuItems, getContextMenuItems} from '@/inputs/context-menu/mock';
@@ -622,7 +623,7 @@ It works only in multi select case.
                     state.loading = true;
                     state.menu = await new Promise(resolve => {
                         setTimeout(() => {
-                            const regex = new RegExp(value, 'i');
+                            const regex = getTextHighlightRegex(value);
                             resolve(allItems.filter(item => {
                                 // check only item type
                                 if (!item.type || item.type === 'item') return regex.test(item.label)

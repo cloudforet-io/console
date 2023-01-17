@@ -16,7 +16,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { TextDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/text/type';
 import type { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
-import { commaFormatter } from '@/util/helpers';
+import { commaFormatter } from '@/utils/helpers';
 
 export default defineComponent<TextDynamicFieldProps>({
     name: 'PDynamicFieldText',

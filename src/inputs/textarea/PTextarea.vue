@@ -1,6 +1,10 @@
 <template>
-    <textarea v-model="proxyValue" :placeholder="placeholder" :readonly="readonly"
-              :autofocus="autofocus" :disabled="disabled" class="p-textarea"
+    <textarea v-model="proxyValue"
+              :placeholder="placeholder"
+              :readonly="readonly"
+              :autofocus="autofocus"
+              :disabled="disabled"
+              class="p-textarea"
               :class="{invalid}"
               v-on="$listeners"
     />
@@ -12,7 +16,7 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 export default defineComponent({
     name: 'PTextarea',

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getBindClass } from '@/util/functional-helpers';
+import { getBindClass } from '@/utils/functional-helpers';
 
 import { gray } from '@/styles/colors.cjs';
 

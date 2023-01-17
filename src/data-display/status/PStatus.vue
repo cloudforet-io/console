@@ -1,28 +1,46 @@
 <template>
-    <span class="p-status" :class="{[theme]: !!theme}" v-on="$listeners">
+    <span class="p-status"
+          :class="{[theme]: !!theme}"
+          v-on="$listeners"
+    >
         <template v-if="theme">
-            <p-lottie v-if="lottie" :name="lottie" :size="iconSize" />
-            <p-i v-else-if="icon" :name="icon"
-                 :height="`${iconSize}rem`" :width="`${iconSize}rem`"
+            <p-lottie v-if="lottie"
+                      :name="lottie"
+                      :size="iconSize"
+            />
+            <p-i v-else-if="icon"
+                 :name="icon"
+                 :height="`${iconSize}rem`"
+                 :width="`${iconSize}rem`"
                  :animation="iconAnimation"
             />
-            <span v-else-if="!disableIcon" class="circle" />
+            <span v-else-if="!disableIcon"
+                  class="circle"
+            />
             <span class="text"><slot>{{ text }}</slot></span>
         </template>
         <template v-else>
-            <p-lottie v-if="lottie" :name="lottie" :size="iconSize" />
-            <p-i v-else-if="icon" :name="icon"
+            <p-lottie v-if="lottie"
+                      :name="lottie"
+                      :size="iconSize"
+            />
+            <p-i v-else-if="icon"
+                 :name="icon"
                  :color="realIconColor ? realIconColor : undefined"
                  :animation="iconAnimation"
-                 :height="`${iconSize}rem`" :width="`${iconSize}rem`"
+                 :height="`${iconSize}rem`"
+                 :width="`${iconSize}rem`"
             />
-            <span v-else-if="!disableIcon" class="circle" :style="{
-                backgroundColor: circleColor
-            }"
+            <span v-else-if="!disableIcon"
+                  class="circle"
+                  :style="{
+                      backgroundColor: circleColor
+                  }"
             />
-            <span class="text" :style="{
-                color: labelColor
-            }"
+            <span class="text"
+                  :style="{
+                      color: labelColor
+                  }"
             >
                 <slot>{{ text }}</slot>
             </span>
@@ -38,7 +56,7 @@ import type { StatusProps } from '@/data-display/status/type';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
-import { getColor } from '@/util/helpers';
+import { getColor } from '@/utils/helpers';
 
 export default defineComponent<StatusProps>({
     name: 'PStatus',

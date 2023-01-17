@@ -64,7 +64,7 @@ import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import type { SpinnerSize } from '@/feedbacks/loading/spinner/type';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
 import { i18n } from '@/translations';
-import { getColor } from '@/util/helpers';
+import { getColor } from '@/utils/helpers';
 
 interface Props {
     loading: boolean;

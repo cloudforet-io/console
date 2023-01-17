@@ -54,7 +54,7 @@ import type {
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PStatus from '@/data-display/status/PStatus.vue';
-import { getContextKey } from '@/util/helpers';
+import { getContextKey } from '@/utils/helpers';
 
 import { BASIC_CHART_COLORS } from '@/styles/colorsets';
 

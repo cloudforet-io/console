@@ -117,7 +117,7 @@ import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.v
 import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import PGridLayout from '@/others/deprecated/grid-layout/PGridLayout.vue';
 import type { ToolboxGridLayoutProps } from '@/others/deprecated/toolbox-grid-layout/type';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 export default {
     name: 'PToolboxGridLayout',

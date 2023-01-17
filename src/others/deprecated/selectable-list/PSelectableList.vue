@@ -1,11 +1,17 @@
 <template>
-    <div class="p-selectable-list" :class="[theme]">
-        <slot v-if="true" name="loading">
+    <div class="p-selectable-list"
+         :class="[theme]"
+    >
+        <slot v-if="true"
+              name="loading"
+        >
             <div class="spinner-container">
                 <p-spinner class="flex items-center justify-center" />
             </div>
         </slot>
-        <slot v-else-if="items.length === 0" name="no-data">
+        <slot v-else-if="items.length === 0"
+              name="no-data"
+        >
             <p-empty>
                 <slot name="no-data-format">
                     {{ $t('COMPONENT.EMPTY.NO_DATA') }}
@@ -13,7 +19,8 @@
             </p-empty>
         </slot>
         <template v-else>
-            <p-selectable-item v-for="(item, idx) in items" :key="getItem(item, mapper.key) || idx"
+            <p-selectable-item v-for="(item, idx) in items"
+                               :key="getItem(item, mapper.key) || idx"
                                :icon-url="getItem(item, mapper.iconUrl) || undefined"
                                :title="getItem(item, mapper.title) || undefined"
                                :active="proxyState.selectedIndexes.includes(idx)"
@@ -24,9 +31,14 @@
                                :icon-size="iconSize"
                                @click="onItemClick(item, idx)"
             >
-                <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
-                    <slot :name="slot" v-bind="scope"
-                          :items="items" :item="item" :index="idx"
+                <template v-for="(_, slot) of $scopedSlots"
+                          #[slot]="scope"
+                >
+                    <slot :name="slot"
+                          v-bind="scope"
+                          :items="items"
+                          :item="item"
+                          :index="idx"
                     />
                 </template>
             </p-selectable-item>
@@ -48,7 +60,7 @@ import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { themes } from '@/others/deprecated/selectable-item/config';
 import PSelectableItem from '@/others/deprecated/selectable-item/PSelectableItem.vue';
 import type { SelectableListProps, MapperKeyType } from '@/others/deprecated/selectable-list/type';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 
 export default {

@@ -1,8 +1,8 @@
-import type { Ref } from 'vue';
 import {
     computed, ref,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import type { Ref } from 'vue';
+import type Vue from 'vue';
 
 
 /**

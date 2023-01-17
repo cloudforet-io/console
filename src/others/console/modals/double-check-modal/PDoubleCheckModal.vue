@@ -47,7 +47,7 @@ import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import { SizeMapping } from '@/feedbacks/modals/type';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/inputs/input/text-input/PTextInput.vue';
-import { makeProxy } from '@/util/composition-helpers';
+import { makeProxy } from '@/utils/composition-helpers';
 
 
 export default {

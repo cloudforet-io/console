@@ -76,7 +76,8 @@ import type { MenuItem } from '@/inputs/context-menu/type';
 import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { SearchProps } from '@/inputs/search/search/type';
 import { i18n } from '@/translations';
-import { makeByPassListeners } from '@/util/composition-helpers';
+import { makeByPassListeners } from '@/utils/composition-helpers';
+import { getTextHighlightRegex } from '@/utils/helpers';
 
 const PContextMenu = import('@/inputs/context-menu/PContextMenu.vue');
 
@@ -183,7 +184,7 @@ export default defineComponent<SearchProps>({
             let results: MenuItem[] = [...list];
             const trimmed = inputText.trim();
             if (trimmed) {
-                const regex = new RegExp(inputText, 'i');
+                const regex = getTextHighlightRegex(inputText);
                 results = results.filter((d) => regex.test(d.label as string));
             }
             return results;

@@ -5,7 +5,7 @@ import { BADGE_SHAPE } from '@/data-display/badges/type';
 import type { BadgeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/badge/type';
 import type { BadgeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
-import { commaFormatter, getColor } from '@/util/helpers';
+import { commaFormatter, getColor } from '@/utils/helpers';
 
 export default {
     name: 'PDynamicFieldBadge',
