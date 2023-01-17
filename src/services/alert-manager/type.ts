@@ -27,15 +27,6 @@ export interface EscalationPolicyDataModel {
     scope: ScopeType;
 }
 
-export interface EscalationPolicyFormModel {
-    name: string;
-    rules: Rule[];
-    scope: ScopeType;
-    finish_condition: FINISH_CONDITION.acknowledged | FINISH_CONDITION.resolved;
-    repeat_count: number;
-    project_id?: string;
-}
-
 type Responder = {
     resource_type: string;
     resource_id: string;
