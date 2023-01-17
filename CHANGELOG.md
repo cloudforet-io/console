@@ -1,3 +1,10 @@
+# [2.0.0-beta.14](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.13...v2.0.0-beta.14) (2023-01-17)
+
+
+### Bug Fixes
+
+* **board:** predicate on useSelect ([#238](https://github.com/cloudforet-io/mirinae/issues/238)) ([2531ead](https://github.com/cloudforet-io/mirinae/commit/2531ead892b1617f6d94772f987738ae9080f18e))
+
 # [2.0.0-beta.13](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.12...v2.0.0-beta.13) (2023-01-17)
 
 
