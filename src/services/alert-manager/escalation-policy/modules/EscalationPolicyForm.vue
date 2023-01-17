@@ -9,7 +9,7 @@
                 <p-text-input :value="name"
                               :invalid="invalid"
                               class="w-1/2"
-                              @update:value="setForm('name', $event)"
+                              @update:value="handleUpdateName"
                 />
             </template>
         </p-field-group>
@@ -146,7 +146,6 @@ export default {
         const escalationPolicyFormState = escalationPolicyFormStore.state;
         const state = reactive({
             projects: computed(() => store.getters['reference/projectItems']),
-            mode: computed(() => (props.escalationPolicyData?.escalation_policy_id ? ACTION.update : ACTION.create)),
             //
             scopeLabels: computed(() => ({
                 [SCOPE.DOMAIN]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'),
@@ -195,7 +194,12 @@ export default {
         const handleChangeFinishCondition = (value) => {
             escalationPolicyFormState.finishCondition = value;
         };
+        const handleUpdateName = (_name) => {
+            setForm('name', _name);
+            escalationPolicyFormState.name = _name;
+        };
         const handleSelectProject = (selected) => {
+            setForm('projectId', selected[0]?.id);
             escalationPolicyFormState.projectId = selected[0]?.id;
         };
 
@@ -209,7 +213,6 @@ export default {
             }
         }, { immediate: true });
         watch(() => isAllValid.value, (_isAllValid) => {
-            console.log('isNameProjectIdFormValid', _isAllValid);
             escalationPolicyFormState.isNameProjectIdFormValid = _isAllValid;
         }, { immediate: true });
 
@@ -227,6 +230,7 @@ export default {
             PROJECT_ROUTE,
             handleChangeScope,
             handleChangeFinishCondition,
+            handleUpdateName,
             handleSelectProject,
             //
             name,
