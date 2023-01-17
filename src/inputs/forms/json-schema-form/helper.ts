@@ -77,9 +77,13 @@ export const initFormDataWithSchema = (schema?: JsonSchema, formData?: object): 
             if (!Array.isArray(result[key])) {
                 result[key] = undefined;
             } else {
-                const isSearchDropdownType = !!getMenuItemsFromSchema(property);
-                const keyProperty = isSearchDropdownType ? 'name' : 'value'; // 'name' for PFilterableDropdown, 'value' for PTextInput
-                result[key] = result[key].map((d) => ({ [keyProperty]: d }));
+                const menuMap = {};
+                if (Array.isArray(property.menuItems)) {
+                    property.menuItems.forEach((d) => {
+                        if (d.name) menuMap[d.name] = d;
+                    });
+                }
+                result[key] = result[key].map((d) => ({ name: d, label: menuMap[d]?.label ?? d }));
             }
         }
     });
@@ -164,6 +168,10 @@ export const getAppearanceType = (schemaProperty: InnerJsonSchema): InputAppeara
     if (getInputTypeBySchemaProperty(schemaProperty) === 'password') return 'masking';
     if (getComponentNameBySchemaProperty(schemaProperty) === 'PTextInput') {
         if (schemaProperty.type === 'array') return 'stack';
+        return 'basic';
+    }
+    if (getComponentNameBySchemaProperty(schemaProperty) === 'PFilterableDropdown') {
+        if (schemaProperty.type === 'array') return 'badge';
         return 'basic';
     }
     return undefined;
