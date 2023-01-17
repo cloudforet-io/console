@@ -2,7 +2,7 @@
     <div class="gnb-dashboard-recent">
         <p-data-loader :data="recentDashboardItems"
                        :loading="loading"
-                       :class="{ loading: loading && !recentDashboardItems.length }"
+                       class="gnb-dashboard-recent-context"
         >
             <div class="gnb-dashboard-recent-list">
                 <div @click="hideMenu">
@@ -147,16 +147,11 @@ export default defineComponent<Props>({
 </script>
 <style lang="postcss" scoped>
 .gnb-dashboard-recent {
-    /* custom design-system component - p-data-loader */
-    :deep(.p-data-loader) {
-        &.loading {
-            height: 13rem;
-        }
-        .data-loader-container {
-            max-height: calc(100vh - $gnb-height - 3.75rem);
-            overflow-y: auto;
-            padding: 0.5rem;
-        }
+    .gnb-dashboard-recent-context {
+        max-height: calc(85vh - 9rem);
+        overflow-y: auto;
+        padding: 0.5rem;
+        min-height: 15rem;
     }
 
     .gnb-dashboard-recent-list {

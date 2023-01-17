@@ -230,7 +230,6 @@ export default defineComponent<Props>({
             @apply text-gray-400;
             font-size: 0.875rem;
             line-height: 1.5;
-            padding-top: 1.5rem;
         }
         .button-wrapper {
             display: flex;
