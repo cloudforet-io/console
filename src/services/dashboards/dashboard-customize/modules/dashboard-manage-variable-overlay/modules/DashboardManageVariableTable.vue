@@ -74,6 +74,7 @@ import {
     PBadge, PDataTable, PSelectStatus, PToggleButton, PButton, PCollapsiblePanel,
 } from '@spaceone/design-system';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -148,6 +149,10 @@ const handleToggleUse = (propertyName: string, value: boolean) => {
 };
 
 onMounted(() => {
+    if (dashboardDetailState.variablesSchema.order.length === 0) {
+        SpaceRouter.router.go(-1);
+        return;
+    }
     const properties = dashboardDetailState.variablesSchema.properties;
     const order = dashboardDetailState.variablesSchema.order;
     const convertedVariables = order.map((d) => {

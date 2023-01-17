@@ -32,9 +32,6 @@
                 </template>
             </p-panel-top>
             <dashboard-manage-variable-table v-if="contentType === 'LIST'"
-                                             :content-type.sync="contentType"
-                                             :variables="variableSchema.properties"
-                                             :order="variableSchema.order"
                                              @delete="handleOpenDeleteModal"
                                              @edit="handleChangeEditContent"
             />
