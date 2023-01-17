@@ -309,7 +309,8 @@ useIgnoreWindowArrowKeydownEvents({ predicate: proxyVisibleMenu });
             > .selected-item {
                 @apply text-label-md text-gray-900;
                 flex-grow: 1;
-                padding: 0.375rem 0.5rem;
+                line-height: 1.5;
+                padding: 0.25rem 0.5rem;
             }
             > .tags-wrapper {
                 flex-grow: 1;
