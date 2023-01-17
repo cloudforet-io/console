@@ -27,7 +27,7 @@
                                 @validate="handleFormValidate"
             >
                 <template #label-extra="{ propertyName }">
-                    <div v-if="inheritableProperties.includes(propertyName)"
+                    <div v-if="inheritSchemaProperties[propertyName] && inheritSchemaProperties[propertyName].menuItems.length > 0"
                          class="inherit-toggle-button"
                     >
                         <span class="text"
@@ -124,7 +124,17 @@ export default defineComponent<Props>({
         const state = reactive({
             widgetConfig: computed(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
             widgetOptionsJsonSchema: {} as JsonSchema,
-            inheritableProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.inheritable_properties || []),
+            inheritSchemaProperties: computed(() => {
+                const variablesSchema = dashboardDetailState.variablesSchema;
+                const properties = state.widgetConfig?.options_schema?.schema?.properties ?? {};
+                const schema = {};
+                Object.keys(properties).forEach((propertyName) => {
+                    const propertySchema = properties[propertyName] ?? {};
+                    if (!propertySchema) return;
+                    schema[propertyName] = refineOptionSchemaByVariablesSchema(propertySchema, variablesSchema);
+                });
+                return schema;
+            }),
             //
             schemaFormData: {},
             isSchemaFormValid: undefined,
@@ -164,7 +174,7 @@ export default defineComponent<Props>({
             return selectedItem && !isEmpty(selectedItem);
         };
 
-        const getFormDataFromWidgetInfo = (widgetInfo:DashboardLayoutWidgetInfo) => {
+        const getFormDataFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
             const { widget_options, inherit_options } = widgetInfo;
             const formData = {};
 
@@ -173,7 +183,7 @@ export default defineComponent<Props>({
                 if (optionKey === 'filters') {
                     Object.entries((optionValue ?? {}) as WidgetFiltersMap).forEach(([key, value]) => {
                         if (Array.isArray(value)) {
-                            formData[`filters.${key}`] = value.map((filter) => filter.v);
+                            formData[`filters.${key}`] = value.map((filter) => filter.v).flat();
                         } else {
                             formData[`filters.${key}`] = value.v;
                         }
@@ -219,18 +229,18 @@ export default defineComponent<Props>({
 
         /* schema refining helpers */
         const refineOptionSchemaByVariablesSchema = (propertySchema: JsonSchema['properties'], variablesSchema: DashboardVariablesSchema) => {
-            const enabledVariables = Object.entries(variablesSchema.properties)
+            const availableVariables = Object.entries(variablesSchema.properties)
                 .filter(([, d]) => {
                     if (!d.use) return false;
                     const variableType = d.selection_type === 'MULTI' ? 'array' : 'string';
                     return propertySchema.type === variableType;
                 });
-            const _enum = enabledVariables.map(([key]) => key);
+            const _enum = availableVariables.map(([key]) => key);
             return {
                 title: propertySchema.title,
                 type: 'string',
                 enum: _enum.length ? _enum : [null],
-                menuItems: enabledVariables.map(([key, val]) => ({
+                menuItems: availableVariables.map(([key, val]) => ({
                     name: key, label: val.name,
                 })),
                 default: undefined,
@@ -369,9 +379,10 @@ export default defineComponent<Props>({
             /* more options */
             handleMoreOptionAdd,
             handleMoreOptionRemove,
+            /* inherit */
+            handleChangeInheritToggle,
             //
             isSelected,
-            handleChangeInheritToggle,
             handleFormValidate,
         };
     },
