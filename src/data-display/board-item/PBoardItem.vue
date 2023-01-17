@@ -128,6 +128,7 @@ export default defineComponent<BoardItemProps>({
         } = useSelect({
             selected: computed(() => props.selected),
             value: computed(() => props.value),
+            predicate: () => !!(props.selected && props.value && props.selected === props.value),
         });
 
         return {

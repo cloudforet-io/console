@@ -4,14 +4,14 @@
          :style="styleVariableByOptions"
     >
         <template v-for="(board, index) in boardList">
-            <p-board-item :key="`board-${board.name}-${index}`"
+            <p-board-item :key="`board-${board.value}-${index}`"
                           class="p-board-item"
                           :class="{
                               'first-list-item': index === 0,
                               'last-list-item': index === boardList.length - 1,
                               'selectable': selectable
                           }"
-                          :value="board.name"
+                          :value="board.value"
                           :left-icon="board.leftIcon"
                           :icon-button-sets="board.iconButtonSets"
                           :rounded="board.rounded"
