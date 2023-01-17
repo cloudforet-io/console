@@ -5,7 +5,7 @@ import {
 
 import dayjs from 'dayjs';
 import {
-    cloneDeep, flattenDeep, isEqual, union,
+    cloneDeep, flattenDeep, isEmpty, isEqual, union,
 } from 'lodash';
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
@@ -125,7 +125,12 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setDashboardInfo(originState.dashboardInfo);
     };
 
-    const setDashboardInfo = (dashboardInfo: DashboardModel) => {
+    const setDashboardInfo = (dashboardInfo?: DashboardModel): void => {
+        if (!dashboardInfo || isEmpty(dashboardInfo)) {
+            console.error('setDashboardInfo failed', dashboardInfo);
+            return;
+        }
+
         originState.dashboardInfo = dashboardInfo;
 
         const _dashboardInfo = cloneDeep(dashboardInfo);
