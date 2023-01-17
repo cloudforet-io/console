@@ -123,8 +123,7 @@ export default defineComponent({
         (async () => {
             await Promise.allSettled([
                 store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
-                store.dispatch('dashboard/loadDomainDashboard'),
-                store.dispatch('dashboard/loadProjectDashboard'),
+                store.dispatch('dashboard/loadAllDashboard'),
             ]);
         })();
 

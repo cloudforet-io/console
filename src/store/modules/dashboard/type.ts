@@ -10,5 +10,6 @@ export interface DashboardState {
     scope: string;
     domainItemCount: number;
     projectItemCount: number;
+    loading: boolean;
 }
 

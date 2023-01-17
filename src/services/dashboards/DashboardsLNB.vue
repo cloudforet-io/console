@@ -149,10 +149,7 @@ export default defineComponent({
         };
 
         (async () => {
-            await Promise.allSettled([
-                store.dispatch('dashboard/loadProjectDashboard'),
-                store.dispatch('dashboard/loadDomainDashboard'),
-            ]);
+            await store.dispatch('dashboard/loadAllDashboard');
         })();
 
         return {

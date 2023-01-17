@@ -13,6 +13,7 @@ const state: DashboardState = {
     scope: 'ALL',
     domainItemCount: 0,
     projectItemCount: 0,
+    loading: true,
 };
 
 export default {
