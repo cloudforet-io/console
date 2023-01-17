@@ -36,9 +36,7 @@ const getRefinedOptions = (
     const mergedOptions = merge({}, configOptions, optionsData);
     if (!inheritOptions || !dashboardVariables) return mergedOptions;
 
-    const parentOptions: Partial<WidgetOptions> = {
-        filters: convertInheritOptionsToWidgetFiltersMap(inheritOptions, dashboardVariables, optionsErrorMap),
-    };
+    const parentOptions: Partial<WidgetOptions> = convertInheritOptionsToWidgetFiltersMap(inheritOptions, dashboardVariables, optionsErrorMap);
     return merge({}, mergedOptions, parentOptions);
 };
 
@@ -46,8 +44,10 @@ const convertInheritOptionsToWidgetFiltersMap = (
     inheritOptions: InheritOptions,
     dashboardVariables: DashboardVariables,
     optionsErrorMap?: InheritOptionsErrorMap,
-): WidgetFiltersMap => {
-    const result: WidgetFiltersMap = {};
+): Partial<WidgetOptions> => {
+    const result: Partial<WidgetOptions> = {
+        filters: {},
+    };
     Object.entries(inheritOptions).forEach(([filterKey, inheritOption]) => {
         if (optionsErrorMap?.[filterKey]) return;
 
@@ -57,8 +57,12 @@ const convertInheritOptionsToWidgetFiltersMap = (
         const variableValue = dashboardVariables[variableKey];
         if (!variableValue || !variableValue?.length) return;
 
-        const _filterKey = filterKey.replace('filters.', '');
-        if (variableValue) result[_filterKey] = [{ k: _filterKey, v: variableValue, o: '=' }];
+        if (filterKey.startsWith('filters.')) {
+            const _filterKey = filterKey.replace('filters.', '');
+            if (variableValue) result.filters[_filterKey] = [{ k: _filterKey, v: variableValue, o: '=' }];
+        } else {
+            result[filterKey] = variableValue;
+        }
     });
     return result;
 };

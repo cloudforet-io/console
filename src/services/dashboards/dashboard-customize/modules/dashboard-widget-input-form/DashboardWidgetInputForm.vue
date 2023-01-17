@@ -316,7 +316,10 @@ export default defineComponent<Props>({
         };
         const getRefinedSelectedOptions = () => {
             const defaultProperties = state.widgetConfig.options_schema?.default_properties ?? [];
-            return optionsMenuItems.value.filter((d) => !state.requiredProperties.includes(d.name) && defaultProperties.includes(d.name));
+            return optionsMenuItems.value.filter((d) => {
+                if (state.inheritItemMap[d.name]) return true;
+                return !state.requiredProperties.includes(d.name) && defaultProperties.includes(d.name);
+            });
         };
 
         /* inherit */
