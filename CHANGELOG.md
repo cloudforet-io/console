@@ -1,3 +1,10 @@
+# [2.0.0-beta.12](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.11...v2.0.0-beta.12) (2023-01-17)
+
+
+### Bug Fixes
+
+* **dynamic-helper:** remove splitDisableKeys parameter of getValueByPath ([#236](https://github.com/cloudforet-io/mirinae/issues/236)) ([4e4b6e3](https://github.com/cloudforet-io/mirinae/commit/4e4b6e3402f24f2122a1d2dd2107e824c37e6f74))
+
 # [2.0.0-beta.11](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.10...v2.0.0-beta.11) (2023-01-16)
 
 
