@@ -1,15 +1,16 @@
 import { find } from 'lodash';
 
+import { getTextHighlightRegex } from '@/data-display/text-highlighting/helper';
 import type {
     KeyItem, KeyItemSet, KeyMenuItem, ValueHandler, ValueItem, ValueMenuItem, MenuFormatterArgs,
 } from '@/inputs/search/query-search/type';
 
 
-export const getRootKeyItemHandler = (keyItemSets: KeyItemSet[]): ValueHandler => (val: string) => {
+export const getRootKeyItemHandler = (keyItemSets: KeyItemSet[]): ValueHandler => (val: string|number) => {
     const results: KeyMenuItem[] = [];
     let totalCount = 0;
 
-    const regex = val ? RegExp(val, 'i') : null;
+    const regex = getTextHighlightRegex(val);
 
     keyItemSets.forEach((set) => {
         let items: KeyItem[];

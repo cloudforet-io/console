@@ -1,6 +1,8 @@
-export const getTextHighlightRegex = (term?: string) => {
+import { escapeRegExp } from 'lodash';
+
+export const getTextHighlightRegex = (term?: string|number) => {
     let regex = '';
-    if (term) {
+    if (typeof term === 'string') {
         // remove spaces in the search term
         const text = term.replace(/\s/g, '');
         for (let i = 0; i < text.length; i++) {
@@ -8,6 +10,8 @@ export const getTextHighlightRegex = (term?: string) => {
             // add space regex after every single character to find matching keywords ignoring spaces
             if (i < text.length - 1) regex += '\\s*';
         }
+    } else if (typeof term === 'number') {
+        regex = `${term}`;
     }
-    return new RegExp(regex, 'i');
+    return new RegExp(escapeRegExp(regex), 'i');
 };
