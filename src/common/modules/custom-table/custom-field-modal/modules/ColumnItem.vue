@@ -1,36 +1,39 @@
 <template>
-    <p-check-box v-show="regex.test(item.name)"
-                 :key="item.key"
-                 v-model="proxySelectedKeys"
-                 :value="item.key"
-                 :class="{'draggable-item' :proxySelectedKeys.includes(item.key)}"
+    <span v-show="regex.test(item.name)"
+          :key="item.key"
+          class="column-item"
+          :class="{'draggable-item' :proxySelectedKeys.includes(item.key)}"
     >
-        <span class="name">
-            <template v-for="(text, i) in item.name.split(regex)">
-                <strong v-if="i !== 0"
-                        :key="`${i}-match`"
-                >{{ getMatchText(item.name) }}</strong>
-                <span :key="i">{{ text }}</span>
-            </template>
+        <p-check-box v-model="proxySelectedKeys"
+                     :value="item.key"
+        >
+            <p-text-highlighting :text="item.name"
+                                 :term="searchText"
+                                 style-type="secondary"
+            />
             <span v-if="item.options && item.options.field_description"
                   class="ml-1 text-gray-400"
             >{{ item.options.field_description }}</span>
-        </span>
+        </p-check-box>
         <p-i name="ic_drag-handle"
              width="1rem"
              height="1rem"
              class="drag-icon"
         />
-    </p-check-box>
+
+    </span>
 </template>
 
 <script lang="ts">
 import type { PropType, SetupContext } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed,
+    defineComponent, reactive, toRefs,
 } from 'vue';
 
-import { PCheckBox, PI } from '@spaceone/design-system';
+import {
+    PCheckBox, PI, PTextHighlighting, getTextHighlightRegex,
+} from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -46,6 +49,7 @@ export default defineComponent<Props>({
     components: {
         PI,
         PCheckBox,
+        PTextHighlighting,
     },
     model: {
         prop: 'selectedKeys',
@@ -70,19 +74,13 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            regex: computed(() => new RegExp(props.searchText || '', 'i')),
+            regex: computed(() => getTextHighlightRegex(props.searchText)),
             proxySelectedKeys: useProxyValue('selectedKeys', props, emit),
         });
 
-        const getMatchText = (text: string): string => {
-            const res = state.regex.exec(text);
-            if (res) return res[0];
-            return '';
-        };
 
         return {
             ...toRefs(state),
-            getMatchText,
             TAGS_PREFIX,
         };
     },
@@ -90,32 +88,38 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss" scoped>
-/* custom design-system component - p-checkbox */
-.p-checkbox:deep() {
+.column-item {
     display: flex;
+    width: 100%;
     align-items: center;
     cursor: pointer;
     padding: 0.375rem 0.5rem;
-    &:hover {
-        @apply bg-blue-200;
+
+    @media (hover: hover) {
+        &:hover {
+            @apply bg-blue-200;
+        }
     }
-    .text {
+
+    /* custom design-system component - p-checkbox */
+    .p-checkbox:deep() {
         flex-grow: 1;
         display: inline-flex;
         align-items: center;
+        .check-icon {
+            margin-right: 0.25rem;
+            flex-shrink: 0;
+        }
+        .text {
+            display: inline-flex;
+        }
     }
 
-    .check-icon {
-        margin-right: 0.25rem;
-        flex-shrink: 0;
-    }
-    .name {
-        flex-grow: 1;
-    }
     .drag-icon {
         flex-shrink: 0;
         display: none;
     }
+
     &.draggable-item {
         .drag-icon {
             display: inline-block;
