@@ -4,6 +4,7 @@ import {
 } from 'vue';
 
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import dayjs from 'dayjs';
 import { flattenDeep, isEmpty, merge } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -124,7 +125,18 @@ export function useWidgetState<Data = any>(
             return state.widgetConfig.sizes[0];
         }),
         loading: true,
-        settings: computed<DashboardSettings|undefined>(() => props.dashboardSettings),
+        settings: computed<DashboardSettings>(() => ({
+            ...props.dashboardSettings,
+            date_range: props.dashboardSettings.date_range?.enabled ? props.dashboardSettings.date_range : {
+                enabled: false,
+                start: dayjs.utc().format('YYYY-MM'),
+                end: dayjs.utc().format('YYYY-MM'),
+            },
+            currency: props.dashboardSettings.currency?.enabled ? props.dashboardSettings.currency : {
+                enabled: false,
+                value: CURRENCY.USD,
+            },
+        })),
         data: undefined as Data|undefined,
         selectorItems: computed<MenuItem[]>(() => {
             if (!state.options?.selector_options?.enabled) return [];
