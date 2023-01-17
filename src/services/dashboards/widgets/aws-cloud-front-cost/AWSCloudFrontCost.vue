@@ -76,6 +76,8 @@ import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components
 import type { UsageType, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getXYChartLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+// eslint-disable-next-line import/no-cycle
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import { getReferenceTypeOfGroupBy, sortTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
@@ -143,7 +145,11 @@ const state = reactive({
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
             period: objectToQueryString(state.dateRange),
-            filters: objectToQueryString({ ...state.options.filters, provider: ['aws'], product: ['AmazonCloudFront'] }),
+            filters: objectToQueryString({
+                ...getWidgetLocationFilters(state.options.filters),
+                provider: ['aws'],
+                product: ['AmazonCloudFront'],
+            }),
         },
     })),
 });

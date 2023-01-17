@@ -83,6 +83,8 @@ import {
     getXYChartLegends,
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+// eslint-disable-next-line import/no-cycle
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import {
     getReferenceTypeOfGroupBy, getWidgetTableDateFields, sortTableData,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
@@ -92,6 +94,7 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 import type { CostAnalyzeDataModel, Legend, XYChartData } from '@/services/dashboards/widgets/type';
+
 
 type Data = CostAnalyzeDataModel['results'];
 interface FullData {
@@ -143,7 +146,7 @@ const state = reactive({
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
             period: objectToQueryString(state.dateRange),
-            filters: objectToQueryString(state.options.filters),
+            filters: objectToQueryString(getWidgetLocationFilters(state.options.filters)),
         },
     })),
 });
