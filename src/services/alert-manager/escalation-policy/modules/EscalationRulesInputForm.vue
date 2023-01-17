@@ -241,7 +241,7 @@ export default {
                 return true;
             },
             rules(value: Rule[]) {
-                let result = true;
+                let result = '';
                 value.forEach((d, idx) => {
                     if (!repeatCount.value && idx === value.length - 1) return;
                     if (d?.escalate_minutes < 0) result = 'Only numbers are allowed.';
