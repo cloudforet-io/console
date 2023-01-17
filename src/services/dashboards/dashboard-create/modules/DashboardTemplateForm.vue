@@ -94,7 +94,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { DashboardConfig } from '@/services/dashboards/config';
-import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
 import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
@@ -137,11 +136,11 @@ const existingTemplateState = reactive({
             tooltipText: i18n.t('DASHBOARDS.CREATE.PREVIEW'),
             eventAction: () => {
                 const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');
+                const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
                 const { href } = SpaceRouter.router.resolve({
-                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    name: routeName,
                     params: {
                         dashboardId: isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id,
-                        dashboardScope: isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
                     },
                 });
                 window.open(href, '_blank');

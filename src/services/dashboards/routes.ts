@@ -42,35 +42,30 @@ const dashboardsRoute: RouteConfig = {
                     component: DashboardCreatePage,
                 },
                 {
-                    path: ':dashboardScope',
-                    meta: {
-                        translationId: ({ params }) => {
-                            if (params.dashboardScope === 'project') return 'DASHBOARDS.ALL_DASHBOARDS.PROJECT';
-                            return 'DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE';
-                        },
-                        copiable: true,
-                    },
+                    path: 'project',
+                    name: DASHBOARDS_ROUTE.PROJECT._NAME,
+                    meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.PROJECT' },
                     redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
                     props: true,
                     component: { template: '<router-view/>' },
                     children: [
                         {
                             path: ':dashboardId',
-                            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                            name: DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME,
                             meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
                             props: true,
                             component: DashboardDetailPage,
                         },
                         {
                             path: 'customize/:dashboardId?',
-                            name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                            name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
                             meta: {
                                 breadcrumbs: ({ params }) => {
                                     const breadcrumbs: Breadcrumb[] = [
                                         {
                                             name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
                                             to: {
-                                                name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                                                name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
                                             },
                                         },
                                     ];
@@ -78,7 +73,55 @@ const dashboardsRoute: RouteConfig = {
                                         breadcrumbs.push({
                                             name: params.dashboardId,
                                             to: {
-                                                name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                                                name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
+                                                params: {
+                                                    dashboardId: params.dashboardId,
+                                                },
+                                            },
+                                            copiable: true,
+                                        });
+                                    }
+                                    return breadcrumbs;
+                                },
+                            },
+                            props: true,
+                            component: DashboardCustomizePage,
+                        },
+                    ],
+                },
+                {
+                    path: 'workspace',
+                    name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
+                    meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE' },
+                    redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
+                    props: true,
+                    component: { template: '<router-view/>' },
+                    children: [
+                        {
+                            path: ':dashboardId',
+                            name: DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME,
+                            meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
+                            props: true,
+                            component: DashboardDetailPage,
+                        },
+                        {
+                            path: 'customize/:dashboardId?',
+                            name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+                            meta: {
+                                breadcrumbs: ({ params }) => {
+                                    const breadcrumbs: Breadcrumb[] = [
+                                        {
+                                            name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
+                                            to: {
+                                                name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+                                            },
+                                        },
+                                    ];
+                                    if (params.dashboardId) {
+                                        breadcrumbs.push({
+                                            name: params.dashboardId,
+                                            to: {
+                                                name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
                                                 params: {
                                                     dashboardId: params.dashboardId,
                                                 },

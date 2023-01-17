@@ -62,7 +62,8 @@ const props = defineProps<{
 // };
 
 const handleClickCustomize = () => {
-    SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
+    const routeName = props.dashboardId.startsWith('project') ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME;
+    SpaceRouter.router.push({ name: routeName, params: { dashboardId: props.dashboardId } });
 };
 
 </script>

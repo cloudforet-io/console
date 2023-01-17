@@ -110,7 +110,8 @@ export default {
 
             dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
             dashboardDetailState.dashboardId = undefined;
-            SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME, params: { dashboardScope: state.dashboardScope } });
+            const routeName = state.dashboardScope === DASHBOARD_SCOPE.PROJECT ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME;
+            SpaceRouter.router.push({ name: routeName });
         };
 
         return {

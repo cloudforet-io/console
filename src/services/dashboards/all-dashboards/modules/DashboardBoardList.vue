@@ -182,9 +182,12 @@ export default defineComponent<DashboardBoardListProps>({
                 iconName: 'ic_edit',
                 tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
                 eventAction: () => {
+                    const routeName = props.scopeType ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME;
                     SpaceRouter.router.push({
-                        name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
-                        params: { dashboardId: dashboardItem[state.dashboardScopeKey] },
+                        name: routeName,
+                        params: {
+                            dashboardId: dashboardItem[state.dashboardScopeKey],
+                        },
                     });
                 },
             },
@@ -206,10 +209,10 @@ export default defineComponent<DashboardBoardListProps>({
 
         /* EVENT */
         const handleClickBoardItem = (item: DashboardModel) => {
+            const routeName = props.scopeType ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
             SpaceRouter.router.push({
-                name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                name: routeName,
                 params: {
-                    dashboardScope: props.scopeType,
                     dashboardId: item[state.dashboardScopeKey],
                 },
             });

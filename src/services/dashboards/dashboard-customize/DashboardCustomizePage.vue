@@ -72,7 +72,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type {
     DashboardConfig,
 } from '@/services/dashboards/config';
-import { DASHBOARD_SCOPE, MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
+import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
 import DashboardCustomizePageName
@@ -142,11 +142,11 @@ const updateDashboardData = async () => {
                 domain_dashboard_id: props.dashboardId,
             });
         }
+        const routeName = dashboardDetailOriginState.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
         await SpaceRouter.router.push({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            name: routeName,
             params: {
                 dashboardId: props.dashboardId as string,
-                dashboardScope: dashboardDetailOriginState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
     } catch (e) {
@@ -171,11 +171,11 @@ const createDashboard = async () => {
             });
             dashboardDetailState.dashboardId = result.domain_dashboard_id;
         }
+        const routeName = dashboardDetailOriginState.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
         await SpaceRouter.router.push({
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            name: routeName,
             params: {
                 dashboardId: dashboardDetailState.dashboardId as string,
-                dashboardScope: dashboardDetailOriginState.isProjectDashboard ? DASHBOARD_SCOPE.PROJECT : DASHBOARD_SCOPE.DOMAIN,
             },
         });
     } catch (e) {
