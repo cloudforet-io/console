@@ -1,28 +1,29 @@
 <template>
     <div class="escalation-policy-form">
-        <p-field-group
-            :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_LABEL')"
-            required
-            :invalid="!isNameValid"
-            :invalid-text="nameInvalidText"
+        <p-field-group required
+                       :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_LABEL')"
+                       :invalid="invalidState.name"
+                       :invalid-text="invalidTexts.name"
         >
-            <p-text-input v-model="inputModel.name"
-                          :invalid="!isNameValid"
-                          class="w-1/2"
-            />
+            <template #default="{invalid}">
+                <p-text-input :value="name"
+                              :invalid="invalid"
+                              class="w-1/2"
+                              @update:value="handleUpdateName"
+                />
+            </template>
         </p-field-group>
-        <p-field-group
-            v-if="showScope"
-            :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.SCOPE_LABEL')"
-            required
+        <p-field-group v-if="showScope"
+                       :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.SCOPE_LABEL')"
+                       required
         >
             <template #default>
                 <div v-if="mode === ACTION.create">
                     <p-radio v-for="(item, idx) in scopes"
                              :key="idx"
                              :selected="item.value"
-                             :value="inputModel.scope"
-                             @change="onChangeScope(item.value)"
+                             :value="escalationPolicyFormState.scope"
+                             @change="handleChangeScope(item.value)"
                     >
                         {{ item.label }}
                     </p-radio>
@@ -32,21 +33,21 @@
                 <span v-if="mode === ACTION.update"
                       class="scope-text"
                 >
-                    <span>{{ scopeLabels[inputModel.scope] || inputModel.scope }}</span>
-                    <span v-if="inputModel.scope === SCOPE.PROJECT">
-                        (<p-anchor :to="referenceRouter(inputModel.project_id,{ resource_type: 'identity.Project' })"
-                                   :text="projects[inputModel.project_id] ? projects[inputModel.project_id].label : inputModel.project_id"
+                    <span>{{ scopeLabels[escalationPolicyFormState.scope] || escalationPolicyFormState.scope }}</span>
+                    <span v-if="escalationPolicyFormState.scope === SCOPE.PROJECT">
+                        (<p-anchor :to="referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' })"
+                                   :text="projects[escalationPolicyFormState.projectId] ? projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
                                    highlight
                         />)
                     </span>
                 </span>
             </template>
         </p-field-group>
-        <p-field-group v-if="showScope && inputModel.scope === SCOPE.PROJECT && mode === ACTION.create"
+        <p-field-group v-if="showScope && escalationPolicyFormState.scope === SCOPE.PROJECT && mode === ACTION.create"
                        class="project-field"
                        required
-                       :invalid="!isProjectValid"
-                       :invalid-text="projectInvalidText"
+                       :invalid="invalidState.projectId"
+                       :invalid-text="invalidTexts.projectId"
         >
             <template #label>
                 <span>{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_LABEL') }}</span>
@@ -56,10 +57,12 @@
                           highlight
                 />
             </template>
-            <project-select-dropdown project-selectable
-                                     :invalid="!isProjectValid"
-                                     @select="onSelectProject"
-            />
+            <template #default="{invalid}">
+                <project-select-dropdown project-selectable
+                                         :invalid="invalid"
+                                         @select="handleSelectProject"
+                />
+            </template>
         </p-field-group>
         <p-field-group
             :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.FINISH_CONDITION_LABEL')"
@@ -68,8 +71,8 @@
             <p-radio v-for="(item, idx) in finishConditions"
                      :key="idx"
                      :selected="item.value"
-                     :value="inputModel.finish_condition"
-                     @change="onChangeFinishCondition(item.value)"
+                     :value="escalationPolicyFormState.finishCondition"
+                     @change="handleChangeFinishCondition(item.value)"
             >
                 {{ item.label }}
             </p-radio>
@@ -83,18 +86,14 @@
                     {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATION_RULES_HELP_TEXT') }}
                 </span>
             </template>
-            <escalation-rules-input-form
-                :scope="inputModel.scope"
-                :rules.sync="inputModel.rules"
-                :repeat-count.sync="inputModel.repeat_count"
-                :project-id="inputModel.project_id"
-            />
+            <escalation-rules-input-form />
         </p-field-group>
     </div>
 </template>
 
 <script lang="ts">
 
+import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -102,23 +101,21 @@ import {
 import {
     PAnchor, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
+import { useFormValidator } from '@/common/composables/form-validator';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import EscalationRulesInputForm from '@/services/alert-manager/escalation-policy/modules/EscalationRulesInputForm.vue';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
-import type { EscalationPolicyFormModel } from '@/services/alert-manager/type';
+import type { EscalationPolicyDataModel } from '@/services/alert-manager/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-const DEFAULT_REPEAT_COUNT = 0;
-const DEFAULT_NOTIFICATION_LEVEL = 'LV1';
 
 export default {
     name: 'EscalationPolicyForm',
@@ -133,120 +130,91 @@ export default {
     props: {
         mode: {
             type: String,
-            default: undefined,
+            default: ACTION.create,
         },
         showScope: {
             type: Boolean,
             default: true,
         },
-        escalationPolicy: {
-            type: Object,
-            default: undefined,
-        },
-        projectId: {
-            type: String,
-            default: undefined,
-        },
-        /* sync */
-        isAllValid: {
-            type: Boolean,
-            default: false,
+        escalationPolicyData: {
+            type: Object as PropType<EscalationPolicyDataModel>,
+            default: () => ({}),
         },
     },
-    setup(props, { emit }) {
+    setup(props) {
+        const escalationPolicyFormStore = useEscalationPolicyFormStore();
+        const escalationPolicyFormState = escalationPolicyFormStore.state;
         const state = reactive({
             projects: computed(() => store.getters['reference/projectItems']),
-            proxyIsAllValid: useProxyValue('isAllValid', props, emit),
             //
-            inputModel: {
-                name: undefined as undefined | string,
-                scope: SCOPE.DOMAIN,
-                rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }],
-                finish_condition: FINISH_CONDITION.acknowledged,
-                repeat_count: DEFAULT_REPEAT_COUNT,
-                project_id: props.projectId,
-            } as EscalationPolicyFormModel,
-            showValidation: false,
-            isNameValid: computed(() => !state.nameInvalidText),
-            nameInvalidText: computed(() => {
-                if (typeof state.inputModel.name === 'undefined') return undefined;
-                if (!state.inputModel.name) {
-                    return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
-                }
-                if (state.inputModel.name.length > 40) {
-                    return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
-                }
-                return undefined;
-            }),
-            isProjectValid: computed(() => !state.projectInvalidText),
-            projectInvalidText: computed(() => {
-                if (!state.showValidation) return undefined;
-                if (state.inputModel.scope === SCOPE.DOMAIN) return undefined;
-                if (!state.inputModel.project_id) {
-                    return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_REQUIRED');
-                }
-                return undefined;
-            }),
             scopeLabels: computed(() => ({
                 [SCOPE.DOMAIN]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'),
                 [SCOPE.PROJECT]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
             })),
             scopes: computed(() => [
-                {
-                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'), value: SCOPE.DOMAIN,
-                }, {
-                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: SCOPE.PROJECT,
-                },
+                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'), value: SCOPE.DOMAIN },
+                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: SCOPE.PROJECT },
             ]),
             finishConditions: computed(() => [
-                {
-                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ACKNOWLEDGED'), value: FINISH_CONDITION.acknowledged,
-                }, {
-                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOLVED'), value: FINISH_CONDITION.resolved,
-                },
+                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ACKNOWLEDGED'), value: FINISH_CONDITION.acknowledged },
+                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOLVED'), value: FINISH_CONDITION.resolved },
             ]),
         });
 
-        /* util */
-        const initInputModel = () => {
-            if (props.mode === ACTION.create) {
-                state.inputModel.name = undefined;
-                state.inputModel.scope = SCOPE.DOMAIN;
-                state.inputModel.rules = [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }];
-                state.inputModel.finish_condition = FINISH_CONDITION.acknowledged;
-                state.inputModel.project_id = props.projectId;
-                state.inputModel.repeat_count = DEFAULT_REPEAT_COUNT;
-                state.proxyIsAllValid = false;
-            } else if (props.mode === ACTION.update && props.escalationPolicy) {
-                state.inputModel = cloneDeep(props.escalationPolicy);
-                state.proxyIsAllValid = true;
-            }
-        };
+        const {
+            forms: {
+                name,
+                projectId,
+            },
+            setForm,
+            invalidState,
+            invalidTexts,
+            isAllValid,
+        } = useFormValidator({
+            name: undefined as string|undefined,
+            projectId: undefined as string|undefined,
+        }, {
+            name(value) {
+                if (!value) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
+                if (value.length > 40) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
+                return true;
+            },
+            projectId(value) {
+                if (escalationPolicyFormState.scope === SCOPE.DOMAIN) return true;
+                if (!value) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_REQUIRED');
+                return true;
+            },
+        });
 
         /* event */
-        const onChangeInputModel = () => {
-            // state.showValidation = true;
-            state.proxyIsAllValid = state.isNameValid && state.isProjectValid;
-            emit('change', state.inputModel);
+        const handleChangeScope = (value) => {
+            escalationPolicyFormState.scope = value;
+            if (value === SCOPE.DOMAIN) escalationPolicyFormState.projectId = undefined;
         };
-        const onChangeScope = (value) => {
-            state.inputModel.scope = value;
-            if (value === SCOPE.DOMAIN) state.inputModel.project_id = undefined;
+        const handleChangeFinishCondition = (value) => {
+            escalationPolicyFormState.finishCondition = value;
         };
-        const onChangeFinishCondition = (value) => {
-            state.inputModel.finish_condition = value;
+        const handleUpdateName = (_name) => {
+            setForm('name', _name);
+            escalationPolicyFormState.name = _name;
         };
-        const onSelectProject = (selected) => {
-            state.inputModel.project_id = selected[0]?.id;
+        const handleSelectProject = (selected) => {
+            setForm('projectId', selected[0]?.id);
+            escalationPolicyFormState.projectId = selected[0]?.id;
         };
 
-        watch([() => props.mode, () => props.escalationPolicy], () => {
-            initInputModel();
+        watch([() => props.mode, () => props.escalationPolicyData], ([mode, escalationPolicyData]) => {
+            if (mode === ACTION.create) {
+                escalationPolicyFormStore.resetEscalationPolicyFormData();
+            } else if (props.escalationPolicyData?.escalation_policy_id) {
+                escalationPolicyFormStore.initEscalationPolicyFormData(escalationPolicyData);
+                setForm('name', escalationPolicyFormState.name);
+                setForm('projectId', escalationPolicyFormState.projectId);
+            }
         }, { immediate: true });
-
-        watch(() => state.inputModel, () => {
-            onChangeInputModel();
-        }, { deep: true });
+        watch(() => isAllValid.value, (_isAllValid) => {
+            escalationPolicyFormState.isNameProjectIdFormValid = _isAllValid;
+        }, { immediate: true });
 
         // LOAD REFERENCE STORE
         (async () => {
@@ -255,13 +223,22 @@ export default {
 
         return {
             ...toRefs(state),
+            escalationPolicyFormState,
             referenceRouter,
             SCOPE,
             ACTION,
             PROJECT_ROUTE,
-            onChangeScope,
-            onChangeFinishCondition,
-            onSelectProject,
+            handleChangeScope,
+            handleChangeFinishCondition,
+            handleUpdateName,
+            handleSelectProject,
+            //
+            name,
+            projectId,
+            invalidState,
+            invalidTexts,
+            isAllValid,
+            setForm,
         };
     },
 };

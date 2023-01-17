@@ -14,13 +14,17 @@ export interface Rule {
     escalate_minutes?: number;
 }
 
-export interface EscalationPolicyFormModel {
+export type FinishCondition = FINISH_CONDITION.acknowledged | FINISH_CONDITION.resolved;
+
+export interface EscalationPolicyDataModel {
+    escalation_policy_id: string;
+    finish_condition: FinishCondition;
+    is_default?: boolean;
     name: string;
+    project_id?: string;
+    repeat_count: number;
     rules: Rule[];
     scope: ScopeType;
-    finish_condition: FINISH_CONDITION.acknowledged | FINISH_CONDITION.resolved;
-    repeat_count: number;
-    project_id?: string;
 }
 
 type Responder = {
