@@ -10,10 +10,10 @@
             <span class="col-rule">
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RULE') }}
             </span>
-            <p-anchor v-if="scope === SCOPE.PROJECT && projectId"
+            <p-anchor v-if="escalationPolicyFormState.scope === SCOPE.PROJECT && escalationPolicyFormState.projectId"
                       class="link-text"
                       :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATIONS_SETTINGS')"
-                      :to="{ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: { id: projectId } }"
+                      :to="{ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: { id: escalationPolicyFormState.projectId } }"
                       highlight
             />
         </div>
@@ -52,15 +52,18 @@
                     <strong>{{ value }}</strong>
                 </template>
                 <template #minute>
-                    <p-text-input v-model.number="rule.escalate_minutes"
-                                  type="number"
-                                  :min="0"
-                                  class="rule-input"
+                    <p-field-group required
+                                   :invalid="rule.escalate_minutes < 0"
                     >
-                        <!--                        <template #right-extra>-->
-                        <!--                            {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}-->
-                        <!--                        </template>-->
-                    </p-text-input>
+                        <template #default="{invalid}">
+                            <p-text-input v-model.number="rule.escalate_minutes"
+                                          type="number"
+                                          :min="0"
+                                          :invalid="invalid"
+                                          class="rule-input"
+                            />
+                        </template>
+                    </p-field-group>
                 </template>
             </i18n>
             <div class="col-mobile-input">
@@ -91,15 +94,18 @@
                       class="col-mobile-rule"
                 >
                     <template #minute>
-                        <p-text-input v-model.number="rule.escalate_minutes"
-                                      type="number"
-                                      :min="0"
-                                      class="rule-input"
+                        <p-field-group required
+                                       :invalid="rule.escalate_minutes < 0"
                         >
-                            <!--                            <template #right-extra>-->
-                            <!--                                {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}-->
-                            <!--                            </template>-->
-                        </p-text-input>
+                            <template #default="{invalid}">
+                                <p-text-input v-model.number="rule.escalate_minutes"
+                                              type="number"
+                                              :min="0"
+                                              :invalid="invalid"
+                                              class="rule-input"
+                                />
+                            </template>
+                        </p-field-group>
                     </template>
                 </i18n>
             </div>
@@ -107,7 +113,7 @@
                 v-if="rules.length > 1"
                 class="delete-button"
                 name="ic_trashcan"
-                @click="onClickDeleteRule(idx)"
+                @click="handleDeleteRule(idx)"
             />
         </div>
         <div class="add-row">
@@ -118,15 +124,20 @@
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_ALL') }}
             </span>
             <span class="col-input">
-                <p-text-input v-model.number="proxyRepeatCount"
-                              type="number"
-                              :min="0"
-                              class="repeat-input"
+                <p-field-group required
+                               :invalid="invalidState.repeatCount"
+                               :invalid-text="invalidTexts.repeatCount"
                 >
-                    <!--                    <template #right-extra>-->
-                    <!--                        {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.TIME') }}-->
-                    <!--                    </template>-->
-                </p-text-input>
+                    <template #default="{invalid}">
+                        <p-text-input :value="repeatCount"
+                                      type="number"
+                                      :min="0"
+                                      class="repeat-input"
+                                      :invalid="invalid"
+                                      @update:value="handleUpdateRepeatCount"
+                        />
+                    </template>
+                </p-field-group>
             </span>
             <span class="col-label">
                 <span class="label">
@@ -140,7 +151,7 @@
                       icon-left="ic_plus_bold"
                       style-type="tertiary"
                       :disabled="rules.length >= 5"
-                      @click="onClickAddStep"
+                      @click="handleAddStep"
             >
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ADD_RULE') }}
             </p-button>
@@ -149,22 +160,27 @@
 </template>
 
 <script lang="ts">
-
-import { reactive, toRefs, watch } from 'vue';
+import {
+    reactive, toRefs, watch,
+} from 'vue';
 
 import {
-    PAnchor, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio,
+    PAnchor, PBadge, PIconButton, PSelectDropdown, PI, PButton, PTextInput, PRadio, PFieldGroup,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProxyValue } from '@/common/composables/proxy-state';
+import { useFormValidator } from '@/common/composables/form-validator';
 
 import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
 import { SCOPE } from '@/services/alert-manager/lib/config';
+import type { Rule } from '@/services/alert-manager/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
+
 
 const NOTIFICATION_LEVELS = Object.freeze([
     { name: 'ALL', label: 'All' },
@@ -195,41 +211,51 @@ export default {
         PButton,
         PTextInput,
         PRadio,
+        PFieldGroup,
     },
-    props: {
-        scope: {
-            type: String,
-            default: '',
-        },
-        rules: {
-            type: Array,
-            default: () => ([]),
-        },
-        repeatCount: {
-            type: Number,
-            default: 0,
-        },
-        projectId: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props, { emit }) {
+    setup() {
+        const escalationPolicyFormStore = useEscalationPolicyFormStore();
+        const escalationPolicyFormState = escalationPolicyFormStore.state;
+        const escalationPolicyFormOriginState = escalationPolicyFormStore.originState;
         const state = reactive({
-            proxyRepeatCount: useProxyValue('repeatCount', props, emit),
             projectChannels: [],
+        });
+
+        const {
+            forms: {
+                repeatCount,
+                rules,
+            },
+            setForm,
+            invalidState,
+            invalidTexts,
+            isAllValid,
+        } = useFormValidator({
+            repeatCount: 0,
+            rules: [] as Rule[],
+        }, {
+            repeatCount(value) {
+                if (Number.isNaN(value) || typeof value !== 'number') return 'Only numbers are allowed.';
+                if (value < 0) return 'Must be 0 or greater.';
+                return true;
+            },
+            rules(value: Rule[]) {
+                let result = true;
+                value.forEach((d, idx) => {
+                    if (idx < value.length - 1) return;
+                    if (!repeatCount.value) return;
+                    if (d?.escalate_minutes < 0) result = false;
+                });
+                return result;
+            },
         });
 
         /* api */
         const apiQuery = new ApiQueryHelper();
-        const getQuery = () => {
-            apiQuery
-                .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
-            return apiQuery.data;
-        };
-        const listProjectChannel = async () => {
+        const listProjectChannel = async (projectId: string) => {
             try {
-                const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
+                apiQuery.setFilters([{ k: 'project_id', v: projectId, o: '=' }]);
+                const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: apiQuery.data });
                 state.projectChannels = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -239,47 +265,73 @@ export default {
 
         /* util */
         const showEscalatesAfterForm = (idx) => {
-            if (idx < props.rules.length - 1) return true;
-            return state.proxyRepeatCount > 0;
+            if (idx < rules.value.length - 1) return true;
+            return repeatCount.value > 0;
         };
 
         /* event */
-        const onClickDeleteRule = (idx) => {
-            const rules = props.rules;
-            rules.splice(idx, 1);
-            if (rules.length > 0 && !state.proxyRepeatCount) rules[rules.length - 1].escalate_minutes = undefined;
-            emit('update:rules', rules);
+        const handleDeleteRule = (idx) => {
+            const _rules = cloneDeep(rules.value);
+            _rules.splice(idx, 1);
+            if (_rules.length > 0 && !repeatCount.value) _rules[_rules.length - 1].escalate_minutes = undefined;
+            setForm('rules', _rules);
         };
-        const onClickAddStep = () => {
-            const rules = props.rules;
-            if (rules.length > 0 && !state.proxyRepeatCount) rules[rules.length - 1].escalate_minutes = 30;
-
-            rules.push({
-                notification_level: NOTIFICATION_LEVELS[rules.length + 1].name,
-                escalate_minutes: state.proxyRepeatCount > 0 ? 30 : undefined,
+        const handleAddStep = () => {
+            const _rules = cloneDeep(rules.value);
+            if (_rules.length > 0 && !repeatCount.value) _rules[_rules.length - 1].escalate_minutes = 30;
+            _rules.push({
+                notification_level: NOTIFICATION_LEVELS[_rules.length + 1].name,
+                escalate_minutes: repeatCount.value > 0 ? 30 : undefined,
             });
-            emit('update:rules', rules);
+            setForm('rules', _rules);
+        };
+        const handleUpdateRepeatCount = (_repeatCount) => {
+            const _after = Number(_repeatCount);
+            const _before = repeatCount.value;
+            const _rules = cloneDeep(rules.value);
+            //
+            if (!_before && _after > 0) _rules[_rules.length - 1].escalate_minutes = 30;
+            if (!_after) _rules[_rules.length - 1].escalate_minutes = undefined;
+            setForm('rules', _rules);
+            setForm('repeatCount', _after);
         };
 
-        watch(() => props.projectId, (projectId) => {
-            if (projectId) listProjectChannel();
-        }, { immediate: true });
-
-        watch(() => state.proxyRepeatCount, (after, before) => {
-            const rules = props.rules;
-            if (!before && after > 0) rules[rules.length - 1].escalate_minutes = 30;
-            if (!after) rules[rules.length - 1].escalate_minutes = undefined;
-            emit('update:rules', rules);
+        watch(() => escalationPolicyFormState.projectId, (projectId) => {
+            if (projectId) listProjectChannel(projectId);
         });
+        watch(() => escalationPolicyFormOriginState.escalationPolicyData?.escalation_policy_id, (escalationPolicyId) => {
+            if (escalationPolicyId) {
+                setForm('repeatCount', escalationPolicyFormState.repeatCount);
+                setForm('rules', escalationPolicyFormState.rules);
+            }
+        }, { immediate: true });
+        watch(() => rules.value, (_rules) => {
+            escalationPolicyFormState.rules = _rules;
+        }, { deep: true, immediate: true });
+        watch(() => repeatCount.value, (_repeatCount) => {
+            escalationPolicyFormState.repeatCount = _repeatCount;
+        }, { immediate: true });
+        watch(() => isAllValid.value, (_isAllValid) => {
+            escalationPolicyFormState.isEscalationRulesFormValid = _isAllValid;
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
+            escalationPolicyFormState,
             PROJECT_ROUTE,
             NOTIFICATION_LEVELS,
             MINIFIED_NOTIFICATION_LEVELS,
             SCOPE,
-            onClickDeleteRule,
-            onClickAddStep,
+            //
+            repeatCount,
+            rules,
+            invalidState,
+            invalidTexts,
+            setForm,
+            //
+            handleDeleteRule,
+            handleAddStep,
+            handleUpdateRepeatCount,
             showEscalatesAfterForm,
         };
     },
@@ -344,8 +396,12 @@ export default {
             font-size: 0.875rem;
             line-height: 1.4;
 
-            .rule-input {
+            /* custom design-system component - p-text-input */
+            :deep(.p-text-input) {
                 width: 6rem;
+                input {
+                    width: 100%;
+                }
             }
         }
         .col-mobile-input {
@@ -374,6 +430,16 @@ export default {
         }
         .col-input {
             @apply col-span-2;
+            .p-field-group {
+                margin-bottom: 0;
+            }
+
+            /* custom design-system component - p-text-input */
+            :deep(.p-text-input) {
+                input {
+                    width: 100%;
+                }
+            }
             .repeat-input {
                 width: 6rem;
             }
