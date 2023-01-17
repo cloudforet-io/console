@@ -16,7 +16,9 @@
                       class="selected-item"
                 >
                     {{ displayValueOnDropdownButton }}
-                    <p-badge v-if="displayBadgeValueOnDropdownButton">
+                    <p-badge v-if="displayBadgeValueOnDropdownButton"
+                             :style-type="disabled ? 'gray200' : 'blue200'"
+                    >
                         {{ displayBadgeValueOnDropdownButton }}
                     </p-badge>
                 </span>

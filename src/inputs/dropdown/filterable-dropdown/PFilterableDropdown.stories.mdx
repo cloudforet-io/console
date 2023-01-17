@@ -370,6 +370,10 @@ If you don't want to use this feature, give true to the disableHandler prop.
                 <p class="text-label-lg font-bold my-3">Disabled</p>
                 <p-filterable-dropdown :menu="menu" :selected.sync="selected" disabled />
                 <br/>
+                <p-filterable-dropdown :menu="menu" :selected.sync="selected" multi-selectable appearance-type="badge" disabled />
+                <br/>
+                <p-filterable-dropdown :menu="menu" :selected.sync="selected" multi-selectable appearance-type="stack" disabled />
+                <br/>
                 <p class="text-label-lg font-bold my-3">Readonly</p>
                 <p-filterable-dropdown :menu="menu" :selected.sync="selected" readonly />
                 <br/>
@@ -377,7 +381,7 @@ If you don't want to use this feature, give true to the disableHandler prop.
 `,
             setup(props) {
                 const state = reactive({
-                    selected: [props.menu.find(d => !d.type || d.type === 'item')],
+                    selected: props.menu.filter(d => !d.type || d.type === 'item').slice(0, 2),
                 })
                 return {
                     ...toRefs(state)
