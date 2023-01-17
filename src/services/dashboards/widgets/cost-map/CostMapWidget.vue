@@ -52,6 +52,8 @@ import type { GroupBy, WidgetExpose, WidgetProps } from '@/services/dashboards/w
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { getRefinedTreemapChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+// eslint-disable-next-line import/no-cycle
+import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
@@ -89,7 +91,7 @@ const state = reactive({
             granularity: primitiveToQueryString(state.granularity),
             group_by: arrayToQueryString([state.groupBy]),
             period: objectToQueryString(state.dateRange),
-            filters: objectToQueryString(state.options.filters),
+            filters: objectToQueryString(getWidgetLocationFilters(state.options.filters)),
         },
     })),
 });
