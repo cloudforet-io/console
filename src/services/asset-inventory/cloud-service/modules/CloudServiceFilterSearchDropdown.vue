@@ -43,7 +43,7 @@ import {
 } from 'vue';
 
 import {
-    PFilterableDropdown,
+    PFilterableDropdown, getTextHighlightRegex,
 } from '@spaceone/design-system';
 import type {
     FilterableDropdownMenuItem,
@@ -54,7 +54,6 @@ import { store } from '@/store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { SortedRegionReferenceItem, RegionReferenceMap } from '@/store/modules/reference/region/type';
 
-import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 
 import { CLOUD_SERVICE_CATEGORY, CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';

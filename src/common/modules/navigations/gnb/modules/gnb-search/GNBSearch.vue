@@ -63,7 +63,7 @@ import {
 } from 'vue';
 import type { DirectiveFunction, SetupContext } from 'vue';
 
-import { PI, screens } from '@spaceone/design-system';
+import { getTextHighlightRegex, PI, screens } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce, throttle } from 'lodash';
@@ -87,7 +87,6 @@ import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { getTextHighlightRegex } from '@/common/components/text/text-highlighting/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { SuggestionItem, SuggestionType } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import {
