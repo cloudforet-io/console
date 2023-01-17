@@ -32,7 +32,7 @@
                                 v-show="defaultTemplateState.allPage > 10"
                                 :this-page="defaultTemplateState.thisPage"
                                 :all-page="defaultTemplateState.allPage"
-                                @pageChange="handleChangePagination($event, 'DEFAULT')"
+                                @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
                             />
                         </div>
                     </div>
@@ -72,7 +72,7 @@
                             <p-text-pagination
                                 :this-page="existingTemplateState.thisPage"
                                 :all-page="existingTemplateState.allPage"
-                                @pageChange="handleChangePagination($event, 'EXISTING')"
+                                @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
                             />
                         </div>
                     </div>
@@ -101,7 +101,10 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const emit = defineEmits(['set-template']);
 
-type DashboardTemplateBoardSet = DashboardConfig & { leftIcon: string, iconButtonSets: Array<any> };
+type DashboardTemplateBoardSet = DashboardConfig & { value: string, leftIcon: string, iconButtonSets: Array<any> };
+
+const TEMPLATE_TYPE = { DEFAULT: 'DEFAULT', EXISTING: 'EXISTING' };
+type TemplateType = typeof TEMPLATE_TYPE[keyof typeof TEMPLATE_TYPE];
 
 const state = reactive({
     selectedTemplateName: '',
@@ -112,6 +115,7 @@ const defaultTemplateState = reactive({
     boardSets: computed<DashboardTemplateBoardSet[]>(() => Object.values(DASHBOARD_TEMPLATES).map((d: DashboardConfig) => ({
         ...d,
         // below values are used only for render
+        value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
         leftIcon: d.description?.icon ?? '',
         iconButtonSets: [!!d.description?.preview_image && {
             iconName: 'ic_external-link',
@@ -127,43 +131,46 @@ const existingTemplateState = reactive({
     dashboards: computed<DashboardModel[]>(() => [...store.state.dashboard.domainItems, ...store.state.dashboard.projectItems].filter((d) => d.name.includes(existingTemplateState.searchValue))),
     thisPage: 1,
     allPage: computed<number>(() => Math.ceil(existingTemplateState.dashboards.length / 10) || 1),
-    boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards.map((d: DomainDashboardModel & ProjectDashboardModel) => ({
-        ...d,
-        // below values are used only for render
-        leftIcon: d.description?.preview_image ?? '',
-        iconButtonSets: [{
-            iconName: 'ic_external-link',
-            tooltipText: i18n.t('DASHBOARDS.CREATE.PREVIEW'),
-            eventAction: () => {
-                const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');
-                const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-                const { href } = SpaceRouter.router.resolve({
-                    name: routeName,
-                    params: {
-                        dashboardId: isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id,
-                    },
-                });
-                window.open(href, '_blank');
-            },
-        }],
-    })).slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
+    boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards.map((d: DomainDashboardModel & ProjectDashboardModel) => {
+        const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');
+        return {
+            ...d,
+            // below values are used only for render
+            value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id}`,
+            leftIcon: d.description?.preview_image ?? '',
+            iconButtonSets: [{
+                iconName: 'ic_external-link',
+                tooltipText: i18n.t('DASHBOARDS.CREATE.PREVIEW'),
+                eventAction: () => {
+                    const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
+                    const { href } = SpaceRouter.router.resolve({
+                        name: routeName,
+                        params: {
+                            dashboardId: isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id,
+                        },
+                    });
+                    window.open(href, '_blank');
+                },
+            }],
+        };
+    }).slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
     searchValue: '',
 });
 
 const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
-    state.selectedTemplateName = selectedTemplate.name;
+    state.selectedTemplateName = selectedTemplate.value;
     const _selectedTemplate: Partial<DashboardTemplateBoardSet> = { ...selectedTemplate };
     delete _selectedTemplate.leftIcon;
     delete _selectedTemplate.iconButtonSets;
     emit('set-template', _selectedTemplate as DashboardModel);
 };
 
-const handleChangePagination = (page: number, type: 'DEFAULT'|'EXISTING'): void => {
-    if (type === 'DEFAULT') {
+const handleChangePagination = (page: number, type: TemplateType): void => {
+    if (type === TEMPLATE_TYPE.DEFAULT) {
         if (page > defaultTemplateState.boardSets.length) return;
         defaultTemplateState.thisPage = page;
     }
-    if (type === 'EXISTING') {
+    if (type === TEMPLATE_TYPE.EXISTING) {
         if (page > existingTemplateState.boardSets.length) return;
         existingTemplateState.thisPage = page;
     }
