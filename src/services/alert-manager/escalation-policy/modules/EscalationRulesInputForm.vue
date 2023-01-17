@@ -198,6 +198,7 @@ const MINIFIED_NOTIFICATION_LEVELS = Object.freeze([
     { name: 'LV4', label: '4' },
     { name: 'LV5', label: '5' },
 ]);
+const DEFAULT_NOTIFICATION_LEVEL = 'LV1';
 
 export default {
     name: 'EscalationRulesInputForm',
@@ -232,7 +233,7 @@ export default {
             isAllValid,
         } = useFormValidator({
             repeatCount: 0,
-            rules: [] as Rule[],
+            rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }] as Rule[],
         }, {
             repeatCount(value) {
                 if (Number.isNaN(value) || typeof value !== 'number') return 'Only numbers are allowed.';
@@ -242,9 +243,8 @@ export default {
             rules(value: Rule[]) {
                 let result = true;
                 value.forEach((d, idx) => {
-                    if (idx < value.length - 1) return;
-                    if (!repeatCount.value) return;
-                    if (d?.escalate_minutes < 0) result = false;
+                    if (!repeatCount.value && idx === value.length - 1) return;
+                    if (d?.escalate_minutes < 0) result = 'Only numbers are allowed.';
                 });
                 return result;
             },
