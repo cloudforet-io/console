@@ -51,7 +51,7 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 
 import { i18n } from '@/translations';
 
-import DashboardWidgetInputForm from '@/services/dashboards/dashboard-customize/modules/DashboardWidgetInputForm.vue';
+import DashboardWidgetInputForm from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-list-config';
 

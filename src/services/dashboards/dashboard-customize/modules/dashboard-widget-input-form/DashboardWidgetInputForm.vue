@@ -1,15 +1,15 @@
 <template>
     <div class="dashboard-widget-input-form">
         <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
-                       :invalid="invalidState.name"
-                       :invalid-text="invalidTexts.name"
+                       :invalid="isNameInvalid"
+                       :invalid-text="nameInvalidText"
                        required
         >
             <p-text-input :value="name"
-                          :invalid="invalidState.name"
+                          :invalid="isNameInvalid"
                           :placeholder="widgetConfig?.title"
                           class="input"
-                          @update:value="handleInputName"
+                          @update:value="updateName"
             />
         </p-field-group>
         <div v-if="widgetConfig?.description?.translation_id"
@@ -71,7 +71,7 @@
 import { vOnClickOutside } from '@vueuse/components';
 import type { DirectiveFunction } from 'vue';
 import {
-    computed, defineComponent, reactive, toRef, toRefs, watch,
+    computed, defineComponent, reactive, ref, toRef, toRefs, watch,
 } from 'vue';
 
 import {
@@ -85,7 +85,6 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 import { cloneDeep, isEmpty } from 'lodash';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -94,8 +93,10 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 import type { ReferenceItem } from '@/store/modules/reference/type';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
-import { useFormValidator } from '@/common/composables/form-validator';
 
+import {
+    useWidgetNameInput,
+} from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/composables/use-widget-name-input';
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type {
@@ -156,11 +157,9 @@ export default defineComponent<Props>({
             //
             schemaFormData: {},
             isSchemaFormValid: undefined,
-            isAllValid: computed(() => state.isSchemaFormValid && isAllValid.value),
+            isAllValid: computed(() => state.isSchemaFormValid && isNameValid.value),
             inheritItemMap: {} as {[propertyName: string]: boolean},
             //
-            targetRef: null as HTMLElement | null,
-            contextMenuRef: null as HTMLElement | null,
             optionsMenuItems: computed<MenuItem[]>(() => {
                 const menuItems: MenuItem[] = [];
                 const schemaProperties = state.widgetConfig?.options_schema?.schema.properties;
@@ -175,21 +174,14 @@ export default defineComponent<Props>({
             selectedOptions: [] as MenuItem[],
         });
 
+        /* name form validation */
         const {
-            forms: {
-                name,
-            },
-            setForm,
-            invalidState,
-            invalidTexts,
-            isAllValid,
-            resetAll,
-        } = useFormValidator({
-            name: '',
-        }, {
-            name(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.VALIDATION_NAME'); },
-        });
+            name, resetName, updateName, isNameValid, isNameInvalid, nameInvalidText,
+        } = useWidgetNameInput();
 
+        /* context menu controller */
+        const targetRef = ref<any|null>(null);
+        const contextMenuRef = ref<any|null>(null);
         const {
             visibleMenu: visibleContextMenu,
             refinedMenu,
@@ -199,8 +191,8 @@ export default defineComponent<Props>({
             initiateMenu,
         } = useContextMenuController({
             useFixedStyle: true,
-            targetRef: toRef(state, 'targetRef'),
-            contextMenuRef: toRef(state, 'contextMenuRef'),
+            targetRef,
+            contextMenuRef,
             useReorderBySelection: true,
             selected: toRef(state, 'selectedOptions'),
             menu: toRef(state, 'optionsMenuItems'),
@@ -311,7 +303,7 @@ export default defineComponent<Props>({
             widgetFormStore.initWidgetForm(widgetKey);
             const widgetInfo:DashboardLayoutWidgetInfo|undefined = widgetFormState.widgetInfo;
             if (!widgetInfo) return;
-            handleInputName(widgetInfo.title);
+            updateName(widgetInfo.title);
             const { schemaFormData, inheritItemMap } = convertWidgetInfoToJsonSchemaForm(widgetInfo);
             state.inheritItemMap = inheritItemMap;
             Object.entries(inheritItemMap).forEach(([key, value]) => {
@@ -357,10 +349,7 @@ export default defineComponent<Props>({
         const handleFormValidate = (isValid) => {
             state.isSchemaFormValid = isValid;
         };
-        const handleInputName = (val) => {
-            setForm('name', val);
-            widgetFormStore.setWidgetTitle(val);
-        };
+
 
         /* Init */
         (async () => {
@@ -385,7 +374,7 @@ export default defineComponent<Props>({
                 setInitialValueForEditMode(widgetKey);
             } else {
                 state.schemaFormData = {};
-                resetAll();
+                resetName();
             }
         }, { immediate: true });
         watch([() => state.widgetConfig, () => storeState.loading], ([widgetConfig, storeLoading]) => {
@@ -406,10 +395,12 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
+            targetRef,
+            contextMenuRef,
             name,
-            setForm,
-            invalidState,
-            invalidTexts,
+            updateName,
+            isNameInvalid,
+            nameInvalidText,
             //
             refinedMenu,
             contextMenuStyle,
@@ -419,7 +410,6 @@ export default defineComponent<Props>({
             handleClickAddOptions,
             handleSelectOption,
             handleFormValidate,
-            handleInputName,
             hideContextMenu,
             showContextMenu,
         };
