@@ -80,10 +80,12 @@
                                           v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                     >
                                         <p-tooltip position="bottom"
-                                                   :contents="isEllipsisActive(rowIndex, colIndex) ? getTooltipContents(item, field) : undefined"
+                                                   :contents="isEllipsisActive(rowIndex, colIndex, fields[colIndex]) ? getTooltipContents(item, field) : undefined"
                                         >
                                             <div class="detail-item-wrapper">
-                                                <span class="td-contents">
+                                                <span ref="labelRef"
+                                                      class="td-contents"
+                                                >
                                                     <template v-if="colIndex === 0 && props.showLegend">
                                                         <p-status v-if="props.showLegend"
                                                                   class="toggle-button"
@@ -101,6 +103,7 @@
                                                              class="icon"
                                                         />
                                                     </template>
+
                                                     <slot :name="`col-${field.name}-text`"
                                                           v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                                     >
@@ -119,7 +122,7 @@
                                                         />
                                                         </div>
                                                         <span v-else
-                                                              ref="labelRef"
+                                                              class="common-text-box"
                                                               :class="{'ellipsis-box': !props.disableEllipsis }"
                                                         >{{ getValue(item, field) }}</span>
                                                     </slot>
@@ -303,10 +306,12 @@ const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], 
 const getColSlotProps = (item, field, colIndex, rowIndex) => ({
     item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
 });
-const isEllipsisActive = (rowIndex:number, colIndex:number):boolean => {
+const isEllipsisActive = (rowIndex:number, colIndex:number, field):boolean => {
+    if (field.detailOptions?.type === 'popover') return false;
     const tdIndex = props.fields.length * rowIndex + colIndex;
     if (labelRef.value?.length && labelRef.value) {
-        return (labelRef.value[tdIndex]?.offsetWidth < labelRef.value[tdIndex]?.scrollWidth);
+        const labelElement = labelRef.value[tdIndex]?.getElementsByClassName('common-text-box')[0] as HTMLElement;
+        return (labelElement?.offsetWidth < labelElement?.scrollWidth);
     } return false;
 };
 
@@ -415,6 +420,11 @@ const handleClickRow = (rowData) => {
     }
     td {
         @apply px-4 z-0 align-middle min-w-28 text-sm;
+
+        &:hover {
+            @apply bg-gray-200;
+        }
+
         .detail-item-wrapper {
             @apply flex justify-between items-center;
 
