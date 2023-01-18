@@ -150,7 +150,7 @@ const handleDelete = (index: number) => {
     }
     + .invalid-feedback {
         @apply absolute;
-        top: 100%;
+        top: calc(100% + 2px);
         margin-top: 0;
     }
 }

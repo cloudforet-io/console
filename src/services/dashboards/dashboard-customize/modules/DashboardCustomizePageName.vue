@@ -168,6 +168,9 @@ const handleEnter = () => {
         .p-field-group {
             margin-bottom: 0.75rem;
         }
+        .back-btn {
+            margin-top: 0.1875rem;
+        }
     }
 }
 .p-field-group {
