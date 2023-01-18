@@ -307,6 +307,41 @@ export const Playground = (args, {argTypes}) => {
 <br/>
 <br/>
 
+## Medium Size
+
+<Canvas>
+    <Story name="Medium Size">
+        {{
+            components: { PSidebar },
+            template: `
+            <div style="height: 500px;">
+                <p-sidebar :visible="true"
+                            title="Medium Size"
+                            :hide-close-button="true"
+                            size="md"
+                            class="mt-4"
+                >
+                    <div class="bg-primary3 p-4 min-h-full flex justify-center items-center">
+                        Non-sidebar area
+                    </div>
+                    <template #sidebar>Medium Size</template>
+                </p-sidebar>
+            </div>
+    <!--<div>-->`,
+            setup(props) {
+                return {
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+<br/>
+<br/>
+
 ## Small Size
 
 <Canvas>

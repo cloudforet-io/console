@@ -8,7 +8,7 @@
         <transition name="slide-fade">
             <div v-if="proxyVisible"
                  class="sidebar-wrapper"
-                 :class="size"
+                 :class="{[size]: true, 'fixed-size': isFixedSize}"
             >
                 <div class="inner"
                      :style="{'overflow-y': disableScroll ? 'unset' : 'auto'}"
@@ -75,6 +75,10 @@ export default defineComponent({
             type: String,
             default: SIDEBAR_SIZE.md,
             validator: (value) => Object.keys(SIDEBAR_SIZE).includes(value as string),
+        },
+        isFixedSize: {
+            type: Boolean,
+            default: false,
         },
         hideCloseButton: {
             type: Boolean,
@@ -195,9 +199,25 @@ export default defineComponent({
     @screen lg {
         flex-direction: row;
 
-        $sidebar-sm: 16.25rem;
+        $sidebar-sm: 20%;
         $sidebar-md: 25%;
         $sidebar-lg: 30%;
+        $sidebar-fixed-sm: 16.25rem;
+        $sidebar-fixed-md: 20rem;
+        $sidebar-fixed-lg: 25rem;
+
+        @define-mixin sidebar-size $sidebar-size, $sidebar-fixed-size {
+            width: $sidebar-size;
+            .footer {
+                width: $sidebar-size;
+            }
+            &.fixed-size {
+                width: $sidebar-fixed-size;
+                .footer {
+                    width: $sidebar-fixed-size;
+                }
+            }
+        }
         .sidebar-wrapper {
             position: static;
             height: 100%;
@@ -206,24 +226,14 @@ export default defineComponent({
             flex-shrink: 0;
             border-top-width: 0;
             border-left-width: 1px;
-
             &.sm {
-                width: $(sidebar-sm);
-                .footer {
-                    width: $(sidebar-sm);
-                }
+                @mixin sidebar-size $sidebar-sm, $sidebar-fixed-sm;
             }
             &.md {
-                width: $(sidebar-md);
-                .footer {
-                    width: $(sidebar-md);
-                }
+                @mixin sidebar-size $sidebar-md, $sidebar-fixed-md;
             }
             &.lg {
-                width: $(sidebar-lg);
-                .footer {
-                    width: $(sidebar-lg);
-                }
+                @mixin sidebar-size $sidebar-lg, $sidebar-fixed-lg;
             }
         }
         .slide-fade-enter, .slide-fade-leave-to {

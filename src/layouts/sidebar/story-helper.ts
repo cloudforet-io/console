@@ -78,6 +78,24 @@ export const getSidebarArgTypes = (): ArgTypes => ({
             options: Object.values(SIDEBAR_SIZE),
         },
     },
+    isFixedSize: {
+        name: 'isFixedSize',
+        type: { name: 'boolean' },
+        description: 'Whether or not sidebar size is fixed',
+        defaultValue: SIDEBAR_SIZE.md,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     hideCloseButton: {
         name: 'hideCloseButton',
         type: { name: 'boolean' },
