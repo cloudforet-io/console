@@ -154,6 +154,7 @@ const handleEnter = () => {
     text-decoration: underline;
 }
 .p-text-input {
+    @apply font-normal;
     width: 100%;
 }
 

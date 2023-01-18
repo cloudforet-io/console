@@ -11,7 +11,7 @@
                 <span>{{ monthMenuItems[selectedMonthMenuIndex].label }}</span>
                 <p-badge
                     v-if="monthMenuItems[selectedMonthMenuIndex].badge"
-                    style-type="primary3"
+                    style-type="indigo100"
                     shape="round"
                     class="ml-1"
                 >
@@ -23,7 +23,7 @@
                     <span>{{ item.label }}</span>
                     <p-badge
                         v-if="item.badge"
-                        style-type="primary3"
+                        style-type="indigo100"
                         shape="round"
                         class="ml-1"
                     >

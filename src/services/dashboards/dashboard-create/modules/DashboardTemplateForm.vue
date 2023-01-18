@@ -29,13 +29,14 @@
                                 </template>
                             </p-board>
                             <p-text-pagination
-                                v-show="defaultTemplateState.allPage > 10"
+                                v-show="defaultTemplateState.allPage >= 2"
                                 :this-page="defaultTemplateState.thisPage"
                                 :all-page="defaultTemplateState.allPage"
                                 @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
                             />
                         </div>
                     </div>
+                    <p-divider />
                     <div class="card-container">
                         <span class="card-wrapper-title">
                             {{ $t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
@@ -70,6 +71,7 @@
                                 </p-empty>
                             </div>
                             <p-text-pagination
+                                v-show="existingTemplateState.allPage >= 2"
                                 :this-page="existingTemplateState.thisPage"
                                 :all-page="existingTemplateState.allPage"
                                 @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
@@ -86,7 +88,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PBoard, PLabel, PTextPagination, PSearch, PEmpty,
+    PPaneLayout, PPanelTop, PBoard, PLabel, PTextPagination, PSearch, PEmpty, PDivider,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -192,7 +194,7 @@ const handleInputSearch = () => {
 .dashboard-template-wrapper {
     padding: 0.5rem 1rem 2.375rem 1rem;
     .dashboard-template-container {
-        @apply bg-gray-100 border-gray-200 grid gap-4;
+        @apply bg-gray-100 border-gray-200 grid gap-5;
         padding: 1rem 1rem 1.25rem;
         border-width: 1px;
         border-radius: 0.5rem;
