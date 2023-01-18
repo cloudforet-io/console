@@ -46,15 +46,7 @@
         </div>
         <p-divider class="divider" />
         <div class="dashboard-selectors">
-            <div class="variable-selector-wrapper">
-                <template v-for="(propertyName, idx) in variablesState.order">
-                    <variable-selector-dropdown v-if="variablesState.properties[propertyName]?.use"
-                                                :key="`${propertyName}-${idx}`"
-                                                :property-name="propertyName"
-                                                :reference-map="variablesState.allReferenceTypeInfo[propertyName]?.referenceMap"
-                    />
-                </template>
-            </div>
+            <dashboard-variables-selector class="variable-selector-wrapper" />
             <dashboard-refresh-dropdown :interval-option.sync="dashboardDetailState.settings.refresh_interval_option"
                                         :loading="dashboardDetailState.loadingWidgets"
                                         @refresh="handleRefresh"
@@ -86,7 +78,6 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -105,7 +96,6 @@ import { gray } from '@/styles/colors';
 
 import type { RefreshIntervalOption } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
@@ -115,6 +105,7 @@ import DashboardLabels from '@/services/dashboards/modules/dashboard-label/Dashb
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardCloneModal from '@/services/dashboards/modules/DashboardCloneModal.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
+import DashboardVariablesSelector from '@/services/dashboards/modules/DashboardVariablesSelector.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const PUBLIC_ICON_COLOR = gray[500];
@@ -133,12 +124,6 @@ const state = reactive({
     nameEditModalVisible: false,
     deleteModalVisible: false,
     cloneModalVisible: false,
-});
-
-const variablesState = reactive({
-    properties: computed(() => dashboardDetailState.variablesSchema.properties),
-    order: computed(() => dashboardDetailState.variablesSchema.order),
-    allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
 });
 
 const queryState = reactive({
