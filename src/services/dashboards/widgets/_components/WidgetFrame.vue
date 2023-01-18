@@ -172,8 +172,8 @@ const state = reactive({
         if (start && endDayjs) {
             let endText;
             const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
-            if (isCurrentMonth) endText = dayjs.utc().format('YYYY-MM-DD');
-            else endText = endDayjs.endOf('month').format('YYYY-MM-DD');
+            if (isCurrentMonth) endText = dayjs.utc().format('YY-MM-DD');
+            else endText = endDayjs.endOf('month').format('YY-MM-DD');
             return `${start} ~ ${endText}`;
         }
         if (start && !endDayjs) {
@@ -216,7 +216,7 @@ const state = reactive({
     ]),
 });
 
-const setBasicDateFormat = (date) => (date ? dayjs.utc(date).format('YYYY-MM-DD') : undefined);
+const setBasicDateFormat = (date) => (date ? dayjs.utc(date).format('YY-MM-DD') : undefined);
 const handleEditButtonClick = () => { state.visibleEditModal = true; };
 const handleDeleteModalConfirm = () => {
     dashboardDetailStore.deleteWidget(props.widgetKey);
