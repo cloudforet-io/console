@@ -158,11 +158,15 @@ const handleEnter = () => {
 }
 
 .p-page-title {
+    margin-bottom: 0;
     :deep(.title-wrapper) {
         display: flex;
         width: 100%;
         & h2 {
             width: calc(100% - 2.25rem);
+        }
+        .p-field-group {
+            margin-bottom: 0.75rem;
         }
     }
 }

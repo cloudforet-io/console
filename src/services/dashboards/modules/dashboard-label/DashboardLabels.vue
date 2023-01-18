@@ -32,6 +32,7 @@
             <p-text-input
                 :value="inputText"
                 :invalid="invalidState.inputText"
+                size="sm"
                 @update:value="setForm('inputText', $event)"
             />
         </p-field-group>
@@ -109,8 +110,11 @@ const handleDelete = (index: number) => {
 .dashboard-labels {
     display: flex;
     flex-flow: wrap;
+    column-gap: 0.25rem;
+    row-gap: 0.25rem;
     max-width: 50%;
-    min-height: 2.75rem;
+    min-height: 2rem;
+    padding-top: 0.25rem;
 }
 .p-icon-button {
     margin-right: 0.25rem;
@@ -121,8 +125,8 @@ const handleDelete = (index: number) => {
 }
 
 /* custom design-system component - p-label */
-:deep(.p-label) {
-    margin-bottom: 0.375rem;
+.p-label {
+    margin: 0.125rem 0;
     max-width: 100%;
     .label-content {
         max-width: 100%;
@@ -134,7 +138,7 @@ const handleDelete = (index: number) => {
     }
 }
 .p-field-group {
-    height: 2.75rem;
+    @apply relative;
     margin-bottom: 0;
 }
 
@@ -143,6 +147,11 @@ const handleDelete = (index: number) => {
     .input-container {
         min-height: 1.5rem;
         height: 1.5rem;
+    }
+    + .invalid-feedback {
+        @apply absolute;
+        top: 100%;
+        margin-top: 0;
     }
 }
 </style>

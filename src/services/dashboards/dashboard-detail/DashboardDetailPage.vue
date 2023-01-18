@@ -260,6 +260,9 @@ onUnmounted(() => {
 </script>
 
 <style lang="postcss" scoped>
+.p-page-title {
+    margin-bottom: 0.75rem;
+}
 .dashboard-title-icon-buttons-wrapper {
     display: inline-flex;
     gap: 0.5rem;
@@ -270,7 +273,7 @@ onUnmounted(() => {
     @apply mb-6;
 }
 .filter-box {
-    @apply flex justify-between items-start mt-5;
+    @apply flex justify-between items-start mb-4;
 }
 .dashboard-selectors {
     @apply relative flex justify-between items-start z-10;
