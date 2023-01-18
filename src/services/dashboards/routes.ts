@@ -50,7 +50,7 @@ const dashboardsRoute: RouteConfig = {
                     component: { template: '<router-view/>' },
                     children: [
                         {
-                            path: ':dashboardId',
+                            path: 'detail/:dashboardId',
                             name: DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME,
                             meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
                             props: true,
@@ -98,7 +98,7 @@ const dashboardsRoute: RouteConfig = {
                     component: { template: '<router-view/>' },
                     children: [
                         {
-                            path: ':dashboardId',
+                            path: 'detail/:dashboardId',
                             name: DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME,
                             meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
                             props: true,
