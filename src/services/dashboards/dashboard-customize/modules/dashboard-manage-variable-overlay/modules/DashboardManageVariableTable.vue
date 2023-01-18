@@ -52,7 +52,7 @@
                         {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.EDIT') }}
                     </p-button>
                     <p-button class="manage-button"
-                              style-type="tertiary"
+                              style-type="negative-secondary"
                               icon-left="ic_trashcan"
                               size="sm"
                               @click="handleDeleteVariable(value)"
