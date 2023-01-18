@@ -23,6 +23,8 @@
             <p-json-schema-form v-if="widgetOptionsJsonSchema.properties"
                                 :schema="widgetOptionsJsonSchema"
                                 :form-data.sync="schemaFormData"
+                                :custom-error-map="inheritOptionsErrorMap"
+                                :validation-mode="widgetKey ? 'all' : 'input'"
                                 class="widget-options-form"
                                 @validate="handleFormValidate"
             >
