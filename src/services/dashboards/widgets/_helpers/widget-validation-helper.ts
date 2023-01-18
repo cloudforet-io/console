@@ -25,7 +25,8 @@ export const getWidgetInheritOptionsErrorMap = (
         if (!inheritOption?.enabled) return;
 
         const variableKey = inheritOption?.variable_info?.key;
-        if (!variableKey || !dashboardVariablesSchema?.properties?.[variableKey]?.use) {
+        if (!variableKey) return;
+        if (!dashboardVariablesSchema?.properties?.[variableKey]?.use) {
             errorMap[propertyName] = i18n.t('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST');
             return;
         }

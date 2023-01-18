@@ -1,5 +1,6 @@
 import { reactive } from 'vue';
 
+import { cloneDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
@@ -27,28 +28,18 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         widgetOptions: undefined,
         widgetInfo: undefined,
     });
-    const setWidgetConfigId = (val?: string) => {
-        state.widgetConfigId = val;
-    };
-    const setWidgetTitle = (val?: string) => {
-        state.widgetTitle = val;
-    };
-    const setIsValid = (val: boolean) => {
-        state.isValid = val;
-    };
-    const setFormData = (formData: any, inheritItemMap: Record<string, boolean>) => {
+    const setFormData = (formData: any) => {
         if (!state.widgetConfigId) return;
         const widgetConfig = getWidgetConfig(state.widgetConfigId);
         const widgetOptions: WidgetOptions = {
             ...widgetConfig.options,
         };
         const widgetFiltersMap: WidgetOptions['filters'] = {};
-        const inheritOptions: InheritOptions = {};
+        const _inheritOptions = cloneDeep(state.inheritOptions);
         Object.entries(formData).forEach(([key, val]) => {
             const _propertyName = key.replace('filters.', '');
-            if (inheritItemMap[key]) {
-                if (!val) return;
-                inheritOptions[key] = {
+            if (_inheritOptions?.[key]?.enabled && val) {
+                _inheritOptions[key] = {
                     enabled: true,
                     variable_info: {
                         key: val as string,
@@ -64,18 +55,20 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
 
         //
         state.widgetOptions = widgetOptions;
-        state.inheritOptions = inheritOptions;
     };
 
     const initWidgetForm = (widgetKey: string) => {
         state.widgetInfo = dashboardDetailInfoStore.dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
+        if (state.widgetInfo) {
+            state.widgetConfigId = state.widgetInfo.widget_name;
+            state.widgetTitle = state.widgetInfo.title;
+            state.widgetOptions = state.widgetInfo.widget_options;
+            state.inheritOptions = state.widgetInfo.inherit_options;
+        }
     };
 
     return {
         state,
-        setWidgetConfigId,
-        setWidgetTitle,
-        setIsValid,
         setFormData,
         initWidgetForm,
     };

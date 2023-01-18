@@ -18,8 +18,8 @@
                 <div class="error-title">
                     <span class="error-icon-wrapper">
                         <p-i name="ic_alert"
-                             height="1rem"
-                             width="1rem"
+                             height="1.5rem"
+                             width="1.5rem"
                              color="inherit"
                         />
                     </span>
