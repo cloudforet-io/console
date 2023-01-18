@@ -420,6 +420,11 @@ const handleClickRow = (rowData) => {
     }
     td {
         @apply px-4 z-0 align-middle min-w-28 text-sm;
+
+        &:hover {
+            @apply bg-gray-200;
+        }
+
         .detail-item-wrapper {
             @apply flex justify-between items-center;
 
