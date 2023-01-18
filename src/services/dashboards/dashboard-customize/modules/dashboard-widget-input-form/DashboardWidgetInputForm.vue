@@ -176,15 +176,16 @@ export default defineComponent<Props>({
         const handleMoreOptionRemove = (propertyName: string) => {
             const propertySchema = state.widgetConfig?.options_schema?.schema?.properties[propertyName];
             if (!propertySchema) return;
+
+            // update widget options json schema
             const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
             delete _widgetOptionsJsonSchema.properties[propertyName];
             state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
 
-            const _inheritOptions = cloneDeep(widgetFormState.inheritOptions);
-            if (_inheritOptions?.[propertyName]) {
-                delete _inheritOptions[propertyName];
-                widgetFormState.inheritOptions = _inheritOptions;
-            }
+            // update inherit options
+            widgetFormState.inheritOptions = { ...widgetFormState.inheritOptions, [propertyName]: { enabled: false } };
+
+            state.schemaFormData = { ...state.schemaFormData, [propertyName]: undefined };
         };
 
         /* Util */
@@ -221,9 +222,7 @@ export default defineComponent<Props>({
 
         /* inherit */
         const handleChangeInheritToggle = (propertyName: string, { value }) => {
-            let _inheritOptions = cloneDeep(widgetFormState.inheritOptions);
-            _inheritOptions = { ..._inheritOptions, [propertyName]: { enabled: value } };
-            widgetFormState.inheritOptions = _inheritOptions;
+            widgetFormState.inheritOptions = { ...widgetFormState.inheritOptions, [propertyName]: { enabled: value } };
 
             // update widget option schema
             const originPropertySchema = state.widgetConfig?.options_schema?.schema?.properties?.[propertyName] ?? {};
