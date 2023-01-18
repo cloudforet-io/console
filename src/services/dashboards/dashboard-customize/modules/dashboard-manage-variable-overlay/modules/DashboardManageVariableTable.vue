@@ -122,11 +122,6 @@ const state = reactive({
     allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
 });
 
-/* Helper */
-const variableTypeBadgeStyleFormatter = (type: VariableType) => {
-    if (type === 'MANAGED') return 'gray';
-    return 'primary';
-};
 /* EVENT */
 const handleSelectType = (selected) => {
     state.selectedVariableType = selected;
@@ -147,7 +142,12 @@ const handleToggleUse = (propertyName: string, value: boolean) => {
     dashboardDetailState.variablesSchema.properties[propertyName].use = !value;
 };
 
-watch(() => dashboardDetailState.variablesSchema.order, (order) => {
+/* Helper */
+const variableTypeBadgeStyleFormatter = (type: VariableType) => {
+    if (type === 'MANAGED') return 'gray';
+    return 'primary';
+};
+const convertAndUpdateVariablesForTable = (order: string[]) => {
     const properties = dashboardDetailState.variablesSchema.properties;
     const convertedVariables = order.map((d) => {
         if (properties[d].variable_type === 'MANAGED') {
@@ -166,6 +166,10 @@ watch(() => dashboardDetailState.variablesSchema.order, (order) => {
     if (state.selectedVariableType === 'ALL') {
         state.orderedVariables = convertedVariables;
     } else state.orderedVariables = convertedVariables.filter((d) => d.variable_type === state.selectedVariableType);
+};
+
+watch(() => dashboardDetailState.variablesSchema.order, (_order) => {
+    convertAndUpdateVariablesForTable(_order);
 }, { immediate: true });
 
 const {
