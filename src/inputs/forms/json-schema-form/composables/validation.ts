@@ -8,17 +8,20 @@ import type Ajv from 'ajv';
 import type { Localize } from 'ajv-i18n/localize/types';
 import { isEmpty } from 'lodash';
 
-import type { JsonSchemaFormProps, InnerJsonSchema } from '@/inputs/forms/json-schema-form/type';
+import type { JsonSchemaFormProps, InnerJsonSchema, CustomErrorMap } from '@/inputs/forms/json-schema-form/type';
 
 const getErrorMessage = ({ instancePath, message, params }: ErrorObject) => {
     const dataKey = instancePath.slice(1).replace('/', '.');
     return `${dataKey ? `${dataKey}: ` : ''}${message}${params.allowedValues ? `: ${params.allowedValues.join(', ')}` : ''}`;
 };
 
-export const useValidation = (props: JsonSchemaFormProps, { ajv, formData, localize }: {
+export const useValidation = (props: JsonSchemaFormProps, {
+    ajv, formData, localize, customErrorMap,
+}: {
     ajv: Ajv,
     formData: Ref<object|undefined>;
     localize: Ref<Localize|null>;
+    customErrorMap: Ref<CustomErrorMap|undefined>;
 }) => {
     const state = reactive({
         validator: computed<ValidateFunction|null>(() => {
@@ -59,6 +62,16 @@ export const useValidation = (props: JsonSchemaFormProps, { ajv, formData, local
                         }
                     }
                 });
+
+                if (customErrorMap.value) {
+                    Object.entries(customErrorMap.value).forEach(([property, errorMessage]) => {
+                        if (errorObj[property]) {
+                            errorObj[property].push(errorMessage);
+                        } else {
+                            errorObj[property] = [errorMessage];
+                        }
+                    });
+                }
             }
             return errorObj;
         }),

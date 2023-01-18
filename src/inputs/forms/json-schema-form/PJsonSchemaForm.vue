@@ -208,6 +208,10 @@ export default defineComponent<JsonSchemaFormProps>({
             type: Boolean,
             default: false,
         },
+        customErrorMap: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     setup(props, { emit }) {
         const ajv = new Ajv({
@@ -274,6 +278,7 @@ export default defineComponent<JsonSchemaFormProps>({
             ajv,
             formData: computed(() => (props.isRoot ? state.refinedFormData : props.formData)),
             localize,
+            customErrorMap: computed(() => props.customErrorMap),
         });
 
         const initFormData = () => {
@@ -352,6 +357,9 @@ export default defineComponent<JsonSchemaFormProps>({
                 emit('change', isValid, refinedFormData);
             }
         }, { immediate: !state.isJsonInputMode });
+        watch(() => props.customErrorMap, () => {
+            emit('validate', validateFormData());
+        });
 
         return {
             ...toRefs(state),

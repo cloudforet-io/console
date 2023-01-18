@@ -30,6 +30,7 @@ export type InnerJsonSchema = JsonSchema & {
     appearanceType?: InputAppearanceType;
 };
 
+export type CustomErrorMap = Record<string, string>;
 export interface JsonSchemaFormProps {
     schema?: JsonSchema;
     formData?: object;
@@ -37,4 +38,5 @@ export interface JsonSchemaFormProps {
     validationMode?: ValidationMode; // default: input
     isRoot?: boolean;
     resetOnSchemaChange?: boolean;
+    customErrorMap?: CustomErrorMap;
 }

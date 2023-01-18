@@ -132,6 +132,24 @@ export const getJsonSchemaFormArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    customErrorMap: {
+        name: 'customErrorMap',
+        type: { name: 'object' },
+        description: 'Error map for custom error messages.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: 'object',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '{}',
+            },
+        },
+        control: {
+            type: 'object',
+        },
+    },
     // events
     onChange: {
         name: 'change',
