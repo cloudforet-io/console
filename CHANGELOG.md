@@ -1,3 +1,10 @@
+# [2.0.0-beta.16](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.15...v2.0.0-beta.16) (2023-01-18)
+
+
+### Bug Fixes
+
+* **p-json-schema-form:** add customErrorMap ([#240](https://github.com/cloudforet-io/mirinae/issues/240)) ([f8b9312](https://github.com/cloudforet-io/mirinae/commit/f8b9312b397134200d00cb0fa8b97798de0a951c))
+
 # [2.0.0-beta.15](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.14...v2.0.0-beta.15) (2023-01-18)
 
 
