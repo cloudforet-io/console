@@ -80,7 +80,7 @@
                                           v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                     >
                                         <p-tooltip position="bottom"
-                                                   :contents="isEllipsisActive(rowIndex, colIndex, fields[colIndex]) ? getTooltipContents(item, field) : undefined"
+                                                   :contents="isEllipsisActive(rowIndex, colIndex) ? getTooltipContents(item, field) : undefined"
                                         >
                                             <div class="detail-item-wrapper">
                                                 <span ref="labelRef"
@@ -306,8 +306,8 @@ const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], 
 const getColSlotProps = (item, field, colIndex, rowIndex) => ({
     item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
 });
-const isEllipsisActive = (rowIndex:number, colIndex:number, field):boolean => {
-    if (field.detailOptions?.type === 'popover') return false;
+const isEllipsisActive = (rowIndex:number, colIndex:number):boolean => {
+    if (props.fields[colIndex].detailOptions?.type === 'popover') return false;
     const tdIndex = props.fields.length * rowIndex + colIndex;
     if (labelRef.value?.length && labelRef.value) {
         const labelElement = labelRef.value[tdIndex]?.getElementsByClassName('common-text-box')[0] as HTMLElement;
