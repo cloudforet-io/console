@@ -16,6 +16,11 @@ import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
  * allWidgetWidthList: Array<Array<number>> -> [[320], [320, 480], [320, 480]]
  * */
 
+
+// each widget's gap are 16px
+const GAP = 16;
+
+
 const widgetSizeRangeExtractor = (size: WidgetSize, containerWidth: number = WIDGET_CONTAINER_MIN_WIDTH): Array<number> => {
     if (size === WIDGET_SIZE.sm) return WIDGET_WIDTH_RANGE_LIST.sm;
     if (size === WIDGET_SIZE.md) return WIDGET_WIDTH_RANGE_LIST.md;
@@ -42,9 +47,11 @@ const selectAllWidgetWidthRange = (widgetSizeList: Array<WidgetSize>, containerW
         // extract widget one by one
         const selectedWidgetSize: Array<number> = widgetSizeRangeExtractor(widgetSizeList.shift() as WidgetSize, containerWidth);
         rowWidthSum += selectedWidgetSize[0];
+
+        const containerWidthWithGap = containerWidth - (rowWidgetWidthRange.length * GAP);
         // Compare the sum of widget sizes of one row with containerWidth to push the maximum value
         // and initialize it to the default value of the shifted card.
-        if (rowWidthSum > containerWidth) {
+        if (rowWidthSum > containerWidthWithGap) {
             allWidgetWidthRange.push(rowWidgetWidthRange);
             rowWidgetWidthRange = [];
             rowWidthSum = selectedWidgetSize[0];
@@ -82,21 +89,22 @@ const allWidgetWidthReAligner = (allWidgetWidthRange: Array<Array<Array<number>>
         reAssignedRowWidth = [];
         // j -> increase widget size as +80
         for (let j = 0; j < WIDGET_WIDTH_RANGE_LENGTH_MAX; j += 1) {
+            const containerWidthWithGap = containerWidth - ((allWidgetWidthRange[i].length - 1) * GAP);
+            rowWidthSum = 0;
+            reAssignedRowWidth = [];
             // k -> circuit allWidgetWidthRange
             for (let k = 0; k < allWidgetWidthRange[i].length; k += 1) {
-                rowWidthSum = 0;
-                reAssignedRowWidth = [];
                 widthSelectPointer[i].unshift(j);
                 // l -> compare sum of each row width && push one row
                 for (let l = 0; l < allWidgetWidthRange[i].length; l += 1) {
                     rowWidthSum += allWidgetWidthRange[i][l][widthSelectPointer[i][l]];
 
-                    if (rowWidthSum > containerWidth) {
+                    if (rowWidthSum > containerWidthWithGap) {
                         reAssignedWidgetWidthList.push(reAssignedRowWidth);
                         break;
                     }
 
-                    if (rowWidthSum === containerWidth) {
+                    if (rowWidthSum === containerWidthWithGap) {
                         reAssignedRowWidth.push(allWidgetWidthRange[i][l][widthSelectPointer[i][l]]);
                         reAssignedWidgetWidthList.push(reAssignedRowWidth);
                         break;
@@ -104,9 +112,9 @@ const allWidgetWidthReAligner = (allWidgetWidthRange: Array<Array<Array<number>>
 
                     reAssignedRowWidth.push(allWidgetWidthRange[i][l][widthSelectPointer[i][l]]);
                 }
-                if (rowWidthSum >= containerWidth) break;
+                if (rowWidthSum >= containerWidthWithGap) break;
             }
-            if (rowWidthSum >= containerWidth) break;
+            if (rowWidthSum >= containerWidthWithGap) break;
             // consider last element
             if (j === WIDGET_WIDTH_RANGE_LENGTH_MAX - 1 && reAssignedRowWidth.length) {
                 reAssignedWidgetWidthList.push(reAssignedRowWidth);

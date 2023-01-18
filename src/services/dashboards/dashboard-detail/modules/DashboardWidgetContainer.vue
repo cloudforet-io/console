@@ -127,7 +127,7 @@ export default defineComponent<Props>({
         const refineContainerWidth = (containerWidth: number|undefined): number => {
             if (!containerWidth || containerWidth < WIDGET_CONTAINER_MIN_WIDTH) return WIDGET_CONTAINER_MIN_WIDTH;
             if (containerWidth > WIDGET_CONTAINER_MAX_WIDTH) return WIDGET_CONTAINER_MAX_WIDTH;
-            return containerWidth - (containerWidth % 80);
+            return containerWidth - (containerWidth % 16);
         };
 
         const handleIntersectionObserver = async ([{ isIntersecting, target }]) => {

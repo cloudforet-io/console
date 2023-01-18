@@ -47,7 +47,7 @@ function permutation(arr, selectNum) {
 
 // if AMOUNT is more than 10, call stack boom
 // for more specific test, please scale up the AMOUNT.
-const _SELECT_WIDGET_AMOUNT = 2;
+const _SELECT_WIDGET_AMOUNT = 5;
 // e.g) [['sm', 'sm', 'md'], ['sm', 'sm', 'lg'] ...]
 const widgetCases: Array<Array<WidgetSize>> = permutation(['sm', 'md', 'lg', 'xl', 'full'], _SELECT_WIDGET_AMOUNT);
 const widgetCasesLength = widgetCases.length;
