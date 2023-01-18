@@ -1,3 +1,10 @@
+# [2.0.0-beta.17](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.16...v2.0.0-beta.17) (2023-01-18)
+
+
+### Features
+
+* add fixed sizes to sidebar ([#242](https://github.com/cloudforet-io/mirinae/issues/242)) ([dec9a44](https://github.com/cloudforet-io/mirinae/commit/dec9a44e0941ad7d1bc36f3c0c2d5b9f9f32def2))
+
 # [2.0.0-beta.16](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.15...v2.0.0-beta.16) (2023-01-18)
 
 
