@@ -1,3 +1,10 @@
+# [2.0.0-beta.19](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.18...v2.0.0-beta.19) (2023-01-18)
+
+
+### Bug Fixes
+
+* **text-pagination:** add default slot ([#244](https://github.com/cloudforet-io/mirinae/issues/244)) ([d36ed76](https://github.com/cloudforet-io/mirinae/commit/d36ed76c6d45f93207953771f7d3b42a966ca8b5))
+
 # [2.0.0-beta.18](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.17...v2.0.0-beta.18) (2023-01-18)
 
 
