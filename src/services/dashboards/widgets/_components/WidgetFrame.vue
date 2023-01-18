@@ -16,6 +16,13 @@
                  class="error-container"
             >
                 <div class="error-title">
+                    <span class="error-icon-wrapper">
+                        <p-i name="ic_alert"
+                             height="1rem"
+                             width="1rem"
+                             color="inherit"
+                        />
+                    </span>
                     <span>{{ $t('DASHBOARDS.WIDGET.ERROR_TITLE') }}</span>
                 </div>
                 <span class="error-message">
@@ -91,7 +98,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router/types/router';
 
 import {
-    PAnchor, PButton, PDivider, PIconButton,
+    PAnchor, PButton, PDivider, PIconButton, PI,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -246,12 +253,17 @@ const handleDeleteModalConfirm = () => {
     }
     .error-container {
         @apply flex items-center flex-col h-full;
+        height: 25.25rem;
         padding: 0 1.5625rem;
 
         .error-title {
             @apply text-gray-700 flex justify-center items-center;
             font-size: 1.125rem;
             height: 42%;
+            .error-icon-wrapper {
+                @apply text-red-400;
+                padding-right: 0.5rem;
+            }
         }
         .error-message {
             @apply text-gray-700;

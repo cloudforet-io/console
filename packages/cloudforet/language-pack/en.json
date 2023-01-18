@@ -1361,8 +1361,7 @@
 				"DESC": "Displays the top project list that used resources of compute, database, storage the most.   "
 			},
 			"UPDATE_TITLE": "Update Widget",
-			"VALIDATION_PROPERTY_DIFFERENT_TYPE": "This property has a different type from the dashboard variable.",
-			"VALIDATION_PROPERTY_NOT_EXIST": "This property does not exist on the dashboard variables."
+			"VALIDATION_PROPERTY_NOT_EXIST": "The previously selected variable from dashboard has been changed."
 		}
 	},
 	"IAM": {
