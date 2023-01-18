@@ -218,7 +218,8 @@ onBeforeUnmount(() => {
 .dashboard-customize-page {
     @apply relative;
     .filters-box {
-        @apply flex justify-between mt-4 items-start;
+        @apply flex justify-between items-start;
+        margin-bottom: 1.3125rem;
     }
 
     .dashboard-selectors {
