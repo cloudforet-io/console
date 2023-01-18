@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard-detail-page">
         <p-page-title :title="dashboardDetailState.name">
-            <template v-if="dashboardDetailState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+            <template v-if="dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
                 <p-i name="ic_public"
@@ -19,13 +19,13 @@
                     <p-icon-button name="ic_edit-text"
                                    width="1.5rem"
                                    height="1.5rem"
-                                   :disabled="!state.hasManagePermission && dashboardDetailState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   :disabled="!state.hasManagePermission && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    @click="handleVisibleNameEditModal"
                     />
                     <p-icon-button name="ic_trashcan"
                                    width="1.5rem"
                                    height="1.5rem"
-                                   :disabled="!state.hasManagePermission && dashboardDetailState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   :disabled="!state.hasManagePermission && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    @click="handleVisibleDeleteModal"
                     />
                 </span>
@@ -126,6 +126,7 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailOriginState = dashboardDetailStore.originState;
 
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
