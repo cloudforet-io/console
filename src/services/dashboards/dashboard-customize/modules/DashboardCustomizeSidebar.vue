@@ -37,11 +37,22 @@
                          :key="`drag-item-${widget.widget_name}-${idx}`"
                          class="draggable-item"
                     >
-                        <p-i name="ic_drag-handle--slim"
-                             width="1rem"
-                             height="1rem"
-                        />
-                        <span class="text">{{ widget.title }}</span>
+                        <div>
+                            <p-i name="ic_drag-handle--slim"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                            <span class="text">{{ widget.title }}</span>
+                        </div>
+                        <span v-if="dashboardDetailValidationState.widgetValidMap[widget.widget_key] === false"
+                              class="error-icon-wrapper"
+                        >
+                            <p-i name="ic_alert"
+                                 height="1rem"
+                                 width="1rem"
+                                 color="inherit"
+                            />
+                        </span>
                     </div>
                 </draggable>
             </div>
@@ -172,6 +183,7 @@ onUnmounted(() => {
             @apply border border-gray-200 rounded bg-white;
             display: flex;
             gap: 0.5rem;
+            justify-content: space-between;
             cursor: grab;
             padding: 0.5rem;
             &:active {
@@ -179,6 +191,10 @@ onUnmounted(() => {
             }
             .text {
                 @apply truncate;
+                padding-left: 0.25rem;
+            }
+            .error-icon-wrapper {
+                @apply text-red-400;
             }
         }
         .ghost {
