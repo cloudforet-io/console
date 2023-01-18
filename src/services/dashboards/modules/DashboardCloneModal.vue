@@ -65,6 +65,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import type { DashboardViewer, DashboardConfig, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardDetailInfoStoreState } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
@@ -137,7 +138,9 @@ export default defineComponent<Props>({
             },
             viewers(value: DashboardViewer) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
         });
-
+        const currentRouteName = SpaceRouter.router.currentRoute.name;
+        const dashboardDetailStore = useDashboardDetailInfoStore();
+        const dashboardOriginState = dashboardDetailStore.originState;
         const state = reactive({
             proxyVisible: props.visible,
             filteredVisibilityList: computed(() => visibilityList),
@@ -156,10 +159,7 @@ export default defineComponent<Props>({
                             && item.name !== props.dashboard?.name)
                         .map((_item) => _item.name);
                 }
-                return store.state.dashboard.domainItems.map((item) => {
-                    if (item.name !== props.dashboard?.name) return item.name;
-                    return '';
-                });
+                return store.state.dashboard.domainItems.map((item) => item.name);
             }),
             layouts: computed<DashboardLayoutWidgetInfo[]|DashboardLayoutWidgetInfo[][]>(() => {
                 if (props.dashboard?.layouts) return props.dashboard?.layouts;
@@ -179,10 +179,10 @@ export default defineComponent<Props>({
                 name: name.value,
                 viewers: viewers.value,
                 layouts: state.layouts,
-                labels: props.dashboard?.labels,
-                settings: props.dashboard?.settings,
-                variables: props.dashboard?.variables,
-                variables_schema: state.variablesSchema,
+                labels: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.labels : dashboardOriginState.dashboardInfo?.labels,
+                settings: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.settings : dashboardOriginState.dashboardInfo?.settings,
+                variables: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.variables : dashboardOriginState.dashboardInfo?.variables,
+                variables_schema: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? state.variablesSchema : dashboardOriginState.dashboardInfo?.variablesSchema,
             })),
         });
 
