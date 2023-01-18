@@ -236,6 +236,11 @@ const handleDeleteModalConfirm = () => {
     .widget-header {
         @apply flex justify-between items-center;
         .title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
             font-size: 1rem;
             font-weight: 700;
             color: theme('colors.gray.900');
