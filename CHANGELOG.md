@@ -1,3 +1,13 @@
+# [2.0.0-beta.15](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.14...v2.0.0-beta.15) (2023-01-18)
+
+
+### Bug Fixes
+
+* **filterable-dropdown:** apply style type to badge ([e59e252](https://github.com/cloudforet-io/mirinae/commit/e59e252b2e82778b957217355078f140276e5791))
+* **filterable-dropdown:** sustain same height in badge case ([9f23dd1](https://github.com/cloudforet-io/mirinae/commit/9f23dd16dc7abd68274a68da20dc8453fafd5cba))
+* **json-schema-form:** if menuItems are given, init raw data with it ([9d678b9](https://github.com/cloudforet-io/mirinae/commit/9d678b9dfaf881c25421ed08f1ef00631bfb9dbd))
+* **json-shcema-form:** remove context key ([16d9b77](https://github.com/cloudforet-io/mirinae/commit/16d9b77bd3f93b5308b1a9827e66921a637c7fde))
+
 # [2.0.0-beta.14](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.13...v2.0.0-beta.14) (2023-01-17)
 
 
