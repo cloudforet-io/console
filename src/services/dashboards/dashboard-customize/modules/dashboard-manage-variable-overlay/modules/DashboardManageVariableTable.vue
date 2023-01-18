@@ -67,14 +67,13 @@
 
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from 'vue';
 
 import {
     PBadge, PDataTable, PSelectStatus, PToggleButton, PButton, PCollapsiblePanel,
 } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -148,13 +147,8 @@ const handleToggleUse = (propertyName: string, value: boolean) => {
     dashboardDetailState.variablesSchema.properties[propertyName].use = !value;
 };
 
-onMounted(() => {
-    if (dashboardDetailState.variablesSchema.order.length === 0) {
-        SpaceRouter.router.go(-1);
-        return;
-    }
+watch(() => dashboardDetailState.variablesSchema.order, (order) => {
     const properties = dashboardDetailState.variablesSchema.properties;
-    const order = dashboardDetailState.variablesSchema.order;
     const convertedVariables = order.map((d) => {
         if (properties[d].variable_type === 'MANAGED') {
             return {
@@ -172,7 +166,7 @@ onMounted(() => {
     if (state.selectedVariableType === 'ALL') {
         state.orderedVariables = convertedVariables;
     } else state.orderedVariables = convertedVariables.filter((d) => d.variable_type === state.selectedVariableType);
-});
+}, { immediate: true });
 
 const {
     orderedVariables,
