@@ -29,9 +29,7 @@
                                 @validate="handleFormValidate"
             >
                 <template #label-extra="{ propertyName }">
-                    <div v-if="inheritSchemaProperties[propertyName] && inheritSchemaProperties[propertyName].menuItems.length > 0"
-                         class="inherit-toggle-button"
-                    >
+                    <div class="inherit-toggle-button">
                         <span class="text"
                               :class="{inherit: inheritableProperties.includes(propertyName)}"
                         >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
@@ -132,17 +130,6 @@ export default defineComponent<Props>({
         const state = reactive({
             widgetConfig: computed(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
             widgetOptionsJsonSchema: {} as JsonSchema,
-            inheritSchemaProperties: computed(() => {
-                const variablesSchema = dashboardDetailState.variablesSchema;
-                const properties = state.widgetConfig?.options_schema?.schema?.properties ?? {};
-                const schema = {};
-                Object.keys(properties).forEach((propertyName) => {
-                    const propertySchema = properties[propertyName] ?? {};
-                    if (!propertySchema) return;
-                    schema[propertyName] = refineOptionSchemaByVariablesSchema(propertySchema, variablesSchema);
-                });
-                return schema;
-            }),
             //
             schemaFormData: {},
             isSchemaFormValid: undefined,
