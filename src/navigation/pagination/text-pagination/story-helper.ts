@@ -71,4 +71,22 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    /* slot */
+    defaultSlot: {
+        name: 'default',
+        description: 'Slot to customize page contents area.',
+        defaultValue: '',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
 });

@@ -10,8 +10,10 @@
              class="page-number"
         >
             <div class="page-number-text">
-                <span class="this-page">{{ thisPage }}</span>
-                <span v-if="allPage"> / {{ allPage }}</span>
+                <slot>
+                    <span class="this-page">{{ thisPage }}</span>
+                    <span v-if="allPage"> / {{ allPage }}</span>
+                </slot>
             </div>
         </div>
 

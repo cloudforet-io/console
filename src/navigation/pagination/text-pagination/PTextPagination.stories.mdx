@@ -114,6 +114,34 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
+
+## Custom contents with default slot
+<Canvas>
+    <Story name="Custom contents with default slot">
+        {{
+            components:{ PTextPagination },
+            template: `
+              <div style="display: flex; align-items:center; justify-content:center;">
+              <p-text-pagination
+                  :this-page.sync="thisPage"
+              ><template #default>
+<span>{{ thisPage }} page</span>
+</template>
+</p-text-pagination>
+              </div>
+            `,
+            setup() {
+                const state = reactive({
+                    thisPage: 1,
+                });
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
 ## Playground
 <Canvas>
     <Story name="playground" >
