@@ -1361,7 +1361,6 @@
 				"DESC": "컴퓨트, 데이터베이스, 스토리지 리소스 사용량이 많은 상위 프로젝트들을 빠르게 파악할 수 있는 위젯."
 			},
 			"UPDATE_TITLE": "",
-			"VALIDATION_PROPERTY_DIFFERENT_TYPE": "",
 			"VALIDATION_PROPERTY_NOT_EXIST": ""
 		}
 	},
