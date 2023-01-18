@@ -37,13 +37,12 @@
                          :key="`drag-item-${widget.widget_name}-${idx}`"
                          class="draggable-item"
                     >
-                        <div>
+                        <span>
                             <p-i name="ic_drag-handle--slim"
                                  width="1rem"
                                  height="1rem"
-                            />
-                            <span class="text">{{ widget.title }}</span>
-                        </div>
+                            /></span>
+                        <span class="text">{{ widget.title }}</span>
                         <span v-if="dashboardDetailValidationState.widgetValidMap[widget.widget_key] === false"
                               class="error-icon-wrapper"
                         >
@@ -183,7 +182,6 @@ onUnmounted(() => {
             @apply border border-gray-200 rounded bg-white;
             display: flex;
             gap: 0.5rem;
-            justify-content: space-between;
             cursor: grab;
             padding: 0.5rem;
             &:active {
@@ -191,7 +189,6 @@ onUnmounted(() => {
             }
             .text {
                 @apply truncate;
-                padding-left: 0.25rem;
             }
             .error-icon-wrapper {
                 @apply text-red-400;

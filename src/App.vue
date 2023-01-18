@@ -25,6 +25,7 @@
                     <p-sidebar :visible="$store.state.display.visibleSidebar"
                                :style-type="$store.getters['display/sidebarProps'].styleType"
                                :size="$store.getters['display/sidebarProps'].size"
+                               :is-fixed-size="$store.getters['display/sidebarProps'].isFixedSize"
                                :hide-close-button="$store.getters['display/sidebarProps'].disableButton"
                                :disable-scroll="$store.getters['display/sidebarProps'].disableScroll"
                                @close="$store.dispatch('display/hideSidebar')"
