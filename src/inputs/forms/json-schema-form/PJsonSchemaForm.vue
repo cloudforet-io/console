@@ -357,9 +357,6 @@ export default defineComponent<JsonSchemaFormProps>({
                 emit('change', isValid, refinedFormData);
             }
         }, { immediate: !state.isJsonInputMode });
-        watch(() => props.customErrorMap, () => {
-            emit('validate', validateFormData());
-        });
 
         return {
             ...toRefs(state),
