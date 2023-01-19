@@ -18,10 +18,12 @@
                       #title-right-extra
             >
                 <span class="dashboard-title-icon-buttons-wrapper">
-                    <favorite-button :item-id="props.dashboardId"
-                                     :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                     scale="0.8"
-                    />
+                    <div class="favorite-wrapper">
+                        <favorite-button :item-id="props.dashboardId"
+                                         :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                         scale="0.8"
+                        />
+                    </div>
                     <p-icon-button name="ic_edit-text"
                                    width="1.5rem"
                                    height="1.5rem"
@@ -274,7 +276,12 @@ onUnmounted(() => {
     display: inline-flex;
     gap: 0.5rem;
     align-items: center;
-    margin-left: 0.25rem;
+    .favorite-wrapper {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+    }
 }
 .divider {
     @apply mb-6;
