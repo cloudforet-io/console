@@ -37,7 +37,9 @@ import {
     defineComponent, reactive, toRefs, ref, onMounted, watch, onBeforeUnmount, computed,
 } from 'vue';
 
-import { flattenDeep, isEmpty } from 'lodash';
+import {
+    debounce, flattenDeep, isEmpty, isEqual,
+} from 'lodash';
 
 import { store } from '@/store';
 
@@ -190,12 +192,13 @@ export default defineComponent<Props>({
         watch(() => state.dashboardVariablesSchema, () => {
             if (props.editMode) validateAllWidget();
         }, { immediate: true });
-        watch([() => state.dashboardSettings.date_range, () => state.dashboardSettings.currency], () => {
-            refreshAllWidget();
+        watch([() => state.dashboardSettings.date_range, () => state.dashboardSettings.currency, () => state.dashboardId], ([dateRange, currency, dashboardId], prev) => {
+            if (dashboardId === prev[2]) return;
+            if (!isEqual(dateRange, prev[0]) || !isEqual(currency, prev[1])) refreshAllWidget();
         }, { deep: true });
 
 
-        const refreshAllWidget = async () => {
+        const refreshAllWidget = debounce(async () => {
             const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
 
             const filteredRefs = state.widgetRef.filter((comp: WidgetComponent|null) => {
@@ -213,7 +216,7 @@ export default defineComponent<Props>({
                     state.widgetDataMap[widgetKey] = result.value;
                 }
             });
-        };
+        }, 150);
         expose({
             refreshAllWidget,
         });
