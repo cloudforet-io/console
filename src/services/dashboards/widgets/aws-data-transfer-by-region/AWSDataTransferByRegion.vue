@@ -9,6 +9,7 @@
                                           @select="handleSelectSelectorType"
             />
         </template>
+
         <div class="chart-wrapper">
             <p-data-loader class="chart-loader"
                            :loading="state.loading"
@@ -22,7 +23,6 @@
                 />
             </p-data-loader>
         </div>
-
         <widget-data-table :loading="state.loading"
                            :fields="state.tableFields"
                            :items="state.data?.results"
@@ -300,16 +300,18 @@ defineExpose<WidgetExpose<FullData>>({
 <style lang="postcss" scoped>
 .aws-data-transfer-by-region {
     .chart-wrapper {
-        height: 10.75rem;
+        height: 10.125rem;
         .chart-loader {
             height: 100%;
             .chart {
+                @apply border border-gray-200;
                 height: 100%;
             }
         }
     }
     .widget-data-table {
-        height: 50%;
+        padding-top: 1rem;
+        height: calc(50% - 1rem);
     }
     &.full {
         .widget-data-table {

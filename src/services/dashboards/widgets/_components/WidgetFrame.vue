@@ -255,6 +255,7 @@ const handleDeleteModalConfirm = () => {
         height: auto;
         overflow-y: auto;
         flex: 1 1;
+        padding: 0 1.5rem;
     }
     .error-container {
         @apply flex items-center flex-col h-full;
