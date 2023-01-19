@@ -65,6 +65,7 @@ export const useAmcharts5 = (
     };
 
     const setChartColors = (chart: am5.SerialChart | am5hierarchy.Treemap, colors: string[]) => {
+        if (colors.length === 0) return;
         const am5ColorSet = colors.map((color) => am5.color(color));
         if (chart instanceof am5percent.PieChart) {
             chart.series.getIndex(0)?.get('colors')?.set('colors', am5ColorSet);

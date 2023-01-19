@@ -3,34 +3,40 @@
                   class="base-pie-widget"
                   @refresh="refreshWidget"
     >
-        <div class="chart-wrapper">
-            <p-data-loader class="chart-loader"
-                           :loading="state.loading"
-                           :data="state.data"
-                           loader-type="skeleton"
-                           :loader-backdrop-opacity="1"
-                           show-data-from-scratch
-            >
-                <div ref="chartContext"
-                     class="chart"
-                />
-            </p-data-loader>
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               loader-type="skeleton"
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                    <template #loader>
+                        <p-skeleton width="155px"
+                                    height="155px"
+                        />
+                    </template>
+                </p-data-loader>
+            </div>
+            <widget-data-table :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data?.results"
+                               :legends.sync="state.legends"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.data?.more"
+                               :color-set="colorSet"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               show-legend
+                               @toggle-legend="handleToggleLegend"
+                               @update:thisPage="handleUpdateThisPage"
+            />
         </div>
-
-        <widget-data-table :loading="state.loading"
-                           :fields="state.tableFields"
-                           :items="state.data?.results"
-                           :legends.sync="state.legends"
-                           :currency="state.currency"
-                           :currency-rates="props.currencyRates"
-                           :this-page="state.thisPage"
-                           :show-next-page="state.data?.more"
-                           :color-set="colorSet"
-                           :all-reference-type-info="props.allReferenceTypeInfo"
-                           show-legend
-                           @toggle-legend="handleToggleLegend"
-                           @update:thisPage="handleUpdateThisPage"
-        />
     </widget-frame>
 </template>
 
@@ -44,7 +50,7 @@ import {
 import type { Location } from 'vue-router/types/router';
 
 import { color } from '@amcharts/amcharts5';
-import { PDataLoader } from '@spaceone/design-system';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -248,8 +254,14 @@ defineExpose<WidgetExpose<FullData>>({
 
 <style scoped lang="postcss">
 .base-pie-widget {
+    .data-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
     .chart-wrapper {
-        height: 10.75rem;
+        height: 155px;
+        margin-bottom: 1rem;
         .chart {
             height: 100%;
         }
@@ -258,7 +270,7 @@ defineExpose<WidgetExpose<FullData>>({
         height: 100%;
     }
     .widget-data-table {
-        height: 50%;
+        flex-grow: 1;
     }
     &.full {
         .widget-data-table {

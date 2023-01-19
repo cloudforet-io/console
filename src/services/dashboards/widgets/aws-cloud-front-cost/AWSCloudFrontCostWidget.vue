@@ -11,32 +11,34 @@
                                           @select="handleSelectSelectorType"
             />
         </template>
-        <div class="chart-wrapper">
-            <p-data-loader class="chart-loader"
-                           :loading="state.loading"
-                           :data="state.data"
-                           loader-type="skeleton"
-                           :loader-backdrop-opacity="1"
-                           show-data-from-scratch
-            >
-                <div ref="chartContext"
-                     class="chart"
-                />
-            </p-data-loader>
-        </div>
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               loader-type="skeleton"
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
 
-        <widget-data-table :loading="state.loading"
-                           :fields="state.tableFields"
-                           :items="state.data?.results"
-                           :currency="state.currency"
-                           :currency-rates="props.currencyRates"
-                           :all-reference-type-info="props.allReferenceTypeInfo"
-                           :legends.sync="state.legends"
-                           :color-set="colorSet"
-                           :this-page="state.thisPage"
-                           :show-next-page="state.data?.more"
-                           @update:thisPage="handleUpdateThisPage"
-        />
+            <widget-data-table :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data?.results"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :legends.sync="state.legends"
+                               :color-set="colorSet"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.data?.more"
+                               @update:thisPage="handleUpdateThisPage"
+            />
+        </div>
     </widget-frame>
 </template>
 
@@ -296,18 +298,25 @@ defineExpose<WidgetExpose<FullData>>({
 </script>
 <style lang="postcss" scoped>
 .aws-cloud-front-cost {
-    .chart-wrapper {
-        height: 10.75rem;
-        .chart-loader {
-            height: 100%;
-            .chart {
+    .data-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        .chart-wrapper {
+            height: 185px;
+            margin-bottom: 1rem;
+            .chart-loader {
                 height: 100%;
+                .chart {
+                    height: 100%;
+                }
             }
         }
+        .widget-data-table {
+            flex-grow: 1;
+        }
     }
-    .widget-data-table {
-        height: 50%;
-    }
+
     &.full {
         .widget-data-table {
             height: auto;
