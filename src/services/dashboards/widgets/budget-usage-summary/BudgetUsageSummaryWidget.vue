@@ -337,7 +337,7 @@ defineExpose<WidgetExpose<Data[]>>({
     .budget {
         @apply flex flex-col row-gap-1 text-gray-900;
         line-height: 1.25;
-        height: 5.875rem;
+        height: 94px;
         margin-bottom: 1rem;
         .budget-label {
             font-size: 1rem;
@@ -383,6 +383,9 @@ defineExpose<WidgetExpose<Data[]>>({
         .budget-usage-summary {
             .data-container {
                 @apply flex justify-between;
+            }
+            .budget {
+                width: 30%;
             }
         }
         .skeleton-container {
