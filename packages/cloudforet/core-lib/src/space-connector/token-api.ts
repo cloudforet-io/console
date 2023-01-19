@@ -33,6 +33,8 @@ export default class TokenAPI {
     private readonly sessionTimeoutCallback: SessionTimeoutCallback;
 
     constructor(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback) {
+        // init refreshing state to avoid passing refreshing process
+        TokenAPI.unsetRefreshingState();
         this.sessionTimeoutCallback = sessionTimeoutCallback;
 
         const axiosConfig = {
