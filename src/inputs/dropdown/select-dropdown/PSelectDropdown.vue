@@ -303,6 +303,9 @@ export default defineComponent<SelectDropdownProps>({
         .text {
             flex-grow: 1;
             flex-shrink: 0;
+            padding: 0.25rem 0;
+            line-height: 1.5;
+            height: 100%;
         }
         .dropdown-icon {
             flex-shrink: 0;
