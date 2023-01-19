@@ -15,6 +15,7 @@
                            :loading="state.loading"
                            :data="state.data"
                            loader-type="skeleton"
+                           disable-empty-case
                            :loader-backdrop-opacity="1"
                            show-data-from-scratch
             >

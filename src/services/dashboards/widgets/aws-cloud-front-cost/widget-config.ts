@@ -13,7 +13,7 @@ const {
 const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsCloudFrontCost',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/aws-cloud-front-cost/AWSCloudFrontCost.vue'),
+        component: import('@/services/dashboards/widgets/aws-cloud-front-cost/AWSCloudFrontCostWidget.vue'),
     }),
     title: 'AWS CloudFront Cost',
     labels: ['Cost'],

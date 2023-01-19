@@ -12,35 +12,37 @@
                                           @select="handleSelectSelectorType"
             />
         </template>
-        <div class="chart-wrapper">
-            <p-data-loader class="chart-loader"
-                           :loading="state.loading"
-                           :data="state.chartData"
-                           loader-type="skeleton"
-                           :loader-backdrop-opacity="1"
-                           show-data-from-scratch
-            >
-                <div ref="chartContext"
-                     class="chart"
-                />
-            </p-data-loader>
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.chartData"
+                               loader-type="skeleton"
+                               disable-empty-case
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+            <widget-data-table :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data?.results"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :all-reference-type-info="props.allReferenceTypeInfo"
+                               :legends.sync="state.legends"
+                               :color-set="colorSet"
+                               :this-page="state.thisPage"
+                               :show-next-page="state.data?.more"
+                               disable-ellipsis
+                               show-legend
+                               @toggle-legend="handleToggleLegend"
+                               @update:thisPage="handleUpdateThisPage"
+            />
         </div>
-
-        <widget-data-table :loading="state.loading"
-                           :fields="state.tableFields"
-                           :items="state.data?.results"
-                           :currency="state.currency"
-                           :currency-rates="props.currencyRates"
-                           :all-reference-type-info="props.allReferenceTypeInfo"
-                           :legends.sync="state.legends"
-                           :color-set="colorSet"
-                           :this-page="state.thisPage"
-                           :show-next-page="state.data?.more"
-                           disable-ellipsis
-                           show-legend
-                           @toggle-legend="handleToggleLegend"
-                           @update:thisPage="handleUpdateThisPage"
-        />
     </widget-frame>
 </template>
 
@@ -275,17 +277,23 @@ defineExpose<WidgetExpose<FullData>>({
 
 <style lang="postcss" scoped>
 .base-trend-widget {
-    .chart-wrapper {
-        height: 10.75rem;
-        .chart-loader {
-            height: 100%;
-            .chart {
+    .data-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        .chart-wrapper {
+            height: 10.75rem;
+            margin-bottom: 1rem;
+            .chart-loader {
                 height: 100%;
+                .chart {
+                    height: 100%;
+                }
             }
         }
-    }
-    .widget-data-table {
-        height: 50%;
+        .widget-data-table {
+            flex-grow: 1;
+        }
     }
     &.full {
         .widget-data-table {
