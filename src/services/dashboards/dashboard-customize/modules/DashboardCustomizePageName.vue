@@ -3,12 +3,10 @@
         child
         @goBack="$router.go(-1)"
     >
-        <template v-if="props.dashboardId"
-                  #title
-        >
-            <p-field-group
-                :invalid="invalidState.nameInput"
-                :invalid-text="invalidTexts.nameInput"
+        <template v-if="props.dashboardId">
+            <p-field-group v-if="props.name"
+                           :invalid="invalidState.nameInput"
+                           :invalid-text="invalidTexts.nameInput"
             >
                 <template #default>
                     <input v-if="state.editMode"
@@ -27,10 +25,12 @@
                     </span>
                 </template>
             </p-field-group>
+            <p-skeleton v-else
+                        width="20rem"
+                        height="1.5rem"
+            />
         </template>
-        <template v-else-if="props.dashboardId === undefined"
-                  #title
-        >
+        <template v-else-if="props.dashboardId === undefined">
             <p-field-group
                 :invalid="invalidState.nameInput"
                 :invalid-text="invalidTexts.nameInput"
@@ -52,7 +52,9 @@
 import { vOnClickOutside } from '@vueuse/components';
 import { computed, reactive } from 'vue';
 
-import { PFieldGroup, PPageTitle, PTextInput } from '@spaceone/design-system';
+import {
+    PFieldGroup, PPageTitle, PSkeleton, PTextInput,
+} from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

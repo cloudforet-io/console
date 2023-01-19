@@ -2,71 +2,97 @@
     <widget-frame v-bind="widgetFrameProps"
                   @refresh="handleRefresh"
     >
-        <p-data-loader class="monthly-cost"
-                       :loading="state.loading"
-                       :data="state.data"
-                       :loader-backdrop-opacity="1"
-                       loader-type="skeleton"
-        >
+        <div class="monthly-cost">
             <div class="cost">
                 <p class="cost-label">
                     {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.CURRENT_MONTH') }}
                 </p>
-                <div class="cost-value">
-                    {{ currencyMoneyFormatter(state.currentMonthlyCost, state.currency) }}
-                </div>
-                <div class="cost-info">
-                    <p-i
-                        :name="state.isDecreased ? 'ic_decrease' : 'ic_increase'"
-                        fill
-                        width="1rem"
-                        height="1rem"
-                        :color="state.isDecreased ? green[700] : red[500]"
-                        original
-                    />
-                    {{ currencyMoneyFormatter(state.differenceCost, state.currency) }}
-                    <p-badge :style-type="state.isDecreased ? 'green200' : 'alert'"
-                             shape="square"
-                    >
-                        {{ state.differenceCostRate }} %
-                    </p-badge>
-                </div>
+                <p-data-loader class="data-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               :loader-backdrop-opacity="1"
+                               disable-empty-case
+                               loader-type="skeleton"
+                >
+                    <div class="cost-value">
+                        {{ currencyMoneyFormatter(state.currentMonthlyCost, state.currency) }}
+                    </div>
+                    <div class="cost-info">
+                        <p-i v-if="typeof state.isDecreased === 'boolean'"
+                             :name="state.isDecreased ? 'ic_decrease' : 'ic_increase'"
+                             fill
+                             width="1rem"
+                             height="1rem"
+                             :color="state.isDecreased ? green[700] : red[500]"
+                             original
+                        />
+                        {{ currencyMoneyFormatter(state.differenceCost, state.currency) }}
+                        <p-badge :style-type="state.isDecreased === undefined ? 'gray200' : state.isDecreased ? 'green200' : 'alert'"
+                                 shape="square"
+                        >
+                            {{ state.differenceCostRate }} %
+                        </p-badge>
+                    </div>
+                    <template #loader>
+                        <div class="skeleton-wrapper">
+                            <p-skeleton class="skeleton"
+                                        width="10rem"
+                                        height="1.875rem"
+                            />
+                            <p-skeleton class="skeleton"
+                                        width="7.5rem"
+                                        height="1.5rem"
+                            />
+                        </div>
+                    </template>
+                </p-data-loader>
             </div>
             <p-divider />
             <div class="cost">
                 <p class="cost-label">
                     {{ $t('DASHBOARDS.WIDGET.MONTHLY_COST.PREVIOUS_MONTH') }}
                 </p>
-                <div class="cost-value">
-                    {{ currencyMoneyFormatter(state.previousMonthlyCost, state.currency) }}
-                </div>
-                <div class="cost-info">
-                    {{ state.previousMonth.format('MMM YYYY') }}
-                </div>
+                <p-data-loader class="data-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               :loader-backdrop-opacity="1"
+                               disable-empty-case
+                               loader-type="skeleton"
+                >
+                    <div class="cost-value">
+                        {{ currencyMoneyFormatter(state.previousMonthlyCost, state.currency) }}
+                    </div>
+                    <div class="cost-info">
+                        {{ state.previousMonth.format('MMM YYYY') }}
+                    </div>
+                    <template #loader>
+                        <div class="skeleton-wrapper">
+                            <p-skeleton class="skeleton"
+                                        width="10rem"
+                                        height="1.875rem"
+                            />
+                            <p-skeleton class="skeleton"
+                                        width="7.5rem"
+                                        height="1.5rem"
+                            />
+                        </div>
+                    </template>
+                </p-data-loader>
             </div>
             <div class="chart-wrapper">
-                <div ref="chartContext"
-                     class="chart"
-                />
-            </div>
-            <template #loader>
-                <div v-for="(_, idx) in state.skeletons"
-                     :key="`skeleton-${idx}`"
-                     class="skeleton-wrapper mt-4"
+                <p-data-loader class="data-loader"
+                               :loading="state.loading"
+                               :data="state.data"
+                               :loader-backdrop-opacity="1"
+                               disable-empty-case
+                               loader-type="skeleton"
                 >
-                    <p-skeleton width="10rem"
-                                height="1.875rem"
-                                class="mb-1"
+                    <div ref="chartContext"
+                         class="chart"
                     />
-                    <p-skeleton width="7.5rem"
-                                height="1.5rem"
-                    />
-                </div>
-                <p-skeleton width="100%"
-                            height="100%"
-                />
-            </template>
-        </p-data-loader>
+                </p-data-loader>
+            </div>
+        </div>
     </widget-frame>
 </template>
 
@@ -131,11 +157,17 @@ const state = reactive({
     }),
     differenceCostRate: computed(() => {
         let previousMonthlyCost = state.previousMonthlyCost;
-        if (Number.isNaN(state.differenceCost)) return '--';
+        if (typeof state.differenceCost !== 'number') return '--';
         if (state.currentMonthlyCost === 0) previousMonthlyCost = 1;
         return (state.differenceCost / previousMonthlyCost * 100).toFixed(2);
     }),
-    isDecreased: computed<boolean>(() => (state.differenceCost < 0)),
+    isDecreased: computed<boolean|undefined>(() => {
+        if (typeof state.differenceCost === 'number') {
+            if (state.differenceCost === 0) return undefined;
+            return state.differenceCost < 0;
+        }
+        return undefined;
+    }),
 });
 const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
@@ -258,6 +290,7 @@ defineExpose<WidgetExpose<Data>>({
     .cost {
         @apply text-gray-900;
         line-height: 1.25;
+        height: 5.75rem;
         .cost-label {
             font-size: 1rem;
         }
@@ -280,23 +313,28 @@ defineExpose<WidgetExpose<Data>>({
 
     .chart-wrapper {
         flex-grow: 1;
-        height: 6.25rem;
         margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
         width: 100%;
         .chart {
             height: 100%;
         }
     }
-}
-:deep(.data-loader-container) {
-    > .loader-wrapper > .loader {
-        @apply flex-col items-start justify-start;
-    }
-    .skeleton-wrapper {
-        @apply flex flex-col;
-        &:last-of-type {
-            margin-top: 3.8125rem;
-            margin-bottom: 1.875rem;
+    .data-loader {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        .skeleton-wrapper {
+            width: 100%;
+            height: 100%;
+            .skeleton {
+                display: block;
+                margin-top: 0.25rem;
+            }
+            &.chart {
+                height: 6.25rem;
+                margin-bottom: 1.5rem;
+            }
         }
     }
 }
