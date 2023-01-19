@@ -333,7 +333,8 @@ defineExpose<WidgetExpose<FullData>>({
             padding-bottom: 1rem;
             .chart {
                 @apply border border-gray-200;
-                height: 90%;
+                height: calc(90% - 2px);
+                width: calc(100% - 2px);
             }
             .legend-wrapper {
                 .circle-wrapper {

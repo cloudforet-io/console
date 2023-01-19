@@ -302,17 +302,18 @@ defineExpose<WidgetExpose<FullData>>({
 .aws-data-transfer-by-region {
     .chart-wrapper {
         height: 10.125rem;
+        margin-bottom: 1rem;
         .chart-loader {
             height: 100%;
             .chart {
                 @apply border border-gray-200;
-                height: 100%;
+                height: calc(100% - 2px);
+                width: calc(100% - 2px);
             }
         }
     }
     .widget-data-table {
-        padding-top: 1rem;
-        height: calc(50% - 1rem);
+        height: 50%;
     }
     &.full {
         .widget-data-table {
