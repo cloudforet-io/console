@@ -327,29 +327,15 @@ defineExpose<WidgetExpose<Data[]>>({
         }
     }
 }
-
 .full {
-    @screen desktop {
-        .budget-usage-summary {
-            .data-container {
-                @apply flex justify-between;
-            }
-            .skeleton-container {
-                @apply flex-row justify-between;
-                .skeleton-wrapper {
-                    &:last-of-type {
-                        margin-top: 0;
-                    }
-                }
-            }
+    .budget-usage-summary {
+        .data-container {
+            @apply flex justify-between;
         }
-    }
-
-    @screen laptop {
-        .budget-usage-summary {
-            height: 23.625rem;
-            .data-container {
-                @apply block h-full;
+        .skeleton-container {
+            @apply flex flex-row justify-between;
+            .skeleton-wrapper {
+                margin-top: 0;
             }
         }
     }
