@@ -19,6 +19,8 @@
 </template>
 
 <script lang="ts">
+import { store } from '@/store';
+
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
@@ -30,6 +32,12 @@ export default {
     components: { DashboardsLNB, GeneralPageLayout, VerticalPageLayout },
     setup() {
         const { breadcrumbs } = useBreadcrumbs();
+
+        /* init */
+        (async () => {
+            await store.dispatch('display/loadCurrencyRates');
+        })();
+
         return {
             breadcrumbs,
         };

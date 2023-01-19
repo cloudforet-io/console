@@ -17,7 +17,7 @@
                                    loader-type="skeleton"
                     >
                         <div class="budget-value">
-                            {{ currencyMoneyFormatter(state.totalSpent, state.currency) }}
+                            {{ currencyMoneyFormatter(state.totalSpent, state.currency, props.currencyRates) }}
                         </div>
                         <div class="budget-info">
                             {{ state.budgetCount }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETS') }}
@@ -48,7 +48,7 @@
                                    loader-type="skeleton"
                     >
                         <div class="budget-value">
-                            {{ currencyMoneyFormatter(state.totalBudget, state.currency) }}
+                            {{ currencyMoneyFormatter(state.totalBudget, state.currency, props.currencyRates) }}
                         </div>
                         <div class="budget-info">
                             {{ state.leftBudget }}
