@@ -1267,6 +1267,7 @@
 			"REQUIRED": "필수 입력 항목입니다.",
 			"UPDATE_TITLE": "",
 			"VALIDATION_DASHBOARD_NAME_INPUT": "",
+			"VALIDATION_DASHBOARD_NAME_LENGTH": "제목은 100글자를 넘을 수 없습니다.",
 			"VALIDATION_DASHBOARD_NAME_UNIQUE": ""
 		},
 		"LNB": {
