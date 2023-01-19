@@ -52,7 +52,7 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
             properties: {
                 ...schema.properties,
                 group_by: {
-                    title: 'Group By',
+                    title: 'Group by',
                     type: 'string',
                     enum: Object.values(GROUP_BY),
                     menuItems: Object.values(GROUP_BY_ITEM_MAP),
