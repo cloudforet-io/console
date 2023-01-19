@@ -30,8 +30,8 @@
             :invalid-text="invalidTexts.inputText"
         >
             <p-text-input
-                ref="textInputRef"
                 :value="inputText"
+                :is-focused.sync="state.isInputFocused"
                 :invalid="invalidState.inputText"
                 size="sm"
                 :placeholder="$t('DASHBOARDS.CUSTOMIZE.ENTER_NEW_LABEL')"
@@ -45,7 +45,7 @@
 // CAUTION: this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
 import {
-    computed, nextTick, reactive, ref,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -64,7 +64,6 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(['update:labelList']);
 
-const textInputRef = ref<null|any>(null);
 const {
     forms: {
         inputText,
@@ -89,12 +88,12 @@ const state = reactive({
         set(val: Array<string>) { emit('update:labelList', val); },
     }),
     inputMode: false,
+    isInputFocused: false,
 });
 
 const handleClickPlus = async () => {
     state.inputMode = true;
-    await nextTick();
-    textInputRef.value?.focus();
+    state.isInputFocused = true;
 };
 const handleEscape = () => {
     state.inputMode = false;
