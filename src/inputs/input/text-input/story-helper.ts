@@ -52,6 +52,24 @@ export const getTextInputArgTypes = (): ArgTypes => {
                 options: Object.values(INPUT_SIZE),
             },
         },
+        isFocused: {
+            name: 'isFocused',
+            type: { name: 'boolean' },
+            description: 'focused value for sync.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: null,
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         disabled: {
             name: 'disabled',
             type: { name: 'boolean' },
@@ -429,6 +447,19 @@ export const getTextInputArgTypes = (): ArgTypes => {
         onUpdateValue: {
             name: 'update:value',
             description: 'Event emitted when value is updated. Works with v-model, sync.',
+            table: {
+                type: {
+                    summary: null,
+                },
+                defaultValue: {
+                    summary: null,
+                },
+                category: 'events',
+            },
+        },
+        onUpdateIsFocused: {
+            name: 'update:is-focused',
+            description: 'Event emitted when focused state is updated. Works with isFocused prop sync.',
             table: {
                 type: {
                     summary: null,

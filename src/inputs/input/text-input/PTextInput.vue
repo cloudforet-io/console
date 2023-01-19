@@ -143,6 +143,7 @@ import type {
 interface TextInputProps {
     value?: string|number;
     size?: InputSize;
+    isFocused?: boolean;
     disabled: boolean;
     block: boolean;
     invalid: boolean;
@@ -188,6 +189,10 @@ export default defineComponent<TextInputProps>({
             validator(size: InputSize) {
                 return Object.values(INPUT_SIZE).includes(size);
             },
+        },
+        isFocused: {
+            type: Boolean,
+            default: false,
         },
         disabled: {
             type: Boolean,
@@ -264,11 +269,18 @@ export default defineComponent<TextInputProps>({
     setup(props, { emit, attrs }) {
         /* input focusing */
         const inputRef = ref<HTMLElement|null>(null);
-        const { focused: isInputFocused } = useFocus(inputRef);
+        const { focused: isInputFocused } = useFocus(inputRef, { initialValue: props.isFocused });
         const focusOnInput = () => {
             if (isInputFocused.value) return;
             isInputFocused.value = true;
         };
+        watch(isInputFocused, (val) => {
+            emit('update:is-focused', val);
+        });
+        watch(() => props.isFocused, (val) => {
+            if (val === isInputFocused.value) return;
+            isInputFocused.value = val;
+        });
 
         /* selected */
         const proxySelected = ref<InputItem[]>(props.selected);
@@ -429,10 +441,6 @@ export default defineComponent<TextInputProps>({
                 initiateMenu();
             }
         };
-        // Notice: Focus event below is used in console.
-        const focus = () => {
-            inputRef.value?.focus();
-        };
         const handleInputKeyup = (event) => {
             if ((event.key === 'ArrowDown' || event.key === 'Down') && props.useAutoComplete) {
                 if (refinedMenu.value.length === 0) return;
@@ -516,7 +524,6 @@ export default defineComponent<TextInputProps>({
             handleInputFocus,
             handleInputKeyup,
             handleInputKeydown,
-            focus,
         };
     },
 });
