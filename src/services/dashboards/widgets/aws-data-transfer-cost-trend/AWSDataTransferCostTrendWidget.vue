@@ -273,6 +273,14 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
+    settings: toRef(state, 'settings'),
+    onCurrencyUpdate: async () => {
+        if (!state.data) return;
+        state.legends = getXYChartLegends(state.data, state.groupBy, props.allReferenceTypeInfo);
+        chartHelper.refreshRoot();
+        await nextTick();
+        if (chartHelper.root.value) drawChart(state.chartData);
+    },
 });
 
 defineExpose<WidgetExpose<Data>>({

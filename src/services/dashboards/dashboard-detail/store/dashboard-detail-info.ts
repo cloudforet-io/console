@@ -163,7 +163,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             ...info,
             widget_key: info.widget_key ?? uuidv4(),
         })) ?? [];
-        state.widgetDataMap = {};
     };
 
     const getDashboardInfo = async (dashboardId: undefined|string, force = false) => {

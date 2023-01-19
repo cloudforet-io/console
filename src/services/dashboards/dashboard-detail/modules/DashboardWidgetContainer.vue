@@ -37,7 +37,9 @@ import {
     defineComponent, reactive, toRefs, ref, onMounted, watch, onBeforeUnmount, computed,
 } from 'vue';
 
-import { flattenDeep, isEmpty } from 'lodash';
+import {
+    debounce, flattenDeep, isEmpty, isEqual,
+} from 'lodash';
 
 import { store } from '@/store';
 
@@ -93,10 +95,6 @@ export default defineComponent<Props>({
             dashboardVariables: computed(() => dashboardDetailState.variables),
             dashboardVariablesSchema: computed(() => dashboardDetailState.variablesSchema),
             dashboardSettings: computed<DashboardSettings>(() => dashboardDetailState.settings),
-            widgetDataMap: computed({
-                get() { return dashboardDetailState.widgetDataMap; },
-                set(val) { dashboardDetailState.widgetDataMap = val; },
-            }),
             widgetConfigMap: computed<Record<string, WidgetConfig>>(() => {
                 const _configMap: Record<string, WidgetConfig> = {};
                 state.widgetInfoList.forEach((d) => {
@@ -135,9 +133,9 @@ export default defineComponent<Props>({
             if (isIntersecting) {
                 const targetWidgetRef: WidgetComponent|null = state.widgetRef.find((d) => d?.$el?.id === target.id);
                 if (typeof targetWidgetRef?.initWidget === 'function') {
-                    const prevData = props.reusePreviousData ? state.widgetDataMap[target.id] : undefined;
+                    const prevData = props.reusePreviousData ? dashboardDetailState.widgetDataMap[target.id] : undefined;
                     const data = await targetWidgetRef.initWidget(prevData);
-                    state.widgetDataMap[target.id] = data;
+                    dashboardDetailState.widgetDataMap[target.id] = data;
                     state.initiatedWidgetMap[target.id] = data;
                 }
             }
@@ -190,12 +188,28 @@ export default defineComponent<Props>({
         watch(() => state.dashboardVariablesSchema, () => {
             if (props.editMode) validateAllWidget();
         }, { immediate: true });
-        watch([() => state.dashboardSettings.date_range, () => state.dashboardSettings.currency], () => {
-            refreshAllWidget();
-        }, { deep: true });
 
 
-        const refreshAllWidget = async () => {
+        let dashboardChangedTime;
+        watch(() => state.dashboardId, () => {
+            dashboardChangedTime = new Date().getTime();
+        });
+        watch(() => state.dashboardSettings, (dashboardSettings, prevSettings) => {
+            // escape if there is no initiated widget
+            if (isEmpty(state.initiatedWidgetMap)) return;
+
+            // escape if just initiated
+            if (new Date().getTime() - dashboardChangedTime < 300) return;
+
+            // refresh if date range is changed
+            if (!isEqual(dashboardSettings.date_range, prevSettings?.date_range)) {
+                refreshAllWidget();
+            }
+        });
+
+
+        const refreshAllWidget = debounce(async () => {
+            dashboardDetailState.loadingWidgets = true;
             const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
 
             const filteredRefs = state.widgetRef.filter((comp: WidgetComponent|null) => {
@@ -210,10 +224,11 @@ export default defineComponent<Props>({
             results.forEach((result, idx) => {
                 if (result.status === 'fulfilled') {
                     const widgetKey = filteredRefs[idx]?.$el?.id;
-                    state.widgetDataMap[widgetKey] = result.value;
+                    dashboardDetailState.widgetDataMap[widgetKey] = result.value;
                 }
             });
-        };
+            dashboardDetailState.loadingWidgets = false;
+        }, 150);
         expose({
             refreshAllWidget,
         });

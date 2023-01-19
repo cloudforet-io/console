@@ -1,5 +1,5 @@
 <template>
-    <div v-on-click-outside="hideContextMenu"
+    <div ref="containerRef"
          class="variable-more-button-dropdown"
          :class="{'open-menu': visibleMenu}"
     >
@@ -14,7 +14,6 @@
                         ref="contextMenuRef"
                         class="variables-menu"
                         searchable
-                        use-fixed-menu-style
                         :search-text="state.searchText"
                         :style="contextMenuStyle"
                         :menu="refinedMenu"
@@ -41,11 +40,10 @@
 </template>
 
 <script lang="ts" setup>
-// CAUTION: this vOnClickOutside is using !! Please do not remove.
-import { vOnClickOutside } from '@vueuse/components';
+import { onClickOutside } from '@vueuse/core';
 import {
     computed,
-    reactive, toRef, toRefs, watch,
+    reactive, ref, toRef, toRefs, watch,
 } from 'vue';
 
 import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
@@ -91,14 +89,12 @@ const {
     visibleMenu,
     refinedMenu,
     contextMenuStyle,
-    showContextMenu,
     hideContextMenu,
     focusOnContextMenu,
     initiateMenu,
     reloadMenu,
     showMoreMenu,
 } = useContextMenuController({
-    useFixedStyle: true,
     targetRef: toRef(state, 'targetRef'),
     contextMenuRef: toRef(state, 'contextMenuRef'),
     useMenuFiltering: true,
@@ -108,6 +104,9 @@ const {
     menu: toRef(state, 'variableList'),
     pageSize: 10,
 });
+
+const containerRef = ref<HTMLElement|null>(null);
+onClickOutside(containerRef, hideContextMenu);
 
 // helper
 const updateVariablesUse = () => {
@@ -133,7 +132,7 @@ const handleClickButton = () => {
         hideContextMenu();
     } else {
         state.selectedForUpdate = state.selected;
-        showContextMenu(); // update reorderedMenu automatically
+        focusOnContextMenu();
     }
 };
 
@@ -181,6 +180,8 @@ const {
     /* custom design-system component - p-context-menu */
     :deep(.variables-menu) {
         .label-wrapper {
+            min-width: 7rem;
+            width: max-content;
             max-width: 22.5rem;
         }
     }

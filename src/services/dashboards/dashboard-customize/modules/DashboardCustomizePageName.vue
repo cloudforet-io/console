@@ -9,7 +9,8 @@
                            :invalid-text="invalidTexts.nameInput"
             >
                 <template #default>
-                    <input v-if="state.editMode"
+                    <input v-show="state.editMode"
+                           ref="inputRef"
                            v-on-click-outside="handleEnter"
                            class="name-input"
                            :value="nameInput"
@@ -17,7 +18,7 @@
                            @keydown.esc="handleEscape"
                            @keydown.enter="handleEnter"
                     >
-                    <span v-else
+                    <span v-if="!state.editMode"
                           class="title-area"
                           @click="handleClickTitle"
                     >
@@ -40,6 +41,7 @@
                         :invalid="invalid"
                         :placeholder="state.placeHolder"
                         :value="nameInput"
+                        :is-focused.sync="isTextInputFocused"
                         @update:value="handlePTextInput"
                     />
                 </template>
@@ -50,7 +52,10 @@
 <script setup lang="ts">
 // Below directive is used. Do not remove!!!
 import { vOnClickOutside } from '@vueuse/components';
-import { computed, reactive } from 'vue';
+import { useFocus } from '@vueuse/core';
+import {
+    computed, nextTick, reactive, ref,
+} from 'vue';
 
 import {
     PFieldGroup, PPageTitle, PSkeleton, PTextInput,
@@ -98,6 +103,10 @@ const {
     },
 });
 
+const inputRef = ref<HTMLElement|null>(null);
+const { focused: isInputFocused } = useFocus(inputRef, { initialValue: true });
+const isTextInputFocused = ref(true);
+
 // handlers for <p-text-input /> (creating feature)
 const handlePTextInput = (t: string) => {
     setForm('nameInput', t);
@@ -107,8 +116,10 @@ const handlePTextInput = (t: string) => {
 };
 
 // handlers for <input /> (customizing feature)
-const handleClickTitle = () => {
+const handleClickTitle = async () => {
     state.editMode = true;
+    await nextTick();
+    isInputFocused.value = true;
 };
 const handleInput = (e: InputEvent): void => {
     setForm('nameInput', (e.target as HTMLInputElement).value);

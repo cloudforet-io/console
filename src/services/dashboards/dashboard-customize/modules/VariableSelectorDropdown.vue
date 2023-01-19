@@ -1,12 +1,12 @@
 <template>
-    <div v-on-click-outside="hideContextMenu"
+    <div ref="containerRef"
          class="dashboard-variable-dropdown"
          :class="{ 'open-menu': visibleMenu }"
     >
         <button ref="targetRef"
                 class="dropdown-box"
                 :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
-                @click="toggleContextMenu"
+                @click="toggleMenu"
         >
             <span class="variable-contents">
                 <span class="variable-label">{{ variableName }}</span>
@@ -42,7 +42,6 @@
                         ref="contextMenuRef"
                         class="options-menu"
                         searchable
-                        use-fixed-menu-style
                         :search-text="state.searchText"
                         :style="contextMenuStyle"
                         :menu="refinedMenu"
@@ -59,11 +58,10 @@
 </template>
 
 <script setup lang="ts">
-// CAUTION: this vOnClickOutside is using !! Please do not remove.
-import { vOnClickOutside } from '@vueuse/components';
+import { onClickOutside } from '@vueuse/core';
 import {
     computed,
-    reactive, toRef, toRefs, watch,
+    reactive, ref, toRef, toRefs, watch,
 } from 'vue';
 
 import {
@@ -123,14 +121,12 @@ const {
     visibleMenu,
     refinedMenu,
     contextMenuStyle,
-    toggleContextMenu,
     hideContextMenu,
     focusOnContextMenu,
     initiateMenu,
     reloadMenu,
     showMoreMenu,
 } = useContextMenuController({
-    useFixedStyle: true,
     targetRef: toRef(state, 'targetRef'),
     contextMenuRef: toRef(state, 'contextMenuRef'),
     useMenuFiltering: true,
@@ -140,6 +136,14 @@ const {
     menu: toRef(state, 'options'),
     pageSize: 10,
 });
+
+const toggleMenu = () => {
+    if (visibleMenu.value) hideContextMenu();
+    else focusOnContextMenu();
+};
+
+const containerRef = ref<HTMLElement|null>(null);
+onClickOutside(containerRef, hideContextMenu);
 
 // event
 const handleClearSelected = () => {
@@ -253,6 +257,8 @@ const {
     /* custom design-system component - p-context-menu */
     :deep(.options-menu) {
         .label-wrapper {
+            min-width: 7rem;
+            width: max-content;
             max-width: 22.5rem;
         }
     }

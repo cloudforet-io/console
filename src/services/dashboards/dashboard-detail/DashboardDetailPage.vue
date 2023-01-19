@@ -18,10 +18,12 @@
                       #title-right-extra
             >
                 <span class="dashboard-title-icon-buttons-wrapper">
-                    <favorite-button :item-id="props.dashboardId"
-                                     :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                     scale="0.8"
-                    />
+                    <div class="favorite-wrapper">
+                        <favorite-button :item-id="props.dashboardId"
+                                         :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                         scale="0.8"
+                        />
+                    </div>
                     <p-icon-button name="ic_edit-text"
                                    width="1.5rem"
                                    height="1.5rem"
@@ -46,14 +48,17 @@
         <div class="filter-box">
             <dashboard-labels :label-list="dashboardDetailState.labels" />
             <dashboard-toolset
-                :currency.sync="dashboardDetailState.settings.currency"
-                :date-range.sync="dashboardDetailState.settings.date_range"
+                :currency="dashboardDetailState.settings.currency"
+                :date-range="dashboardDetailState.settings.date_range"
+                @update:currency="handleUpdateCurrency"
+                @update:date-range="handleUpdateDateRange"
             />
         </div>
         <p-divider class="divider" />
         <div class="dashboard-selectors">
             <dashboard-variables-selector class="variable-selector-wrapper" />
-            <dashboard-refresh-dropdown :interval-option.sync="dashboardDetailState.settings.refresh_interval_option"
+            <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
+                                        :interval-option.sync="dashboardDetailState.settings.refresh_interval_option"
                                         :loading="dashboardDetailState.loadingWidgets"
                                         @refresh="handleRefresh"
             />
@@ -75,7 +80,7 @@
 
 <script setup lang="ts">
 import {
-    computed, onUnmounted,
+    computed, onMounted, onUnmounted,
     reactive, ref, watch,
 } from 'vue';
 
@@ -186,10 +191,21 @@ const handleVisibleCloneModal = () => {
 };
 
 // else
-const handleRefresh = async () => {
-    dashboardDetailState.loadingWidgets = true;
-    if (widgetContainerRef.value) await widgetContainerRef.value.refreshAllWidget();
-    dashboardDetailState.loadingWidgets = false;
+const handleRefresh = () => {
+    if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
+};
+
+const handleUpdateCurrency = (currency) => {
+    dashboardDetailState.settings = {
+        ...dashboardDetailState.settings,
+        currency,
+    };
+};
+const handleUpdateDateRange = (dateRange) => {
+    dashboardDetailState.settings = {
+        ...dashboardDetailState.settings,
+        date_range: dateRange,
+    };
 };
 
 /* init */
@@ -250,6 +266,13 @@ watch(() => props.dashboardId, (_dashboardId) => {
 onUnmounted(() => {
     dashboardDetailStore.revertDashboardData();
 });
+
+onMounted(() => {
+    /*
+    Empty widget data map which is used in DashboardWidgetContainer to reuse data and not to call api when going to customize page.
+     */
+    dashboardDetailState.widgetDataMap = {};
+});
 </script>
 
 <style lang="postcss" scoped>
@@ -260,7 +283,12 @@ onUnmounted(() => {
     display: inline-flex;
     gap: 0.5rem;
     align-items: center;
-    margin-left: 0.25rem;
+    .favorite-wrapper {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+    }
 }
 .divider {
     @apply mb-6;
