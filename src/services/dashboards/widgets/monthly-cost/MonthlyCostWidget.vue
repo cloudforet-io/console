@@ -15,7 +15,7 @@
                                loader-type="skeleton"
                 >
                     <div class="cost-value">
-                        {{ currencyMoneyFormatter(state.currentMonthlyCost, state.currency) }}
+                        {{ currencyMoneyFormatter(state.currentMonthlyCost, state.currency, props.currencyRates) }}
                     </div>
                     <div class="cost-info">
                         <p-i v-if="typeof state.isDecreased === 'boolean'"
@@ -26,7 +26,7 @@
                              :color="state.isDecreased ? green[700] : red[500]"
                              original
                         />
-                        {{ currencyMoneyFormatter(state.differenceCost, state.currency) }}
+                        {{ currencyMoneyFormatter(state.differenceCost, state.currency, props.currencyRates) }}
                         <p-badge :style-type="state.isDecreased === undefined ? 'gray200' : state.isDecreased ? 'green200' : 'alert'"
                                  shape="square"
                         >
@@ -60,7 +60,7 @@
                                loader-type="skeleton"
                 >
                     <div class="cost-value">
-                        {{ currencyMoneyFormatter(state.previousMonthlyCost, state.currency) }}
+                        {{ currencyMoneyFormatter(state.previousMonthlyCost, state.currency, props.currencyRates) }}
                     </div>
                     <div class="cost-info">
                         {{ state.previousMonth.format('MMM YYYY') }}
