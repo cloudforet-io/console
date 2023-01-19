@@ -1,7 +1,7 @@
 <template>
     <p-context-menu ref="contextMenuRef"
                     class="gnb-suggestion-list"
-                    :menu="items"
+                    :menu="refinedItems"
                     no-select-indication
                     @keyup:up:end="$emit('move-focus-end', 'UPWARD')"
                     @keyup:down:end="$emit('move-focus-end', 'DOWNWARD')"
@@ -22,12 +22,12 @@
             >
                 <span class="image">
                     <p-lazy-img v-if="item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE"
-                                :src="item.icon || ''"
+                                :src="item.itemIcon || ''"
                                 width="1rem"
                                 height="1rem"
                     />
                     <p-i v-else
-                         :name="item.icon"
+                         :name="item.itemIcon"
                          width="1rem"
                          height="1rem"
                     />
@@ -76,6 +76,7 @@
 <script lang="ts">
 import type { PropType, SetupContext } from 'vue';
 import {
+    computed,
     defineComponent, onUnmounted,
     reactive, toRefs, watch,
 } from 'vue';
@@ -133,6 +134,7 @@ export default defineComponent<Props>({
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             contextMenuRef: null as null | any,
+            refinedItems: computed(() => props.items.map((d) => ({ ...d, icon: undefined, itemIcon: d.icon }))),
         });
 
         const handleSelect = (item, index) => {
