@@ -1,3 +1,10 @@
+# [2.0.0-beta.21](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.20...v2.0.0-beta.21) (2023-01-19)
+
+
+### Features
+
+* **board:** custom overlay content slot ([#246](https://github.com/cloudforet-io/mirinae/issues/246)) ([13735a1](https://github.com/cloudforet-io/mirinae/commit/13735a1670f3a79e728b92870841e7d2893cb1e6))
+
 # [2.0.0-beta.20](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.19...v2.0.0-beta.20) (2023-01-19)
 
 
