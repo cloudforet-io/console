@@ -4,7 +4,6 @@
                        :loading="props.loading"
                        :data="props.items"
                        :loader-backdrop-opacity="1"
-                       show-data-from-scratch
                        disable-empty-case
         >
             <template #default="{isEmpty}">
