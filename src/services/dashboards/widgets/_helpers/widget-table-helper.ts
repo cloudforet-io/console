@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { sortBy } from 'lodash';
+import { cloneDeep, sortBy } from 'lodash';
 
 import type { AllReferenceTypeInfo, ReferenceType } from '@/store/modules/reference/type';
 
@@ -46,6 +46,34 @@ export const getWidgetTableDateFields = (
         count += 1;
     }
     return dateFields;
+};
+
+/**
+ * @name getRefinedDateTableData
+ * @description set data of empty date. This is necessary for index-oriented fields, like `usd_cost_sum.0.value`
+ * @example (before) [{ date: '2023-01', provider: 'aws' }]
+ * @example (after) [{ date: '2023-01', provider: 'aws' }, { date: '2022-10' }, { date: '2022-11' }, { date: '2022-12' }]
+ */
+export const getRefinedDateTableData = (
+    results: CostAnalyzeDataModel['results'],
+    dateRange: DateRange,
+    fieldsKey = 'usd_cost_sum',
+): CostAnalyzeDataModel['results'] => {
+    if (!results?.length) return [];
+    const _results = cloneDeep(results);
+    results.forEach((result, idx) => {
+        const _fieldsData = cloneDeep(result[fieldsKey]);
+        let now = dayjs.utc(dateRange.start).clone();
+        while (now.isSameOrBefore(dayjs.utc(dateRange.end), 'month')) {
+            const _date = now.format('YYYY-MM');
+            if (!_fieldsData.filter((d) => d.date === _date)?.length) {
+                _fieldsData.push({ date: _date });
+            }
+            now = now.add(1, 'month');
+        }
+        _results[idx][fieldsKey] = _fieldsData;
+    });
+    return _results;
 };
 
 export const sortTableData = (rawData: CostAnalyzeDataModel['results'], sortKey = 'date'): CostAnalyzeDataModel['results'] => {
