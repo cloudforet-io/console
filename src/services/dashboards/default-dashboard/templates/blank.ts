@@ -8,6 +8,7 @@ export const blankPreview: DefaultDashboardPreviewConfig = {
     description: {
         icon: 'ic_dashboard-template_blank',
         preview_image: '',
+        text: 'Build your own dashboard from scratch.',
     },
 };
 
