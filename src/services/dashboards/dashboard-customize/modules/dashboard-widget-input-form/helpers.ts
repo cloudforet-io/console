@@ -16,11 +16,15 @@ const refineFilterOptionSchema = (propertyName: string, propertySchema: JsonSche
 
     // use reference store data if exists
     const referenceData: ReferenceMap = referenceStoreState[referenceType];
-    const menuItems: MenuItem[] = Object.values(referenceData).map((d) => ({
-        name: d.key, label: d.label,
-    }));
+    let menuItems: MenuItem[] = [];
+    let _enum: string[] = [];
+    if (referenceData) {
+        menuItems = Object.values(referenceData).map((d) => ({
+            name: d.key, label: d.label,
+        }));
+        _enum = Object.keys(referenceData);
+    }
 
-    const _enum = Object.keys(referenceData);
     if (propertySchema.type === 'array') {
         return {
             ...propertySchema,
