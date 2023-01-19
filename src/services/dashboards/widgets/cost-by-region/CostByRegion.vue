@@ -325,13 +325,14 @@ defineExpose<WidgetExpose<FullData>>({
 .cost-by-region {
     .content-wrapper {
         @apply grid grid-cols-12;
+        grid-column-gap: 1rem;
         height: 100%;
-        padding: 0 1.5rem;
         .chart-loader {
             @apply col-span-5;
             height: 100%;
             padding-bottom: 1rem;
             .chart {
+                @apply border border-gray-200;
                 height: 90%;
             }
             .legend-wrapper {

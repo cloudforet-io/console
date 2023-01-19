@@ -210,7 +210,7 @@ defineExpose<WidgetExpose<Data>>({
         width: 100%;
         height: 100%;
         position: relative;
-        padding: 0 1.5rem 1rem 1.5rem;
+        padding-bottom: 1rem;
         .waffle-chart {
             display: flex;
             height: 87%;

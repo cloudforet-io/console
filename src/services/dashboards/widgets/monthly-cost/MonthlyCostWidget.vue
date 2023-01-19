@@ -255,7 +255,6 @@ defineExpose<WidgetExpose<Data>>({
 .monthly-cost {
     display: flex;
     flex-direction: column;
-    padding: 0 1.5rem;
     .cost {
         @apply text-gray-900;
         line-height: 1.25;

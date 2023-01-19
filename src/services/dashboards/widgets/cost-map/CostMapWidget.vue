@@ -229,7 +229,7 @@ defineExpose<WidgetExpose<TreemapChartData['children']>>({
 </script>
 <style lang="postcss" scoped>
 .cost-map {
-    padding: 0 1.25rem 1.25rem;
+    padding-bottom: 1.25rem;
 }
 
 .chart-wrapper {

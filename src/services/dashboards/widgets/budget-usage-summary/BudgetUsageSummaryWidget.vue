@@ -283,7 +283,6 @@ defineExpose<WidgetExpose<Data[]>>({
 </script>
 <style lang="postcss" scoped>
 .budget-usage-summary {
-    padding: 0 1.5rem;
     height: 100%;
     min-height: 10rem;
     .budget {
