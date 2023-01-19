@@ -121,8 +121,25 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         validationState.widgetValidMap = {};
     };
 
-    const revertDashboardData = () => {
-        setDashboardInfo(originState.dashboardInfo);
+    const revertDashboardFilterData = () => {
+        const originDashboardInfo = originState.dashboardInfo;
+        state.settings = {
+            date_range: {
+                enabled: originDashboardInfo.settings?.date_range?.enabled ?? false,
+                start: originDashboardInfo.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM-01'),
+                end: originDashboardInfo.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM-DD'),
+            },
+            currency: {
+                enabled: originDashboardInfo.settings?.currency?.enabled ?? false,
+                value: originDashboardInfo.settings.currency?.value ?? CURRENCY.USD,
+            },
+            refresh_interval_option: originDashboardInfo.settings?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
+        };
+        state.variablesSchema = {
+            properties: { ...managedDashboardVariablesSchema.properties, ...originDashboardInfo.variables_schema?.properties ?? {} },
+            order: union(managedDashboardVariablesSchema.order, originDashboardInfo.variables_schema?.order ?? []),
+        };
+        state.variables = originDashboardInfo.variables ?? {};
     };
 
     const setDashboardInfo = (dashboardInfo?: DashboardModel): void => {
@@ -214,6 +231,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         delete validationState.widgetValidMap[widgetKey];
     };
     const resetVariables = () => {
+        console.log('reset');
         const originProperties = { ...managedDashboardVariablesSchema.properties, ...originState.dashboardInfo.variables_schema.properties };
         const originOrder = union(managedDashboardVariablesSchema.order, originState.dashboardInfo.variables_schema.order);
         const originVariables = originState.dashboardInfo.variables;
@@ -248,7 +266,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state,
         originState,
         validationState,
-        revertDashboardData,
+        revertDashboardFilterData,
         getDashboardInfo,
         setDashboardInfo,
         toggleWidgetSize,
