@@ -5,7 +5,6 @@
     >
         <div ref="targetRef"
              class="input-container"
-             :tabindex="disabled || $attrs.readonly ? -1 : 0"
              :class="{invalid: isSelectedInvalid || invalid, disabled}"
              @keyup.down="focusOnContextMenu(0)"
              @keyup.esc.capture.stop="hideMenu"
@@ -39,6 +38,7 @@
                 >
                     <input v-bind="$attrs"
                            ref="inputRef"
+                           :tabindex="disabled || $attrs.readonly ? -1 : 0"
                            :type="inputType"
                            :value="displayedInputValue"
                            :disabled="disabled"
@@ -429,6 +429,10 @@ export default defineComponent<TextInputProps>({
                 initiateMenu();
             }
         };
+        // Notice: Focus event below is used in console.
+        const focus = () => {
+            inputRef.value?.focus();
+        };
         const handleInputKeyup = (event) => {
             if ((event.key === 'ArrowDown' || event.key === 'Down') && props.useAutoComplete) {
                 if (refinedMenu.value.length === 0) return;
@@ -512,6 +516,7 @@ export default defineComponent<TextInputProps>({
             handleInputFocus,
             handleInputKeyup,
             handleInputKeydown,
+            focus,
         };
     },
 });
