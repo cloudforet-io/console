@@ -1,11 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { excludePropertiesFromDashboardCommonWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-options-schema-helper';
 
-const {
-    default_properties,
-    inheritable_properties,
-    schema,
-} = excludePropertiesFromDashboardCommonWidgetConfig(['filters.provider']);
 
 const awsPersonalHealthDashboardWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsPersonalHealthDashboard',
@@ -24,12 +18,9 @@ const awsPersonalHealthDashboardWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options_schema: {
-        default_properties,
-        inheritable_properties,
         schema: {
             type: 'object',
             properties: {
-                ...schema.properties,
             },
         },
     },
