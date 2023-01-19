@@ -31,6 +31,7 @@
                 <p-button class="manage-variable-button"
                           style-type="secondary"
                           icon-left="ic_setting"
+                          :disabled="isDetailPage"
                           @click="handleOpenOverlay"
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE') }}
@@ -57,6 +58,7 @@ import { SpaceRouter } from '@/router';
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
@@ -84,6 +86,8 @@ const state = reactive({
     // Since variable's use changes after the dropdown is closed, create state to store the previous state and use it.
     selectedForUpdate: [] as MenuItem[],
 });
+const currentPageName = SpaceRouter.router.currentRoute.name;
+const isDetailPage = (currentPageName === DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME) || (currentPageName === DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME);
 
 const {
     visibleMenu,
