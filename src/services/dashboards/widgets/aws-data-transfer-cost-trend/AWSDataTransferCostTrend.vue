@@ -73,6 +73,7 @@ import {
     getRefinedXYChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import {
+    getRefinedDateTableData,
     getWidgetTableDateFields, sortTableData,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
@@ -178,7 +179,7 @@ const fetchData = async (): Promise<Data> => {
             },
         });
         const _refinedData = getRefinedTableData(results);
-        return sortTableData(_refinedData);
+        return sortTableData(getRefinedDateTableData(_refinedData, state.dateRange));
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];

@@ -86,7 +86,7 @@ import {
 // eslint-disable-next-line import/no-cycle
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import {
-    getReferenceTypeOfGroupBy, getWidgetTableDateFields, sortTableData,
+    getReferenceTypeOfGroupBy, getRefinedDateTableData, getWidgetTableDateFields, sortTableData,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
@@ -175,7 +175,7 @@ const fetchData = async (): Promise<FullData> => {
                 ...apiQueryHelper.data,
             },
         });
-        return { results: sortTableData(results), more };
+        return { results: sortTableData(getRefinedDateTableData(results, state.dateRange)), more };
     } catch (e) {
         ErrorHandler.handleError(e);
         return { results: [], more: false };
