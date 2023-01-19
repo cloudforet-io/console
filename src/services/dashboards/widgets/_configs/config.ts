@@ -86,7 +86,6 @@ export interface WidgetConfig {
 
 export interface WidgetOptionsSchema {
     default_properties?: string[];
-    inheritable_properties?: string[];
     schema: JsonSchema | any;
 }
 
