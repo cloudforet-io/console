@@ -47,9 +47,8 @@
             </p-json-schema-form>
         </p-data-loader>
         <dashboard-widget-more-options :widget-config-id="widgetConfigId"
-                                       :inheritable-properties="inheritableProperties"
-                                       @add-schema-property="handleMoreOptionAdd"
-                                       @remove-schema-property="handleMoreOptionRemove"
+                                       :selected-properties="widgetFormState.defaultSchemaProperties"
+                                       @update:selected-properties="handleUpdateDefaultSchemaProperties"
         />
     </div>
 </template>
@@ -62,16 +61,13 @@ import {
 import {
     PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import { cloneDeep, isEmpty } from 'lodash';
-
-import type { ReferenceMap } from '@/store/modules/reference/type';
+import { cloneDeep, isEmpty, union } from 'lodash';
 
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+
 import {
     useReferenceStore,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/composables/use-reference-store';
@@ -80,12 +76,16 @@ import {
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/composables/use-widget-title-input';
 import DashboardWidgetMoreOptions
     from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/DashboardWidgetMoreOptions.vue';
+import {
+    getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
+} from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/helpers';
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type {
-    DashboardLayoutWidgetInfo,
+    DashboardLayoutWidgetInfo, WidgetConfig,
     WidgetFiltersMap,
     WidgetOptionsSchema,
+    InheritOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import type {
@@ -128,20 +128,22 @@ export default defineComponent<Props>({
         const widgetFormState = widgetFormStore.state;
 
         const state = reactive({
-            widgetConfig: computed(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
+            widgetConfig: computed<WidgetConfig|undefined>(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
             widgetOptionsJsonSchema: {} as JsonSchema,
-            //
             schemaFormData: {},
-            isSchemaFormValid: undefined,
-            isAllValid: computed(() => state.isSchemaFormValid && isTitleValid.value),
-            inheritableProperties: computed<string[]>(() => Object.entries(widgetFormState.inheritOptions ?? {})
+            // inherit
+            inheritOptions: {} as InheritOptions,
+            inheritableProperties: computed<string[]>(() => Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
                 .filter(([, inheritOption]) => !!inheritOption.enabled)
                 .map(([propertyName]) => propertyName)),
             inheritOptionsErrorMap: computed<InheritOptionsErrorMap>(() => getWidgetInheritOptionsErrorMap(
                 widgetFormState.inheritOptions,
-                state.widgetConfig.options_schema.schema,
+                state.widgetConfig?.options_schema?.schema,
                 dashboardDetailState.variablesSchema,
             )),
+            // validation
+            isSchemaFormValid: undefined,
+            isAllValid: computed(() => state.isSchemaFormValid && isTitleValid.value),
         });
 
         /* title form validation */
@@ -153,29 +155,29 @@ export default defineComponent<Props>({
         const { referenceStoreState } = useReferenceStore();
 
         /* more options */
-        const handleMoreOptionAdd = (propertyName: string) => {
-            const propertySchema = state.widgetConfig?.options_schema?.schema?.properties[propertyName];
-            if (!propertySchema) return;
-            const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
-            _widgetOptionsJsonSchema.properties[propertyName] = refineOptionSchema(propertyName, propertySchema);
-            state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
-        };
-        const handleMoreOptionRemove = (propertyName: string) => {
-            const propertySchema = state.widgetConfig?.options_schema?.schema?.properties[propertyName];
-            if (!propertySchema) return;
-
-            // update widget options json schema
-            const _widgetOptionsJsonSchema = cloneDeep(state.widgetOptionsJsonSchema);
-            delete _widgetOptionsJsonSchema.properties[propertyName];
-            state.widgetOptionsJsonSchema = _widgetOptionsJsonSchema;
+        const handleUpdateDefaultSchemaProperties = (properties: string[]) => {
+            widgetFormState.defaultSchemaProperties = properties;
 
             // update inherit options
-            widgetFormState.inheritOptions = { ...widgetFormState.inheritOptions, [propertyName]: { enabled: false } };
+            const inheritOptions = {};
+            const origin = widgetFormState.inheritOptions ?? {};
+            Object.keys(origin).forEach((name) => {
+                if (properties.includes(name)) inheritOptions[name] = origin[name];
+                else inheritOptions[name] = { enabled: false };
+            });
+            widgetFormState.inheritOptions = inheritOptions;
 
-            state.schemaFormData = { ...state.schemaFormData, [propertyName]: undefined };
+            // update schema
+            state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
+                referenceStoreState,
+                state.widgetConfig?.options_schema ?? {},
+                dashboardDetailState.variablesSchema,
+                widgetFormState.inheritOptions,
+                properties,
+            );
         };
 
-        /* Util */
+        /* utils */
         const isSelected = (selectedItem: SelectDropdownMenu | FilterableDropdownMenuItem[]): boolean => {
             if (Array.isArray(selectedItem)) return !!selectedItem.length;
             return selectedItem && !isEmpty(selectedItem);
@@ -206,6 +208,18 @@ export default defineComponent<Props>({
             });
             return formData;
         };
+        const getDefaultSchemaPropertiesFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
+            /*
+                TODO: After 1.11.0 QA duration, if statement below must be deleted.
+                This is compatible code to guard the case when default_schema_properties is undefined.
+                After release, this case doesn't needed to be considered.
+            */
+            if (!widgetInfo.default_schema_properties) {
+                return getRefinedDefaultSchemaProperties(state.widgetConfig?.options_schema ?? {});
+            }
+            return widgetInfo.default_schema_properties ?? [];
+        };
+
 
         /* inherit */
         const handleChangeInheritToggle = (propertyName: string, { value }) => {
@@ -217,7 +231,7 @@ export default defineComponent<Props>({
                 ...state.widgetOptionsJsonSchema,
                 properties: {
                     ...state.widgetOptionsJsonSchema.properties,
-                    [propertyName]: getWidgetOptionSchema(propertyName, originPropertySchema, dashboardDetailState.variablesSchema, value),
+                    [propertyName]: getWidgetOptionSchema(propertyName, originPropertySchema, dashboardDetailState.variablesSchema, referenceStoreState, value),
                 },
             };
 
@@ -226,108 +240,83 @@ export default defineComponent<Props>({
         };
 
         /* schema refining helpers */
-        const refineOptionSchemaByVariablesSchema = (propertySchema: JsonSchema['properties'], variablesSchema: DashboardVariablesSchema) => {
-            const availableVariables = Object.entries(variablesSchema.properties)
-                .filter(([, d]) => {
-                    if (!d.use) return false;
-                    const variableType = d.selection_type === 'MULTI' ? 'array' : 'string';
-                    return propertySchema.type === variableType;
-                });
-            const _enum = availableVariables.map(([key]) => key);
-            return {
-                title: propertySchema.title,
-                type: 'string',
-                enum: _enum.length ? _enum : [null],
-                menuItems: availableVariables.map(([key, val]) => ({
-                    name: key, label: val.name,
-                })),
-                default: undefined,
-            };
-        };
-        const refineFilterOptionSchema = (propertyName: string, propertySchema: JsonSchema['properties']): JsonSchema['properties'] => {
-            const referenceType = propertyName.replace('filters.', '');
+        const getRefinedDefaultSchemaProperties = (widgetOptionsSchema: WidgetOptionsSchema): string[] => {
+            const requiredProperties: string[] = widgetOptionsSchema.schema.required ?? [];
+            const defaultProperties: string[] = widgetOptionsSchema.default_properties ?? [];
+            const allProperties = union(requiredProperties, defaultProperties);
 
-            // use reference store data if exists
-            const referenceData: ReferenceMap = referenceStoreState[referenceType];
-            const menuItems: MenuItem[] = Object.values(referenceData).map((d) => ({
-                name: d.key, label: d.label,
-            }));
+            // generate maps. { [propertyName: string]: number(= index) }
+            const requiredIdxMap = {};
+            requiredProperties.forEach((name, idx) => { requiredIdxMap[name] = idx; });
+            const defaultIdxMap = {};
+            defaultProperties.forEach((name, idx) => { defaultIdxMap[name] = idx; });
 
-            const _enum = Object.keys(referenceData);
-            if (propertySchema.type === 'array') {
-                return {
-                    ...propertySchema,
-                    items: { enum: _enum.length ? _enum : [null] },
-                    menuItems,
-                };
-            }
-            return {
-                ...propertySchema,
-                enum: _enum.length ? _enum : [null],
-                menuItems,
-            };
-        };
-        const refineOptionSchema = (propertyName: string, propertySchema: JsonSchema['properties']): JsonSchema['properties'] => {
-            if (propertyName.startsWith('filters.')) return refineFilterOptionSchema(propertyName, propertySchema);
-            return propertySchema;
-        };
-        const getWidgetOptionSchema = (propertyName: string, propertySchema: JsonSchema['properties'], variablesSchema: DashboardVariablesSchema, isInherit: boolean) => {
-            let refinedPropertySchema;
-            if (isInherit) {
-                // inherit case
-                refinedPropertySchema = refineOptionSchemaByVariablesSchema(propertySchema, variablesSchema);
-            } else {
-                // non inherit case
-                refinedPropertySchema = refineOptionSchema(propertyName, propertySchema);
-            }
-            return refinedPropertySchema;
-        };
-        const getRefinedWidgetOptionsSchema = (widgetOptionsSchema: WidgetOptionsSchema, variablesSchema: DashboardVariablesSchema): JsonSchema => {
-            const defaultProperties = widgetOptionsSchema?.default_properties ?? [];
-            const schema = widgetOptionsSchema?.schema;
+            return allProperties.sort((a, b) => {
+                if (requiredIdxMap[a] !== undefined) {
+                    // if both are required, follow required index order
+                    if (requiredIdxMap[b] !== undefined) return requiredIdxMap[a] > requiredIdxMap[b] ? 1 : -1;
+                    // otherwise, required item comes before
+                    return -1;
+                }
+                // if one is default and one is required, required one comes before
+                if (requiredIdxMap[b] !== undefined) return 1;
 
-            const refinedJsonSchema = {
-                type: 'object',
-                properties: {},
-                required: schema?.required ?? [],
-            } as JsonSchema;
-            if (!schema?.properties) return refinedJsonSchema;
-
-            // refine each property schema
-            Object.entries(schema.properties).forEach(([propertyName, propertySchema]) => {
-                // set properties declared in default_properties only
-                if (!defaultProperties.includes(propertyName)) return;
-                const isInherit = state.inheritableProperties.includes(propertyName);
-                refinedJsonSchema.properties[propertyName] = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, isInherit);
+                // if both are default, follow default index order
+                return defaultIdxMap[a] > defaultIdxMap[b] ? 1 : -1;
             });
-
-            return refinedJsonSchema;
         };
 
         /* states settings */
         const resetStates = () => {
+            // reset widget form store states
             widgetFormStore.$reset();
+            widgetFormState.defaultSchemaProperties = [];
+            widgetFormState.inheritOptions = {};
+            // reset states
             state.widgetOptionsJsonSchema = {
                 type: 'object',
                 properties: {},
                 required: [],
+                order: [],
             };
             state.schemaFormData = {};
             resetTitle();
         };
         const initStatesByWidgetConfig = (widgetConfigId: string) => {
+            const widgetOptionsSchema: WidgetOptionsSchema = state.widgetConfig?.options_schema ?? {};
+            // init widget form store states
             widgetFormState.widgetConfigId = widgetConfigId;
-            state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(state.widgetConfig.options_schema, dashboardDetailState.variablesSchema);
+            widgetFormState.inheritOptions = {};
+            widgetFormState.defaultSchemaProperties = getRefinedDefaultSchemaProperties(widgetOptionsSchema);
+            // init states
+            state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
+                referenceStoreState,
+                widgetOptionsSchema,
+                dashboardDetailState.variablesSchema,
+                widgetFormState.inheritOptions,
+                widgetFormState.defaultSchemaProperties,
+            );
         };
         const setStatesForEditMode = (widgetKey: string) => {
-            widgetFormStore.initWidgetForm(widgetKey);
-            const widgetInfo: DashboardLayoutWidgetInfo|undefined = widgetFormState.widgetInfo;
+            const widgetOptionsSchema = state.widgetConfig?.options_schema ?? {};
+
+            // set widget form store states
+            const widgetInfo = widgetFormStore.initWidgetForm(widgetKey);
             if (!widgetInfo) return;
 
             // init title
             updateTitle(widgetInfo.title);
+            // init widget form store states
+            widgetFormState.inheritOptions = widgetInfo.inherit_options ?? {};
+            widgetFormState.defaultSchemaProperties = getDefaultSchemaPropertiesFromWidgetInfo(widgetInfo);
             // init options schema
-            state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(state.widgetConfig.options_schema, dashboardDetailState.variablesSchema);
+            state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
+                referenceStoreState,
+                widgetOptionsSchema,
+                dashboardDetailState.variablesSchema,
+                widgetFormState.inheritOptions,
+                widgetFormState.defaultSchemaProperties,
+            );
             // init form data
             state.schemaFormData = getFormDataFromWidgetInfo(widgetInfo);
         };
@@ -363,6 +352,7 @@ export default defineComponent<Props>({
         }, { immediate: true });
 
         return {
+            widgetFormState,
             ...toRefs(state),
             /* widget title input */
             title,
@@ -372,8 +362,7 @@ export default defineComponent<Props>({
             /* reference store */
             referenceStoreState,
             /* more options */
-            handleMoreOptionAdd,
-            handleMoreOptionRemove,
+            handleUpdateDefaultSchemaProperties,
             /* inherit */
             handleChangeInheritToggle,
             //

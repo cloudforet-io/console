@@ -133,12 +133,13 @@ export interface WidgetOptions {
 
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
-    widget_key: string; // widget unique key
+    widget_key: string; // widget unique key. used for layout key binding.
     title: string; // widget title
     widget_options: WidgetOptions;
     size: WidgetSize;
     version: string; // widget config version
     inherit_options: InheritOptions; // inherit information for the widget option
+    default_schema_properties: string[]; // schema properties that are shown on widget form. updated when use add more options.
 }
 export type InheritOptions = Record<string, {
     enabled?: boolean;
