@@ -17,21 +17,23 @@
             <div class="content">
                 <slot name="content" />
             </div>
-            <div v-if="iconSetList.length > 0"
-                 class="right-overlay-wrapper desktop"
+            <div
+                class="right-overlay-wrapper desktop"
             >
                 <div class="overlay-contents">
-                    <slot name="overlay-contents" />
-                    <p-tooltip v-for="(iconAction, index) in iconSetList"
-                               :key="`${iconAction.iconName}-desktop-${index}`"
-                               class="overlay-icon-button"
-                               :contents="iconAction.tooltipText"
-                               position="bottom"
-                    >
-                        <p-icon-button :name="iconAction.iconName"
-                                       @click.stop="iconAction.eventAction"
-                        />
-                    </p-tooltip>
+                    <slot name="overlay-content" />
+                    <div v-if="iconSetList.length">
+                        <p-tooltip v-for="(iconAction, index) in iconSetList"
+                                   :key="`${iconAction.iconName}-desktop-${index}`"
+                                   class="overlay-icon-button"
+                                   :contents="iconAction.tooltipText"
+                                   position="bottom"
+                        >
+                            <p-icon-button :name="iconAction.iconName"
+                                           @click.stop="iconAction.eventAction"
+                            />
+                        </p-tooltip>
+                    </div>
                 </div>
             </div>
             <div v-if="iconSetList.length > 0"

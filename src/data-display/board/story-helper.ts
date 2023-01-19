@@ -120,6 +120,18 @@ export const getBoardArgTypes = (): ArgTypes => ({
             defaultValue: 'Board Item Custom Right Content',
         },
     },
+    itemOverlayContentSlot: {
+        name: 'itemOverlayContentSlot',
+        description: "Slot to replace board item's overlay-content to custom content",
+        defaultValue: 'Board Item Custom Item Overlay Content',
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+            defaultValue: 'Board Item Custom Item Overlay Content',
+        },
+    },
     // events
     itemClick: {
         name: 'item-click',

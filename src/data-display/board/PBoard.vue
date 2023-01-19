@@ -33,6 +33,11 @@
                           v-bind="{...$props, board, index}"
                     />
                 </template>
+                <template #overlay-content>
+                    <slot name="item-overlay-content"
+                          v-bind="{...$props, board, index}"
+                    />
+                </template>
             </p-board-item>
         </template>
     </div>
