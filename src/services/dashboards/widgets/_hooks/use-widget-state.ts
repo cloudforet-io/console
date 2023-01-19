@@ -59,7 +59,12 @@ const convertInheritOptionsToWidgetFiltersMap = (
 
         if (filterKey.startsWith('filters.')) {
             const _filterKey = filterKey.replace('filters.', '');
-            if (variableValue) result.filters[_filterKey] = [{ k: _filterKey, v: variableValue, o: '=' }];
+            if (variableValue) {
+                result.filters = {
+                    ...result.filters,
+                    [_filterKey]: [{ k: _filterKey, v: variableValue, o: '=' }],
+                };
+            }
         } else {
             result[filterKey] = variableValue;
         }
