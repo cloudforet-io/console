@@ -6,7 +6,7 @@
         <button ref="targetRef"
                 class="dropdown-box"
                 :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
-                @click="toggleContextMenu"
+                @click="toggleMenu"
         >
             <span class="variable-contents">
                 <span class="variable-label">{{ variableName }}</span>
@@ -123,7 +123,6 @@ const {
     visibleMenu,
     refinedMenu,
     contextMenuStyle,
-    toggleContextMenu,
     hideContextMenu,
     focusOnContextMenu,
     initiateMenu,
@@ -140,6 +139,11 @@ const {
     menu: toRef(state, 'options'),
     pageSize: 10,
 });
+
+const toggleMenu = () => {
+    if (visibleMenu.value) hideContextMenu();
+    else focusOnContextMenu();
+};
 
 // event
 const handleClearSelected = () => {

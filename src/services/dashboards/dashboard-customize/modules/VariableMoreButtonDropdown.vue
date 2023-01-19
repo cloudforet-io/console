@@ -91,7 +91,6 @@ const {
     visibleMenu,
     refinedMenu,
     contextMenuStyle,
-    showContextMenu,
     hideContextMenu,
     focusOnContextMenu,
     initiateMenu,
@@ -133,7 +132,7 @@ const handleClickButton = () => {
         hideContextMenu();
     } else {
         state.selectedForUpdate = state.selected;
-        showContextMenu(); // update reorderedMenu automatically
+        focusOnContextMenu();
     }
 };
 
