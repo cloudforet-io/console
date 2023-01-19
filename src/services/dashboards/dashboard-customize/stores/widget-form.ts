@@ -33,7 +33,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     const setFormData = (formData: any) => {
         if (!state.widgetConfigId) return;
         const widgetConfig = getWidgetConfig(state.widgetConfigId);
-        const widgetOptions: WidgetOptions = {
+        const _widgetOptions: WidgetOptions = {
             ...widgetConfig.options,
         };
         const widgetFiltersMap: WidgetOptions['filters'] = {};
@@ -50,12 +50,13 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             } else if (key.startsWith('filters.')) {
                 if (val) widgetFiltersMap[_propertyName] = [{ k: _propertyName, v: val, o: '=' }];
             } else {
-                widgetOptions[key] = val;
+                _widgetOptions[key] = val;
             }
         });
-        widgetOptions.filters = widgetFiltersMap;
+        _widgetOptions.filters = widgetFiltersMap;
 
-        state.widgetOptions = widgetOptions;
+        state.widgetOptions = _widgetOptions;
+        state.inheritOptions = _inheritOptions;
     };
 
     const initWidgetForm = (widgetKey: string): DashboardLayoutWidgetInfo|undefined => {
