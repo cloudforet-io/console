@@ -233,11 +233,12 @@ defineExpose<WidgetExpose<Data>>({
             @apply text-gray-600;
             position: absolute;
             bottom: 0;
-            display: flex;
-            gap: 0.75rem;
+            width: 100%;
             font-size: 0.75rem;
             padding-top: 1rem;
             .legend {
+                display: inline-block;
+                padding-right: 0.75rem;
                 .legend-icon {
                     display: inline-block;
                     width: 0.625rem;
