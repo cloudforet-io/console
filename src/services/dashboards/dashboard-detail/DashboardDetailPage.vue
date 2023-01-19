@@ -1,7 +1,11 @@
 <template>
     <div class="dashboard-detail-page">
         <p-page-title :title="dashboardDetailState.name">
-            <template v-if="dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+            <p-skeleton v-if="!dashboardDetailState.name"
+                        width="20rem"
+                        height="1.5rem"
+            />
+            <template v-if="dashboardDetailState.name && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
                 <p-i name="ic_public"
@@ -10,7 +14,9 @@
                      :color="PUBLIC_ICON_COLOR"
                 />
             </template>
-            <template #title-right-extra>
+            <template v-if="dashboardDetailState.name"
+                      #title-right-extra
+            >
                 <span class="dashboard-title-icon-buttons-wrapper">
                     <favorite-button :item-id="props.dashboardId"
                                      :favorite-type="FAVORITE_TYPE.DASHBOARD"
@@ -74,7 +80,7 @@ import {
 } from 'vue';
 
 import {
-    PDivider, PI, PIconButton, PPageTitle,
+    PDivider, PI, PIconButton, PPageTitle, PSkeleton,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
