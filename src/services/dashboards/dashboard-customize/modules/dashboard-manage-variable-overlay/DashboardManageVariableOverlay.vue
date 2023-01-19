@@ -82,6 +82,7 @@ import type {
     OverlayStatus,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 interface Props {
     visible: boolean;
@@ -92,6 +93,7 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailOriginState = dashboardDetailStore.originState;
 
 const state = reactive({
     contentType: 'LIST' as OverlayStatus,
@@ -178,7 +180,10 @@ const handleClickGoBackButton = () => {
         deleteModalState.visible = true;
         return;
     }
-    SpaceRouter.router.go(-1);
+    SpaceRouter.router.replace({
+        name: dashboardDetailOriginState.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+        params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
+    });
 };
 const handleClickCancel = () => {
     deleteModalState.type = 'CANCEL';
