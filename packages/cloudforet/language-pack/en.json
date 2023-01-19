@@ -1267,6 +1267,7 @@
 			"REQUIRED": "Required Field",
 			"UPDATE_TITLE": "Update Dashboard",
 			"VALIDATION_DASHBOARD_NAME_INPUT": "Please input dashboard name",
+			"VALIDATION_DASHBOARD_NAME_LENGTH": "Title cannot be longer than 100 characters.",
 			"VALIDATION_DASHBOARD_NAME_UNIQUE": "Dashboard name must be unique"
 		},
 		"LNB": {

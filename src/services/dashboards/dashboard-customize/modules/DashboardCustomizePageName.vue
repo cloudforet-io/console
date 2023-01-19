@@ -78,18 +78,7 @@ const state = reactive({
     name: useProxyValue('name', props, emit),
     placeHolder: dashboardDetailState.name,
     editMode: false,
-    dashboardNameList: computed<string[]>(() => {
-        if (dashboardDetailState.projectId) {
-            return store.state.dashboard.projectItems
-                .filter((item) => (item.project_id === dashboardDetailState.projectId)
-                && item.name !== dashboardDetailState.name)
-                .map((_item) => _item.name);
-        }
-        return store.state.dashboard.domainItems.map((item) => {
-            if (item.name !== dashboardDetailState.name) return item.name;
-            return '';
-        });
-    }),
+    dashboardNameList: computed<string[]>(() => store.getters['dashboard/getDashboardNameList'](dashboardDetailState.projectId, dashboardDetailState.name)),
 });
 const {
     forms: {
@@ -102,6 +91,7 @@ const {
     nameInput: props.dashboardId ? props.name : '',
 }, {
     nameInput(value: string) {
+        if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
         if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
         if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
         return '';
