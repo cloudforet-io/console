@@ -6,7 +6,7 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
     widget_config_id: 'costPie',
     title: 'Cost Pie',
     labels: ['Cost'],
-    base_configs: [{ config_id: 'dashboardCommon' }, { config_id: 'basePie' }],
+    base_configs: [{ config_id: 'basePie' }],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.COST_PIE.DESC',
         preview_image: 'widget-img_costPie--thumbnail.png',
@@ -15,8 +15,7 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
         chart_type: CHART_TYPE.PIE,
     },
     options_schema: {
-        default_properties: ['group_by'],
-        inheritable_properties: ['group_by'],
+        default_properties: ['group_by', `filters.${GROUP_BY.PROVIDER}`, `filters.${GROUP_BY.PROJECT}`, `filters.${GROUP_BY.SERVICE_ACCOUNT}`],
         schema: {
             type: 'object',
             properties: {
@@ -25,6 +24,46 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
                     type: 'string',
                     enum: Object.values(GROUP_BY),
                     menuItems: Object.values(GROUP_BY_ITEM_MAP),
+                },
+                [`filters.${GROUP_BY.PROVIDER}`]: {
+                    title: 'Provider',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.PROJECT}`]: {
+                    title: 'Project',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.SERVICE_ACCOUNT}`]: {
+                    title: 'Service Account',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.PROJECT_GROUP}`]: {
+                    title: 'Project Group',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.CATEGORY}`]: {
+                    title: 'Category',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.RESOURCE_GROUP}`]: {
+                    title: 'Resource Group',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.PRODUCT}`]: {
+                    title: 'Product',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.REGION}`]: {
+                    title: 'Region',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.TYPE}`]: {
+                    title: 'Type',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.ACCOUNT}`]: {
+                    title: 'Account ID',
+                    type: 'array',
                 },
             },
             required: ['group_by'],

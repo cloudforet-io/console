@@ -76,6 +76,7 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import type { UsageType, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getXYChartLegends, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 // eslint-disable-next-line import/no-cycle
@@ -115,7 +116,7 @@ const state = reactive({
     legends: [] as Legend[],
     chartData: computed(() => {
         const valueKey = `${state.fieldsKey}_sum`;
-        const _chartData = getRefinedXYChartData(state.data?.results, state.groupBy, 'usage_type', valueKey, true);
+        const _chartData = getRefinedXYChartData(state.data?.results, state.groupBy, GROUP_BY.TYPE, valueKey, true);
         return _chartData.reverse();
     }),
     tableFields: computed<Field[]>(() => {

@@ -1,12 +1,6 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import { excludePropertiesFromDashboardCommonWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-options-schema-helper';
 
-const {
-    default_properties,
-    inheritable_properties,
-    schema,
-} = excludePropertiesFromDashboardCommonWidgetConfig(['filters.provider']);
 
 const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsDataTransferByRegion',
@@ -42,12 +36,30 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties,
-        inheritable_properties,
+        default_properties: [`filters.${GROUP_BY.PROJECT}`, `filters.${GROUP_BY.SERVICE_ACCOUNT}`],
         schema: {
             type: 'object',
             properties: {
-                ...schema.properties,
+                [`filters.${GROUP_BY.PROJECT}`]: {
+                    title: 'Project',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.SERVICE_ACCOUNT}`]: {
+                    title: 'Service Account',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.PROJECT_GROUP}`]: {
+                    title: 'Project Group',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.REGION}`]: {
+                    title: 'Region',
+                    type: 'array',
+                },
+                [`filters.${GROUP_BY.ACCOUNT}`]: {
+                    title: 'Account ID',
+                    type: 'array',
+                },
             },
         },
     },
