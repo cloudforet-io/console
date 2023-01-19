@@ -33,6 +33,7 @@
                 :value="inputText"
                 :invalid="invalidState.inputText"
                 size="sm"
+                :placeholder="$t('DASHBOARDS.CUSTOMIZE.ENTER_NEW_LABEL')"
                 @update:value="setForm('inputText', $event)"
             />
         </p-field-group>
