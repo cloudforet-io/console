@@ -76,6 +76,7 @@ const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
 });
 
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
+    // CAUTION: don't directly access and modify originState outside this store.
     const originState = reactive<DashboardDetailInfoOriginState>({
         isProjectDashboard: computed<boolean>(() => {
             if (state.projectId) return true;
@@ -121,25 +122,12 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         validationState.widgetValidMap = {};
     };
 
-    const revertDashboardFilterData = () => {
-        const originDashboardInfo = originState.dashboardInfo;
-        state.settings = {
-            date_range: {
-                enabled: originDashboardInfo.settings?.date_range?.enabled ?? false,
-                start: originDashboardInfo.settings?.date_range?.start ?? dayjs.utc().format('YYYY-MM-01'),
-                end: originDashboardInfo.settings?.date_range?.end ?? dayjs.utc().format('YYYY-MM-DD'),
-            },
-            currency: {
-                enabled: originDashboardInfo.settings?.currency?.enabled ?? false,
-                value: originDashboardInfo.settings.currency?.value ?? CURRENCY.USD,
-            },
-            refresh_interval_option: originDashboardInfo.settings?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
-        };
-        state.variablesSchema = {
-            properties: { ...managedDashboardVariablesSchema.properties, ...originDashboardInfo.variables_schema?.properties ?? {} },
-            order: union(managedDashboardVariablesSchema.order, originDashboardInfo.variables_schema?.order ?? []),
-        };
-        state.variables = originDashboardInfo.variables ?? {};
+    const setOriginDashboardName = (name: string) => {
+        originState.dashboardInfo.name = name;
+    };
+
+    const revertDashboardData = () => {
+        setDashboardInfo(originState.dashboardInfo);
     };
 
     const setDashboardInfo = (dashboardInfo?: DashboardModel): void => {
@@ -266,7 +254,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state,
         originState,
         validationState,
-        revertDashboardFilterData,
+        revertDashboardData,
         getDashboardInfo,
         setDashboardInfo,
         toggleWidgetSize,
@@ -277,6 +265,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         deleteWidget,
         resetVariables,
         updateWidgetValidation,
+        setOriginDashboardName,
     };
 });
 

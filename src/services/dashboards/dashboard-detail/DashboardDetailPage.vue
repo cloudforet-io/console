@@ -181,6 +181,7 @@ const handleVisibleNameEditModal = () => {
 };
 const handleNameUpdate = (name: string) => {
     dashboardDetailState.name = name;
+    dashboardDetailStore.setOriginDashboardName(name);
 };
 
 // delete dashboard
@@ -256,7 +257,7 @@ watch(() => props.dashboardId, (_dashboardId) => {
 });
 
 onUnmounted(() => {
-    dashboardDetailStore.revertDashboardFilterData();
+    dashboardDetailStore.revertDashboardData();
 });
 </script>
 
