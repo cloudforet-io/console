@@ -292,6 +292,14 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
+    settings: toRef(state, 'settings'),
+    onCurrencyUpdate: async () => {
+        if (!state.data) return;
+        state.legends = getPieChartLegends(state.data.results, state.groupBy);
+        chartHelper.clearChildrenOfRoot();
+        await nextTick();
+        if (chartHelper.root.value) drawChart(state.chartData);
+    },
 });
 
 defineExpose<WidgetExpose<FullData>>({

@@ -198,14 +198,13 @@ export default defineComponent<Props>({
             // escape if there is no initiated widget
             if (isEmpty(state.initiatedWidgetMap)) return;
 
-            // escape settings data are the same
-            if (isEqual(dashboardSettings.date_range, prevSettings?.date_range) && isEqual(dashboardSettings.currency, prevSettings?.currency)) return;
-
             // escape if just initiated
             if (new Date().getTime() - dashboardChangedTime < 300) return;
 
-            // otherwise, refresh
-            refreshAllWidget();
+            // refresh if date range is changed
+            if (!isEqual(dashboardSettings.date_range, prevSettings?.date_range)) {
+                refreshAllWidget();
+            }
         });
 
 
