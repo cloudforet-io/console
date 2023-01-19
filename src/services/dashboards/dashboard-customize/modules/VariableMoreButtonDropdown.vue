@@ -57,9 +57,11 @@ import { SpaceRouter } from '@/router';
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDeatilOriginState = dashboardDetailStore.originState;
 
 const state = reactive({
     targetRef: null as HTMLElement | null,
@@ -120,7 +122,11 @@ const updateVariablesUse = () => {
 const handleOpenOverlay = () => {
     hideContextMenu();
     updateVariablesUse();
-    SpaceRouter.router.push({ hash: MANAGE_VARIABLES_HASH_NAME });
+    SpaceRouter.router.push({
+        name: dashboardDeatilOriginState.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+        params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
+        hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
+    });
 };
 const handleClickButton = () => {
     if (visibleMenu.value) {
