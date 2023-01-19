@@ -13,7 +13,7 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/aws-data-transfer-by-region/AWSDataTransferByRegion.vue'),
     }),
-    title: 'AWS Data-Transfer By Region',
+    title: 'AWS Data-Transfer by Region',
     labels: ['Cost'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.AWS_DATA_TRANSFER_BY_REGION.DESC',
