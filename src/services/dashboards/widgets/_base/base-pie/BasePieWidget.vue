@@ -177,6 +177,8 @@ const drawChart = (chartData: PieChartData[]) => {
         valueField: 'usd_cost_sum',
     };
     const series = chartHelper.createPieSeries(seriesSettings);
+    series.labels.template.set('forceHidden', true);
+    series.ticks.template.set('forceHidden', true);
     chart.series.push(series);
     chartHelper.setChartColors(chart, colorSet.value);
 
