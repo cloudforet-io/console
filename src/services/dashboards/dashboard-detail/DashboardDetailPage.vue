@@ -46,8 +46,10 @@
         <div class="filter-box">
             <dashboard-labels :label-list="dashboardDetailState.labels" />
             <dashboard-toolset
-                :currency.sync="dashboardDetailState.settings.currency"
-                :date-range.sync="dashboardDetailState.settings.date_range"
+                :currency="dashboardDetailState.settings.currency"
+                :date-range="dashboardDetailState.settings.date_range"
+                @update:currency="handleUpdateCurrency"
+                @update:date-range="handleUpdateDateRange"
             />
         </div>
         <p-divider class="divider" />
@@ -187,10 +189,21 @@ const handleVisibleCloneModal = () => {
 };
 
 // else
-const handleRefresh = async () => {
-    dashboardDetailState.loadingWidgets = true;
-    if (widgetContainerRef.value) await widgetContainerRef.value.refreshAllWidget();
-    dashboardDetailState.loadingWidgets = false;
+const handleRefresh = () => {
+    if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
+};
+
+const handleUpdateCurrency = (currency) => {
+    dashboardDetailState.settings = {
+        ...dashboardDetailState.settings,
+        currency,
+    };
+};
+const handleUpdateDateRange = (dateRange) => {
+    dashboardDetailState.settings = {
+        ...dashboardDetailState.settings,
+        date_range: dateRange,
+    };
 };
 
 /* init */

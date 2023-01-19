@@ -38,7 +38,7 @@ import {
 } from 'vue';
 
 import {
-    flattenDeep, isEmpty, isEqual,
+    debounce, flattenDeep, isEmpty, isEqual,
 } from 'lodash';
 
 import { store } from '@/store';
@@ -192,13 +192,15 @@ export default defineComponent<Props>({
         watch(() => state.dashboardVariablesSchema, () => {
             if (props.editMode) validateAllWidget();
         }, { immediate: true });
-        watch([() => state.dashboardSettings.date_range, () => state.dashboardSettings.currency, () => state.dashboardId], ([dateRange, currency, dashboardId], prev) => {
-            if (dashboardId === prev[2]) return;
-            if (!isEqual(dateRange, prev[0]) || !isEqual(currency, prev[1])) refreshAllWidget();
-        }, { deep: true });
+        watch([() => state.dashboardSettings, () => state.dashboardId], ([dashboardSettings, dashboardId], [prevSettings, prevDashboardId]) => {
+            if (dashboardId !== prevDashboardId) return;
+            if (isEqual(dashboardSettings.date_range, prevSettings?.date_range) && isEqual(dashboardSettings.currency, prevSettings?.currency)) return;
+            refreshAllWidget();
+        });
 
 
-        const refreshAllWidget = async () => {
+        const refreshAllWidget = debounce(async () => {
+            dashboardDetailState.loadingWidgets = true;
             const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
 
             const filteredRefs = state.widgetRef.filter((comp: WidgetComponent|null) => {
@@ -216,7 +218,8 @@ export default defineComponent<Props>({
                     state.widgetDataMap[widgetKey] = result.value;
                 }
             });
-        };
+            dashboardDetailState.loadingWidgets = false;
+        }, 150);
         expose({
             refreshAllWidget,
         });
