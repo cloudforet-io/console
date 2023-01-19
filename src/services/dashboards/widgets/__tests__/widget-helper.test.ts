@@ -26,7 +26,7 @@ describe('[Widget Helper] getWidgetConfig', () => {
         expect(basePieConfig).toBeFalsy();
     });
     it('Merge configs by base configs', () => {
-        expect(costPieSchema?.properties?.['filters.provider']).toBeFalsy();
+        expect(costPieSchema?.properties?.['filters.provider']).toBeTruthy();
 
         if (!costPieConfigId) throw new Error('Can not test. No widget config id in costPieConfigId');
         const mergedCostPieConfig = getWidgetConfig(costPieConfigId);
