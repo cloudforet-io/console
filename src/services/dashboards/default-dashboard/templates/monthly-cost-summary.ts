@@ -32,6 +32,7 @@ export const monthlyCostSummaryDashboard: DashboardConfig = {
         currency: {
             enabled: true,
         },
+        refresh_interval_option: '15s',
     },
     variables_schema: {
         properties: {},

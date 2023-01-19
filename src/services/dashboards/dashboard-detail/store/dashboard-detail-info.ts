@@ -154,10 +154,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         };
         state.variables = _dashboardInfo.variables ?? {};
         state.labels = _dashboardInfo.labels;
-        state.dashboardWidgetInfoList = flattenDeep(_dashboardInfo?.layouts ?? []).map((info) => ({
+        state.dashboardWidgetInfoList = _dashboardInfo?.layouts?.flat()?.map((info) => ({
             ...info,
-            widget_key: uuidv4(),
-        }));
+            widget_key: info.widget_key ?? uuidv4(),
+        })) ?? [];
         state.widgetDataMap = {};
     };
 

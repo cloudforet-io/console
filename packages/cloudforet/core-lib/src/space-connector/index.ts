@@ -79,6 +79,8 @@ export class SpaceConnector {
                 SpaceConnector.instance.loadAPI(1),
                 SpaceConnector.instance.loadAPI(2),
             ]);
+        } else {
+            throw new Error('Instance already exists');
         }
     }
 

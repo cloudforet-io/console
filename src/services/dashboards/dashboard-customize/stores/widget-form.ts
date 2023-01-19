@@ -15,6 +15,7 @@ interface State {
     inheritOptions?: InheritOptions;
     widgetOptions?: WidgetOptions;
     widgetInfo?: DashboardLayoutWidgetInfo;
+    defaultSchemaProperties?: string[];
 }
 
 export const useWidgetFormStore = defineStore('widget-form', () => {
@@ -27,6 +28,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         inheritOptions: undefined,
         widgetOptions: undefined,
         widgetInfo: undefined,
+        defaultSchemaProperties: undefined,
     });
     const setFormData = (formData: any) => {
         if (!state.widgetConfigId) return;
@@ -53,18 +55,19 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         });
         widgetOptions.filters = widgetFiltersMap;
 
-        //
         state.widgetOptions = widgetOptions;
     };
 
-    const initWidgetForm = (widgetKey: string) => {
+    const initWidgetForm = (widgetKey: string): DashboardLayoutWidgetInfo|undefined => {
         state.widgetInfo = dashboardDetailInfoStore.dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
         if (state.widgetInfo) {
             state.widgetConfigId = state.widgetInfo.widget_name;
             state.widgetTitle = state.widgetInfo.title;
             state.widgetOptions = state.widgetInfo.widget_options;
             state.inheritOptions = state.widgetInfo.inherit_options;
+            state.defaultSchemaProperties = state.widgetInfo.default_schema_properties;
         }
+        return state.widgetInfo;
     };
 
     return {
