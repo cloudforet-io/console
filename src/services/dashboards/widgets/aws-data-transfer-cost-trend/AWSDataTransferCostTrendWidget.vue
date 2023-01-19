@@ -12,30 +12,32 @@
                                           @select="handleSelectSelectorType"
             />
         </template>
-        <div class="chart-wrapper">
-            <p-data-loader class="chart-loader"
-                           :loading="state.loading"
-                           :data="state.chartData"
-                           loader-type="skeleton"
-                           :loader-backdrop-opacity="1"
-                           show-data-from-scratch
-            >
-                <div ref="chartContext"
-                     class="chart"
-                />
-            </p-data-loader>
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="state.loading"
+                               :data="state.chartData"
+                               loader-type="skeleton"
+                               disable-empty-case
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                </p-data-loader>
+            </div>
+            <widget-data-table :loading="state.loading"
+                               :fields="state.tableFields"
+                               :items="state.data"
+                               :currency="state.currency"
+                               :currency-rates="props.currencyRates"
+                               :all-reference-type-info="allReferenceTypeInfo"
+                               :legends.sync="state.legends"
+                               :color-set="colorSet"
+                               disable-ellipsis
+            />
         </div>
-
-        <widget-data-table :loading="state.loading"
-                           :fields="state.tableFields"
-                           :items="state.data"
-                           :currency="state.currency"
-                           :currency-rates="props.currencyRates"
-                           :all-reference-type-info="allReferenceTypeInfo"
-                           :legends.sync="state.legends"
-                           :color-set="colorSet"
-                           disable-ellipsis
-        />
     </widget-frame>
 </template>
 
@@ -281,18 +283,25 @@ defineExpose<WidgetExpose<Data>>({
 
 <style lang="postcss" scoped>
 .aws-data-transfer-cost-trend {
-    .chart-wrapper {
-        height: 10.75rem;
-        .chart-loader {
-            height: 100%;
-            .chart {
+    .data-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        .chart-wrapper {
+            height: 10.75rem;
+            margin-bottom: 1rem;
+            .chart-loader {
                 height: 100%;
+                .chart {
+                    height: 100%;
+                }
             }
         }
+        .widget-data-table {
+            flex-grow: 1;
+        }
     }
-    .widget-data-table {
-        height: 50%;
-    }
+
     &.full {
         .widget-data-table {
             height: auto;
