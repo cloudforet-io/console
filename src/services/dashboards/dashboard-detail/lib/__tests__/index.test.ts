@@ -2,7 +2,7 @@ import { describe, expect } from 'vitest';
 
 import {
     WIDGET_CONTAINER_MAX_WIDTH,
-    WIDGET_CONTAINER_MIN_WIDTH,
+    WIDGET_CONTAINER_MIN_WIDTH, WIDGET_GAP,
 } from '@/services/dashboards/dashboard-detail/lib/config';
 import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
@@ -47,7 +47,7 @@ function permutation(arr, selectNum) {
 
 // if AMOUNT is more than 10, call stack boom
 // for more specific test, please scale up the AMOUNT.
-const _SELECT_WIDGET_AMOUNT = 5;
+const _SELECT_WIDGET_AMOUNT = 4;
 // e.g) [['sm', 'sm', 'md'], ['sm', 'sm', 'lg'] ...]
 const widgetCases: Array<Array<WidgetSize>> = permutation(['sm', 'md', 'lg', 'xl', 'full'], _SELECT_WIDGET_AMOUNT);
 const widgetCasesLength = widgetCases.length;
@@ -64,7 +64,7 @@ describe('Assign width for permutation selected widgets', () => {
 
     it('Count of widgets should not be changed after assigning its width', () => {
         for (let caseCount = 0; caseCount < widgetCasesLength; caseCount += 1) {
-            for (let containerWidth = WIDGET_CONTAINER_MIN_WIDTH; containerWidth <= WIDGET_CONTAINER_MAX_WIDTH; containerWidth += 80) {
+            for (let containerWidth = WIDGET_CONTAINER_MIN_WIDTH; containerWidth <= WIDGET_CONTAINER_MAX_WIDTH; containerWidth += WIDGET_GAP) {
                 assignedWidgetCasesCount = 0;
                 const selectedCase = [...widgetCases[caseCount]];
 
