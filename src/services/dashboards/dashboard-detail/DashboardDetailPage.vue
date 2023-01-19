@@ -80,7 +80,7 @@
 
 <script setup lang="ts">
 import {
-    computed, onUnmounted,
+    computed, onMounted, onUnmounted,
     reactive, ref, watch,
 } from 'vue';
 
@@ -265,6 +265,13 @@ watch(() => props.dashboardId, (_dashboardId) => {
 
 onUnmounted(() => {
     dashboardDetailStore.revertDashboardData();
+});
+
+onMounted(() => {
+    /*
+    Empty widget data map which is used in DashboardWidgetContainer to reuse data and not to call api when going to customize page.
+     */
+    dashboardDetailState.widgetDataMap = {};
 });
 </script>
 
