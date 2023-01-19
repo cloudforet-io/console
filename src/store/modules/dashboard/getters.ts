@@ -32,3 +32,17 @@ const getItems = (items: DashboardModel[], filters: ConsoleFilter[], viewers: st
     });
     return result;
 };
+
+export const getDashboardNameList: Getter<DashboardState, any> = (state, getters): any => (projectId:string, dashboardName: string) => {
+    if (projectId) {
+        return getters.getProjectItems
+            .filter((item) => (
+                item.project_id === projectId)
+                && item.name !== dashboardName)
+            .map((_item) => _item.name);
+    }
+    return getters.getDomainItems.map((item) => {
+        if (item.name !== dashboardName) return item.name;
+        return '';
+    });
+};

@@ -26,6 +26,7 @@
 
 import type { SetupContext } from 'vue';
 import {
+    computed,
     defineComponent,
     reactive, toRefs, watch,
 } from 'vue';
@@ -39,6 +40,8 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+
+import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 
 interface Props {
     visible: boolean;
@@ -73,6 +76,8 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const dashboardDetailStore = useDashboardDetailInfoStore();
+        const dashboardDetailState = dashboardDetailStore.state;
         const {
             forms: {
                 _name,
@@ -86,10 +91,16 @@ export default defineComponent<Props>({
         } = useFormValidator({
             _name: '',
         }, {
-            _name(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
+            _name(value: string) {
+                if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
+                if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
+                if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
+                return '';
+            },
         });
         const state = reactive({
             proxyVisible: props.visible,
+            dashboardNameList: computed<string[]>(() => store.getters['dashboard/getDashboardNameList'](dashboardDetailState.projectId, dashboardDetailState.name)),
         });
 
         // const _invalid_unique = 'Dashboard name must be unique'; i18n.t('VALIDATION_DASHBOARD_NAME_UNIQUE')
