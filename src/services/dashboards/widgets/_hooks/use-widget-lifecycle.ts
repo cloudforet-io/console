@@ -1,10 +1,13 @@
+import type { Ref } from 'vue';
 import {
     onUnmounted, watch,
 } from 'vue';
 
 import { isEqual } from 'lodash';
 
-import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { Currency } from '@/store/modules/display/config';
+
+import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { InheritOptions, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 
 
@@ -12,6 +15,8 @@ interface UseWidgetLifecycleOptions {
     disposeWidget?: () => void;
     refreshWidget: () => void;
     props: WidgetProps;
+    settings?: Ref<DashboardSettings>;
+    onCurrencyUpdate?: (current?: Currency, previous?: Currency) => void|Promise<void>;
 }
 
 const checkRefreshable = (
@@ -36,6 +41,8 @@ export const useWidgetLifecycle = ({
     disposeWidget,
     refreshWidget,
     props,
+    settings,
+    onCurrencyUpdate,
 }: UseWidgetLifecycleOptions): void => {
     onUnmounted(() => {
         if (disposeWidget) disposeWidget();
@@ -50,4 +57,11 @@ export const useWidgetLifecycle = ({
         const _isRefreshable = checkRefreshable(props.inheritOptions, after, before, true);
         if (_isRefreshable) refreshWidget();
     }, { deep: true });
+    if (settings && onCurrencyUpdate) {
+        watch(settings, (current, previous) => {
+            if (current && previous && current?.currency?.value !== previous?.currency?.value) {
+                onCurrencyUpdate(current.currency.value, previous.currency.value);
+            }
+        });
+    }
 };

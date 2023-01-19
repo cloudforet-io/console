@@ -37,6 +37,7 @@ import type { RefreshIntervalOption } from '@/services/dashboards/config';
 import { refreshIntervalOptionList, REFRESH_INTERVAL_OPTIONS_MAP } from '@/services/dashboards/config';
 
 interface Props {
+    dashboardId: string;
     readOnly: boolean;
     refreshDisabled: boolean;
     intervalOption: RefreshIntervalOption;
@@ -50,6 +51,10 @@ export default defineComponent<Props>({
         PSelectDropdown,
     },
     props: {
+        dashboardId: {
+            type: String,
+            default: '',
+        },
         readOnly: {
             type: Boolean,
             default: false,
@@ -104,7 +109,6 @@ export default defineComponent<Props>({
                 clearRefreshInterval();
                 return;
             }
-
             refreshIntervalFunction = setInterval(() => {
                 if (props.loading) {
                     clearRefreshInterval();
@@ -122,10 +126,16 @@ export default defineComponent<Props>({
             executeRefreshInterval();
         };
 
-        watch(() => props.loading, (loading) => {
-            if (loading) {
+        watch([() => props.dashboardId, () => props.loading], ([dashboardId, loading], prev) => {
+            if (!dashboardId || props.refreshDisabled) {
                 clearRefreshInterval();
-            } else {
+                return;
+            }
+
+            if (dashboardId !== prev[0] || loading) {
+                clearRefreshInterval();
+            }
+            if (!loading) {
                 if (props.refreshDisabled) return;
                 executeRefreshInterval();
             }

@@ -24,7 +24,7 @@ import type { ComputedRef } from 'vue';
 import {
     computed,
     defineExpose,
-    defineProps, nextTick, reactive, ref, toRefs,
+    defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
@@ -220,6 +220,13 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
+    settings: toRef(state, 'settings'),
+    onCurrencyUpdate: async () => {
+        if (!state.data) return;
+        chartHelper.refreshRoot();
+        await nextTick();
+        if (chartHelper.root.value) drawChart(state.chartData);
+    },
 });
 
 defineExpose<WidgetExpose<TreemapChartData['children']>>({
