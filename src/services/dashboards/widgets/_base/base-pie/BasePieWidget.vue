@@ -43,6 +43,7 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
+import { color } from '@amcharts/amcharts5';
 import { PDataLoader } from '@spaceone/design-system';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -55,6 +56,8 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { gray } from '@/styles/colors';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
@@ -177,10 +180,21 @@ const drawChart = (chartData: PieChartData[]) => {
     chart.series.push(series);
     chartHelper.setChartColors(chart, colorSet.value);
 
-    const tooltip = chartHelper.createTooltip();
-    chartHelper.setPieTooltipText(series, tooltip, state.currency, props.currencyRates);
-    series.slices.template.set('tooltip', tooltip);
-    series.data.setAll(chartData);
+    if (chartData.some((d) => d.usd_cost_sum && d.usd_cost_sum > 0)) {
+        const tooltip = chartHelper.createTooltip();
+        chartHelper.setPieTooltipText(series, tooltip, state.currency, props.currencyRates);
+        series.slices.template.set('tooltip', tooltip);
+        series.data.setAll(chartData);
+    } else {
+        series.data.setAll([{
+            usd_cost_sum: 1,
+        }]);
+        series.slices.template.setAll({
+            fill: color(gray[200]),
+            strokeOpacity: 0,
+            forceInactive: true,
+        });
+    }
 
     state.chart = chart;
     state.series = series;
