@@ -67,6 +67,7 @@ export interface DashboardConfig {
     description?: {
         preview_image?: string;
         icon?: string;
+        text?: string;
     }
 }
 
