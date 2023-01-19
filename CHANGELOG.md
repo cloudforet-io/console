@@ -1,3 +1,10 @@
+# [2.0.0-beta.23](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.22...v2.0.0-beta.23) (2023-01-19)
+
+
+### Features
+
+* **text-input:** add isFocused prop and update:is-focused event ([#248](https://github.com/cloudforet-io/mirinae/issues/248)) ([89ee8b2](https://github.com/cloudforet-io/mirinae/commit/89ee8b21d4c83cef6a0ed4a9da94a1ac3f1b1cb3))
+
 # [2.0.0-beta.22](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.21...v2.0.0-beta.22) (2023-01-19)
 
 
