@@ -132,7 +132,6 @@ export default defineComponent<Props>({
             widgetOptionsJsonSchema: {} as JsonSchema,
             schemaFormData: {},
             // inherit
-            inheritOptions: {} as InheritOptions,
             inheritableProperties: computed<string[]>(() => Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
                 .filter(([, inheritOption]) => !!inheritOption.enabled)
                 .map(([propertyName]) => propertyName)),
