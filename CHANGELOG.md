@@ -1,3 +1,14 @@
+# [2.0.0-beta.20](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.19...v2.0.0-beta.20) (2023-01-19)
+
+
+### Bug Fixes
+
+* **context-menu:** focus on search if position is undefined and searchable ([84d5202](https://github.com/cloudforet-io/mirinae/commit/84d520256e7b6d319360d3a4ac5be745c548a43d))
+* **filterable-dropdown:** add placeholder style ([efb5735](https://github.com/cloudforet-io/mirinae/commit/efb573596be7f010c3fcc142f0dfba80570d3e94))
+* **filterable-dropdown:** focus search on show menu ([54760ce](https://github.com/cloudforet-io/mirinae/commit/54760ce8154020ba6616a9369ea2c11b63116429))
+* **select-dropdown:** add placeholder style ([f6852c2](https://github.com/cloudforet-io/mirinae/commit/f6852c213df701cad2f9036b99d395e954914114))
+* **select-dropdown:** make the same alignment with filterable-dropdown ([b651294](https://github.com/cloudforet-io/mirinae/commit/b65129442610d2060c57138c74d8e2dc13f8a0da))
+
 # [2.0.0-beta.19](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.18...v2.0.0-beta.19) (2023-01-18)
 
 
