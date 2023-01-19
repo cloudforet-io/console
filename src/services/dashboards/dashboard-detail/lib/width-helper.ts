@@ -2,6 +2,7 @@ import { sum, max } from 'lodash';
 
 import { WIDGET_WIDTH_RANGE_LIST, WIDGET_GAP } from '@/services/dashboards/dashboard-detail/lib/config';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
 
 const isEveryWidthMax = (sizeRow: string[], widthRow: number[]): boolean => sizeRow.every((size, idx) => {
@@ -32,7 +33,7 @@ export const widgetWidthAssigner = (widgetSizeList: WidgetSize[], containerWidth
     const results: number[][] = [];
     let sizeRow: string[] = [];
     widgetSizeList.forEach((widgetSize) => {
-        if (widgetSize === 'full') {
+        if (widgetSize === WIDGET_SIZE.full) {
             results.push(getWidthRow(sizeRow, containerWidth));
             results.push([containerWidth]);
             sizeRow = [];
