@@ -6,13 +6,18 @@
         <div ref="targetRef"
              class="dropdown-button"
              :tabindex="(disabled || readonly) ? -1 : 0"
-             @keyup.down="focusOnContextMenu(0)"
+             @keyup.down="focusOnContextMenu(undefined)"
              @keyup.esc.capture.stop="hideMenu"
              @keyup.enter.capture.stop="toggleMenu"
              @click="toggleMenu"
         >
             <div class="selection-display-wrapper">
-                <span v-if="displayValueOnDropdownButton"
+                <span v-if="displayValueOnDropdownButton === undefined"
+                      class="placeholder"
+                >
+                    {{ props.placeholder || $t('COMPONENT.FILTERABLE_DROPDOWN.PLACEHOLDER') }}
+                </span>
+                <span v-else-if="displayValueOnDropdownButton"
                       class="selected-item"
                 >
                     {{ displayValueOnDropdownButton }}
@@ -189,7 +194,7 @@ const hideMenu = () => {
     }
 };
 const showMenu = () => {
-    if (!proxyVisibleMenu.value && !props.disabled) proxyVisibleMenu.value = true;
+    if (!proxyVisibleMenu.value && !props.disabled) focusOnContextMenu();
 };
 const toggleMenu = () => {
     if (proxyVisibleMenu.value) hideMenu();
@@ -287,7 +292,6 @@ const {
     multiSelectable: toRef(props, 'multiSelectable'),
     selected: proxySelected,
     appearanceType: toRef(props, 'appearanceType'),
-    placeholder: toRef(props, 'placeholder'),
 });
 
 /* ignore window arrow keydown event */
@@ -308,6 +312,12 @@ useIgnoreWindowArrowKeydownEvents({ predicate: proxyVisibleMenu });
             flex-grow: 1;
             display: flex;
             width: 100%;
+            > .placeholder {
+                @apply text-label-md text-gray-600;
+                flex-grow: 1;
+                line-height: 1.5;
+                padding: 0.25rem 0.5rem;
+            }
             > .selected-item {
                 @apply text-label-md text-gray-900;
                 flex-grow: 1;

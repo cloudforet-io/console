@@ -90,7 +90,7 @@
 import {
     computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import type Vue from 'vue';
 
 import { groupBy } from 'lodash';
 

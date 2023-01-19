@@ -233,6 +233,10 @@ const {
 
 /* util */
 const focus = (position?: number) => {
+    if (props.searchable && position === undefined) {
+        state.isFocusedOnSearch = true;
+        return;
+    }
     const focusedIdx = _focus(position);
     if (focusedIdx !== undefined) emit('focus', focusedIdx);
 };
