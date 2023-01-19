@@ -59,12 +59,14 @@
         <portal to="widget-footer">
             <div class="footer-wrapper">
                 <p-button style-type="transparent"
+                          :disabled="loading"
                           @click="handleClickCancelButton"
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary"
                           :disabled="!dashboardDetailValidationState.isWidgetLayoutValid"
+                          :loading="loading"
                           @click="handleClickSaveButton"
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
@@ -101,6 +103,7 @@ import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_c
 interface Props {
     widgetInfoList: DashboardLayoutWidgetInfo[];
     dashboardId?: string;
+    loading?: boolean;
 }
 
 const props = defineProps<Props>();

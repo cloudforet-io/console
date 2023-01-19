@@ -27,6 +27,7 @@
                                      :dashboard-id="props.dashboardId"
                                      :enable-date-range.sync="dashboardDetailState.settings.date_range.enabled"
                                      :enable-currency.sync="dashboardDetailState.settings.currency.enabled"
+                                     :loading="state.loading"
                                      @save="handleSave"
         />
     </div>
@@ -80,6 +81,7 @@ const state = reactive({
         variables: dashboardDetailState.variables,
         variables_schema: dashboardDetailState.variablesSchema,
     })),
+    loading: false,
 });
 
 /* Api */
@@ -155,8 +157,10 @@ const handleUpdateLabelList = (labels: Array<string>) => {
     dashboardDetailState.labels = [...labels];
 };
 const handleSave = async () => {
+    state.loading = true;
     if (dashboardDetailState.dashboardId) await updateDashboardData();
     if (dashboardDetailState.dashboardId === undefined) await createDashboard();
+    state.loading = false;
 };
 
 // for preventing refresh
