@@ -76,6 +76,7 @@ const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
 });
 
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
+    // CAUTION: don't directly access and modify originState outside this store.
     const originState = reactive<DashboardDetailInfoOriginState>({
         isProjectDashboard: computed<boolean>(() => {
             if (state.projectId) return true;
@@ -119,6 +120,10 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         //
         validationState.isNameValid = undefined;
         validationState.widgetValidMap = {};
+    };
+
+    const setOriginDashboardName = (name: string) => {
+        originState.dashboardInfo.name = name;
     };
 
     const revertDashboardData = () => {
@@ -259,6 +264,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         deleteWidget,
         resetVariables,
         updateWidgetValidation,
+        setOriginDashboardName,
     };
 });
 
