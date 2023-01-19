@@ -27,7 +27,7 @@
                 @keydown.down="handlePressDownKey"
         >
             <span class="text"
-                  :class="{placeholder: !$scopedSlots.default && !selectedItem}"
+                  :class="{placeholder: !selectedItem}"
             >
                 <slot name="default"
                       v-bind="{item: selectedItem}"
@@ -306,6 +306,9 @@ export default defineComponent<SelectDropdownProps>({
             padding: 0.25rem 0;
             line-height: 1.5;
             height: 100%;
+            &.placeholder {
+                @apply text-gray-600;
+            }
         }
         .dropdown-icon {
             flex-shrink: 0;
