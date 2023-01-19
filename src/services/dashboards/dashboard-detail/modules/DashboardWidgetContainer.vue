@@ -38,7 +38,7 @@ import {
 } from 'vue';
 
 import {
-    debounce, flattenDeep, isEmpty, isEqual,
+    flattenDeep, isEmpty, isEqual,
 } from 'lodash';
 
 import { store } from '@/store';
@@ -198,7 +198,7 @@ export default defineComponent<Props>({
         }, { deep: true });
 
 
-        const refreshAllWidget = debounce(async () => {
+        const refreshAllWidget = async () => {
             const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
 
             const filteredRefs = state.widgetRef.filter((comp: WidgetComponent|null) => {
@@ -216,7 +216,7 @@ export default defineComponent<Props>({
                     state.widgetDataMap[widgetKey] = result.value;
                 }
             });
-        }, 150);
+        };
         expose({
             refreshAllWidget,
         });
