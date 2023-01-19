@@ -1283,7 +1283,7 @@
 				"DESC": "Summarizes cloud service usage by region from cloud providers."
 			},
 			"AWS_CLOUD_FRONT_COST": {
-				"DESC": "Displays the data usage and costs from AWS CloudFront for the selected period, aggregated by 'Group By' option. "
+				"DESC": "Displays the data usage and costs from AWS CloudFront for the selected period, aggregated by 'Group by' option. "
 			},
 			"AWS_DATA_TRANSFER_BY_REGION": {
 				"DESC": "Displays the data usage and costs by Region from AWS Data-Transfer for the selected period."
@@ -1321,19 +1321,19 @@
 				"DESC": "Displays the total costs by Region for the selected period. "
 			},
 			"COST_DONUT": {
-				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group By' option. "
+				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group by' option. "
 			},
 			"COST_MAP": {
-				"DESC": "Displays proportions of total costs that allow you to compare 10-15 top highest spending for the selected period, aggregated by 'Group By' option."
+				"DESC": "Displays proportions of total costs that allow you to compare 10-15 top highest spending for the selected period, aggregated by 'Group by' option."
 			},
 			"COST_PIE": {
-				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group By' option. "
+				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group by' option. "
 			},
 			"COST_TREND": {
-				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group By' option. "
+				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group by' option. "
 			},
 			"COST_TREND_STACKED": {
-				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group By' option. "
+				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group by' option. "
 			},
 			"DAILY_UPDATES": {
 				"DESC": "Displays the list of cloud resources created or deleted today. "
