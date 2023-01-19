@@ -30,6 +30,7 @@
             :invalid-text="invalidTexts.inputText"
         >
             <p-text-input
+                ref="textInputRef"
                 :value="inputText"
                 :invalid="invalidState.inputText"
                 size="sm"
@@ -43,7 +44,9 @@
 <script setup lang="ts">
 // CAUTION: this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
-import { computed, reactive } from 'vue';
+import {
+    computed, nextTick, reactive, ref,
+} from 'vue';
 
 import {
     PFieldGroup, PIconButton, PLabel, PTextInput,
@@ -61,7 +64,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(['update:labelList']);
 
-
+const textInputRef = ref<null|any>(null);
 const {
     forms: {
         inputText,
@@ -88,8 +91,10 @@ const state = reactive({
     inputMode: false,
 });
 
-const handleClickPlus = () => {
+const handleClickPlus = async () => {
     state.inputMode = true;
+    await nextTick();
+    textInputRef.value?.focus();
 };
 const handleEscape = () => {
     state.inputMode = false;
