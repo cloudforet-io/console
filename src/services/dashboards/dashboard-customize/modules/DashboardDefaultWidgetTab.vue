@@ -165,7 +165,7 @@ export default {
         @apply overflow-auto flex-shrink-0;
         width: 20rem;
         height: inherit;
-        padding: 1.25rem;
+        padding: 1.25rem 1.25rem 0 1.25rem;
         .no-selected-wrapper {
             @apply flex flex-col justify-center items-center;
             height: 100%;
