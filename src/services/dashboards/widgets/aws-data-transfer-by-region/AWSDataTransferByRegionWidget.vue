@@ -188,7 +188,7 @@ const fetchData = async (): Promise<FullData> => {
         const { results, more } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             query: {
                 granularity: state.granularity,
-                group_by: [state.groupBy, 'usage_type'],
+                group_by: [state.groupBy, GROUP_BY.TYPE],
                 start: state.dateRange.start,
                 end: state.dateRange.end,
                 fields: {
@@ -201,12 +201,12 @@ const fetchData = async (): Promise<FullData> => {
                         operator: 'sum',
                     },
                 },
-                field_group: ['usage_type'],
+                field_group: [GROUP_BY.TYPE],
                 sort: [{ key: '_total_usd_cost_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
         });
-        return { results: sortTableData(results, 'usage_type'), more };
+        return { results: sortTableData(results, GROUP_BY.TYPE), more };
     } catch (e) {
         ErrorHandler.handleError(e);
         return { results: [], more: false };
