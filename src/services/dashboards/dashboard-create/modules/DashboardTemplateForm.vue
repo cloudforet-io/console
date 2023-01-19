@@ -18,7 +18,7 @@
                                 @item-click="handleSelectTemplate"
                             >
                                 <template #item-content="{board}">
-                                    <strong>{{ board.name }}</strong>
+                                    <strong class="dashboard-name">{{ board.name }}</strong>
                                     <div class="dashboard-label-wrapper">
                                         <p-label v-for="(label, idx) in board.labels"
                                                  :key="`board-${board.name}-label-${idx}`"
@@ -26,6 +26,22 @@
                                                  :click-stop="false"
                                         />
                                     </div>
+                                    <span class="dashboard-description-text">{{ board.description.text }}</span>
+                                </template>
+                                <template #item-overlay-content="{board}">
+                                    <router-link
+                                        v-if="board.description?.preview_image"
+                                        :to="`/images/dashboard-previews/dashboard-img_${board.description?.preview_image}--thumbnail.png`"
+                                        target="_blank"
+                                    >
+                                        <div class="dashboard-template-overlay-content">
+                                            <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.PREVIEW') }}</span>
+                                            <p-i name="ic_external-link"
+                                                 height="1em"
+                                                 width="1em"
+                                            />
+                                        </div>
+                                    </router-link>
                                 </template>
                             </p-board>
                             <p-text-pagination
@@ -56,12 +72,23 @@
                                     @item-click="handleSelectTemplate"
                                 >
                                     <template #item-content="{board}">
-                                        <strong>{{ board.name }}</strong>
+                                        <strong class="dashboard-name">{{ board.name }}</strong>
                                         <div class="dashboard-label-wrapper">
                                             <p-label v-for="(label, idx) in board.labels"
                                                      :key="`board-${board.name}-label-${idx}`"
                                                      :text="label"
                                                      :click-stop="false"
+                                            />
+                                        </div>
+                                    </template>
+                                    <template #item-overlay-content="{board}">
+                                        <div class="dashboard-template-overlay-content"
+                                             @click="handleOpenDashboardNewTab(board)"
+                                        >
+                                            <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.PREVIEW') }}</span>
+                                            <p-i name="ic_external-link"
+                                                 height="1em"
+                                                 width="1em"
                                             />
                                         </div>
                                     </template>
@@ -88,12 +115,11 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PBoard, PLabel, PTextPagination, PSearch, PEmpty, PDivider,
+    PPaneLayout, PPanelTop, PBoard, PLabel, PTextPagination, PSearch, PEmpty, PDivider, PI,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import type { DashboardConfig } from '@/services/dashboards/config';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
@@ -103,7 +129,7 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const emit = defineEmits(['set-template']);
 
-type DashboardTemplateBoardSet = DashboardConfig & { value: string, leftIcon: string, iconButtonSets: Array<any> };
+type DashboardTemplateBoardSet = DashboardConfig & { value: string, leftIcon: string };
 
 const TEMPLATE_TYPE = { DEFAULT: 'DEFAULT', EXISTING: 'EXISTING' };
 type TemplateType = typeof TEMPLATE_TYPE[keyof typeof TEMPLATE_TYPE];
@@ -119,14 +145,6 @@ const defaultTemplateState = reactive({
         // below values are used only for render
         value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
         leftIcon: d.description?.icon ?? '',
-        iconButtonSets: [!!d.description?.preview_image && {
-            iconName: 'ic_external-link',
-            tooltipText: i18n.t('DASHBOARDS.CREATE.PREVIEW'),
-            eventAction: () => {
-                const href = `/images/dashboard-previews/dashboard-img_${d.description?.preview_image}--thumbnail.png`;
-                window.open(href, '_blank');
-            },
-        }],
     })).slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1)),
 });
 const existingTemplateState = reactive({
@@ -140,30 +158,29 @@ const existingTemplateState = reactive({
             // below values are used only for render
             value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id}`,
             leftIcon: d.description?.preview_image ?? '',
-            iconButtonSets: [{
-                iconName: 'ic_external-link',
-                tooltipText: i18n.t('DASHBOARDS.CREATE.PREVIEW'),
-                eventAction: () => {
-                    const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-                    const { href } = SpaceRouter.router.resolve({
-                        name: routeName,
-                        params: {
-                            dashboardId: isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id,
-                        },
-                    });
-                    window.open(href, '_blank');
-                },
-            }],
         };
     }).slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
     searchValue: '',
 });
 
+const handleOpenDashboardNewTab = (board: DashboardModel) => {
+    const isProjectDashboard = Object.prototype.hasOwnProperty.call(board, 'project_dashboard_id');
+    const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
+    const { href } = SpaceRouter.router.resolve({
+        name: routeName,
+        params: {
+            dashboardId: isProjectDashboard
+                ? (board as ProjectDashboardModel).project_dashboard_id
+                : (board as DomainDashboardModel).domain_dashboard_id,
+        },
+    });
+    window.open(href, '_blank');
+};
+
 const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
     state.selectedTemplateName = selectedTemplate.value;
     const _selectedTemplate: Partial<DashboardTemplateBoardSet> = { ...selectedTemplate };
     delete _selectedTemplate.leftIcon;
-    delete _selectedTemplate.iconButtonSets;
     emit('set-template', _selectedTemplate as DashboardModel);
 };
 
@@ -203,9 +220,24 @@ const handleInputSearch = () => {
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
+        .dashboard-name {
+            @apply text-sm;
+        }
+        .dashboard-description-text {
+            @apply text-gray-500 text-xs;
+        }
+        .dashboard-template-overlay-content {
+            height: 1.5rem;
+        }
+        .dashboard-template-overlay-preview {
+            @apply text-gray-700 text-sm mr-1;
+            &:hover {
+                @apply underline;
+            }
+        }
         .existing-dashboard-board {
             @apply relative;
-            min-height: 27rem;
+            min-height: 5rem;
 
             @screen tablet {
                 min-height: 54.5rem;
