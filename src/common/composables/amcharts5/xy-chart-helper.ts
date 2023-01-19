@@ -37,6 +37,8 @@ const createXYChart = (root: Root, settings?: IXYChartSettings): am5xy.XYChart =
         maxTooltipDistance: -1,
         cursor,
         pinchZoomX: false,
+        paddingLeft: 0,
+        paddingRight: 0,
         ...settings,
     }));
 };
