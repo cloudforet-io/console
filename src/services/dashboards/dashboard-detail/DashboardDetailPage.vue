@@ -181,6 +181,7 @@ const handleVisibleNameEditModal = () => {
 };
 const handleNameUpdate = (name: string) => {
     dashboardDetailState.name = name;
+    dashboardDetailOriginState.dashboardInfo.name = name;
 };
 
 // delete dashboard
