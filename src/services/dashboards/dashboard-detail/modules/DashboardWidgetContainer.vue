@@ -223,6 +223,11 @@ export default defineComponent<Props>({
             // emit('rendered', state.widgetRef);
         });
 
+        /* init */
+        (async () => {
+            await store.dispatch('display/loadCurrencyRates');
+        })();
+
         return {
             containerRef,
             ...toRefs(state),
