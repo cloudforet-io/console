@@ -331,10 +331,6 @@ defineExpose<WidgetExpose<Data>>({
                 display: block;
                 margin-top: 0.25rem;
             }
-            &.chart {
-                height: 6.25rem;
-                margin-bottom: 1.5rem;
-            }
         }
     }
 }

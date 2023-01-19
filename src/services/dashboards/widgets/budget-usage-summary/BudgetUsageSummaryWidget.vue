@@ -3,65 +3,94 @@
                   no-height-limit
                   @refresh="handleRefresh"
     >
-        <p-data-loader class="budget-usage-summary"
-                       :loading="state.loading"
-                       :data="state.data"
-                       :loader-backdrop-opacity="1"
-                       loader-type="skeleton"
-        >
+        <div class="budget-usage-summary">
             <div class="data-container">
                 <div class="budget">
                     <p class="budget-label">
                         {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_SPENT') }}
                     </p>
-                    <div class="budget-value">
-                        {{ currencyMoneyFormatter(state.totalSpent, state.currency) }}
-                    </div>
-                    <div class="budget-info">
-                        {{ state.budgetCount }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETS') }}
-                    </div>
+                    <p-data-loader class="data-loader"
+                                   :loading="state.loading"
+                                   :data="state.data"
+                                   :loader-backdrop-opacity="1"
+                                   disable-empty-case
+                                   loader-type="skeleton"
+                    >
+                        <div class="budget-value">
+                            {{ currencyMoneyFormatter(state.totalSpent, state.currency) }}
+                        </div>
+                        <div class="budget-info">
+                            {{ state.budgetCount }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETS') }}
+                        </div>
+                        <template #loader>
+                            <div class="skeleton-wrapper">
+                                <p-skeleton class="skeleton"
+                                            width="10rem"
+                                            height="1.875rem"
+                                />
+                                <p-skeleton class="skeleton"
+                                            width="7.5rem"
+                                            height="1.5rem"
+                                />
+                            </div>
+                        </template>
+                    </p-data-loader>
                 </div>
                 <div class="budget">
                     <p class="budget-label">
                         {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET') }}
                     </p>
-                    <div class="budget-value">
-                        {{ currencyMoneyFormatter(state.totalBudget, state.currency) }}
-                    </div>
-                    <div class="budget-info">
-                        {{ state.leftBudget }}
-                    </div>
+                    <p-data-loader class="data-loader"
+                                   :loading="state.loading"
+                                   :data="state.data"
+                                   :loader-backdrop-opacity="1"
+                                   disable-empty-case
+                                   loader-type="skeleton"
+                    >
+                        <div class="budget-value">
+                            {{ currencyMoneyFormatter(state.totalBudget, state.currency) }}
+                        </div>
+                        <div class="budget-info">
+                            {{ state.leftBudget }}
+                        </div>
+                        <template #loader>
+                            <div class="skeleton-wrapper">
+                                <p-skeleton class="skeleton"
+                                            width="10rem"
+                                            height="1.875rem"
+                                />
+                                <p-skeleton class="skeleton"
+                                            width="7.5rem"
+                                            height="1.5rem"
+                                />
+                            </div>
+                        </template>
+                    </p-data-loader>
                 </div>
                 <div class="chart-wrapper">
-                    <div ref="chartContext"
-                         class="chart"
+                    <p-data-loader class="data-loader"
+                                   :loading="state.loading"
+                                   :data="state.data"
+                                   :loader-backdrop-opacity="1"
+                                   disable-empty-case
+                                   loader-type="skeleton"
                     >
-                        <span class="budget-usage">
-                            {{ state.spentBudget.rate.toFixed(2) }}%{{ state.spentBudget.isOver ? '+' : '' }}
-                        </span>
-                    </div>
+                        <div ref="chartContext"
+                             class="chart"
+                        >
+                            <span class="budget-usage">
+                                <template v-if="Number.isNaN(state.spentBudget.rate)">
+                                    -- %
+                                </template>
+                                <template v-else>
+                                    {{ state.spentBudget.rate.toFixed(2) }}%{{ state.spentBudget.isOver ? '+' : '' }}
+                                </template>
+                            </span>
+                        </div>
+                    </p-data-loader>
                 </div>
             </div>
-            <template #loader>
-                <div class="skeleton-container">
-                    <div v-for="(_, idx) in state.skeletons"
-                         :key="`skeleton-${idx}`"
-                         class="skeleton-wrapper mt-4"
-                    >
-                        <p-skeleton width="10rem"
-                                    height="1.875rem"
-                                    class="mb-1"
-                        />
-                        <p-skeleton width="7.5rem"
-                                    height="1.5rem"
-                        />
-                    </div>
-                    <p-skeleton width="9rem"
-                                height="9rem"
-                    />
-                </div>
-            </template>
-        </p-data-loader>
+        </div>
     </widget-frame>
 </template>
 
@@ -110,6 +139,14 @@ interface Data {
     }
 }
 
+interface ChartData {
+    budget_type: string;
+    budget_rate: number;
+    pieSettings?: {
+        fill: string
+    }
+}
+
 const DATE_FORMAT = 'YYYY-MM';
 
 const props = defineProps<WidgetProps>();
@@ -123,7 +160,7 @@ const state = reactive({
     skeletons: [1, 2],
     chart: null as null|ReturnType<typeof createPieChart>,
     series: null as null|ReturnType<typeof createPieSeries>,
-    chartData: computed(() => {
+    chartData: computed<ChartData[]>(() => {
         if (!state.data) return [];
 
         let chartSpentBudgetRate = state.spentBudget.rate;
@@ -240,7 +277,19 @@ const drawChart = (chartData) => {
         strokeOpacity: 0,
     });
 
-    series.data.setAll(chartData);
+    if (chartData.some((d) => d[seriesSettings.valueField] && d[seriesSettings.valueField] > 0)) {
+        series.data.setAll(chartData);
+    } else {
+        series.data.setAll([{
+            [seriesSettings.valueField]: 1,
+        }]);
+        series.slices.template.setAll({
+            fill: color(gray[200]),
+            strokeOpacity: 0,
+            forceInactive: true,
+        });
+    }
+
     state.chart = chart;
     state.series = series;
 };
@@ -288,6 +337,7 @@ defineExpose<WidgetExpose<Data[]>>({
     .budget {
         @apply flex flex-col row-gap-1 text-gray-900;
         line-height: 1.25;
+        height: 5.875rem;
         margin-bottom: 1rem;
         .budget-label {
             font-size: 1rem;
@@ -315,21 +365,25 @@ defineExpose<WidgetExpose<Data[]>>({
         height: 100%;
     }
 }
-.skeleton-container {
-    @apply flex-col items-start justify-start;
+.data-loader {
+    display: flex;
     width: 100%;
+    height: 100%;
     .skeleton-wrapper {
-        @apply flex flex-col;
-        &:last-of-type {
-            margin-top: 2.5rem;
-            margin-bottom: 1.875rem;
+        width: 100%;
+        height: 100%;
+        .skeleton {
+            display: block;
+            margin-top: 0.25rem;
         }
     }
 }
 .full {
-    .budget-usage-summary {
-        .data-container {
-            @apply flex justify-between;
+    @screen desktop {
+        .budget-usage-summary {
+            .data-container {
+                @apply flex justify-between;
+            }
         }
         .skeleton-container {
             @apply flex flex-row justify-between;
