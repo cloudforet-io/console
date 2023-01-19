@@ -6,7 +6,7 @@
         <div ref="targetRef"
              class="dropdown-button"
              :tabindex="(disabled || readonly) ? -1 : 0"
-             @keyup.down="focusOnContextMenu(0)"
+             @keyup.down="focusOnContextMenu(undefined)"
              @keyup.esc.capture.stop="hideMenu"
              @keyup.enter.capture.stop="toggleMenu"
              @click="toggleMenu"
@@ -189,7 +189,7 @@ const hideMenu = () => {
     }
 };
 const showMenu = () => {
-    if (!proxyVisibleMenu.value && !props.disabled) proxyVisibleMenu.value = true;
+    if (!proxyVisibleMenu.value && !props.disabled) focusOnContextMenu();
 };
 const toggleMenu = () => {
     if (proxyVisibleMenu.value) hideMenu();
