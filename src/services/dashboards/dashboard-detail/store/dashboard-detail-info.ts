@@ -219,7 +219,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         delete validationState.widgetValidMap[widgetKey];
     };
     const resetVariables = () => {
-        console.log('reset');
         const originProperties = { ...managedDashboardVariablesSchema.properties, ...originState.dashboardInfo.variables_schema.properties };
         const originOrder = union(managedDashboardVariablesSchema.order, originState.dashboardInfo.variables_schema.order);
         const originVariables = originState.dashboardInfo.variables;
