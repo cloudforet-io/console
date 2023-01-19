@@ -13,7 +13,7 @@
             <span>
                 <span>{{ item.label }}</span>
                 <p-badge v-if="item.badge"
-                         style-type="primary3"
+                         style-type="indigo100"
                          shape="round"
                 >
                     {{ item.badge }}
@@ -26,7 +26,7 @@
             <span>
                 <span>{{ item.label }}</span>
                 <p-badge v-if="item.badge"
-                         style-type="primary3"
+                         style-type="indigo100"
                          shape="round"
                 >
                     {{ item.badge }}
