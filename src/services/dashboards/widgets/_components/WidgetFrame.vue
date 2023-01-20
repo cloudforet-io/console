@@ -69,7 +69,6 @@
                     <p-icon-button v-if="icon.isAvailable"
                                    :key="`${icon.name}-${getUUID()}`"
                                    :name="icon.name"
-                                   :disabled="icon.disabled"
                                    shape="square"
                                    style-type="tertiary"
                                    @click="icon.handleClick"
@@ -145,7 +144,6 @@ export interface WidgetFrameProps {
 interface IconConfig {
     isAvailable: boolean;
     name: string;
-    disabled: boolean;
     handleClick: () => void;
 }
 const { i18nDayjs } = useI18nDayjs();
@@ -191,9 +189,8 @@ const state = reactive({
     visibleDeleteModal: false,
     editModeIconButtonList: computed<IconConfig[]>(() => [
         {
-            isAvailable: !props.disableExpandIcon,
+            isAvailable: !(props.disableFullSize || props.isOnlyFullSize),
             name: state.isFull ? 'ic_collapse-angle' : 'ic_expand-angle',
-            disabled: !!props.disableFullSize || !!props.isOnlyFullSize,
             handleClick: () => {
                 dashboardDetailStore.toggleWidgetSize(props.widgetKey);
                 if (props.refreshOnResize) emit('refresh');
@@ -202,13 +199,11 @@ const state = reactive({
         {
             isAvailable: !props.disableEditIcon,
             name: 'ic_edit',
-            disabled: false,
             handleClick: handleEditButtonClick,
         },
         {
             isAvailable: !props.disableDeleteIcon,
             name: 'ic_trashcan',
-            disabled: false,
             handleClick: () => {
                 state.visibleDeleteModal = true;
             },
