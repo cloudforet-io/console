@@ -1171,6 +1171,7 @@
 				"LABEL_DATE": "",
 				"LABEL_NAME": "이름",
 				"NAME_DESC": "",
+				"NAME_PLACEHOLDER": "",
 				"NO_SELECTED": "",
 				"NO_SELECTED_HELP_TEXT": "",
 				"SIDEBAR_TITLE": "대시보드 편집",
