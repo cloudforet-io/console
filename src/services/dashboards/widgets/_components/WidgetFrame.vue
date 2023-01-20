@@ -254,7 +254,6 @@ const handleDeleteModalConfirm = () => {
     }
     .error-container {
         @apply flex items-center flex-col h-full;
-        height: 25.25rem;
         padding: 0 1.5625rem;
 
         .error-title {
