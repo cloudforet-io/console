@@ -133,7 +133,7 @@ export const getComponentNameBySchemaProperty = (schemaProperty: InnerJsonSchema
     if (schemaProperty.type === 'object') return 'PJsonSchemaForm';
     if (Array.isArray(schemaProperty.enum) && schemaProperty.type === 'string') return 'PSelectDropdown';
     const items = getMenuItemsFromSchema(schemaProperty);
-    if (items) return 'PFilterableDropdown';
+    if (items || schemaProperty.reference) return 'PFilterableDropdown';
     return 'PTextInput';
 };
 
@@ -147,6 +147,7 @@ export const getInputTypeBySchemaProperty = (schemaProperty: InnerJsonSchema): T
 export const getInputPlaceholderBySchemaProperty = (schemaProperty: InnerJsonSchema) => schemaProperty.examples?.[0] ?? '';
 
 export const getMenuItemsBySchemaProperty = (schemaProperty: InnerJsonSchema): SelectDropdownMenu[]|undefined => {
+    if (schemaProperty.reference) return undefined;
     // get menu items from menuItems
     if (Array.isArray(schemaProperty.menuItems) && schemaProperty.menuItems.length) {
         return schemaProperty.menuItems;

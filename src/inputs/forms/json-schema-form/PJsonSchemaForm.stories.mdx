@@ -18,6 +18,9 @@ import {supportLanguages} from "@/translations";
 import {
     VALIDATION_MODES
 } from "@/inputs/forms/json-schema-form/type";
+import {
+    getFilterableDropdownMenuWithMultiTypes,
+} from '@/inputs/dropdown/filterable-dropdown/mock';
 
 
 <Meta title='Inputs/Forms/Json Schema Form' parameters={{
@@ -39,17 +42,44 @@ export const Template = (args, { argTypes }) => ({
             :validation-mode="validationMode"
             :reset-on-schema-change="resetOnSchemaChange"
             :custom-error-map="customErrorMap"
+            :reference-handler="simpleHandler"
         />
     `,
     setup(props) {
         const state = reactive({
             proxyFormData: props.formData,
         });
+        const menu = getFilterableDropdownMenuWithMultiTypes()
+        let allResults = [];
+        const simpleHandler = async (inputText) => {
+            state.loading = true;
+            allResults = await new Promise(resolve => {
+                setTimeout(() => {
+                    let filtered;
+                    const trimmed = inputText.trim();
+                    if (trimmed) {
+                        filtered = new Fuse(menu, {
+                            keys: ['label'],
+                            distance: 100,
+                            threshold: 0.1,
+                            ignoreLocation: true,
+                        }).search(trimmed);
+                    } else {
+                        filtered = [...menu]
+                    }
+                    resolve(filtered)
+                }, 500)
+            })
+            state.loading = false;
+            const results = allResults.slice(0, 5)
+            return { results, more: allResults.length > results.length }
+        }
         watch(() => props.formData, (formData) => {
             state.proxyFormData = formData
         })
         return {
-            ...toRefs(state)
+            ...toRefs(state),
+            simpleHandler
         }
     }
 });
@@ -86,8 +116,9 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 |json|custom|[Text Editor](?path=/docs/inputs-text-editor--basic)|json input mode. works only with `object` type|
 |enum|custom|[Select Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|supports `string` type only|
 |items|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|supports `array` type only|
+|menuItems|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|supports `array` type only|
+|reference|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|It represents name of reference type. supports `string` type only|
 |order|custom|-|order of properties. string[]|
-
 
 
 

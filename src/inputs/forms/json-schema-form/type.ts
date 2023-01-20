@@ -1,5 +1,6 @@
 import type { JSONSchemaType } from 'ajv';
 
+import type { AutocompleteHandler } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
 import type { InputAppearanceType } from '@/inputs/input/text-input/type';
 import type { SupportLanguage } from '@/translations';
@@ -26,6 +27,7 @@ export type InnerJsonSchema = JsonSchema & {
     inputType?: TextInputType;
     inputPlaceholder?: string;
     menuItems?: SelectDropdownMenu[];
+    reference?: string;
     multiInputMode?: boolean;
     appearanceType?: InputAppearanceType;
 };
@@ -39,4 +41,5 @@ export interface JsonSchemaFormProps {
     isRoot?: boolean;
     resetOnSchemaChange?: boolean;
     customErrorMap?: CustomErrorMap;
+    referenceHandler?: AutocompleteHandler;
 }

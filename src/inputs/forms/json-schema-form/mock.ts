@@ -139,7 +139,11 @@ export const getDefaultSchema = () => ({
             },
             required: ['gender'],
         },
-
+        friends: {
+            title: 'Friends (use referenceHandler)',
+            type: 'array',
+            reference: 'friend',
+        },
     },
     required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails', 'colors', 'provider'],
     order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'provider', 'age', 'phone', 'homepage', 'additional', 'colors', 'foods', 'food'],

@@ -92,6 +92,7 @@
                                            show-select-marker
                                            use-fixed-menu-style
                                            :invalid="invalid"
+                                           :handler="schemaProperty.reference ? referenceHandler : undefined"
                                            class="input-form"
                                            @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                     >
@@ -211,6 +212,10 @@ export default defineComponent<JsonSchemaFormProps>({
         customErrorMap: {
             type: Object,
             default: () => ({}),
+        },
+        referenceHandler: {
+            type: Function,
+            default: undefined,
         },
     },
     setup(props, { emit }) {
