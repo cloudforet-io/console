@@ -59,7 +59,7 @@ interface ValidationState {
     isWidgetLayoutValid: ComputedRef<boolean>;
     widgetValidMap: WidgetValidMap;
 }
-const DEFAULT_REFRESH_INTERVAL = '15s';
+const DEFAULT_REFRESH_INTERVAL = '5m';
 const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
     settings: {
         date_range: {
