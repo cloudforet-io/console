@@ -119,13 +119,13 @@ const state = reactive({
     ...toRefs(useWidgetState<FullData>(props)),
     tableFields: computed<Field[]>(() => [
         {
-            label: 'Provider', name: GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' },
+            label: 'Provider', name: GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' }, width: '20%',
         },
         {
-            label: 'Region', name: GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' },
+            label: 'Region', name: GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
         },
         {
-            label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' }, textAlign: 'right',
+            label: 'Cost', name: 'usd_cost_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
         },
     ]),
     legends: [] as Legend[],

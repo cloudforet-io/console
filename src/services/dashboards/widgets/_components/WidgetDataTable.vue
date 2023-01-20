@@ -462,8 +462,6 @@ const handleClickRow = (rowData) => {
         }
         &.has-width {
             word-break: break-word;
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
         }
         &.right {
             @apply text-right;
