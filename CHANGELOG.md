@@ -1,3 +1,10 @@
+# [2.0.0-beta.24](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.23...v2.0.0-beta.24) (2023-01-20)
+
+
+### Bug Fixes
+
+* **json-schema-form:** add `handler` props & `referenceMenuItems` keyword ([#249](https://github.com/cloudforet-io/mirinae/issues/249)) ([95ea6e4](https://github.com/cloudforet-io/mirinae/commit/95ea6e4554f155b40176f8198f5edcc27aba9bef))
+
 # [2.0.0-beta.23](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.22...v2.0.0-beta.23) (2023-01-19)
 
 
