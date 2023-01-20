@@ -6,8 +6,9 @@
                        required
         >
             <p-text-input :value="title"
+                          :is-focused.sync="isFocused"
                           :invalid="isTitleInvalid"
-                          :placeholder="widgetConfig?.title"
+                          :placeholder="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NAME_PLACEHOLDER')"
                           class="input"
                           @update:value="updateTitle"
             />
@@ -65,8 +66,6 @@ import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/i
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { cloneDeep, isEmpty, union } from 'lodash';
-
-
 
 import {
     useReferenceStore,
@@ -143,6 +142,8 @@ export default defineComponent<Props>({
             // validation
             isSchemaFormValid: undefined,
             isAllValid: computed(() => state.isSchemaFormValid && isTitleValid.value),
+
+            isFocused: false,
         });
 
         /* title form validation */
@@ -334,8 +335,12 @@ export default defineComponent<Props>({
 
             // set states if widget key exists. this is for updating widget case.
             if (widgetKey) setStatesForEditMode(widgetKey);
-        });
 
+            // set focus on text input
+            if (widgetConfigId) {
+                state.isFocused = true;
+            }
+        });
 
         /* validation */
         const handleFormValidate = (isValid) => {
