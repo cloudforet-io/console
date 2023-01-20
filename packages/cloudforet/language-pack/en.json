@@ -1171,6 +1171,7 @@
 				"LABEL_DATE": "Date Range Selector",
 				"LABEL_NAME": "Name",
 				"NAME_DESC": "Displays the top list of 10 highest spending throughout the whole period of filtered date, aggregated by selected Group-By.",
+				"NAME_PLACEHOLDER": "Enter widget name",
 				"NO_SELECTED": "No Selected Widget",
 				"NO_SELECTED_HELP_TEXT": "Information of the widget selected in the left panel and configurable items are displayed.",
 				"SIDEBAR_TITLE": "Customize Dashboard",
