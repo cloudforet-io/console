@@ -75,7 +75,10 @@ import {
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type {
+    KeyItemSet, ValueHandler, KeyDataType, KeyItem,
+} from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
@@ -135,9 +138,8 @@ export default {
                 ],
             }]),
             valueHandlerMap: computed(() => ({
-                /* TODO: Apply ADD_ONS API */
-                // label: makeReferenceValueHandler('dashboard.ProjectDashboard'),
-            } as ValueHandlerMap)),
+                label: makeCombinedDashboardLabelsDistinctHandler(),
+            })),
             queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(store.state.dashboard.searchFilters).queryTags),
         });
 
@@ -168,6 +170,30 @@ export default {
             urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
                 replaceUrlQuery(urlQueryString);
             });
+        };
+
+        const makeCombinedDashboardLabelsDistinctHandler = (): ValueHandler | undefined => {
+            const projectLabelsValueHandler = makeDistinctValueHandler('dashboard.ProjectDashboard', 'labels');
+            const domainLabelsValueHandler = makeDistinctValueHandler('dashboard.DomainDashboard', 'labels');
+
+            return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
+                const defaultResult = {
+                    results: [],
+                    totalCount: 0,
+                };
+                let results;
+                const projectResult = projectLabelsValueHandler ? await projectLabelsValueHandler(inputText, keyItem, currentDataType, subPath) : defaultResult;
+                results = projectResult.results ?? [];
+                const domainResult = domainLabelsValueHandler ? await domainLabelsValueHandler(inputText, keyItem, currentDataType, subPath) : defaultResult;
+                (domainResult.results ?? []).forEach((result) => {
+                    if (results.some((d) => d.label === result.label)) return;
+                    results = [...results, result];
+                });
+                return {
+                    results,
+                    totalCount: (projectResult.totalCount ?? 0) + (domainResult.totalCount ?? 0),
+                };
+            };
         };
 
         (async () => {
