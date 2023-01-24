@@ -138,7 +138,7 @@ export default {
                 ],
             }]),
             valueHandlerMap: computed(() => ({
-                label: makeCombinedDashboardLabelsDistinctHandler(),
+                label: combinedDashbaordLabelsAutoCompleteHandler(),
             })),
             queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(store.state.dashboard.searchFilters).queryTags),
         });
@@ -172,9 +172,10 @@ export default {
             });
         };
 
-        const makeCombinedDashboardLabelsDistinctHandler = (): ValueHandler | undefined => {
+        const combinedDashbaordLabelsAutoCompleteHandler = (): ValueHandler | undefined => {
             const projectLabelsValueHandler = makeDistinctValueHandler('dashboard.ProjectDashboard', 'labels');
             const domainLabelsValueHandler = makeDistinctValueHandler('dashboard.DomainDashboard', 'labels');
+            if (!projectLabelsValueHandler && !domainLabelsValueHandler) return undefined;
 
             return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
                 const defaultResult = {
@@ -183,14 +184,17 @@ export default {
                 };
                 let results;
                 const projectResult = projectLabelsValueHandler ? await projectLabelsValueHandler(inputText, keyItem, currentDataType, subPath) : defaultResult;
-                results = projectResult.results ?? [];
                 const domainResult = domainLabelsValueHandler ? await domainLabelsValueHandler(inputText, keyItem, currentDataType, subPath) : defaultResult;
+                results = projectResult.results ?? [];
                 (domainResult.results ?? []).forEach((result) => {
                     if (results.some((d) => d.label === result.label)) return;
                     results = [...results, result];
                 });
                 return {
-                    results,
+                    results: results.sort((a, b) => {
+                        if (a.label > b.label) return 1;
+                        return -1;
+                    }),
                     totalCount: (projectResult.totalCount ?? 0) + (domainResult.totalCount ?? 0),
                 };
             };
