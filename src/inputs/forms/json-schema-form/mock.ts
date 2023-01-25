@@ -1,4 +1,9 @@
 import { faker } from '@faker-js/faker';
+import Fuse from 'fuse.js';
+import { range } from 'lodash';
+
+import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
+import type { ReferenceHandler } from '@/inputs/forms/json-schema-form/type';
 
 export const getDefaultSchema = () => ({
     type: 'object',
@@ -143,9 +148,10 @@ export const getDefaultSchema = () => ({
             title: 'Friends (use referenceHandler)',
             type: 'array',
             reference: 'friend',
+            items: {},
         },
     },
-    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails', 'colors', 'provider'],
+    required: ['user_id', 'password', 'user_name', 'age', 'homepage', 'phone', 'additional', 'emails', 'colors', 'provider', 'friends'],
     order: ['user_id', 'password', 'user_name', 'user_nickname', 'country_code', 'provider', 'age', 'phone', 'homepage', 'additional', 'colors', 'foods', 'food'],
 });
 
@@ -161,4 +167,46 @@ export const getJsonInputSchema = () => {
     const schema: any = getDefaultSchema();
     schema.json = true;
     return schema;
+};
+
+const getMenuItem = (): FilterableDropdownMenuItem => ({
+    name: faker.datatype.uuid(),
+    label: `${faker.random.word()}`, // (${faker.random.word()})`,
+    type: 'item',
+    // disabled: faker.datatype.boolean(),
+});
+export const getMenuItems = (min = 10, max = 30): FilterableDropdownMenuItem[] => range(faker.datatype.number({ min, max })).map(() => getMenuItem());
+
+export const getReferenceHandler = (pageSize = 10): ReferenceHandler => {
+    const allItems: FilterableDropdownMenuItem[] = getMenuItems(pageSize * 3, pageSize * 4);
+    return async (inputText, schema, pageStart, pageLimit) => {
+        const allResults = await new Promise<FilterableDropdownMenuItem[]>((resolve) => {
+            setTimeout(() => {
+                let filtered;
+                const trimmed = inputText.trim();
+                if (trimmed) {
+                    filtered = new Fuse(allItems, {
+                        keys: ['label'],
+                        distance: 100,
+                        threshold: 0.1,
+                        ignoreLocation: true,
+                    }).search(trimmed);
+                } else {
+                    filtered = [...allItems];
+                }
+
+                resolve(filtered);
+            });
+        });
+
+
+        let sliced = allResults;
+        if (pageStart !== undefined && pageLimit !== undefined) {
+            sliced = allResults.slice(pageStart - 1, pageLimit);
+        }
+        return {
+            results: sliced,
+            more: pageLimit ? allResults.length > pageLimit : false,
+        };
+    };
 };

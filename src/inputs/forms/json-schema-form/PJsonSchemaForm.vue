@@ -89,10 +89,11 @@
                                            :selected="rawFormData[schemaProperty.propertyName]"
                                            :multi-selectable="schemaProperty.multiInputMode"
                                            :appearance-type="schemaProperty.appearanceType"
+                                           :page-size="schemaProperty.pageSize"
                                            show-select-marker
                                            use-fixed-menu-style
                                            :invalid="invalid"
-                                           :handler="schemaProperty.reference ? referenceHandler : undefined"
+                                           :handler="schemaProperty.referenceHandler"
                                            class="input-form"
                                            @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                     >
@@ -111,6 +112,7 @@
                                       :placeholder="schemaProperty.inputPlaceholder"
                                       :appearance-type="schemaProperty.appearanceType"
                                       :autocomplete="false"
+                                      :use-auto-complete="schemaProperty.useAutoComplete"
                                       :disabled="schemaProperty.disabled"
                                       :multi-input="schemaProperty.multiInputMode"
                                       class="input-form"
@@ -146,14 +148,22 @@ import {
     getAppearanceType,
     getComponentNameBySchemaProperty,
     getInputPlaceholderBySchemaProperty,
-    getInputTypeBySchemaProperty, getMenuItemsBySchemaProperty, getMultiInputMode,
-    initFormDataWithSchema, initJsonInputDataWithSchema, initRefinedFormData, refineObjectByProperties,
+    getInputTypeBySchemaProperty,
+    getMenuItemsBySchemaProperty,
+    getMultiInputMode,
+    getPageSize,
+    getReferenceHandler,
+    getUseAutoComplete,
+    initFormDataWithSchema,
+    initJsonInputDataWithSchema,
+    initRefinedFormData,
+    refineObjectByProperties,
     refineValueByProperty,
 } from '@/inputs/forms/json-schema-form/helper';
 import type {
     InnerJsonSchema,
     JsonSchema,
-    JsonSchemaFormProps,
+    JsonSchemaFormProps, ReferenceHandler,
     ValidationMode,
 } from '@/inputs/forms/json-schema-form/type';
 import { VALIDATION_MODES } from '@/inputs/forms/json-schema-form/type';
@@ -214,7 +224,7 @@ export default defineComponent<JsonSchemaFormProps>({
             default: () => ({}),
         },
         referenceHandler: {
-            type: Function,
+            type: Function as PropType<ReferenceHandler|undefined>,
             default: undefined,
         },
     },
@@ -242,7 +252,10 @@ export default defineComponent<JsonSchemaFormProps>({
                             inputPlaceholder: getInputPlaceholderBySchemaProperty(schemaProperty),
                             menuItems: getMenuItemsBySchemaProperty(schemaProperty),
                             multiInputMode: getMultiInputMode(schemaProperty),
+                            useAutoComplete: getUseAutoComplete(schemaProperty),
                             appearanceType: getAppearanceType(schemaProperty),
+                            pageSize: getPageSize(schemaProperty),
+                            referenceHandler: getReferenceHandler(schemaProperty, props),
                         };
                         return refined;
                     }).sort((a, b) => {

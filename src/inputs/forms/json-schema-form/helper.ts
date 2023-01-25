@@ -1,6 +1,7 @@
+import type { AutocompleteHandler } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
 import type {
-    ComponentName, InnerJsonSchema, JsonSchema, TextInputType,
+    ComponentName, InnerJsonSchema, JsonSchema, JsonSchemaFormProps, TextInputType,
 } from '@/inputs/forms/json-schema-form/type';
 import type { InputAppearanceType } from '@/inputs/input/text-input/type';
 
@@ -19,9 +20,8 @@ const refineNumberTypeValue = (val: any): any => {
 const refineArrayTypeValue = (schema: JsonSchema, val?: any[]): string[] | undefined => {
     if (!val?.length) return undefined;
     if (typeof val[0] === 'string') return val;
-    const items = getMenuItemsFromSchema(schema);
-    if (items) return val.map((d) => d.name); // 'name' for PFilterableDropdown
-    return val.map((d) => d.value);
+
+    return val.map((d) => d.name); // Get data from each item's name property. This is the spec of PFilterableDropdown and PTextInput's selected prop
 };
 
 const getMenuItemsFromSchema = (schemaProperty: JsonSchema): string[]|undefined => {
@@ -32,13 +32,15 @@ const getMenuItemsFromSchema = (schemaProperty: JsonSchema): string[]|undefined 
         items = schemaProperty.enum;
     } else if (schemaProperty.type === 'array') {
         // PTextInput multi input case (array, non-strict select) - not used yet
-        if (Array.isArray(schemaProperty.items)) {
-            schemaProperty.items.forEach((item) => {
-                if (typeof item === 'object' && Array.isArray(item.enum)) {
-                    items = items ? items.concat(item.enum) : item.enum;
-                }
-            });
-            // PFilterableDropdown case (array, strict select)
+        if (isStrictArraySelectMode(schemaProperty)) {
+            if (Array.isArray(schemaProperty.items)) {
+                schemaProperty.items.forEach((item) => {
+                    if (typeof item === 'object' && Array.isArray(item.enum)) {
+                        items = items ? items.concat(item.enum) : item.enum;
+                    }
+                });
+            }
+        // PFilterableDropdown case (array, strict select)
         } else if (typeof schemaProperty.items === 'object') {
             items = Array.isArray(schemaProperty.items.enum) ? schemaProperty.items.enum : undefined;
         }
@@ -47,8 +49,8 @@ const getMenuItemsFromSchema = (schemaProperty: JsonSchema): string[]|undefined 
     return items?.filter((d) => typeof d === 'string');
 };
 
-// eslint-disable-next-line no-unused-vars,@typescript-eslint/no-unused-vars
 const isStrictArraySelectMode = (schemaProperty: JsonSchema): boolean => {
+    if (schemaProperty.reference) return true;
     if (typeof schemaProperty.items === 'object') {
         return Array.isArray(schemaProperty.items.enum);
     }
@@ -132,8 +134,7 @@ export const getComponentNameBySchemaProperty = (schemaProperty: InnerJsonSchema
     if (schemaProperty.format === 'generate_id') return 'GenerateIdFormat';
     if (schemaProperty.type === 'object') return 'PJsonSchemaForm';
     if (Array.isArray(schemaProperty.enum) && schemaProperty.type === 'string') return 'PSelectDropdown';
-    const items = getMenuItemsFromSchema(schemaProperty);
-    if (items || schemaProperty.reference) return 'PFilterableDropdown';
+    if (isStrictArraySelectMode(schemaProperty)) return 'PFilterableDropdown';
     return 'PTextInput';
 };
 
@@ -165,10 +166,12 @@ export const getMultiInputMode = (schemaProperty: InnerJsonSchema): boolean => {
     return schemaProperty?.maxItems !== 1;
 };
 
+export const getUseAutoComplete = (schemaProperty: InnerJsonSchema): boolean => schemaProperty.type === 'array';
+
 export const getAppearanceType = (schemaProperty: InnerJsonSchema): InputAppearanceType|undefined => {
     if (getInputTypeBySchemaProperty(schemaProperty) === 'password') return 'masking';
     if (getComponentNameBySchemaProperty(schemaProperty) === 'PTextInput') {
-        if (schemaProperty.type === 'array') return 'stack';
+        if (schemaProperty.type === 'array') return 'badge';
         return 'basic';
     }
     if (getComponentNameBySchemaProperty(schemaProperty) === 'PFilterableDropdown') {
@@ -176,4 +179,18 @@ export const getAppearanceType = (schemaProperty: InnerJsonSchema): InputAppeara
         return 'basic';
     }
     return undefined;
+};
+
+export const getPageSize = (schemaProperty: InnerJsonSchema): number|undefined => {
+    if (schemaProperty.reference) return 10;
+    return undefined;
+};
+
+export const getReferenceHandler = (schemaProperty: InnerJsonSchema, props: JsonSchemaFormProps): AutocompleteHandler|undefined => {
+    if (!schemaProperty.reference) return undefined;
+
+    const handler = props.referenceHandler;
+    if (!handler) return undefined;
+
+    return (inputText, pageStart, pageSize) => handler(inputText, schemaProperty, pageStart, pageSize);
 };

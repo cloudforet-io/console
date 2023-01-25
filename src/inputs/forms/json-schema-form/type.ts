@@ -1,6 +1,6 @@
 import type { JSONSchemaType } from 'ajv';
 
-import type { AutocompleteHandler } from '@/inputs/dropdown/filterable-dropdown/type';
+import type { AutocompleteHandler, FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
 import type { InputAppearanceType } from '@/inputs/input/text-input/type';
 import type { SupportLanguage } from '@/translations';
@@ -16,6 +16,8 @@ export type JsonSchema<Properties = object> = JSONSchemaType<Properties> & {
     order?: string[];
     disabled?: boolean;
     json?: boolean;
+    menuItems?: SelectDropdownMenu[];
+    reference?: string;
 };
 
 export const VALIDATION_MODES = ['input', 'all', 'none'] as const;
@@ -26,13 +28,24 @@ export type InnerJsonSchema = JsonSchema & {
     componentName: ComponentName;
     inputType?: TextInputType;
     inputPlaceholder?: string;
-    menuItems?: SelectDropdownMenu[];
-    reference?: string;
     multiInputMode?: boolean;
+    useAutoComplete?: boolean;
     appearanceType?: InputAppearanceType;
+    pageSize?: number;
+    referenceHandler?: AutocompleteHandler;
 };
 
 export type CustomErrorMap = Record<string, string>;
+
+export interface HandlerRes {
+    results: FilterableDropdownMenuItem[];
+    more?: boolean;
+}
+export interface ReferenceHandler {
+    (inputText: string, schema: InnerJsonSchema, pageStart?: number, pageLimit?: number): Promise<HandlerRes>|HandlerRes;
+}
+
+
 export interface JsonSchemaFormProps {
     schema?: JsonSchema;
     formData?: object;
@@ -41,5 +54,5 @@ export interface JsonSchemaFormProps {
     isRoot?: boolean;
     resetOnSchemaChange?: boolean;
     customErrorMap?: CustomErrorMap;
-    referenceHandler?: AutocompleteHandler;
+    referenceHandler?: ReferenceHandler;
 }
