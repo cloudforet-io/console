@@ -27,7 +27,7 @@
 import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import type Vue from 'vue';
 
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
@@ -39,12 +39,13 @@ import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect';
 import PI from '@/foundation/icons/PI.vue';
 import type { DatetimePickerProps } from '@/inputs/datetime-picker/type';
 import { DATA_TYPE, SELECT_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
-import { i18n } from '@/translations';
+import { I18nConnector } from '@/translations';
 import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 import { getLocaleFile } from '@/translations/vendors/flatpickr';
 
 import Instance = Flatpickr.Instance;
+
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -64,7 +65,6 @@ type FlatpickrMode = typeof FLATPICKR_MODE[keyof typeof FLATPICKR_MODE];
 
 export default {
     name: 'PDatetimePicker',
-    i18n,
     components: {
         PI,
     },
@@ -132,7 +132,7 @@ export default {
                 }),
             ] : [])),
             localeFile: computed(() => {
-                const localeFile = getLocaleFile(i18n.locale);
+                const localeFile = getLocaleFile(I18nConnector.i18n.locale);
                 if (localeFile) return { ...localeFile, rangeSeparator: ' ~ ' };
                 return { rangeSeparator: ' ~ ' };
             }),

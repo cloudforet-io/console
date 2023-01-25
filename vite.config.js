@@ -30,6 +30,7 @@ export default defineConfig(({ mode }) => ({
             output: {
                 globals: {
                     vue: 'Vue',
+                    'vue-i18n': 'vue-i18n',
                 },
             },
         },

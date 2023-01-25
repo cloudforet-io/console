@@ -35,3 +35,15 @@ export const i18n = new VueI18n({
     messages,
     silentFallbackWarn: true,
 });
+
+export class I18nConnector {
+    private static _i18n: VueI18n;
+
+    static get i18n() {
+        return I18nConnector._i18n;
+    }
+
+    static set i18n(_i18n: VueI18n) {
+        I18nConnector._i18n = _i18n;
+    }
+}

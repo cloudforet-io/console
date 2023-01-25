@@ -63,7 +63,6 @@ import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import type { SpinnerSize } from '@/feedbacks/loading/spinner/type';
 import { SPINNER_SIZE } from '@/feedbacks/loading/spinner/type';
-import { i18n } from '@/translations';
 import { getColor } from '@/utils/helpers';
 
 interface Props {
@@ -81,7 +80,6 @@ interface Props {
 export default defineComponent<Props>({
     name: 'PDataLoader',
     components: { PSpinner, PSkeleton },
-    i18n,
     props: {
         loading: {
             type: Boolean,

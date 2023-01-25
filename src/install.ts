@@ -9,6 +9,8 @@ import Notifications from 'vue-notification';
 import VueRouter from 'vue-router';
 import SvgIcon from 'vue-svgicon';
 
+import { i18n, I18nConnector } from '@/translations';
+
 import { applyAmchartsGlobalSettings } from './plugins/amcharts';
 
 export interface MirinaeOptions {
@@ -16,6 +18,7 @@ export interface MirinaeOptions {
     installVueI18n?: boolean;
     installFragment?: boolean;
     amchartsLicenses?: string[];
+    vueI18n?: VueI18n;
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -49,6 +52,7 @@ export class MirinaeInstaller {
             classPrefix: 'p-i',
         });
         vueConstructor.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
+        I18nConnector.i18n = options.vueI18n ?? i18n;
         applyAmchartsGlobalSettings(options?.amchartsLicenses);
     }
 

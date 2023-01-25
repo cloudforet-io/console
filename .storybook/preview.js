@@ -17,7 +17,7 @@ import { fontUrls, webFonts } from '@/styles/web-fonts.cjs';
 import VTooltip from 'v-tooltip';
 
 import SpaceOneTheme from './CloudforetTheme';
-import {i18n} from '@/translations'
+import {i18n, I18nConnector} from '@/translations'
 import { applyAmchartsGlobalSettings } from '@/plugins/amcharts';
 import screens from "@/styles/screens.cjs";
 
@@ -36,6 +36,8 @@ applyAmchartsGlobalSettings()
 Vue.prototype.toJSON = function () {
     return this;
 };
+
+I18nConnector.i18n = i18n;
 
 webFontLoader.load({
     google: {

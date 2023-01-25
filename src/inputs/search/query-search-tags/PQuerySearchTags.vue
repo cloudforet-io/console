@@ -63,13 +63,11 @@ import type {
     QueryTag, QueryTagConverter, QueryTagValidator,
 } from '@/inputs/search/query-search-tags/type';
 import type { QueryItem } from '@/inputs/search/query-search/type';
-import { i18n } from '@/translations';
 
 
 export default defineComponent<QuerySearchTagsProps>({
     name: 'PQuerySearchTags',
     directives: { tooltip: VTooltip },
-    i18n,
     components: {
         PButton, PTag,
     },

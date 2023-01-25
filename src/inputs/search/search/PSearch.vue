@@ -75,7 +75,7 @@ import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { SearchProps } from '@/inputs/search/search/type';
-import { i18n } from '@/translations';
+import { I18nConnector } from '@/translations';
 import { makeByPassListeners } from '@/utils/composition-helpers';
 import { getTextHighlightRegex } from '@/utils/helpers';
 
@@ -84,7 +84,6 @@ const PContextMenu = import('@/inputs/context-menu/PContextMenu.vue');
 export default defineComponent<SearchProps>({
     name: 'PSearch',
     components: { PI, PContextMenu },
-    i18n,
     directives: { clickOutside: vOnClickOutside as DirectiveFunction },
     model: {
         prop: 'value',
@@ -159,7 +158,7 @@ export default defineComponent<SearchProps>({
             inputRef: null as null|HTMLElement,
             handlerLoading: false,
             placeholderText: computed<TranslateResult>(() => {
-                if (props.placeholder === undefined) return i18n.t('COMPONENT.SEARCH.PLACEHOLDER');
+                if (props.placeholder === undefined) return I18nConnector.i18n.t('COMPONENT.SEARCH.PLACEHOLDER');
                 return props.placeholder;
             }),
             filteredMenu: [] as MenuItem[],
