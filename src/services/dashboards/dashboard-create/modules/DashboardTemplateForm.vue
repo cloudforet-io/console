@@ -185,14 +185,8 @@ const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
 };
 
 const handleChangePagination = (page: number, type: TemplateType): void => {
-    if (type === TEMPLATE_TYPE.DEFAULT) {
-        if (page > defaultTemplateState.boardSets.length) return;
-        defaultTemplateState.thisPage = page;
-    }
-    if (type === TEMPLATE_TYPE.EXISTING) {
-        if (page > existingTemplateState.boardSets.length) return;
-        existingTemplateState.thisPage = page;
-    }
+    if (type === TEMPLATE_TYPE.DEFAULT) defaultTemplateState.thisPage = page;
+    if (type === TEMPLATE_TYPE.EXISTING) existingTemplateState.thisPage = page;
 };
 
 const handleInputSearch = () => {
