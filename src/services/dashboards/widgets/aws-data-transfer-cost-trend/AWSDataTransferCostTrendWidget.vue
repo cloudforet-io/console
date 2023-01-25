@@ -36,6 +36,7 @@
                                :legends.sync="state.legends"
                                :color-set="colorSet"
                                disable-ellipsis
+                               disable-pagination
             />
         </div>
     </widget-frame>
