@@ -116,7 +116,7 @@ export default {
                 if (state.scopeStatus === SCOPE_TYPE.PROJECT) {
                     return !!(state.projectDashboardList.length);
                 }
-                return !!(state.dashboardTotalCount);
+                return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
             }),
         });
 
