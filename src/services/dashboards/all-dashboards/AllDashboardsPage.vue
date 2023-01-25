@@ -75,9 +75,13 @@ import {
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import type {
+    KeyItemSet, ValueHandler, KeyDataType, KeyItem, ValueMenuItem,
+} from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
+import type { HandlerResponse } from '@/component-util/query-search/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
@@ -135,9 +139,8 @@ export default {
                 ],
             }]),
             valueHandlerMap: computed(() => ({
-                /* TODO: Apply ADD_ONS API */
-                // label: makeReferenceValueHandler('dashboard.ProjectDashboard'),
-            } as ValueHandlerMap)),
+                label: combinedDashbaordLabelsAutoCompleteHandler(),
+            })),
             queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(store.state.dashboard.searchFilters).queryTags),
         });
 
@@ -168,6 +171,37 @@ export default {
             urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
                 replaceUrlQuery(urlQueryString);
             });
+        };
+
+        const combinedDashbaordLabelsAutoCompleteHandler = (): ValueHandler | undefined => {
+            const projectLabelsValueHandler = makeDistinctValueHandler('dashboard.ProjectDashboard', 'labels');
+            const domainLabelsValueHandler = makeDistinctValueHandler('dashboard.DomainDashboard', 'labels');
+            if (!projectLabelsValueHandler && !domainLabelsValueHandler) return undefined;
+
+            return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
+                const results = [] as ValueMenuItem[];
+                const promises = [] as (HandlerResponse | Promise<HandlerResponse>)[];
+
+                if (projectLabelsValueHandler) promises.push(projectLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
+                if (domainLabelsValueHandler) promises.push(domainLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
+                const responses = await Promise.allSettled(promises);
+
+                // combine both of results and sort
+                responses.forEach((res) => {
+                    if (res.status === 'fulfilled') {
+                        res.value.results.forEach((item) => {
+                            if (results.some((d) => d.name === item.name)) return;
+                            results.push(item);
+                        });
+                    }
+                });
+                results.sort((a, b) => (a.label > b.label ? 1 : -1));
+
+                return {
+                    results,
+                    totalCount: results.length ?? 0,
+                };
+            };
         };
 
         (async () => {
