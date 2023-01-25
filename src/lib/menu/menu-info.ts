@@ -135,5 +135,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     [MENU_ID.INFO_NOTICE]: {
         translationId: 'MENU.INFO_NOTICE',
         isNew: true,
+        needPermissionByRole: true,
     },
 });

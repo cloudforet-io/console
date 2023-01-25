@@ -69,7 +69,7 @@
                     />
                 </template>
             </p-field-group>
-            <div v-if="hasSystemRole"
+            <div v-if="hasSystemRole || hasDomainRole"
                  class="notice-create-options-wrapper"
             >
                 <p-check-box v-model="isPinned">
@@ -163,6 +163,7 @@ export default {
     setup(props) {
         const state = reactive({
             hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
+            hasDomainRole: computed<boolean>(() => store.getters['user/hasDomainRole']),
             userName: computed<string>(() => store.state.user.name),
             isPinned: false,
             isPopup: false,
