@@ -182,19 +182,24 @@ export default {
                     results: [],
                     totalCount: 0,
                 };
-                let results;
                 const projectResult = projectLabelsValueHandler ? await projectLabelsValueHandler(inputText, keyItem, currentDataType, subPath) : defaultResult;
                 const domainResult = domainLabelsValueHandler ? await domainLabelsValueHandler(inputText, keyItem, currentDataType, subPath) : defaultResult;
+
+                let results;
                 results = projectResult.results ?? [];
+
+                // combine both of results and sort
                 (domainResult.results ?? []).forEach((result) => {
                     if (results.some((d) => d.label === result.label)) return;
                     results = [...results, result];
                 });
+                results.sort((a, b) => {
+                    if (a.label > b.label) return 1;
+                    return -1;
+                });
+
                 return {
-                    results: results.sort((a, b) => {
-                        if (a.label > b.label) return 1;
-                        return -1;
-                    }),
+                    results,
                     totalCount: (projectResult.totalCount ?? 0) + (domainResult.totalCount ?? 0),
                 };
             };
