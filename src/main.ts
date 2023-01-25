@@ -28,7 +28,7 @@ Vue.use(PiniaVuePlugin);
 
 directive(Vue);
 
-Vue.use(SpaceDesignSystem);
+Vue.use(SpaceDesignSystem, { vueI18n: i18n });
 
 /** ********** SET VUE CONFIG ************** */
 
