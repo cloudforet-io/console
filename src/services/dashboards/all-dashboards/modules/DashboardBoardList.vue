@@ -3,7 +3,7 @@
         <p-field-title class="p-field-title">
             <template #default>
                 <span>{{ fieldTitle }}</span>
-                <span class="board-count">({{ dashboardList.length }})</span>
+                <span class="board-count">({{ dashboardTotalCount }})</span>
             </template>
         </p-field-title>
         <p-board :board-sets="dashboardListByBoardSets"
@@ -49,12 +49,12 @@
                 </div>
             </template>
         </p-board>
-        <div v-if="dashboardList.length >= 10"
+        <div v-if="dashboardTotalCount >= 10"
              class="dashboard-list-pagination"
         >
-            <p-pagination :total-count="dashboardList.length"
+            <p-pagination :total-count="dashboardTotalCount"
                           :page-size="PAGE_SIZE"
-                          :current-page="thisPage"
+                          :this-page="thisPage"
                           @change="handlePage"
             />
         </div>
@@ -143,6 +143,7 @@ export default defineComponent<DashboardBoardListProps>({
     setup(props) {
         const state = reactive({
             thisPage: 1,
+            dashboardTotalCount: computed<number>(() => props.dashboardList.length ?? 0),
             dashboardScopeKey: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? DOMAIN_SCOPE_KEY : PROJECT_SCOPE_KEY)),
             projectItems: computed(() => store.getters['reference/projectItems']),
             dashboardListByBoardSets: computed<BoardSet[]>(() => props.dashboardList
