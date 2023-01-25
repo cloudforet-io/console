@@ -73,7 +73,7 @@
                                        :selected="rawFormData[schemaProperty.propertyName]"
                                        :items="schemaProperty.menuItems"
                                        :disabled="schemaProperty.disabled"
-                                       use-fixed-menu-style
+                                       :use-fixed-menu-style="useFixedMenuStyle"
                                        class="input-form"
                                        @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                     >
@@ -91,7 +91,7 @@
                                            :appearance-type="schemaProperty.appearanceType"
                                            :page-size="schemaProperty.pageSize"
                                            show-select-marker
-                                           use-fixed-menu-style
+                                           :use-fixed-menu-style="useFixedMenuStyle"
                                            :invalid="invalid"
                                            :handler="schemaProperty.referenceHandler"
                                            class="input-form"
@@ -113,6 +113,7 @@
                                       :appearance-type="schemaProperty.appearanceType"
                                       :autocomplete="false"
                                       :use-auto-complete="schemaProperty.useAutoComplete"
+                                      :use-fixed-menu-style="useFixedMenuStyle"
                                       :disabled="schemaProperty.disabled"
                                       :multi-input="schemaProperty.multiInputMode"
                                       class="input-form"
@@ -226,6 +227,10 @@ export default defineComponent<JsonSchemaFormProps>({
         referenceHandler: {
             type: Function as PropType<ReferenceHandler|undefined>,
             default: undefined,
+        },
+        useFixedMenuStyle: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {
