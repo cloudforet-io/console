@@ -1175,7 +1175,7 @@
 				"NO_SELECTED": "위젯이 선택되지 않음",
 				"NO_SELECTED_HELP_TEXT": "특정 위젯 선택시, 위젯 정보와 편집 가능한 옵션 필드가 이 곳에 보여집니다. ",
 				"SIDEBAR_TITLE": "대시보드 편집",
-				"TAB_ALERT": "얼\u001b럿",
+				"TAB_ALERT": "얼럿",
 				"TAB_ALL": "전체",
 				"TAB_ASSET": "에셋",
 				"TAB_COST": "비용",
@@ -1199,7 +1199,7 @@
 			"SAVE": "저장",
 			"VALIDATION_DUPLICATED_LABEL": "이미 존재하는 레이블 입니다.",
 			"VARIABLES": {
-				"ADD": "변수 추\u001e가",
+				"ADD": "변수 추가",
 				"ADD_OPTIONS": "추가",
 				"CANCEL": "취소",
 				"CHECK_MODAL_CONTENTS": "이 작업은 취소 할 수 없습니다.",
