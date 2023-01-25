@@ -2,14 +2,26 @@ import type { Action } from 'vuex';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+// eslint-disable-next-line import/no-cycle
+import { store } from '@/store';
 
 import type { DashboardState } from '@/store/modules/dashboard/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+const getApiQuery = () => new ApiQueryHelper().setFilters([{
+    k: 'user_id',
+    v: [null, store.state.user.userId || ''],
+    o: '=',
+}]).data;
+
 export const loadDomainDashboard: Action<DashboardState, any> = async ({ commit }): Promise<void> => {
+    const query = getApiQuery();
+
     try {
-        const { results, total_count } = await SpaceConnector.clientV2.dashboard.domainDashboard.list({});
+        const { results, total_count } = await SpaceConnector.clientV2.dashboard.domainDashboard.list({ query });
         if (results) {
             commit('setDomainItems', results);
             commit('setDomainItemCount', total_count);
@@ -19,8 +31,10 @@ export const loadDomainDashboard: Action<DashboardState, any> = async ({ commit 
     }
 };
 export const loadProjectDashboard: Action<DashboardState, any> = async ({ commit }): Promise<void> => {
+    const query = getApiQuery();
+
     try {
-        const { results, total_count } = await SpaceConnector.clientV2.dashboard.projectDashboard.list({});
+        const { results, total_count } = await SpaceConnector.clientV2.dashboard.projectDashboard.list({ query });
         if (results) {
             commit('setProjectItems', results);
             commit('setProjectItemCount', total_count);

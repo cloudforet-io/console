@@ -1,8 +1,12 @@
+export const WIDGET_WIDTH_CRITERIA = 16;
+
+const getWidthRangeList = (n: number) => [...Array(36)].map((_, index) => n + index * WIDGET_WIDTH_CRITERIA);
+
 export const WIDGET_WIDTH_RANGE_LIST = {
-    sm: [320, 400, 480],
-    md: [480, 560, 640],
-    lg: [640, 720, 800],
-    xl: [800, 880, 960],
+    sm: getWidthRangeList(320), // 320 ~ 880
+    md: getWidthRangeList(480), // 480 ~ 960
+    lg: getWidthRangeList(640), // 640 ~ 1200
+    xl: getWidthRangeList(800), // 800 ~ 1360
 };
 
 export const WIDGET_CONTAINER_MIN_WIDTH = 320;
