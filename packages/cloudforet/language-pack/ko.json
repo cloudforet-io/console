@@ -1208,7 +1208,7 @@
 				"DELETE_TITLE": "이 변수를 삭제하시겠습니까?",
 				"EDIT": "편집",
 				"FILTER_ALL": "전체",
-        "FILTER_CUSTOM": "Custom",
+			        "FILTER_CUSTOM": "Custom",
 				"FILTER_MANAGED": "Managed",
 				"FILTER_TITLE": "변수 타입",
 				"LABEL_NAME": "이름",
