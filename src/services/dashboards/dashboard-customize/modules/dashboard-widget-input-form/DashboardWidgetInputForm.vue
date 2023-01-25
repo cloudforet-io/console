@@ -47,7 +47,8 @@
                 </template>
             </p-json-schema-form>
         </p-data-loader>
-        <dashboard-widget-more-options :widget-config-id="widgetConfigId"
+        <dashboard-widget-more-options class="more-option-container"
+                                       :widget-config-id="widgetConfigId"
                                        :selected-properties="widgetFormState.defaultSchemaProperties"
                                        @update:selected-properties="handleUpdateDefaultSchemaProperties"
         />
@@ -437,6 +438,10 @@ export default defineComponent<Props>({
                 @apply text-gray-600;
             }
         }
+    }
+
+    .more-option-container {
+        z-index: 2;
     }
 }
 </style>
