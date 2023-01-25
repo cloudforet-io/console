@@ -685,15 +685,15 @@
 				"UPDATE_DASHBOARD": "대시보드 이름 변경"
 			},
 			"HOME": {
-				"COST_ANALYSIS_DESC": "",
-				"COST_BUDGET_DESC": "",
-				"COST_DASHBOARD": "",
-				"COST_DASHBOARD_DESC": "",
-				"ENABLE_BUTTON": "",
-				"LEARN_MORE": "",
-				"MORE_INFO": "",
-				"TITLE": "",
-				"TOPIC_DESC": ""
+				"COST_ANALYSIS_DESC": "여러 클라우드 리소스들을 그룹별로 세분화하여 보다 세밀하게 비용 분석이 가능합니다.",
+				"COST_BUDGET_DESC": "각 프로젝트별 비용 예산을 설정하고 자원 사용량을 체계적으로 관리할 수 있습니다.",
+				"COST_DASHBOARD": "비용 대시보드",
+				"COST_DASHBOARD_DESC": "다양한 위젯들을 비용 관리 대시보드에 추가하여 빠르게 클라우드 비용 상태를 파악할 수 있습니다. ",
+				"ENABLE_BUTTON": "비용 관리 서비스 활성화",
+				"LEARN_MORE": "더보기",
+				"MORE_INFO": "추가 정보",
+				"TITLE": "손쉽게 비용을 분석하고 자원을 최적화하세요",
+				"TOPIC_DESC": "비용을 항목별로 관리해 상세 내역을 분석해보세요. \n분석 정보를 활용해 자원을 최적화할 수 있습니다."
 			},
 			"MAIN": {
 				"ALT_E_EDIT_FILTER": "필터 수정 실패",
@@ -798,7 +798,7 @@
 		"FNB": {
 			"PRIVACY": "개인정보처리방침 ",
 			"PRIVACY_MSG": "준비 중입니다.",
-			"PROJECT_POLICIES": ""
+			"PROJECT_POLICIES": "Project Policies"
 		},
 		"GNB": {
 			"ACCOUNT": {
@@ -814,9 +814,9 @@
 				"ROLE_ROOT_ADMIN": "Root 관리자"
 			},
 			"DASHBOARDS": {
-				"CREATE_DASHBOARDS": "",
-				"NO_ITEMS": "",
-				"VIEW_ALL": ""
+				"CREATE_DASHBOARDS": "새 대시보드 생성",
+				"NO_ITEMS": "아이템이 없습니다",
+				"VIEW_ALL": "모든 대시보드 보기"
 			},
 			"FAVORITES": {
 				"ALL_CLOUD_SERVICES": "모든 클라우드 서비스",
@@ -1124,118 +1124,118 @@
 			"CREATE": "생성",
 			"CREAT_NEW_DASHBOARD": "대시보드 생성",
 			"DASHBOARDS_TITLE": "대시보드",
-			"ENTIRE_WORKSPACE": "",
+			"ENTIRE_WORKSPACE": "전체 워크스페이스",
 			"FILTER_ALL": "전체",
-			"FILTER_ENTIRE_WORKSPACE": "",
+			"FILTER_ENTIRE_WORKSPACE": "전체 워크스페이스",
 			"FILTER_PRIVATE": "비공개",
 			"FILTER_PUBLIC": "공개",
-			"FILTER_SINGLE_PROJECT": "",
-			"HELP_TEXT_CREATE": "",
+			"FILTER_SINGLE_PROJECT": "개별 프로젝트",
+			"HELP_TEXT_CREATE": "커스텀 대시보드를 생성하고, 클라우드 데이터 한눈에 파악하세요. ",
 			"LABEL_SCOPE": "범위",
-			"LABEL_VIWERS": "",
+			"LABEL_VIWERS": "조회범위",
 			"PROJECT": "프로젝트",
-			"SINGLE_PROJECT": "",
-			"TOOLTIP_CLONE": "",
+			"SINGLE_PROJECT": "개별 프로젝트",
+			"TOOLTIP_CLONE": "복제",
 			"TOOLTIP_DELETE": "삭제",
 			"TOOLTIP_EDIT": "편집",
-			"VIEW_ALL": ""
+			"VIEW_ALL": "모든 대시보드 보기"
 		},
 		"CREATE": {
 			"CANCEL": "취소",
 			"CREATE": "생성",
-			"ENTIRE_WORKSPACES": "",
-			"LABEL_DEFAULT_TEMPLATE": "",
-			"LABEL_EXISTING_DASHBOARD": "",
-			"LABEL_SCOPE": "",
-			"LABEL_START_FROM": "",
-			"LABEL_VIEWERS": "",
+			"ENTIRE_WORKSPACES": "전체 워크스페이스",
+			"LABEL_DEFAULT_TEMPLATE": "기본 템플릿 중 선택",
+			"LABEL_EXISTING_DASHBOARD": "저장된 대시보드 중 선택",
+			"LABEL_SCOPE": "대시보드 범위",
+			"LABEL_START_FROM": "기본 생성 폼",
+			"LABEL_VIEWERS": "조회범위",
 			"NO_ITEMS": "아이템이 없습니다",
 			"PREVIEW": "미리보기",
 			"PRIVATE": "비공개",
-			"PRIVATE_DESC": "",
+			"PRIVATE_DESC": "나만보기",
 			"PUBLIC": "공개",
-			"PUBLIC_DESC": "",
-			"SINGLE_PROJECT": "",
+			"PUBLIC_DESC": "본 워크스페이스에 'view' 엑세스 권한을 갖는 모든 유저",
+			"SINGLE_PROJECT": "개별 프로젝트",
 			"TITLE": "대시보드 생성",
 			"VALIDATION_PROJECT": "프로젝트를 선택해주세요.",
-			"VALIDATION_TEMPLATE": ""
+			"VALIDATION_TEMPLATE": "템플릿을 선택하세요."
 		},
 		"CUSTOMIZE": {
-			"ADD_LABEL": "",
+			"ADD_LABEL": "+ 버튼을 추가하여 레이블을 추가할 수 있습니다.",
 			"ADD_WIDGET": {
 				"ADD": "위젯 추가",
-				"ADD_OPTIONS": "",
-				"FROM_DASHBOARD": "",
-				"INHERIT": "",
-				"LABEL_CURRENCY": "",
-				"LABEL_DATE": "",
+				"ADD_OPTIONS": "옵션 추가",
+				"FROM_DASHBOARD": "대시보드 옵션 값",
+				"INHERIT": "상속받기",
+				"LABEL_CURRENCY": "통화 적용 옵션",
+				"LABEL_DATE": "기간 적용 옵션",
 				"LABEL_NAME": "이름",
-				"NAME_DESC": "",
-				"NAME_PLACEHOLDER": "",
-				"NO_SELECTED": "",
-				"NO_SELECTED_HELP_TEXT": "",
+				"NAME_DESC": "선택한 Group-By를 기준으로 조회 기간동안 발생한 상위 10개 비용 데이터를 보여주는 위젯.",
+				"NAME_PLACEHOLDER": "위젯 이름 입력",
+				"NO_SELECTED": "위젯이 선택되지 않음",
+				"NO_SELECTED_HELP_TEXT": "특정 위젯 선택시, 위젯 정보와 편집 가능한 옵션 필드가 이 곳에 보여집니다. ",
 				"SIDEBAR_TITLE": "대시보드 편집",
 				"TAB_ALERT": "얼\u001b럿",
 				"TAB_ALL": "전체",
-				"TAB_ASSET": "",
+				"TAB_ASSET": "에셋",
 				"TAB_COST": "비용",
 				"TAB_CUSTOM": "커스텀",
 				"TAB_DEFAULT": "기본",
 				"TITLE": "새로운 위젯 추가",
 				"VALIDATION_NAME": "이름을 입력하세요."
 			},
-			"ALT_E_UPDATE_DASHBOARD": "",
+			"ALT_E_UPDATE_DASHBOARD": "대시보드 편집 실패",
 			"CANCEL": "취소",
-			"ENTER_NEW_LABEL": "",
-			"REFRESH_INTERVAL_10M": "",
-			"REFRESH_INTERVAL_15S": "",
-			"REFRESH_INTERVAL_1H": "",
-			"REFRESH_INTERVAL_1M": "",
-			"REFRESH_INTERVAL_30M": "",
-			"REFRESH_INTERVAL_30S": "",
-			"REFRESH_INTERVAL_5M": "",
-			"REFRESH_OFF": "",
+			"ENTER_NEW_LABEL": "레이블 입력",
+			"REFRESH_INTERVAL_10M": "10분",
+			"REFRESH_INTERVAL_15S": "15초",
+			"REFRESH_INTERVAL_1H": "1시간",
+			"REFRESH_INTERVAL_1M": "1분",
+			"REFRESH_INTERVAL_30M": "30분",
+			"REFRESH_INTERVAL_30S": "30초",
+			"REFRESH_INTERVAL_5M": "5분",
+			"REFRESH_OFF": "꺼짐",
 			"RESET": "초기화",
 			"SAVE": "저장",
-			"VALIDATION_DUPLICATED_LABEL": "",
+			"VALIDATION_DUPLICATED_LABEL": "이미 존재하는 레이블 입니다.",
 			"VARIABLES": {
-				"ADD": "",
+				"ADD": "변수 추\u001e가",
 				"ADD_OPTIONS": "추가",
 				"CANCEL": "취소",
-				"CHECK_MODAL_CONTENTS": "",
-				"CHECK_MODAL_DELETE_TITLE": "",
+				"CHECK_MODAL_CONTENTS": "이 작업은 취소 할 수 없습니다.",
+				"CHECK_MODAL_DELETE_TITLE": "변경된 사항을 취소하시겠습니까?",
 				"DELETE": "삭제",
-				"DELETE_TITLE": "",
+				"DELETE_TITLE": "이 변수를 삭제하시겠습니까?",
 				"EDIT": "편집",
 				"FILTER_ALL": "전체",
 				"FILTER_CUSTOM": "커스텀",
-				"FILTER_MANAGED": "",
-				"FILTER_TITLE": "",
+				"FILTER_MANAGED": "Managed",
+				"FILTER_TITLE": "변수 타입",
 				"LABEL_NAME": "이름",
-				"LABEL_OPTIONS": "",
-				"LABEL_SELECTION_TYPE": "",
-				"MORE": "",
-				"MULTI_SELECT": "",
-				"PLACEHOLDER_OPTIONS": "",
+				"LABEL_OPTIONS": "옵션",
+				"LABEL_SELECTION_TYPE": "선택 타입",
+				"MORE": "추가",
+				"MULTI_SELECT": "다중 선택",
+				"PLACEHOLDER_OPTIONS": "데이터 소스 입력",
 				"SAVE": "저장",
-				"SINGLE_SELECT": "",
-				"SUB_TITLE": "",
-				"SUB_TITLE_EDIT": "",
-				"TITLE": "",
+				"SINGLE_SELECT": "단일 선택",
+				"SUB_TITLE": "변수",
+				"SUB_TITLE_EDIT": "변수 편집",
+				"TITLE": "변수 관리",
 				"VALIDATION_NAME_REQUIRED": ""
 			}
 		},
 		"DETAIL": {
-			"AUTO": "",
-			"CLONE": "",
-			"CURRENT_MONTH": "",
+			"AUTO": "자동",
+			"CLONE": "복제",
+			"CURRENT_MONTH": "최근월",
 			"CUSTOM": "커스텀",
 			"CUSTOMIZE": "편집",
 			"DEFAULT": "기본",
 			"DELETE": "삭제",
-			"EXPORT": "",
+			"EXPORT": "파일 저장",
 			"PDF_EXPORT": {
-				"APPLIED_FILTERS": ""
+				"APPLIED_FILTERS": "적용된 필터"
 			},
 			"PERIOD_CUSTOM": "기간 선택",
 			"PERIOD_LAST_14_DAYS": "최근 2주일",
@@ -1244,16 +1244,16 @@
 			"PERIOD_LAST_7_DAYS": "최근 1주일",
 			"PERIOD_LAST_MONTH": "지난 달",
 			"PERIOD_THIS_MONTH": "이번 달",
-			"REFRESH": "",
+			"REFRESH": "자동 새로고침",
 			"SET_HOME": "홈 대시보드로 설정"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "대시보드 생성 실패",
-			"ALT_E_DELETE_DASHBOARD": "",
-			"ALT_E_EDIT_NAME": "",
-			"ALT_E_UPDATE_DASHBOARD_NAME": "",
-			"ALT_S_DELETE_DASHBOARD": "",
-			"CLONE_TITLE": "",
+			"ALT_E_DELETE_DASHBOARD": "대시보드 삭제 실패",
+			"ALT_E_EDIT_NAME": "대시보드 이름 수정 실패",
+			"ALT_E_UPDATE_DASHBOARD_NAME": "대시보드 이름 수정 실패",
+			"ALT_S_DELETE_DASHBOARD": "대시보드 삭제 완료",
+			"CLONE_TITLE": "대시보드 복제",
 			"CUSTOM_DATE_FROM": "시작",
 			"CUSTOM_DATE_TITLE": "기간 선택",
 			"CUSTOM_DATE_TO": "종료",
@@ -1262,21 +1262,21 @@
 			"DATE_HELP_TEXT_MONTHLY": "최대 12개월 기간내 설정 가능",
 			"DELETE_TITLE": "대시보드를 삭제하시겠습니까?",
 			"LABEL_DASHBOARD_NAME": "대시보드 이름",
-			"LABEL_PRIVATE": "",
-			"LABEL_PUBLIC": "",
-			"LABEL_VIEWERS": "",
+			"LABEL_PRIVATE": "비공개 (나만보기)",
+			"LABEL_PUBLIC": "공개 ('대시보드' 메뉴에 'view' 엑세스 권한이 있는 모든 유저 대상)",
+			"LABEL_VIEWERS": "조회범위",
 			"REQUIRED": "필수 입력 항목입니다.",
-			"UPDATE_TITLE": "",
-			"VALIDATION_DASHBOARD_NAME_INPUT": "",
-			"VALIDATION_DASHBOARD_NAME_LENGTH": "제목은 100글자를 넘을 수 없습니다.",
-			"VALIDATION_DASHBOARD_NAME_UNIQUE": ""
+			"UPDATE_TITLE": "대시보드 이름 수정",
+			"VALIDATION_DASHBOARD_NAME_INPUT": "대시보드 이름을 입력해주세요.",
+			"VALIDATION_DASHBOARD_NAME_LENGTH": "대시보드 이름은 100글자를 넘을 수 없습니다.",
+			"VALIDATION_DASHBOARD_NAME_UNIQUE": "동일한 이름의 대시보드가 이미 존재합니다. "
 		},
 		"LNB": {
-			"ONLY_FAVORITE": ""
+			"ONLY_FAVORITE": "즐겨찾기 항목만 노출"
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
-				"DESC": ""
+				"DESC": "얼럿 히스토리 설명"
 			},
 			"ALERT_STATUS_OVERVIEW": {
 				"DESC": "발생한 얼럿 전체 목록에 관련된 프로젝트와 긴급도를 함께 보여주는 위젯.  "
@@ -1308,10 +1308,10 @@
 			},
 			"BUDGET_USAGE_SUMMARY": {
 				"AVAILABLE": "사용가능",
-				"BUDGETS": "",
+				"BUDGETS": "Budgets",
 				"DESC": "조회 기간동안의 전체 발생 비용, 예산 사용상태에 대한 요약 데이터를 나타내주는 위젯.",
 				"TOTAL_BUDGET": "총 예산",
-				"TOTAL_SPENT": ""
+				"TOTAL_SPENT": "총 사용 금액"
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
 				"DESC": "조회 기간동안의 프로젝트별 예산 사용상태를 예산 고갈 예측과 함께 보여주는 위젯. "
@@ -1342,16 +1342,16 @@
 			},
 			"DATE_PAST_7_DAYS": "지난 7 일",
 			"DATE_TODAY": "오늘",
-			"DELETE_CONTENTS": "",
-			"DELETE_TITLE": "",
+			"DELETE_CONTENTS": "이 위젯을 삭제하시겠습니까? 대시보드를 저장하게 될 경우, 삭제한 위젯은 복구할 수 없습니다. ",
+			"DELETE_TITLE": "위젯 삭제 ",
 			"DETAILS": "상세 정보",
-			"EDIT_WIDGET": "",
-			"ERROR_MSG": "",
-			"ERROR_TITLE": "",
+			"EDIT_WIDGET": "위젯 옵션 수정",
+			"ERROR_MSG": "대시보드상의 변수 변경 또는 호환성 관련하여 선택된 위젯 옵션 중 이슈가 있어 수정이 필요합니다.  ",
+			"ERROR_TITLE": "데이터 표시 불가",
 			"MONTHLY_COST": {
-				"CURRENT_MONTH": "",
+				"CURRENT_MONTH": "최근월 발생 비용",
 				"DESC": "조회기간의 최근월 비용 및 전월 동일 기간과의 비교 데이터를 보여주는 위젯.",
-				"PREVIOUS_MONTH": ""
+				"PREVIOUS_MONTH": "전월 발생 비용"
 			},
 			"NO_DATA": "데이터가 없습니다.",
 			"PROJECT_ACTIVITY_SUMMARY": {
@@ -1363,8 +1363,8 @@
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "컴퓨트, 데이터베이스, 스토리지 리소스 사용량이 많은 상위 프로젝트들을 빠르게 파악할 수 있는 위젯."
 			},
-			"UPDATE_TITLE": "",
-			"VALIDATION_PROPERTY_NOT_EXIST": ""
+			"UPDATE_TITLE": "위젯 편집",
+			"VALIDATION_PROPERTY_NOT_EXIST": "이전에 선택했던 옵션 변수에 변경 사항이 있습니다. "
 		}
 	},
 	"IAM": {
