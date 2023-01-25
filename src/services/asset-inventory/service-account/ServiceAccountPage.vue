@@ -238,7 +238,7 @@ export default {
 
         /** Field Handler for display formatting(project id -> project name)* */
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
-            if (field.extraData?.reference) {
+            if (field.extraData?.reference && field.data !== null) {
                 return referenceFieldFormatter(field.extraData.reference, field.data);
             }
             return {};
