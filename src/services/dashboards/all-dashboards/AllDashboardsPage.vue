@@ -77,10 +77,11 @@ import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/to
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type {
-    KeyItemSet, ValueHandler, KeyDataType, KeyItem,
+    KeyItemSet, ValueHandler, KeyDataType, KeyItem, ValueMenuItem,
 } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
+import type { HandlerResponse } from '@/component-util/query-search/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
@@ -178,29 +179,27 @@ export default {
             if (!projectLabelsValueHandler && !domainLabelsValueHandler) return undefined;
 
             return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
-                const defaultResult = {
-                    results: [],
-                    totalCount: 0,
-                };
-                const projectResult = projectLabelsValueHandler ? await projectLabelsValueHandler(inputText, keyItem, currentDataType, subPath) : defaultResult;
-                const domainResult = domainLabelsValueHandler ? await domainLabelsValueHandler(inputText, keyItem, currentDataType, subPath) : defaultResult;
+                const results = [] as ValueMenuItem[];
+                const promises = [] as (HandlerResponse | Promise<HandlerResponse>)[];
 
-                let results;
-                results = projectResult.results ?? [];
+                if (projectLabelsValueHandler) promises.push(projectLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
+                if (domainLabelsValueHandler) promises.push(domainLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
+                const responses = await Promise.allSettled(promises);
 
                 // combine both of results and sort
-                (domainResult.results ?? []).forEach((result) => {
-                    if (results.some((d) => d.label === result.label)) return;
-                    results = [...results, result];
+                responses.forEach((res) => {
+                    if (res.status === 'fulfilled') {
+                        res.value.results.forEach((item) => {
+                            if (results.some((d) => d.name === item.name)) return;
+                            results.push(item);
+                        });
+                    }
                 });
-                results.sort((a, b) => {
-                    if (a.label > b.label) return 1;
-                    return -1;
-                });
+                results.sort((a, b) => (a.label > b.label ? 1 : -1));
 
                 return {
                     results,
-                    totalCount: (projectResult.totalCount ?? 0) + (domainResult.totalCount ?? 0),
+                    totalCount: results.length ?? 0,
                 };
             };
         };
