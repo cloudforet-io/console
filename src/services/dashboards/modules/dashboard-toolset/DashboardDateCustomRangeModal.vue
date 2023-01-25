@@ -42,7 +42,9 @@
 
 <script lang="ts">
 
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, reactive, toRefs, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { PButtonModal, PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
@@ -82,6 +84,10 @@ export default {
             default: 'yearToDate',
         },
         granularity: {
+            type: String,
+            default: undefined,
+        },
+        selectedMonth: {
             type: String,
             default: undefined,
         },
@@ -162,6 +168,14 @@ export default {
             }
             emit('confirm', period);
         };
+
+        watch(() => props.selectedMonth, (d) => {
+            if (d !== 'custom') {
+                state.startDate = [];
+                state.endDate = [];
+            }
+        });
+
         return {
             ...toRefs(state),
             handleConfirm,
