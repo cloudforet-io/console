@@ -155,8 +155,8 @@ const state = reactive({
         { key: getUUID(), value: '' },
     ] as OptionItem[],
     selectionMenu: computed(() => [
-        { name: 'MULTI', label: 'Multi select' },
-        { name: 'SINGLE', label: 'Single select' },
+        { name: 'MULTI', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT') },
+        { name: 'SINGLE', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT') },
     ]),
 
 });
