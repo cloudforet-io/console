@@ -1,6 +1,10 @@
 import { sum, max } from 'lodash';
 
-import { WIDGET_WIDTH_RANGE_LIST, WIDGET_GAP } from '@/services/dashboards/dashboard-detail/lib/config';
+import {
+    WIDGET_WIDTH_RANGE_LIST,
+    WIDGET_GAP,
+    WIDGET_WIDTH_CRITERIA,
+} from '@/services/dashboards/dashboard-detail/lib/config';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
@@ -14,14 +18,14 @@ const isEveryWidthMax = (sizeRow: string[], widthRow: number[]): boolean => size
 const getWidthRow = (sizeRow: string[], containerWidth: number): number[] => {
     const widthRow = sizeRow.map((d) => WIDGET_WIDTH_RANGE_LIST[d][0]);
     let extraWidth = containerWidth - ((widthRow.length - 1) * WIDGET_GAP) - sum(widthRow);
-    if (extraWidth < 80) return widthRow;
+    if (extraWidth < WIDGET_WIDTH_CRITERIA) return widthRow;
 
-    while (extraWidth >= 80 && !isEveryWidthMax(sizeRow, widthRow)) {
+    while (extraWidth >= WIDGET_WIDTH_CRITERIA && !isEveryWidthMax(sizeRow, widthRow)) {
         // eslint-disable-next-line no-loop-func
         sizeRow.forEach((size, idx) => {
             const maxWidth = max(WIDGET_WIDTH_RANGE_LIST[size]) as number;
-            if (maxWidth > widthRow[idx] && extraWidth >= 80) widthRow[idx] += 80;
-            extraWidth -= 80;
+            if (maxWidth > widthRow[idx] && extraWidth >= WIDGET_WIDTH_CRITERIA) widthRow[idx] += WIDGET_WIDTH_CRITERIA;
+            extraWidth -= WIDGET_WIDTH_CRITERIA;
         });
     }
     return widthRow;

@@ -47,7 +47,7 @@ import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
 import type { DashboardSettings } from '@/services/dashboards/config';
 import {
-    WIDGET_CONTAINER_MAX_WIDTH, WIDGET_CONTAINER_MIN_WIDTH,
+    WIDGET_CONTAINER_MAX_WIDTH, WIDGET_CONTAINER_MIN_WIDTH, WIDGET_WIDTH_CRITERIA,
 } from '@/services/dashboards/dashboard-detail/lib/config';
 import { widgetThemeAssigner } from '@/services/dashboards/dashboard-detail/lib/theme-helper';
 import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
@@ -125,7 +125,7 @@ export default defineComponent<Props>({
         const refineContainerWidth = (containerWidth: number|undefined): number => {
             if (!containerWidth || containerWidth < WIDGET_CONTAINER_MIN_WIDTH) return WIDGET_CONTAINER_MIN_WIDTH;
             if (containerWidth > WIDGET_CONTAINER_MAX_WIDTH) return WIDGET_CONTAINER_MAX_WIDTH;
-            return containerWidth - (containerWidth % 16);
+            return containerWidth - (containerWidth % WIDGET_WIDTH_CRITERIA);
         };
 
         const handleIntersectionObserver = async ([{ isIntersecting, target }]) => {
