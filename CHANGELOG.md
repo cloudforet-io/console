@@ -1,3 +1,10 @@
+# [2.0.0-beta.25](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.24...v2.0.0-beta.25) (2023-01-25)
+
+
+### Bug Fixes
+
+* add 'I18nConnector' for using i18n in console ([#250](https://github.com/cloudforet-io/mirinae/issues/250)) ([8450c38](https://github.com/cloudforet-io/mirinae/commit/8450c385e59ba277843f2f3f91a79d65528c20e4))
+
 # [2.0.0-beta.24](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.23...v2.0.0-beta.24) (2023-01-20)
 
 
