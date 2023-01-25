@@ -2,7 +2,7 @@ import { describe, expect } from 'vitest';
 
 import {
     WIDGET_CONTAINER_MAX_WIDTH,
-    WIDGET_CONTAINER_MIN_WIDTH, WIDGET_GAP,
+    WIDGET_CONTAINER_MIN_WIDTH, WIDGET_WIDTH_CRITERIA,
 } from '@/services/dashboards/dashboard-detail/lib/config';
 import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
@@ -64,7 +64,7 @@ describe('Assign width for permutation selected widgets', () => {
 
     it('Count of widgets should not be changed after assigning its width', () => {
         for (let caseCount = 0; caseCount < widgetCasesLength; caseCount += 1) {
-            for (let containerWidth = WIDGET_CONTAINER_MIN_WIDTH; containerWidth <= WIDGET_CONTAINER_MAX_WIDTH; containerWidth += WIDGET_GAP) {
+            for (let containerWidth = WIDGET_CONTAINER_MIN_WIDTH; containerWidth <= WIDGET_CONTAINER_MAX_WIDTH; containerWidth += WIDGET_WIDTH_CRITERIA) {
                 assignedWidgetCasesCount = 0;
                 const selectedCase = [...widgetCases[caseCount]];
 
