@@ -292,6 +292,7 @@ defineExpose<WidgetExpose<Data>>({
 
 <style lang="postcss" scoped>
 .aws-data-transfer-cost-trend {
+
     .data-container {
         display: flex;
         flex-direction: column;
@@ -312,6 +313,9 @@ defineExpose<WidgetExpose<Data>>({
     }
 
     &.full {
+        .data-container {
+            min-height: 21rem;
+        }
         .widget-data-table {
             height: auto;
         }
