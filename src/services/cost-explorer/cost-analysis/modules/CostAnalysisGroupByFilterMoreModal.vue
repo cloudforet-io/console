@@ -34,6 +34,7 @@
                     use-fixed-menu-style
                     multi-selectable
                     appearance-type="stack"
+                    show-select-marker
                 />
             </p-field-group>
         </template>
