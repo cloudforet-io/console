@@ -1,3 +1,11 @@
+# [2.0.0-beta.27](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.26...v2.0.0-beta.27) (2023-01-26)
+
+
+### Bug Fixes
+
+* **check-box:** do not make text color red in invalid case ([c4bc0d6](https://github.com/cloudforet-io/mirinae/commit/c4bc0d6961be1e45279ac1eb4bbbf5591285914b))
+* **markdown:** fix error of option setting ([4c3a36e](https://github.com/cloudforet-io/mirinae/commit/4c3a36e2bb22f025fbea2be52d97e45c79af8c14))
+
 # [2.0.0-beta.26](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.25...v2.0.0-beta.26) (2023-01-26)
 
 
