@@ -205,13 +205,14 @@ import CloudServiceHistory from '@/services/asset-inventory/cloud-service/cloud-
 import CloudServiceTagsPanel
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceTagsPanel.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { assetInventoryStore } from '@/services/asset-inventory/store';
 import type { Period } from '@/services/cost-explorer/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 
 // TODO: move this code to store
-const STORAGE_PREFIX = 'inventory/cloudService';
+const STORAGE_PREFIX = ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
 const TABLE_MIN_HEIGHT = 400;
 
 export default {
