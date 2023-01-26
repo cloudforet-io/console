@@ -39,7 +39,6 @@ const getResources = async (inputText: string, distinctKey: string, resourceType
 };
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getReferenceHandler = (): ReferenceHandler => async (inputText, schema, pageStart, pageLimit) => {
-    console.debug('schema', schema);
     if (!schema.reference) return { results: [] };
     const resources = await getResources(inputText, schema.reference.reference_key ?? schema.propertyName, schema.reference.resource_type);
     return {
