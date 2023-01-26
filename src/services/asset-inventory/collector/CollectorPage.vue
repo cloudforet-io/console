@@ -35,14 +35,13 @@
                                       @export="exportCollectorDataToExcel"
                 >
                     <template #toolbox-left>
-                        <router-link :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME }">
-                            <p-button style-type="primary"
-                                      icon-left="ic_plus_bold"
-                                      :disabled="!hasManagePermission"
-                            >
-                                {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
-                            </p-button>
-                        </router-link>
+                        <p-button style-type="primary"
+                                  icon-left="ic_plus_bold"
+                                  :disabled="!hasManagePermission"
+                                  @click="$router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME })"
+                        >
+                            {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
+                        </p-button>
                         <p-select-dropdown class="left-toolbox-item"
                                            :items="dropdown"
                                            :disabled="!hasManagePermission"
