@@ -39,7 +39,8 @@
                 </span>
             </template>
             <template #extra>
-                <dashboard-control-buttons :dashboard-id="props.dashboardId"
+                <dashboard-control-buttons v-if="state.hasManagePermission"
+                                           :dashboard-id="props.dashboardId"
                                            :name="dashboardDetailState.name"
                                            @update:visible-clone-modal="handleVisibleCloneModal"
                 />
