@@ -2,6 +2,7 @@ import type { Getter } from 'vuex';
 
 import { store } from '@/store';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { CostExplorerState } from '@/services/cost-explorer/store/type';
 
 export const dashboardList: Getter<CostExplorerState, any> = (state) => {
@@ -16,4 +17,4 @@ export const dashboardList: Getter<CostExplorerState, any> = (state) => {
     return [...publicList, ...userList];
 };
 
-export const homeDashboardId: Getter<CostExplorerState, any> = (): string|undefined => store.getters['settings/getItem']('homeDashboard', '/costExplorer');
+export const homeDashboardId: Getter<CostExplorerState, any> = (): string|undefined => store.getters['settings/getItem']('homeDashboard', COST_EXPLORER_ROUTE.DASHBOARD._NAME);
