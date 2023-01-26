@@ -11,13 +11,17 @@ export type TextInputType = typeof TEXT_INPUT_TYPES[number];
 const COMPONENTS = ['PTextInput', 'GenerateIdFormat', 'PJsonSchemaForm', 'PSelectDropdown', 'PFilterableDropdown'] as const;
 export type ComponentName = typeof COMPONENTS[number];
 
+interface Reference {
+    resource_type: string;
+    reference_key?: string;
+}
 export type JsonSchema<Properties = object> = JSONSchemaType<Properties> & {
     title?: string;
     order?: string[];
     disabled?: boolean;
     json?: boolean;
     menuItems?: SelectDropdownMenu[];
-    reference?: string;
+    reference?: Reference;
 };
 
 export const VALIDATION_MODES = ['input', 'all', 'none'] as const;

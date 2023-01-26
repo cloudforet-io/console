@@ -89,7 +89,7 @@
                                            :selected="rawFormData[schemaProperty.propertyName]"
                                            :multi-selectable="schemaProperty.multiInputMode"
                                            :appearance-type="schemaProperty.appearanceType"
-                                           :page-size="schemaProperty.pageSize"
+                                           :page-size="10"
                                            show-select-marker
                                            :use-fixed-menu-style="useFixedMenuStyle"
                                            :invalid="invalid"
@@ -116,6 +116,7 @@
                                       :use-fixed-menu-style="useFixedMenuStyle"
                                       :disabled="schemaProperty.disabled"
                                       :multi-input="schemaProperty.multiInputMode"
+                                      :page-size="10"
                                       class="input-form"
                                       @update:value="!schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                                       @update:selected="schemaProperty.multiInputMode && handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
@@ -152,7 +153,6 @@ import {
     getInputTypeBySchemaProperty,
     getMenuItemsBySchemaProperty,
     getMultiInputMode,
-    getPageSize,
     getReferenceHandler,
     getUseAutoComplete,
     initFormDataWithSchema,
@@ -259,7 +259,6 @@ export default defineComponent<JsonSchemaFormProps>({
                             multiInputMode: getMultiInputMode(schemaProperty),
                             useAutoComplete: getUseAutoComplete(schemaProperty),
                             appearanceType: getAppearanceType(schemaProperty),
-                            pageSize: getPageSize(schemaProperty),
                             referenceHandler: getReferenceHandler(schemaProperty, props),
                         };
                         return refined;

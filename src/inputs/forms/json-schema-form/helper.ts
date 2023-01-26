@@ -181,11 +181,6 @@ export const getAppearanceType = (schemaProperty: InnerJsonSchema): InputAppeara
     return undefined;
 };
 
-export const getPageSize = (schemaProperty: InnerJsonSchema): number|undefined => {
-    if (schemaProperty.reference) return 10;
-    return undefined;
-};
-
 export const getReferenceHandler = (schemaProperty: InnerJsonSchema, props: JsonSchemaFormProps): AutocompleteHandler|undefined => {
     if (!schemaProperty.reference) return undefined;
 
