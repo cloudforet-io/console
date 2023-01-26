@@ -195,8 +195,6 @@ export default defineComponent<Props>({
                     Object.entries((optionValue ?? {}) as WidgetFiltersMap).forEach(([key, value]) => {
                         if (Array.isArray(value)) {
                             formData[`filters.${key}`] = value.map((filter) => filter.v).flat();
-                        } else {
-                            formData[`filters.${key}`] = value.v;
                         }
                     });
                 } else {
