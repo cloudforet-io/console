@@ -32,7 +32,7 @@ export const getWidgetInheritOptionsErrorMap = (
         }
 
         const variableType = dashboardVariablesSchema.properties[variableKey].selection_type === 'MULTI' ? 'array' : 'string';
-        const widgetPropertyType = widgetOptionsSchema.properties[propertyName].type;
+        const widgetPropertyType = widgetOptionsSchema?.properties?.[propertyName]?.type;
         if (variableType !== widgetPropertyType) {
             errorMap[propertyName] = i18n.t('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST');
         }

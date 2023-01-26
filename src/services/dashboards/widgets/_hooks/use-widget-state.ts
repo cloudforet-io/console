@@ -12,6 +12,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 import type { ChartType } from '@/services/cost-explorer/cost-dashboard/type';
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import type {
@@ -22,7 +24,6 @@ import type {
     WidgetFiltersMap,
     WidgetFilter,
 } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
@@ -77,15 +78,16 @@ const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): C
     const results: ConsoleFilter[] = [];
     Object.entries(widgetFiltersMap).forEach(([filterKey, filterItems]) => {
         if (!filterItems?.length) return;
-        if ((filterKey === GROUP_BY.PROJECT || filterKey === GROUP_BY.PROJECT_GROUP)) {
+        if ((filterKey === REFERENCE_TYPE_INFO.project.type || filterKey === REFERENCE_TYPE_INFO.project_group.type)) {
             filterItems.forEach((d) => {
                 results.push(d);
             });
         } else {
             filterItems.forEach((d) => {
+                const value = Array.isArray(d.v) ? d.v : [d.v];
                 results.push({
-                    k: `cost_types.${filterKey}`,
-                    v: [null, ...d.v],
+                    k: `cost_types.${d.k}`,
+                    v: [null, ...value],
                     o: d.o,
                 });
             });

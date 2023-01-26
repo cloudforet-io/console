@@ -98,7 +98,7 @@ interface LegendOptions {
 /* widget filters */
 export interface WidgetFilter {
     k?: string;
-    v: null|string|boolean|number;
+    v: null|string|boolean|number|Array<null|string|boolean|number>;
     o?: ConsoleFilterOperator;
 }
 export const WIDGET_FILTER_KEYS = [

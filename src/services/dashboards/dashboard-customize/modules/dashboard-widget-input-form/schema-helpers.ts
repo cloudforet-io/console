@@ -95,7 +95,7 @@ export const getRefinedWidgetOptionsSchema = (
         type: 'object',
         properties: {},
         required: schema?.required ?? [],
-        order: defaultSchemaProperties as WidgetOptionsSchemaProperty[],
+        order: schema?.order ?? defaultSchemaProperties as WidgetOptionsSchemaProperty[],
     };
     if (!schema?.properties) return refinedJsonSchema;
 
