@@ -14,9 +14,7 @@
         <article v-if="isTopicModeSelected"
                  class="topic-wrapper"
         >
-            <div class="topic-content-wrapper"
-                 :class="{'invalid': !isTopicValid}"
-            >
+            <div class="topic-content-wrapper">
                 <h5 class="setting">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
                 </h5>
