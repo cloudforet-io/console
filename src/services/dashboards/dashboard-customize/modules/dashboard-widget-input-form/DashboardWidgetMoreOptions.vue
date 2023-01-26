@@ -57,6 +57,7 @@ const state = reactive({
     widgetConfig: computed(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
     requiredProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.schema?.required ?? []),
     defaultProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.default_properties ?? []),
+    propertiesOrder: computed<string[]>(() => state.widgetConfig?.options_schema?.schema?.order ?? []),
     allProperties: computed<string[]>(() => Object.keys(state.widgetConfig?.options_schema?.schema.properties ?? {})),
     schemaProperties: computed<JsonSchema['properties']>(() => state.widgetConfig?.options_schema?.schema?.properties ?? {}),
     defaultIdxMap: computed<Record<string, number>>(() => {
@@ -64,10 +65,23 @@ const state = reactive({
         state.defaultProperties.forEach((name, idx) => { defaultIdxMap[name] = idx; });
         return defaultIdxMap;
     }),
+    orderIdxMap: computed<Record<string, number>>(() => {
+        const orderIdxMap = {};
+        state.propertiesOrder.forEach((name, idx) => { orderIdxMap[name] = idx; });
+        return orderIdxMap;
+    }),
 });
 
 /* sort */
 const sortItems = (items: MenuItem[]) => items.sort((a, b) => {
+    if (state.orderIdxMap[a.name] !== undefined) {
+        // if both are in order array, follow order array
+        if (state.orderIdxMap[b.name] !== undefined) return state.orderIdxMap[a.name] > state.orderIdxMap[b.name] ? 1 : -1;
+        // otherwise, the item in order array comes before
+        return -1;
+    }
+
+    // if both are not in order array
     if (state.defaultIdxMap[a.name] !== undefined) {
         // if both are default, follow default index order
         if (state.defaultIdxMap[b.name] !== undefined) return state.defaultIdxMap[a.name] > state.defaultIdxMap[b.name] ? 1 : -1;
