@@ -62,7 +62,7 @@ const state = reactive({
     nameEditModalVisible: false,
     deleteModalVisible: false,
     cloneModalVisible: false,
-    refreshInterval: '15s',
+    refreshInterval: '5m',
     loading: true,
     widgetElementList: null as HTMLElement[]|null,
     isPageMounted: false,
