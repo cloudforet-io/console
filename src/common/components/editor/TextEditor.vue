@@ -128,12 +128,11 @@ export default defineComponent<Props>({
 .text-editor {
     > .editor-content {
         .ProseMirror {
+            @mixin all-nodes-style;
             min-height: inherit;
             &:focus {
                 @apply outline-none;
             }
-
-            @mixin all-nodes-style;
         }
     }
 }
