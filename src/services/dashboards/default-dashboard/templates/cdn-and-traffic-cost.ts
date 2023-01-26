@@ -27,7 +27,7 @@ export const cdnAndTrafficCostDashboard: DashboardConfig = {
         currency: {
             enabled: true,
         },
-        refresh_interval_option: '15s',
+        refresh_interval_option: '5m',
     },
     variables_schema: {
         properties: {},
