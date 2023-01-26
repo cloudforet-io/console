@@ -11,21 +11,20 @@
                             error-icon="ic_provider_other"
                 />
             </template>
-            <template v-if="!isManagedAccount"
+            <template v-if="hasManagePermission"
                       #title-right-extra
             >
                 <div class="title-right-wrapper">
                     <p-icon-button name="ic_trashcan"
                                    class="w-full delete-button"
-                                   :disabled="!hasManagePermission"
+                                   :disabled="hasManagePermission"
                                    @click="handleOpenDeleteModal"
                     />
                 </div>
             </template>
-            <template v-if="!isManagedAccount"
-                      #extra
-            >
+            <template #extra>
                 <p-button style-type="tertiary"
+                          :disabled="!hasManagePermission"
                           class="link-button"
                 >
                     <p-anchor :href="consoleLink">
@@ -39,7 +38,7 @@
                 <p-panel-top :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE')" />
                 <div class="badge-wrapper">
                     <service-account-badge :account-type="item.service_account_type"
-                                           :is-managed="isManagedAccount"
+                                           :is-managed="hasManagePermission"
                     />
                 </div>
             </p-pane-layout>
@@ -47,7 +46,7 @@
                                      :service-account-loading="loading"
                                      :service-account-id="serviceAccountId"
                                      :service-account-type="serviceAccountType"
-                                     :editable="!isManagedAccount"
+                                     :editable="hasManagePermission"
                                      @change-project="handleChangeProject"
             />
             <service-account-attached-general-accounts v-if="item.service_account_type === ACCOUNT_TYPE.TRUSTED"
@@ -57,7 +56,7 @@
             <service-account-base-information :provider="providerKey"
                                               :service-account-loading="loading"
                                               :service-account-id="serviceAccountId"
-                                              :editable="!isManagedAccount"
+                                              :editable="hasManagePermission"
                                               @refresh="handleRefresh"
             />
             <service-account-credentials :provider="providerKey"
@@ -66,7 +65,7 @@
                                          :service-account-name="item.name"
                                          :project-id="projectId"
                                          :attached-trusted-account-id="attachedTrustedAccountId"
-                                         :editable="!isManagedAccount"
+                                         :editable="hasManagePermission"
                                          @refresh="handleRefresh"
             />
         </div>
@@ -161,7 +160,6 @@ export default defineComponent({
             }),
             projectId: computed(() => state.item.project_info?.project_id),
             serviceAccountType: computed(() => state.item.service_account_type),
-            isManagedAccount: computed(() => state.item.tags?.is_managed === 'true' ?? false),
             deleteModalVisible: false,
         });
 
