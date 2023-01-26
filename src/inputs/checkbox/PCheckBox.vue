@@ -1,23 +1,28 @@
 <template>
     <span class="p-checkbox"
+          :class="{disabled, invalid}"
           @click.stop.prevent="onClick"
           v-on="$listeners"
     >
         <input type="checkbox">
-        <slot :slot-scope="$props" name="icon" v-bind="{isSelected}">
-            <p-i width="1.25rem" height="1.25rem"
+        <slot :slot-scope="$props"
+              name="icon"
+              v-bind="{isSelected}"
+        >
+            <p-i width="1.25rem"
+                 height="1.25rem"
                  class="check-icon"
-                 :class="{disabled,invalid}"
                  :color="isSelected||disabled ? undefined : 'inherit transparent'"
                  :name="iconName"
             />
         </slot>
         <span v-if="$scopedSlots.default"
               class="text"
-              :class="{disabled,invalid}"
               @click.stop="onClick"
         >
-            <slot name="default" v-bind="{isSelected}" />
+            <slot name="default"
+                  v-bind="{isSelected}"
+            />
         </span>
     </span>
 </template>
@@ -114,36 +119,43 @@ export default defineComponent<CheckboxProps>({
         width: 0;
     }
 
-    &:hover {
-        .text {
-            @apply text-blue-600;
-        }
-        .check-icon {
-            @apply text-gray-900;
-        }
-        .disabled {
-            @apply text-gray-400;
-        }
-        .invalid {
-            @apply text-red-500;
-        }
-    }
-
-    .text {
+    > .text {
         @apply text-gray-900 cursor-pointer;
         font-weight: 400;
         font-size: 14px;
         vertical-align: middle;
     }
-    .check-icon {
+    > .check-icon {
         @apply text-gray-400 cursor-pointer;
     }
-    .disabled {
-        @apply text-gray-400;
-        cursor: not-allowed;
+
+    @media (hover: hover) {
+        &:hover:not(.disabled) {
+            &:not(.invalid) {
+                > .check-icon {
+                    @apply text-gray-900;
+                }
+            }
+            > .text {
+                @apply text-blue-600;
+            }
+        }
     }
-    .invalid {
-        @apply text-red-500 cursor-pointer;
+
+    &.disabled {
+        > .check-icon {
+            @apply text-gray-400;
+            cursor: not-allowed;
+        }
+        > .text {
+            @apply text-gray-400;
+            cursor: not-allowed;
+        }
+    }
+    &.invalid {
+        > .check-icon {
+            @apply text-red-500;
+        }
     }
 }
 
