@@ -164,7 +164,7 @@ export default defineComponent<Props>({
                 else mergedMoreGroupBy.push(item);
             });
             state.proxyVisible = false;
-            costExplorerStore.commit('costAnalysis/setMoreGroupBy', mergedMoreGroupBy);
+            costExplorerStore.dispatch('costAnalysis/setMoreGroupBy', mergedMoreGroupBy);
         };
 
         /* Watcher */
