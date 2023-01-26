@@ -95,6 +95,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/services/dashboards/config';
@@ -146,12 +147,13 @@ export default defineComponent<DashboardBoardListProps>({
             dashboardTotalCount: computed<number>(() => props.dashboardList.length ?? 0),
             dashboardScopeKey: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? DOMAIN_SCOPE_KEY : PROJECT_SCOPE_KEY)),
             projectItems: computed(() => store.getters['reference/projectItems']),
+            hasManagePermission: useManagePermissionState(),
             dashboardListByBoardSets: computed<BoardSet[]>(() => props.dashboardList
                 .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
                 .map((d) => {
                     const dashboardWithBoardSet = {
                         ...d,
-                        iconButtonSets: convertBoardItemButtonSet(d),
+                        iconButtonSets: state.hasManagePermission ? convertBoardItemButtonSet(d) : [],
                     };
                     const projectId = 'project_id';
                     if (d[projectId]) {
