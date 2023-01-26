@@ -1,3 +1,17 @@
+# [2.0.0-beta.26](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.25...v2.0.0-beta.26) (2023-01-26)
+
+
+### Bug Fixes
+
+* **json-schema-form:** fix reference keyword's type ([2f7cfda](https://github.com/cloudforet-io/mirinae/commit/2f7cfdacbdc4d15f6ced267b136385ff4aafdcbf))
+* **json-schema-form:** make work reference handler with reference keyword ([f6fd0bd](https://github.com/cloudforet-io/mirinae/commit/f6fd0bdacecd80c9c735fd0f1ae943d21533f992))
+* **text-input:** fix style of badge appearance type ([bdd8a47](https://github.com/cloudforet-io/mirinae/commit/bdd8a479e982a90374c2f82ba7a588724f9f829d))
+
+
+### Features
+
+* **json-schema-form:** add useFixedMenuStyle prop ([9fe8dd3](https://github.com/cloudforet-io/mirinae/commit/9fe8dd30795be5c4f66b21fdbeb8f0563aa2e26a))
+
 # [2.0.0-beta.25](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.24...v2.0.0-beta.25) (2023-01-25)
 
 
