@@ -44,6 +44,7 @@ import { PDivider } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 
@@ -81,6 +82,7 @@ const state = reactive({
         layouts: [dashboardDetailState.dashboardWidgetInfoList],
         variables: dashboardDetailState.variables,
         variables_schema: dashboardDetailState.variablesSchema,
+        tags: { created_by: store.state.user.userId },
     })),
     loading: false,
 });
