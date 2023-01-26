@@ -36,7 +36,7 @@
                 </div>
                 <div class="label-wrapper">
                     <p-label :class="{'item-label': true, 'viewers-label': true, 'private-label': board.viewers === DASHBOARD_VIEWER.PRIVATE}"
-                             :text="board.viewers === DASHBOARD_VIEWER.PUBLIC ? 'Public' : 'Private'"
+                             :text="board.viewers === DASHBOARD_VIEWER.PUBLIC ? $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PUBLIC') : $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PRIVATE')"
                              :left-icon="board.viewers === DASHBOARD_VIEWER.PUBLIC ? 'ic_public' : 'ic_private'"
                     />
                     <p-label v-for="(label, idx) in board.labels"
