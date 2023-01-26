@@ -6,7 +6,7 @@
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
-        :disabled="!isAllValid"
+        :disabled="!isAllValid || isLabelDuplicated"
         @confirm="handleConfirm"
     >
         <template #body>
@@ -43,8 +43,8 @@
                 <p-field-group
                     :label="$t('PROJECT.DETAIL.MEMBER.LABEL_LABEL')"
                     :help-text="$t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT')"
-                    :invalid="invalidState.labels"
-                    :invalid-text="invalidTexts.labels"
+                    :invalid="invalidState.labels || isLabelDuplicated"
+                    :invalid-text="invalidTexts.labels || $t('PROJECT.DETAIL.MEMBER.DUPLICATED_VALUE')"
                 >
                     <template #default="{invalid}">
                         <p-text-input :selected="labels"
@@ -52,7 +52,7 @@
                                       multi-input
                                       appearance-type="stack"
                                       block
-                                      @update:selected="handleUpdateLabel"
+                                      @update="handleUpdateLabel"
                         />
                     </template>
                 </p-field-group>
@@ -63,14 +63,14 @@
 
 <script lang="ts">
 
-import { reactive, toRefs } from 'vue';
+import { reactive, ref, toRefs } from 'vue';
 import type { PropType, SetupContext } from 'vue';
 
 import {
     PButtonModal, PFieldGroup, PFilterableDropdown, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { SelectedItem as InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
+import type { MenuItem as InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -132,6 +132,7 @@ export default {
             userId: '',
             showRoleWarning: false,
         });
+        const isLabelDuplicated = ref<boolean>(false);
         const {
             forms: { labels, selectedRoleItems },
             invalidState,
@@ -146,8 +147,6 @@ export default {
                 return true;
             },
             labels: (val: InputItem[]) => {
-                const invalidItems = val.filter((d) => d.invalid);
-                if (invalidItems.length) return invalidItems[invalidItems.length - 1]?.invalidText || '';
                 if (val.length > 5) return i18n.t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT');
                 return true;
             },
@@ -191,7 +190,7 @@ export default {
                 const params: any = {
                     role_id: selectedRoleItems.value[0].name,
                     users: [state.userId],
-                    labels: labels.value.map((d) => d.value),
+                    labels: labels.value.map((d) => d.name),
                 };
                 if (props.isProjectGroup) {
                     params.project_group_id = props.projectGroupId;
@@ -209,7 +208,7 @@ export default {
         const updateMember = async () => {
             const params: any = {
                 user_id: state.userId,
-                labels: labels.value.map((d) => d.value),
+                labels: labels.value.map((d) => d.name),
             };
             try {
                 if (props.isProjectGroup) {
@@ -227,12 +226,8 @@ export default {
         };
 
         /* Event */
-        const handleUpdateLabel = (inputLabels: InputItem[]) => {
-            const _labels = [...inputLabels];
-            _labels.forEach((label) => {
-                label.invalid = label.duplicated;
-                label.invalidText = i18n.t('PROJECT.DETAIL.MEMBER.DUPLICATED_VALUE');
-            });
+        const handleUpdateLabel = (inputLabels: InputItem[], isValid: boolean) => {
+            isLabelDuplicated.value = !isValid;
             setForm('labels', inputLabels);
         };
         const handleConfirm = async () => {
@@ -262,7 +257,7 @@ export default {
             state.userId = props.selectedMember.resource_id;
             const roleId = props.selectedMember.role_info?.role_id;
             setForm('selectedRoleItems', state.roleItems.filter((d) => d.name === roleId));
-            setForm('labels', props.selectedMember?.labels?.map((label) => ({ value: label, label })) || []);
+            setForm('labels', props.selectedMember?.labels?.map((label) => ({ name: label, label })) || []);
         };
 
         (async () => {
@@ -274,6 +269,7 @@ export default {
             ...toRefs(state),
             //
             labels,
+            isLabelDuplicated,
             selectedRoleItems,
             invalidState,
             invalidTexts,
