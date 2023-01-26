@@ -46,7 +46,7 @@
 <script lang="ts">
 import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import {
@@ -72,7 +72,14 @@ import type {
     ServiceAccountModelForBinding,
 } from '@/services/asset-inventory/service-account/type';
 
-export default {
+interface Props {
+    provider?: string;
+    serviceAccountId?: string;
+    editable: boolean;
+    serviceAccountLoading: boolean;
+}
+
+export default defineComponent<Props>({
     name: 'ServiceAccountBaseInformation',
     components: {
         ServiceAccountBaseInformationForm,
@@ -202,7 +209,7 @@ export default {
             handleChangeForm,
         };
     },
-};
+});
 </script>
 <style lang="postcss" scoped>
 .service-account-base-information {
