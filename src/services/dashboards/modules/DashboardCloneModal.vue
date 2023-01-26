@@ -33,7 +33,7 @@
                          class="radio-group"
                          @change="setForm('viewers', $event)"
                 >
-                    <span class="capitalize ml-1">{{ label.toLowerCase() }}</span>
+                    <span class="ml-1">{{ label }}</span>
                 </p-radio>
             </p-field-group>
         </template>
@@ -76,16 +76,6 @@ interface Props {
     manageDisabled: boolean;
 }
 
-const visibilityList = [
-    {
-        name: DASHBOARD_VIEWER.PRIVATE,
-        label: i18n.t('DASHBOARDS.FORM.LABEL_PRIVATE'),
-    },
-    {
-        name: DASHBOARD_VIEWER.PUBLIC,
-        label: i18n.t('DASHBOARDS.FORM.LABEL_PUBLIC'),
-    },
-];
 export default defineComponent<Props>({
     name: 'DashboardCloneModal',
     components: {
@@ -144,7 +134,10 @@ export default defineComponent<Props>({
         const dashboardOriginState = dashboardDetailStore.originState;
         const state = reactive({
             proxyVisible: props.visible,
-            filteredVisibilityList: computed(() => visibilityList),
+            filteredVisibilityList: computed(() => [
+                { name: DASHBOARD_VIEWER.PRIVATE, label: i18n.t('DASHBOARDS.FORM.LABEL_PRIVATE') },
+                { name: DASHBOARD_VIEWER.PUBLIC, label: i18n.t('DASHBOARDS.FORM.LABEL_PUBLIC') },
+            ]),
             projectId: computed(() => {
                 if (Object.prototype.hasOwnProperty.call(props.dashboard ?? {}, 'projectId')) {
                     return (props.dashboard as unknown as DashboardDetailInfoStoreState).projectId;

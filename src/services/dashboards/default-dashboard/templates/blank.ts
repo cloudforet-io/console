@@ -1,3 +1,5 @@
+import { i18n } from '@/translations';
+
 import type { DashboardConfig } from '@/services/dashboards/config';
 import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/default-dashboard/config';
 
@@ -8,7 +10,7 @@ export const blankPreview: DefaultDashboardPreviewConfig = {
     description: {
         icon: 'ic_dashboard-template_blank',
         preview_image: '',
-        text: 'Build your own dashboard from scratch.',
+        text: i18n.t('DASHBOARDS.CREATE.BLANK_DESC'),
     },
 };
 
