@@ -5,7 +5,7 @@
                       :total-count="dashboardTotalCount"
         >
             <template #extra>
-                <p-button v-if="workspaceDashboardList || projectDashboardList"
+                <p-button v-if="hasManagePermission && (workspaceDashboardList || projectDashboardList)"
                           icon-left="ic_plus"
                           @click="handleCreateDashboard"
                 >
@@ -87,6 +87,8 @@ import { store } from '@/store';
 
 import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
 
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+
 import AllDashboardsSelectFilter from '@/services/dashboards/all-dashboards/modules/AllDashboardsSelectFilter.vue';
 import DashboardBoardList from '@/services/dashboards/all-dashboards/modules/DashboardBoardList.vue';
 import { SCOPE_TYPE } from '@/services/dashboards/all-dashboards/type';
@@ -122,6 +124,7 @@ export default {
                 }
                 return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
             }),
+            hasManagePermission: useManagePermissionState(),
         });
 
         const searchQueryHelper = new QueryHelper();
