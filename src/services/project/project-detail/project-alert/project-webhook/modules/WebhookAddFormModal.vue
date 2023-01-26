@@ -162,10 +162,10 @@ export default {
         };
 
         /* event */
-        const onFirstInputName = (e) => {
+        const onFirstInputName = (value) => {
             state.disabled = true;
             state.showValidation = true;
-            state.webhookName = e.target.value;
+            state.webhookName = value;
         };
         const onClickConfirm = async () => {
             if (!state.showValidation) {

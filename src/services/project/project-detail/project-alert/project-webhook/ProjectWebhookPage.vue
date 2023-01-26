@@ -395,7 +395,7 @@ export default {
         const onExport = async () => {
             await store.dispatch('file/downloadExcel', {
                 url: '/monitoring/webhook/list',
-                param: { query: webhookListApiQuery },
+                param: { project_id: props.id, query: webhookListApiQuery },
                 fields: [
                     { name: 'Name', key: 'name' },
                     { name: 'State', key: 'state' },
