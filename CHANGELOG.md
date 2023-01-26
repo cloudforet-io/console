@@ -1,3 +1,10 @@
+# [2.0.0-beta.29](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.28...v2.0.0-beta.29) (2023-01-26)
+
+
+### Bug Fixes
+
+* **p-query-search:** remove contextMenu when there is no menu ([e43f7ed](https://github.com/cloudforet-io/mirinae/commit/e43f7edcdad89f371d6b72f7b0a22e2ff2bba2ed))
+
 # [2.0.0-beta.28](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.27...v2.0.0-beta.28) (2023-01-26)
 
 
