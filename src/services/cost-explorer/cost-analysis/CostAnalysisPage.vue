@@ -14,6 +14,8 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
+import { isEqual } from 'lodash';
+
 import { SpaceRouter } from '@/router';
 
 import {
@@ -110,8 +112,11 @@ export default {
                     filters: objectToQueryString(options.filters),
                 };
 
-                if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
-                    SpaceRouter.router.replace({ query: newQuery });
+
+                if (!isEqual(newQuery, currentQuery)) {
+                    SpaceRouter.router.replace({ query: newQuery }).catch((e) => {
+                        if (e.name !== 'NavigationDuplicated') console.error(e);
+                    });
                 }
             }, { immediate: false });
         };

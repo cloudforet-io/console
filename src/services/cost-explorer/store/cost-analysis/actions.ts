@@ -1,8 +1,9 @@
 import type { Action } from 'vuex';
 
+import { union } from 'lodash';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -12,55 +13,94 @@ import {
     getInitialDates,
     getRefinedCostQueryOptions,
 } from '@/services/cost-explorer/lib/helper';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { CostAnalysisStoreState } from '@/services/cost-explorer/store/cost-analysis/type';
-import type { CostQuerySetModel, CostQuerySetOption, MoreGroupByItem } from '@/services/cost-explorer/type';
+import type {
+    CostQuerySetModel, CostQuerySetOption, MoreGroupByItem,
+} from '@/services/cost-explorer/type';
 
-export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = ({ commit }): void => {
+const moreGroupByCategorySet = new Set(Object.values(MORE_GROUP_BY));
+const convertGroupByStringToMoreGroupByItem = (moreGroupBy: string, selected?: boolean, disabled?: boolean) => {
+    // moreGroupBy is saved as a string in the form of 'category.key'.
+    // So to convert back to moreGroupByItem, separate category and key.
+    // In this process, get only items belonging to the given moreGroupBy category.
+    const dotIndex = moreGroupBy.indexOf('.');
+    if (dotIndex > 0) {
+        const category = moreGroupBy.slice(0, dotIndex);
+        if (category && moreGroupByCategorySet.has(category)) {
+            return {
+                category, key: moreGroupBy.slice(dotIndex + 1), selected, disabled,
+            };
+        }
+    }
+    return undefined;
+};
+const getMergedMoreGroupByItems = (selectedGroupBy: string[], storedMoreGroupByItems?: MoreGroupByItem[]): MoreGroupByItem[] => {
+    const moreGroupByItems: MoreGroupByItem[] = [];
+
+    const selectedGroupByMap = {};
+    selectedGroupBy.forEach((d) => {
+        selectedGroupByMap[d] = true;
+    });
+
+    const disabledGroupByMap = {};
+    let allGroupBy = selectedGroupBy;
+    if (Array.isArray(storedMoreGroupByItems)) {
+        allGroupBy = union(selectedGroupBy, storedMoreGroupByItems.map((item) => {
+            const itemKey = `${item.category}.${item.key}`;
+            if (item.disabled) disabledGroupByMap[itemKey] = true;
+            return itemKey;
+        }));
+    }
+
+    allGroupBy.forEach((d) => {
+        const item = convertGroupByStringToMoreGroupByItem(d, selectedGroupByMap[d], disabledGroupByMap[d] && !selectedGroupByMap[d]);
+        if (item) moreGroupByItems.push(item);
+    });
+
+    return moreGroupByItems;
+};
+
+export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = ({ commit, rootGetters }): void => {
     commit('setGranularity', GRANULARITY.ACCUMULATED);
     commit('setStack', false);
     commit('setGroupBy', []);
     commit('setPrimaryGroupBy', undefined);
-    commit('setMoreGroupBy', []);
     commit('setPeriod', getInitialDates());
     commit('setFilters', {});
+    // set more group by items
+    const storedMoreGroupByItems: MoreGroupByItem[] = rootGetters['settings/getItem']('more_group_by', COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME);
+    const moreGroupByItems = getMergedMoreGroupByItems([], storedMoreGroupByItems);
+    commit('setMoreGroupBy', moreGroupByItems);
 };
 
 const defaultGroupBySet = new Set<string>(Object.values(GROUP_BY));
-const moreGroupByCategorySet = new Set(Object.values(MORE_GROUP_BY));
+
 /**
  * @description Set store states from saved query or from url query
  */
-export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit }, options: CostQuerySetOption): void => {
+export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit, rootGetters }, options: CostQuerySetOption): void => {
     const refinedOptions = getRefinedCostQueryOptions(options);
 
     if (refinedOptions.granularity) commit('setGranularity', refinedOptions.granularity);
     if (typeof refinedOptions.stack === 'boolean') commit('setStack', refinedOptions.stack);
 
     const refinedDefaultGroupBy: string[] = [];
-    const moreGroupByItems: MoreGroupByItem[] = [];
     const refinedGroupBy = refinedOptions.group_by?.filter((d) => {
         // Get only what belongs to the default groupBy
         if (defaultGroupBySet.has(d)) {
             refinedDefaultGroupBy.push(d);
             return true;
         }
-
-        // moreGroupBy is saved as a string in the form of 'category.key' when stored in group_by of the query option.
-        // So to convert back to moreGroupByItem, separate category and key.
-        // In this process, get only items belonging to the given moreGroupBy category.
-        const dotIndex = d.indexOf('.');
-        if (dotIndex > 0) {
-            const category = d.slice(0, dotIndex);
-            if (category && moreGroupByCategorySet.has(category)) {
-                moreGroupByItems.push({ category, key: d.slice(dotIndex + 1), selected: true });
-                return true;
-            }
-        }
-
-        return false;
+        // Get only what is convertable to moreGroupByItem
+        return !!convertGroupByStringToMoreGroupByItem(d);
     });
     commit('setGroupBy', refinedDefaultGroupBy);
     commit('setPrimaryGroupBy', refinedGroupBy?.[0]); // The first item of group_by is primaryGroupBy
+
+    // set moreGroupByItems
+    const storedMoreGroupByItems: MoreGroupByItem[] = rootGetters['settings/getItem']('more_group_by', COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME);
+    const moreGroupByItems = getMergedMoreGroupByItems(refinedGroupBy ?? [], storedMoreGroupByItems);
     commit('setMoreGroupBy', moreGroupByItems);
 
     if (options.period) commit('setPeriod', { start: options.period.start, end: options.period.end });
@@ -69,11 +109,21 @@ export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit },
     }
 };
 
-export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ commit }): Promise<void|Error> => {
+export const setMoreGroupBy: Action<CostAnalysisStoreState, any> = ({ commit, dispatch }, moreGroupByItems: MoreGroupByItem[]) => {
+    commit('setMoreGroupBy', moreGroupByItems);
+
+    dispatch('settings/setItem', {
+        key: 'more_group_by',
+        value: moreGroupByItems,
+        path: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+    }, { root: true });
+};
+
+export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ commit, rootState }): Promise<void|Error> => {
     try {
         const { results } = await SpaceConnector.client.costAnalysis.costQuerySet.list({
             query: {
-                filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
+                filter: [{ k: 'user_id', v: rootState.user.userId, o: 'eq' }],
             },
         });
         commit('setCostQueryList', results);
