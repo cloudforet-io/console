@@ -12,6 +12,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { Currency } from '@/store/modules/display/config';
 import { CURRENCY } from '@/store/modules/display/config';
 
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 import type { ChartType } from '@/services/cost-explorer/cost-dashboard/type';
 import type { DashboardSettings, DashboardVariables } from '@/services/dashboards/config';
 import type {
@@ -20,8 +22,9 @@ import type {
     Granularity, GroupBy,
     SelectorType,
     WidgetFiltersMap,
+    WidgetFilter,
 } from '@/services/dashboards/widgets/_configs/config';
-import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
@@ -59,12 +62,11 @@ const convertInheritOptionsToWidgetFiltersMap = (
 
         if (filterKey.startsWith('filters.')) {
             const _filterKey = filterKey.replace('filters.', '');
-            if (variableValue) {
-                result.filters = {
-                    ...result.filters,
-                    [_filterKey]: [{ k: _filterKey, v: variableValue, o: '=' }],
-                };
-            }
+            const filterDataKey = getWidgetFilterDataKey(_filterKey);
+            result.filters = {
+                ...result.filters,
+                [_filterKey]: [{ k: filterDataKey, v: variableValue, o: '=' }],
+            };
         } else {
             result[filterKey] = variableValue;
         }
@@ -76,15 +78,16 @@ const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): C
     const results: ConsoleFilter[] = [];
     Object.entries(widgetFiltersMap).forEach(([filterKey, filterItems]) => {
         if (!filterItems?.length) return;
-        if ((filterKey === GROUP_BY.PROJECT || filterKey === GROUP_BY.PROJECT_GROUP)) {
+        if ((filterKey === REFERENCE_TYPE_INFO.project.type || filterKey === REFERENCE_TYPE_INFO.project_group.type)) {
             filterItems.forEach((d) => {
                 results.push(d);
             });
         } else {
             filterItems.forEach((d) => {
+                const value = Array.isArray(d.v) ? d.v : [d.v];
                 results.push({
-                    k: `cost_types.${filterKey}`,
-                    v: [null, ...d.v],
+                    k: `cost_types.${d.k}`,
+                    v: [null, ...value],
                     o: d.o,
                 });
             });
@@ -167,9 +170,9 @@ export function useWidgetState<Data = any>(
             if (state.options?.pagination_options?.enabled) return state.options.pagination_options.page_size;
             return undefined;
         }),
-        consoleFilters: computed(() => {
+        consoleFilters: computed<WidgetFilter[]>(() => {
             if (!state.options?.filters || isEmpty(state.options.filters)) return [];
-            return flattenDeep(Object.values(state.options.filters));
+            return flattenDeep<WidgetFilter[]>(Object.values(state.options.filters));
         }),
         budgetConsoleFilters: computed(() => {
             if (!state.options?.filters || isEmpty(state.options.filters)) return [];

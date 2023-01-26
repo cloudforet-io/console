@@ -26,6 +26,7 @@
                                 :form-data.sync="schemaFormData"
                                 :custom-error-map="inheritOptionsErrorMap"
                                 :validation-mode="widgetKey ? 'all' : 'input'"
+                                use-fixed-menu-style
                                 class="widget-options-form"
                                 @validate="handleFormValidate"
             >
@@ -78,7 +79,7 @@ import DashboardWidgetMoreOptions
     from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/DashboardWidgetMoreOptions.vue';
 import {
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
-} from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/helpers';
+} from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/schema-helpers';
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type {
@@ -194,8 +195,6 @@ export default defineComponent<Props>({
                     Object.entries((optionValue ?? {}) as WidgetFiltersMap).forEach(([key, value]) => {
                         if (Array.isArray(value)) {
                             formData[`filters.${key}`] = value.map((filter) => filter.v).flat();
-                        } else {
-                            formData[`filters.${key}`] = value.v;
                         }
                     });
                 } else {

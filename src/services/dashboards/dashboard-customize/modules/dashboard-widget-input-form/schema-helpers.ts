@@ -7,7 +7,11 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
     useReferenceStore,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/composables/use-reference-store';
-import type { InheritOptions, WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/config';
+import type {
+    InheritOptions,
+    WidgetOptionsSchema,
+    WidgetOptionsSchemaProperty,
+} from '@/services/dashboards/widgets/_configs/config';
 
 type ReferenceStoreState = ReturnType<typeof useReferenceStore>['referenceStoreState'];
 
@@ -84,15 +88,15 @@ export const getRefinedWidgetOptionsSchema = (
     variablesSchema: DashboardVariablesSchema,
     inheritOptions: InheritOptions,
     defaultSchemaProperties: string[],
-): JsonSchema => {
+): WidgetOptionsSchema['schema'] => {
     const schema = widgetOptionsSchema?.schema;
 
-    const refinedJsonSchema = {
+    const refinedJsonSchema: WidgetOptionsSchema['schema'] = {
         type: 'object',
         properties: {},
         required: schema?.required ?? [],
-        order: defaultSchemaProperties,
-    } as JsonSchema;
+        order: schema?.order ?? defaultSchemaProperties as WidgetOptionsSchemaProperty[],
+    };
     if (!schema?.properties) return refinedJsonSchema;
 
     // refine each property schema

@@ -33,21 +33,21 @@ describe('[Widget Helper] getWidgetConfig', () => {
         expect(mergedCostPieConfig.options_schema?.schema?.properties['filters.provider']).toBeTruthy();
     });
     it('Merge default_properties of base trend config', () => {
-        const mergedBaseTrendConfig = getWidgetConfig(costTrendConfigId);
+        const mergedBaseTrendConfig = getWidgetConfig(costTrendConfigId as string);
         expect(mergedBaseTrendConfig?.options_schema?.default_properties).toEqual(expect.arrayContaining([
-            'filters.provider', 'filters.project_id', 'filters.service_account_id',
+            'filters.provider', 'filters.project', 'filters.service_account',
         ]));
     });
     it('test MonthlyCostWidget', () => {
         const mergedMonthlyCostWidgetConfig = getWidgetConfig(monthlyCostWidgetConfigId);
         expect(mergedMonthlyCostWidgetConfig?.options_schema?.default_properties).toEqual(expect.arrayContaining([
-            'filters.provider', 'filters.project_id', 'filters.service_account_id',
+            'filters.provider', 'filters.project', 'filters.service_account',
         ]));
     });
     it('test CostMapWidget', () => {
         const mergedCostMapWidgetConfig = getWidgetConfig(costMapWidgetConfigId);
         expect(mergedCostMapWidgetConfig?.options_schema?.default_properties).toEqual(expect.arrayContaining([
-            'group_by', 'filters.provider', 'filters.project_id', 'filters.service_account_id',
+            'group_by', 'filters.provider', 'filters.project', 'filters.service_account',
         ]));
     });
 });

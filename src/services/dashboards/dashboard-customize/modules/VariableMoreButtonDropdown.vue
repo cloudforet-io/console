@@ -69,14 +69,14 @@ const state = reactive({
     variableList: computed<MenuItem[]>(() => state.variableSchema.order.map((property) => {
         const currentProperty = state.variableSchema.properties[property];
         return ({
-            name: property, label: currentProperty.name,
+            name: property, label: currentProperty?.name ?? property,
         });
     })),
     selected: computed<MenuItem[]>(() => {
         const result = [] as MenuItem[];
         state.variableSchema.order.forEach((property) => {
             const currentProperty = state.variableSchema.properties[property];
-            if (!currentProperty.use) return;
+            if (!currentProperty?.use) return;
             result.push({ name: property, label: currentProperty.name });
         });
         return result;

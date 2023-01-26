@@ -14,6 +14,8 @@ import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 export const projectItems: Getter<any, any> = (state): ProjectReferenceMap => state.project?.items ?? {};
 
 export const projectGroupItems: Getter<any, any> = (state): ProjectGroupReferenceMap => state.projectGroup?.items ?? {};
@@ -40,75 +42,74 @@ export const webhookItems: Getter<any, any> = (state): WebhookReferenceMap => st
 
 export const allReferenceTypeInfo: Getter<any, any> = (state, getters): AllReferenceTypeInfo => ({
     projectGroup: {
-        type: 'projectGroup',
-        key: 'project_group_id',
-        name: 'Project Group',
+        ...REFERENCE_TYPE_INFO.project_group,
         referenceMap: getters.projectGroupItems,
     },
+    project_group: {
+        ...REFERENCE_TYPE_INFO.project_group,
+        referenceMap: getters.projectGroupItems,
+    },
+    //
     project: {
-        type: 'project',
-        key: 'project_id',
-        name: 'Project',
+        ...REFERENCE_TYPE_INFO.project,
         referenceMap: getters.projectItems,
     },
+    //
     protocol: {
-        type: 'protocol',
-        key: 'protocol_id',
-        name: 'Protocol',
+        ...REFERENCE_TYPE_INFO.protocol,
         referenceMap: getters.protocolItems,
     },
+    //
     cloudServiceType: {
-        type: 'cloudServiceType',
-        key: 'cloud_service_type',
-        name: 'Cloud Service Type',
+        ...REFERENCE_TYPE_INFO.cloud_service_type,
         referenceMap: getters.cloudServiceTypeItems,
     },
+    cloud_service_type: {
+        ...REFERENCE_TYPE_INFO.cloud_service_type,
+        referenceMap: getters.cloudServiceTypeItems,
+    },
+    //
     collector: {
-        type: 'collector',
-        key: 'collector_id',
-        name: 'Collector',
+        ...REFERENCE_TYPE_INFO.collector,
         referenceMap: getters.collectorItems,
     },
+    //
     plugin: {
-        type: 'plugin',
-        key: 'plugin_id',
-        name: 'Plugin',
+        ...REFERENCE_TYPE_INFO.plugin,
         referenceMap: getters.pluginItems,
     },
+    //
     provider: {
-        type: 'provider',
-        key: 'provider',
-        name: 'Provider',
+        ...REFERENCE_TYPE_INFO.provider,
         referenceMap: getters.providerItems,
     },
+    //
     region: {
-        type: 'region',
-        key: 'region_code',
-        name: 'Region',
+        ...REFERENCE_TYPE_INFO.region,
         referenceMap: getters.regionItems,
     },
+    //
     secret: {
-        type: 'secret',
-        key: 'secret_id',
-        name: 'Secret',
+        ...REFERENCE_TYPE_INFO.secret,
         referenceMap: getters.secretItems,
     },
+    //
     serviceAccount: {
-        type: 'serviceAccount',
-        key: 'service_account_id',
-        name: 'Service Account',
+        ...REFERENCE_TYPE_INFO.service_account,
         referenceMap: getters.serviceAccountItems,
     },
+    service_account: {
+        ...REFERENCE_TYPE_INFO.service_account,
+        referenceMap: getters.serviceAccountItems,
+    },
+    //
     user: {
-        type: 'user',
-        key: 'user_id',
-        name: 'User',
+        ...REFERENCE_TYPE_INFO.user,
         referenceMap: getters.userItems,
     },
+    //
     webhook: {
-        type: 'webhook',
-        key: 'webhook_id',
-        name: 'Webhook',
+        ...REFERENCE_TYPE_INFO.webhook,
         referenceMap: getters.webhookItems,
     },
 });

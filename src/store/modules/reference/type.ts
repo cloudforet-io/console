@@ -18,7 +18,20 @@ export interface ReferenceItem<Data = Record<string, any>> {
 
 export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<string, Item>;
 
-export type ReferenceType = 'projectGroup'|'project'|'cloudServiceType'|'provider'|'region'|'serviceAccount'|'collector'|'protocol'|'plugin'|'secret'|'user'|'webhook';
+export type ReferenceType =
+    'projectGroup'|'project_group' // supports both camel case and snake case
+    |'project'
+    |'cloudServiceType'|'cloud_service_type'
+    |'provider'
+    |'region'
+    | 'serviceAccount'|'service_account'
+    |'collector'
+    |'protocol'
+    |'plugin'
+    |'secret'
+    |'user'
+    |'webhook';
+
 interface ReferenceTypeInfo {
     type: ReferenceType;
     key: string; // project_id
