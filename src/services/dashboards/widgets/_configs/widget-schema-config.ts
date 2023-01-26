@@ -30,27 +30,42 @@ export const COST_REFERENCE_SCHEMA = {
     [GROUP_BY.CATEGORY]: {
         title: 'Category',
         type: 'array',
-        reference: 'cost_analysis.Cost',
+        reference: {
+            resource_type: 'cost_analysis.Cost',
+            reference_key: GROUP_BY.CATEGORY,
+        },
     },
     [GROUP_BY.RESOURCE_GROUP]: {
         title: 'Resource Group',
         type: 'array',
-        reference: 'cost_analysis.Cost',
+        reference: {
+            resource_type: 'cost_analysis.Cost',
+            reference_key: GROUP_BY.RESOURCE_GROUP,
+        },
     },
     [GROUP_BY.PRODUCT]: {
         title: 'Product',
         type: 'array',
-        reference: 'cost_analysis.Cost',
+        reference: {
+            resource_type: 'cost_analysis.Cost',
+            reference_key: GROUP_BY.PRODUCT,
+        },
     },
     [GROUP_BY.TYPE]: {
         title: 'Type',
         type: 'array',
-        reference: 'cost_analysis.Cost',
+        reference: {
+            resource_type: 'cost_analysis.Cost',
+            reference_key: GROUP_BY.TYPE,
+        },
     },
     [GROUP_BY.ACCOUNT]: {
         title: 'Account ID',
         type: 'array',
-        reference: 'cost_analysis.Cost',
+        reference: {
+            resource_type: 'cost_analysis.Cost',
+            reference_key: GROUP_BY.ACCOUNT,
+        },
     },
 } as const;
 

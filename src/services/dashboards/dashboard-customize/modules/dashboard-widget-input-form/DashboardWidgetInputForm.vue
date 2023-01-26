@@ -27,6 +27,7 @@
                                 :custom-error-map="inheritOptionsErrorMap"
                                 :validation-mode="widgetKey ? 'all' : 'input'"
                                 use-fixed-menu-style
+                                :reference-handler="referenceHandler"
                                 class="widget-options-form"
                                 @validate="handleFormValidate"
             >
@@ -77,6 +78,9 @@ import {
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/composables/use-widget-title-input';
 import DashboardWidgetMoreOptions
     from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/DashboardWidgetMoreOptions.vue';
+import {
+    getReferenceHandler,
+} from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/reference-handler-helpers';
 import {
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/schema-helpers';
@@ -147,6 +151,8 @@ export default defineComponent<Props>({
 
             isFocused: false,
         });
+
+        const referenceHandler = getReferenceHandler();
 
         /* title form validation */
         const {
@@ -358,6 +364,7 @@ export default defineComponent<Props>({
         return {
             widgetFormState,
             ...toRefs(state),
+            referenceHandler,
             /* widget title input */
             title,
             updateTitle,
