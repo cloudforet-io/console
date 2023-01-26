@@ -34,6 +34,7 @@
         </p-select-dropdown>
         <dashboard-date-custom-range-modal :visible.sync="customRangeModalVisible"
                                            granularity="MONTHLY"
+                                           :selected-month="monthMenuItems[selectedMonthMenuIndex].name"
                                            @confirm="handleCustomRangeModalConfirm"
         />
     </div>
