@@ -15,7 +15,7 @@ import {
     computed, getCurrentInstance,
     reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import type Vue from 'vue';
 
 import type {
     MarkdownDynamicLayoutProps,

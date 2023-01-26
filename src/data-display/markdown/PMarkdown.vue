@@ -8,20 +8,19 @@ import { computed, defineComponent } from 'vue';
 
 import DOMPurify from 'dompurify';
 import { render } from 'ejs';
+import hljs from 'highlight.js';
 import { get } from 'lodash';
 import { marked } from 'marked';
 
 import type { MarkdownProps } from '@/data-display/markdown/type';
 
 
+
 marked.setOptions({
     gfm: true,
     breaks: true,
     pedantic: false,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    highlight: async (code, language) => {
-        const hljs = await import('highlight.js');
+    highlight: (code, language) => {
         const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
         const result = hljs.highlight(validLanguage, code);
         return result.value;
@@ -56,7 +55,13 @@ export default defineComponent<MarkdownProps>({
             if (props.data) {
                 doc = render(doc, props.data);
             }
-            doc = marked.parse(doc).replace(/<pre>/g, '<pre class="hljs"');
+            marked.parse(doc, (error, parseResult) => {
+                if (error) console.error('[Mirinae] Markdown parsing error: ', error);
+                else {
+                    doc = parseResult.replace(/<pre>/g, '<pre class="hljs"');
+                }
+            });
+
             return DOMPurify.sanitize(doc);
         });
         return {
