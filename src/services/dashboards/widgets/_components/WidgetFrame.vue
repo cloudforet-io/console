@@ -278,7 +278,7 @@ const handleDeleteModalConfirm = () => {
         }
     }
     .widget-footer {
-        @apply border-t rounded-b-lg bg-gray-100;
+        @apply border-t rounded-b-lg bg-gray-100 border-gray-200;
         padding: 0.3125rem 1rem;
         height: 1.75rem;
         > .widget-footer-wrapper {
