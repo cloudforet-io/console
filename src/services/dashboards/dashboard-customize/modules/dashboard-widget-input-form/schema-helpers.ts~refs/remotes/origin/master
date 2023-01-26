@@ -20,24 +20,27 @@ const refineFilterOptionSchema = (propertyName: string, propertySchema: JsonSche
 
     // use reference store data if exists
     const referenceData: ReferenceMap = referenceStoreState[referenceType];
-
+    let menuItems: MenuItem[] = [];
+    let _enum: string[] = [];
     if (referenceData) {
-        let menuItems: MenuItem[] = [];
-        let _enum: string[] = [];
-
         menuItems = Object.values(referenceData).map((d) => ({
             name: d.key, label: d.label,
         }));
         _enum = Object.keys(referenceData);
+    }
 
+    if (propertySchema.type === 'array') {
         return {
             ...propertySchema,
             items: { enum: _enum.length ? _enum : [null] },
             menuItems,
         };
     }
-
-    return propertySchema;
+    return {
+        ...propertySchema,
+        enum: _enum.length ? _enum : [null],
+        menuItems,
+    };
 };
 const refineOptionSchema = (propertyName: string, propertySchema: JsonSchema['properties'], referenceStoreState: ReferenceStoreState): JsonSchema['properties'] => {
     if (propertyName.startsWith('filters.')) return refineFilterOptionSchema(propertyName, propertySchema, referenceStoreState);
