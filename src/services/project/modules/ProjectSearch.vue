@@ -31,11 +31,6 @@
                         @select="onMenuSelect"
         >
             <template #item--format="{item}">
-                <p-i :name="item.icon"
-                     height="1rem"
-                     width="1rem"
-                     class="mr-1"
-                />
                 <p-text-highlighting :text="item.label"
                                      :term="trimmedValue"
                                      style-type="secondary"
