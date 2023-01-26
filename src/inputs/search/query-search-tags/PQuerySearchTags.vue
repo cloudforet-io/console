@@ -180,7 +180,7 @@ export default defineComponent<QuerySearchTagsProps>({
             display: flex;
             flex-wrap: wrap;
             > .tag {
-                height: 1.5rem;
+                min-height: 1.5rem;
                 margin-bottom: 0.5rem;
                 .text {
                     @apply inline-flex;
