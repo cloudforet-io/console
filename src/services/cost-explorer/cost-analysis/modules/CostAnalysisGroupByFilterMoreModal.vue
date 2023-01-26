@@ -33,6 +33,7 @@
                     :selected.sync="selectedAdditionalInfo"
                     use-fixed-menu-style
                     multi-selectable
+                    appearance-type="stack"
                 />
             </p-field-group>
         </template>

@@ -3,10 +3,10 @@
         <project-select-dropdown
             class="project-select-dropdown"
             project-selectable
-            :selected-project-ids.sync="selectedProjects"
+            :selected-project-ids="selectedProjects"
             :use-fixed-menu-style="false"
             :invalid="proxyIsValid === false"
-            @select="handleSelectedProject"
+            @update:selected-project-ids="handleSelectedProject"
         />
     </div>
 </template>
@@ -22,7 +22,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import type { ProjectForm } from '@/services/asset-inventory/service-account/type';
-import type { ProjectItemResp } from '@/services/project/type';
 
 export default {
     name: 'ServiceAccountProjectForm',
@@ -47,8 +46,9 @@ export default {
         });
 
         /* Event */
-        const handleSelectedProject = (selectedProject: ProjectItemResp[]) => {
-            state.formData = { selectedProjectId: selectedProject.length ? selectedProject[0].id : null };
+        const handleSelectedProject = (selectedProject: string[]) => {
+            state.selectedProjects = selectedProject;
+            state.formData = { selectedProjectId: selectedProject.length ? selectedProject[0] : null };
             state.proxyIsValid = !!selectedProject.length;
         };
 

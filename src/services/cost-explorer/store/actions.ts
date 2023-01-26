@@ -6,6 +6,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { CostExplorerState } from '@/services/cost-explorer/store/type';
 
 export const setDashboardList: Action<CostExplorerState, any> = async ({ commit }): Promise<void> => {
@@ -31,6 +32,6 @@ export const setHomeDashboard: Action<CostExplorerState, any> = (cxt, homeDashbo
     store.dispatch('settings/setItem', {
         key: 'homeDashboard',
         value: homeDashboardId,
-        path: '/costExplorer',
+        path: COST_EXPLORER_ROUTE.DASHBOARD._NAME,
     });
 };

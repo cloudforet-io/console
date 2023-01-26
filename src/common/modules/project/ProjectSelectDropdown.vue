@@ -310,7 +310,7 @@ export default {
 
         watch(() => state._selectedProjectIds, (selectedProjectIds) => {
             if (selectedProjectIds !== props.selectedProjectIds) {
-                emit('update:selectedProjectIds', selectedProjectIds);
+                emit('update:selected-project-ids', selectedProjectIds);
             }
         });
 

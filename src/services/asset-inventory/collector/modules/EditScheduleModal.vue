@@ -34,7 +34,8 @@
                            :invalid-text="validationState.invalidText"
             >
                 <template #label-extra>
-                    <span class="label-help-text">{{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_DESC',{ timezone: formState.timezone[0].label}) }}</span>
+                    <span class="label-help-text">{{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_DESC',
+                                                        { timezone: (formState.timezone && formState.timezone[0]) ? formState.timezone[0].label : '' }) }}</span>
                 </template>
                 <div v-for="(type, idx) in Object.keys(scheduleTypes)"
                      :key="idx"
@@ -265,7 +266,7 @@ export default {
             const res = {};
             get(state, 'schedule.schedule.hours', []).forEach((hour) => {
                 let time = dayjs().utc().hour(hour);
-                if (formState.timezone[0].name !== 'UTC') time = time.tz(formState.timezone[0].name);
+                if (formState.timezone?.[0]?.name !== 'UTC') time = time.tz(formState.timezone?.[0]?.name);
                 res[time.hour()] = time;
             });
             formState.selectedHours = res;
@@ -276,7 +277,7 @@ export default {
             const res = {};
             forEach(formState.selectedHours, (day) => {
                 let time = day.utc();
-                if (formState.timezone[0].name !== 'UTC') time = day.tz(formState.timezone[0].name);
+                if (formState.timezone?.[0]?.name !== 'UTC') time = day.tz(formState.timezone?.[0]?.name);
                 res[time.hour()] = time;
             });
             formState.selectedHours = { ...res };
@@ -372,7 +373,7 @@ export default {
                 delete formState.selectedHours[hour];
             } else {
                 let time = dayjs().utc().hour(hour);
-                if (formState.timezone[0].name !== 'UTC') time = dayjs().tz(formState.timezone[0].name).hour(hour);
+                if (formState.timezone?.[0]?.name !== 'UTC') time = dayjs().tz(formState.timezone?.[0]?.name).hour(hour);
                 formState.selectedHours[hour] = time;
             }
             formState.selectedHours = { ...formState.selectedHours };
@@ -382,7 +383,7 @@ export default {
             else {
                 state.hoursMatrix.forEach((hour) => {
                     let time = dayjs().utc().hour(hour);
-                    if (formState.timezone[0].name !== 'UTC') time = dayjs().tz(formState.timezone[0].name).hour(hour);
+                    if (formState.timezone?.[0]?.name !== 'UTC') time = dayjs().tz(formState.timezone?.[0]?.name).hour(hour);
                     formState.selectedHours[hour] = time;
                 });
                 formState.selectedHours = { ...formState.selectedHours };
