@@ -20,6 +20,7 @@ import type { RoleType } from '@/services/administration/iam/role/config';
 export const getDefaultPagePermissionList = (isDomainOwner: boolean, roleType?: RoleType): PagePermissionTuple[] => {
     if (isDomainOwner) return DOMAIN_OWNER_DEFAULT_PERMISSIONS;
     if (roleType === 'SYSTEM') return SYSTEM_USER_DEFAULT_PERMISSIONS;
+    // FIXME:: DOMAIN_VIEWER should not get ADMIN_PERMISSION.
     if (roleType === 'DOMAIN') return ADMIN_USER_DEFAULT_PERMISSIONS;
     if (roleType === 'PROJECT') return PROJECT_USER_DEFAULT_PERMISSIONS;
     return NO_ROLE_USER_DEFAULT_PERMISSIONS;
