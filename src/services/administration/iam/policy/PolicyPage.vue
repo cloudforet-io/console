@@ -6,14 +6,13 @@
             :total-count="totalCount"
         >
             <template #extra>
-                <router-link :to="{name: ADMINISTRATION_ROUTE.IAM.POLICY.CREATE._NAME}">
-                    <p-button style-type="primary"
-                              icon-left="ic_plus_bold"
-                              :disabled="!hasManagePermission"
-                    >
-                        {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
-                    </p-button>
-                </router-link>
+                <p-button style-type="primary"
+                          icon-left="ic_plus_bold"
+                          :disabled="!hasManagePermission"
+                          @click="$router.push({ name: ADMINISTRATION_ROUTE.IAM.POLICY.CREATE._NAME })"
+                >
+                    {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
+                </p-button>
             </template>
         </p-page-title>
         <policy-list-data-table :anchor-icon-visible="false" />
