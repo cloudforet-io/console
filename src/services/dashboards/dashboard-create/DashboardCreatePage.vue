@@ -98,18 +98,21 @@ export default {
                     ...dashboardTemplate.value,
                     dashboard_id: undefined,
                     project_id: dashboardProject.value?.id ?? '',
+                    name: '',
                     viewers: state.dashboardViewerType,
                 };
             } else {
                 _dashboardTemplate = {
                     ...dashboardTemplate.value,
                     dashboard_id: undefined,
+                    name: '',
                     viewers: state.dashboardViewerType,
                 };
             }
 
             dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
             dashboardDetailState.dashboardId = undefined;
+            dashboardDetailState.placeholder = dashboardTemplate.value.name;
             const routeName = state.dashboardScope === DASHBOARD_SCOPE.PROJECT ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME;
             SpaceRouter.router.push({ name: routeName });
         };
