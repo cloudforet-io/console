@@ -11,6 +11,8 @@ import type { ConsoleFilterOperator } from '@/query/type';
 import type { CurrencyRates } from '@/store/modules/display/type';
 import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
 
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
@@ -30,14 +32,16 @@ export const GRANULARITY = {
 } as const;
 
 export const GROUP_BY = {
-    PROJECT_GROUP: 'project_group_id',
-    PROJECT: 'project_id',
-    PROVIDER: 'provider',
-    SERVICE_ACCOUNT: 'service_account_id',
+    // resource reference type
+    PROVIDER: REFERENCE_TYPE_INFO.provider.key,
+    PROJECT: REFERENCE_TYPE_INFO.project.key,
+    SERVICE_ACCOUNT: REFERENCE_TYPE_INFO.service_account.key,
+    PROJECT_GROUP: REFERENCE_TYPE_INFO.project_group.key,
+    REGION: REFERENCE_TYPE_INFO.region.key,
+    // cost reference
     CATEGORY: 'category',
     RESOURCE_GROUP: 'resource_group',
     PRODUCT: 'product',
-    REGION: 'region_code',
     TYPE: 'usage_type',
     ACCOUNT: 'account',
 } as const;
@@ -84,32 +88,58 @@ export interface WidgetConfig {
     options_schema?: WidgetOptionsSchema;
 }
 
-export interface WidgetOptionsSchema {
-    default_properties?: string[];
-    schema: JsonSchema | any;
-}
 
 type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
-
-
 interface LegendOptions {
     enabled?: boolean;
     show_at?: 'table'|'chart';
 }
 
+/* widget filters */
 export interface WidgetFilter {
     k?: string;
     v: null|string|boolean|number;
     o?: ConsoleFilterOperator;
 }
-export interface WidgetFiltersMap {
-    provider?: WidgetFilter[];
-    project_id?: WidgetFilter[];
-    service_account_id?: WidgetFilter[];
-    user_id?: WidgetFilter[];
-    cloud_service_type_id?: WidgetFilter[];
-    region_code?: WidgetFilter[];
+export const WIDGET_FILTER_KEYS = [
+    // resource reference type
+    REFERENCE_TYPE_INFO.provider.type,
+    REFERENCE_TYPE_INFO.project.type,
+    REFERENCE_TYPE_INFO.service_account.type,
+    REFERENCE_TYPE_INFO.project_group.type,
+    REFERENCE_TYPE_INFO.user.type,
+    REFERENCE_TYPE_INFO.cloud_service_type.type,
+    REFERENCE_TYPE_INFO.region.type,
+    // cost reference
+    GROUP_BY.CATEGORY,
+    GROUP_BY.RESOURCE_GROUP,
+    GROUP_BY.PRODUCT,
+    GROUP_BY.TYPE,
+    GROUP_BY.ACCOUNT,
+] as const;
+export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
+export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
+
+
+/* widget schema */
+export type WidgetFiltersSchema = {
+    [K in WidgetFilterKey as `filters.${K}`]: JsonSchema['properties']
+};
+export type WidgetFiltersSchemaProperty = keyof WidgetFiltersSchema;
+export type WidgetOptionsSchemaProperty = 'group_by'|WidgetFiltersSchemaProperty;
+export type WidgetOptionsSchemaProperties = Partial<Record<WidgetOptionsSchemaProperty, JsonSchema['properties']>>;
+export interface WidgetOptionsSchema {
+    default_properties?: WidgetOptionsSchemaProperty[];
+    schema: {
+        type: 'object',
+        properties: WidgetOptionsSchemaProperties;
+        required?: WidgetOptionsSchemaProperty[];
+        order?: WidgetOptionsSchemaProperty[];
+    };
 }
+
+
+/* widget options */
 export interface WidgetOptions {
     group_by?: GroupBy | string;
     granularity?: Granularity;

@@ -1,5 +1,9 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import {
+    getWidgetFilterOptionsSchema,
+    getWidgetFilterSchemaPropertyNames,
+} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
@@ -36,31 +40,11 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: [`filters.${GROUP_BY.PROJECT}`, `filters.${GROUP_BY.SERVICE_ACCOUNT}`],
+        default_properties: getWidgetFilterSchemaPropertyNames('project', 'service_account'),
         schema: {
             type: 'object',
-            properties: {
-                [`filters.${GROUP_BY.PROJECT}`]: {
-                    title: 'Project',
-                    type: 'array',
-                },
-                [`filters.${GROUP_BY.SERVICE_ACCOUNT}`]: {
-                    title: 'Service Account',
-                    type: 'array',
-                },
-                [`filters.${GROUP_BY.PROJECT_GROUP}`]: {
-                    title: 'Project Group',
-                    type: 'array',
-                },
-                [`filters.${GROUP_BY.REGION}`]: {
-                    title: 'Region',
-                    type: 'array',
-                },
-                [`filters.${GROUP_BY.ACCOUNT}`]: {
-                    title: 'Account ID',
-                    type: 'array',
-                },
-            },
+            properties: getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'account'),
+            order: getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'account'),
         },
     },
 };
