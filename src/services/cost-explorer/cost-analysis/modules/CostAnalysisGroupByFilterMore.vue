@@ -134,7 +134,7 @@ export default defineComponent({
             const target = _moreGroupBy.find((d) => d.category === item.category && d.key === item.key);
             if (target) {
                 target.selected = val;
-                costExplorerStore.commit('costAnalysis/setMoreGroupBy', _moreGroupBy);
+                costExplorerStore.dispatch('costAnalysis/setMoreGroupBy', _moreGroupBy);
             }
         };
         const handleChangeCheckBox = (item: MoreGroupByItem, val) => {
@@ -143,14 +143,14 @@ export default defineComponent({
             if (target) {
                 target.disabled = !val;
                 if (!val) target.selected = false;
-                costExplorerStore.commit('costAnalysis/setMoreGroupBy', _moreGroupBy);
+                costExplorerStore.dispatch('costAnalysis/setMoreGroupBy', _moreGroupBy);
             }
         };
         const handleDeleteItem = (item: MoreGroupByItem) => {
             const _moreGroupBy: MoreGroupByItem[] = cloneDeep(state.moreGroupByItems);
             const targetIdx = _moreGroupBy.findIndex((d) => d.category === item.category && d.key === item.key);
             _moreGroupBy.splice(targetIdx, 1);
-            costExplorerStore.commit('costAnalysis/setMoreGroupBy', _moreGroupBy);
+            costExplorerStore.dispatch('costAnalysis/setMoreGroupBy', _moreGroupBy);
         };
 
         return {

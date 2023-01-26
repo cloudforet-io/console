@@ -34,6 +34,7 @@
                     use-fixed-menu-style
                     multi-selectable
                     appearance-type="stack"
+                    show-select-marker
                 />
             </p-field-group>
         </template>
@@ -163,7 +164,7 @@ export default defineComponent<Props>({
                 else mergedMoreGroupBy.push(item);
             });
             state.proxyVisible = false;
-            costExplorerStore.commit('costAnalysis/setMoreGroupBy', mergedMoreGroupBy);
+            costExplorerStore.dispatch('costAnalysis/setMoreGroupBy', mergedMoreGroupBy);
         };
 
         /* Watcher */
