@@ -12,7 +12,7 @@ import {
      getJsonSchemaFormArgTypes,
 } from '@/inputs/forms/json-schema-form/story-helper';
 import {
-    getDefaultFormData, getDefaultSchema, getJsonInputSchema
+    getDefaultFormData, getDefaultSchema, getJsonInputSchema, getReferenceHandler
 } from "@/inputs/forms/json-schema-form/mock";
 import {supportLanguages} from "@/translations";
 import {
@@ -117,7 +117,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 |enum|custom|[Select Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|supports `string` type only|
 |items|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|supports `array` type only|
 |menuItems|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|supports `array` type only|
-|reference|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|It represents name of reference type. supports `string` type only|
+|reference|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|It represents reference information. supports `{ resource_type: string, reference_key?: string}` type only|
 |order|custom|-|order of properties. string[]|
 
 
@@ -147,6 +147,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
         <p-json-schema-form :schema="schema"
                             :form-data.sync="formData"
                             :language="$i18n.locale"
+                            :reference-handler="handler"
         />
     </div>
     <div class="col-span-6 bg-coral-100 p-4">
@@ -168,6 +169,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
                 const state = reactive({
                     schema: getDefaultSchema(),
                     formData: {},
+                    handler: getReferenceHandler()
                 })
                 return {
                     ...toRefs(state),

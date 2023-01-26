@@ -29,6 +29,6 @@ export const addCustomKeywords = (ajv: Ajv): void => {
     });
     ajv.addKeyword({
         keyword: 'reference',
-        schemaType: 'string',
+        schemaType: 'object',
     });
 };

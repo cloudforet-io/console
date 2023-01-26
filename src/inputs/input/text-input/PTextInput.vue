@@ -28,7 +28,9 @@
                           class="selected-text"
                     >
                         {{ proxySelected[0].label || proxySelected[0].name }}
-                        <p-badge v-if="proxySelected.length > 1">
+                        <p-badge v-if="proxySelected.length > 1"
+                                 :style-type="disabled ? 'gray200' : 'blue200'"
+                        >
                             +{{ proxySelected.length - 1 }}
                         </p-badge>
                     </span>
@@ -279,7 +281,7 @@ export default defineComponent<TextInputProps>({
         });
         watch(() => props.isFocused, (val) => {
             if (val === isInputFocused.value) return;
-            isInputFocused.value = val;
+            isInputFocused.value = !!val;
         });
 
         /* selected */
@@ -569,6 +571,9 @@ export default defineComponent<TextInputProps>({
                 height: 1.25rem;
                 min-width: 2.5rem;
                 margin: 0;
+            }
+            > .selected-text {
+                line-height: 1.25;
             }
         }
 
