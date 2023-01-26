@@ -42,7 +42,7 @@ export default defineComponent({
         VerticalPageLayout,
     },
     setup() {
-        registerServiceStore<InfoState>('costExplorer', infoStoreModule, infoStore);
+        registerServiceStore<InfoState>('info', infoStoreModule, infoStore);
         const { breadcrumbs } = useBreadcrumbs();
 
         /* Init */
