@@ -12,10 +12,10 @@ export const useReferenceStore = () => {
     const referenceStoreState = reactive({
         loading: true,
         provider: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-        project_id: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-        project_group_id: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-        service_account_id: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
-        region_code: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+        project: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+        project_group: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+        service_account: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+        region: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     });
     (async () => {
         referenceStoreState.loading = true;

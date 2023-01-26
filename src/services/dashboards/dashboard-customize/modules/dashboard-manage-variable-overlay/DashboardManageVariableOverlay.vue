@@ -106,7 +106,7 @@ const state = reactive({
     selectedVariable: '' as string,
     variableNames: computed<string[]>(() => {
         const properties = state.variableSchema.properties;
-        return state.variableSchema.order.map((d) => properties[d].name).filter((name) => name !== properties[state.selectedVariable]?.name);
+        return state.variableSchema.order.map((d) => properties[d]?.name).filter((name) => name !== properties[state.selectedVariable]?.name);
     }),
 });
 

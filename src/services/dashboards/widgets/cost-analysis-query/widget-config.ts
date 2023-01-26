@@ -1,6 +1,5 @@
-import { CHART_TYPE } from '@/services/cost-explorer/cost-analysis/type';
-import { GRANULARITY, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const costAnalysisQueryWidgetConfig: WidgetConfig = {
     widget_config_id: 'costAnalysisQuery',
@@ -20,23 +19,20 @@ const costAnalysisQueryWidgetConfig: WidgetConfig = {
         schema: {
             type: 'object',
             properties: {
-                group_by: {
-                    type: 'string',
-                    enum: Object.values(GROUP_BY),
-                },
-                granularity: {
-                    type: 'string',
-                    enum: Object.values(GRANULARITY),
-                },
-                chart_type: {
-                    type: 'string',
-                    enum: Object.values(CHART_TYPE),
-                },
-                stacked: {
-                    type: 'boolean',
-                },
+                ...getWidgetOptionsSchema('group_by'),
+                // granularity: {
+                //     type: 'string',
+                //     enum: Object.values(GRANULARITY),
+                // },
+                // chart_type: {
+                //     type: 'string',
+                //     enum: Object.values(CHART_TYPE),
+                // },
+                // stacked: {
+                //     type: 'boolean',
+                // },
             },
-            required: ['group_by', 'granularity', 'chart_type'],
+            // required: ['group_by', 'granularity', 'chart_type'],
         },
     },
 };
