@@ -1,3 +1,10 @@
+# [2.0.0-beta.28](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.27...v2.0.0-beta.28) (2023-01-26)
+
+
+### Bug Fixes
+
+* **query-search-tags:** do not give fixed height to tag ([e609a9f](https://github.com/cloudforet-io/mirinae/commit/e609a9f283728214babf09b9c91ed1b268e8ecdb))
+
 # [2.0.0-beta.27](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.26...v2.0.0-beta.27) (2023-01-26)
 
 
