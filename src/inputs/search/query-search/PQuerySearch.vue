@@ -1,5 +1,7 @@
 <template>
-    <div v-click-outside="hideMenu" class="p-query-search">
+    <div v-click-outside="hideMenu"
+         class="p-query-search"
+    >
         <p-search :class="{'no-menu': menu ? menu.length === 0 : false}"
                   :value="searchText"
                   :placeholder="placeholder"
@@ -7,15 +9,20 @@
                   :is-focused.sync="isFocused"
         >
             <template #left>
-                <span v-for="(keyItem, idx) in selectedKeys" :key="idx" class="key-tag"
+                <span v-for="(keyItem, idx) in selectedKeys"
+                      :key="idx"
+                      class="key-tag"
                       :class="{active: isFocused || visibleMenu}"
                 >
                     {{ keyItem.label }}
                 </span>
-                <span v-if="operator" class="operator-tag">{{ operator }}</span>
+                <span v-if="operator"
+                      class="operator-tag"
+                >{{ operator }}</span>
             </template>
             <template #default="scope">
-                <input ref="inputRef" v-focus.lazy="isFocused"
+                <input ref="inputRef"
+                       v-focus.lazy="isFocused"
                        :value="searchText"
                        :placeholder="currentPlaceholder || scope.placeholder"
                        :type="inputElType"
@@ -32,18 +39,29 @@
             </template>
             <template #right="scope">
                 <div class="right">
-                    <span v-if="selectedKey || scope.value" class="delete-btn" @click="onDeleteAll">
-                        <p-i class="icon" name="ic_delete" height="1rem"
+                    <span v-if="selectedKey || scope.value"
+                          class="delete-btn"
+                          @click="onDeleteAll"
+                    >
+                        <p-i class="icon"
+                             name="ic_delete"
+                             height="1rem"
                              width="1rem"
                         />
                     </span>
                 </div>
             </template>
-            <template v-for="(_, slot) of searchSlots" #[slot]="scope">
-                <slot :name="`search-${slot}`" v-bind="{...scope}" />
+            <template v-for="(_, slot) of searchSlots"
+                      #[slot]="scope"
+            >
+                <slot :name="`search-${slot}`"
+                      v-bind="{...scope}"
+                />
             </template>
         </p-search>
-        <div v-show="visibleMenu" class="menu-container">
+        <div v-show="visibleMenu && menu.length"
+             class="menu-container"
+        >
             <p-context-menu ref="menuRef"
                             :loading="lazyLoading"
                             :menu="menu"
@@ -53,8 +71,12 @@
                             @select="onMenuSelect"
                             @blur="focus"
             >
-                <template v-for="(_, slot) of menuSlots" #[slot]="scope">
-                    <slot :name="`menu-${slot}`" v-bind="{...scope}" />
+                <template v-for="(_, slot) of menuSlots"
+                          #[slot]="scope"
+                >
+                    <slot :name="`menu-${slot}`"
+                          v-bind="{...scope}"
+                    />
                 </template>
             </p-context-menu>
         </div>
