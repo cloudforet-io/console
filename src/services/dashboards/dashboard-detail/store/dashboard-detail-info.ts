@@ -45,6 +45,7 @@ export interface DashboardDetailInfoStoreState {
     dashboardId: string | undefined;
     projectId: string;
     name: string;
+    placeholder: string;
     settings: DashboardSettings;
     variables: DashboardVariables;
     variablesSchema: DashboardVariablesSchema;
@@ -91,6 +92,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         dashboardId: '',
         projectId: '',
         name: '',
+        placeholder: '',
         settings: DASHBOARD_DEFAULT.settings,
         variables: {},
         variablesSchema: {
@@ -112,6 +114,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const resetDashboardData = () => {
         originState.dashboardInfo = null;
         state.name = '';
+        state.placeholder = '';
         state.projectId = '';
         state.settings = DASHBOARD_DEFAULT.settings;
         state.variables = {};

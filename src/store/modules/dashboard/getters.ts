@@ -33,7 +33,7 @@ const getItems = (items: DashboardModel[], filters: ConsoleFilter[], viewers: st
     return result;
 };
 
-export const getDashboardNameList: Getter<DashboardState, any> = (state, getters): any => (projectId:string, dashboardName: string) => {
+export const getDashboardNameList: Getter<DashboardState, any> = (state, getters): any => (projectId: string, dashboardName: string) => {
     if (projectId) {
         return getters.getProjectItems
             .filter((item) => (

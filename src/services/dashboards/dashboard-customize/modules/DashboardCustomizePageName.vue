@@ -54,7 +54,7 @@
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
 import {
-    computed, nextTick, reactive, ref,
+    computed, nextTick, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -81,7 +81,7 @@ const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     name: useProxyValue('name', props, emit),
-    placeHolder: dashboardDetailState.name,
+    placeHolder: dashboardDetailState.placeholder,
     editMode: false,
     dashboardNameList: computed<string[]>(() => store.getters['dashboard/getDashboardNameList'](dashboardDetailState.projectId, dashboardDetailState.name)),
 });
@@ -138,6 +138,11 @@ const handleEnter = () => {
         state.name = props.name;
     }
 };
+
+watch(() => props.name, (d) => {
+    // for creating dashboard
+    if (!d) setForm('nameInput', '');
+}, { immediate: true });
 
 (async () => {
     await store.dispatch('dashboard/loadProjectDashboard');
