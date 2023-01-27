@@ -1,10 +1,10 @@
 import { describe, expect } from 'vitest';
 
+import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/modules/dashboard-widget-container/helpers/widget-width-helper';
 import {
     WIDGET_CONTAINER_MAX_WIDTH,
     WIDGET_CONTAINER_MIN_WIDTH, WIDGET_WIDTH_CRITERIA,
-} from '@/services/dashboards/dashboard-detail/lib/config';
-import { widgetWidthAssigner } from '@/services/dashboards/dashboard-detail/lib/width-helper';
+} from '@/services/dashboards/dashboard-detail/modules/dashboard-widget-container/widget-container-config';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 
 

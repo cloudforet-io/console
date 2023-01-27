@@ -35,7 +35,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardViewer } from '@/services/dashboards/config';
-import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/DashboardWidgetContainer.vue';
+import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/dashboard-widget-container/DashboardWidgetContainer.vue';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
 import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
