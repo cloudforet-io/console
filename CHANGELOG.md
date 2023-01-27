@@ -1,3 +1,10 @@
+# [2.0.0-beta.31](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.30...v2.0.0-beta.31) (2023-01-27)
+
+
+### Bug Fixes
+
+* **datetime-picker:** disconnect i18nConnector ([#257](https://github.com/cloudforet-io/mirinae/issues/257)) ([08d5398](https://github.com/cloudforet-io/mirinae/commit/08d5398dcda7830f0cb40ab09b3da10781797ad3))
+
 # [2.0.0-beta.30](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.29...v2.0.0-beta.30) (2023-01-27)
 
 
