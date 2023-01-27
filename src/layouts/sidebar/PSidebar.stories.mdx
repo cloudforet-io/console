@@ -28,6 +28,7 @@ export const Template = (args, {argTypes}) => {
                             :style-type="styleType"
                             :size="size"
                             :hide-close-button="hideCloseButton"
+                            :is-fixed-size="isFixedSize"
                             v-model="visible"
                             class="mt-4 flex-grow"
                             @close="onClose"
@@ -60,6 +61,7 @@ export const Playground = (args, {argTypes}) => {
                             :visible="visible"
                             :style-type="styleType"
                             :size="size"
+                            :is-fixed-size="isFixedSize"
                             :hide-close-button="hideCloseButton"
                             class="mt-4 flex-grow"
                 >

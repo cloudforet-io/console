@@ -82,7 +82,7 @@ export const getSidebarArgTypes = (): ArgTypes => ({
         name: 'isFixedSize',
         type: { name: 'boolean' },
         description: 'Whether or not sidebar size is fixed',
-        defaultValue: SIDEBAR_SIZE.md,
+        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',

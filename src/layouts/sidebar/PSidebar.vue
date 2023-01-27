@@ -236,18 +236,24 @@ export default defineComponent({
                 @mixin sidebar-size $sidebar-lg, $sidebar-fixed-lg;
             }
         }
+
+        @define-mixin sidebar-animation $sidebar-size, $sidebar-fixed-size {
+            margin-left: -$(sidebar-size);
+            &.fixed-size {
+                margin-left: -$(sidebar-fixed-size);
+            }
+        }
         .slide-fade-enter, .slide-fade-leave-to {
             transform: translateX(100%);
             opacity: 0;
-
             &.sm {
-                margin-left: -$(sidebar-sm);
+                @mixin sidebar-animation $sidebar-sm, $sidebar-fixed-sm;
             }
             &.md {
-                margin-left: -$(sidebar-md);
+                @mixin sidebar-animation $sidebar-md, $sidebar-fixed-md;
             }
             &.lg {
-                margin-left: -$(sidebar-lg);
+                @mixin sidebar-animation $sidebar-lg, $sidebar-fixed-lg;
             }
         }
     }
