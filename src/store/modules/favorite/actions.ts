@@ -81,7 +81,6 @@ export const load: Action<FavoriteState, any> = async ({ state, commit }, itemTy
 
     // early return if it's being loaded
     if (state.isLoading[itemType]) return;
-
     commit('setIsLoading', { ...state.isLoading, [itemType]: true });
     try {
         const { results } = await SpaceConnector.client.addOns.favorite.list({
@@ -93,6 +92,7 @@ export const load: Action<FavoriteState, any> = async ({ state, commit }, itemTy
         }));
         commit(setCommitsByItemType[itemType], favorites);
     } catch (e) {
+        commit(setCommitsByItemType[itemType], []);
         ErrorHandler.handleError(e);
     } finally {
         commit('setIsLoading', { ...state.isLoading, [itemType]: false });
