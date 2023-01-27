@@ -102,6 +102,7 @@ export default {
         const state = reactive({
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
             authType: computed(() => store.state.domain.extendedAuthType),
+            beforeUser: store.state.user.userId,
             component: computed(() => {
                 let component;
                 const auth = state.authType;
@@ -127,11 +128,12 @@ export default {
             }),
             showErrorMessage: vm.$route.query.error === 'error' || computed(() => store.state.display.isSignInFailed),
         });
-        const onSignIn = async () => {
+        const onSignIn = async (userId) => {
             try {
+                const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
                 const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
 
-                if (!props.nextPath) {
+                if (!props.nextPath || !isSameUserAsPreviouslyLoggedInUser) {
                     await vm.$router.push(defaultRoute);
                     return;
                 }

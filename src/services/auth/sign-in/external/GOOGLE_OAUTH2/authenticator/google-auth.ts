@@ -57,7 +57,7 @@ class GoogleAuth extends Authenticator {
                 longtitle: true,
                 onsuccess: async (googleUser) => {
                     await GoogleAuth.onSuccess(googleUser);
-                    if (onSignInCallback) onSignInCallback();
+                    if (onSignInCallback) onSignInCallback(googleUser?.wt?.cu);
                 },
                 onfailure: async () => {
                     await GoogleAuth.signOut();
