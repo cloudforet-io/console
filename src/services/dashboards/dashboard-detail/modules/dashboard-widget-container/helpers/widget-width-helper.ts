@@ -4,7 +4,7 @@ import {
     WIDGET_WIDTH_RANGE_LIST,
     WIDGET_GAP,
     WIDGET_WIDTH_CRITERIA,
-} from '@/services/dashboards/dashboard-detail/lib/config';
+} from '@/services/dashboards/dashboard-detail/modules/dashboard-widget-container/widget-container-config';
 import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
