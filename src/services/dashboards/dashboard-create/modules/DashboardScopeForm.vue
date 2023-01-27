@@ -5,11 +5,13 @@
             <div class="dashboard-scope-wrapper">
                 <p-radio-group direction="vertical">
                     <p-radio :selected="isDomainScope"
+                             :disabled="!hasManageWorkspacePermission"
                              @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
                     >
                         {{ $t('DASHBOARDS.CREATE.ENTIRE_WORKSPACES') }}
                     </p-radio>
                     <p-radio :selected="!isDomainScope"
+                             :disabled="!hasManageProjectPermission"
                              @change="handleSelectScope(DASHBOARD_SCOPE.PROJECT)"
                     >
                         {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}
@@ -26,7 +28,9 @@
 
 <script lang="ts">
 import type { SetupContext } from 'vue';
-import { defineComponent, reactive, toRefs } from 'vue';
+import {
+    defineComponent, onMounted, reactive, toRefs,
+} from 'vue';
 
 import {
     PPaneLayout, PPanelTop, PRadio, PRadioGroup,
@@ -34,6 +38,9 @@ import {
 
 import { store } from '@/store';
 
+import { MENU_ID } from '@/lib/menu/config';
+
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
@@ -52,6 +59,8 @@ export default defineComponent({
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             isDomainScope: true,
+            hasManageProjectPermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
+            hasManageWorkspacePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
         });
 
         const handleSelectScope = (scopeType: DashboardScope) => {
@@ -68,6 +77,12 @@ export default defineComponent({
         (async () => {
             await store.dispatch('reference/project/load');
         })();
+
+        onMounted(() => {
+            if (!(state.hasManageProjectPermission || state.hasManageWorkspacePermission)) return;
+            if (!state.hasManageProjectPermission) handleSelectScope(DASHBOARD_SCOPE.DOMAIN);
+            if (!state.hasManageWorkspacePermission) handleSelectScope(DASHBOARD_SCOPE.PROJECT);
+        });
 
         return {
             ...toRefs(state),

@@ -6,11 +6,11 @@
         <template #header>
             <div class="header-wrapper">
                 <span>{{ header }}</span>
-                <router-link :to="{ name: DASHBOARDS_ROUTE.CREATE._NAME, path: DASHBOARDS_ROUTE.CREATE._NAME }">
-                    <p-icon-button name="ic_plus_bold"
-                                   size="sm"
-                    />
-                </router-link>
+                <p-icon-button name="ic_plus_bold"
+                               size="sm"
+                               :disabled="hasOnlyViewPermission"
+                               @click="$router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME, path: DASHBOARDS_ROUTE.CREATE._NAME })"
+                />
             </div>
         </template>
     </l-n-b>
@@ -32,6 +32,7 @@ import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favo
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
@@ -45,6 +46,11 @@ export default defineComponent({
     setup() {
         const state = reactive({
             loading: true,
+            hasOnlyViewPermission: computed(() => {
+                const projectManagePermission = useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT).value;
+                const workspaceManagePermission = useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE).value;
+                return !(projectManagePermission || workspaceManagePermission);
+            }),
             showFavoriteOnly: false,
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId)),
             favoriteItemMap: computed(() => {

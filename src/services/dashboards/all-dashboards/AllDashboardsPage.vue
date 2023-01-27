@@ -5,7 +5,7 @@
                       :total-count="dashboardTotalCount"
         >
             <template #extra>
-                <p-button v-if="hasManagePermission && (workspaceDashboardList || projectDashboardList)"
+                <p-button v-if="!hasOnlyViewPermission && (workspaceDashboardList || projectDashboardList)"
                           icon-left="ic_plus"
                           @click="handleCreateDashboard"
                 >
@@ -85,6 +85,7 @@ import type { HandlerResponse } from '@/component-util/query-search/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
+import { MENU_ID } from '@/lib/menu/config';
 import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -124,7 +125,11 @@ export default {
                 }
                 return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
             }),
-            hasManagePermission: useManagePermissionState(),
+            hasOnlyViewPermission: computed(() => {
+                const projectManagePermission = useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT).value;
+                const workspaceManagePermission = useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE).value;
+                return !(projectManagePermission || workspaceManagePermission);
+            }),
         });
 
         const searchQueryHelper = new QueryHelper();
