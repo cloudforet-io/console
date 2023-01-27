@@ -39,7 +39,7 @@ import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect';
 import PI from '@/foundation/icons/PI.vue';
 import type { DatetimePickerProps } from '@/inputs/datetime-picker/type';
 import { DATA_TYPE, SELECT_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
-import { I18nConnector } from '@/translations';
+import { i18n } from '@/translations';
 import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 import { getLocaleFile } from '@/translations/vendors/flatpickr';
@@ -132,7 +132,8 @@ export default {
                 }),
             ] : [])),
             localeFile: computed(() => {
-                const localeFile = getLocaleFile(I18nConnector.i18n.locale);
+                // TODO:: use I18nConnector
+                const localeFile = getLocaleFile(i18n.locale);
                 if (localeFile) return { ...localeFile, rangeSeparator: ' ~ ' };
                 return { rangeSeparator: ' ~ ' };
             }),
