@@ -32,22 +32,20 @@ export const FORM_TYPE = Object.freeze({
 export const MANAGE_FEATURE_MAP = {
     [MENU_ID.DASHBOARDS_WORKSPACE]: {
         title: 'IAM.ROLE.FORM.TOOLTIP_ADMIN_FEATURES',
-        // song-lang
         features: [
-            'Create',
-            'Customize',
-            'Delete',
-            'Clone',
+            'IAM.ROLE.FORM.TOOLTIP_DASHBOARD_CREATE',
+            'IAM.ROLE.FORM.TOOLTIP_DASHBOARD_CUSTOMIZE',
+            'IAM.ROLE.FORM.TOOLTIP_DASHBOARD_DELETE',
+            'IAM.ROLE.FORM.TOOLTIP_DASHBOARD_CLONE',
         ],
     },
     [MENU_ID.DASHBOARDS_PROJECT]: {
         title: 'IAM.ROLE.FORM.TOOLTIP_ADMIN_FEATURES',
-        // song-lang
         features: [
-            'Create',
-            'Customize',
-            'Delete',
-            'Clone',
+            'IAM.ROLE.FORM.TOOLTIP_DASHBOARD_CREATE',
+            'IAM.ROLE.FORM.TOOLTIP_DASHBOARD_CUSTOMIZE',
+            'IAM.ROLE.FORM.TOOLTIP_DASHBOARD_DELETE',
+            'IAM.ROLE.FORM.TOOLTIP_DASHBOARD_CLONE',
         ],
     },
     [MENU_ID.PROJECT]: {

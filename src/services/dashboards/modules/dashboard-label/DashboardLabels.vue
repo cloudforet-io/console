@@ -75,8 +75,7 @@ const {
     inputText: '',
 }, {
     inputText(value: string) {
-        // song-lang
-        if (value.length > 30) return i18n.t('Label cannot be longer than 30 characters');
+        if (value.length > 30) return i18n.t('DASHBOARDS.CUSTOMIZE.VALIDATION_LIMITED_CHAR_LABEL');
         if (state.labelList.find((d) => d === value)) return i18n.t('DASHBOARDS.CUSTOMIZE.VALIDATION_DUPLICATED_LABEL');
         return '';
     },
