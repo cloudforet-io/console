@@ -71,7 +71,7 @@ export class SpaceRouter {
                     nextLocation = { name: HOME_DASHBOARD_ROUTE._NAME };
                 // When a user tries to go to inaccessible page, redirect to error page
                 } else if (userAccessLevel < routeAccessLevel) {
-                    nextLocation = { name: ERROR_ROUTE._NAME };
+                    nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
                 }
             // When an unauthenticated(or token expired) user tries to access a page that only authenticated users can enter, refresh token
             } else if (routeAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {

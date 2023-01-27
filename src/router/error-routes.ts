@@ -10,9 +10,10 @@ export const ERROR_ROUTE = Object.freeze({
 
 export const errorRoutes: RouteConfig[] = [
     {
-        path: '/error-page',
+        path: '/error-page/:statusCode?',
         name: ERROR_ROUTE._NAME,
         meta: { accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH },
+        props: true,
         component: ErrorPage,
     },
     {
