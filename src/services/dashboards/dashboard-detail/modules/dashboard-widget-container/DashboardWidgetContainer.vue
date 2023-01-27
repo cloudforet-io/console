@@ -192,10 +192,9 @@ export default defineComponent<Props>({
             dashboardDetailState,
             dashboardDetailValidationState,
             ...toRefs(state),
+            containerRef,
             reformedWidgetInfoList,
             handleIntersectionObserver,
-            /* container width */
-            containerRef,
         };
     },
 });
