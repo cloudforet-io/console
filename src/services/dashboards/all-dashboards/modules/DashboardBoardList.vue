@@ -149,7 +149,7 @@ export default defineComponent<DashboardBoardListProps>({
             dashboardScopeKey: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? DOMAIN_SCOPE_KEY : PROJECT_SCOPE_KEY)),
             projectItems: computed(() => store.getters['reference/projectItems']),
             hasManagePermission: computed(() => {
-                const routeName = props.scopeType === 'domain' ? MENU_ID.DASHBOARDS_WORKSPACE : MENU_ID.DASHBOARDS_PROJECT;
+                const routeName = props.scopeType === DASHBOARD_SCOPE.DOMAIN ? MENU_ID.DASHBOARDS_WORKSPACE : MENU_ID.DASHBOARDS_PROJECT;
                 return useManagePermissionState(routeName);
             }),
             dashboardListByBoardSets: computed<BoardSet[]>(() => props.dashboardList
@@ -216,7 +216,7 @@ export default defineComponent<DashboardBoardListProps>({
 
         /* EVENT */
         const handleClickBoardItem = (item: DashboardModel) => {
-            const routeName = props.scopeType === 'project' ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
+            const routeName = props.scopeType === DASHBOARD_SCOPE.PROJECT ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
             SpaceRouter.router.push({
                 name: routeName,
                 params: {
