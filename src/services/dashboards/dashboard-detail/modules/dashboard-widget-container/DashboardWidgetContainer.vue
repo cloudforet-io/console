@@ -21,7 +21,7 @@
                        :dashboard-settings="dashboardDetailState.settings"
                        :currency-rates="currencyRates"
                        :edit-mode="editMode"
-                       :error-mode="dashboardDetailValidationState.widgetValidMap[widget.widget_key] === false"
+                       :error-mode="editMode && dashboardDetailValidationState.widgetValidMap[widget.widget_key] === false"
                        :all-reference-type-info="allReferenceTypeInfo"
                        :initiated="!!initiatedWidgetMap[widget.widget_key]"
             />
