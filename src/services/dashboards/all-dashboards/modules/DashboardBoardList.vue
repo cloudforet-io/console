@@ -216,7 +216,7 @@ export default defineComponent<DashboardBoardListProps>({
 
         /* EVENT */
         const handleClickBoardItem = (item: DashboardModel) => {
-            const routeName = props.scopeType ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
+            const routeName = props.scopeType === 'project' ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
             SpaceRouter.router.push({
                 name: routeName,
                 params: {
