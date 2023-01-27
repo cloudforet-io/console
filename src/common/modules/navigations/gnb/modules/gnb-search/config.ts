@@ -1,3 +1,5 @@
+import type { TranslateResult } from 'vue-i18n';
+
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -15,4 +17,7 @@ export interface SuggestionItem extends MenuItem {
     icon?: string;
     defaultIcon?: string;
     provider?: string;
+    type?: string;
+    name?: string;
+    label?: string|TranslateResult;
 }
