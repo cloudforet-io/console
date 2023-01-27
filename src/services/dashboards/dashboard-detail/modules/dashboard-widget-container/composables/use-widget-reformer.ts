@@ -1,7 +1,7 @@
 import type { Ref, AsyncComponent } from 'vue';
 import { computed, reactive, toRef } from 'vue';
 
-import { cloneDeep, flattenDeep } from 'lodash';
+import { flattenDeep } from 'lodash';
 
 import {
     widgetThemeAssigner,
@@ -47,7 +47,6 @@ export const useWidgetReformer = ({
     return {
         reformedWidgetInfoList: computed<ReformedWidgetInfo[]>(() => {
             const widgetInfoList = dashboardWidgetInfoList.value;
-            console.debug('reformedWidgetInfoList', cloneDeep(widgetInfoList));
 
             // get themes
             const themes = getWidgetThemes(widgetInfoList, state.widgetConfigMap);
