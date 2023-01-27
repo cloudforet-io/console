@@ -1,3 +1,11 @@
+# [2.0.0-beta.30](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.29...v2.0.0-beta.30) (2023-01-27)
+
+
+### Bug Fixes
+
+* **dynamic-field-more-type:** fix event bug of dynamicFieldMoreType ([#255](https://github.com/cloudforet-io/mirinae/issues/255)) ([03be654](https://github.com/cloudforet-io/mirinae/commit/03be654f127c6b56472160ece0922ca2429e509e))
+* fix sidebar animation ([#256](https://github.com/cloudforet-io/mirinae/issues/256)) ([63456c5](https://github.com/cloudforet-io/mirinae/commit/63456c5a696af9290ce17ff0c912e4d4572940a0))
+
 # [2.0.0-beta.29](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.28...v2.0.0-beta.29) (2023-01-26)
 
 
