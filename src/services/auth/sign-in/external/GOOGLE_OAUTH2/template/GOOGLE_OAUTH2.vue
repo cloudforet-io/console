@@ -17,7 +17,7 @@ import { loadAuth } from '@/services/auth/authenticator/loader';
 export default defineComponent({
     name: 'GoogleSignIn',
     setup(props, context: SetupContext) {
-        const onSignIn = (userId) => {
+        const onSignIn = (userId:string) => {
             context.emit('sign-in', userId);
         };
         const goToAdminSignIn = () => {

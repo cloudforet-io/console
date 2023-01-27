@@ -128,7 +128,7 @@ export default {
             }),
             showErrorMessage: vm.$route.query.error === 'error' || computed(() => store.state.display.isSignInFailed),
         });
-        const onSignIn = async (userId) => {
+        const onSignIn = async (userId:string) => {
             try {
                 const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
                 const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
