@@ -108,7 +108,7 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
 
 export const GNBMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter((d) => {
     if (d.id === MENU_ID.DASHBOARDS) {
-        return (config.get('DASHBOARD_ENABLED'));
+        return !d.hideOnGNB && !!config.get('DASHBOARD_ENABLED');
     }
     return !d.hideOnGNB;
 });
