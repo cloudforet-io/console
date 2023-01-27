@@ -103,9 +103,8 @@ export default defineComponent<Props>({
 
         /* widget validation */
         useWidgetValidator({
-            validateOnVariablesSchemaChange: true,
+            validateOnVariablesSchemaChange: computed(() => !!props.editMode),
             dashboardWidgetInfoList: reformedWidgetInfoList,
-            editMode: toRef(props, 'editMode'),
             widgetConfigMap,
             variablesSchema: toRef(dashboardDetailState, 'variablesSchema'),
             updateWidgetValidMap: (validMap) => {
