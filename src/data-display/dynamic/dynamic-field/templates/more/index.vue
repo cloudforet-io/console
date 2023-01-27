@@ -3,7 +3,7 @@
         <p-dynamic-field type="text"
                          :data="displayData"
                          :options="nextOptions"
-                         @click="handleClick"
+                         @click.native="handleClick"
         />
         <p-dynamic-layout v-if="isInitiated"
                           :type="SUPPORTED_TYPES.includes(layoutSchema.type) ? layoutSchema.type : SUPPORTED_TYPES[0]"
