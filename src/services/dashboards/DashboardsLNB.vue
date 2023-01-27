@@ -37,6 +37,8 @@ import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
+import type { DashboardScope } from '@/services/dashboards/config';
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import type { ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
@@ -89,12 +91,25 @@ export default defineComponent({
                 },
                 { type: 'divider' },
                 { type: 'favorite-only' },
-                { type: 'top-title', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE') },
-                ...filterFavoriteItems(state.workSpaceMenuSet),
-                { type: 'top-title', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT') },
-                ...filterFavoriteItems(state.projectMenuSet),
+                ...filterLNBItemsByPagePermission(DASHBOARD_SCOPE.DOMAIN, filterFavoriteItems(state.workSpaceMenuSet)),
+                ...filterLNBItemsByPagePermission(DASHBOARD_SCOPE.PROJECT, filterFavoriteItems(state.projectMenuSet)),
             ]),
         });
+
+        const filterLNBItemsByPagePermission = (scope: DashboardScope, items: LNBMenu[]): LNBMenu[] => {
+            const topTitle = {
+                type: 'top-title',
+                label: scope === DASHBOARD_SCOPE.DOMAIN
+                    ? i18n.t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE')
+                    : i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT'),
+            } as LNBItem;
+            const routeName = scope === DASHBOARD_SCOPE.DOMAIN ? MENU_ID.DASHBOARDS_WORKSPACE : MENU_ID.DASHBOARDS_PROJECT;
+            const pagePermission = store.getters['user/pagePermissionMap'];
+
+
+            if (pagePermission[routeName]) return [topTitle, ...items];
+            return [];
+        };
 
         const mashUpProjectGroup = (dashboardList: ProjectDashboardModel[] = []): LNBMenu[] => {
             const dashboardItemsWithGroup = {} as Record<string, ProjectDashboardModel[]>;
