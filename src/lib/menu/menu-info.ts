@@ -12,13 +12,12 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         needPermissionByRole: true,
     },
     [MENU_ID.DASHBOARDS_PROJECT]: {
-        // song-lang
-        translationId: 'Project Dashboard',
+        translationId: 'MENU.DASHBOARDS_PROJECT',
         icon: 'ic_dashboard',
         needPermissionByRole: true,
     },
     [MENU_ID.DASHBOARDS_WORKSPACE]: {
-        translationId: 'Workspace Dashboard',
+        translationId: 'MENU.DASHBOARDS_WORKSPACE',
         icon: 'ic_dashboard',
         needPermissionByRole: true,
     },
