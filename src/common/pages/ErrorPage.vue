@@ -5,10 +5,15 @@
                  src="/images/error-octos.gif"
             >
             <h2 class="error-code">
-                404
+                {{ statusCode }}
             </h2>
             <h3 class="error-message">
-                {{ $t('COMMON.ERROR.404_MSG') }}
+                <template v-if="statusCode === '403'">
+                    {{ $t('COMMON.ERROR.404_MSG') }}
+                </template>
+                <template v-else>
+                    {{ $t('COMMON.ERROR.404_MSG') }}
+                </template>
             </h3>
             <p-button class="go-back-button"
                       style-type="primary"
@@ -21,12 +26,18 @@
     </section>
 </template>
 
-<script>
+<script lang="ts">
 import { PButton } from '@spaceone/design-system';
 
 export default {
     name: 'ErrorPage',
     components: { PButton },
+    props: {
+        statusCode: {
+            type: String,
+            default: '404',
+        },
+    },
 };
 </script>
 

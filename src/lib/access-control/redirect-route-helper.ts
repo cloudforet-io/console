@@ -41,5 +41,6 @@ export const getRedirectRouteByPagePermission = (menuId: MenuId, pagePermissions
         }
         return false;
     });
-    return { name: redirectMenuId ?? ERROR_ROUTE._NAME };
+    if (redirectMenuId) return { name: redirectMenuId };
+    return { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
 };

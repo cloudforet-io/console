@@ -6,7 +6,7 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
-import { errorRoutes } from '@/router/error-routes';
+import { ERROR_ROUTE, errorRoutes } from '@/router/error-routes';
 import { serviceRoutes } from '@/router/service-routes';
 
 import config from '@/lib/config';
@@ -98,7 +98,7 @@ export const siteInit = async () => {
         store.dispatch('display/finishInitializing');
 
         if (SpaceRouter.router) {
-            await SpaceRouter.router.push('/error-page');
+            await SpaceRouter.router.push({ name: ERROR_ROUTE._NAME });
         }
     } finally {
         isFinishedInitializing = true;
