@@ -132,7 +132,7 @@ export default defineComponent({
                 if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
                     await vm.$router.push({ name: AUTH_ROUTE.RESET_PASSWORD._NAME });
                 } else {
-                    context.emit('sign-in');
+                    context.emit('sign-in', state.userId);
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
