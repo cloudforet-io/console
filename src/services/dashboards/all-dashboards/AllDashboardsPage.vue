@@ -130,11 +130,9 @@ export default {
                 }
                 return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
             }),
-            hasOnlyViewPermission: computed(() => {
-                const projectManagePermission = useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT).value;
-                const workspaceManagePermission = useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE).value;
-                return !(projectManagePermission || workspaceManagePermission);
-            }),
+            projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
+            workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
+            hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
             pagePermission: store.getters['user/pagePermissionMap'],
         });
 

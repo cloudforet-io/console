@@ -72,7 +72,7 @@ export default defineComponent({
             ]),
             viewersStatus: computed(() => store.state.dashboard.viewers),
             scopeStatus: computed(() => store.state.dashboard.scope),
-            pagePermission: store.getters['user/pagePermissionMap'],
+            pagePermission: computed(() => store.getters['user/pagePermissionMap']),
         });
 
         const handleChangeViewers = (selected) => {

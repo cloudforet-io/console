@@ -150,14 +150,14 @@ export default defineComponent<DashboardBoardListProps>({
             projectItems: computed(() => store.getters['reference/projectItems']),
             hasManagePermission: computed(() => {
                 const routeName = props.scopeType === DASHBOARD_SCOPE.DOMAIN ? MENU_ID.DASHBOARDS_WORKSPACE : MENU_ID.DASHBOARDS_PROJECT;
-                return useManagePermissionState(routeName);
+                return useManagePermissionState(routeName).value;
             }),
             dashboardListByBoardSets: computed<BoardSet[]>(() => props.dashboardList
                 .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
                 .map((d) => {
                     const dashboardWithBoardSet = {
                         ...d,
-                        iconButtonSets: state.hasManagePermission.value ? convertBoardItemButtonSet(d) : [],
+                        iconButtonSets: state.hasManagePermission ? convertBoardItemButtonSet(d) : [],
                     };
                     const projectId = 'project_id';
                     if (d[projectId]) {

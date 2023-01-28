@@ -48,11 +48,9 @@ export default defineComponent({
     setup() {
         const state = reactive({
             loading: true,
-            hasOnlyViewPermission: computed(() => {
-                const projectManagePermission = useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT).value;
-                const workspaceManagePermission = useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE).value;
-                return !(projectManagePermission || workspaceManagePermission);
-            }),
+            projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
+            workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
+            hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
             showFavoriteOnly: false,
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId)),
             favoriteItemMap: computed(() => {
@@ -105,7 +103,6 @@ export default defineComponent({
             } as LNBItem;
             const routeName = scope === DASHBOARD_SCOPE.DOMAIN ? MENU_ID.DASHBOARDS_WORKSPACE : MENU_ID.DASHBOARDS_PROJECT;
             const pagePermission = store.getters['user/pagePermissionMap'];
-
 
             if (pagePermission[routeName]) return [topTitle, ...items];
             return [];
