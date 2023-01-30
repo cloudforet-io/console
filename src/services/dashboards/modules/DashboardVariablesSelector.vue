@@ -7,7 +7,7 @@
                                         :reference-map="variableState.allReferenceTypeInfo[propertyName]?.referenceMap"
             />
         </template>
-        <variable-more-button-dropdown />
+        <variable-more-button-dropdown :is-managable="props.hasManagePermission" />
         <button class="reset-button"
                 @click="resetVariables"
         >
@@ -39,6 +39,11 @@ import VariableMoreButtonDropdown
 import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 
+interface Props {
+    hasManagePermission: boolean;
+}
+
+const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const { resetVariables } = dashboardDetailStore;

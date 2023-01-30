@@ -30,6 +30,7 @@
                 <p-button class="manage-variable-button"
                           style-type="secondary"
                           icon-left="ic_setting"
+                          :disabled="!props.isManagable"
                           @click="handleOpenOverlay"
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE') }}
@@ -42,7 +43,7 @@
 <script lang="ts" setup>
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed,
+    computed, onMounted,
     reactive, ref, toRef, toRefs, watch,
 } from 'vue';
 
@@ -56,6 +57,12 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+
+interface Props {
+    isManagable: boolean;
+}
+
+const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
@@ -153,6 +160,10 @@ watch(visibleMenu, (_visibleMenu) => {
         updateVariablesUse();
         state.searchText = '';
     }
+});
+
+onMounted(() => {
+    console.log(props.isManagable);
 });
 
 const {

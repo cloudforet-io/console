@@ -17,17 +17,19 @@
             </template>
             <template #footer>
                 <div class="footer-wrapper">
-                    <div v-for="(subMenu, index) in subMenuList"
-                         :key="`footer-${subMenu.label}-${index}`"
-                         class="sub-menu"
-                         @click="hideMenu"
-                    >
-                        <g-n-b-sub-menu :label="subMenu.label"
-                                        :to="subMenu.to"
-                                        :is-beta="subMenu.isBeta"
-                                        :is-new="subMenu.isNew"
-                        />
-                    </div>
+                    <template v-for="(subMenu, index) in subMenuList">
+                        <div v-if="subMenu.show"
+                             :key="`footer-${subMenu.label}-${index}`"
+                             class="sub-menu"
+                             @click="hideMenu"
+                        >
+                            <g-n-b-sub-menu :label="subMenu.label"
+                                            :to="subMenu.to"
+                                            :is-beta="subMenu.isBeta"
+                                            :is-new="subMenu.isNew"
+                            />
+                        </div>
+                    </template>
                     <div v-if="isOverflown"
                          class="gradient-box"
                     />
@@ -52,6 +54,9 @@ import { i18n } from '@/translations';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
+import { MENU_ID } from '@/lib/menu/config';
+
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardFavorite
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardFavorite.vue';
@@ -89,10 +94,12 @@ export default defineComponent({
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.VIEW_ALL'),
                     to: { name: DASHBOARDS_ROUTE.ALL._NAME },
+                    show: true,
                 },
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.CREATE_DASHBOARDS'),
                     to: { name: DASHBOARDS_ROUTE.CREATE._NAME },
+                    show: computed(() => !state.hasOnlyViewPermission),
                 },
             ] as DisplayMenu[],
             isOverflown: false,
@@ -112,6 +119,9 @@ export default defineComponent({
                 });
                 return dashboardList;
             }),
+            projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
+            workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
+            hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
         });
         const hideMenu = () => {
             emit('close');
