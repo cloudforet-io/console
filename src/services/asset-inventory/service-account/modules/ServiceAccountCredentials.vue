@@ -31,6 +31,7 @@
                                                 :credential-data="credentialData"
                                                 :attached-trusted-account-id="attachedTrustedAccountId"
                                                 :loading="loading"
+                                                :has-manage-permission="hasManagePermission"
                                                 @edit="handleClickEditButton"
             />
             <service-account-credentials-form v-if="mode === 'UPDATE'"
@@ -82,6 +83,7 @@ interface Props {
     projectId?: string;
     attachedTrustedAccountId?: string;
     editable: boolean;
+    hasManagePermission: boolean;
 }
 
 export default defineComponent<Props>({
@@ -121,6 +123,10 @@ export default defineComponent<Props>({
         editable: {
             type: Boolean,
             default: false,
+        },
+        hasManagePermission: {
+            type: Boolean,
+            default: undefined,
         },
     },
     setup(props, { emit }: SetupContext) {

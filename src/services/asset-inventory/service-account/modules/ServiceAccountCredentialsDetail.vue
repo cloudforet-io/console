@@ -13,7 +13,8 @@
                 <p class="text">
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.NO_CREDENTIALS') }}
                 </p>
-                <p-button style-type="substitutive"
+                <p-button v-if="hasManagePermission"
+                          style-type="substitutive"
                           icon-left="ic_plus_bold"
                           @click="handleClickAddButton"
                 >
@@ -54,6 +55,7 @@ interface Props {
     loading: boolean;
     credentialData: CredentialModel;
     attachedTrustedAccountId?: string;
+    hasManagePermission: boolean;
 }
 
 export default defineComponent<Props>({
@@ -74,6 +76,10 @@ export default defineComponent<Props>({
         },
         attachedTrustedAccountId: {
             type: String,
+            default: undefined,
+        },
+        hasManagePermission: {
+            type: Boolean,
             default: undefined,
         },
     },
