@@ -1,3 +1,10 @@
+# [2.0.0-beta.32](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.31...v2.0.0-beta.32) (2023-01-30)
+
+
+### Bug Fixes
+
+* **p-search:** fix import bug & add description of autoCompleteHandler ([#259](https://github.com/cloudforet-io/mirinae/issues/259)) ([a51f526](https://github.com/cloudforet-io/mirinae/commit/a51f526a39fd09d71970f35c11604f7ec01cff7a))
+
 # [2.0.0-beta.31](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.30...v2.0.0-beta.31) (2023-01-27)
 
 
