@@ -1,3 +1,10 @@
+# [2.0.0-beta.33](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.32...v2.0.0-beta.33) (2023-01-30)
+
+
+### Bug Fixes
+
+* **p-radio:** handle disable case ([#260](https://github.com/cloudforet-io/mirinae/issues/260)) ([c7f676c](https://github.com/cloudforet-io/mirinae/commit/c7f676c6dfcf3f11d21b4ecb4ac3a835b568b4e0))
+
 # [2.0.0-beta.32](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.31...v2.0.0-beta.32) (2023-01-30)
 
 
