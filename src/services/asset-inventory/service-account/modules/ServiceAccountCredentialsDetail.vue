@@ -13,7 +13,8 @@
                 <p class="text">
                     {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.NO_CREDENTIALS') }}
                 </p>
-                <p-button style-type="substitutive"
+                <p-button v-if="hasManagePermission"
+                          style-type="substitutive"
                           icon-left="ic_plus_bold"
                           @click="handleClickAddButton"
                 >
@@ -47,6 +48,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import type { CredentialModel } from '@/services/asset-inventory/service-account/type';
 
@@ -82,6 +84,7 @@ export default defineComponent<Props>({
             serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
         });
         const state = reactive({
+            hasManagePermission: useManagePermissionState(),
             attachedTrustedAccount: computed(() => {
                 if (props.attachedTrustedAccountId) return storeState.serviceAccounts[props.attachedTrustedAccountId];
                 return undefined;
