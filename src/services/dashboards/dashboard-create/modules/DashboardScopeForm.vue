@@ -64,13 +64,17 @@ export default defineComponent({
         });
 
         const handleSelectScope = (scopeType: DashboardScope) => {
-            state.isDomainScope = scopeType === DASHBOARD_SCOPE.DOMAIN;
-            emit('update:dashboardScope', scopeType);
+            updateScope(scopeType);
         };
 
         const handleSelectProjects = (projects: Array<ProjectItemResp>) => {
             // Emit projects as project.
             emit('set-project', projects[0]);
+        };
+
+        const updateScope = (scopeType: DashboardScope) => {
+            state.isDomainScope = scopeType === DASHBOARD_SCOPE.DOMAIN;
+            emit('update:dashboardScope', scopeType);
         };
 
         // LOAD REFERENCE STORE
@@ -80,8 +84,8 @@ export default defineComponent({
 
         onMounted(() => {
             if (!(state.projectManagePermission || state.workspaceManagePermission)) return;
-            if (!state.projectManagePermission) handleSelectScope(DASHBOARD_SCOPE.DOMAIN);
-            if (!state.workspaceManagePermission) handleSelectScope(DASHBOARD_SCOPE.PROJECT);
+            if (!state.projectManagePermission) updateScope(DASHBOARD_SCOPE.DOMAIN);
+            if (!state.workspaceManagePermission) updateScope(DASHBOARD_SCOPE.PROJECT);
         });
 
         return {
