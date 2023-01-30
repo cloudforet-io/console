@@ -6,11 +6,11 @@
         <template #header>
             <div class="header-wrapper">
                 <span>{{ header }}</span>
-                <router-link :to="{ name: DASHBOARDS_ROUTE.CREATE._NAME, path: DASHBOARDS_ROUTE.CREATE._NAME }">
-                    <p-icon-button name="ic_plus_bold"
-                                   size="sm"
-                    />
-                </router-link>
+                <p-icon-button name="ic_plus_bold"
+                               size="sm"
+                               :disabled="hasOnlyViewPermission"
+                               @click="$router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME, path: DASHBOARDS_ROUTE.CREATE._NAME })"
+                />
             </div>
         </template>
     </l-n-b>
@@ -32,10 +32,13 @@ import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favo
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
+import type { DashboardScope } from '@/services/dashboards/config';
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import type { ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
@@ -45,6 +48,9 @@ export default defineComponent({
     setup() {
         const state = reactive({
             loading: true,
+            projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
+            workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
+            hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
             showFavoriteOnly: false,
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId)),
             favoriteItemMap: computed(() => {
@@ -83,12 +89,24 @@ export default defineComponent({
                 },
                 { type: 'divider' },
                 { type: 'favorite-only' },
-                { type: 'top-title', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE') },
-                ...filterFavoriteItems(state.workSpaceMenuSet),
-                { type: 'top-title', label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT') },
-                ...filterFavoriteItems(state.projectMenuSet),
+                ...filterLNBItemsByPagePermission(DASHBOARD_SCOPE.DOMAIN, filterFavoriteItems(state.workSpaceMenuSet)),
+                ...filterLNBItemsByPagePermission(DASHBOARD_SCOPE.PROJECT, filterFavoriteItems(state.projectMenuSet)),
             ]),
         });
+
+        const filterLNBItemsByPagePermission = (scope: DashboardScope, items: LNBMenu[]): LNBMenu[] => {
+            const topTitle = {
+                type: 'top-title',
+                label: scope === DASHBOARD_SCOPE.DOMAIN
+                    ? i18n.t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE')
+                    : i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT'),
+            } as LNBItem;
+            const routeName = scope === DASHBOARD_SCOPE.DOMAIN ? MENU_ID.DASHBOARDS_WORKSPACE : MENU_ID.DASHBOARDS_PROJECT;
+            const pagePermission = store.getters['user/pagePermissionMap'];
+
+            if (pagePermission[routeName]) return [topTitle, ...items];
+            return [];
+        };
 
         const mashUpProjectGroup = (dashboardList: ProjectDashboardModel[] = []): LNBMenu[] => {
             const dashboardItemsWithGroup = {} as Record<string, ProjectDashboardModel[]>;

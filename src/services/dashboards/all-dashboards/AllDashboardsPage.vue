@@ -5,7 +5,7 @@
                       :total-count="dashboardTotalCount"
         >
             <template #extra>
-                <p-button v-if="hasManagePermission && (workspaceDashboardList || projectDashboardList)"
+                <p-button v-if="!hasOnlyViewPermission && (workspaceDashboardList || projectDashboardList)"
                           icon-left="ic_plus"
                           @click="handleCreateDashboard"
                 >
@@ -39,6 +39,7 @@
                         {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
                     </p-empty>
                     <p-button icon-left="ic_plus"
+                              :disabled="hasOnlyViewPermission"
                               @click="handleCreateDashboard"
                     >
                         {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREAT_NEW_DASHBOARD') }}
@@ -85,6 +86,7 @@ import type { HandlerResponse } from '@/component-util/query-search/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
+import { MENU_ID } from '@/lib/menu/config';
 import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -112,9 +114,13 @@ export default {
             viewersStatus: computed(() => store.state.dashboard.viewers),
             scopeStatus: computed(() => store.state.dashboard.scope),
             loading: computed(() => store.state.dashboard.loading),
-            workspaceDashboardList: computed(() => store.getters['dashboard/getDomainItems']),
-            projectDashboardList: computed(() => store.getters['dashboard/getProjectItems']),
-            dashboardTotalCount: computed(() => store.getters['dashboard/getDashboardCount']),
+            workspaceDashboardList: computed(() => (state.pagePermission[MENU_ID.DASHBOARDS_WORKSPACE] ? store.getters['dashboard/getDomainItems'] : [])),
+            projectDashboardList: computed(() => (state.pagePermission[MENU_ID.DASHBOARDS_PROJECT] ? store.getters['dashboard/getProjectItems'] : [])),
+            dashboardTotalCount: computed(() => {
+                const domainDashboardCount = state.pagePermission[MENU_ID.DASHBOARDS_WORKSPACE] ? store.getters['dashboard/getDomainDashboardCount'] : 0;
+                const projectDashboardCount = state.pagePermission[MENU_ID.DASHBOARDS_PROJECT] ? store.getters['dashboard/getProjectDashboardCount'] : 0;
+                return domainDashboardCount + projectDashboardCount;
+            }),
             filteredDashboardStatus: computed(() => {
                 if (state.scopeStatus === SCOPE_TYPE.DOMAIN) {
                     return !!(state.workspaceDashboardList.length);
@@ -124,7 +130,10 @@ export default {
                 }
                 return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
             }),
-            hasManagePermission: useManagePermissionState(),
+            projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
+            workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
+            hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
+            pagePermission: computed(() => store.getters['user/pagePermissionMap']),
         });
 
         const searchQueryHelper = new QueryHelper();

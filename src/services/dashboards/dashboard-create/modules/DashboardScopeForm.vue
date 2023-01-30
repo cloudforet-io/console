@@ -5,11 +5,13 @@
             <div class="dashboard-scope-wrapper">
                 <p-radio-group direction="vertical">
                     <p-radio :selected="isDomainScope"
+                             :disabled="!workspaceManagePermission"
                              @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
                     >
                         {{ $t('DASHBOARDS.CREATE.ENTIRE_WORKSPACES') }}
                     </p-radio>
                     <p-radio :selected="!isDomainScope"
+                             :disabled="!projectManagePermission"
                              @change="handleSelectScope(DASHBOARD_SCOPE.PROJECT)"
                     >
                         {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}
@@ -26,7 +28,9 @@
 
 <script lang="ts">
 import type { SetupContext } from 'vue';
-import { defineComponent, reactive, toRefs } from 'vue';
+import {
+    defineComponent, onMounted, reactive, toRefs,
+} from 'vue';
 
 import {
     PPaneLayout, PPanelTop, PRadio, PRadioGroup,
@@ -34,6 +38,9 @@ import {
 
 import { store } from '@/store';
 
+import { MENU_ID } from '@/lib/menu/config';
+
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
@@ -52,11 +59,12 @@ export default defineComponent({
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             isDomainScope: true,
+            projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
+            workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
         });
 
         const handleSelectScope = (scopeType: DashboardScope) => {
-            state.isDomainScope = scopeType === DASHBOARD_SCOPE.DOMAIN;
-            emit('update:dashboardScope', scopeType);
+            updateScope(scopeType);
         };
 
         const handleSelectProjects = (projects: Array<ProjectItemResp>) => {
@@ -64,10 +72,21 @@ export default defineComponent({
             emit('set-project', projects[0]);
         };
 
+        const updateScope = (scopeType: DashboardScope) => {
+            state.isDomainScope = scopeType === DASHBOARD_SCOPE.DOMAIN;
+            emit('update:dashboardScope', scopeType);
+        };
+
         // LOAD REFERENCE STORE
         (async () => {
             await store.dispatch('reference/project/load');
         })();
+
+        onMounted(() => {
+            if (!(state.projectManagePermission || state.workspaceManagePermission)) return;
+            if (!state.projectManagePermission) updateScope(DASHBOARD_SCOPE.DOMAIN);
+            if (!state.workspaceManagePermission) updateScope(DASHBOARD_SCOPE.PROJECT);
+        });
 
         return {
             ...toRefs(state),
