@@ -16,25 +16,27 @@
                            style-type="transparent"
                            @update:selected="handleChangeViewers"
         />
-        <p-divider class="divider"
-                   vertical
-        />
-        <span class="filter-header">{{ $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_SCOPE') }}</span>
-        <p-select-status v-for="(scope, idx) in scopeFilterList"
-                         :key="`scope-${idx}`"
-                         :selected="scopeStatus"
-                         class="select-desktop"
-                         :value="scope.name"
-                         @change="handleChangeScope"
-        >
-            {{ scope.label }}
-        </p-select-status>
-        <p-select-dropdown class="select-tablet"
-                           :items="scopeFilterList"
-                           :selected="scopeStatus"
-                           style-type="transparent"
-                           @update:selected="handleChangeScope"
-        />
+        <template v-if="pagePermission[MENU_ID.DASHBOARDS_WORKSPACE] && pagePermission[MENU_ID.DASHBOARDS_PROJECT]">
+            <p-divider class="divider"
+                       vertical
+            />
+            <span class="filter-header">{{ $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_SCOPE') }}</span>
+            <p-select-status v-for="(scope, idx) in scopeFilterList"
+                             :key="`scope-${idx}`"
+                             :selected="scopeStatus"
+                             class="select-desktop"
+                             :value="scope.name"
+                             @change="handleChangeScope"
+            >
+                {{ scope.label }}
+            </p-select-status>
+            <p-select-dropdown class="select-tablet"
+                               :items="scopeFilterList"
+                               :selected="scopeStatus"
+                               style-type="transparent"
+                               @update:selected="handleChangeScope"
+            />
+        </template>
     </div>
 </template>
 
@@ -48,6 +50,8 @@ import { PSelectDropdown, PSelectStatus, PDivider } from '@spaceone/design-syste
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { MENU_ID } from '@/lib/menu/config';
 
 import { SCOPE_TYPE, VIEWERS_TYPE } from '@/services/dashboards/all-dashboards/type';
 
@@ -68,6 +72,7 @@ export default defineComponent({
             ]),
             viewersStatus: computed(() => store.state.dashboard.viewers),
             scopeStatus: computed(() => store.state.dashboard.scope),
+            pagePermission: computed(() => store.getters['user/pagePermissionMap']),
         });
 
         const handleChangeViewers = (selected) => {
@@ -83,6 +88,7 @@ export default defineComponent({
             ...toRefs(state),
             handleChangeViewers,
             handleChangeScope,
+            MENU_ID,
         };
     },
 });

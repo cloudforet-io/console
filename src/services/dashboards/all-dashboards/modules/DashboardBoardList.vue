@@ -92,6 +92,7 @@ import { i18n } from '@/translations';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { MENU_ID } from '@/lib/menu/config';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -147,7 +148,10 @@ export default defineComponent<DashboardBoardListProps>({
             dashboardTotalCount: computed<number>(() => props.dashboardList.length ?? 0),
             dashboardScopeKey: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? DOMAIN_SCOPE_KEY : PROJECT_SCOPE_KEY)),
             projectItems: computed(() => store.getters['reference/projectItems']),
-            hasManagePermission: useManagePermissionState(),
+            hasManagePermission: computed(() => {
+                const routeName = props.scopeType === DASHBOARD_SCOPE.DOMAIN ? MENU_ID.DASHBOARDS_WORKSPACE : MENU_ID.DASHBOARDS_PROJECT;
+                return useManagePermissionState(routeName).value;
+            }),
             dashboardListByBoardSets: computed<BoardSet[]>(() => props.dashboardList
                 .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
                 .map((d) => {
@@ -212,7 +216,7 @@ export default defineComponent<DashboardBoardListProps>({
 
         /* EVENT */
         const handleClickBoardItem = (item: DashboardModel) => {
-            const routeName = props.scopeType ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
+            const routeName = props.scopeType === DASHBOARD_SCOPE.PROJECT ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
             SpaceRouter.router.push({
                 name: routeName,
                 params: {

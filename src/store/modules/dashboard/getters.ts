@@ -7,11 +7,9 @@ import type { DashboardState } from '@/store/modules/dashboard/type';
 
 import type { DashboardModel } from '@/services/dashboards/model';
 
-export const getDashboardCount: Getter<DashboardState, any> = (state): any => {
-    const domainItemCount = state.domainItemCount;
-    const projectItemCount = state.projectItemCount;
-    return domainItemCount + projectItemCount;
-};
+export const getDomainDashboardCount: Getter<DashboardState, any> = (state): any => state.domainItemCount;
+export const getProjectDashboardCount: Getter<DashboardState, any> = (state): any => state.projectItemCount;
+
 export const getDomainItems: Getter<DashboardState, any> = (state): any => getItems(state.domainItems ?? [], state.searchFilters, state.viewers);
 export const getProjectItems: Getter<DashboardState, any> = (state): any => getItems(state.projectItems ?? [], state.searchFilters, state.viewers);
 
