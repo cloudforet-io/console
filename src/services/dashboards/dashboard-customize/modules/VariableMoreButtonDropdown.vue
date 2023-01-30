@@ -43,7 +43,7 @@
 <script lang="ts" setup>
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed, onMounted,
+    computed,
     reactive, ref, toRef, toRefs, watch,
 } from 'vue';
 
@@ -160,10 +160,6 @@ watch(visibleMenu, (_visibleMenu) => {
         updateVariablesUse();
         state.searchText = '';
     }
-});
-
-onMounted(() => {
-    console.log(props.isManagable);
 });
 
 const {
