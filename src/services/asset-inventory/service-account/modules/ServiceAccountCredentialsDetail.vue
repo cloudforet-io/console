@@ -48,7 +48,6 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import type { CredentialModel } from '@/services/asset-inventory/service-account/type';
 
@@ -56,6 +55,7 @@ interface Props {
     loading: boolean;
     credentialData: CredentialModel;
     attachedTrustedAccountId?: string;
+    hasManagePermission: boolean;
 }
 
 export default defineComponent<Props>({
@@ -78,13 +78,16 @@ export default defineComponent<Props>({
             type: String,
             default: undefined,
         },
+        hasManagePermission: {
+            type: Boolean,
+            default: undefined,
+        },
     },
     setup(props, { emit }) {
         const storeState = reactive({
             serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
         });
         const state = reactive({
-            hasManagePermission: useManagePermissionState(),
             attachedTrustedAccount: computed(() => {
                 if (props.attachedTrustedAccountId) return storeState.serviceAccounts[props.attachedTrustedAccountId];
                 return undefined;

@@ -66,6 +66,7 @@
                                          :project-id="projectId"
                                          :attached-trusted-account-id="attachedTrustedAccountId"
                                          :editable="hasManagePermission && !isManagedTrustedAccount"
+                                         :has-manage-permission="hasManagePermission"
                                          @refresh="handleRefresh"
             />
         </div>
