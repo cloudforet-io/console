@@ -78,10 +78,26 @@ export const Template = (args, { argTypes }) => ({
 
 ## Auto Complete
 
+`useAutoComplete` = `true`
+
+Auto Complete function is available when you set `useAutoComplete` prop to `true`.
+
+
+When you enter a keyword in a search input, the `PContextMenu` is displayed.
+
+<br/>
+
+Below is an example of each handler.
+
 <br/>
 <br/>
 
 ### Disable Handler
+`disableHandler` = `true`
+
+<br/>
+
+Menu items are not filtered because there is no handler.
 
 <Canvas>
     <Story name="Disable Handler">
@@ -125,51 +141,11 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-### Default Handler
-
-<Canvas>
-    <Story name="Default Handler">
-        {{
-            components: { PSearch },
-            template: `
-        <div>
-            <div>Search Text : {{ searchText }}</div>
-            <br />
-            <p-search v-model="proxyValue"
-                  use-fixed-menu-style
-                  use-auto-complete
-                  :menu="menu"
-                  @search="handleSearch"/>
-        </div>
-    `,
-            setup(props) {
-                const state = reactive({
-                    proxyValue: props.value,
-                    menu: [
-                        { name: 1, label: 'menu1', type: 'item'},
-                        { name: 2, label: 'menu2', type: 'item'},
-                        { name: 3, label: 'menu3', type: 'item'},
-                    ],
-                    searchText: '',
-                })
-                const handleSearch = (val) => {
-                    state.searchText = val;
-                }
-                return {
-                    ...toRefs(state),
-                    handleSearch,
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-
-<br/>
-<br/>
-
 ### Injected Handler
 
+<br/>
+
+`handler` must be defined. The `handler` is a function that returns a list of filtered menu items.
 <Canvas>
     <Story name="Injected Handler">
         {{
@@ -217,6 +193,52 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+### Default Handler
+
+<br/>
+
+If `handler` is not defined, it is filtered through the built-in default `handler`.
+
+<Canvas>
+    <Story name="Default Handler">
+        {{
+            components: { PSearch },
+            template: `
+        <div>
+            <div>Search Text : {{ searchText }}</div>
+            <br />
+            <p-search v-model="proxyValue"
+                  use-fixed-menu-style
+                  use-auto-complete
+                  :menu="menu"
+                  @search="handleSearch"/>
+        </div>
+    `,
+            setup(props) {
+                const state = reactive({
+                    proxyValue: props.value,
+                    menu: [
+                        { name: 1, label: 'menu1', type: 'item'},
+                        { name: 2, label: 'menu2', type: 'item'},
+                        { name: 3, label: 'menu3', type: 'item'},
+                    ],
+                    searchText: '',
+                })
+                const handleSearch = (val) => {
+                    state.searchText = val;
+                }
+                return {
+                    ...toRefs(state),
+                    handleSearch,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+<br/>
+<br/>
 
 ## Invalid
 

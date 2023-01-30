@@ -79,7 +79,9 @@ import { I18nConnector } from '@/translations';
 import { makeByPassListeners } from '@/utils/composition-helpers';
 import { getTextHighlightRegex } from '@/utils/helpers';
 
-const PContextMenu = import('@/inputs/context-menu/PContextMenu.vue');
+const PContextMenu = () => ({
+    component: import('@/inputs/context-menu/PContextMenu.vue'),
+});
 
 export default defineComponent<SearchProps>({
     name: 'PSearch',
@@ -156,7 +158,7 @@ export default defineComponent<SearchProps>({
         const state = reactive({
             proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
             inputRef: null as null|HTMLElement,
-            handlerLoading: false,
+            handlerLoading: true,
             placeholderText: computed<TranslateResult>(() => {
                 if (props.placeholder === undefined) return I18nConnector.i18n.t('COMPONENT.SEARCH.PLACEHOLDER');
                 return props.placeholder;
@@ -211,6 +213,7 @@ export default defineComponent<SearchProps>({
                 });
                 if (filtered[filtered.length - 1]?.type === 'divider') filtered.pop();
                 state.filteredMenu = filtered;
+                state.handlerLoading = false;
             }
         }, 300);
 
