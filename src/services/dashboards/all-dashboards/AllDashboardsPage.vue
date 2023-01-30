@@ -133,7 +133,7 @@ export default {
             projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
             workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
             hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
-            pagePermission: store.getters['user/pagePermissionMap'],
+            pagePermission: computed(() => store.getters['user/pagePermissionMap']),
         });
 
         const searchQueryHelper = new QueryHelper();
