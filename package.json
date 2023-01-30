@@ -1,6 +1,6 @@
 {
   "name": "cloudforet-console",
-  "version": "1.11.0-rc9",
+  "version": "1.11.0",
   "private": true,
   "description": "Cloudforet Web Console",
   "author": "Cloudforet",
