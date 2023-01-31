@@ -685,15 +685,15 @@
 				"UPDATE_DASHBOARD": "ダッシュボードの更新"
 			},
 			"HOME": {
-				"COST_ANALYSIS_DESC": "",
-				"COST_BUDGET_DESC": "",
-				"COST_DASHBOARD": "",
-				"COST_DASHBOARD_DESC": "",
-				"ENABLE_BUTTON": "",
-				"LEARN_MORE": "",
-				"MORE_INFO": "",
-				"TITLE": "",
-				"TOPIC_DESC": ""
+				"COST_ANALYSIS_DESC": "複数のクラウドリソースをグループ別に細分化し、より詳細にコスト分析が可能です。",
+				"COST_BUDGET_DESC": "各プロジェクト別に予算を設定し、リソース使用量を体系的に管理できます。",
+				"COST_DASHBOARD": " 費用ダッシュボード",
+				"COST_DASHBOARD_DESC": "様々なウィジェットを費用管理ダッシュボードに追加して、素早くクラウド費用状況を把握できます。",
+				"ENABLE_BUTTON": "コストエクスプローラーの有効化",
+				"LEARN_MORE": "詳細はこちら",
+				"MORE_INFO": "詳細情報",
+				"TITLE": "コストを簡単に分析し、リソースを最適化します。",
+				"TOPIC_DESC": "費用を項目別に管理して詳細な内訳の分析ができます。\n 分析したコストデータに基づいてリソースを最適化します。"
 			},
 			"MAIN": {
 				"ALT_E_EDIT_FILTER": "フィルタの更新に失敗しました",
@@ -798,7 +798,7 @@
 		"FNB": {
 			"PRIVACY": "個人情報保護方針",
 			"PRIVACY_MSG": "準備中です",
-			"PROJECT_POLICIES": ""
+			"PROJECT_POLICIES": "プロジェクトポリシー"
 		},
 		"GNB": {
 			"ACCOUNT": {
@@ -814,9 +814,9 @@
 				"ROLE_ROOT_ADMIN": "ルート管理者"
 			},
 			"DASHBOARDS": {
-				"CREATE_DASHBOARDS": "",
-				"NO_ITEMS": "",
-				"VIEW_ALL": ""
+				"CREATE_DASHBOARDS": "新しいダッシュボードを作成する。",
+				"NO_ITEMS": "項目なし",
+				"VIEW_ALL": "すべてのダッシュボードを表示する"
 			},
 			"FAVORITES": {
 				"ALL_CLOUD_SERVICES": "すべてのクラウドサービス",
@@ -1124,122 +1124,122 @@
 			"CREATE": "作成",
 			"CREAT_NEW_DASHBOARD": "新規ダッシュボード作成",
 			"DASHBOARDS_TITLE": "ダッシュボード",
-			"ENTIRE_WORKSPACE": "",
+			"ENTIRE_WORKSPACE": "ワークスペース全体",
 			"FILTER_ALL": "すべて",
-			"FILTER_ENTIRE_WORKSPACE": "",
+			"FILTER_ENTIRE_WORKSPACE": "ワークスペース全体",
 			"FILTER_PRIVATE": "非公開",
 			"FILTER_PUBLIC": "公開",
-			"FILTER_SINGLE_PROJECT": "",
-			"HELP_TEXT_CREATE": "",
-			"LABEL_PRIVATE": "",
-			"LABEL_PUBLIC": "",
+			"FILTER_SINGLE_PROJECT": "個別プロジェクト",
+			"HELP_TEXT_CREATE": "カスタマダッシュボードを作成し、クラウドの利用状況を一目で確認できます。",
+			"LABEL_PRIVATE": "非公開",
+			"LABEL_PUBLIC": "公開",
 			"LABEL_SCOPE": "スコア",
-			"LABEL_VIWERS": "",
+			"LABEL_VIWERS": "公開可否",
 			"PROJECT": "プロジェクト",
-			"SINGLE_PROJECT": "",
-			"TOOLTIP_CLONE": "",
+			"SINGLE_PROJECT": "個別プロジェクト",
+			"TOOLTIP_CLONE": "複製",
 			"TOOLTIP_DELETE": "削除",
 			"TOOLTIP_EDIT": "編集",
-			"VIEW_ALL": ""
+			"VIEW_ALL": "すべてのダッシュボードを表示"
 		},
 		"CREATE": {
-			"BLANK_DESC": "",
+			"BLANK_DESC": "空のダッシュボードを利用して、最初から作成",
 			"CANCEL": "キャンセル",
 			"CREATE": "作成",
-			"ENTIRE_WORKSPACES": "",
-			"LABEL_DEFAULT_TEMPLATE": "",
-			"LABEL_EXISTING_DASHBOARD": "",
-			"LABEL_SCOPE": "",
-			"LABEL_START_FROM": "",
-			"LABEL_VIEWERS": "",
+			"ENTIRE_WORKSPACES": "ワークスペース全体",
+			"LABEL_DEFAULT_TEMPLATE": "デフォルトテンプレートから選択",
+			"LABEL_EXISTING_DASHBOARD": "既存のダッシュボードから選択",
+			"LABEL_SCOPE": "ダッシュボードの範囲",
+			"LABEL_START_FROM": "基本生成フォーム",
+			"LABEL_VIEWERS": "公開可否",
 			"NO_ITEMS": "アイテムがありません",
 			"PREVIEW": "プレビュー",
 			"PRIVATE": "非公開",
-			"PRIVATE_DESC": "",
+			"PRIVATE_DESC": "非公開",
 			"PUBLIC": "公開",
-			"PUBLIC_DESC": "",
-			"SINGLE_PROJECT": "",
+			"PUBLIC_DESC": "該当するダッシュボード範囲に「view」アクセス権限を持つすべてのユーザー",
+			"SINGLE_PROJECT": "個別プロジェクト",
 			"TITLE": "新規ダッシュボード作成",
 			"VALIDATION_PROJECT": "プロジェクトを選択してください。",
-			"VALIDATION_TEMPLATE": ""
+			"VALIDATION_TEMPLATE": "テンプレートを選択してください"
 		},
 		"CUSTOMIZE": {
-			"ADD_LABEL": "",
+			"ADD_LABEL": " +　ボタンを追加してラベルを追加できます。 ",
 			"ADD_WIDGET": {
 				"ADD": "ウィジェットを追加する",
-				"ADD_OPTIONS": "",
-				"FROM_DASHBOARD": "",
-				"INHERIT": "",
-				"LABEL_CURRENCY": "",
-				"LABEL_DATE": "",
+				"ADD_OPTIONS": "オプションの追加",
+				"FROM_DASHBOARD": "ダッシュボードオプション値",
+				"INHERIT": "継承",
+				"LABEL_CURRENCY": "通話適用オプション",
+				"LABEL_DATE": "期間適用オプション",
 				"LABEL_NAME": "名前",
-				"NAME_DESC": "",
-				"NAME_PLACEHOLDER": "",
-				"NO_SELECTED": "",
-				"NO_SELECTED_HELP_TEXT": "",
+				"NAME_DESC": "選択したGroup-Byを基準に照会期間中に発生した上位10個の費用データを表示します。",
+				"NAME_PLACEHOLDER": "ウィジェット名の入力",
+				"NO_SELECTED": "ウィジェットが選択されていません。",
+				"NO_SELECTED_HELP_TEXT": "特定のウィジェットを選択すると、ウィジェット情報と編集可能なオプションフィールドがここに表示されます。",
 				"SIDEBAR_TITLE": "ダッシュボードのカスタマイズ",
 				"TAB_ALERT": "アラート",
 				"TAB_ALL": "すべて",
-				"TAB_ASSET": "",
+				"TAB_ASSET": "アセット",
 				"TAB_COST": "費用",
 				"TAB_CUSTOM": "カスタム",
 				"TAB_DEFAULT": "既定値",
 				"TITLE": "新規ウィジェットの追加",
 				"VALIDATION_NAME": "お名前を入力してください。"
 			},
-			"ALT_E_UPDATE_DASHBOARD": "",
+			"ALT_E_UPDATE_DASHBOARD": "ダッシュボード更新に失敗しました。",
 			"CANCEL": "キャンセル",
-			"ENTER_NEW_LABEL": "",
-			"REFRESH_INTERVAL_10M": "",
-			"REFRESH_INTERVAL_15S": "",
-			"REFRESH_INTERVAL_1H": "",
-			"REFRESH_INTERVAL_1M": "",
-			"REFRESH_INTERVAL_30M": "",
-			"REFRESH_INTERVAL_30S": "",
-			"REFRESH_INTERVAL_5M": "",
-			"REFRESH_OFF": "",
+			"ENTER_NEW_LABEL": "ラベル入力",
+			"REFRESH_INTERVAL_10M": "10分",
+			"REFRESH_INTERVAL_15S": "15秒",
+			"REFRESH_INTERVAL_1H": "1時間",
+			"REFRESH_INTERVAL_1M": "1分",
+			"REFRESH_INTERVAL_30M": "30分",
+			"REFRESH_INTERVAL_30S": "30秒",
+			"REFRESH_INTERVAL_5M": "5分",
+			"REFRESH_OFF": "オフ",
 			"RESET": "初期化",
 			"SAVE": "保存",
-			"VALIDATION_DUPLICATED_LABEL": "",
-			"VALIDATION_LIMITED_CHAR_LABEL": "",
+			"VALIDATION_DUPLICATED_LABEL": "既に存在するラベルです。",
+			"VALIDATION_LIMITED_CHAR_LABEL": "ラベルの長さは30文字までです。",
 			"VARIABLES": {
-				"ADD": "",
+				"ADD": "変数の追加",
 				"ADD_OPTIONS": "追加",
 				"CANCEL": "キャンセル",
-				"CHECK_MODAL_CONTENTS": "",
-				"CHECK_MODAL_DELETE_TITLE": "",
+				"CHECK_MODAL_CONTENTS": "キャンセルすると、変更された内容は保存されません。",
+				"CHECK_MODAL_DELETE_TITLE": "変更された事項をキャンセルしますか？",
 				"DELETE": "削除",
-				"DELETE_TITLE": "",
+				"DELETE_TITLE": "この変数を削除しますか？",
 				"EDIT": "編集",
 				"FILTER_ALL": "すべて",
 				"FILTER_CUSTOM": "カスタム",
-				"FILTER_MANAGED": "",
-				"FILTER_TITLE": "",
+				"FILTER_MANAGED": "管理型",
+				"FILTER_TITLE": "変数タイプ",
 				"LABEL_NAME": "名前",
-				"LABEL_OPTIONS": "",
-				"LABEL_SELECTION_TYPE": "",
-				"MORE": "",
-				"MULTI_SELECT": "",
-				"PLACEHOLDER_OPTIONS": "",
+				"LABEL_OPTIONS": "オプション",
+				"LABEL_SELECTION_TYPE": "選択タイプ",
+				"MORE": "追加",
+				"MULTI_SELECT": "複数選択",
+				"PLACEHOLDER_OPTIONS": "データソースの入力",
 				"SAVE": "保存",
-				"SINGLE_SELECT": "",
-				"SUB_TITLE": "",
-				"SUB_TITLE_EDIT": "",
-				"TITLE": "",
+				"SINGLE_SELECT": "単一選択",
+				"SUB_TITLE": "変数",
+				"SUB_TITLE_EDIT": "変数の編集",
+				"TITLE": "変数の管理",
 				"VALIDATION_NAME_REQUIRED": ""
 			}
 		},
 		"DETAIL": {
-			"AUTO": "",
-			"CLONE": "",
-			"CURRENT_MONTH": "",
+			"AUTO": "自動",
+			"CLONE": "複製",
+			"CURRENT_MONTH": "当月分",
 			"CUSTOM": "カスタム",
 			"CUSTOMIZE": "カスタマイズ",
 			"DEFAULT": "既定値",
 			"DELETE": "削除",
-			"EXPORT": "",
+			"EXPORT": "エクスポート",
 			"PDF_EXPORT": {
-				"APPLIED_FILTERS": ""
+				"APPLIED_FILTERS": "フィルタの適用"
 			},
 			"PERIOD_CUSTOM": "カスタム",
 			"PERIOD_LAST_14_DAYS": "過去14日間",
@@ -1248,16 +1248,16 @@
 			"PERIOD_LAST_7_DAYS": "直近7日間",
 			"PERIOD_LAST_MONTH": "前月",
 			"PERIOD_THIS_MONTH": "今月",
-			"REFRESH": "",
+			"REFRESH": "自動更新",
 			"SET_HOME": "ホームダッシュボードとして設定"
 		},
 		"FORM": {
 			"ALT_E_CREATE_DASHBOARD": "ダッシュボードの作成に失敗しました",
-			"ALT_E_DELETE_DASHBOARD": "",
-			"ALT_E_EDIT_NAME": "",
-			"ALT_E_UPDATE_DASHBOARD_NAME": "",
-			"ALT_S_DELETE_DASHBOARD": "",
-			"CLONE_TITLE": "",
+			"ALT_E_DELETE_DASHBOARD": "ダッシュボードの削除に失敗しました",
+			"ALT_E_EDIT_NAME": "ダッシュボード名の更新に失敗しました",
+			"ALT_E_UPDATE_DASHBOARD_NAME": "ダッシュボード名の更新に失敗しました",
+			"ALT_S_DELETE_DASHBOARD": "ダッシュボードが正常に削除されました",
+			"CLONE_TITLE": "ダッシュボードの複製",
 			"CUSTOM_DATE_FROM": "スタート",
 			"CUSTOM_DATE_TITLE": "期間選択",
 			"CUSTOM_DATE_TO": "終了",
@@ -1266,109 +1266,109 @@
 			"DATE_HELP_TEXT_MONTHLY": "最長12ヶ月(期間内)設定可能",
 			"DELETE_TITLE": "ダッシュボードを削除しますか？",
 			"LABEL_DASHBOARD_NAME": "ダッシュボード名",
-			"LABEL_PRIVATE": "",
-			"LABEL_PUBLIC": "",
-			"LABEL_VIEWERS": "",
+			"LABEL_PRIVATE": "非公開",
+			"LABEL_PUBLIC": "公開（選択したダッシュボードの範囲に対して「View」アクセス権を持つすべてのユーザー）",
+			"LABEL_VIEWERS": "公開可否",
 			"REQUIRED": "必須入力項目です",
-			"UPDATE_TITLE": "",
-			"VALIDATION_DASHBOARD_NAME_INPUT": "",
-			"VALIDATION_DASHBOARD_NAME_LENGTH": "",
-			"VALIDATION_DASHBOARD_NAME_UNIQUE": ""
+			"UPDATE_TITLE": "ダッシュボード名の編集",
+			"VALIDATION_DASHBOARD_NAME_INPUT": "ダッシュボードの名を入力してください。",
+			"VALIDATION_DASHBOARD_NAME_LENGTH": "ダッシュボード名は 100 文字を超えることはできません。",
+			"VALIDATION_DASHBOARD_NAME_UNIQUE": "この名前のダッシュボードはすでに存在します。"
 		},
 		"LNB": {
-			"ONLY_FAVORITE": ""
+			"ONLY_FAVORITE": "お気に入りだけを表示する"
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
-				"DESC": ""
+				"DESC": "アラート履歴の説明"
 			},
 			"ALERT_STATUS_OVERVIEW": {
-				"DESC": ""
+				"DESC": "発生したアラート全体のリストに関連するプロジェクトと緊急度を一緒に表示します。"
 			},
 			"ASSET_SUMMARY_BY_REGIONS": {
-				"DESC": ""
+				"DESC": "クラウドプロバイダのRegion別クラウドサービスの使用状況を要約して表示します。"
 			},
 			"AWS_CLOUD_FRONT_COST": {
-				"DESC": ""
+				"DESC": "選択した期間のAWS CloudFrontのデータ使用量とコストを、'Group by'オプションで集計して表示します。"
 			},
 			"AWS_DATA_TRANSFER_BY_REGION": {
-				"DESC": ""
+				"DESC": "選択した期間の AWS Data-TransferのRegion別のデータ使用量とコストを表示します。"
 			},
 			"AWS_DATA_TRANSFER_COST_TREND": {
-				"DESC": ""
+				"DESC": "選択した期間のAWS Data-Transferのコスト推移を表示します。"
 			},
 			"AWS_PERSONAL_HEALTH_DASHBOARD": {
-				"DESC": "",
+				"DESC": "クラウドサービスリソースに影響を与える特定の運用上の問題の状況を表示します。",
 				"TAB_OPEN_ISSUES": "発生した問題",
 				"TAB_OTHER_NOTIFICATIONS": "その他のお知らせ",
 				"TAB_SCHEDULED_CHANGES": "変更予定内容",
 				"TITLE_AFFECTED_RESOURCES": "影響されたリソース"
 			},
 			"AWS_TRUSTED_ADVISOR": {
-				"DESC": ""
+				"DESC": "AWS Trusted Advisorによる各プロジェクトの点検・分析状況を表示します。"
 			},
 			"BUDGET_STATUS": {
-				"DESC": ""
+				"DESC": "選択した期間中の予算使用量の上位 200 件を表示します。"
 			},
 			"BUDGET_USAGE_SUMMARY": {
 				"AVAILABLE": "使用可能",
-				"BUDGETS": "",
-				"DESC": "",
+				"BUDGETS": "バジェット",
+				"DESC": "総コスト、予算、使用率とともに、総予算消費の概要を表示します。",
 				"TOTAL_BUDGET": "総予算",
-				"TOTAL_SPENT": ""
+				"TOTAL_SPENT": "総使用量"
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
-				"DESC": ""
+				"DESC": "選択した期間中のプロジェクトごとの予算使用量と不足予測値を表示します。"
 			},
 			"CLOUD_ASSEST_SUMMARY": {
-				"DESC": ""
+				"DESC": "クラウドリソースのコスト推移や、サーバー、データベース、ストレージの使用状況を表示します。"
 			},
 			"COST_BY_REGION": {
-				"DESC": ""
+				"DESC": "選択された期間のRegion別コスト合計を表示します。"
 			},
 			"COST_DONUT": {
-				"DESC": ""
+				"DESC": "選択された期間の各項目の合計コストを「Group by」オプションで集計して表示します。"
 			},
 			"COST_MAP": {
-				"DESC": ""
+				"DESC": "選択した期間の総費用の比率を「Group by」オプションで集計し、上位10-15位を比較できるように表示します。"
 			},
 			"COST_PIE": {
-				"DESC": ""
+				"DESC": "選択した期間の各項目の合計コストを「Group by」オプションで集計して表示します。"
 			},
 			"COST_TREND": {
-				"DESC": ""
+				"DESC": "選択した期間の月別コストを「Group by」オプションで集計して表示します。"
 			},
 			"COST_TREND_STACKED": {
-				"DESC": ""
+				"DESC": "選択した期間の月別コストを「Group by」オプションで集計して表示します。"
 			},
 			"DAILY_UPDATES": {
-				"DESC": ""
+				"DESC": "当日の作成または削除されたクラウドリソースの一覧が表示されます。"
 			},
 			"DATE_PAST_7_DAYS": "過去7日間",
 			"DATE_TODAY": "今日",
-			"DELETE_CONTENTS": "",
-			"DELETE_TITLE": "",
+			"DELETE_CONTENTS": "このウィジェットを本当に削除しますか？ダッシュボードが保存されると、削除したウィジェットを復元することはできません。",
+			"DELETE_TITLE": "ウィジェットの削除",
 			"DETAILS": "詳細情報",
-			"EDIT_WIDGET": "",
-			"ERROR_MSG": "",
-			"ERROR_TITLE": "",
+			"EDIT_WIDGET": "ウィジェットオプションの修正",
+			"ERROR_MSG": "ダッシュボードの変数とウィジェットオプションの非互換性によるエラーが発生しました。",
+			"ERROR_TITLE": "ﾃﾞｰﾀｰの表示ができません。",
 			"MONTHLY_COST": {
-				"CURRENT_MONTH": "",
-				"DESC": "",
-				"PREVIOUS_MONTH": ""
+				"CURRENT_MONTH": "直近月発生費用",
+				"DESC": "照会期間の直近の月額費用および前月の同一期間との比較データを表示します。",
+				"PREVIOUS_MONTH": "前月発生費用"
 			},
 			"NO_DATA": "データがありません",
 			"PROJECT_ACTIVITY_SUMMARY": {
-				"DESC": ""
+				"DESC": "各プロジェクト別のトリガー、認知、安全などを素早く確認できます。"
 			},
 			"PROJECT_HEALTH_BOARD": {
-				"DESC": ""
+				"DESC": "最近発生したアラートによって、各プロジェクトの緊急度を表示します。"
 			},
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
-				"DESC": ""
+				"DESC": "コンピュート、データベース、ストレージのリソースを最も多く使用した上位のプロジェクトリストを表示します。"
 			},
-			"UPDATE_TITLE": "",
-			"VALIDATION_PROPERTY_NOT_EXIST": ""
+			"UPDATE_TITLE": "ウィジェットの更新",
+			"VALIDATION_PROPERTY_NOT_EXIST": "ダッシュボードで選択されている変数が変更されました。"
 		}
 	},
 	"IAM": {
@@ -1460,10 +1460,10 @@
 				"TOOLTIP_COLLECTING_DATA": "データ収集",
 				"TOOLTIP_COLLECTOR_CREATE": "コレクタ生成",
 				"TOOLTIP_CONNECT_TO_CONSOLE": "コンソール移動",
-				"TOOLTIP_DASHBOARD_CLONE": "",
-				"TOOLTIP_DASHBOARD_CREATE": "",
-				"TOOLTIP_DASHBOARD_CUSTOMIZE": "",
-				"TOOLTIP_DASHBOARD_DELETE": "",
+				"TOOLTIP_DASHBOARD_CLONE": "複製",
+				"TOOLTIP_DASHBOARD_CREATE": "ダッシュボード作成",
+				"TOOLTIP_DASHBOARD_CUSTOMIZE": "カスタマイズ",
+				"TOOLTIP_DASHBOARD_DELETE": "削除",
 				"TOOLTIP_ESCALATION_POLICY_CREATE": "エスカレーションポリシーの生成",
 				"TOOLTIP_NOTIFICATION_MANAGE": "お知らせ(管理)",
 				"TOOLTIP_NOTIFICATION_SETTINGS": "通知設定",
@@ -2078,8 +2078,8 @@
 		"COST_EXPLORER_COST_ANALYSIS": "コスト分析",
 		"COST_EXPLORER_DASHBOARD": "ダッシュボード",
 		"DASHBOARDS": "ダッシュボード",
-		"DASHBOARDS_PROJECT": "",
-		"DASHBOARDS_WORKSPACE": "",
+		"DASHBOARDS_PROJECT": "プロジェクトダッシュボード",
+		"DASHBOARDS_WORKSPACE": "ワークスペースダッシュボード",
 		"HOME_DASHBOARD": "ダッシュボード",
 		"INFO": "情報",
 		"INFO_NOTICE": "お知らせ",
