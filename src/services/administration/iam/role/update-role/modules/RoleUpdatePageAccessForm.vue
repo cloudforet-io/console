@@ -100,13 +100,12 @@ const getIndividualPagePermissions = (menuItem: PageAccessMenuItem): RawPagePerm
 const getPagePermissions = (menuItems: PageAccessMenuItem[], roleType: RoleType): RawPagePermission[] => {
     // all case
     const allItem = find(menuItems, { id: 'all' });
-    if (allItem && (allItem.isManaged || allItem.isViewed)) {
-        const permission = allItem.isManaged ? PAGE_PERMISSION_TYPE.MANAGE : PAGE_PERMISSION_TYPE.VIEW;
+    if (allItem && allItem.isManaged) {
         if (roleType === ROLE_TYPE.PROJECT) {
             // wildcard is not available for PROJECT role type
             return menuItems.map((menuItem) => getIndividualPagePermissions(menuItem)).flat();
         }
-        return [{ page: '*', permission }];
+        return [{ page: '*', permission: PAGE_PERMISSION_TYPE.MANAGE }];
     }
 
     let results: RawPagePermission[] = [];
@@ -141,6 +140,7 @@ const getPagePermissions = (menuItems: PageAccessMenuItem[], roleType: RoleType)
         });
     });
 
+    if (allItem && allItem.isViewed) return [{ page: '*', permission: PAGE_PERMISSION_TYPE.VIEW }, ...results];
     return results;
 };
 
