@@ -7,7 +7,6 @@ import {
 
 import { makeOptionalProxy } from '@/utils/composition-helpers';
 import { getAllAvailableIcons } from '@/foundation/icons/story-helper';
-import { names as lottieNames } from '@/foundation/lottie/p-lotties/names';
 
 import PSelectStatus from './PSelectStatus.vue';
 import { getSelectStatusArgTypes } from '@/inputs/select-status/story-helper';
@@ -112,42 +111,6 @@ export const Template = (args, { argTypes }) => ({
                     selected: values[0],
                     values,
                     icons: getAllAvailableIcons()
-                })
-                return {
-                    ...toRefs(state),
-                };
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## With Lottie
-
-<Canvas>
-    <Story name="With Lottie">
-        {{
-            components: { PSelectStatus },
-            template: `
-    <div class="w-full overflow p-8 flex flex-wrap">
-        <p-select-status v-for="(value, idx) in values" :key="idx"
-            :value="value"
-            :lottie="lotties[idx]"
-            v-model="selected"
-            class="mr-4"
-        >
-            {{value}}
-        </p-select-status>
-    </div>
-    `,
-            setup(props) {
-                const values = range(8).map(() => faker.random.word())
-                const state = reactive({
-                    selected: values[0],
-                    values,
-                    lotties: lottieNames
                 })
                 return {
                     ...toRefs(state),

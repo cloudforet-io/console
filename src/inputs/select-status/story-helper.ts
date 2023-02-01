@@ -110,24 +110,6 @@ export const getSelectStatusArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
-    lottie: {
-        ame: 'lottie',
-        type: { name: 'string' },
-        description: 'The lottie name that represent the status.',
-        defaultValue: undefined,
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'undefined',
-            },
-        },
-        control: {
-            type: 'text',
-        },
-    },
     iconAnimation: {
         name: 'iconAnimation',
         type: { name: 'string' },
