@@ -1,57 +1,53 @@
 <template>
     <section class="p-icon-modal">
-        <transition v-if="visible"
+        <transition v-if="props.visible"
                     name="modal"
         >
             <article class="modal-mask"
-                     :class="{'no-backdrop':!backdrop}"
+                     :class="{'no-backdrop':!props.backdrop}"
                      role="dialog"
                      aria-modal="true"
                      aria-labelledby="headerTitle"
                      tabindex="1"
             >
                 <div class="modal-wrapper"
-                     :class="size"
+                     :class="props.size"
                 >
                     <div class="content-wrapper">
-                        <p-lottie v-if="lottieName"
-                                  :name="lottieName"
-                                  :size="5"
-                        />
-                        <p-i v-if="iconName"
+                        <p-i v-if="props.iconName"
                              class="block"
-                             :name="iconName"
+                             :name="props.iconName"
                              :color="primaryDark"
                              width="5rem"
                              height="5rem"
                         />
-                        <span v-if="emoji"
+                        <span v-else-if="props.emoji"
                               class="wave"
-                        >👋</span>
+                        >{{ props.emoji }}</span>
                         <div class="header-wrapper"
-                             :class="size"
+                             :class="props.size"
                         >
-                            <p v-if="headerTitle"
+                            <p v-if="props.headerTitle"
                                class="header-title"
                             >
-                                {{ headerTitle }}
+                                {{ props.headerTitle }}
                             </p>
-                            <span v-if="headerDesc"
+                            <span v-if="props.headerDesc"
                                   class="header-desc"
                             >
-                                {{ headerDesc }}
+                                {{ props.headerDesc }}
                             </span>
                         </div>
-                        <div v-if="size === 'md'"
+                        <div v-if="props.size === 'md'"
                              class="body-wrapper"
                         >
                             <slot name="body" />
                         </div>
                         <p-button
-                            :style-type="buttonType"
-                            @click="onClickButton"
+                            :style-type="props.buttonStyleType"
+                            @click="handleClickButton"
                         >
-                            {{ buttonText }}
+                            {{ props.buttonText }}
                         </p-button>
                     </div>
                 </div>
@@ -60,90 +56,44 @@
     </section>
 </template>
 
-<script lang="ts">
-import { reactive, toRefs } from 'vue';
+<script setup lang="ts">
+import { reactive } from 'vue';
 
-import type { IconModalProps } from '@/feedbacks/modals/icon-modal/type';
-import PI from '@/foundation/icons/PI.vue';
-import PLottie from '@/foundation/lottie/PLottie.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import '../modal.pcss';
+import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import { makeProxy } from '@/utils/composition-helpers';
 
 import { primaryDark } from '@/styles/colors.cjs';
 
+const PI = () => import('@/foundation/icons/PI.vue');
 
-export default {
-    name: 'PIconModal',
-    components: {
-        PI,
-        PLottie,
-        PButton,
-    },
-    props: {
-        size: {
-            type: String,
-            default: 'sm',
-        },
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-        lottieName: {
-            type: String,
-            default: undefined,
-        },
-        iconName: {
-            type: String,
-            default: undefined,
-        },
-        emoji: {
-            type: Boolean,
-            default: undefined,
-        },
-        headerTitle: {
-            type: String,
-            default: undefined,
-        },
-        headerDesc: {
-            type: String,
-            default: undefined,
-        },
-        buttonText: {
-            type: String,
-            default: '',
-        },
-        buttonType: {
-            type: String,
-            default: 'tertiary',
-        },
-        outline: {
-            type: Boolean,
-            default: true,
-        },
-        backdrop: {
-            type: Boolean,
-            default: true,
-        },
-    },
-    setup(props: IconModalProps, { emit }) {
-        const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
-        });
+interface IconModalProps {
+    size?: string;
+    visible?: boolean;
+    iconName?: string;
+    emoji?: string;
+    headerTitle?: string;
+    headerDesc?: string;
+    buttonText: string;
+    buttonStyleType?: string;
+    backdrop?: boolean;
+}
+const props = withDefaults(defineProps<IconModalProps>(), {
+    size: 'sm',
+    buttonText: 'close',
+    buttonStyleType: BUTTON_STYLE.tertiary,
+    backdrop: true,
+});
+const emit = defineEmits<{(e: 'clickButton'): void;}>();
+const state = reactive({
+    proxyVisible: makeProxy('visible', props, emit),
+});
 
-        const onClickButton = () => {
-            state.proxyVisible = false;
-            emit('clickButton');
-        };
-
-        return {
-            ...toRefs(state),
-            onClickButton,
-            primaryDark,
-        };
-    },
+const handleClickButton = () => {
+    state.proxyVisible = false;
+    emit('clickButton');
 };
-
 </script>
 
 <style lang="postcss">
@@ -165,10 +115,6 @@ export default {
                 padding: 2.875rem 2rem 3.5rem;
                 width: 100%;
                 min-height: 10.5rem;
-
-                > .p-lottie {
-                    display: inline-flex;
-                }
 
                 > .p-i-icon {
                     margin: auto;
