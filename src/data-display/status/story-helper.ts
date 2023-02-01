@@ -3,7 +3,6 @@ import icon from 'vue-svgicon';
 
 import { themes } from '@/data-display/status/config';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
-import { names } from '@/foundation/lottie/p-lotties/names';
 
 
 export const getStatusArgTypes = (): ArgTypes => ({
@@ -43,25 +42,6 @@ export const getStatusArgTypes = (): ArgTypes => ({
         control: {
             type: 'select',
             options: [null, ...Object.keys(icon.icons)],
-        },
-    },
-    lottie: {
-        name: 'lottie',
-        type: { name: 'string' },
-        description: 'Lottie name',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'null',
-            },
-        },
-        control: {
-            type: 'select',
-            options: [null, ...names],
         },
     },
     text: {

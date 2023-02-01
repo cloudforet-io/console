@@ -4,11 +4,7 @@
           v-on="$listeners"
     >
         <template v-if="theme">
-            <p-lottie v-if="lottie"
-                      :name="lottie"
-                      :size="iconSize"
-            />
-            <p-i v-else-if="icon"
+            <p-i v-if="icon"
                  :name="icon"
                  :height="`${iconSize}rem`"
                  :width="`${iconSize}rem`"
@@ -20,11 +16,7 @@
             <span class="text"><slot>{{ text }}</slot></span>
         </template>
         <template v-else>
-            <p-lottie v-if="lottie"
-                      :name="lottie"
-                      :size="iconSize"
-            />
-            <p-i v-else-if="icon"
+            <p-i v-if="icon"
                  :name="icon"
                  :color="realIconColor ? realIconColor : undefined"
                  :animation="iconAnimation"
@@ -55,12 +47,11 @@ import { themes } from '@/data-display/status/config';
 import type { StatusProps } from '@/data-display/status/type';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 import PI from '@/foundation/icons/PI.vue';
-import PLottie from '@/foundation/lottie/PLottie.vue';
 import { getColor } from '@/utils/helpers';
 
 export default defineComponent<StatusProps>({
     name: 'PStatus',
-    components: { PLottie, PI },
+    components: { PI },
     props: {
         icon: {
             type: String,
@@ -88,10 +79,6 @@ export default defineComponent<StatusProps>({
         disableIcon: {
             type: Boolean,
             default: false,
-        },
-        lottie: {
-            type: String,
-            default: undefined,
         },
         iconSize: {
             type: Number,

@@ -25,7 +25,6 @@ export const Template = (args, { argTypes }) => ({
         :icon-color="iconColor"
         :theme="theme"
         :disable-icon="disableIcon"
-        :lottie="lottie"
         :icon-size="iconSize"
         :icon-animation="iconAnimation"
     >
@@ -92,21 +91,6 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-## Lottie
-<Canvas>
-    <Story name="Lottie Status">
-        {{
-            components:{ PStatus },
-            template: `
-                <div style="display:flex; align-items:center; justify-content:center;">
-                    <p-status lottie="lottie_booting" text="Booting" style="margin: 1rem" />
-                    <p-status lottie="lottie_stopping" text="Stopping" style="margin: 1rem" />
-                    <p-status lottie="lottie_error" text="Error" style="margin: 1rem" />
-                    <p-status lottie="lottie_working" text="In-Progress" style="margin: 1rem" />
-                </div>`,
-        }}
-    </Story>
-</Canvas>
 
 ## Playground
 <Canvas>

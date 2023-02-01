@@ -7,6 +7,5 @@ export interface StatusProps {
     iconColor?: string|null;
     theme?: string|null;
     disableIcon?: boolean;
-    lottie?: string;
     iconSize?: number;
 }
