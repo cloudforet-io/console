@@ -33,7 +33,6 @@ export { default as PGridLayout } from './others/deprecated/grid-layout/PGridLay
 export { default as PPaneLayout } from './layouts/pane-layout/PPaneLayout.vue';
 export { default as PSidebar } from './layouts/sidebar/PSidebar.vue';
 export { default as PTextList } from './others/console/text-list/PTextList.vue';
-export { default as PLottie } from './foundation/lottie/PLottie.vue';
 export { default as PMarkdown } from './data-display/markdown/PMarkdown.vue';
 export { default as PModal } from './feedbacks/modals/modal/PModal.vue';
 export { default as PBreadcrumbs } from './navigation/breadcrumbs/PBreadcrumbs.vue';
@@ -58,7 +57,6 @@ export { default as PDynamicField } from './data-display/dynamic/dynamic-field/P
 export { default as PDynamicLayout } from './data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 export { default as PJsonSchemaForm } from './inputs/forms/json-schema-form/PJsonSchemaForm.vue';
 export { default as PHorizontalLayout } from './layouts/horizontal-layout/PHorizontalLayout.vue';
-export { default as PToolboxGridLayout } from './others/deprecated/toolbox-grid-layout/PToolboxGridLayout.vue';
 export { default as PVerticalLayout } from './layouts/vertical-layout/PVerticalLayout.vue';
 export { default as PWidgetLayout } from './others/deprecated/widget-layout/PWidgetLayout.vue';
 export { default as PLazyImg } from './feedbacks/loading/lazy-img/PLazyImg.vue';

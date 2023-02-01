@@ -1,7 +1,6 @@
 import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
 import PButton from '@/inputs/buttons/button/PButton';
 import { BUTTON_STYLE, BUTTON_SIZE } from '@/inputs/buttons/button/type';
-import PLottie from '@/foundation/lottie/PLottie.vue';
 import { getButtonArgTypes } from '@/inputs/buttons/button/story-helper';
 import { reactive, toRefs } from 'vue';
 
@@ -14,7 +13,7 @@ import { reactive, toRefs } from 'vue';
 
 export const Template = (args, {argTypes})=>({
     props: Object.keys(argTypes),
-    components: {PButton, PLottie},
+    components: {PButton},
     template: `
         <div style="display:flex; align-items:center; justify-content:center; height:150px;">
             <p-button
@@ -44,7 +43,7 @@ export const Template = (args, {argTypes})=>({
 <Canvas>
     <Story name='Sizes' height='150px'>
         {{
-            components:{ PButton, PLottie },
+            components:{ PButton },
             template: `
                 <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
                     <p-button v-for="size in buttonSizes" style-type="primary" style="margin-right: 20px" :size="size">
@@ -68,7 +67,7 @@ export const Template = (args, {argTypes})=>({
 <Canvas>
     <Story name='With Icon' height='150px'>
         {{
-            components:{ PButton, PLottie },
+            components:{ PButton },
             template: `
                 <div>
                     <div style="display:flex; align-items:center; justify-content:center; background-color: white">
@@ -99,7 +98,7 @@ export const Template = (args, {argTypes})=>({
 <Canvas>
     <Story name='Style Types' height='250px'>
         {{
-            components:{ PButton, PLottie },
+            components:{ PButton },
             template: `
                 <div style="display: flex; flex-direction: column; align-items: center; margin-top: 50px; background-color: white">
                     <div style="display:flex">
@@ -135,7 +134,7 @@ export const Template = (args, {argTypes})=>({
 <Canvas>
     <Story name='Disabled' height='150px'>
         {{
-            components:{ PButton, PLottie },
+            components:{ PButton },
             template: `
                 <div style="display: flex; flex-direction: column; align-items: center; background-color: white">
                 <div style="display:flex">
@@ -170,7 +169,7 @@ export const Template = (args, {argTypes})=>({
 <Canvas>
     <Story name='Loading' height='150px'>
         {{
-            components:{ PButton, PLottie },
+            components:{ PButton },
             template: `
                 <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
                     <p-button
@@ -190,7 +189,7 @@ export const Template = (args, {argTypes})=>({
 <Canvas>
     <Story name='Block' height='200px'>
         {{
-            components:{ PButton, PLottie },
+            components:{ PButton },
             template: `
                 <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 50px; background-color: white">
                     <p-button
@@ -222,7 +221,7 @@ export const Template = (args, {argTypes})=>({
 <Canvas>
     <Story name='Readonly' height='150px'>
         {{
-            components:{ PButton, PLottie },
+            components:{ PButton },
             template: `
                 <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
                     <p-button

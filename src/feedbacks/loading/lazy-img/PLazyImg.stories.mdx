@@ -1,7 +1,7 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PLazyImg from './PLazyImg.vue';
 import PButton from '@/inputs/buttons/button/PButton';
-import PLottie from '@/foundation/lottie/PLottie';
+import PI from '@/foundation/icons/PI';
 import { reactive, toRefs } from 'vue';
 import { faker } from '@faker-js/faker';
 import {getLazyImgArgTypes} from '@/feedbacks/loading/lazy-img/story-helper';
@@ -99,11 +99,11 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Custom Loader">
         {{
-            components: { PLazyImg, PLottie },
+            components: { PLazyImg, PI },
             template: `
     <p-lazy-img loading>
         <template #preloader>
-            <p-lottie name="lottie_working" :size="2"></p-lottie>
+            <p-i name="ic_setting" animation="spin" :size="2"></p-i>
         </template>
     </p-lazy-img>
 `

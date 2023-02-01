@@ -25,11 +25,9 @@
                                 <div class="modal-header"
                                      :class="[`${themeColor}-header`]"
                                 >
-                                    <p-lottie name="lottie_error"
-                                              auto
-                                              :size="1.5"
-                                              :class="[`modal-${themeColor}`]"
-                                              class="header-lottie"
+                                    <p-i name="ic_alert"
+                                         :class="[`modal-${themeColor}`]"
+                                         class="header-img"
                                     />
                                     {{ headerTitle }}
                                 </div>
@@ -112,7 +110,7 @@ import type { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
 import { SizeMapping } from '@/feedbacks/modals/type';
 import '@/feedbacks/modals/modal.pcss';
-import PLottie from '@/foundation/lottie/PLottie.vue';
+import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
@@ -122,8 +120,8 @@ import { makeProxy } from '@/utils/composition-helpers';
 export default defineComponent<ButtonModalProps>({
     name: 'PButtonModal',
     components: {
+        PI,
         PIconButton,
-        PLottie,
         PButton,
     },
     model: {
@@ -300,7 +298,7 @@ export default defineComponent<ButtonModalProps>({
                 }
             }
 
-            .header-lottie {
+            .header-img {
                 display: none;
 
                 &.modal-alert {
