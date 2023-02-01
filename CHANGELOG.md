@@ -1,3 +1,10 @@
+# [2.0.0-beta.35](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.34...v2.0.0-beta.35) (2023-02-01)
+
+
+### Bug Fixes
+
+* **lottie:** delete PLottie component ([#270](https://github.com/cloudforet-io/mirinae/issues/270)) ([16b7ffe](https://github.com/cloudforet-io/mirinae/commit/16b7ffef23c74bcd6ae19262f541c92abe4f1146))
+
 # [2.0.0-beta.34](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.33...v2.0.0-beta.34) (2023-02-01)
 
 
