@@ -2,42 +2,53 @@
     <notifications
         class="p-toast-alert"
         :group="group"
-        :position="position"
+        :position="state.position"
         width="320"
         :close-on-click="false"
     >
         <template #body="{item, close}">
-            <div class="alert-contents" :class="item.type"
+            <div class="alert-contents"
+                 :class="item.type"
                  @click="close"
             >
                 <div class="icon-wrapper">
-                    <p-i v-if="item.type === 'success'" name="ic_state_active"
+                    <p-i v-if="item.type === 'success'"
+                         name="ic_state_active"
                          class="item-type-icon"
                          width="1.5rem"
                          height="1.5rem"
                     />
-                    <p-i v-if="item.type === 'warning'" name="ic_list_duplication"
+                    <p-i v-if="item.type === 'warning'"
+                         name="ic_list_duplication"
                          class="item-type-icon"
                          width="1.5rem"
                          height="1.5rem"
                     />
-                    <p-i v-if="item.type === 'alert'" name="ic_alert"
+                    <p-i v-if="item.type === 'alert'"
+                         name="ic_alert"
                          class="item-type-icon"
                          width="1.5rem"
                          height="1.5rem"
                     />
-                    <p-spinner v-if="item.type === 'loading'" class="item-type-icon" />
+                    <p-spinner v-if="item.type === 'loading'"
+                               class="item-type-icon"
+                    />
                 </div>
-                <div class="content-wrapper" :class="[item.type === 'info' ? 'ml-2' : '']">
+                <div class="content-wrapper"
+                     :class="[item.type === 'info' ? 'ml-2' : '']"
+                >
                     <a class="title">{{ item.title }}</a>
-                    <div v-if="item.text" class="contents">
+                    <div v-if="item.text"
+                         class="contents"
+                    >
                         {{ item.text }}
                     </div>
                 </div>
-                <div v-if="isClosedWithButton" class="button-wrapper">
+                <div class="button-wrapper">
                     <p-i name="ic_delete"
                          class="delete-icon"
-                         width="1.5rem" height="1.5rem"
+                         width="1.5rem"
+                         height="1.5rem"
                          color="inherit"
                     />
                 </div>
@@ -46,8 +57,13 @@
     </notifications>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
 
+import type { ToastGroup, ToastPosition } from '@/feedbacks/alert/toast-alert/config';
+import {
+    TOAST_GROUP, TOAST_GROUP_POSITION_MAP,
+} from '@/feedbacks/alert/toast-alert/config';
 import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import PI from '@/foundation/icons/PI.vue';
 
@@ -56,27 +72,15 @@ import PI from '@/foundation/icons/PI.vue';
  * https://www.npmjs.com/package/vue-notification
  */
 
-export default {
-    name: 'PToastAlert',
-    components: {
-        PSpinner,
-        PI,
-    },
-    props: {
-        group: {
-            type: String,
-            default: '',
-        },
-        position: {
-            type: String,
-            default: 'bottom right',
-        },
-        isClosedWithButton: {
-            type: Boolean,
-            default: true,
-        },
-    },
-};
+interface NoticeAlertProps {
+    group: ToastGroup;
+}
+const props = withDefaults(defineProps<NoticeAlertProps>(), {
+    group: TOAST_GROUP.toastTopCenter,
+});
+const state = reactive({
+    position: computed<ToastPosition>(() => TOAST_GROUP_POSITION_MAP[props.group]),
+});
 </script>
 
 <style lang="postcss">
@@ -120,6 +124,7 @@ export default {
         flex-grow: 1;
         .title {
             @apply text-white;
+            display: block;
             font-size: 1rem;
             line-height: 1.375;
             text-transform: capitalize;

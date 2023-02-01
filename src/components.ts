@@ -12,7 +12,7 @@ export { default as PSpinner } from './feedbacks/loading/spinner/PSpinner.vue';
 export { default as PCollapsibleToggle } from './data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
 
 export { default as PNoticeAlert } from './feedbacks/alert/notice/PNoticeAlert.vue';
-export { default as PToastAlert } from './feedbacks/alert/toast/PToastAlert.vue';
+export { default as PToastAlert } from './feedbacks/alert/toast-alert/PToastAlert.vue';
 export { default as PAnchor } from './inputs/anchors/PAnchor.vue';
 export { default as PCopyButton } from './inputs/buttons/copy-button/PCopyButton.vue';
 export { default as PIconButton } from './inputs/buttons/icon-button/PIconButton.vue';
