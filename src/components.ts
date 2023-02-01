@@ -86,7 +86,7 @@ export { default as PTree } from './data-display/tree/PTree.vue';
 export { default as PProgressWizard } from './navigation/wizards/progress-wizard/PProgressWizard.vue';
 export { default as PSelectStatus } from './inputs/select-status/PSelectStatus.vue';
 
-export { default as PNotificationBar } from './feedbacks/notification/PNotificationBar.vue';
+export { default as PNotificationBar } from './feedbacks/notification-bar/PNotificationBar.vue';
 export { default as PDataLoader } from './feedbacks/loading/data-loader/PDataLoader.vue';
 
 export { default as PToolbox } from './navigation/toolbox/PToolbox.vue';

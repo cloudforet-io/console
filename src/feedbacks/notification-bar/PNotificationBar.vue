@@ -20,7 +20,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue';
 
-import { styleTypes } from '@/feedbacks/notification/config';
+import { styleTypes } from '@/feedbacks/notification-bar/config';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { makeProxy } from '@/utils/composition-helpers';
 
