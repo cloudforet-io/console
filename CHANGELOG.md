@@ -1,3 +1,12 @@
+# [2.0.0-beta.34](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.33...v2.0.0-beta.34) (2023-02-01)
+
+
+### Bug Fixes
+
+* **icon-modal:** update storybook and delete `lottieName` props ([#266](https://github.com/cloudforet-io/mirinae/issues/266)) ([c203b0f](https://github.com/cloudforet-io/mirinae/commit/c203b0f068ae6f113a2274597888f154b1c4204d))
+* **select-status:** delete `lottie` props ([#268](https://github.com/cloudforet-io/mirinae/issues/268)) ([39da5cc](https://github.com/cloudforet-io/mirinae/commit/39da5cc0c5e8300e54cca6eace90510d93ddde96))
+* **status:** delete `lottie` props ([#267](https://github.com/cloudforet-io/mirinae/issues/267)) ([bccff8d](https://github.com/cloudforet-io/mirinae/commit/bccff8dde6f76dbf2e3505fcca296877e8befaf6))
+
 # [2.0.0-beta.33](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.32...v2.0.0-beta.33) (2023-01-30)
 
 
