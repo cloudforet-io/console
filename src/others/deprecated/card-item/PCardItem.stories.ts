@@ -1,6 +1,6 @@
 import { withKnobs, text } from '@storybook/addon-knobs';
 
-import PBadge from '@/data-display/badges/PBadge.vue';
+import PBadge from '@/data-display/badge/PBadge.vue';
 import PCardItem from '@/others/deprecated/card-item/PCardItem.vue';
 
 export default {

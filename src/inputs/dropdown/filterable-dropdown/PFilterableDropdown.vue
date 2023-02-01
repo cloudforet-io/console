@@ -105,7 +105,7 @@ import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
 import { debounce, isEqual, reduce } from 'lodash';
 
-import PBadge from '@/data-display/badges/PBadge.vue';
+import PBadge from '@/data-display/badge/PBadge.vue';
 import PTag from '@/data-display/tags/PTag.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuController, useProxyValue } from '@/hooks';

@@ -114,7 +114,7 @@ import type {
     KeyMenuItem, ValueMenuItem, QueryItem, KeyItemSet, ValueHandlerMap,
 } from '@/inputs/search/query-search/type';
 
-const PBadge = () => import('@/data-display/badges/PBadge.vue');
+const PBadge = () => import('@/data-display/badge/PBadge.vue');
 const PTag = () => import('@/data-display/tags/PTag.vue');
 
 interface QueryInputProps {

@@ -1,7 +1,7 @@
 <script lang="ts">
-import PBadge from '@/data-display/badges/PBadge.vue';
-import type { Badge } from '@/data-display/badges/type';
-import { BADGE_SHAPE } from '@/data-display/badges/type';
+import PBadge from '@/data-display/badge/PBadge.vue';
+import type { BadgeProps } from '@/data-display/badge/type';
+import { BADGE_SHAPE } from '@/data-display/badge/type';
 import type { BadgeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/badge/type';
 import type { BadgeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
@@ -35,7 +35,7 @@ export default {
     },
     render(h, { props }: {props: BadgeDynamicFieldProps}) {
         const options: BadgeOptions = props.options;
-        const badgeProps = {} as Badge;
+        const badgeProps = {} as BadgeProps;
 
         if (options.shape) {
             badgeProps.shape = BADGE_SHAPE[options.shape];

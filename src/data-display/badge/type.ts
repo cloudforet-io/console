@@ -48,10 +48,10 @@ export const BADGE_STYLE_OUTLINE = Object.freeze({
     indigo: 'indigo',
 });
 
-export type BadgeStyleType = keyof typeof BADGE_STYLE;
-export type BadgeShape = keyof typeof BADGE_SHAPE;
+export type BadgeStyleType = typeof BADGE_STYLE[keyof typeof BADGE_STYLE];
+export type BadgeShape = typeof BADGE_SHAPE[keyof typeof BADGE_SHAPE];
 
-export interface Badge {
+export interface BadgeProps {
     styleType: BadgeStyleType;
     textColor?: string;
     backgroundColor?: string;
