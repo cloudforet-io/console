@@ -4,6 +4,7 @@ on:
     paths-ignore:
       - '.github/**'
       - 'deploy/helm/**'
+      - 'skaffold.template.yaml'
     branches:
       - master
 

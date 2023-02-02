@@ -32,3 +32,6 @@ coverage/
 
 # Assets
 src/assets
+
+# Skaffold
+skaffold.yaml
