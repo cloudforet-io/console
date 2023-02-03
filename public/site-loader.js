@@ -4,7 +4,7 @@ lottie.loadAnimation({
     renderer: 'svg',
     loop: true,
     autoplay: true,
-    path: 'lottie_initializing.json', // the path to the animation json
+    path: 'lottiefiles/lottie_initializing.json', // the path to the animation json
 });
 
 if ('serviceWorker' in navigator) {

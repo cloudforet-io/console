@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Fragment from 'vue-fragment';
 
+import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
 import SpaceDesignSystem from '@spaceone/design-system';
 import { PiniaVuePlugin, createPinia } from 'pinia';
 import PortalVue from 'portal-vue';
@@ -28,6 +29,7 @@ Vue.use(PiniaVuePlugin);
 
 directive(Vue);
 
+Vue.use(LottieVuePlayer);
 Vue.use(SpaceDesignSystem, { vueI18n: i18n });
 
 /** ********** SET VUE CONFIG ************** */

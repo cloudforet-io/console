@@ -479,9 +479,6 @@ export default defineComponent<Props>({
                 margin-top: 0.5rem;
                 margin-bottom: 1rem;
             }
-            .p-lottie {
-                margin-bottom: 1rem;
-            }
         }
     }
     iframe {

@@ -52,11 +52,11 @@
                     {{ getTimezoneHours(value.hours) }}
                 </span>
                 <span v-else>
-                    <p-lottie class="inline-block mr-1"
-                              style="display: inline-block;"
-                              name="lottie_interval"
-                              auto
-                              :size="1"
+                    <p-i class="inline-block mr-1"
+                         name="ic_setting"
+                         animation="spin"
+                         width="1rem"
+                         height="1rem"
                     />
                     <span>{{ intervalFormatter(value.interval) }}</span>
                 </span>
@@ -99,7 +99,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PLottie, PPanelTop,
+    PButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PPanelTop,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -124,7 +124,6 @@ import EditScheduleModal from '@/services/asset-inventory/collector/modules/Edit
 export default {
     name: 'CollectorSchedules',
     components: {
-        PLottie,
         PTableCheckModal,
         PSelectDropdown,
         PToolboxTable,

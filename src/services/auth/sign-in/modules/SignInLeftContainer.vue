@@ -8,12 +8,11 @@
                 v-if="signInImage"
                 :src="signInImage"
             >
-            <p-lottie
-                v-else
-                :name="isDomainOwner ? 'lottie_planet_signin' : 'lottie_floating-astronaut_signin'"
-                auto
-                width="100%"
-                height="80%"
+            <lottie-vue-player v-else
+                               autoplay
+                               loop
+                               :src="isDomainOwner ? '/lottiefiles/lottie_planet_signin.json' : '/lottiefiles/lottie_floating-astronaut_signin.json'"
+                               :style="{ height: '100%', backgroundColor: 'transparent' }"
             />
         </div>
         <div class="version">
@@ -38,16 +37,13 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import {
-    PLottie, PBadge,
-} from '@spaceone/design-system';
+import { PBadge } from '@spaceone/design-system';
 
 import config from '@/lib/config';
 
 export default {
     name: 'SignInLeftContainer',
     components: {
-        PLottie,
         PBadge,
     },
     props: {
