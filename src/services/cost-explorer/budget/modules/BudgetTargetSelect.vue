@@ -10,7 +10,7 @@
                                  project-selectable
                                  project-group-selectable
                                  :multi-selectable="multiSelectable"
-                                 @update:selectedProjectIds="setForm('selectedTargets', $event)"
+                                 @update:selected-project-ids="setForm('selectedTargets', $event)"
                                  @close="validate('selectedTargets')"
         />
     </p-field-group>
