@@ -45,13 +45,15 @@ const getMockInfo = (config): MockInfo => ({
 export const initApiClient = async (store, config) => {
     const mockInfo = getMockInfo(config);
     const endpoints = mockInfo.all ? mockInfo.endpoints as string[] : getApiEndpoints(config);
-    const tokenApi = new TokenAPI(endpoints[0], getSessionTimeoutCallback(store));
-    await SpaceConnector.init(
-        endpoints,
-        tokenApi,
-        getMockInfo(config),
-        getAfterCallApiMap(store),
-    );
-    const isTokenAlive = SpaceConnector.isTokenAlive;
-    store.dispatch('user/setIsSessionExpired', !isTokenAlive);
+    if (endpoints) {
+        const tokenApi = new TokenAPI(endpoints[0], getSessionTimeoutCallback(store));
+        await SpaceConnector.init(
+            endpoints,
+            tokenApi,
+            getMockInfo(config),
+            getAfterCallApiMap(store),
+        );
+        const isTokenAlive = SpaceConnector.isTokenAlive;
+        store.dispatch('user/setIsSessionExpired', !isTokenAlive);
+    } else throw new Error('ApiClient init failed: There are no endpoints.');
 };
