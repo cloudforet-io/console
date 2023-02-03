@@ -107,7 +107,7 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
 };
 
 export const GNBMenuList: Getter<DisplayState, any> = (state, getters, rootState): DisplayMenu[] => {
-    const allowedDomainIds = config.get('DASHBOARD_ENABLED') ?? [];
+    const allowedDomainIds = Array.isArray(config.get('DASHBOARD_ENABLED')) ? config.get('DASHBOARD_ENABLED') : [];
     const currentDomainId = rootState.domain.domainId;
     const isDashboardMenuEnabled = allowedDomainIds.some((id) => id === currentDomainId);
     return getters.allMenuList.filter((d) => {
