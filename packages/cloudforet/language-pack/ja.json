@@ -1133,7 +1133,7 @@
 			"HELP_TEXT_CREATE": "カスタマダッシュボードを作成し、クラウドの利用状況を一目で確認できます。",
 			"LABEL_PRIVATE": "非公開",
 			"LABEL_PUBLIC": "公開",
-			"LABEL_SCOPE": "スコア",
+			"LABEL_SCOPE": "スコープ",
 			"LABEL_VIWERS": "公開可否",
 			"PROJECT": "プロジェクト",
 			"SINGLE_PROJECT": "個別プロジェクト",
