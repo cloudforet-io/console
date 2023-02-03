@@ -38,7 +38,7 @@ const dashboardsRoute: RouteConfig = {
                 {
                     path: 'create',
                     name: DASHBOARDS_ROUTE.CREATE._NAME,
-                    meta: { translationId: 'DASHBOARDS.CREATE.TITLE' },
+                    meta: { translationId: 'DASHBOARDS.CREATE.TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                     component: DashboardCreatePage,
                 },
                 {
@@ -60,6 +60,7 @@ const dashboardsRoute: RouteConfig = {
                             path: 'customize/:dashboardId?',
                             name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
                             meta: {
+                                accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
                                 breadcrumbs: ({ params }) => {
                                     const breadcrumbs: Breadcrumb[] = [
                                         {
@@ -108,6 +109,7 @@ const dashboardsRoute: RouteConfig = {
                             path: 'customize/:dashboardId?',
                             name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
                             meta: {
+                                accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
                                 breadcrumbs: ({ params }) => {
                                     const breadcrumbs: Breadcrumb[] = [
                                         {
