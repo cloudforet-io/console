@@ -1,10 +1,4 @@
 {
-  "CONSOLE_API": {
-    "ENDPOINT": "https://console.api.dev.spaceone.dev"
-  },
-  "CONSOLE_API_V2": {
-    "ENDPOINT": "https://console-v2.api.dev.spaceone.dev"
-  },
   "GTAG_ID": "DISABLED",
   "GTM_ID": "DISABLED",
   "DOMAIN_NAME": null,
