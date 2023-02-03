@@ -49,7 +49,6 @@ Selector labels
 */}}
 {{- define "spaceone.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "spaceone.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{/*
