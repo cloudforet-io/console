@@ -46,6 +46,8 @@ import {
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 import { find, isEqual } from 'lodash';
 
+import { store } from '@/store';
+
 import type { RawPagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
@@ -165,6 +167,10 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const allowedDomainIds = config.get('DASHBOARD_ENABLED') ?? [];
+        const currentDomainId = store.state.domain.domainId;
+        const isDashboardMenuEnabled = allowedDomainIds.some((id) => id === currentDomainId);
+
         const formState = reactive({
             menuItems: getPageAccessMenuList([{
                 id: 'all',
@@ -174,7 +180,7 @@ export default {
                 hideMenu: false,
             }]).filter((menu) => {
                 if (menu.id === MENU_ID.DASHBOARDS) {
-                    return config.get('DASHBOARD_ENABLED');
+                    return isDashboardMenuEnabled;
                 }
                 return true;
             }),
