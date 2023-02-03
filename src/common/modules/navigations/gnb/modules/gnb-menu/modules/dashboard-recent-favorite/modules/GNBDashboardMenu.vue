@@ -90,7 +90,7 @@ export default defineComponent({
                 { label: i18n.t('COMMON.GNB.RECENT.RECENT'), name: 'recent', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'favorite',
-            subMenuList: [
+            subMenuList: computed(() => [
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.VIEW_ALL'),
                     to: { name: DASHBOARDS_ROUTE.ALL._NAME },
@@ -101,7 +101,7 @@ export default defineComponent({
                     to: { name: DASHBOARDS_ROUTE.CREATE._NAME },
                     show: computed(() => !state.hasOnlyViewPermission),
                 },
-            ] as DisplayMenu[],
+            ] as DisplayMenu[]),
             isOverflown: false,
             dashboardList: computed<GNBDashboardMenuItem[]>(() => {
                 const dashboardList: GNBDashboardMenuItem[] = [];
