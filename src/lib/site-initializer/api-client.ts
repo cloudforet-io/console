@@ -45,7 +45,7 @@ const getMockInfo = (config): MockInfo => ({
 export const initApiClient = async (store, config) => {
     const mockInfo = getMockInfo(config);
     const endpoints = mockInfo.all ? mockInfo.endpoints as string[] : getApiEndpoints(config);
-    if (endpoints) {
+    if (endpoints && endpoints.length) {
         const tokenApi = new TokenAPI(endpoints[0], getSessionTimeoutCallback(store));
         await SpaceConnector.init(
             endpoints,
