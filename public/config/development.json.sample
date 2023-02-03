@@ -1,6 +1,9 @@
 {
   "CONSOLE_API": {
-    "ENDPOINT": "http://localhost:3000"
+    "ENDPOINT": "https://console.api.dev.spaceone.dev"
+  },
+  "CONSOLE_API_V2": {
+    "ENDPOINT": "https://console-v2.api.dev.spaceone.dev"
   },
   "GTAG_ID": "DISABLED",
   "DOMAIN_NAME": "spaceone",
