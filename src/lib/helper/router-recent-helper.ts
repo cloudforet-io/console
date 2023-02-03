@@ -12,7 +12,7 @@ import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     /* DASHBOARD */
-    if (to.name === DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME || to.name === DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME) {
+    if (to.name === DASHBOARDS_ROUTE.PROJECT?.DETAIL._NAME || to.name === DASHBOARDS_ROUTE.WORKSPACE?.DETAIL._NAME) {
         const dashboardId = to?.params?.dashboardId;
         if (!dashboardId) return undefined;
         return { itemType: RECENT_TYPE.DASHBOARD, itemId: dashboardId };
