@@ -47,9 +47,10 @@
                     <br><span class="time">{{ timeFormatter(item.created_at) }}</span>
                 </div>
                 <div class="right-part col-span-2">
-                    <p-lottie name="lottie_working"
-                              auto
-                              :size="1.5"
+                    <p-i name="ic_setting"
+                         animation="spin"
+                         width="1.5rem"
+                         height="1.5rem"
                     />
                 </div>
             </div>
@@ -73,7 +74,7 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PLottie, PSkeleton, PI } from '@spaceone/design-system';
+import { PSkeleton, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
@@ -120,7 +121,6 @@ export interface JobModel {
 export default {
     name: 'CollectingProgress',
     components: {
-        PLottie,
         WidgetLayout,
         PSkeleton,
         PI,

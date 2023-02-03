@@ -2,10 +2,10 @@
     <div class="wrap">
         <div class="error">
             <div class="error-contents">
-                <p-lottie class="flex items-center justify-center"
-                          name="lottie_floating-astronaut"
-                          auto
-                          :size="20"
+                <lottie-vue-player autoplay
+                                   loop
+                                   src="/lottiefiles/lottie_floating-astronaut.json"
+                                   :style="{ height: '20rem', width: '20rem', backgroundColor: 'transparent' }"
                 />
                 <p class="error-message">
                     {{ $t('COMMON.ERROR.NO_RESOURCE_MSG') }}
@@ -29,9 +29,7 @@ import {
 import type { RouteConfig } from 'vue-router';
 import type { Vue } from 'vue/types/vue';
 
-import {
-    PLottie, PButton,
-} from '@spaceone/design-system';
+import { PButton } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -41,7 +39,6 @@ export default {
     name: 'NoResourcePage',
     components: {
         PButton,
-        PLottie,
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
