@@ -106,11 +106,16 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
     return _allGnbMenuList;
 };
 
-export const GNBMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter((d) => {
-    if (d.id === MENU_ID.DASHBOARDS) {
-        return !d.hideOnGNB && !!config.get('DASHBOARD_ENABLED');
-    }
-    return !d.hideOnGNB;
-});
+export const GNBMenuList: Getter<DisplayState, any> = (state, getters, rootState): DisplayMenu[] => {
+    const allowedDomainIds = config.get('DASHBOARD_ENABLED') ?? [];
+    const currentDomainId = rootState.domain.domainId;
+    const isDashboardMenuEnabled = allowedDomainIds.some((id) => id === currentDomainId);
+    return getters.allMenuList.filter((d) => {
+        if (d.id === MENU_ID.DASHBOARDS) {
+            return isDashboardMenuEnabled && !d.hideOnGNB;
+        }
+        return !d.hideOnGNB;
+    });
+};
 
 export const siteMapMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter((d) => !d.hideOnSiteMap);
