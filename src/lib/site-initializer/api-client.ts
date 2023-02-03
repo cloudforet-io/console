@@ -35,7 +35,16 @@ const getSessionTimeoutCallback = (store) => () => {
     store.dispatch('user/setIsSessionExpired', true);
     store.dispatch('error/showSessionExpiredError');
 };
-const getApiEndpoints = (config) => [config.get('CONSOLE_API.ENDPOINT'), config.get('CONSOLE_API_V2.ENDPOINT')];
+const getApiEndpoints = (config) => {
+    const ENDPOINT_V1 = config.get('CONSOLE_API.ENDPOINT');
+    const ENDPOINT_V2 = config.get('CONSOLE_API_V2.ENDPOINT');
+    if (ENDPOINT_V1 && ENDPOINT_V2) {
+        return [ENDPOINT_V1, ENDPOINT_V2];
+    }
+    if (!ENDPOINT_V1) {
+        throw new Error('ApiClient init failed: There are no endpoint v1.');
+    } else throw new Error('ApiClient init failed: There are no endpoint v2.');
+};
 const getMockInfo = (config): MockInfo => ({
     endpoints: [config.get('MOCK.ENDPOINT')],
     all: config.get('MOCK.ALL'),
@@ -45,15 +54,13 @@ const getMockInfo = (config): MockInfo => ({
 export const initApiClient = async (store, config) => {
     const mockInfo = getMockInfo(config);
     const endpoints = mockInfo.all ? mockInfo.endpoints as string[] : getApiEndpoints(config);
-    if (endpoints && endpoints.length) {
-        const tokenApi = new TokenAPI(endpoints[0], getSessionTimeoutCallback(store));
-        await SpaceConnector.init(
-            endpoints,
-            tokenApi,
-            getMockInfo(config),
-            getAfterCallApiMap(store),
-        );
-        const isTokenAlive = SpaceConnector.isTokenAlive;
-        store.dispatch('user/setIsSessionExpired', !isTokenAlive);
-    } else throw new Error('ApiClient init failed: There are no endpoints.');
+    const tokenApi = new TokenAPI(endpoints[0], getSessionTimeoutCallback(store));
+    await SpaceConnector.init(
+        endpoints,
+        tokenApi,
+        getMockInfo(config),
+        getAfterCallApiMap(store),
+    );
+    const isTokenAlive = SpaceConnector.isTokenAlive;
+    store.dispatch('user/setIsSessionExpired', !isTokenAlive);
 };
