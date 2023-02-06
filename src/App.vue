@@ -3,21 +3,11 @@
          id="app"
     >
         <template v-if="$store.state.display.isInitialized">
-            <p-notice-alert group="noticeTopLeft"
-                            position="top left"
-            />
-            <p-notice-alert group="noticeTopRight"
-                            position="top right"
-            />
-            <p-notice-alert group="noticeBottomLeft"
-                            position="bottom left"
-            />
-            <p-notice-alert group="noticeBottomRight"
-                            position="bottom right"
-            />
-            <p-toast-alert group="toastTopCenter"
-                           position="top center"
-            />
+            <p-notice-alert group="noticeTopLeft" />
+            <p-notice-alert group="noticeTopRight" />
+            <p-notice-alert group="noticeBottomLeft" />
+            <p-notice-alert group="noticeBottomRight" />
+            <p-toast-alert group="toastTopCenter" />
             <top-notification />
             <template v-if="showGNB">
                 <g-n-b class="gnb" />
@@ -66,7 +56,7 @@
             </template>
             <router-view v-else />
             <p-icon-modal :visible="isExpired"
-                          emoji
+                          emoji="👋"
                           :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
                           :button-text="$t('COMMON.SESSION_MODAL.SIGNIN')"
                           button-type="primary"
