@@ -1,3 +1,10 @@
+# [2.0.0-beta.36](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.35...v2.0.0-beta.36) (2023-02-07)
+
+
+### Bug Fixes
+
+* **button:** fix click style bug ([#273](https://github.com/cloudforet-io/mirinae/issues/273)) ([74b8d0d](https://github.com/cloudforet-io/mirinae/commit/74b8d0d16806dc94d9c3c0832cf750a677d73510))
+
 # [2.0.0-beta.35](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.34...v2.0.0-beta.35) (2023-02-01)
 
 
