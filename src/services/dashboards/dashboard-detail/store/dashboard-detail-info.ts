@@ -1,5 +1,5 @@
 import type { ComputedRef, UnwrapRef } from 'vue';
-import {
+import Vue, {
     computed, reactive,
 } from 'vue';
 
@@ -218,7 +218,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     const deleteWidget = (widgetKey: string) => {
         state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widget_key !== widgetKey);
-        delete validationState.widgetValidMap[widgetKey];
+        Vue.delete(validationState.widgetValidMap, widgetKey);
     };
     const resetVariables = () => {
         const originProperties = { ...managedDashboardVariablesSchema.properties, ...originState.dashboardInfo.variables_schema.properties };
