@@ -1,27 +1,33 @@
 <template>
-    <router-link :to="to || {}" class="p-anchor" custom>
+    <router-link :to="props.to || {}"
+                 class="p-anchor"
+                 custom
+    >
         <template #default="{href: toHref, navigate}">
             <span>
-                <a ref="anchorRef" class="p-anchor"
-                   :class="{disabled, highlight, [size]: true}"
+                <a ref="anchorRef"
+                   class="p-anchor"
+                   :class="{disabled: props.disabled, highlight: props.highlight, [props.size]: true}"
                    :target="validateTarget()"
-                   :href="to ? (toHref || href ): href"
+                   :href="props.to ? (toHref || props.href ): props.href"
                    @click.stop="navigate"
                 >
-                    <p-i v-if="iconVisible && hasText && iconPosition === IconPosition.left"
-                         :name="iconName"
-                         height="1.1em" width="1.1em"
+                    <p-i v-if="props.hideIcon && hasText && props.iconPosition === IconPosition.left"
+                         :name="props.iconName"
+                         height="1.1em"
+                         width="1.1em"
                          color="inherit"
                          class="icon"
                     />
                     <span class="text">
                         <slot v-bind="{...$props}">
-                            {{ text }}
+                            {{ props.text }}
                         </slot>
                     </span>
-                    <p-i v-if="iconVisible && hasText && iconPosition === IconPosition.right"
-                         :name="iconName"
-                         height="1.1em" width="1.1em"
+                    <p-i v-if="props.hideIcon && hasText && props.iconPosition === IconPosition.right"
+                         :name="props.iconName"
+                         height="1.1em"
+                         width="1.1em"
                          color="inherit"
                          class="icon"
                     />
@@ -31,8 +37,8 @@
     </router-link>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+<script setup lang="ts">
+import { computed, ref } from 'vue';
 
 import type { Location } from 'vue-router';
 
@@ -40,11 +46,11 @@ import PI from '@/foundation/icons/PI.vue';
 import { AnchorSize, IconPosition } from '@/inputs/anchors/type';
 
 
-interface Props {
+interface AnchorProps {
   text?: string;
   size?: AnchorSize;
   iconPosition?: IconPosition;
-  iconVisible?: boolean;
+  hideIcon?: boolean;
   iconName?: string;
   href?: string;
   to?: Location;
@@ -52,74 +58,20 @@ interface Props {
   highlight?: boolean;
 }
 
-export default defineComponent<Props>({
-    name: 'PAnchor',
-    components: {
-        PI,
-    },
-    props: {
-        text: {
-            type: String,
-            default: '',
-        },
-        size: {
-            type: String,
-            default: AnchorSize.md,
-            validator(type: AnchorSize) {
-                return Object.values(AnchorSize).includes(type);
-            },
-        },
-        iconPosition: {
-            type: String,
-            default: IconPosition.right,
-            validator(type: IconPosition) {
-                return Object.values(IconPosition).includes(type);
-            },
-        },
-        iconVisible: {
-            type: Boolean,
-            default: true,
-        },
-        iconName: {
-            type: String,
-            default: 'ic_external-link',
-        },
-        href: {
-            type: String,
-            default: undefined,
-        },
-        to: {
-            type: Object,
-            default: undefined,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        highlight: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props: Props) {
-        const validateTarget = () => {
-            const {
-                disabled, iconName, iconVisible,
-            } = props;
-            if (disabled) return '_self';
-            if (iconName === 'ic_external-link' && iconVisible) return '_blank';
-            return '_self';
-        };
-        const anchorRef = ref<HTMLElement|null>(null);
-        const hasText = computed(() => !!anchorRef.value?.textContent);
-        return {
-            validateTarget,
-            anchorRef,
-            hasText,
-            IconPosition,
-        };
-    },
+const props = withDefaults(defineProps<AnchorProps>(), {
+    text: '',
+    size: AnchorSize.md,
+    iconPosition: IconPosition.right,
+    iconName: 'ic_external-link',
 });
+
+const validateTarget = () => {
+    if (props.disabled) return '_self';
+    if (props.iconName === 'ic_external-link' && props.hideIcon) return '_blank';
+    return '_self';
+};
+const anchorRef = ref<HTMLElement|null>(null);
+const hasText = computed(() => !!anchorRef.value?.textContent);
 </script>
 
 <style lang="postcss">

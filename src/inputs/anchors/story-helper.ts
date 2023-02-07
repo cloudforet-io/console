@@ -62,18 +62,18 @@ export const getAnchorsArgTypes = (): ArgTypes => ({
             options: [...Object.values(IconPosition)],
         },
     },
-    iconVisible: {
-        name: 'iconVisible',
+    hideIcon: {
+        name: 'hideIcon',
         type: { name: 'boolean' },
-        description: 'Whether or not the icon is displayed.',
-        defaultValue: true,
+        description: 'Whether or not hide icon.',
+        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
             },
             category: 'props',
             defaultValue: {
-                summary: true,
+                summary: false,
             },
         },
         control: {
