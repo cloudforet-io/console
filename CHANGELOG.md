@@ -1,3 +1,10 @@
+# [2.0.0-beta.37](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.36...v2.0.0-beta.37) (2023-02-07)
+
+
+### Features
+
+* **anchor:** change props from `iconVisible` to `hideIcon` ([#272](https://github.com/cloudforet-io/mirinae/issues/272)) ([9982fbd](https://github.com/cloudforet-io/mirinae/commit/9982fbd8786a66b6d83c5090c31b4d30279986a3))
+
 # [2.0.0-beta.36](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.35...v2.0.0-beta.36) (2023-02-07)
 
 
