@@ -31,8 +31,9 @@ export const load: Action<RegionReferenceState, any> = async ({ state, commit },
         const regions: RegionReferenceMap = {};
 
         response.results.forEach((regionInfo: any): void => {
-            regions[regionInfo.region_code] = {
-                key: regionInfo.region_code,
+            const regionKey = regionInfo.region_code === 'global' ? `${regionInfo.region_code}-${regionInfo.provider}` : regionInfo.region_code;
+            regions[regionKey] = {
+                key: regionKey,
                 label: `${regionInfo.name} | ${regionInfo.region_code}`,
                 name: regionInfo.name,
                 continent: RegionMap[regionInfo.tags.continent] || {},
