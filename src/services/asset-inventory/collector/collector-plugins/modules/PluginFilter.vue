@@ -18,7 +18,7 @@
         <!--                  class="filter" :class="{selected: checked}"-->
         <!--                  @click.stop="handleClickResourceText(resource)"-->
         <!--            >-->
-        <!--                <p-check-box :selected="resourceOptions[resource]" :value="true" @change="handleClickResourceText(resource)" />-->
+        <!--                <p-checkbox :selected="resourceOptions[resource]" :value="true" @change="handleClickResourceText(resource)" />-->
         <!--                {{ resource }}-->
         <!--            </span>-->
         <!--        </div>-->
@@ -33,7 +33,7 @@ import {
 
 import {
     PRadio,
-    // PCheckBox, PDivider
+    // PCheckbox, PDivider
 } from '@spaceone/design-system';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -42,7 +42,7 @@ export default {
     name: 'PluginFilter',
     components: {
         PRadio,
-        // PCheckBox,
+        // PCheckbox,
         // PDivider,
     },
     props: {

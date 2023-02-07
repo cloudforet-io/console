@@ -10,9 +10,9 @@
         <template #body>
             <div class="body-inner">
                 <p>{{ $t('MONITORING.ALERT.ALERT_LIST.UPDATE_ACKNOWLEDGE_MODAL.ASSIGN_TO_YOU') }}</p>
-                <p-check-box v-model="isAssignedToMe">
+                <p-checkbox v-model="isAssignedToMe">
                     <span> {{ $t('MONITORING.ALERT.ALERT_LIST.UPDATE_ACKNOWLEDGE_MODAL.ASSIGN_TO_ME_YES') }}</span>
-                </p-check-box>
+                </p-checkbox>
             </div>
         </template>
     </p-button-modal>
@@ -25,7 +25,7 @@ import {
     reactive, toRefs, watch,
 } from 'vue';
 
-import { PButtonModal, PCheckBox } from '@spaceone/design-system';
+import { PButtonModal, PCheckbox } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -44,7 +44,7 @@ export default {
     name: 'AlertAcknowledgeModalModal',
     components: {
         PButtonModal,
-        PCheckBox,
+        PCheckbox,
     },
     props: {
         visible: {

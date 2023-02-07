@@ -35,11 +35,11 @@
                              :key="`tags-${item.key}-${pIdx}`"
                              class="list-item"
                         >
-                            <p-check-box :selected="!item.disabled"
-                                         @change="handleChangeCheckBox(item, ...arguments)"
+                            <p-checkbox :selected="!item.disabled"
+                                        @change="handleChangeCheckBox(item, ...arguments)"
                             >
                                 {{ item.key }}
-                            </p-check-box>
+                            </p-checkbox>
                             <p-icon-button name="ic_trashcan"
                                            size="sm"
                                            @click="handleDeleteItem(item)"
@@ -67,7 +67,7 @@ import {
 } from 'vue';
 
 import {
-    PIconButton, PPopover, PButton, PSelectButton, PCheckBox,
+    PIconButton, PPopover, PButton, PSelectButton, PCheckbox,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
@@ -86,7 +86,7 @@ export default defineComponent({
         PPopover,
         PButton,
         PSelectButton,
-        PCheckBox,
+        PCheckbox,
     },
     props: {
         printMode: {

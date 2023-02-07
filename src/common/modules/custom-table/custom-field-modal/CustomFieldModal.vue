@@ -45,9 +45,9 @@
                         </div>
 
                         <header>
-                            <p-check-box :selected="isAllSelected"
-                                         :value="true"
-                                         @change="onChangeAllSelect"
+                            <p-checkbox :selected="isAllSelected"
+                                        :value="true"
+                                        @change="onChangeAllSelect"
                             />
                             <span class="text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_NAME') }}</span>
                         </header>
@@ -109,7 +109,7 @@ import {
 import draggable from 'vuedraggable';
 
 import {
-    PButton, PButtonModal, PCheckBox, PDataLoader, PSearch,
+    PButton, PButtonModal, PCheckbox, PDataLoader, PSearch,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 
@@ -163,7 +163,7 @@ export default defineComponent<Props>({
         PButtonModal,
         PSearch,
         PButton,
-        PCheckBox,
+        PCheckbox,
         PDataLoader,
         draggable,
     },

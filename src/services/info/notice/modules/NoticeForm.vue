@@ -72,12 +72,12 @@
             <div v-if="hasSystemRole || hasDomainRole"
                  class="notice-create-options-wrapper"
             >
-                <p-check-box v-model="isPinned">
+                <p-checkbox v-model="isPinned">
                     <span>{{ $t('INFO.NOTICE.FORM.PIN_NOTICE') }}</span>
-                </p-check-box>
-                <p-check-box v-model="isPopup">
+                </p-checkbox>
+                <p-checkbox v-model="isPopup">
                     <span>{{ $t('INFO.NOTICE.FORM.IN_POP_UP') }}</span>
-                </p-check-box>
+                </p-checkbox>
             </div>
         </p-pane-layout>
         <div class="notice-create-buttons-wrapper">
@@ -106,7 +106,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PFieldGroup, PTextInput, PRadio, PFilterableDropdown, PCheckBox, PButton,
+    PPaneLayout, PFieldGroup, PTextInput, PRadio, PFilterableDropdown, PCheckbox, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -143,7 +143,7 @@ export default {
         PTextInput,
         PRadio,
         PFilterableDropdown,
-        PCheckBox,
+        PCheckbox,
         PButton,
     },
     props: {

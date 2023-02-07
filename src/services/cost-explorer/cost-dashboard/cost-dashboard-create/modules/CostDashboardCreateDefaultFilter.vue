@@ -1,11 +1,11 @@
 <template>
     <fragment>
         <h3>{{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.FILTER') }}</h3>
-        <p-check-box v-model="includesFilter"
-                     :disabled="!isDashboardTemplate"
+        <p-checkbox v-model="includesFilter"
+                    :disabled="!isDashboardTemplate"
         >
             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.APPLIED_FILTER') }}
-        </p-check-box>
+        </p-checkbox>
         <p-button size="sm"
                   style-type="tertiary"
                   :disabled="!isDashboardTemplate"
@@ -25,7 +25,7 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PButton, PCheckBox,
+    PButton, PCheckbox,
 } from '@spaceone/design-system';
 import { has } from 'lodash';
 
@@ -36,7 +36,7 @@ export default {
     name: 'CostDashboardCreateDefaultFilter',
     components: {
         ViewFilterModal,
-        PCheckBox,
+        PCheckbox,
         PButton,
     },
 

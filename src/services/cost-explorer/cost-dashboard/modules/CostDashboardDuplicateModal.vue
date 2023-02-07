@@ -18,9 +18,9 @@
                               @update:value="setForm('name', $event)"
                 />
             </p-field-group>
-            <p-check-box v-model="includesFilter">
+            <p-checkbox v-model="includesFilter">
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.APPLIED_FILTER') }}
-            </p-check-box>
+            </p-checkbox>
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.DASHBOARD.DASHBOARD_VISIBILITY')"
                            :invalid="invalidState.visibility"
                            :invalid-text="invalidTexts.visibility"
@@ -50,7 +50,7 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PCheckBox, PFieldGroup, PRadio, PTextInput,
+    PButtonModal, PCheckbox, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -96,7 +96,7 @@ export default defineComponent<Props>({
         PRadio,
         PFieldGroup,
         PTextInput,
-        PCheckBox,
+        PCheckbox,
     },
     model: {
         prop: 'visible',

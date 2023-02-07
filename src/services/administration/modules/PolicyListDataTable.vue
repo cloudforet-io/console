@@ -45,7 +45,7 @@
             <template #col-policy_id-format="{ value, item }">
                 <template v-if="value">
                     <p-anchor
-                        :icon-visible="anchorIconVisible"
+                        :hide-icon="!anchorIconVisible"
                         highlight
                         :to="{
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,

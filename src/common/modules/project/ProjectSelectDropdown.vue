@@ -80,7 +80,7 @@ import {
 } from 'vue';
 
 import {
-    PCheckBox, PI, PRadio, PFilterableDropdown, PSelectDropdown, PTag, PTree, PButton,
+    PCheckbox, PI, PRadio, PFilterableDropdown, PSelectDropdown, PTag, PTree, PButton,
 } from '@spaceone/design-system';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 
@@ -107,7 +107,7 @@ export default {
         PTag,
         PTree,
         PRadio,
-        PCheckBox,
+        PCheckbox,
         PI,
         PButton,
     },
@@ -174,7 +174,7 @@ export default {
                 },
             }),
             selectComponent: computed(() => {
-                if (props.multiSelectable) return PCheckBox;
+                if (props.multiSelectable) return PCheckbox;
                 return PRadio;
             }),
             contextKey: Math.floor(Math.random() * Date.now()),

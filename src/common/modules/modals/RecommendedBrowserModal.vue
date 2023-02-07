@@ -27,9 +27,9 @@
         </template>
         <template #footer-extra>
             <div>
-                <p-check-box v-model="isSelected">
+                <p-checkbox v-model="isSelected">
                     {{ $t('APP.MODAL.RECOMMEND_BROWSER.DO_NOT_SHOW_AGAIN') }}
-                </p-check-box>
+                </p-checkbox>
             </div>
         </template>
         <template #confirm-button>
@@ -40,7 +40,7 @@
 <script lang="ts">
 import { reactive, toRefs } from 'vue';
 
-import { PButtonModal, PCheckBox } from '@spaceone/design-system';
+import { PButtonModal, PCheckbox } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -53,7 +53,7 @@ export default {
     name: 'RecommendedBrowserModal',
     components: {
         PButtonModal,
-        PCheckBox,
+        PCheckbox,
     },
     setup() {
         const state = reactive({

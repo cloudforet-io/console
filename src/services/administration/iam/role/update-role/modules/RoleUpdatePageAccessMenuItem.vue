@@ -22,18 +22,18 @@
         <div class="right-part"
              :class="isSubMenu ? 'sub-menu' : 'menu'"
         >
-            <p-check-box :selected="menu.isViewed"
-                         :disabled="menu.isManaged"
-                         class="pr-6"
-                         @change="handleChangeView"
+            <p-checkbox :selected="menu.isViewed"
+                        :disabled="menu.isManaged"
+                        class="pr-6"
+                        @change="handleChangeView"
             >
                 <span>{{ $t('IAM.ROLE.FORM.VIEW') }}</span>
-            </p-check-box>
-            <p-check-box :selected="menu.isManaged"
-                         @change="handleChangeManage"
+            </p-checkbox>
+            <p-checkbox :selected="menu.isManaged"
+                        @change="handleChangeManage"
             >
                 <span>Manage</span>
-            </p-check-box>
+            </p-checkbox>
             <p-tooltip v-if="tooltipText"
                        class="help-icon"
                        :contents="tooltipText"
@@ -56,7 +56,7 @@ import {
 } from 'vue';
 
 import {
-    PCheckBox, PIconButton, PI, PTooltip,
+    PCheckbox, PIconButton, PI, PTooltip,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -67,7 +67,7 @@ import type { PageAccessMenuItem } from '@/services/administration/iam/role/type
 export default {
     name: 'RoleUpdatePageAccessMenuItem',
     components: {
-        PCheckBox,
+        PCheckbox,
         PIconButton,
         PI,
         PTooltip,
