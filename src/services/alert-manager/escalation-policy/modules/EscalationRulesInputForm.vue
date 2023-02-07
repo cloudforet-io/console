@@ -54,6 +54,7 @@
                 <template #minute>
                     <p-field-group required
                                    :invalid="rule.escalate_minutes < 0"
+                                   class="rule-input-wrapper"
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model.number="rule.escalate_minutes"
@@ -402,6 +403,10 @@ export default {
                 input {
                     width: 100%;
                 }
+            }
+
+            .rule-input-wrapper {
+                margin-bottom: 0;
             }
         }
         .col-mobile-input {
