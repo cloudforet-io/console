@@ -1,5 +1,5 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import PCheckBox from './PCheckbox.vue';
+import PCheckbox from './PCheckbox.vue';
 import { getCurrentInstance, reactive, toRefs } from 'vue';
 import { makeOptionalProxy } from '@/utils/composition-helpers';
 import { getCheckboxArgTypes } from '@/inputs/checkbox/story-helper';
@@ -15,10 +15,10 @@ import { getCheckboxArgTypes } from '@/inputs/checkbox/story-helper';
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
-    components: { PCheckBox },
+    components: { PCheckbox },
     template: `
         <div class="h-full w-full overflow p-8">
-            <p-check-box :value="value"
+            <p-checkbox :value="value"
                         v-model="proxySelected"
                         :disabled="disabled"
                         :predicate="predicate"
@@ -29,7 +29,7 @@ export const Template = (args, { argTypes }) => ({
                 <template #icon>
                     <span v-if="iconSlot" v-html="iconSlot"/>
                 </template>
-            </p-check-box>
+            </p-checkbox>
         </div>
     `,
     setup(props) {
@@ -53,13 +53,13 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Basic">
         {{
-            components: { PCheckBox },
+            components: { PCheckbox },
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-check-box v-for="value in values" v-model="selected" :value="value" :key="value">
+                <p-checkbox v-for="value in values" v-model="selected" :value="value" :key="value">
                     This is checkbox for {{value}}
-                </p-check-box>
+                </p-checkbox>
             </div>
             selected : {{selected}}
         </div>
@@ -85,13 +85,13 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Simple Boolean">
         {{
-            components: { PCheckBox },
+            components: { PCheckbox },
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-check-box v-model="selected">
+                <p-checkbox v-model="selected">
                     simple boolean checkbox
-                </p-check-box>
+                </p-checkbox>
             </div>
             selected : {{selected}}
         </div>
@@ -116,16 +116,16 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Disabled">
         {{
-            components: { PCheckBox },
+            components: { PCheckbox },
             template: `
         <div>
             <div class="flex flex-col mb-8">
-                <p-check-box v-model="notSelected" disabled>
+                <p-checkbox v-model="notSelected" disabled>
                     you can't select disabled checkbox.
-                </p-check-box>
-                <p-check-box v-model="selected" disabled>
+                </p-checkbox>
+                <p-checkbox v-model="selected" disabled>
                     checked disabled
-                </p-check-box>
+                </p-checkbox>
             </div>
         </div>
     `,
@@ -150,18 +150,18 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Invalid">
         {{
-            components: { PCheckBox },
+            components: { PCheckbox },
             template: `
          <div>
             <div class="flex flex-col mb-8">
                 <p class="mb-4">At least, one item must be selected.</p>
-                <p-check-box v-for="value in values" :key="value"
+                <p-checkbox v-for="value in values" :key="value"
                             v-model="selected"
                             :value="value"
                             :invalid="selected.length === 0"
 >
                     {{value}}
-                </p-check-box>
+                </p-checkbox>
             </div>
             selected : {{selected}}
         </div>
@@ -187,17 +187,17 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Advanced">
         {{
-            components: { PCheckBox },
+            components: { PCheckbox },
             template: `
          <div>
             <div class="flex flex-col mb-8">
-                <p-check-box v-for="value in values" :key="value.key"
+                <p-checkbox v-for="value in values" :key="value.key"
                             v-model="selected"
                             :value="value"
                             :predicate="predicate"
 >
                     {{value.name}}
-                </p-check-box>
+                </p-checkbox>
             </div>
             selected : <pre>{{selected}}</pre>
         </div>
