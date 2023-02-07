@@ -167,7 +167,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const allowedDomainIds = config.get('DASHBOARD_ENABLED') ?? [];
+        const allowedDomainIds = Array.isArray(config.get('DASHBOARD_ENABLED')) ? config.get('DASHBOARD_ENABLED') : [];
         const currentDomainId = store.state.domain.domainId;
         const isDashboardMenuEnabled = allowedDomainIds.some((id) => id === currentDomainId);
 
