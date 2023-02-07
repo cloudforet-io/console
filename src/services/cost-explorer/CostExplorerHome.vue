@@ -17,7 +17,6 @@
                 <br>
                 <p-anchor text="More information"
                           icon-position="right"
-                          icon-visible
                           icon-name="ic_external-link"
                           :href="SERVICE_CONTENTS.topic.link"
                           highlight
@@ -44,7 +43,6 @@
                     </p>
                     <p-anchor :text="submenu.link_text"
                               icon-position="right"
-                              icon-visible
                               icon-name="ic_external-link"
                               highlight
                               :href="submenu.link"

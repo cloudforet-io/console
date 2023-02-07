@@ -7,7 +7,7 @@
                      height="1em"
                 />
                 <p-anchor class="title"
-                          :icon-visible="false"
+                          hide-icon
                           :to="{ name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME, params: { id: item.alert_id } }"
                 >
                     <span v-tooltip.bottom="item.title">{{ item.title }}</span>
@@ -25,7 +25,7 @@
                           v-tooltip.bottom="projectNameFormatter(item.project_id)"
                           class="project-link"
                           :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
-                          :icon-visible="false"
+                          hide-icon
                 >
                     {{ projectNameFormatter(item.project_id) }}
                 </p-anchor>

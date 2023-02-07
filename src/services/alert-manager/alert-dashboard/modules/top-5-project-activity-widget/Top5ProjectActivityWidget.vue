@@ -35,7 +35,7 @@
                      class="table-row"
                 >
                     <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
-                              :icon-visible="false"
+                              hide-icon
                               size="sm"
                               class="col-name"
                     >
