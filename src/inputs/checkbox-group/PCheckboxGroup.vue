@@ -1,5 +1,7 @@
 <template>
-    <div class="p-checkbox-group" :class="direction">
+    <div class="p-checkbox-group"
+         :class="direction"
+    >
         <slot name="default" />
     </div>
 </template>

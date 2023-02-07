@@ -202,7 +202,7 @@ import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { useProxyValue } from '@/hooks';
 import { copyAnyData } from '@/utils/helpers';
 
-const PCheckBox = () => import('@/inputs/checkbox/PCheckBox.vue');
+const PCheckBox = () => import('@/inputs/checkbox/PCheckbox.vue');
 const PTextBeautifier = () => import('@/data-display/text-beautifier/PTextBeautifier.vue');
 const PRadio = () => import('@/inputs/radio/PRadio.vue');
 const PI = () => import('@/foundation/icons/PI.vue');
