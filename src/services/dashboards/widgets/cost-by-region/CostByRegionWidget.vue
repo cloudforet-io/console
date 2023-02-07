@@ -366,5 +366,8 @@ defineExpose<WidgetExpose<FullData>>({
             @apply col-span-7;
         }
     }
+    &.full {
+        min-height: 29rem;
+    }
 }
 </style>
