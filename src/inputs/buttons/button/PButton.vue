@@ -145,7 +145,7 @@ export default defineComponent<ButtonProps>({
         background-color: $default-color;
         color: $text-color;
         border-color: $border-color;
-        &:not(.readonly):hover {
+        &:not(.readonly):not(.disabled):hover {
             background-color: $hover-color;
             &:active {
                 background-color: $active-color;
@@ -154,7 +154,7 @@ export default defineComponent<ButtonProps>({
         &.disabled {
             @apply bg-gray-200 text-gray-400 border-transparent;
             cursor: not-allowed;
-            &:hover, &:active {
+            &:hover, &:active, &:focus {
                 @apply bg-gray-200;
             }
         }
