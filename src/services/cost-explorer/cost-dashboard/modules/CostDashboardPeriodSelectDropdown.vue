@@ -3,12 +3,12 @@
         <div v-if="!printMode"
              class="fix-date-box"
         >
-            <p-check-box :selected="isFixedTypeSelected"
-                         :disabled="disableFixDate"
-                         @change="handleSelectedFixDate"
+            <p-checkbox :selected="isFixedTypeSelected"
+                        :disabled="disableFixDate"
+                        @change="handleSelectedFixDate"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FIX_DATE') }}
-            </p-check-box>
+            </p-checkbox>
             <p-tooltip class="fix-date-tooltip"
                        :contents="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FIXED_DATE_TOOLTIP')"
                        :position="'bottom'"
@@ -55,7 +55,7 @@ import {
 } from 'vue';
 
 import {
-    PBadge, PSelectDropdown, PCheckBox, PI, PTooltip,
+    PBadge, PSelectDropdown, PCheckbox, PI, PTooltip,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
@@ -86,7 +86,7 @@ export default {
         CurrencySelectDropdown,
         PSelectDropdown,
         PBadge,
-        PCheckBox,
+        PCheckbox,
         PI,
         PTooltip,
     },

@@ -72,9 +72,9 @@
                 >
                     <template #header>
                         <div class="mobile-header">
-                            <p-check-box v-model="isAssignedToMe">
+                            <p-checkbox v-model="isAssignedToMe">
                                 <span>{{ $t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME') }}</span>
-                            </p-check-box>
+                            </p-checkbox>
                             <p-text-pagination
                                 :this-page.sync="thisPage"
                                 :all-page="allPage"
@@ -112,7 +112,7 @@ import {
 } from 'vue';
 
 import {
-    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckBox, PIconButton, PI,
+    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckbox, PIconButton, PI,
 } from '@spaceone/design-system';
 import { find, sum } from 'lodash';
 
@@ -158,7 +158,7 @@ export default {
         PSelectStatus,
         PTextPagination,
         PSelectButton,
-        PCheckBox,
+        PCheckbox,
         PIconButton,
         PI,
     },

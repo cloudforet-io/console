@@ -34,12 +34,12 @@
                     </template>
                 </p-tab>
                 <div class="no-more">
-                    <p-check-box v-model="noMore"
-                                 :value="true"
-                                 @change="onChangeNoMore"
+                    <p-checkbox v-model="noMore"
+                                :value="true"
+                                @change="onChangeNoMore"
                     >
                         {{ $t('COMMON.HANDBOOK_BUTTON.DONT_DISPLAY') }}
-                    </p-check-box>
+                    </p-checkbox>
                 </div>
             </div>
         </portal>
@@ -53,7 +53,7 @@ import {
 } from 'vue';
 
 import {
-    PI, PCheckBox, PTab,
+    PI, PCheckbox, PTab,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -63,7 +63,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 export default defineComponent({
     name: 'HandbookButton',
     components: {
-        PI, PCheckBox, PTab,
+        PI, PCheckbox, PTab,
     },
     props: {
         tabs: {

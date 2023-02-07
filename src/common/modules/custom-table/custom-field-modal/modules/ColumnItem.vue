@@ -4,8 +4,8 @@
           class="column-item"
           :class="{'draggable-item' :proxySelectedKeys.includes(item.key)}"
     >
-        <p-check-box v-model="proxySelectedKeys"
-                     :value="item.key"
+        <p-checkbox v-model="proxySelectedKeys"
+                    :value="item.key"
         >
             <p-text-highlighting :text="item.name"
                                  :term="searchText"
@@ -14,7 +14,7 @@
             <span v-if="item.options && item.options.field_description"
                   class="ml-1 text-gray-400"
             >{{ item.options.field_description }}</span>
-        </p-check-box>
+        </p-checkbox>
         <p-i name="ic_drag-handle"
              width="1rem"
              height="1rem"
@@ -32,7 +32,7 @@ import {
 } from 'vue';
 
 import {
-    PCheckBox, PI, PTextHighlighting, getTextHighlightRegex,
+    PCheckbox, PI, PTextHighlighting, getTextHighlightRegex,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 
@@ -48,7 +48,7 @@ export default defineComponent<Props>({
     name: 'ColumnItem',
     components: {
         PI,
-        PCheckBox,
+        PCheckbox,
         PTextHighlighting,
     },
     model: {

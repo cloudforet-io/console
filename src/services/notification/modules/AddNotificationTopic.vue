@@ -18,15 +18,15 @@
                 <h5 class="setting">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
                 </h5>
-                <p-check-box v-for="item in TOPIC_LIST"
-                             :key="item.value"
-                             v-model="selectedTopic"
-                             :value="item.value"
-                             :invalid="!isTopicValid"
-                             @change="onChangeTopic"
+                <p-checkbox v-for="item in TOPIC_LIST"
+                            :key="item.value"
+                            v-model="selectedTopic"
+                            :value="item.value"
+                            :invalid="!isTopicValid"
+                            @change="onChangeTopic"
                 >
                     <span class="topic-label">{{ item.label }}</span>
-                </p-check-box>
+                </p-checkbox>
             </div>
         </article>
         <p v-if="!isTopicValid"
@@ -43,7 +43,7 @@ import {
     computed, reactive, toRefs,
 } from 'vue';
 
-import { PRadio, PCheckBox } from '@spaceone/design-system';
+import { PRadio, PCheckbox } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -56,7 +56,7 @@ export default {
     name: 'AddNotificationTopic',
     components: {
         PRadio,
-        PCheckBox,
+        PCheckbox,
     },
     props: {
         topic: {

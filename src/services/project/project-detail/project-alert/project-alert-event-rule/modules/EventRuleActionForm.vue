@@ -100,12 +100,12 @@
                 </tags-input-group>
             </div>
         </div>
-        <p-check-box v-model="proxyOptions.stop_processing"
-                     :value="true"
-                     class="stop-processing-input"
+        <p-checkbox v-model="proxyOptions.stop_processing"
+                    :value="true"
+                    class="stop-processing-input"
         >
             {{ $t('PROJECT.EVENT_RULE.THEN_STOP_PROCESSING') }}
-        </p-check-box>
+        </p-checkbox>
     </section>
 </template>
 
@@ -115,7 +115,7 @@ import {
 } from 'vue';
 
 import {
-    PToggleButton, PRadio, PButton, PCheckBox, PSelectDropdown, PFilterableDropdown,
+    PToggleButton, PRadio, PButton, PCheckbox, PSelectDropdown, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -143,7 +143,7 @@ export default {
         PToggleButton,
         PRadio,
         PButton,
-        PCheckBox,
+        PCheckbox,
         PSelectDropdown,
         PFilterableDropdown,
     },

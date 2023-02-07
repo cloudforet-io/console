@@ -32,13 +32,13 @@
             >
                 {{ item.label }}
             </p-select-button>
-            <p-check-box :value="ASSIGNED_STATE.ASSIGNED_TO_ME"
-                         :selected="selectedAssigned"
-                         class="only-mobile"
-                         @change="onSelectAssignedCheckbox"
+            <p-checkbox :value="ASSIGNED_STATE.ASSIGNED_TO_ME"
+                        :selected="selectedAssigned"
+                        class="only-mobile"
+                        @change="onSelectAssignedCheckbox"
             >
                 <span>{{ $t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME') }}</span>
-            </p-check-box>
+            </p-checkbox>
         </div>
     </div>
 </template>
@@ -48,7 +48,7 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import { PCheckBox, PSelectButton, PSelectStatus } from '@spaceone/design-system';
+import { PCheckbox, PSelectButton, PSelectStatus } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -62,7 +62,7 @@ export default {
     components: {
         PSelectStatus,
         PSelectButton,
-        PCheckBox,
+        PCheckbox,
 
     },
     props: {
