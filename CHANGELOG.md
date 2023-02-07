@@ -1,3 +1,10 @@
+# [2.0.0-beta.38](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.37...v2.0.0-beta.38) (2023-02-07)
+
+
+### Features
+
+* **checkbox:** change component name from `PCheckBox` to `PCheckbox` ([#275](https://github.com/cloudforet-io/mirinae/issues/275)) ([3bc963c](https://github.com/cloudforet-io/mirinae/commit/3bc963c0b2f1d3d54b87463473fb902c04820b44))
+
 # [2.0.0-beta.37](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.36...v2.0.0-beta.37) (2023-02-07)
 
 
