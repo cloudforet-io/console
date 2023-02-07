@@ -27,7 +27,7 @@
                         />
                     </div>
                     <text-highlighting class="region-code"
-                                       :text="item.continentLabel"
+                                       :text="item.name"
                                        :term="searchTerm"
                                        style-type="secondary"
                     />
