@@ -65,7 +65,7 @@
                     {{ $t('DASHBOARDS.CUSTOMIZE.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary"
-                          :disabled="!dashboardDetailValidationState.isWidgetLayoutValid"
+                          :disabled="!dashboardDetailValidationState.isWidgetLayoutValid || !dashboardDetailValidationState.isNameValid"
                           :loading="loading"
                           @click="handleClickSaveButton"
                 >
