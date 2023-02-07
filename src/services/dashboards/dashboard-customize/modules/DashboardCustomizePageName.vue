@@ -78,6 +78,7 @@ const emit = defineEmits<{(e: string, value: string): void}>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailValidationState = dashboardDetailStore.validationState;
 
 const state = reactive({
     name: useProxyValue('name', props, emit),
@@ -142,6 +143,10 @@ const handleEnter = () => {
 watch(() => props.name, (d) => {
     // for creating dashboard
     if (!d) setForm('nameInput', '');
+}, { immediate: true });
+
+watch(() => invalidState.nameInput, (invalid) => {
+    dashboardDetailValidationState.isNameValid = !invalid;
 }, { immediate: true });
 
 (async () => {
