@@ -21,7 +21,7 @@ export const Template = (args, { argTypes }) => ({
             :text="text"
             :size="size"
             :icon-position="iconPosition"
-            :icon-visible="iconVisible"
+            :hide-icon="hideIcon"
             :icon-name="iconName"
             :href="href"
             :to="to"
@@ -58,7 +58,7 @@ Opens as a new tab only if you use the ic_external-link icon.
             template: `
             <div class="grid gap-6">
                 <p-anchor href="https://www.google.com">This is <strong>default</strong> anchor with default slot.</p-anchor>
-                <p-anchor text="This is a default anchor with text props." :icon-visible="false" href="https://www.google.com" />
+                <p-anchor text="This is a default anchor with text props." :hide-icon="true" href="https://www.google.com" />
             </div>
     `,
         }}

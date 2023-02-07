@@ -41,7 +41,7 @@ interface CheckboxProps extends SelectProps {
 }
 
 export default defineComponent<CheckboxProps>({
-    name: 'PCheckBox',
+    name: 'PCheckbox',
     components: { PI },
     model: {
         prop: 'selected',

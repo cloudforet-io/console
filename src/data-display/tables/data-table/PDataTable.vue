@@ -24,9 +24,9 @@
                                     :rowspan="numOfFieldRows"
                                     class="all-select"
                                 >
-                                    <p-check-box v-if="multiSelect"
-                                                 v-model="allState"
-                                                 @change="onSelectAllToggle"
+                                    <p-checkbox v-if="multiSelect"
+                                                v-model="allState"
+                                                @change="onSelectAllToggle"
                                     />
                                 </th>
                                 <th v-for="(field, fieldColIndex) in fieldRow"
@@ -125,10 +125,10 @@
                                 class="select-checkbox"
                                 @click.stop.prevent="onSelectClick"
                             >
-                                <p-check-box v-if="multiSelect"
-                                             v-model="proxyState.proxySelectIndex"
-                                             :disabled="getRowSelectable ? getRowSelectable(item, rowIndex): false"
-                                             :value="rowIndex"
+                                <p-checkbox v-if="multiSelect"
+                                            v-model="proxyState.proxySelectIndex"
+                                            :disabled="getRowSelectable ? getRowSelectable(item, rowIndex): false"
+                                            :value="rowIndex"
                                 />
                                 <p-radio v-else
                                          :selected="proxyState.proxySelectIndex[0]"
@@ -202,7 +202,7 @@ import PSpinner from '@/feedbacks/loading/spinner/PSpinner.vue';
 import { useProxyValue } from '@/hooks';
 import { copyAnyData } from '@/utils/helpers';
 
-const PCheckBox = () => import('@/inputs/checkbox/PCheckbox.vue');
+const PCheckbox = () => import('@/inputs/checkbox/PCheckbox.vue');
 const PTextBeautifier = () => import('@/data-display/text-beautifier/PTextBeautifier.vue');
 const PRadio = () => import('@/inputs/radio/PRadio.vue');
 const PI = () => import('@/foundation/icons/PI.vue');
@@ -218,7 +218,7 @@ export default defineComponent<DataTableProps>({
         PSpinner,
         PTextBeautifier,
         PI,
-        PCheckBox,
+        PCheckbox,
         PCopyButton,
         PRadio,
     },
