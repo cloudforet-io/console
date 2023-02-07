@@ -1,3 +1,10 @@
+# [2.0.0-beta.39](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.38...v2.0.0-beta.39) (2023-02-07)
+
+
+### Bug Fixes
+
+* **anchor:** use right props in story ([48c055e](https://github.com/cloudforet-io/mirinae/commit/48c055ef0b2442e5aafd9de3e5c736dc4d7ab1bb))
+
 # [2.0.0-beta.38](https://github.com/cloudforet-io/mirinae/compare/v2.0.0-beta.37...v2.0.0-beta.38) (2023-02-07)
 
 
