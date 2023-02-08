@@ -218,7 +218,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     const deleteWidget = (widgetKey: string) => {
         state.dashboardWidgetInfoList = state.dashboardWidgetInfoList.filter((info) => info.widget_key !== widgetKey);
-        delete validationState.widgetValidMap[widgetKey];
+        const _widgetValidMap = { ...validationState.widgetValidMap };
+        delete _widgetValidMap[widgetKey];
+        validationState.widgetValidMap = _widgetValidMap;
     };
     const resetVariables = () => {
         const originProperties = { ...managedDashboardVariablesSchema.properties, ...originState.dashboardInfo.variables_schema.properties };
