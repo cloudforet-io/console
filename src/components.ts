@@ -1,4 +1,3 @@
-export { default as PBackToTopButton } from './navigation/scrolls/back-to-top-button/PBackToTopButton.vue';
 export { default as PBadge } from './data-display/badge/PBadge.vue';
 export { default as PButton } from './inputs/buttons/button/PButton.vue';
 export { default as PTextButton } from './inputs/buttons/text-button/PTextButton.vue';
