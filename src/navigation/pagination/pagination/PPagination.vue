@@ -39,7 +39,7 @@ import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 export default {
-    name: 'PBottomPagination',
+    name: 'PPagination',
     components: { PIconButton },
     props: {
         thisPage: {
@@ -57,18 +57,6 @@ export default {
             type: Number,
             required: true,
         },
-        // pageStart: {
-        //     type: Number,
-        //     validator(value) {
-        //         return value > 0;
-        //     },
-        // },
-        // pageLimit: {
-        //     type: Number,
-        //     validator(value) {
-        //         return value > 0;
-        //     },
-        // },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as Vue;
