@@ -2239,6 +2239,7 @@
 					"URGENCY": "緊急度"
 				},
 				"INFO": {
+					"ACCOUNT_ID": "",
 					"ACKNOWLEDGED": "確認時間",
 					"ALERT_ID": "アラートID",
 					"ALT_E_UPDATE_DESCRIPTION": "説明修正に失敗",

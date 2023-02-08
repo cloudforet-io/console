@@ -48,6 +48,9 @@
                                     disable-link
                 />
             </template>
+            <template #data-account="{ value }">
+                {{ value }}
+            </template>
             <template #data-created_at>
                 {{ iso8601Formatter(data.created_at, timezone) }}
             </template>
@@ -150,6 +153,7 @@ export default {
                     label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY'),
                     copyValueFormatter: () => state.data.triggered_by,
                 },
+                { name: 'account', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), copyValueFormatter: () => state.data.account },
                 { name: 'reference.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
             ],
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
