@@ -27,7 +27,7 @@
         </div>
         <p-horizontal-layout :min-height="TABLE_MIN_HEIGHT"
                              :height="tableState.tableHeight"
-                             @drag-end="handleTableHeightChange"
+                             @resize-end="handleTableHeightChange"
         >
             <template #container="{ height }">
                 <template v-if="tableState.schema">
