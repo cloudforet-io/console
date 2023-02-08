@@ -2239,6 +2239,7 @@
 					"URGENCY": "Urgency"
 				},
 				"INFO": {
+					"ACCOUNT_ID": "Account ID",
 					"ACKNOWLEDGED": "Acknowledged",
 					"ALERT_ID": "Alert ID",
 					"ALT_E_UPDATE_DESCRIPTION": "Failed to Update Description",
