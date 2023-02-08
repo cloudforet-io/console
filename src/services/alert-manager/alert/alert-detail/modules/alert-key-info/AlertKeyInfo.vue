@@ -48,6 +48,9 @@
                                     disable-link
                 />
             </template>
+            <template #data-account="{ value }">
+                {{ value }}
+            </template>
             <template #data-created_at>
                 {{ iso8601Formatter(data.created_at, timezone) }}
             </template>
@@ -150,11 +153,15 @@ export default {
                     label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY'),
                     copyValueFormatter: () => state.data.triggered_by,
                 },
+                { name: 'account', label: i18n.t('Account ID'), copyValueFormatter: () => state.data.account },
                 { name: 'reference.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
             ],
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
-            data: computed(() => alertManagerStore.state.alert.alertData) || {},
+            data: computed(() => {
+                console.log(alertManagerStore.state.alert.alertData);
+                return alertManagerStore.state.alert.alertData;
+            }) || {},
             escalationPolicyName: '',
             loading: true,
             timezone: computed(() => store.state.user.timezone),
