@@ -158,10 +158,7 @@ export default {
             ],
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
-            data: computed(() => {
-                console.log(alertManagerStore.state.alert.alertData);
-                return alertManagerStore.state.alert.alertData;
-            }) || {},
+            data: computed(() => alertManagerStore.state.alert.alertData) || {},
             escalationPolicyName: '',
             loading: true,
             timezone: computed(() => store.state.user.timezone),
