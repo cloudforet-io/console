@@ -8,23 +8,15 @@
             />
         </div>
 
-        <div class="dragger-container">
-            <div class="line left"
-                 :class="{'colored': line}"
-                 :style="lineStyle"
-            />
-
-            <span class="dragger"
-                  :style="draggerStyle"
-                  @mousedown="onMousedown"
+        <div class="resizer-container">
+            <span class="resizer"
+                  @mousedown="handleMousedown"
             >
-                <slot name="dragger">
-                    <p-i color="inherit"
-                         width="1.5rem"
-                         height="1.5rem"
-                         name="btn_height-modifier"
-                    />
-                </slot>
+                <p-i color="inherit"
+                     width="1.5rem"
+                     height="1.5rem"
+                     name="btn_height-modifier"
+                />
             </span>
         </div>
     </div>
@@ -41,18 +33,6 @@ export default {
     name: 'PHorizontalLayout',
     components: { PI },
     props: {
-        line: {
-            type: Boolean,
-            default: false,
-        },
-        draggerSize: {
-            type: String,
-            default: '1.5rem',
-        },
-        draggerWidth: {
-            type: Number,
-            default: 30,
-        },
         height: {
             type: Number,
             default: 400,
@@ -68,20 +48,13 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            lineStyle: {
-                width: `calc(50% - ${props.width}px)`,
-            },
-            draggerStyle: {
-                'font-size': props.draggerSize,
-                width: `${props.draggerWidth}px`,
-            },
             containerHeight: props.height,
-            dragging: false,
+            resizing: false,
             pageY: null as null|number,
         });
 
-        const onMousemove = (e) => {
-            if (state.dragging) {
+        const handleMousemove = (e) => {
+            if (state.resizing) {
                 e.preventDefault();
 
                 if (state.pageY === null) {
@@ -98,30 +71,24 @@ export default {
             }
         };
 
-        const onMouseup = () => {
-            if (state.dragging) {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                emit('drag-end', state.containerHeight);
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                state.dragging = false;
+        const handleMouseup = () => {
+            if (state.resizing) {
+                emit('resize-end', state.containerHeight);
+                state.resizing = false;
                 state.pageY = null;
-                window.document.removeEventListener('mousemove', onMousemove);
-                window.document.removeEventListener('mouseup', onMouseup);
+                window.document.removeEventListener('mousemove', handleMousemove);
+                window.document.removeEventListener('mouseup', handleMouseup);
             }
         };
-        const onMousedown = () => {
-            state.dragging = true;
-            window.document.addEventListener('mousemove', onMousemove);
-            window.document.addEventListener('mouseup', onMouseup);
+        const handleMousedown = () => {
+            state.resizing = true;
+            window.document.addEventListener('mousemove', handleMousemove);
+            window.document.addEventListener('mouseup', handleMouseup);
         };
 
         return {
             ...toRefs(state),
-            onMousedown,
-            onMousemove,
-            onMouseup,
+            handleMousedown,
         };
     },
 };
@@ -132,20 +99,12 @@ export default {
     .horizontal-contents {
         overflow: hidden;
     }
-    .dragger-container {
+    .resizer-container {
         @apply relative mt-4 pb-7;
-        .line {
-            @apply absolute inline-block border-b;
-            border-color: transparent;
-            &.colored {
-                @apply border-gray;
-            }
-            &.left {
-                @apply left-0;
-            }
-        }
-        .dragger {
-            @apply absolute inline-block text-gray-300 top-0 text-2xl items-center;
+        .resizer {
+            @apply absolute text-gray-300 items-center text-display-md;
+            width: 1.875rem;
+            top: 0;
             left: 50%;
             transform: translate(-50%, -50%);
             &:hover, &:active {
@@ -156,7 +115,7 @@ export default {
     }
 
     @screen mobile {
-        .dragger-container {
+        .resizer-container {
             visibility: hidden;
         }
     }
