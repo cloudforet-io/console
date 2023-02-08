@@ -153,7 +153,7 @@ export default {
                     label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY'),
                     copyValueFormatter: () => state.data.triggered_by,
                 },
-                { name: 'account', label: i18n.t('Account ID'), copyValueFormatter: () => state.data.account },
+                { name: 'account', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), copyValueFormatter: () => state.data.account },
                 { name: 'reference.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
             ],
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
