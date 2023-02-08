@@ -5,8 +5,8 @@ import { range } from 'lodash';
 import {
     COLLAPSIBLE_LIST_THEME,
     COLLAPSIBLE_LIST_TOGGLE_POSITION,
-} from '@/data-display/collapsibles/collapsible-list/config';
-import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
+} from '@/data-display/collapsible/collapsible-list/config';
+import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
 
 
 export const getCollapsibleListArgTypes = (): ArgTypes => ({

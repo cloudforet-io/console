@@ -27,8 +27,8 @@ import {
 
 import { debounce } from 'lodash';
 
-import type { CollapsiblePanelProps } from '@/data-display/collapsibles/collapsible-panel/type';
-import PCollapsibleToggle from '@/data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
+import type { CollapsiblePanelProps } from '@/data-display/collapsible/collapsible-panel/type';
+import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
 import { useProxyValue } from '@/hooks';
 
 

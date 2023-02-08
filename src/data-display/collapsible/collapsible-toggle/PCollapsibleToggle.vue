@@ -29,10 +29,10 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import type { CollapsibleToggleProps } from '@/data-display/collapsibles/collapsible-toggle/type';
+import type { CollapsibleToggleProps } from '@/data-display/collapsible/collapsible-toggle/type';
 import {
     COLLAPSIBLE_TOGGLE_TYPE,
-} from '@/data-display/collapsibles/collapsible-toggle/type';
+} from '@/data-display/collapsible/collapsible-toggle/type';
 import PI from '@/foundation/icons/PI.vue';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton.vue';
 import { makeOptionalProxy } from '@/utils/composition-helpers';

@@ -9,7 +9,7 @@ export { default as PTextInput } from './inputs/input/text-input/PTextInput.vue'
 export { default as PFieldTitle } from './data-display/field-title/PFieldTitle.vue';
 export { default as PSkeleton } from './feedbacks/loading/skeleton/PSkeleton.vue';
 export { default as PSpinner } from './feedbacks/loading/spinner/PSpinner.vue';
-export { default as PCollapsibleToggle } from './data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
+export { default as PCollapsibleToggle } from './data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
 
 export { default as PNoticeAlert } from './feedbacks/alert/notice-alert/PNoticeAlert.vue';
 export { default as PToastAlert } from './feedbacks/alert/toast-alert/PToastAlert.vue';
@@ -23,7 +23,7 @@ export { default as PListCard } from './data-display/cards/list-card/PListCard.v
 export { default as PBoard } from './data-display/board/PBoard.vue';
 export { default as PLabel } from './data-display/label/PLabel.vue';
 export { default as PBoardItem } from './data-display/board-item/PBoardItem.vue';
-export { default as PCollapsiblePanel } from './data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
+export { default as PCollapsiblePanel } from './data-display/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 export { default as PCheckbox } from './inputs/checkbox/PCheckbox.vue';
 export { default as PCheckboxGroup } from './inputs/checkbox-group/PCheckboxGroup.vue';
 export { default as PFieldGroup } from './inputs/forms/field-group/PFieldGroup.vue';
@@ -96,7 +96,7 @@ export { default as PBalloonTab } from './navigation/tabs/ballon-tab/PBalloonTab
 export { default as PBoxTab } from './navigation/tabs/box-tab/PBoxTab.vue';
 
 export { default as PTextarea } from './inputs/textarea/PTextarea.vue';
-export { default as PCollapsibleList } from './data-display/collapsibles/collapsible-list/PCollapsibleList.vue';
+export { default as PCollapsibleList } from './data-display/collapsible/collapsible-list/PCollapsibleList.vue';
 
 export { default as PDynamicChart } from './data-display/dynamic/dynamic-chart/PDynamicChart.vue';
 export { default as PDynamicWidget } from './data-display/dynamic/dynamic-widget/PDynamicWidget.vue';

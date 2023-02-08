@@ -53,11 +53,11 @@ import {
 import {
     COLLAPSIBLE_LIST_THEME,
     COLLAPSIBLE_LIST_TOGGLE_POSITION,
-} from '@/data-display/collapsibles/collapsible-list/config';
-import type { CollapsibleItem, CollapsibleListProps } from '@/data-display/collapsibles/collapsible-list/type';
-import PCollapsiblePanel from '@/data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
-import PCollapsibleToggle from '@/data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
-import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
+} from '@/data-display/collapsible/collapsible-list/config';
+import type { CollapsibleItem, CollapsibleListProps } from '@/data-display/collapsible/collapsible-list/type';
+import PCollapsiblePanel from '@/data-display/collapsible/collapsible-panel/PCollapsiblePanel.vue';
+import PCollapsibleToggle from '@/data-display/collapsible/collapsible-toggle/PCollapsibleToggle.vue';
+import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsible/collapsible-toggle/type';
 import { useProxyValue } from '@/hooks';
 
 export default defineComponent<CollapsibleListProps>({
