@@ -7,22 +7,27 @@ export const RESOURCE_REFERENCE_SCHEMA = {
     [REFERENCE_TYPE_INFO.provider.type]: {
         title: REFERENCE_TYPE_INFO.provider.name,
         type: 'array',
+        default: REFERENCE_TYPE_INFO.provider.name,
     },
     [REFERENCE_TYPE_INFO.project.type]: {
         title: REFERENCE_TYPE_INFO.project.name,
         type: 'array',
+        default: REFERENCE_TYPE_INFO.project.name,
     },
     [REFERENCE_TYPE_INFO.service_account.type]: {
         title: REFERENCE_TYPE_INFO.service_account.name,
         type: 'array',
+        default: REFERENCE_TYPE_INFO.service_account.name,
     },
     [REFERENCE_TYPE_INFO.project_group.type]: {
         title: REFERENCE_TYPE_INFO.project_group.name,
         type: 'array',
+        default: REFERENCE_TYPE_INFO.project_group.name,
     },
     [REFERENCE_TYPE_INFO.region.type]: {
         title: REFERENCE_TYPE_INFO.region.name,
         type: 'array',
+        default: REFERENCE_TYPE_INFO.region.name,
     },
 } as const;
 
