@@ -7,7 +7,7 @@
 - [ ] Bug fixes
 - [ ] Feature improvement
 - [ ] Refactor
-- [ ] Others (performance improvement, refactoring, CI/CD, etc.)
+- [ ] Others (performance improvement, CI/CD, etc.)
 
 ### Checklist
 - [ ] `Error / Warning / Lint / Type`

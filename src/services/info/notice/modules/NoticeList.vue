@@ -57,10 +57,8 @@
             </template>
         </p-data-loader>
         <div class="pagination-wrapper">
-            <p-pagination class="pagination"
-                          :total-count="noticeItemTotalCount"
+            <p-pagination :total-count="noticeItemTotalCount"
                           :page-size="10"
-                          :current-page="1"
                           @change="handlePageChange"
             />
         </div>
