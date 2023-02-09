@@ -4,13 +4,13 @@
                                  multi-selectable
                                  project-selectable
                                  :selected-project-ids="selectedItems.map(d => d.name)"
-                                 @update:selectedProjectIds="handleSelectedProjectIds"
+                                 @update:selected-project-ids="handleSelectedProjectIds"
         />
         <project-select-dropdown v-else-if="category === FILTER.PROJECT_GROUP"
                                  multi-selectable
                                  project-group-selectable
                                  :selected-project-ids="selectedItems.map(d => d.name)"
-                                 @update:selectedProjectIds="handleSelectedProjectIds"
+                                 @update:selected-project-ids="handleSelectedProjectIds"
         />
         <p-filterable-dropdown
             v-else-if="category === FILTER.SERVICE_ACCOUNT || category === FILTER.REGION || category === FILTER.PROVIDER"
