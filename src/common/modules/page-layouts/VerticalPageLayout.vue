@@ -27,7 +27,6 @@
                 <div class="fnb">
                     <f-n-b />
                 </div>
-                <!--                <p-back-to-top-button :container="containerRef" />-->
             </div>
         </template>
     </p-vertical-layout>
