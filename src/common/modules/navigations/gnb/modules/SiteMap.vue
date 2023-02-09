@@ -44,7 +44,7 @@
                         </router-link>
                     </li>
 
-                    <template v-if="menu.subMenuList && menu.subMenuList.length > 0">
+                    <template v-if="menu.subMenuList && menu.subMenuList.length > 0 && menu.id !== MENU_ID.DASHBOARDS">
                         <template v-for="(subMenu, subMenuIdx) in menu.subMenuList">
                             <template v-if="subMenu.show !== false">
                                 <li v-if="subMenu"
@@ -84,8 +84,11 @@ import vClickOutside from 'v-click-outside';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 
+import { MENU_ID } from '@/lib/menu/config';
+
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
+
 
 export default {
     name: 'SiteMap',
@@ -133,6 +136,7 @@ export default {
             hideSiteMap,
             handleSiteMapButtonClick,
             navigateToMenu,
+            MENU_ID,
         };
     },
 };
