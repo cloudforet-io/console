@@ -4,7 +4,7 @@ import { MENU_ID } from '@/lib/menu/config';
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     [MENU_ID.HOME_DASHBOARD]: {
         translationId: 'MENU.HOME_DASHBOARD',
-        icon: 'ic_dashboard',
+        icon: 'ic_home-menu',
     },
     [MENU_ID.DASHBOARDS]: {
         translationId: 'MENU.DASHBOARDS',
