@@ -67,22 +67,26 @@
                              :key="index"
                              :to="item.href"
                 >
-                    <p-selectable-item :icon-url="iconUrl(item)"
-                                       theme="card"
-                                       class="card"
-                    >
-                        <template #contents>
-                            <div class="group-name">
-                                {{ item.group }}
+                    <div class="card">
+                        <div class="content-wrapper">
+                            <p-lazy-img :src="iconUrl(item)"
+                                        width="2rem"
+                                        height="2rem"
+                                        class="icon"
+                            />
+                            <div class="content">
+                                <div class="group-name">
+                                    {{ item.group }}
+                                </div>
+                                <div class="name">
+                                    {{ item.name }}
+                                </div>
                             </div>
-                            <div class="name">
-                                {{ item.name }}
-                            </div>
-                        </template>
-                        <template #extra>
+                        </div>
+                        <div class="extra">
                             <span class="count">{{ item.count || 0 }}</span>
-                        </template>
-                    </p-selectable-item>
+                        </div>
+                    </div>
                 </router-link>
             </div>
         </template>
@@ -90,11 +94,9 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
 import { computed, reactive, toRefs } from 'vue';
 
-import { PSelectableItem, PSkeleton, PI } from '@spaceone/design-system';
+import { PSkeleton, PI, PLazyImg } from '@spaceone/design-system';
 import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -123,9 +125,9 @@ export default {
     name: 'CloudServices',
     components: {
         WidgetLayout,
-        PSelectableItem,
         PSkeleton,
         PI,
+        PLazyImg,
     },
     props: {
         providers: {
@@ -276,10 +278,18 @@ export default {
         @apply grid-cols-1;
     }
 
-    .item-container {
-        &.card {
-            &:hover {
-                @apply bg-blue-100;
+    .card {
+        display: flex;
+        justify-content: space-between;
+        &:hover {
+            @apply bg-blue-100;
+        }
+        .content-wrapper {
+            display: flex;
+            align-items: center;
+            .icon {
+                @apply flex-shrink-0;
+                margin-right: 0.5rem;
             }
         }
     }
@@ -312,7 +322,10 @@ export default {
 }
 
 .card {
+    @apply border border-gray-200 rounded;
+    display: flex;
     margin-bottom: 0.5rem;
+    padding: 0.5rem 1rem;
     .group-name {
         @apply font-bold mb-1 truncate leading-tight;
         font-size: 0.875rem;
