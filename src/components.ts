@@ -37,7 +37,6 @@ export { default as PBreadcrumbs } from './navigation/breadcrumbs/PBreadcrumbs.v
 export { default as PPanelTop } from './data-display/titles/panel-top/PPanelTop.vue';
 export { default as PProgressBar } from './data-display/progress-bar/PProgressBar.vue';
 export { default as PSearch } from './inputs/search/search/PSearch.vue';
-export { default as PSelectableItem } from './others/deprecated/selectable-item/PSelectableItem.vue';
 export { default as PStatus } from './data-display/status/PStatus.vue';
 export { default as PTag } from './data-display/tags/PTag.vue';
 export { default as PTextEditor } from './inputs/text-editor/PTextEditor.vue';
@@ -58,7 +57,6 @@ export { default as PHorizontalLayout } from './layouts/horizontal-layout/PHoriz
 export { default as PVerticalLayout } from './layouts/vertical-layout/PVerticalLayout.vue';
 export { default as PWidgetLayout } from './others/deprecated/widget-layout/PWidgetLayout.vue';
 export { default as PLazyImg } from './feedbacks/loading/lazy-img/PLazyImg.vue';
-export { default as PSelectableList } from './others/deprecated/selectable-list/PSelectableList.vue';
 export { default as PButtonModal } from './feedbacks/modals/button-modal/PButtonModal.vue';
 export { default as PDoubleCheckModal } from './others/console/modals/double-check-modal/PDoubleCheckModal.vue';
 export { default as PIconModal } from './feedbacks/modals/icon-modal/PIconModal.vue';
