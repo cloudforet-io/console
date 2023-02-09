@@ -355,7 +355,6 @@ export default defineComponent<Props>({
             }
 
             // initiate states by widget config
-            resetStates();
             initStatesByWidgetConfig(widgetConfigId);
 
             // set states if widget key exists. this is for updating widget case.
