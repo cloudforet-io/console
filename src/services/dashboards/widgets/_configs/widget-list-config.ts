@@ -27,7 +27,7 @@ import monthlyCost from '@/services/dashboards/widgets/monthly-cost/widget-confi
 // eslint-disable-next-line import/order
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 
-export const CONSOLE_WIDGET_ORDER = [
+export const CONSOLE_WIDGET_LIST = [
     'monthlyCost',
     'budgetUsageSummary',
     'costMap',
@@ -41,9 +41,11 @@ export const CONSOLE_WIDGET_ORDER = [
     'awsDataTransferByRegion',
     'budgetStatus',
     'budgetUsageByTarget',
-];
+] as const;
 
-export const CONSOLE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {
+export type WidgetKey = typeof CONSOLE_WIDGET_LIST[number];
+
+export const CONSOLE_WIDGET_CONFIGS: Record<WidgetKey, Partial<WidgetConfig>> = {
     monthlyCost,
     budgetUsageSummary,
     costMap,
