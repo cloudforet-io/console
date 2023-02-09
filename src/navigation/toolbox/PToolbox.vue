@@ -229,7 +229,7 @@ export default defineComponent<ToolboxProps>({
                     name: d, label: d, type: 'item',
                 }));
             }),
-            selectedSortBy: computed(() => ((sortByOptionsData && props.sortable) ? sortByOptionsData[proxyState.sortBy][0]?.label : proxyState.sortBy)),
+            selectedSortBy: computed(() => ((sortByOptionsData && props.sortable) ? sortByOptionsData[proxyState.sortBy]?.[0]?.label : proxyState.sortBy)),
             valueSetMap: computed<Record<string, ValueSet>>(() => {
                 const valueSetMap: Record<string, ValueSet> = {};
                 (props.keyItemSets ?? []).forEach((keyItemSet) => keyItemSet.items.forEach((item) => {
