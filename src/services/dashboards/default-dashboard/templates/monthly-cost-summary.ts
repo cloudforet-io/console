@@ -1,6 +1,7 @@
 import type { DashboardConfig } from '@/services/dashboards/config';
 import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/default-dashboard/config';
 import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/default-dashboard/helper';
+import type { WidgetCustomTitleMap } from '@/services/dashboards/default-dashboard/templates/type';
 
 const widgetList = [
     'monthlyCost',
@@ -23,6 +24,14 @@ export const monthlyCostSummaryDashboardPreview: DefaultDashboardPreviewConfig =
     },
 };
 
+const widgetCustomTitleMap: WidgetCustomTitleMap = {
+    monthlyCost: 'Monthly Cost Overview',
+    costMap: 'Cost By Project',
+    costTrend: 'Cost Trend By Project',
+    costTrendStacked: 'Cost Trend By Product',
+    costDonut: 'Cost By Provider',
+};
+
 export const monthlyCostSummaryDashboard: DashboardConfig = {
     ...monthlyCostSummaryDashboardPreview,
     settings: {
@@ -40,6 +49,6 @@ export const monthlyCostSummaryDashboard: DashboardConfig = {
     },
     variables: {},
     layouts: [
-        getDashboardLayoutWidgetInfoList(widgetList),
+        getDashboardLayoutWidgetInfoList(widgetList, widgetCustomTitleMap),
     ],
 };

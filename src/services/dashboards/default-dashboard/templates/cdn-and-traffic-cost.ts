@@ -1,6 +1,7 @@
 import type { DashboardConfig } from '@/services/dashboards/config';
 import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/default-dashboard/config';
 import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/default-dashboard/helper';
+import type { WidgetCustomTitleMap } from '@/services/dashboards/default-dashboard/templates/type';
 
 const widgetList = [
     'awsDataTransferCostTrend',
@@ -16,6 +17,10 @@ export const cdnAndTrafficCostDashboardPreview: DefaultDashboardPreviewConfig = 
         icon: 'ic_dashboard-template_cdn-traffic-cost',
         preview_image: 'cdnAndTrafficCost',
     },
+};
+
+const widgetCustomTitleMap: WidgetCustomTitleMap = {
+    awsCloudFrontCost: 'AWS CloudFront Cost by Project',
 };
 
 export const cdnAndTrafficCostDashboard: DashboardConfig = {
@@ -35,6 +40,6 @@ export const cdnAndTrafficCostDashboard: DashboardConfig = {
     },
     variables: {},
     layouts: [
-        getDashboardLayoutWidgetInfoList(widgetList),
+        getDashboardLayoutWidgetInfoList(widgetList, widgetCustomTitleMap),
     ],
 };
