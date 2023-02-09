@@ -236,9 +236,6 @@ export default defineComponent<Props>({
         /* inherit */
         const handleChangeInheritToggle = (propertyName: string, { value }) => {
             widgetFormState.inheritOptions = { ...widgetFormState.inheritOptions, [propertyName]: { enabled: value } };
-            if (value) {
-                state.schemaFormData[propertyName] = propertyName.replace('filters.', '');
-            }
 
             // update widget option schema
             const originPropertySchema = state.widgetConfig?.options_schema?.schema?.properties?.[propertyName] ?? {};
@@ -298,6 +295,7 @@ export default defineComponent<Props>({
             resetTitle();
         };
         const initStatesByWidgetConfig = (widgetConfigId: string) => {
+            state.schemaFormData = {};
             const widgetOptionsSchema: WidgetOptionsSchema = state.widgetConfig?.options_schema ?? {};
             // init widget form store states
             widgetFormState.widgetConfigId = widgetConfigId;
