@@ -1,10 +1,15 @@
 <template>
-    <div class="vertical-container" :style="{height: height}">
-        <div class="sidebar-container" :style="sbContainerStyle"
+    <div class="vertical-layout"
+         :style="{height: height}"
+    >
+        <div class="sidebar-container"
+             :style="sidebarContainerStyle"
              :class="{transition:transition}"
         >
-            <div :style="sbStyle">
-                <slot name="sidebar" v-bind="{width, hide, transition, height}" />
+            <div :style="sidebarStyle">
+                <slot name="sidebar"
+                      v-bind="{width, hide, transition, height}"
+                />
             </div>
         </div>
         <div class="resizer-container line"
@@ -14,20 +19,24 @@
              @mousemove="isResizing"
              @mouseup="endResizing"
         >
-            <span class="resizer">
+            <span class="resizer"
+                  :class="{hide}"
+            >
                 <span @click="hideSidebar">
-                    <slot name="hide-button">
-                        <p-i class="btn-vertical-hide"
+                    <slot name="resizer-button">
+                        <p-i class="resizer-button"
                              width="1.25rem"
                              height="1.25rem"
                              :name="hide ? 'btn_ic_tree_hidden—folded' : 'btn_ic_tree_hidden'"
-                             :color="hide ? undefined : 'white primary3'"
+                             :color="hide ? 'primary2 white' : 'white inherit'"
                         />
                     </slot>
                 </span>
             </span>
         </div>
-        <div class="main" :style="mainStyle">
+        <div class="main"
+             :style="mainStyle"
+        >
             <slot />
         </div>
     </div>
@@ -77,13 +86,13 @@ export default {
             clientX: null,
             hide: false,
             transition: false,
-            sbContainerStyle: computed(() => ({
+            sidebarContainerStyle: computed(() => ({
                 width: `${state.width}px`,
                 height: '100%',
                 'overflow-y': 'auto',
                 'overflow-x': 'hidden',
             })),
-            sbStyle: computed(() => ({
+            sidebarStyle: computed(() => ({
                 width: 'auto',
                 // height: '100%',
                 minWidth: `${props.minWidth}px`,
@@ -171,76 +180,73 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
-.vertical-container {
+<style lang="postcss">
+.vertical-layout {
     display: flex;
     width: 100%;
     flex-direction: row;
     padding: 0;
     margin: unset;
-}
-.sidebar-container {
-    @apply bg-white;
-    box-shadow: 0.0625rem 0 0.25rem rgba(0, 0, 0, 0.12);
-    &.transition {
-        transition: width 0.2s;
-    }
-}
-.main {
-    display: flex;
-    flex-direction: column;
-    justify-content: stretch;
 
-    /* flex-grow: 1; */
-    overflow-x: hidden;
-    overflow-y: auto;
-}
-.resizer-container {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    position: sticky;
-    top: 0;
-    height: 100%;
-    width: 0;
-    &.transition {
-        transition: left 0.2s;
-    }
-    &.line {
-        @apply border-l border-gray-200;
-        background-color: transparent;
-        &:hover {
-            @apply border-l border-secondary;
-            cursor: ew-resize;
+    .sidebar-container {
+        @apply bg-white;
+        box-shadow: 1px 0 0.25rem rgba(0, 0, 0, 0.12);
+        &.transition {
+            transition: width 0.2s;
         }
     }
-    &.prohibit-line {
-        @apply border-l  border-gray-200;
-        background-color: transparent;
-        &:hover {
-            @apply border-l border-secondary;
-        }
+    .main {
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
+
+        /* flex-grow: 1; */
+        overflow-x: hidden;
+        overflow-y: auto;
     }
-    .resizer {
-        @apply text-gray-400;
-        display: inline-block;
-        position: absolute;
-        font-size: 1.5rem;
-        font-weight: 600;
-        text-align: center;
-        z-index: 1;
-        cursor: col-resize;
-        > span {
-            margin-right: 0.65rem;
-            cursor: pointer;
-        }
-    }
-    .btn-vertical-hide {
-        margin-top: 1rem;
-        margin-left: 0.5rem;
+    .resizer-container {
+        display: flex;
+        align-items: flex-start;
         justify-content: center;
-        &:hover {
-            @apply text-secondary;
+        position: sticky;
+        top: 0;
+        height: 100%;
+        width: 0;
+        &.transition {
+            transition: left 0.2s;
+        }
+        &.line {
+            @apply border-l border-transparent;
+            background-color: transparent;
+            &:hover {
+                @apply border-l border-secondary;
+                cursor: ew-resize;
+            }
+        }
+        .resizer {
+            @apply text-gray-400;
+            display: inline-block;
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            z-index: 1;
+            cursor: col-resize;
+            > span {
+                margin-right: 0.65rem;
+                cursor: pointer;
+            }
+            &.hide {
+                @apply text-primary-2;
+            }
+        }
+        .resizer-button {
+            margin-top: 1rem;
+            margin-left: 0.55rem;
+            justify-content: center;
+            &:hover {
+                @apply text-secondary;
+            }
         }
     }
 }

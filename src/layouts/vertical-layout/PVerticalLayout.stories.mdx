@@ -1,0 +1,53 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PVerticalLayout from '@/layouts/vertical-layout/PVerticalLayout.vue';
+import {
+    getVerticalLayoutArgTypes
+} from '@/layouts/vertical-layout/story-helper';
+
+
+<Meta title='Layouts/Vertical Layout' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A228265&t=6YbalXLy731vS0l2-4'
+    }
+}} component={PVerticalLayout} argTypes={getVerticalLayoutArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: {
+        PVerticalLayout
+    },
+    template: `
+        <div style="width: 100vw; height: 10rem; border: 1px solid gray;">
+            <p-vertical-layout>
+                <template #sidebar>
+                    Left Layout
+                </template>
+                <template #default>
+                    Right Layout
+                </template>
+            </p-vertical-layout>
+        </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Vertical Layout
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
