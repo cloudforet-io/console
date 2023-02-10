@@ -5,6 +5,7 @@ import { defineStore } from 'pinia';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type { DashboardLayoutWidgetInfo, InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 
@@ -31,6 +32,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         defaultSchemaProperties: undefined,
     });
     const setFormData = (formData: any) => {
+        console.debug('setFormData');
         if (!state.widgetConfigId) return;
         const widgetConfig = getWidgetConfig(state.widgetConfigId);
         const _widgetOptions: WidgetOptions = {
@@ -48,7 +50,10 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
                     },
                 };
             } else if (key.startsWith('filters.')) {
-                if (val) widgetFiltersMap[_propertyName] = [{ k: _propertyName, v: val, o: '=' }];
+                if (val) {
+                    const filterDataKey = getWidgetFilterDataKey(_propertyName);
+                    widgetFiltersMap[_propertyName] = [{ k: filterDataKey, v: val, o: '=' }];
+                }
             } else {
                 _widgetOptions[key] = val;
             }

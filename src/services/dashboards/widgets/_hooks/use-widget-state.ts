@@ -40,7 +40,17 @@ const getRefinedOptions = (
     if (!inheritOptions || !dashboardVariables) return mergedOptions;
 
     const parentOptions: Partial<WidgetOptions> = convertInheritOptionsToWidgetFiltersMap(inheritOptions, dashboardVariables, optionsErrorMap);
-    return merge({}, mergedOptions, parentOptions);
+    const refined = merge({}, mergedOptions, parentOptions);
+
+    // This is compatible code for already stored data before 1.11.0.2
+    const filtersEntries = refined.filters ? Object.entries(refined.filters) : [];
+    filtersEntries.forEach(([filterKey, filters]) => {
+        const filterDataKey = getWidgetFilterDataKey(filterKey);
+        filters?.forEach((filter) => {
+            if (filter.k === filterKey) filter.k = filterDataKey;
+        });
+    });
+    return refined;
 };
 
 const convertInheritOptionsToWidgetFiltersMap = (
