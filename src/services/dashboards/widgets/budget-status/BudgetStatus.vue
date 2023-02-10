@@ -52,6 +52,7 @@ import {
 import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
+import dayjs from 'dayjs';
 import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -69,7 +70,6 @@ import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
-// eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
@@ -77,6 +77,7 @@ import type { Legend, BudgetDataModel } from '@/services/dashboards/widgets/type
 
 
 type Data = BudgetDataModel['results'];
+const DATE_FORMAT = 'YYYY-MM';
 
 const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
@@ -89,8 +90,8 @@ const state = reactive({
         { label: '< 70%', color: indigo[100] },
     ])),
     dateRange: computed<DateRange>(() => ({
-        start: state.settings?.date_range?.start,
-        end: state.settings?.date_range?.end,
+        start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
+        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
     })),
     widgetLocation: computed<Location>(() => ({
         name: COST_EXPLORER_ROUTE.BUDGET._NAME,
