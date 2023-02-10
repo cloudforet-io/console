@@ -138,7 +138,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            fields: [
+            fields: computed(() => [
                 { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },
                 { name: 'rule', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RULE'), disableCopy: true },
                 { name: 'severity', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SEVERITY'), disableCopy: true },
@@ -155,7 +155,7 @@ export default {
                 },
                 { name: 'account', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), copyValueFormatter: () => state.data.account },
                 { name: 'reference.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
-            ],
+            ]),
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
             data: computed(() => alertManagerStore.state.alert.alertData) || {},

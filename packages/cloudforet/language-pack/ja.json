@@ -2080,7 +2080,7 @@
 		"DASHBOARDS": "ダッシュボード",
 		"DASHBOARDS_PROJECT": "プロジェクトダッシュボード",
 		"DASHBOARDS_WORKSPACE": "ワークスペースダッシュボード",
-		"HOME_DASHBOARD": "",
+		"HOME_DASHBOARD": "ホーム",
 		"INFO": "情報",
 		"INFO_NOTICE": "お知らせ",
 		"MY_PAGE": "マイページ",
@@ -2239,7 +2239,7 @@
 					"URGENCY": "緊急度"
 				},
 				"INFO": {
-					"ACCOUNT_ID": "",
+					"ACCOUNT_ID": "Account ID",
 					"ACKNOWLEDGED": "確認時間",
 					"ALERT_ID": "アラートID",
 					"ALT_E_UPDATE_DESCRIPTION": "説明修正に失敗",
