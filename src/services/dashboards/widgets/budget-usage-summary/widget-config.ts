@@ -26,7 +26,7 @@ const budgetUsageSummaryConfig: WidgetConfig = {
         granularity: GRANULARITY.ACCUMULATED,
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project'),
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region'),
         schema: {
             type: 'object',
             properties: getWidgetFilterOptionsSchema('provider', 'project', 'service_account', 'product', 'region'),

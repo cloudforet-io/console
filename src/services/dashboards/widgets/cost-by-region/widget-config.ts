@@ -35,7 +35,7 @@ const costByRegionWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account'),
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region'),
         schema: {
             type: 'object',
             properties: getWidgetFilterOptionsSchema(
