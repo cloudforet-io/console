@@ -23,7 +23,6 @@ const costTrendStackedWidgetConfig: Partial<WidgetConfig> = {
             enabled: true,
             show_at: 'table',
         },
-        group_by: 'product',
     },
     options_schema: {
         default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account')],

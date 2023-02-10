@@ -1,17 +1,27 @@
 import type { DashboardConfig } from '@/services/dashboards/config';
 import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/default-dashboard/config';
 import { getDashboardLayoutWidgetInfoList } from '@/services/dashboards/default-dashboard/helper';
-import type { WidgetCustomTitleMap } from '@/services/dashboards/default-dashboard/templates/type';
+import { GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 
-const widgetList = [
-    'monthlyCost',
-    'budgetUsageSummary',
-    'costMap',
-    'costTrend',
-    'costTrendStacked',
-    'costDonut',
-    'budgetStatus',
-    'costByRegion',
+const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
+    ['monthlyCost', { title: 'Monthly Cost Overview' }],
+    ['budgetUsageSummary'],
+    ['costMap', { title: 'Cost By Project' }],
+    ['costTrend', {
+        title: 'Cost Trend By Project',
+        widget_options: {
+            group_by: GROUP_BY.PROJECT,
+        },
+    }],
+    ['costTrendStacked', {
+        title: 'Cost Trend By Product',
+        widget_options: {
+            group_by: GROUP_BY.PRODUCT,
+        },
+    }],
+    ['costDonut', { title: 'Cost By Provider' }],
+    ['budgetStatus'],
+    ['costByRegion'],
 ];
 
 export const monthlyCostSummaryDashboardPreview: DefaultDashboardPreviewConfig = {
@@ -22,14 +32,6 @@ export const monthlyCostSummaryDashboardPreview: DefaultDashboardPreviewConfig =
         icon: 'ic_dashboard-template_monthly-cost-summary',
         preview_image: 'monthlyCostSummary',
     },
-};
-
-const widgetCustomTitleMap: WidgetCustomTitleMap = {
-    monthlyCost: 'Monthly Cost Overview',
-    costMap: 'Cost By Project',
-    costTrend: 'Cost Trend By Project',
-    costTrendStacked: 'Cost Trend By Product',
-    costDonut: 'Cost By Provider',
 };
 
 export const monthlyCostSummaryDashboard: DashboardConfig = {
@@ -49,6 +51,6 @@ export const monthlyCostSummaryDashboard: DashboardConfig = {
     },
     variables: {},
     layouts: [
-        getDashboardLayoutWidgetInfoList(widgetList, widgetCustomTitleMap),
+        getDashboardLayoutWidgetInfoList(widgetList),
     ],
 };
