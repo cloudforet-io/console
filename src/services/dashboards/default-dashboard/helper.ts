@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ERROR_CASE_WIDGET_INFO } from '@/services/dashboards/default-dashboard/config';
@@ -12,11 +13,21 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
             const widgetConfig = getWidgetConfig(widgetId);
             const widgetConfigTitle = widgetConfig.title ?? widgetConfig.widget_config_id;
             const title = customInfo?.title ? (customInfo?.title ?? widgetConfigTitle) : widgetConfigTitle;
+            const widgetOptions = () => {
+                const defaultOptions = cloneDeep(widgetConfig.options);
+                const customOptions = customInfo?.widget_options;
+                if (customOptions && defaultOptions) {
+                    Object.keys(customOptions).forEach((key) => {
+                        defaultOptions[key] = customOptions[key];
+                    });
+                }
+                return defaultOptions;
+            };
             const widgetInfo: DashboardLayoutWidgetInfo = {
                 widget_key: uuidv4(),
                 widget_name: widgetConfig.widget_config_id,
                 title,
-                widget_options: widgetConfig.options ?? {},
+                widget_options: widgetOptions() ?? {},
                 size: widgetConfig.sizes[0],
                 version: '1',
                 inherit_options: getWidgetDefaultInheritOptions(widgetConfig),

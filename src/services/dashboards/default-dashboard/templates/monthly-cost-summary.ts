@@ -6,8 +6,18 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['monthlyCost', { title: 'Monthly Cost Overview' }],
     ['budgetUsageSummary'],
     ['costMap', { title: 'Cost By Project' }],
-    ['costTrend', { title: 'Cost Trend By Project' }],
-    ['costTrendStacked', { title: 'Cost Trend By Product' }],
+    ['costTrend', {
+        title: 'Cost Trend By Project',
+        widget_options: {
+            group_by: 'project_id',
+        },
+    }],
+    ['costTrendStacked', {
+        title: 'Cost Trend By Product',
+        widget_options: {
+            group_by: 'product',
+        },
+    }],
     ['costDonut', { title: 'Cost By Provider' }],
     ['budgetStatus'],
     ['costByRegion'],

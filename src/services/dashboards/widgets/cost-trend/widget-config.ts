@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
     getWidgetFilterSchemaPropertyNames,
@@ -23,7 +23,6 @@ const costTrendWidgetConfig: Partial<WidgetConfig> = {
             enabled: true,
             show_at: 'table',
         },
-        group_by: GROUP_BY.PROJECT,
     },
     options_schema: {
         default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account')],
