@@ -26,7 +26,7 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
         group_by: 'budget_id',
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project'),
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region'),
         schema: {
             type: 'object',
             properties: getWidgetFilterOptionsSchema('provider', 'project', 'service_account', 'product', 'region'),
