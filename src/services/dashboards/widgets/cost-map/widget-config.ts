@@ -27,7 +27,7 @@ const costMapWidgetConfig: WidgetConfig = {
         granularity: GRANULARITY.ACCUMULATED,
     },
     options_schema: {
-        default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account')],
+        default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region')],
         schema: {
             type: 'object',
             properties: {

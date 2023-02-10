@@ -26,7 +26,7 @@ const monthlyCostWidgetConfig: WidgetConfig = {
         granularity: GRANULARITY.MONTHLY,
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account'),
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region'),
         schema: {
             type: 'object',
             properties: {

@@ -38,7 +38,7 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: {
-        default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account')],
+        default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'region')],
         schema: {
             type: 'object',
             properties: {
