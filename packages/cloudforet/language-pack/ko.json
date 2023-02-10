@@ -2239,7 +2239,7 @@
 					"URGENCY": "긴급도"
 				},
 				"INFO": {
-					"ACCOUNT_ID": "",
+					"ACCOUNT_ID": "Account ID",
 					"ACKNOWLEDGED": "확인 시간",
 					"ALERT_ID": "얼럿 ID",
 					"ALT_E_UPDATE_DESCRIPTION": "설명 수정 실패",
