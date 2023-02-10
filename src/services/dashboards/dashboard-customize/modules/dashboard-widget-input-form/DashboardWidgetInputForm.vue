@@ -138,14 +138,9 @@ export default defineComponent<Props>({
             schemaFormData: {},
             // inherit
             requiredProperties: computed<string[]>(() => state.widgetConfig.options_schema?.schema.required ?? []),
-            inheritableProperties: computed<string[]>(() => {
-                if (props.widgetKey) {
-                    return Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
-                        .filter(([, inheritOption]) => !!inheritOption.enabled)
-                        .map(([propertyName]) => propertyName);
-                }
-                return widgetFormState.defaultSchemaProperties?.filter((d) => !state.requiredProperties.includes(d)) ?? [];
-            }),
+            inheritableProperties: computed(() => Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
+                .filter(([, inheritOption]) => !!inheritOption.enabled)
+                .map(([propertyName]) => propertyName)),
             inheritOptionsErrorMap: computed<InheritOptionsErrorMap>(() => getWidgetInheritOptionsErrorMap(
                 widgetFormState.inheritOptions,
                 state.widgetConfig?.options_schema?.schema,
