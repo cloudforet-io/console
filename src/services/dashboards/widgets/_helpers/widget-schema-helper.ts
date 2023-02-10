@@ -1,9 +1,11 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
 import type {
+    WidgetConfig,
     WidgetFilterKey,
     WidgetFiltersSchemaProperty,
     WidgetOptionsSchemaProperty,
+    InheritOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import {
     COST_REFERENCE_SCHEMA, GROUP_BY_SCHEMA,
@@ -42,3 +44,16 @@ export const getWidgetFilterOptionsSchema = (...filterKeys: WidgetFilterKey[]): 
 
 
 export const getWidgetFilterSchemaPropertyNames = (...keys: WidgetFilterKey[]): WidgetFiltersSchemaProperty[] => keys.map((key) => `filters.${key}` as WidgetFiltersSchemaProperty);
+
+export const getWidgetDefaultInheritOptions = (widgetConfig: WidgetConfig): InheritOptions => {
+    const inheritOptions: InheritOptions = {};
+    const defaultProperties = widgetConfig.options_schema?.default_properties ?? [];
+    const requiredProperties = widgetConfig.options_schema?.schema.required ?? [];
+    defaultProperties.filter((d) => !requiredProperties.includes(d)).forEach((propertyName) => {
+        inheritOptions[propertyName] = {
+            enabled: true,
+            variable_info: { key: propertyName.replace('filters.', '') },
+        };
+    });
+    return inheritOptions;
+};

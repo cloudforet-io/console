@@ -23,7 +23,6 @@ const costTrendWidgetConfig: Partial<WidgetConfig> = {
             enabled: true,
             show_at: 'table',
         },
-        group_by: 'project_id',
     },
     options_schema: {
         default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account')],

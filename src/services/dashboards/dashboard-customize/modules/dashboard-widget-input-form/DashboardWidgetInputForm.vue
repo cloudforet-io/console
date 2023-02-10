@@ -137,9 +137,15 @@ export default defineComponent<Props>({
             widgetOptionsJsonSchema: {} as JsonSchema,
             schemaFormData: {},
             // inherit
-            inheritableProperties: computed<string[]>(() => Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
-                .filter(([, inheritOption]) => !!inheritOption.enabled)
-                .map(([propertyName]) => propertyName)),
+            requiredProperties: computed<string[]>(() => state.widgetConfig.options_schema?.schema.required ?? []),
+            inheritableProperties: computed<string[]>(() => {
+                if (props.widgetKey) {
+                    return Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
+                        .filter(([, inheritOption]) => !!inheritOption.enabled)
+                        .map(([propertyName]) => propertyName);
+                }
+                return widgetFormState.defaultSchemaProperties?.filter((d) => !state.requiredProperties.includes(d)) ?? [];
+            }),
             inheritOptionsErrorMap: computed<InheritOptionsErrorMap>(() => getWidgetInheritOptionsErrorMap(
                 widgetFormState.inheritOptions,
                 state.widgetConfig?.options_schema?.schema,
@@ -289,11 +295,21 @@ export default defineComponent<Props>({
             resetTitle();
         };
         const initStatesByWidgetConfig = (widgetConfigId: string) => {
+            state.schemaFormData = {};
             const widgetOptionsSchema: WidgetOptionsSchema = state.widgetConfig?.options_schema ?? {};
             // init widget form store states
             widgetFormState.widgetConfigId = widgetConfigId;
-            widgetFormState.inheritOptions = {};
             widgetFormState.defaultSchemaProperties = getRefinedDefaultSchemaProperties(widgetOptionsSchema);
+            widgetFormState.inheritOptions = {};
+            if (!props.widgetKey) {
+                widgetFormState.defaultSchemaProperties.filter((d) => !state.requiredProperties.includes(d)).forEach((propertyName) => {
+                    widgetFormState.inheritOptions = {
+                        ...widgetFormState.inheritOptions,
+                        [propertyName]: { enabled: true },
+                    };
+                    state.schemaFormData[propertyName] = propertyName.replace('filters.', '');
+                });
+            }
             // init states
             state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
                 referenceStoreState,
