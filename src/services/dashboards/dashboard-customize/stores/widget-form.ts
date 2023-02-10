@@ -32,7 +32,6 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         defaultSchemaProperties: undefined,
     });
     const setFormData = (formData: any) => {
-        console.debug('setFormData');
         if (!state.widgetConfigId) return;
         const widgetConfig = getWidgetConfig(state.widgetConfigId);
         const _widgetOptions: WidgetOptions = {
