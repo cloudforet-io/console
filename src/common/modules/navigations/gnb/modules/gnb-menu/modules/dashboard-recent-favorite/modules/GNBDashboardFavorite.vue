@@ -12,11 +12,11 @@
                 >
                     <div v-for="(item, index) in sortedFavoriteList"
                          :key="`favorite-${item.label}-${index}`"
-                         @click="hideMenu"
                     >
                         <g-n-b-sub-menu :label="item.label"
                                         :is-draggable="true"
                                         :to="dashboardRouteFormatter(item.itemId)"
+                                        @navigate="hideMenu"
                         >
                             <template #extra-mark>
                                 <favorite-button :favorite-type="FAVORITE_TYPE.DASHBOARD"

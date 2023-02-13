@@ -36,15 +36,16 @@
             <div v-else-if="hasSubMenu"
                  v-show="isOpened"
                  class="sub-menu-wrapper"
-                 @click="hideMenu"
             >
                 <g-n-b-sub-menu v-for="(subMenu, index) in subMenuList"
                                 :key="index"
                                 :show="!subMenu.hideOnGNB"
                                 :label="subMenu.label"
                                 :to="subMenu.to"
+                                :href="subMenu.href"
                                 :is-beta="subMenu.isBeta"
                                 :is-new="subMenu.isNew"
+                                @navigate="hideMenu"
                 />
             </div>
         </div>
@@ -75,15 +76,20 @@ import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSub
 import GNBDashboardMenu
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardMenu.vue';
 
+interface SubMenu extends DisplayMenu {
+    href?: string;
+}
+
 interface Props {
     show: boolean;
     menuId: MenuId;
     label: TranslateResult;
     to?: RawLocation;
+    href?: string;
     hasPermission: boolean;
     isOpened: boolean;
     isSelected: boolean;
-    subMenuList: DisplayMenu[];
+    subMenuList: SubMenu[];
 }
 export default defineComponent<Props>({
     name: 'GNBMenu',
@@ -112,6 +118,10 @@ export default defineComponent<Props>({
             type: Object,
             default: () => ({}),
         },
+        href: {
+            type: String,
+            default: undefined,
+        },
         hasPermission: {
             type: Boolean,
             default: true,
@@ -125,7 +135,7 @@ export default defineComponent<Props>({
             default: false,
         },
         subMenuList: {
-            type: Array as PropType<DisplayMenu[]>,
+            type: Array as PropType<SubMenu[]>,
             default: () => [],
         },
     },
@@ -145,6 +155,7 @@ export default defineComponent<Props>({
                 if (isDuplicatePath) return;
                 hideMenu();
                 if (props.to) SpaceRouter.router.push(props.to);
+                else if (props.href) window.open(props.href, '_blank');
             }
         };
 

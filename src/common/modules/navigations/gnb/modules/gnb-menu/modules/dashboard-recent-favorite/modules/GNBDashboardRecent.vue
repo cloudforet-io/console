@@ -5,25 +5,24 @@
                        class="gnb-dashboard-recent-context"
         >
             <div class="gnb-dashboard-recent-list">
-                <div @click="hideMenu">
-                    <g-n-b-sub-menu v-for="(item) in recentDashboardItems"
-                                    :key="`recent-${item.label}-${item.itemId}`"
-                                    class="dashboard-recent-item"
-                                    :label="item.label"
-                                    :to="dashboardRouteFormatter(item.itemId)"
-                                    @mouseenter.native="hoveredItem = item.itemId"
-                                    @mouseleave.native="hoveredItem = ''"
-                    >
-                        <template #extra-mark>
-                            <favorite-button class="favorite-button"
-                                             :item-id="item.itemId"
-                                             :favorite-type="item.itemType"
-                                             :visible-active-case-only="!getIsHovered(item.itemId)"
-                                             scale="0.65"
-                            />
-                        </template>
-                    </g-n-b-sub-menu>
-                </div>
+                <g-n-b-sub-menu v-for="(item) in recentDashboardItems"
+                                :key="`recent-${item.label}-${item.itemId}`"
+                                class="dashboard-recent-item"
+                                :label="item.label"
+                                :to="dashboardRouteFormatter(item.itemId)"
+                                @mouseenter.native="hoveredItem = item.itemId"
+                                @mouseleave.native="hoveredItem = ''"
+                                @navigate="hideMenu"
+                >
+                    <template #extra-mark>
+                        <favorite-button class="favorite-button"
+                                         :item-id="item.itemId"
+                                         :favorite-type="item.itemType"
+                                         :visible-active-case-only="!getIsHovered(item.itemId)"
+                                         scale="0.65"
+                        />
+                    </template>
+                </g-n-b-sub-menu>
             </div>
             <template #no-data>
                 <div class="no-data">
