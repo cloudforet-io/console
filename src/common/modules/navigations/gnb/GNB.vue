@@ -11,7 +11,7 @@
             <g-n-b-logo :to="logoLink" />
 
             <g-n-b-menu v-for="(menu, idx) in gnbMenuList"
-                        :key="idx"
+                        :key="`gnb-menu-${idx}`"
                         :show="menu.show"
                         :menu-id="menu.id"
                         :label="menu.label"

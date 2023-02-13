@@ -21,12 +21,12 @@
                         <div v-if="subMenu.show"
                              :key="`footer-${subMenu.label}-${index}`"
                              class="sub-menu"
-                             @click="hideMenu"
                         >
                             <g-n-b-sub-menu :label="subMenu.label"
                                             :to="subMenu.to"
                                             :is-beta="subMenu.isBeta"
                                             :is-new="subMenu.isNew"
+                                            @navigate="hideMenu"
                             />
                         </div>
                     </template>
