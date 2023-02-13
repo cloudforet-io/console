@@ -23,6 +23,7 @@
             <template #extra="tab">
                 <p-badge v-if="count[tab.name] !== 0"
                          :style-type="tab.name === activeTab ? 'primary3' : 'gray200'"
+                         badge-type="subtle"
                 >
                     {{ commaFormatter(count[tab.name]) }}
                 </p-badge>

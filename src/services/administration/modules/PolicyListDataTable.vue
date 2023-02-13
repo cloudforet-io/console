@@ -36,7 +36,7 @@
                 </div>
             </template>
             <template #col-policy_type-format="{ value }">
-                <p-badge outline
+                <p-badge badge-type="solid-outline"
                          :style-type="policyTypeBadgeColorFormatter(value)"
                 >
                     {{ capitalize(value ? value : POLICY_TYPES.MANAGED) }}

@@ -6,8 +6,8 @@
                 <template #extra>
                     <div class="w-full text-right">
                         <p-badge v-if="alertData.escalation_ttl === 0"
-                                 outline
-                                 style-type="indigo"
+                                 badge-type="solid-outline"
+                                 style-type="indigo500"
                         >
                             {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.COMPLETED') }}
                         </p-badge>
@@ -26,6 +26,7 @@
                         <span class="step">[{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.STEP') }} {{ index+1 }}]</span>
                         <span class="level">{{ data.notification_level }}</span>
                         <p-badge v-if="data.notification_level === `LV${alertData.escalation_step}`"
+                                 badge-type="subtle"
                                  style-type="primary3"
                         >
                             {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.CURRENT') }}

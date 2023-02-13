@@ -9,7 +9,7 @@ import type { PolicyDataModel } from '@/services/administration/iam/policy/lib/t
 
 export const policyTypeBadgeColorFormatter = (policyType: PolicyTypes) => {
     switch (policyType) {
-    case POLICY_TYPES.MANAGED: return 'gray';
+    case POLICY_TYPES.MANAGED: return 'gray500';
     case POLICY_TYPES.CUSTOM: return 'primary1';
     default: return '';
     }

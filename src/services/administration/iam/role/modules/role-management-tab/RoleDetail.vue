@@ -12,7 +12,7 @@
             </template>
             <template #data-role_type="{ data }">
                 <p-badge v-if="data"
-                         :outline="true"
+                         badge-type="solid-outline"
                          :style-type="ROLE_TYPE_BADGE_OPTION[data].styleType"
                 >
                     {{ ROLE_TYPE_BADGE_OPTION[data] ? ROLE_TYPE_BADGE_OPTION[data].label : '' }}
@@ -48,7 +48,7 @@
                       :sort-desc="true"
         >
             <template #col-policy_type-format="{ value }">
-                <p-badge outline
+                <p-badge badge-type="solid-outline"
                          :style-type="policyTypeBadgeColorFormatter(value)"
                 >
                     {{ value }}

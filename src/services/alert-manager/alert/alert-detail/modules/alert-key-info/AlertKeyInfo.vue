@@ -20,8 +20,9 @@
                 </span>
             </template>
             <template #data-severity="{value}">
-                <p-badge outline
-                         :background-color="ALERT_SEVERITY_COLORS[value]"
+                <p-badge background-color="white"
+                         :text-color="ALERT_SEVERITY_COLORS[value]"
+                         :outline-color="ALERT_SEVERITY_COLORS[value]"
                 >
                     {{ ALERT_SEVERITY[value] || value }}
                 </p-badge>

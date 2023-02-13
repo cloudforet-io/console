@@ -31,6 +31,7 @@
                 <p v-if="value.length === 0" />
                 <p-badge v-for="(label, idx) in value"
                          :key="idx"
+                         badge-type="subtle"
                          style-type="gray200"
                          class="mr-2"
                 >

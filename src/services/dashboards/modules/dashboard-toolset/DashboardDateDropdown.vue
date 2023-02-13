@@ -12,7 +12,7 @@
                 <p-badge
                     v-if="monthMenuItems[selectedMonthMenuIndex].badge"
                     style-type="indigo100"
-                    shape="round"
+                    badge-type="subtle"
                     class="ml-1"
                 >
                     {{ monthMenuItems[selectedMonthMenuIndex].badge }}
@@ -24,7 +24,7 @@
                     <p-badge
                         v-if="item.badge"
                         style-type="indigo100"
-                        shape="round"
+                        badge-type="subtle"
                         class="ml-1"
                     >
                         {{ item.badge }}

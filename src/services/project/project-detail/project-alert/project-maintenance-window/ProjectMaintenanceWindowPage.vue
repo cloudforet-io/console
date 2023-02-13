@@ -38,7 +38,9 @@
                 </p-button>
             </template>
             <template #col-state-format="{value}">
-                <p-badge :style-type="MAINTENANCE_WINDOW_STATE[value] === MAINTENANCE_WINDOW_STATE.OPEN ? 'yellow200' : 'gray200'">
+                <p-badge :style-type="MAINTENANCE_WINDOW_STATE[value] === MAINTENANCE_WINDOW_STATE.OPEN ? 'yellow200' : 'gray200'"
+                         badge-type="subtle"
+                >
                     {{ MAINTENANCE_WINDOW_STATE[value] }}
                 </p-badge>
             </template>

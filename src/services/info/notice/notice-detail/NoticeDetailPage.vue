@@ -31,7 +31,7 @@
                            :data="noticePostData"
             >
                 <div class="post-title">
-                    <p-badge outline
+                    <p-badge badge-type="solid-outline"
                              :style-type="noticeTypeBadgeInfo.style"
                     >
                         {{ noticeTypeBadgeInfo.label }}

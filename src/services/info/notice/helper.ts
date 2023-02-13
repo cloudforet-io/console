@@ -14,8 +14,8 @@ export const getPostBadgeInfo = (noticePostType: NoticePostType): NoticePostBadg
     case NOTICE_POST_TYPE.INTERNAL:
         return {
             label: i18n.t('INFO.NOTICE.DOMAIN_NOTICE'),
-            style: 'gray',
+            style: 'gray500',
         };
-    default: return { label: '', style: 'gray' };
+    default: return { label: '', style: 'gray500' };
     }
 };

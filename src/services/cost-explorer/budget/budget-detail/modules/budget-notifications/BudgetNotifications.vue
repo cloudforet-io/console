@@ -28,9 +28,8 @@
                                     :key="item.id"
                                 >
                                     <span class="bullet">•</span>
-                                    <p-badge :style-type="item.notification_type === BUDGET_NOTIFICATIONS_TYPE.WARNING ? 'gray'
-                                                 : 'alert'"
-                                             outline
+                                    <p-badge :style-type="item.notification_type === BUDGET_NOTIFICATIONS_TYPE.WARNING ? 'gray500' : 'alert'"
+                                             badge-type="solid-outline"
                                              class="icon"
                                     >
                                         {{ item.notification_type === 'WARNING' ? 'Warning' : 'Critical' }}

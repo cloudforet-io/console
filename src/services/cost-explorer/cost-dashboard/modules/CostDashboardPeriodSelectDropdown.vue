@@ -19,7 +19,9 @@
                 />
             </p-tooltip>
         </div>
-        <p-badge style-type="gray200">
+        <p-badge style-type="gray200"
+                 badge-type="subtle"
+        >
             <p v-if="dateFormatter(selectedPeriod.start, 'M') !== dateFormatter(selectedPeriod.end, 'M')">
                 {{ dateFormatter(selectedPeriod.start, 'MMMM D') }}, {{ dateFormatter(selectedPeriod.start, 'YYYY') }}
                 ~ {{ dateFormatter(selectedPeriod.end, 'MMMM D') }}, {{ dateFormatter(selectedPeriod.end, 'YYYY') }}

@@ -25,7 +25,7 @@
                     </template>
                     <template #col-role_type-format="{ value }">
                         <p-badge v-if="value"
-                                 :outline="true"
+                                 badge-type="solid-outline"
                                  :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType"
                         >
                             {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}

@@ -67,6 +67,7 @@
                 <template #extra="tab">
                     <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0"
                              style-type="primary3"
+                             badge-type="subtle"
                     >
                         {{ commaFormatter(counts[ALERT_STATE.TRIGGERED]) }}
                     </p-badge>

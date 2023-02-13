@@ -29,7 +29,7 @@
         >
             <template #col-state-format="{ value }">
                 <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
-                         :outline="value === ALERT_STATE.ERROR"
+                         :badge-type="value === ALERT_STATE.ERROR ? 'solid-outline' : 'subtle'"
                 >
                     {{ alertStateI18n[value] }}
                 </p-badge>

@@ -71,6 +71,7 @@
                 <div v-if="isSpaceOneUserProtocol">
                     <p-badge v-for="(userId, index) in dataForEdit.users"
                              :key="`users-${index}`"
+                             badge-type="subtle"
                              style-type="gray200"
                              shape="square"
                              class="mr-2 rounded"
