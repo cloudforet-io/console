@@ -96,13 +96,17 @@ export default {
 
 <style lang="postcss">
 .p-horizontal-layout {
-    .horizontal-contents {
+    > .horizontal-contents {
         overflow: hidden;
     }
-    .resizer-container {
-        @apply relative mt-4 pb-7;
+    > .resizer-container {
+        width: 100%;
+        position: relative;
+        margin-top: 1rem;
+        padding-bottom: 1.75rem;
         .resizer {
             @apply absolute text-gray-300 items-center text-display-md;
+            display: inline-block;
             width: 1.875rem;
             top: 0;
             left: 50%;
@@ -115,7 +119,7 @@ export default {
     }
 
     @screen mobile {
-        .resizer-container {
+        > .resizer-container {
             visibility: hidden;
         }
     }

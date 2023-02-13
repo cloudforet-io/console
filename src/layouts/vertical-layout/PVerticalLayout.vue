@@ -1,5 +1,5 @@
 <template>
-    <div class="vertical-layout"
+    <div class="p-vertical-layout"
          :style="{height: height}"
     >
         <div class="sidebar-container"
@@ -181,21 +181,21 @@ export default {
 </script>
 
 <style lang="postcss">
-.vertical-layout {
+.p-vertical-layout {
     display: flex;
     width: 100%;
     flex-direction: row;
     padding: 0;
     margin: unset;
 
-    .sidebar-container {
+    > .sidebar-container {
         @apply bg-white;
         box-shadow: 1px 0 0.25rem rgba(0, 0, 0, 0.12);
         &.transition {
             transition: width 0.2s;
         }
     }
-    .main {
+    > .main {
         display: flex;
         flex-direction: column;
         justify-content: stretch;
@@ -204,7 +204,7 @@ export default {
         overflow-x: hidden;
         overflow-y: auto;
     }
-    .resizer-container {
+    > .resizer-container {
         display: flex;
         align-items: flex-start;
         justify-content: center;
