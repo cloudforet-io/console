@@ -51,6 +51,7 @@
                         :key="`topic-${index}`"
                     >
                         <p-badge style-type="gray200"
+                                 badge-type="subtle"
                                  shape="square"
                                  class="rounded"
                         >

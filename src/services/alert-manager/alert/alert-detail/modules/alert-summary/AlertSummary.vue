@@ -17,6 +17,7 @@
             </template>
             <template v-else>
                 <p-badge style-type="alert"
+                         badge-type="solid"
                          shape="square"
                 >
                     {{ ALERT_STATE.ERROR }}

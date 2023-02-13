@@ -22,8 +22,8 @@
              class="content-row"
         >
             <span class="col-step">
-                <p-badge outline
-                         style-type="gray"
+                <p-badge badge-type="solid-outline"
+                         style-type="gray500"
                 >{{ idx + 1 }}</p-badge>
             </span>
             <span class="col-notification">

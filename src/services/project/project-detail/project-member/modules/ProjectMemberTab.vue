@@ -47,6 +47,7 @@
                 <p-badge v-for="(label, idx) in value"
                          :key="idx"
                          style-type="gray200"
+                         badge-type="subtle"
                          class="mr-2"
                 >
                     {{ label }}

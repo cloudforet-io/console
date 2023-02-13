@@ -9,7 +9,9 @@
                 <span v-if="type === POLICY_TYPES.MANAGED"
                       class="policy-managed-badge"
                 >
-                    <p-badge style-type="gray200">{{ $t('IAM.POLICY.FORM.VIEW_ONLY') }}</p-badge>
+                    <p-badge badge-type="subtle"
+                             style-type="gray200"
+                    >{{ $t('IAM.POLICY.FORM.VIEW_ONLY') }}</p-badge>
                 </span>
                 <span v-if="type === POLICY_TYPES.CUSTOM"
                       class="policy-edit-buttons"
@@ -49,13 +51,13 @@
                 <br>
                 <div class="policy-detail-type-badge">
                     <p-badge v-if="type === POLICY_TYPES.MANAGED"
-                             outline
-                             style-type="gray"
+                             badge-type="solid-outline"
+                             style-type="gray500"
                     >
                         {{ $t('IAM.POLICY.FORM.MANAGED_POLICY') }}
                     </p-badge>
                     <p-badge v-else
-                             outline
+                             badge-type="solid-outline"
                              style-type="primary1"
                     >
                         {{ $t('IAM.POLICY.FORM.CUSTOM_POLICY') }}

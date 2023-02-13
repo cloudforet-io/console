@@ -20,7 +20,7 @@
             </template>
             <template #col-variable_type-format="{ value }">
                 <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
-                         outline
+                         badge-type="solid-outline"
                 >
                     {{ variableType[value] }}
                 </p-badge>
@@ -144,7 +144,7 @@ const handleToggleUse = (propertyName: string, value: boolean) => {
 
 /* Helper */
 const variableTypeBadgeStyleFormatter = (type: VariableType) => {
-    if (type === 'MANAGED') return 'gray';
+    if (type === 'MANAGED') return 'gray500';
     return 'primary';
 };
 const convertAndUpdateVariablesForTable = (order: string[]) => {

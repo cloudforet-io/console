@@ -33,35 +33,35 @@
         >
             <p-badge v-if="channelData.notification_level === 'LV1'"
                      style-type="secondary1"
-                     outline
+                     badge-type="solid-outline"
                      class="level-badge"
             >
                 {{ channelData.notification_level }}
             </p-badge>
             <p-badge v-if="channelData.notification_level === 'LV2'"
-                     style-type="indigo"
-                     outline
+                     style-type="indigo500"
+                     badge-type="solid-outline"
                      class="level-badge"
             >
                 {{ channelData.notification_level }}
             </p-badge>
             <p-badge v-if="channelData.notification_level === 'LV3'"
-                     style-type="peacock"
-                     outline
+                     style-type="peacock400"
+                     badge-type="solid-outline"
                      class="level-badge"
             >
                 {{ channelData.notification_level }}
             </p-badge>
             <p-badge v-if="channelData.notification_level === 'LV4'"
                      style-type="coral500"
-                     outline
+                     badge-type="solid-outline"
                      class="level-badge"
             >
                 {{ channelData.notification_level }}
             </p-badge>
             <p-badge v-if="channelData.notification_level === 'LV5'"
                      style-type="alert"
-                     outline
+                     badge-type="solid-outline"
                      class="level-badge"
             >
                 {{ channelData.notification_level }}

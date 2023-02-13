@@ -23,6 +23,7 @@
                         <div>
                             <span class="title">{{ title }}</span>
                             <p-badge v-if="count"
+                                     badge-type="subtle"
                                      :style-type="getBadgeStyleType(color)"
                             >
                                 {{ count }}

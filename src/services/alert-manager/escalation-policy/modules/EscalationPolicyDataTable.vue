@@ -15,7 +15,8 @@
         <template #col-name-format="{ value }">
             <span>{{ value.label }}</span>
             <p-badge v-if="value.isDefault"
-                     outline
+                     badge-type="solid-outline"
+                     style-type="primary"
                      class="ml-2"
             >
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.DEFAULT') }}
@@ -25,12 +26,16 @@
             {{ ruleFormatter(value) }}
         </template>
         <template #col-finish_condition-format="{ value }">
-            <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)">
+            <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
+                     :badge-type="value === ALERT_STATE.ERROR ? 'solid-outline' : 'subtle'"
+            >
                 {{ finishConditions[value] }}
             </p-badge>
         </template>
         <template #col-scope-format="{ value }">
-            <p-badge :style-type="alertScopeBadgeStyleTypeFormatter(value)">
+            <p-badge :style-type="alertScopeBadgeStyleTypeFormatter(value)"
+                     badge-type="subtle"
+            >
                 {{ scopes[value] }}
             </p-badge>
         </template>
@@ -48,7 +53,6 @@
 </template>
 
 <script lang="ts">
-
 import { computed, reactive, toRefs } from 'vue';
 
 import {
@@ -64,6 +68,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
 
 export default {
@@ -144,6 +149,7 @@ export default {
 
         return {
             ...toRefs(state),
+            ALERT_STATE,
             referenceRouter,
             alertStateBadgeStyleTypeFormatter,
             alertScopeBadgeStyleTypeFormatter,

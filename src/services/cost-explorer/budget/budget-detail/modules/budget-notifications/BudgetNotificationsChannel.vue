@@ -19,6 +19,7 @@
                       :key="`${user}-${index}`"
                 >
                     <p-badge style-type="gray200"
+                             badge-type="subtle"
                              shape="square"
                              class="rounded mr-1"
                     >{{ user }}</p-badge>
@@ -34,7 +35,7 @@
         </template>
         <template #col-notification_level-format="{value}">
             <p-badge :style-type="getBadgeColor(value)"
-                     outline
+                     badge-type="solid-outline"
             >
                 {{ value }}
             </p-badge>
@@ -76,9 +77,9 @@ const getBadgeColor = (level: string) => {
     case 'LV1':
         return 'secondary1';
     case 'LV2':
-        return 'indigo';
+        return 'indigo500';
     case 'LV3':
-        return 'peacock';
+        return 'peacock400';
     case 'LV4':
         return 'coral500';
     case 'LV5':

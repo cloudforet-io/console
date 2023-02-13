@@ -61,6 +61,7 @@
                 <template v-if="!!Object.keys(value).length">
                     <p-badge v-for="([key, val], idx) in Object.entries(value)"
                              :key="`${key}-${val}-${idx}`"
+                             badge-type="subtle"
                              style-type="gray200"
                              class="mr-2"
                     >

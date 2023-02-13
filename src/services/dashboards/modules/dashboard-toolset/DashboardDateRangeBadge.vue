@@ -1,5 +1,6 @@
 <template>
     <p-badge style-type="gray200"
+             badge-type="subtle"
              class="dashboard-date-range-badge"
     >
         <p v-if="dateFormatter(state.dateRange.start, 'M') !== dateFormatter(state.dateRange.end, 'M')">

@@ -37,6 +37,7 @@
                     :key="`topic-${index}`"
                 >
                     <p-badge style-type="gray200"
+                             badge-type="subtle"
                              shape="square"
                     >
                         <span v-if="item === 'monitoring.Alert'">Alert</span>

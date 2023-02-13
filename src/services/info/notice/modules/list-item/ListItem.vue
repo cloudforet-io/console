@@ -26,7 +26,7 @@
                 />
             </div>
             <div class="info">
-                <p-badge outline
+                <p-badge badge-type="solid-outline"
                          :style-type="noticeTypeBadge.style"
                 >
                     {{ noticeTypeBadge.label }}

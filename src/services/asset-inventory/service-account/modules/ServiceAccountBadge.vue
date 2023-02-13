@@ -1,5 +1,7 @@
 <template>
-    <p-badge :style-type="badgeOption.styleType">
+    <p-badge :style-type="badgeOption.styleType"
+             badge-type="subtle"
+    >
         {{ badgeOption.label }}
     </p-badge>
 </template>

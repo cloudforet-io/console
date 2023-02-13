@@ -25,7 +25,7 @@
             <p-badge v-for="(tag, idx) in resourceTypeSearchTags"
                      :key="idx"
                      style-type="primary"
-                     :outline="true"
+                     badge-type="solid-outline"
                      class="filter-tag"
             >
                 <span>{{ tag }}</span>
@@ -63,8 +63,8 @@
                                 <div v-if="item.labels">
                                     <p-badge v-for="(label, idx) in item.labels"
                                              :key="`${label}-${idx}`"
-                                             style-type="gray"
-                                             :outline="true"
+                                             style-type="gray500"
+                                             badge-type="solid-outline"
                                              class="mr-2 mb-2"
                                     >
                                         {{ label }}

@@ -20,8 +20,8 @@
                     <div v-for="(rule, idx) in escalationRules"
                          :key="`rule-${idx}`"
                     >
-                        <p-badge outline
-                                 style-type="gray"
+                        <p-badge badge-type="solid-outline"
+                                 style-type="gray500"
                         >
                             {{ $t('PROJECT.DETAIL.ALERT.STEP') }} {{ idx + 1 }}
                         </p-badge>

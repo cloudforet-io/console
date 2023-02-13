@@ -9,7 +9,7 @@
             <div class="policy-create-contents">
                 <p-field-title>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-field-title>
                 <br>
-                <p-badge outline
+                <p-badge badge-type="solid-outline"
                          style-type="primary1"
                 >
                     {{ $t('IAM.POLICY.FORM.CUSTOM_POLICY') }}

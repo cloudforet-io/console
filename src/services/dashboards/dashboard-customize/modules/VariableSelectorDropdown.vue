@@ -18,6 +18,7 @@
                 <p-badge v-if="state.selected.length > 1"
                          class="selected-count"
                          style-type="blue300"
+                         badge-type="subtle"
                 >
                     +{{ state.selected.length - 1 }}
                 </p-badge>

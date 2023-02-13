@@ -2,7 +2,9 @@
     <div class="cost-analysis-period-select-dropdown"
          :class="{responsive: !printMode}"
     >
-        <p-badge style-type="gray200">
+        <p-badge style-type="gray200"
+                 badge-type="subtle"
+        >
             <p class="text">
                 {{ periodText }}
             </p>

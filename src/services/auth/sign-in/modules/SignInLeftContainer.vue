@@ -16,10 +16,9 @@
             />
         </div>
         <div class="version">
-            <p-badge
-                style-type="primary"
-                outline
-                shape="square"
+            <p-badge style-type="primary"
+                     badge-type="solid-outline"
+                     shape="square"
             >
                 {{ $t('COMMON.SIGN_IN.VERSION') }} {{ version }}
             </p-badge>

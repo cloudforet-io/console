@@ -43,7 +43,9 @@
                             <template #additional-title>
                                 <div v-if="item.noteItemMap.length">
                                     <span class="additional-title">{{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}</span>
-                                    <p-badge style-type="gray200">
+                                    <p-badge badge-type="subtle"
+                                             style-type="gray200"
+                                    >
                                         {{ item.noteItemMap.length }}
                                     </p-badge>
                                 </div>

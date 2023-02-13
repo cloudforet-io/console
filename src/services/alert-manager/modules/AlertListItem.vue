@@ -13,8 +13,8 @@
                     <span v-tooltip.bottom="item.title">{{ item.title }}</span>
                 </p-anchor>
                 <p-badge v-if="showMemberName && item.assignee"
-                         outline
-                         style-type="primary2"
+                         style-type="primary1"
+                         badge-type="solid-outline"
                          class="member-name"
                 >
                     {{ userReference.name || item.assignee }}
@@ -30,6 +30,7 @@
                     {{ projectNameFormatter(item.project_id) }}
                 </p-anchor>
                 <p-badge :style-type="badgeStyleTypeFormatter(item.state)"
+                         badge-type="subtle"
                          class="badge"
                 >
                     {{ alertStateI18n[item.state] }}

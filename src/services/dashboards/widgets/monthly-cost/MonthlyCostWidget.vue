@@ -28,6 +28,7 @@
                         />
                         {{ currencyMoneyFormatter(state.differenceCost, state.currency, props.currencyRates) }}
                         <p-badge :style-type="state.isDecreased === undefined ? 'gray200' : state.isDecreased ? 'green200' : 'alert'"
+                                 :badge-type="state.isDecreased ? 'subtle' : 'solid'"
                                  shape="square"
                         >
                             {{ state.differenceCostRate }} %

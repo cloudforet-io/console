@@ -14,7 +14,7 @@
                 {{ item.title }}
             </h1>
             <div class="notice-popup-info">
-                <p-badge outline
+                <p-badge badge-type="solid-outline"
                          :style-type="noticeTypeBadgeInfo.style"
                 >
                     {{ noticeTypeBadgeInfo.label }}

@@ -26,7 +26,7 @@
         </template>
         <template #col-type-format="{ value }">
             <p-badge :style-type="getTagTypeBadgeOption(value).styleType"
-                     outline
+                     :badge-type="CLOUD_SERVICE_TAG_TYPE.CUSTOM ? 'solid-outline' : 'subtle'"
             >
                 {{ getTagTypeBadgeOption(value).label }}
             </p-badge>
@@ -34,6 +34,7 @@
         <template #col-provider-format="{ value }">
             <p-badge v-if="value"
                      :background-color="getProviderBadgeOption(value).color"
+                     text-color="white"
             >
                 {{ getProviderBadgeOption(value)?.label }}
             </p-badge>
@@ -165,6 +166,7 @@ export default {
         });
         return {
             ...toRefs(state),
+            CLOUD_SERVICE_TAG_TYPE,
             handleSelectTagType,
             handleTagsUpdated,
             getTagTypeBadgeOption,
