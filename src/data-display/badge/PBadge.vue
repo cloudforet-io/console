@@ -40,6 +40,10 @@ export default defineComponent<BadgeProps>({
             type: String,
             default: undefined,
         },
+        outlineColor: {
+            type: String,
+            default: undefined,
+        },
         shape: {
             type: String,
             default: BADGE_SHAPE.ROUND,
@@ -55,10 +59,14 @@ export default defineComponent<BadgeProps>({
             }),
             inlineStyles: computed(() => {
                 // custom case
-                if (props.backgroundColor || props.textColor) {
+                if (props.backgroundColor || props.textColor || props.outlineColor) {
                     const inlineStyle = {} as {[prop: string]: string};
                     if (props.backgroundColor) inlineStyle.backgroundColor = getColor(props.backgroundColor);
                     if (props.textColor) inlineStyle.color = getColor(props.textColor);
+                    if (props.outlineColor) {
+                        inlineStyle.borderColor = getColor(props.outlineColor);
+                        inlineStyle.borderWidth = '1px';
+                    }
                     return inlineStyle;
                 }
                 // static case

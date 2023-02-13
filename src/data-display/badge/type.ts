@@ -52,5 +52,6 @@ export interface BadgeProps {
     styleType: BadgeStyleType;
     textColor?: string;
     backgroundColor?: string;
+    outlineColor?: string;
     shape: BadgeShape;
 }

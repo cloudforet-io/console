@@ -78,6 +78,24 @@ export const getBadgesArgTypes = (): ArgTypes => ({
             type: 'color',
         },
     },
+    outlineColor: {
+        name: 'outlineColor',
+        type: { name: 'string' },
+        description: 'Outline color of badge.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null',
+            },
+        },
+        control: {
+            type: 'color',
+        },
+    },
     shape: {
         name: 'shape',
         type: { name: 'string' },
