@@ -9,7 +9,6 @@ export const SELECT_DROPDOWN_STYLE_TYPE = Object.freeze({
     DEFAULT: 'default',
     ICON_BUTTON: 'icon-button',
     TRANSPARENT: 'transparent',
-    PRIMARY_BUTTON: 'primary-button',
     SECONDARY_BUTTON: 'secondary-button',
 } as const);
 

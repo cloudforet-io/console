@@ -325,11 +325,6 @@ export default defineComponent<SelectDropdownProps>({
             @apply bg-white text-gray-900 border-gray-300;
         }
     }
-    &.primary-button {
-        .dropdown-button {
-            @apply border-none bg-violet-800 text-white;
-        }
-    }
     &.secondary-button {
         .dropdown-button {
             @apply text-violet-800 border-violet-800;
@@ -356,9 +351,6 @@ export default defineComponent<SelectDropdownProps>({
         }
         &.icon-button {
             display: none;
-        }
-        &.primary-button {
-            @mixin read-only-style;
         }
         &.secondary-button {
             @mixin read-only-style;
@@ -396,9 +388,6 @@ export default defineComponent<SelectDropdownProps>({
                 @apply bg-transparent;
             }
         }
-        &.primary-button {
-            @mixin disabled-style-filled-bg;
-        }
         &.secondary-button {
             @mixin disabled-style-filled-bg;
         }
@@ -434,11 +423,6 @@ export default defineComponent<SelectDropdownProps>({
                 @apply text-secondary;
             }
         }
-        &.primary-button {
-            .dropdown-button {
-                @apply text-white bg-blue-600;
-            }
-        }
         &.secondary-button {
             .dropdown-button {
                 @apply border-secondary text-secondary bg-white;
@@ -465,16 +449,6 @@ export default defineComponent<SelectDropdownProps>({
                 @media (hover: hover) {
                     &:not(.active):not(.disabled):hover {
                         @apply text-secondary;
-                        outline: none;
-                    }
-                }
-            }
-        }
-        &.primary-button {
-            .dropdown-button {
-                @media (hover: hover) {
-                    &:not(.active):not(.disabled):hover {
-                        @apply text-white bg-blue-600;
                         outline: none;
                     }
                 }
