@@ -1,6 +1,6 @@
 <template>
     <span class="p-badge"
-          :class="allBodyClass"
+          :class="[`badge-${shape}`, ...badgeClassList]"
           :style="[inlineStyles]"
     >
         <slot />
@@ -13,19 +13,24 @@ import {
 } from 'vue';
 import type { PropType } from 'vue';
 
-import { BADGE_STYLE } from '@/data-display/badge/type';
-import type { BadgeProps, BadgeStyleType } from '@/data-display/badge/type';
+import { get } from 'lodash';
+
+import type { BadgeProps, BadgeStyleType, BadgeType } from '@/data-display/badge/type';
+import { BADGE_SHAPE, BADGE_TYPE } from '@/data-display/badge/type';
 import { getColor } from '@/utils/helpers';
+
+import colors from '@/styles/colors.cjs';
 
 export default defineComponent<BadgeProps>({
     name: 'PBadge',
     props: {
+        badgeType: {
+            type: String as PropType<BadgeType>,
+            default: BADGE_TYPE.SOLID,
+        },
         styleType: {
             type: String as PropType<BadgeStyleType>,
             default: 'primary',
-            validator(value: string) {
-                return Object.keys(BADGE_STYLE).indexOf(value) !== -1;
-            },
         },
         textColor: {
             type: String,
@@ -37,33 +42,48 @@ export default defineComponent<BadgeProps>({
         },
         shape: {
             type: String,
-            default: 'round',
-        },
-        outline: {
-            type: Boolean,
-            default: false,
+            default: BADGE_SHAPE.ROUND,
         },
     },
-    setup(props) {
+    setup(props: BadgeProps) {
         const state = reactive({
-            allBodyClass: computed(() => {
-                const classes: string[] = [];
-                if (props.shape) classes.push(`badge-${props.shape}`);
-                if (!(props.backgroundColor && props.textColor)) classes.push(`badge-${props.styleType}`);
-                if (props.outline) classes.push('outline');
-                return classes;
+            badgeClassList: computed<string[]>(() => {
+                if (!props.backgroundColor || !props.textColor) {
+                    return [`badge-${props.badgeType}`, `badge-${props.styleType}`];
+                }
+                return [];
             }),
             inlineStyles: computed(() => {
-                const inlineStyle = {} as {[prop: string]: string};
-                if (props.backgroundColor) inlineStyle.backgroundColor = getColor(props.backgroundColor);
-                if (props.textColor) inlineStyle.color = getColor(props.textColor);
-                if ((props.backgroundColor || props.textColor) && props.outline) {
-                    inlineStyle.borderColor = getColor(props.backgroundColor);
-                    inlineStyle.borderWidth = '1px';
-                    inlineStyle.backgroundColor = 'transparent';
-                    inlineStyle.color = getColor(props.textColor ? props.textColor : props.backgroundColor);
+                // custom case
+                if (props.backgroundColor || props.textColor) {
+                    const inlineStyle = {} as {[prop: string]: string};
+                    if (props.backgroundColor) inlineStyle.backgroundColor = getColor(props.backgroundColor);
+                    if (props.textColor) inlineStyle.color = getColor(props.textColor);
+                    return inlineStyle;
                 }
-                return inlineStyle;
+                // static case
+                const styleTypeNum = props.styleType.match(/\d{3}/)?.[0];
+                let badgeColor = getColor(props.styleType);
+                if (styleTypeNum) {
+                    // coral600 -> coral[600]
+                    const colStr = props.styleType.match(/[a-z]+/)?.[0];
+                    const color = get(colors, `${colStr}[${styleTypeNum}]`);
+                    if (color) badgeColor = color;
+                }
+                if (props.badgeType === BADGE_TYPE.SOLID) {
+                    return {
+                        backgroundColor: badgeColor,
+                        color: getColor('white'),
+                    };
+                } if (props.badgeType === BADGE_TYPE.SOLID_OUTLINE) {
+                    return {
+                        backgroundColor: getColor('white'),
+                        color: badgeColor,
+                        borderColor: badgeColor,
+                        borderWidth: '1px',
+                    };
+                }
+                return [];
             }),
         });
 
@@ -96,51 +116,22 @@ export default defineComponent<BadgeProps>({
         @apply rounded-md;
     }
 
-    @define-mixin badge-color $theme, $color, $opposite-color {
-        &.badge-$(theme) {
-            background-color: $color;
-            color: $opposite-color;
-            &.outline {
-                background-color: transparent;
-                border: 1px solid $color;
-                color: $color;
-            }
-        }
-    }
-
-    @define-mixin badge-without-outline $theme, $bg-color, $text-color {
+    @define-mixin subtle $theme, $bg-color, $text-color {
         &.badge-$(theme) {
             background-color: $bg-color;
             color: $text-color;
         }
     }
 
-    @mixin badge-color primary, theme('colors.primary'), theme('colors.white');
-    @mixin badge-color primary-dark, theme('colors.primary-dark'), theme('colors.white');
-    @mixin badge-color primary1, theme('colors.primary1'), theme('colors.white');
-    @mixin badge-color primary2, theme('colors.primary2'), theme('colors.white');
-    @mixin badge-color secondary, theme('colors.secondary'), theme('colors.white');
-    @mixin badge-color secondary1, theme('colors.secondary1'), theme('colors.white');
-    @mixin badge-color alert, theme('colors.alert'), theme('colors.white');
-    @mixin badge-color safe, theme('colors.safe'), theme('colors.white');
-    @mixin badge-color gray900, theme('colors.gray.900'), theme('colors.white');
-    @mixin badge-color gray, theme('colors.gray.default'), theme('colors.white');
-    @mixin badge-color coral600, theme('colors.coral.600'), theme('colors.white');
-    @mixin badge-color coral500, theme('colors.coral.500'), theme('colors.white');
-    @mixin badge-color peacock, theme('colors.peacock.500'), theme('colors.white');
-    @mixin badge-color indigo, theme('colors.indigo.500'), theme('colors.white');
-    @mixin badge-color indigo100, theme('colors.indigo.100'), theme('colors.indigo.600');
-
-    /* Styles without outline case */
-    @mixin badge-without-outline primary3, theme('colors.primary3'), theme('colors.violet.600');
-    @mixin badge-without-outline blue200, theme('colors.blue.200'), theme('colors.blue.600');
-    @mixin badge-without-outline blue300, theme('colors.blue.300'), theme('colors.blue.600');
-    @mixin badge-without-outline green200, theme('colors.green.200'), theme('colors.green.700');
-    @mixin badge-without-outline gray200, theme('colors.gray.200'), theme('colors.gray.900');
-    @mixin badge-without-outline coral100, theme('colors.coral.100'), theme('colors.coral.600');
-    @mixin badge-without-outline peacock200, theme('colors.peacock.200'), theme('colors.peacock.800');
-    @mixin badge-without-outline yellow200, theme('colors.yellow.200'), theme('colors.gray.900');
-    @mixin badge-without-outline red100, theme('colors.red.100'), theme('colors.red.500');
+    @mixin subtle primary3, theme('colors.primary3'), theme('colors.violet.600');
+    @mixin subtle blue200, theme('colors.blue.200'), theme('colors.blue.600');
+    @mixin subtle blue300, theme('colors.blue.300'), theme('colors.blue.600');
+    @mixin subtle green200, theme('colors.green.200'), theme('colors.green.700');
+    @mixin subtle indigo100, theme('colors.indigo.100'), theme('colors.indigo.600');
+    @mixin subtle gray200, theme('colors.gray.100'), theme('colors.gray.700');
+    @mixin subtle gray200, theme('colors.gray.200'), theme('colors.gray.900');
+    @mixin subtle yellow200, theme('colors.yellow.200'), theme('colors.gray.900');
+    @mixin subtle red100, theme('colors.red.100'), theme('colors.red.500');
 }
 
 </style>

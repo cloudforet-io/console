@@ -42,7 +42,6 @@ export default {
         }
 
         if (options.outline_color) {
-            badgeProps.outline = true;
             badgeProps.backgroundColor = getColor(options.outline_color);
         } else {
             badgeProps.backgroundColor = getColor(options.background_color);

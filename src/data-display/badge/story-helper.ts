@@ -1,26 +1,45 @@
 import type { ArgTypes } from '@storybook/addons';
 
-import { BADGE_SHAPE, BADGE_STYLE } from '@/data-display/badge/type';
+import { BADGE_SHAPE, BADGE_STYLE_TYPE, BADGE_TYPE } from '@/data-display/badge/type';
 
 
 export const getBadgesArgTypes = (): ArgTypes => ({
-    styleType: {
-        name: 'styleType',
+    badgeType: {
+        name: 'badgeType',
         type: { name: 'string' },
-        description: 'Badge style',
-        defaultValue: BADGE_STYLE.primary,
+        description: 'Badge type',
+        defaultValue: BADGE_TYPE.SOLID,
         table: {
             type: {
                 summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: BADGE_STYLE.primary,
+                summary: BADGE_TYPE.SOLID,
             },
         },
         control: {
             type: 'select',
-            options: Object.values(BADGE_STYLE),
+            options: Object.values(BADGE_TYPE),
+        },
+    },
+    styleType: {
+        name: 'styleType',
+        type: { name: 'string' },
+        description: 'Badge style',
+        defaultValue: BADGE_STYLE_TYPE.primary,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: BADGE_STYLE_TYPE.primary,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(BADGE_STYLE_TYPE),
         },
     },
     textColor: {
@@ -76,24 +95,6 @@ export const getBadgesArgTypes = (): ArgTypes => ({
         control: {
             type: 'select',
             options: Object.values(BADGE_SHAPE),
-        },
-    },
-    outline: {
-        name: 'outline',
-        type: { name: 'boolean' },
-        description: 'Outlined when true',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false,
-            },
-        },
-        control: {
-            type: 'boolean',
         },
     },
     defaultSlot: {

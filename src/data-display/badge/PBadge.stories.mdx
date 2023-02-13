@@ -1,6 +1,6 @@
 import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
 import PBadge from "@/data-display/badge/PBadge";
-import { BADGE_STYLE, BADGE_STYLE_OUTLINE } from '@/data-display/badge/type';
+import { SOLID_STYLE_TYPE, SOLID_OUTLINE_STYLE_TYPE, SUBTLE_STYLE_TYPE } from '@/data-display/badge/type';
 import { getBadgesArgTypes } from '@/data-display/badge/story-helper';
 
 <Meta title='Data Display/Badge' parameters={{
@@ -15,11 +15,12 @@ export const Template = (args,{argTypes})=>({
     components: { PBadge },
     template: `
         <div style="display:flex; align-items:center; justify-content:center; height:100px;">
-            <p-badge :styleType="styleType"
-                    :text-color="textColor"
-                    :backgroundColor="backgroundColor"
-                    :outline="outline"
-                    :shape="shape"
+            <p-badge
+                :badge-type="badgeType"
+                :style-type="styleType"
+                :text-color="textColor"
+                :background-color="backgroundColor"
+                :shape="shape"
             >{{$props.defaultSlot}}</p-badge>
         </div>`,
 })
@@ -30,47 +31,40 @@ export const Template = (args,{argTypes})=>({
 <br/>
 <br/>
 
-## Style Types
+## Badge Types
 
 <Canvas>
-    <Story name='Style Types'>
+    <Story name='Badge Types'>
         {{
             components:{ PBadge },
             template: `
-                <div class="w-full h-full flex flex-wrap items-center justify-center">
-                    <p-badge v-for="styleType in styleTypes" :styleType="styleType" :key="styleType" class="m-2">
+                <div class="w-full h-full">
+                    <p style="font-weight: bold">Solid</p>
+                    <p-badge v-for="styleType in solidStyleTypes" badge-type="solid" :style-type="styleType" :key="Math.random().toString()" class="m-2">
+                        {{styleType}}
+                    </p-badge><br/><br/>
+                    <p style="font-weight: bold">Solid-Outline</p>
+                    <p-badge v-for="styleType in solidOutlineStyleTypes" badge-type="solid-outline" :style-type="styleType" :key="styleType" class="m-2">
+                        {{styleType}}
+                    </p-badge><br/><br/>
+                    <p style="font-weight: bold">Subtle</p>
+                    <p-badge v-for="styleType in subtleStyleTypes" badge-type="subtle" :style-type="styleType" :key="Math.random().toString()" class="m-2">
                         {{styleType}}
                     </p-badge>
                 </div>`,
             setup() {
                 return {
-                    styleTypes: Object.values(BADGE_STYLE)
+                    solidStyleTypes: Object.values(SOLID_STYLE_TYPE),
+                    solidOutlineStyleTypes: Object.values(SOLID_OUTLINE_STYLE_TYPE),
+                    subtleStyleTypes: Object.values(SUBTLE_STYLE_TYPE),
                 }
             }
         }}
     </Story>
 </Canvas>
 
-## Outlined
-
-<Canvas>
-    <Story name='Outlined'>
-        {{
-            components:{ PBadge },
-            template: `
-                <div class="w-full h-full flex flex-wrap items-center justify-center">
-                    <p-badge v-for="styleType in styleTypes" :styleType="styleType" outline class="m-2">
-                        {{styleType}}
-                    </p-badge>
-                </div>`,
-            setup() {
-                return {
-                    styleTypes: Object.values(BADGE_STYLE_OUTLINE)
-                }
-            }
-        }}
-    </Story>
-</Canvas>
+<br/>
+<br/>
 
 ## Shapes
 
