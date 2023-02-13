@@ -3,32 +3,40 @@
                :contents="isEllipsisActive() ? label : undefined"
                position="bottom"
     >
-        <router-link
-            class="gnb-sub-menu"
-            :to="to"
+        <router-link class="gnb-sub-menu"
+                     :to="href ? {} : to"
+                     custom
         >
-            <div class="gnb-sub-contents">
-                <div class="contents-left"
-                     :class="{ 'is-exist-extra-mark': $slots['extra-mark'] }"
-                >
-                    <p-i v-if="isDraggable"
-                         name="ic_drag-handle--slim"
-                         width="1rem"
-                         height="1rem"
-                         class="drag-icon"
-                    />
-                    <div ref="labelRef"
-                         class="label"
+            <template #default="{href: toHref, navigate}">
+                <span>
+                    <a class="gnb-sub-contents"
+                       :href="href ? href : toHref"
+                       :target="href ? '_blank' : undefined"
+                       @click.stop="handleClickAnchor(navigate, $event)"
                     >
-                        {{ label }}
-                    </div>
-                    <beta-mark v-if="isBeta" />
-                    <new-mark v-if="isNew" />
-                </div>
-                <div class="contents-right">
-                    <slot name="extra-mark" />
-                </div>
-            </div>
+                        <div class="contents-left"
+                             :class="{ 'is-exist-extra-mark': $slots['extra-mark'] }"
+                        >
+                            <p-i v-if="isDraggable"
+                                 name="ic_drag-handle--slim"
+                                 width="1rem"
+                                 height="1rem"
+                                 class="drag-icon"
+                            />
+                            <div ref="labelRef"
+                                 class="label"
+                            >
+                                {{ label }}
+                            </div>
+                            <beta-mark v-if="isBeta" />
+                            <new-mark v-if="isNew" />
+                        </div>
+                        <div class="contents-right">
+                            <slot name="extra-mark" />
+                        </div>
+                    </a>
+                </span>
+            </template>
         </router-link>
     </p-tooltip>
 </template>
@@ -49,7 +57,8 @@ import NewMark from '@/common/components/marks/NewMark.vue';
 interface Props {
     show?: boolean;
     label: string|undefined|TranslateResult;
-    to: Route;
+    to?: Route;
+    href?: string;
     isBeta?: boolean;
     isNew?: boolean;
     isDraggable?: boolean;
@@ -69,6 +78,10 @@ export default defineComponent<Props>({
             type: Object,
             default: () => ({}),
         },
+        href: {
+            type: String,
+            default: undefined,
+        },
         label: {
             type: String as PropType<string|undefined|TranslateResult>,
             default: '',
@@ -86,7 +99,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup() {
+    setup(props, { emit }) {
         const state = reactive({
             labelRef: null as HTMLElement|null,
         });
@@ -96,9 +109,15 @@ export default defineComponent<Props>({
             } return false;
         };
 
+        const handleClickAnchor = (navigateFn, event: Event) => {
+            if (!props.href) navigateFn(event);
+            emit('navigate');
+        };
+
         return {
             ...toRefs(state),
             isEllipsisActive,
+            handleClickAnchor,
         };
     },
 });
