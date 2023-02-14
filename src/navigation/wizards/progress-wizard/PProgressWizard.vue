@@ -22,23 +22,6 @@
                                 {{ tab.label || tab.name }} {{ tab.optional ? `(${$t('COMPONENT.PROGRESS_WIZARD.OPTIONAL')})`: '' }}
                             </span>
                         </slot>
-
-                        <slot :name="`help-${tab.name}`"
-                              :tab="tab"
-                        >
-                            <p-tooltip-button v-if="tab.help"
-                                              class="help"
-                                              :tooltip="tab.help"
-                                              position="top"
-                            >
-                                <template #button>
-                                    <p-i name="ic_tooltip"
-                                         width="1rem"
-                                         height="1rem"
-                                    />
-                                </template>
-                            </p-tooltip-button>
-                        </slot>
                     </div>
                 </div>
             </slot>
@@ -148,7 +131,6 @@ import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import type {
     ProgressWizardProps,
 } from '@/navigation/wizards/progress-wizard/type';
-import PTooltipButton from '@/others/deprecated/tooltip-button/PTooltipButton.vue';
 import { makeProxy } from '@/utils/composition-helpers';
 
 
@@ -158,7 +140,6 @@ export default {
         PPaneLayout,
         PI,
         PButton,
-        PTooltipButton,
     },
     props: {
         tabs: {
