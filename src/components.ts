@@ -54,7 +54,6 @@ export { default as PDynamicLayout } from './data-display/dynamic/dynamic-layout
 export { default as PJsonSchemaForm } from './inputs/forms/json-schema-form/PJsonSchemaForm.vue';
 export { default as PHorizontalLayout } from './layouts/horizontal-layout/PHorizontalLayout.vue';
 export { default as PVerticalLayout } from './layouts/vertical-layout/PVerticalLayout.vue';
-export { default as PWidgetLayout } from './others/deprecated/widget-layout/PWidgetLayout.vue';
 export { default as PLazyImg } from './feedbacks/loading/lazy-img/PLazyImg.vue';
 export { default as PButtonModal } from './feedbacks/modals/button-modal/PButtonModal.vue';
 export { default as PDoubleCheckModal } from './others/console/modals/double-check-modal/PDoubleCheckModal.vue';
