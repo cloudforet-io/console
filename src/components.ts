@@ -17,7 +17,6 @@ export { default as PCopyButton } from './inputs/buttons/copy-button/PCopyButton
 export { default as PIconButton } from './inputs/buttons/icon-button/PIconButton.vue';
 export { default as PToggleButton } from './inputs/buttons/toggle-button/PToggleButton.vue';
 export { default as PCard } from './data-display/cards/card/PCard.vue';
-export { default as PCardItem } from './others/deprecated/card-item/PCardItem.vue';
 export { default as PListCard } from './data-display/cards/list-card/PListCard.vue';
 export { default as PBoard } from './data-display/board/PBoard.vue';
 export { default as PLabel } from './data-display/label/PLabel.vue';
@@ -43,8 +42,6 @@ export { default as PTooltip } from './data-display/tooltips/PTooltip.vue';
 export { default as PDatetimePicker } from './inputs/datetime-picker/PDatetimePicker.vue';
 
 export { default as PSelectButtonGroup } from './inputs/buttons/select-button-group/PSelectButtonGroup.vue';
-export { default as PTooltipButton } from './others/deprecated/tooltip-button/PTooltipButton.vue';
-export { default as PChartLoader } from './others/console/charts/chart-loader/PChartLoader.vue';
 export { default as PContextMenu } from './inputs/context-menu/PContextMenu.vue';
 export { default as PDatePagination } from './navigation/pagination/date-pagination/PDatePagination.vue';
 export { default as PDefinition } from './data-display/tables/definition-table/definition/PDefinition.vue';
