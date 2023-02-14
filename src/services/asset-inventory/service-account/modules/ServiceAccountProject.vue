@@ -1,6 +1,8 @@
 <template>
     <p-pane-layout class="service-account-project">
-        <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')">
+        <p-heading heading-type="sub"
+                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"
+        >
             <template #extra>
                 <p-button v-if="mode === 'READ' && editable"
                           style-type="transparent"
@@ -25,7 +27,7 @@
                     </p-button>
                 </div>
             </template>
-        </p-panel-top>
+        </p-heading>
         <div v-if="!serviceAccountLoading"
              class="content-wrapper"
         >
@@ -49,7 +51,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PButton,
+    PPaneLayout, PHeading, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -80,7 +82,7 @@ export default defineComponent<Props>({
         ServiceAccountProjectDetail,
         ServiceAccountProjectForm,
         PPaneLayout,
-        PPanelTop,
+        PHeading,
         PButton,
     },
     props: {
@@ -156,8 +158,8 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .service-account-project {
-    /* custom design-system component - p-panel-top */
-    :deep(.p-panel-top) {
+    /* custom design-system component - p-heading */
+    :deep(.p-heading) {
         .extra {
             text-align: right;
         }

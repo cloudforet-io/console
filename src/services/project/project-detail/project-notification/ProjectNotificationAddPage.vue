@@ -4,10 +4,10 @@
                        class="flex-grow"
                        :routes="routeState.routes"
         />
-        <p-page-title child
-                      :title="pageTitle"
-                      class="page-title"
-                      @goBack="$router.go(-1)"
+        <p-heading show-back-button
+                   :title="pageTitle"
+                   class="page-title"
+                   @click-back-button="$router.go(-1)"
         />
         <notification-add-form :project-id="projectId"
                                :protocol-id="protocolId"
@@ -26,7 +26,7 @@ import VueI18n from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PBreadcrumbs, PPageTitle,
+    PBreadcrumbs, PHeading,
 } from '@spaceone/design-system';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -40,7 +40,7 @@ export default {
     components: {
         NotificationAddForm,
         PBreadcrumbs,
-        PPageTitle,
+        PHeading,
         GeneralPageLayout,
     },
 

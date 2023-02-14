@@ -1,10 +1,10 @@
 <template>
     <section class="provider-add-page">
         <!--song-lang-->
-        <p-page-title
-            child
+        <p-heading
+            show-back-button
             :title="$t('Add Provider')"
-            @goBack="$router.go(-1)"
+            @click-back-button="$router.go(-1)"
         />
         <p-divider />
         <p-data-loader class="flex-grow"
@@ -45,7 +45,7 @@ import {
 } from 'vue';
 
 import {
-    PPageTitle, PDivider, PDataLoader, PButtonModal, PIconModal,
+    PHeading, PDivider, PDataLoader, PButtonModal, PIconModal,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -57,7 +57,7 @@ import ProviderListCard from '@/services/administration/additional-settings/prov
 export default {
     name: 'ProviderAddPage',
     components: {
-        PPageTitle,
+        PHeading,
         PDivider,
         PDataLoader,
         ProviderListCard,

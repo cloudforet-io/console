@@ -1,6 +1,8 @@
 <template>
     <p-pane-layout class="service-account-account-type">
-        <p-panel-top :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ACCOUNT_TYPE_TITLE')" />
+        <p-heading heading-type="sub"
+                   :title="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ACCOUNT_TYPE_TITLE')"
+        />
         <div class="content-wrapper">
             <div class="create-mode-wrapper">
                 <div class="card-wrapper">
@@ -45,7 +47,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PSelectCard, PI,
+    PPaneLayout, PHeading, PSelectCard, PI,
 } from '@spaceone/design-system';
 
 import type { AccountType } from '@/services/asset-inventory/service-account/type';
@@ -54,7 +56,7 @@ export default defineComponent({
     name: 'ServiceAccountAccountType',
     components: {
         PPaneLayout,
-        PPanelTop,
+        PHeading,
         PSelectCard,
         PI,
     },

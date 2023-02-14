@@ -1,9 +1,9 @@
 <template>
     <div>
-        <p-page-title child
-                      :title="pageTitle"
-                      class="page-title"
-                      @goBack="$router.go(-1)"
+        <p-heading show-back-button
+                   :title="pageTitle"
+                   class="page-title"
+                   @click-back-button="$router.go(-1)"
         />
         <notification-add-form :protocol-id="protocolId"
                                :protocol-type="protocolType"
@@ -20,9 +20,7 @@ import {
 import VueI18n from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
 
-import {
-    PPageTitle,
-} from '@spaceone/design-system';
+import { PHeading } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -34,7 +32,7 @@ export default {
     name: 'NotificationAddPage',
     components: {
         NotificationAddForm,
-        PPageTitle,
+        PHeading,
     },
 
     setup() {

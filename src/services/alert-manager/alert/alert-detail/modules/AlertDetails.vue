@@ -1,6 +1,8 @@
 <template>
     <section>
-        <p-panel-top>{{ $t('PAGE_SCHEMA.BASE_INFO') }}</p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="$t('PAGE_SCHEMA.BASE_INFO')"
+        />
         <p-definition-table :fields="fields"
                             :data="data"
                             :skeleton-rows="7"
@@ -23,7 +25,9 @@
                 </span>
             </template>
         </p-definition-table>
-        <p-panel-top>{{ $t('MONITORING.ALERT.DETAIL.DETAILS.ADDITIONAL_INFO') }}</p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="$t('MONITORING.ALERT.DETAIL.DETAILS.ADDITIONAL_INFO')"
+        />
         <p-definition-table :fields="additionalState.fields"
                             :data="additionalState.data"
                             :skeleton-rows="7"
@@ -33,11 +37,10 @@
 </template>
 
 <script lang="ts">
-
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PDefinitionTable, PPanelTop,
+    PDefinitionTable, PHeading,
 } from '@spaceone/design-system';
 import { map } from 'lodash';
 
@@ -52,7 +55,7 @@ export default {
     name: 'AlertDetails',
     components: {
         PDefinitionTable,
-        PPanelTop,
+        PHeading,
     },
     props: {
         id: {

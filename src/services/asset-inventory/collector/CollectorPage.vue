@@ -1,10 +1,10 @@
 <template>
     <div class="collector-page">
-        <p-page-title :title="$t('PLUGIN.COLLECTOR.MAIN.TITLE')"
-                      use-total-count
-                      use-selected-count
-                      :selected-count="selectedItems.length"
-                      :total-count="totalCount"
+        <p-heading :title="$t('PLUGIN.COLLECTOR.MAIN.TITLE')"
+                   use-total-count
+                   use-selected-count
+                   :selected-count="selectedItems.length"
+                   :total-count="totalCount"
         >
             <template #extra>
                 <router-link :to="{name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }">
@@ -16,7 +16,7 @@
                     </p-button>
                 </router-link>
             </template>
-        </p-page-title>
+        </p-heading>
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-query-search-table :fields="fields"
@@ -221,7 +221,7 @@ import type { Component } from 'vue/types/umd';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PHorizontalLayout, PSelectDropdown, PLazyImg, PPageTitle, PDataTable, PQuerySearchTable,
+    PHorizontalLayout, PSelectDropdown, PLazyImg, PHeading, PDataTable, PQuerySearchTable,
     PTab, PTableCheckModal, PButton, PStatus, PI, PEmpty,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -261,7 +261,7 @@ export default {
     name: 'CollectorPage',
     components: {
         PI,
-        PPageTitle,
+        PHeading,
         PLazyImg,
         PHorizontalLayout,
         PButton,

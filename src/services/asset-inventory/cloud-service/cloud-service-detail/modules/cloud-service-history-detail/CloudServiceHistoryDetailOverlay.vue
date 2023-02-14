@@ -1,9 +1,9 @@
 <template>
     <div class="cloud-service-history-detail-overlay">
         <p-pane-layout class="page-wrapper">
-            <p-page-title :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')"
-                          child
-                          @goBack="$router.go(-1)"
+            <p-heading :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.HISTORY_DETAIL')"
+                       show-back-button
+                       @click-back-button="$router.go(-1)"
             >
                 <template #title-right-extra>
                     <div class="title-right-extra">
@@ -18,7 +18,7 @@
                         </p-copy-button>
                     </div>
                 </template>
-            </p-page-title>
+            </p-heading>
             <div class="content-wrapper">
                 <div class="left-part">
                     <div class="title-wrapper">
@@ -93,7 +93,6 @@
 </template>
 
 <script lang="ts">
-
 import { useInfiniteScroll } from '@vueuse/core';
 import {
     computed, defineComponent, getCurrentInstance, onMounted, reactive, toRefs, watch,
@@ -102,7 +101,7 @@ import type { PropType } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PPaneLayout, PPageTitle, PTab, PCopyButton, PBadge, PDivider, PSpinner,
+    PPaneLayout, PHeading, PTab, PCopyButton, PBadge, PDivider, PSpinner,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
@@ -146,7 +145,7 @@ export default defineComponent<Props>({
         CloudServiceHistoryLogTab,
         VerticalTimeline,
         PPaneLayout,
-        PPageTitle,
+        PHeading,
         PTab,
         CloudServiceHistoryDetailNote,
         PCopyButton,
@@ -269,8 +268,8 @@ export default defineComponent<Props>({
         border: none;
         flex-grow: 1;
 
-        /* custom design-system component - p-page-title */
-        :deep(.p-page-title) {
+        /* custom design-system component - p-heading */
+        :deep(.p-heading) {
             min-height: 3.5rem;
             height: auto;
             padding: 1.5rem 1.5rem 0 1.5rem;

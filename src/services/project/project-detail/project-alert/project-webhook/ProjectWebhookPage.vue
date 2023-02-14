@@ -20,10 +20,10 @@
             @export="onExport"
         >
             <template #toolbox-top>
-                <p-panel-top
-                    use-total-count
-                    :total-count="totalCount"
-                    :title="$t('PROJECT.DETAIL.SUBTAB_WEBHOOK')"
+                <p-heading heading-type="sub"
+                           use-total-count
+                           :total-count="totalCount"
+                           :title="$t('PROJECT.DETAIL.SUBTAB_WEBHOOK')"
                 />
             </template>
             <template #toolbox-left>
@@ -138,7 +138,7 @@ import type { Vue } from 'vue/types/vue';
 
 import {
     PToolboxTable,
-    PPanelTop,
+    PHeading,
     PButton,
     PStatus,
     PLazyImg,
@@ -184,7 +184,7 @@ export default {
         WebhookUpdateFormModal,
         DeleteModal,
         PToolboxTable,
-        PPanelTop,
+        PHeading,
         PButton,
         PSelectDropdown,
         PStatus,

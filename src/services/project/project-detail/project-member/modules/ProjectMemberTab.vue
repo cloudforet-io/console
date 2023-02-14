@@ -13,9 +13,10 @@
                          @refresh="handleChangeTable()"
         >
             <template #toolbox-top>
-                <p-panel-top :title="$t('PROJECT.DETAIL.MEMBER_TITLE')"
-                             use-total-count
-                             :total-count="totalCount"
+                <p-heading heading-type="sub"
+                           :title="$t('PROJECT.DETAIL.MEMBER_TITLE')"
+                           use-total-count
+                           :total-count="totalCount"
                 />
             </template>
             <template #toolbox-left>
@@ -94,7 +95,7 @@ import {
     PAnchor,
     PBadge,
     PButton,
-    PPanelTop,
+    PHeading,
     PSelectDropdown,
     PTableCheckModal,
     PToolboxTable,
@@ -134,7 +135,7 @@ export default {
     components: {
         PAnchor,
         PToolboxTable,
-        PPanelTop,
+        PHeading,
         PButton,
         PSelectDropdown,
         PBadge,
@@ -359,7 +360,7 @@ export default {
     /* custom design-system component - p-toolbox-table */
     :deep(.p-toolbox-table) {
         @apply border-none;
-        .p-panel-top {
+        .p-heading {
             height: auto;
             line-height: 1.6;
             margin-bottom: 0.5rem;

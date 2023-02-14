@@ -100,8 +100,8 @@ export default {
 .service-account-base-information-detail {
     /* custom design-system component - p-dynamic-layout */
 
-    /* custom design-system component - p-panel-top */
-    :deep(.p-panel-top) {
+    /* custom design-system component - p-heading */
+    :deep(.p-heading) {
         display: none;
     }
 }

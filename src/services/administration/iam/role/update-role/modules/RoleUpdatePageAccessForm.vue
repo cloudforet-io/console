@@ -1,8 +1,8 @@
 <template>
     <p-pane-layout class="role-create-page-access-form">
-        <p-panel-top>
-            {{ $t('IAM.ROLE.DETAIL.PAGE_ACCESS') }}
-        </p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="$t('IAM.ROLE.DETAIL.PAGE_ACCESS')"
+        />
         <div class="page-access-menu">
             <div class="header-wrapper">
                 <span class="left-part">{{ $t('IAM.ROLE.FORM.MENU') }}</span>
@@ -37,13 +37,12 @@
 </template>
 
 <script lang="ts">
-
 import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
+import { PPaneLayout, PHeading } from '@spaceone/design-system';
 import { find, isEqual } from 'lodash';
 
 import { store } from '@/store';
@@ -151,7 +150,7 @@ export default {
     components: {
         RoleUpdatePageAccessMenuItem,
         PPaneLayout,
-        PPanelTop,
+        PHeading,
     },
     props: {
         initialPagePermissions: {

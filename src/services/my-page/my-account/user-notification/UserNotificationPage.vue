@@ -1,6 +1,6 @@
 <template>
     <section class="notification-wrapper">
-        <p-page-title :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')" />
+        <p-heading :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')" />
         <p-pane-layout>
             <notification-channel-list />
         </p-pane-layout>
@@ -13,7 +13,7 @@ import {
 } from 'vue';
 
 import {
-    PPageTitle, PPaneLayout,
+    PHeading, PPaneLayout,
 } from '@spaceone/design-system';
 
 import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
@@ -22,7 +22,7 @@ export default {
     name: 'UserNotificationPage',
     components: {
         NotificationChannelList,
-        PPageTitle,
+        PHeading,
         PPaneLayout,
     },
     setup() {

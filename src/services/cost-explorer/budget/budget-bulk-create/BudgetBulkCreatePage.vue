@@ -2,7 +2,7 @@
     <div>
         <div class="flex flex-wrap justify-between">
             <div>
-                <p-page-title title="Create Bulk Budget" />
+                <p-heading title="Create Bulk Budget" />
             </div>
             <handbook-button type="billing/cost-analysis/budget/bulk-create" />
         </div>
@@ -31,7 +31,7 @@ import {
     reactive, toRefs,
 } from 'vue';
 
-import { PButton, PPageTitle } from '@spaceone/design-system';
+import { PButton, PHeading } from '@spaceone/design-system';
 
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 
@@ -46,11 +46,11 @@ export default {
     name: 'BudgetBulkCreatePage',
     components: {
         HandbookButton,
-        PPageTitle,
         BudgetBulkCreateFileUpload,
         BudgetBulkCreateTemplateDownload,
-        PButton,
         BudgetBulkCreateModal,
+        PButton,
+        PHeading,
     },
     setup() {
         const state = reactive({

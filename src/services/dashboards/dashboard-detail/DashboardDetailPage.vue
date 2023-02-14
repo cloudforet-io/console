@@ -1,6 +1,6 @@
 <template>
     <div class="dashboard-detail-page">
-        <p-page-title :title="dashboardDetailState.name">
+        <p-heading :title="dashboardDetailState.name">
             <p-skeleton v-if="!dashboardDetailState.name"
                         width="20rem"
                         height="1.5rem"
@@ -45,7 +45,7 @@
                                            @update:visible-clone-modal="handleVisibleCloneModal"
                 />
             </template>
-        </p-page-title>
+        </p-heading>
         <div class="filter-box">
             <dashboard-labels :label-list="dashboardDetailState.labels" />
             <dashboard-toolset
@@ -88,7 +88,7 @@ import {
 } from 'vue';
 
 import {
-    PDivider, PI, PIconButton, PPageTitle, PSkeleton,
+    PDivider, PI, PIconButton, PHeading, PSkeleton,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -279,7 +279,7 @@ onMounted(() => {
 </script>
 
 <style lang="postcss" scoped>
-.p-page-title {
+.p-heading {
     margin-bottom: 0.75rem;
 }
 .dashboard-title-icon-buttons-wrapper {

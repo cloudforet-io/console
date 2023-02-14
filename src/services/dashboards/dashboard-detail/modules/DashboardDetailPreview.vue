@@ -3,13 +3,13 @@
     <div ref="dashboardRef"
          class="dashboard-detail-preview"
     >
-        <p-page-title ref="dashboardTitleRef"
-                      :title="state.name"
+        <p-heading ref="dashboardTitleRef"
+                   :title="state.name"
         >
             <template #extra>
                 <dashboard-toolset />
             </template>
-        </p-page-title>
+        </p-heading>
         <div class="filter-box">
             <div>{{ $t('DASHBOARDS.DETAIL.PDF_EXPORT.APPLIED_FILTERS') }}</div> <dashboard-labels :label-list="state.labelList" />
         </div>
@@ -26,7 +26,7 @@ import {
     reactive, computed, watch, onMounted, ref,
 } from 'vue';
 
-import { PPageTitle } from '@spaceone/design-system';
+import { PHeading } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 

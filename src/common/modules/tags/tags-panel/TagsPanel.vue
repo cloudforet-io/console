@@ -1,11 +1,10 @@
 <template>
     <div>
-        <p-panel-top :use-total-count="true"
-                     :total-count="isCustomMode ? customItems.length : items.length"
+        <p-heading heading-type="sub"
+                   :use-total-count="true"
+                   :total-count="isCustomMode ? customItems.length : items.length"
+                   :title="$t('COMMON.TAGS.TITLE')"
         >
-            <template #default>
-                {{ $t('COMMON.TAGS.TITLE') }}
-            </template>
             <template #extra>
                 <div class="edit-button-container">
                     <p-button style-type="secondary"
@@ -17,7 +16,7 @@
                     </p-button>
                 </div>
             </template>
-        </p-panel-top>
+        </p-heading>
         <slot name="table-top" />
         <p-data-table :fields="isCustomMode ? customFields : fields"
                       :items="isCustomMode ? customItems : items"
@@ -49,7 +48,6 @@
 </template>
 
 <script lang="ts">
-
 import type { PropType, SetupContext } from 'vue';
 import {
     computed, reactive, toRefs, watch,
@@ -57,7 +55,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PDataTable, PPanelTop, PButton,
+    PDataTable, PHeading, PButton,
 } from '@spaceone/design-system';
 import { get, camelCase } from 'lodash';
 
@@ -79,7 +77,7 @@ export default {
     name: 'TagsPanel',
     components: {
         PDataTable,
-        PPanelTop,
+        PHeading,
         PButton,
         TagsOverlay,
     },

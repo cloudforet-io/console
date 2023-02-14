@@ -44,9 +44,9 @@
                             />
                         </span>
                     </div>
-                    <p-page-title :title="storeState.groupName ? storeState.groupName : $t('PROJECT.LANDING.ALL_PROJECT')"
-                                  use-total-count
-                                  :total-count="storeState.projectCount || 0"
+                    <p-heading :title="storeState.groupName ? storeState.groupName : $t('PROJECT.LANDING.ALL_PROJECT')"
+                               use-total-count
+                               :total-count="storeState.projectCount || 0"
                     >
                         <template #title-right-extra>
                             <div class="favorite-btn-wrapper">
@@ -100,7 +100,7 @@
                                 </div>
                             </div>
                         </template>
-                    </p-page-title>
+                    </p-heading>
                     <project-card-list class="card-container"
                                        :parent-groups="storeState.parentGroups"
                                        :manage-disabled="!hasRootProjectGroupManagePermission"
@@ -129,7 +129,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PI, PPageTitle, PBreadcrumbs, PButton, PSelectDropdown,
+    PI, PHeading, PBreadcrumbs, PButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -185,7 +185,7 @@ export default {
         PVerticalPageLayout,
         PI,
         PButton,
-        PPageTitle,
+        PHeading,
         ProjectSearch,
         ProjectGroupFormModal,
     },
@@ -386,7 +386,7 @@ export default {
     @apply flex flex-col w-full h-full;
 }
 
-.p-page-title {
+.p-heading {
     @apply pb-5 border-b border-gray-200;
 }
 

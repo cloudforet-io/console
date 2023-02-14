@@ -1,6 +1,8 @@
 <template>
     <p-pane-layout class="service-account-credentials">
-        <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')">
+        <p-heading heading-type="sub"
+                   :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
+        >
             <template #extra>
                 <p-button v-if="mode === 'READ' && editable && !isEmpty(credentialData)"
                           icon-left="ic_edit"
@@ -25,7 +27,7 @@
                     </p-button>
                 </div>
             </template>
-        </p-panel-top>
+        </p-heading>
         <div class="content-wrapper">
             <service-account-credentials-detail v-show="mode === 'READ'"
                                                 :credential-data="credentialData"
@@ -53,7 +55,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PButton,
+    PPaneLayout, PHeading, PButton,
 } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
@@ -92,7 +94,7 @@ export default defineComponent<Props>({
         ServiceAccountCredentialsForm,
         ServiceAccountCredentialsDetail,
         PPaneLayout,
-        PPanelTop,
+        PHeading,
         PButton,
     },
     props: {
@@ -299,8 +301,8 @@ export default defineComponent<Props>({
 </script>
 <style lang="postcss" scoped>
 .service-account-credentials {
-    /* custom design-system component - p-panel-top */
-    :deep(.p-panel-top) {
+    /* custom design-system component - p-heading */
+    :deep(.p-heading) {
         .extra {
             text-align: right;
         }

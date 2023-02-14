@@ -1,6 +1,6 @@
 <template>
     <div class="alert-dashboard-page">
-        <p-page-title :title="$t('MONITORING.ALERT.DASHBOARD.DASHBOARD')" />
+        <p-heading :title="$t('MONITORING.ALERT.DASHBOARD.DASHBOARD')" />
         <div class="widget-wrapper">
             <alert-state-widget :activated-projects="activatedProjects"
                                 class="alert-state-widget"
@@ -26,9 +26,7 @@ import {
     reactive, toRefs,
 } from 'vue';
 
-import {
-    PPageTitle,
-} from '@spaceone/design-system';
+import { PHeading } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -46,7 +44,7 @@ export default {
         CurrentProjectStatusWidget,
         AlertHistoryWidget,
         AlertStateWidget,
-        PPageTitle,
+        PHeading,
     },
     setup() {
         const state = reactive({

@@ -24,9 +24,9 @@
             </template>
             <template #api_key>
                 <section>
-                    <p-panel-top>
-                        {{ $t('IDENTITY.USER.MAIN.API_KEY') }}
-                    </p-panel-top>
+                    <p-heading heading-type="sub"
+                               :title="$t('IDENTITY.USER.MAIN.API_KEY')"
+                    />
                     <user-a-p-i-key-table class="api-key-table"
                                           :user-id="selectedUsers[0].user_id"
                                           :disabled="manageDisabled"
@@ -86,7 +86,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PEmpty, PStatus, PTab, PDataTable, PPanelTop,
+    PEmpty, PStatus, PTab, PDataTable, PHeading,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
@@ -115,7 +115,7 @@ export default {
         PTab,
         PTagsPanel,
         PDataTable,
-        PPanelTop,
+        PHeading,
     },
     props: {
         manageDisabled: {

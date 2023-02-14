@@ -1,7 +1,9 @@
 <template>
     <section class="dashboard-scope-form">
         <p-pane-layout>
-            <p-panel-top :title="$t('DASHBOARDS.CREATE.LABEL_SCOPE')" />
+            <p-heading heading-type="sub"
+                       :title="$t('DASHBOARDS.CREATE.LABEL_SCOPE')"
+            />
             <div class="dashboard-scope-wrapper">
                 <p-radio-group direction="vertical">
                     <p-radio :selected="isDomainScope"
@@ -33,7 +35,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PRadio, PRadioGroup,
+    PPaneLayout, PHeading, PRadio, PRadioGroup,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -53,7 +55,7 @@ export default defineComponent({
         ProjectSelectDropdown,
         PRadioGroup,
         PRadio,
-        PPanelTop,
+        PHeading,
         PPaneLayout,
     },
     setup(props, { emit }: SetupContext) {

@@ -2,10 +2,9 @@
     <div v-if="!loading"
          class="alert-detail-page"
     >
-        <p-page-title :title="alertInfo.title"
-                      child
-                      class="page-title"
-                      @goBack="$router.go(-1)"
+        <p-heading :title="alertInfo.title"
+                   show-back-button
+                   @click-back-button="$router.go(-1)"
         >
             <template #title-right-extra>
                 <span class="alert-number">#{{ alertInfo.alert_number }}</span>
@@ -22,7 +21,7 @@
                     />
                 </span>
             </template>
-        </p-page-title>
+        </p-heading>
         <section class="detail-contents-wrapper">
             <div class="left-wrapper">
                 <alert-summary :id="id"
@@ -87,7 +86,7 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PIconButton, PPageTitle } from '@spaceone/design-system';
+import { PIconButton, PHeading } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -125,7 +124,7 @@ export default {
         AlertKeyInfo,
         AlertSummary,
         DeleteModal,
-        PPageTitle,
+        PHeading,
         PIconButton,
     },
     props: {

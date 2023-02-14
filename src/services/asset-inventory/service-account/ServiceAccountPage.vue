@@ -1,9 +1,8 @@
 <template>
     <section class="service-account-page">
-        <p-page-title :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: selectedProviderName})"
-                      use-total-count
-                      :total-count="typeOptionState.totalCount"
-                      class="page-title"
+        <p-heading :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: selectedProviderName})"
+                   use-total-count
+                   :total-count="typeOptionState.totalCount"
         />
         <service-account-provider-list :provider-list="providerList"
                                        :selected-provider.sync="selectedProvider"
@@ -63,7 +62,7 @@ import {
 } from 'vue';
 
 import {
-    PPageTitle, PDynamicLayout, PButton, PSelectStatus,
+    PHeading, PDynamicLayout, PButton, PSelectStatus,
 } from '@spaceone/design-system';
 import type {
     DynamicLayoutEventListener,
@@ -105,7 +104,7 @@ export default {
         CustomFieldModal,
         ServiceAccountProviderList,
         PDynamicLayout,
-        PPageTitle,
+        PHeading,
         PButton,
         PSelectStatus,
     },

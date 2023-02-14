@@ -1,10 +1,10 @@
 <template>
     <div class="collection-rule">
-        <p-panel-top use-total-count
-                     :total-count="totalCount"
-        >
-            {{ $t('PLUGIN.COLLECTOR.MAIN.COLLECTION_RULE') }}
-        </p-panel-top>
+        <p-heading heading-type="sub"
+                   use-total-count
+                   :total-count="totalCount"
+                   :title="$t('PLUGIN.COLLECTOR.MAIN.COLLECTION_RULE')"
+        />
         <div class="content-wrapper">
             <p-card>
                 <template #header>
@@ -25,13 +25,13 @@
 import { reactive, toRefs } from 'vue';
 
 import {
-    PPanelTop, PCard,
+    PHeading, PCard,
 } from '@spaceone/design-system';
 
 export default {
     name: 'CollectionRule',
     components: {
-        PPanelTop,
+        PHeading,
         PCard,
     },
     props: {},

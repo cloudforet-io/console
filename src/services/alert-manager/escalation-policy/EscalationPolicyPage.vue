@@ -1,10 +1,10 @@
 <template>
     <div class="escalation-policy-page">
-        <p-page-title :title="pageTitle"
-                      use-total-count
-                      use-selected-count
-                      :total-count="tableState.totalCount"
-                      :selected-count="selectedItem ? 1 : 0"
+        <p-heading :title="pageTitle"
+                   use-total-count
+                   use-selected-count
+                   :total-count="tableState.totalCount"
+                   :selected-count="selectedItem ? 1 : 0"
         />
         <div class="table-wrapper">
             <p-toolbox
@@ -65,7 +65,7 @@ import {
 } from 'vue';
 
 import {
-    PPageTitle, PButton, PSelectDropdown, PToolbox,
+    PHeading, PButton, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
@@ -98,7 +98,7 @@ export default {
         EscalationPolicyFormModal,
         DeleteModal,
         EscalationPolicyDataTable,
-        PPageTitle,
+        PHeading,
         PButton,
         PSelectDropdown,
         PToolbox,

@@ -8,9 +8,9 @@
             <div v-if="item"
                  class="top-wrapper"
             >
-                <p-page-title :title="item.name"
-                              child
-                              @goBack="$router.go(-1)"
+                <p-heading :title="item.name"
+                           show-back-button
+                           @click-back-button="$router.go(-1)"
                 >
                     <template #title-right-extra>
                         <div class="button-wrapper">
@@ -49,7 +49,7 @@
                             </p-button>
                         </div>
                     </template>
-                </p-page-title>
+                </p-heading>
             </div>
 
             <maintenance-happening-list class="maintenance-happening-list"
@@ -114,7 +114,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PTab, PPageTitle, PButtonModal,
+    PTab, PHeading, PButtonModal,
     PButton, PCopyButton, PBreadcrumbs, PIconButton, PBadge, PDataLoader,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
@@ -163,7 +163,7 @@ export default {
         FavoriteButton,
         BetaMark,
         PButtonModal,
-        PPageTitle,
+        PHeading,
         PTab,
         PIconButton,
         PCopyButton,
@@ -356,8 +356,8 @@ export default {
     max-width: 1368px;
     margin: 0 auto;
 }
-.p-page-title {
-    @apply mb-0;
+.p-heading {
+    margin-bottom: 0;
 }
 .top-wrapper {
     @apply mb-8 flex flex-wrap items-center;

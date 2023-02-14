@@ -1,6 +1,8 @@
 <template>
     <div>
-        <p-panel-top>{{ title }}</p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="title"
+        />
         <p-definition-table :fields="fields"
                             :data="data"
                             :loading="loading"
@@ -19,7 +21,9 @@
                 </p-badge>
             </template>
         </p-definition-table>
-        <p-panel-top>{{ pageAccessState.title }}</p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="pageAccessState.title"
+        />
         <div v-for="pageAccessData in pageAccessState.pageAccessDataList"
              :key="pageAccessData.label"
         >
@@ -39,7 +43,9 @@
                 </template>
             </p-definition-table>
         </div>
-        <p-panel-top>{{ $t('IAM.ROLE.DETAIL.API_POLICY') }}</p-panel-top>
+        <p-heading heading-type="sub">
+            {{ $t('IAM.ROLE.DETAIL.API_POLICY') }}
+        </p-heading>
         <p-data-table :fields="policyState.fields"
                       :items="policyState.items"
                       :loading="loading"
@@ -70,14 +76,13 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PAnchor, PBadge, PDataTable, PDefinitionTable, PPanelTop,
+    PAnchor, PBadge, PDataTable, PDefinitionTable, PHeading,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
@@ -110,7 +115,7 @@ export default {
     name: 'RoleDetail',
     components: {
         PDefinitionTable,
-        PPanelTop,
+        PHeading,
         PBadge,
         PDataTable,
         PAnchor,

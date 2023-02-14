@@ -1,8 +1,9 @@
 <template>
     <div class="cloud-service-history-changes-tab">
-        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES')"
-                     use-total-count
-                     :total-count="changesCount"
+        <p-heading heading-type="sub"
+                   :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES')"
+                   use-total-count
+                   :total-count="changesCount"
         />
         <div class="cloud-service-history-changes-wrapper">
             <nav class="cloud-service-history-changes-key-nav">
@@ -76,7 +77,7 @@ import {
 } from 'vue';
 
 import {
-    PPanelTop, PCard, PContextMenu, PI,
+    PHeading, PCard, PContextMenu, PI,
 } from '@spaceone/design-system';
 
 import vueDiff from '@/common/components/forms/vue-diff/Diff.vue';
@@ -89,7 +90,7 @@ export default defineComponent({
     name: 'CloudServiceHistoryChangesTab',
     components: {
         vueDiff,
-        PPanelTop,
+        PHeading,
         PCard,
         PContextMenu,
         PI,
@@ -156,7 +157,7 @@ export default defineComponent({
 .cloud-service-history-changes-tab {
     height: 100%;
     padding: 1rem;
-    .p-panel-top {
+    .p-heading {
         margin: 0.5rem 0 1rem 0;
     }
     .cloud-service-history-changes-wrapper {

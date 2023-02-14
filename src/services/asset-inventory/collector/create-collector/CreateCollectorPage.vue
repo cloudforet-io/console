@@ -1,8 +1,8 @@
 <template>
     <div class="collector-creator-page">
-        <p-page-title :title="$t('PLUGIN.COLLECTOR.CREATE.TITLE')"
-                      child
-                      @goBack="$router.go(-1)"
+        <p-heading :title="$t('PLUGIN.COLLECTOR.CREATE.TITLE')"
+                   show-back-button
+                   @click-back-button="$router.go(-1)"
         />
         <p-progress-wizard :tabs="tabState.tabs"
                            :active-idx.sync="tabState.activeIdx"
@@ -64,14 +64,13 @@
 </template>
 
 <script lang="ts">
-
 import {
     reactive, toRefs, computed, getCurrentInstance,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PProgressWizard, PSelectDropdown, PLazyImg, PFieldGroup, PTextInput, PPageTitle, PToggleButton,
+    PProgressWizard, PSelectDropdown, PLazyImg, PFieldGroup, PTextInput, PHeading, PToggleButton,
 } from '@spaceone/design-system';
 import { get, some } from 'lodash';
 
@@ -96,7 +95,7 @@ export default {
         PFieldGroup,
         PProgressWizard,
         TagsInputGroup,
-        PPageTitle,
+        PHeading,
         PLazyImg,
         PToggleButton,
     },

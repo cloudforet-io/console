@@ -1,8 +1,8 @@
 <template>
     <p-pane-layout class="role-update-page-base-information">
-        <p-panel-top>
-            {{ $t('IAM.ROLE.DETAIL.BASE_INFORMATION') }}
-        </p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="$t('IAM.ROLE.DETAIL.BASE_INFORMATION')"
+        />
         <div class="input-wrapper">
             <p-field-group
                 :label="$t('IAM.ROLE.DETAIL.NAME')"
@@ -63,7 +63,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PPaneLayout, PPanelTop, PFieldGroup, PFieldTitle, PTextInput, PSelectCard,
+    PPaneLayout, PHeading, PFieldGroup, PFieldTitle, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -80,7 +80,7 @@ export default {
     name: 'RoleUpdatePageBaseInformation',
     components: {
         PPaneLayout,
-        PPanelTop,
+        PHeading,
         PFieldGroup,
         PTextInput,
         PFieldTitle,

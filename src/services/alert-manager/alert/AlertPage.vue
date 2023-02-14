@@ -1,6 +1,6 @@
 <template>
     <div class="alert-page">
-        <p-page-title :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')" />
+        <p-heading :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')" />
         <div class="content-wrapper grid grid-cols-12 gap-4">
             <new-assigned-alert-list-card class="col-span-12" />
             <assigned-alert-info-panel @select="onSelectAlertState" />
@@ -22,7 +22,7 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PPageTitle } from '@spaceone/design-system';
+import { PHeading } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
@@ -44,7 +44,7 @@ export default {
         AssignedAlertInfoPanel,
         NewAssignedAlertListCard,
         AlertDataTable,
-        PPageTitle,
+        PHeading,
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;

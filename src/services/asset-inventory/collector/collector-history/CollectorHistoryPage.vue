@@ -1,8 +1,8 @@
 <template>
     <div class="collector-history-page">
-        <p-page-title :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')"
-                      child
-                      @goBack="$router.go(-1)"
+        <p-heading :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')"
+                   show-back-button
+                   @click-back-button="$router.go(-1)"
         />
         <p-collector-history-chart @click-date="handleClickDate" />
         <div class="collector-history-table">
@@ -112,7 +112,7 @@ import {
 } from 'vue';
 
 import {
-    PPageTitle, PPagination, PButtonModal, PLazyImg, PI,
+    PHeading, PPagination, PButtonModal, PLazyImg, PI,
     PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -179,7 +179,7 @@ export default {
         PButtonModal,
         PPagination,
         PToolboxTable,
-        PPageTitle,
+        PHeading,
         PSelectButtonGroup,
         PProgressBar,
         PStatus,

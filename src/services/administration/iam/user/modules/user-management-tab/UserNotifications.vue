@@ -1,7 +1,8 @@
 <template>
     <section class="user-notifications-tab">
-        <p-panel-top>
-            {{ title }}
+        <p-heading heading-type="sub"
+                   :title="title"
+        >
             <template #extra>
                 <router-link :to="manageLink">
                     <p-button style-type="primary"
@@ -11,7 +12,7 @@
                     </p-button>
                 </router-link>
             </template>
-        </p-panel-top>
+        </p-heading>
 
         <p-data-table
             :items="items"
@@ -67,13 +68,12 @@
     </section>
 </template>
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
 import {
-    PBadge, PButton, PDataTable, PPanelTop,
+    PBadge, PButton, PDataTable, PHeading,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -92,7 +92,7 @@ export default {
     name: 'UserNotifications',
     components: {
         PDataTable,
-        PPanelTop,
+        PHeading,
         PBadge,
         PButton,
     },

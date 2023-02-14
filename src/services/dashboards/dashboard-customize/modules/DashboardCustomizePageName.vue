@@ -1,7 +1,6 @@
 <template>
-    <p-page-title
-        child
-        @goBack="$router.go(-1)"
+    <p-heading show-back-button
+               @click-back-button="$router.go(-1)"
     >
         <template v-if="props.dashboardId">
             <p-field-group v-if="props.name"
@@ -47,7 +46,7 @@
                 </template>
             </p-field-group>
         </template>
-    </p-page-title>
+    </p-heading>
 </template>
 <script setup lang="ts">
 // Below directive is used. Do not remove!!!
@@ -58,7 +57,7 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PPageTitle, PSkeleton, PTextInput,
+    PFieldGroup, PHeading, PSkeleton, PTextInput,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -171,9 +170,9 @@ watch(() => invalidState.nameInput, (invalid) => {
     width: 100%;
 }
 
-.p-page-title {
+.p-heading {
     margin-bottom: 0;
-    :deep(.title-wrapper) {
+    :deep(.heading-wrapper) {
         display: flex;
         width: 100%;
         & h2 {
@@ -182,7 +181,7 @@ watch(() => invalidState.nameInput, (invalid) => {
         .p-field-group {
             margin-bottom: 0.75rem;
         }
-        .back-btn {
+        .back-button {
             margin-top: 0.1875rem;
         }
     }

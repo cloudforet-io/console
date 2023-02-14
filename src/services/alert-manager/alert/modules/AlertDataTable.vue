@@ -23,10 +23,10 @@
             >
                 <template #toolbox-top>
                     <div class="panel-top-wrapper">
-                        <p-panel-top
-                            use-total-count
-                            :total-count="totalCount"
-                            :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')"
+                        <p-heading heading-type="sub"
+                                   use-total-count
+                                   :total-count="totalCount"
+                                   :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')"
                         >
                             <template #extra>
                                 <alert-actions :selected-items="selectedItems"
@@ -34,7 +34,7 @@
                                                @refresh="getAlerts()"
                                 />
                             </template>
-                        </p-panel-top>
+                        </p-heading>
                     </div>
                 </template>
                 <template #toolbox-left>
@@ -127,7 +127,7 @@ import {
 } from 'vue';
 
 import {
-    PToolboxTable, PButton, PPanelTop, PBadge, PI, PAnchor,
+    PToolboxTable, PButton, PHeading, PBadge, PI, PAnchor,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -175,7 +175,7 @@ export default {
         AlertTriggeredBy,
         PToolboxTable,
         PButton,
-        PPanelTop,
+        PHeading,
         PBadge,
         PI,
         PAnchor,
@@ -479,7 +479,7 @@ export default {
             @apply bg-white;
         }
         .panel-top-wrapper {
-            .p-panel-top {
+            .p-heading {
                 margin-top: 1.5rem;
             }
         }

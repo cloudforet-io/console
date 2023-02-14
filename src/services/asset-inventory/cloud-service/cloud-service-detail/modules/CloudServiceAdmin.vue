@@ -1,7 +1,8 @@
 <template>
     <div>
-        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.ADMIN.MEMBER')"
-                     :total-count="totalCount"
+        <p-heading heading-type="sub"
+                   :title="$t('INVENTORY.CLOUD_SERVICE.ADMIN.MEMBER')"
+                   :total-count="totalCount"
         />
         <p-search-table :fields="fields"
                         :items="items"
@@ -35,7 +36,7 @@ import {
 } from 'vue';
 
 import {
-    PPanelTop, PBadge, PSearchTable,
+    PHeading, PBadge, PSearchTable,
 } from '@spaceone/design-system';
 import type { SearchTableListeners } from '@spaceone/design-system/types/data-display/tables/search-table/type';
 
@@ -53,7 +54,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 export default {
     name: 'CloudServiceAdmin',
     components: {
-        PPanelTop, PBadge, PSearchTable,
+        PHeading, PBadge, PSearchTable,
     },
     props: {
         cloudServiceProjectId: {

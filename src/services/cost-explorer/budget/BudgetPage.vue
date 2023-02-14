@@ -1,6 +1,6 @@
 <template>
     <div class="budget-page">
-        <p-page-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
+        <p-heading :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
             <template #extra>
                 <!--                <p-select-dropdown-->
                 <!--                    class="create-budget-box"-->
@@ -18,7 +18,7 @@
                     {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
                 </p-button>
             </template>
-        </p-page-title>
+        </p-heading>
         <p-divider />
         <budget-list :filters="filters"
                      @update:filters="handleUpdateFilters"
@@ -27,14 +27,13 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PPageTitle, PDivider, PButton,
+    PHeading, PDivider, PButton,
 } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -52,8 +51,7 @@ export default {
     name: 'BudgetPage',
     components: {
         BudgetList,
-        PPageTitle,
-        // PSelectDropdown,
+        PHeading,
         PDivider,
         PButton,
     },

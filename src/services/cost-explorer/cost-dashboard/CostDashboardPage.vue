@@ -3,7 +3,7 @@
         <div v-if="dashboardList.length"
              class="top-wrapper"
         >
-            <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
+            <p-heading :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
                 <template #title-left-extra>
                     <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC"
                          name="ic_public"
@@ -49,7 +49,7 @@
                         </div>
                     </div>
                 </template>
-            </p-page-title>
+            </p-heading>
             <cost-dashboard-filter :dashboard-id="dashboardId"
                                    :filters.sync="filters"
                                    :manage-disabled="!hasManagePermission"
@@ -101,13 +101,12 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
 import {
-    PI, PIconButton, PButton, PPageTitle,
+    PI, PIconButton, PButton, PHeading,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -160,7 +159,7 @@ export default {
         CostDashboardMoreMenu,
         DashboardLayouts,
         CostDashboardFilter,
-        PPageTitle,
+        PHeading,
         PIconButton,
         PButton,
         PI,
@@ -308,7 +307,7 @@ export default {
     flex-direction: column;
     height: 100%;
 }
-.p-page-title {
+.p-heading {
     margin-bottom: 0;
 }
 .top-wrapper {

@@ -1,7 +1,9 @@
 <template>
     <section>
         <p-pane-layout>
-            <p-panel-top :title="$t('DASHBOARDS.CREATE.LABEL_START_FROM')" />
+            <p-heading heading-type="sub"
+                       :title="$t('DASHBOARDS.CREATE.LABEL_START_FROM')"
+            />
             <div class="dashboard-template-wrapper">
                 <div class="dashboard-template-container">
                     <div class="card-container">
@@ -115,7 +117,7 @@
 import { computed, reactive } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PBoard, PLabel, PTextPagination, PSearch, PEmpty, PDivider, PI,
+    PPaneLayout, PHeading, PBoard, PLabel, PTextPagination, PSearch, PEmpty, PDivider, PI,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';

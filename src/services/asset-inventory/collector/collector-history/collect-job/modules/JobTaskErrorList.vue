@@ -1,10 +1,10 @@
 <template>
     <div class="job-task-error-list">
-        <p-panel-top :use-total-count="true"
-                     :total-count="errorItems.length"
-        >
-            {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST') }}
-        </p-panel-top>
+        <p-heading heading-type="sub"
+                   :use-total-count="true"
+                   :total-count="errorItems.length"
+                   :title="$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST')"
+        />
         <p-data-table :fields="errorFields"
                       :items="errorItems"
                       :sortable="false"
@@ -64,7 +64,7 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import { PDataTable, PPanelTop, PCollapsibleToggle } from '@spaceone/design-system';
+import { PDataTable, PHeading, PCollapsibleToggle } from '@spaceone/design-system';
 
 import { resourceTypeLabels } from '@/lib/reference/type';
 
@@ -89,7 +89,7 @@ export default {
     name: 'JobTaskErrorList',
     components: {
         PDataTable,
-        PPanelTop,
+        PHeading,
         PCollapsibleToggle,
     },
     props: {

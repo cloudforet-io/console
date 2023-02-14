@@ -1,6 +1,6 @@
 <template>
     <section>
-        <p-page-title :title="$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE')" />
+        <p-heading :title="$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE')" />
         <p-pane-layout class="form-wrapper">
             <p class="form-title">
                 {{ $t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION') }}
@@ -125,14 +125,13 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PPaneLayout, PButton, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PFilterableDropdown,
+    PPaneLayout, PButton, PFieldGroup, PTextInput, PSelectDropdown, PHeading, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
@@ -153,7 +152,7 @@ import { getPasswordValidationInfo } from '@/services/auth/lib/helper';
 export default {
     name: 'UserAccountPage',
     components: {
-        PPageTitle,
+        PHeading,
         PButton,
         PSelectDropdown,
         PTextInput,

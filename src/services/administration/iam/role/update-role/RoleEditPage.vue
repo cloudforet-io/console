@@ -1,8 +1,8 @@
 <template>
     <section class="role-edit-page">
-        <p-page-title child
-                      :title="$t('IAM.ROLE.FORM.EDIT_TITLE')"
-                      @goBack="$router.go(-1)"
+        <p-heading show-back-button
+                   :title="$t('IAM.ROLE.FORM.EDIT_TITLE')"
+                   @click-back-button="$router.go(-1)"
         />
         <role-update-form :initial-role-data="initialRoleData"
                           :form-type="FORM_TYPE.UPDATE"
@@ -28,10 +28,9 @@
 </template>
 
 <script lang="ts">
-
 import { reactive, toRefs } from 'vue';
 
-import { PPageTitle, PButton } from '@spaceone/design-system';
+import { PHeading, PButton } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -49,7 +48,7 @@ import RoleUpdateForm from '@/services/administration/iam/role/update-role/modul
 export default {
     name: 'RoleEditPage',
     components: {
-        PPageTitle,
+        PHeading,
         PButton,
         RoleUpdateForm,
     },

@@ -1,8 +1,9 @@
 <template>
     <div class="cloud-service-history">
-        <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.HISTORY')"
-                     :total-count="totalCount"
-                     use-total-count
+        <p-heading heading-type="sub"
+                   :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.HISTORY')"
+                   :total-count="totalCount"
+                   use-total-count
         />
         <p-toolbox search-type="query"
                    searchable
@@ -99,7 +100,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PPanelTop, PToolbox, PDataLoader, PBadge, PSpinner,
+    PHeading, PToolbox, PDataLoader, PBadge, PSpinner,
 } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
@@ -140,7 +141,7 @@ export default {
         CloudServiceHistoryDateSelectDropdown,
         CloudServiceHistoryDetailOverlay,
         VerticalTimeline,
-        PPanelTop,
+        PHeading,
         PToolbox,
         PDataLoader,
         PBadge,

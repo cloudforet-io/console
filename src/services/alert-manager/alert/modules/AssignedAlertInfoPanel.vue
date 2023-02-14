@@ -1,8 +1,9 @@
 <template>
     <p-pane-layout class="assign-alert-info">
-        <p-panel-top :title="$t('MONITORING.ALERT.ALERT_LIST.OPEN_ALERT')"
-                     :total-count="totalCount"
-                     use-total-count
+        <p-heading heading-type="sub"
+                   :title="$t('MONITORING.ALERT.ALERT_LIST.OPEN_ALERT')"
+                   :total-count="totalCount"
+                   use-total-count
         />
         <div class="filter-wrapper">
             <span class="filter text-alert mr-4"
@@ -25,7 +26,7 @@
 
 import { computed, reactive, toRefs } from 'vue';
 
-import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
+import { PPaneLayout, PHeading } from '@spaceone/design-system';
 import { find } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -40,7 +41,7 @@ export default {
     name: 'AssignedAlertInfoPanel',
     components: {
         PPaneLayout,
-        PPanelTop,
+        PHeading,
     },
     props: {
     },
@@ -89,8 +90,8 @@ export default {
     @apply col-span-12 rounded-lg;
     padding-bottom: 1rem;
 
-    /* custom design-system component - .p-panel-top */
-    :deep(.p-panel-top) {
+    /* custom design-system component - .p-heading */
+    :deep(.p-heading) {
         margin-top: 1rem;
         margin-bottom: 0.25rem;
         .title, .total-count {

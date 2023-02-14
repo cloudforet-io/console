@@ -1,9 +1,9 @@
 <template>
     <section class="policy-create-page">
-        <p-page-title
-            child
+        <p-heading
+            show-back-button
             :title="$t('IAM.POLICY.FORM.CREATE_TITLE')"
-            @goBack="$router.go(-1)"
+            @click-back-button="$router.go(-1)"
         />
         <p-pane-layout class="policy-create-info-wrapper">
             <div class="policy-create-contents">
@@ -64,13 +64,12 @@
 </template>
 
 <script lang="ts">
-
 import {
     reactive, toRefs,
 } from 'vue';
 
 import {
-    PPageTitle, PPaneLayout, PBadge, PFieldTitle, PFieldGroup, PTextInput, PTextEditor, PButton,
+    PHeading, PPaneLayout, PBadge, PFieldTitle, PFieldGroup, PTextInput, PTextEditor, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -89,7 +88,7 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 export default {
     name: 'PolicyCreatePage',
     components: {
-        PPageTitle,
+        PHeading,
         PPaneLayout,
         PBadge,
         PFieldTitle,

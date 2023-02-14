@@ -1,10 +1,10 @@
 <template>
     <div class="collector-schedules">
-        <p-panel-top use-total-count
-                     :total-count="totalCount"
-        >
-            {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_TITLE') }}
-        </p-panel-top>
+        <p-heading heading-type="sub"
+                   use-total-count
+                   :total-count="totalCount"
+                   :title="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_TITLE')"
+        />
         <p-toolbox-table :items="items"
                          :fields="tableState.fields"
                          sortable
@@ -99,7 +99,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PPanelTop,
+    PButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PHeading,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -128,7 +128,7 @@ export default {
         PSelectDropdown,
         PToolboxTable,
         PButton,
-        PPanelTop,
+        PHeading,
         EditScheduleModal,
     },
     props: {
@@ -281,7 +281,7 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .collector-schedules {
-    .p-panel-top {
+    .p-heading {
         margin-bottom: 0;
     }
     .p-toolbox-table {

@@ -1,10 +1,10 @@
 <template>
     <section class="role-page">
-        <p-page-title :title="$t('IAM.ROLE.ROLE')"
-                      use-selected-count
-                      use-total-count
-                      :total-count="totalCount"
-                      :selected-count="selectedIndices.length"
+        <p-heading :title="$t('IAM.ROLE.ROLE')"
+                   use-selected-count
+                   use-total-count
+                   :total-count="totalCount"
+                   :selected-count="selectedIndices.length"
         />
         <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
@@ -25,7 +25,7 @@ import {
 } from 'vue';
 
 import {
-    PHorizontalLayout, PPageTitle,
+    PHorizontalLayout, PHeading,
 } from '@spaceone/design-system';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -38,7 +38,7 @@ export default defineComponent({
     components: {
         RoleManagementTab,
         PHorizontalLayout,
-        PPageTitle,
+        PHeading,
         RoleManagementTable,
     },
     setup() {

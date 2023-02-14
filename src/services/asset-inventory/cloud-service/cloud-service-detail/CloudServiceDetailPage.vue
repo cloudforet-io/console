@@ -1,21 +1,21 @@
 <template>
     <div>
-        <p-page-title v-if="!isServerPage"
-                      :title="name"
-                      child
-                      use-total-count
-                      use-selected-count
-                      :total-count="typeOptionState.totalCount"
-                      :selected-count="tableState.selectedItems.length"
-                      @goBack="$router.go(-1)"
+        <p-heading v-if="!isServerPage"
+                   :title="name"
+                   show-back-button
+                   use-total-count
+                   use-selected-count
+                   :total-count="typeOptionState.totalCount"
+                   :selected-count="tableState.selectedItems.length"
+                   @click-back-button="$router.go(-1)"
         />
-        <p-page-title v-else
-                      :title="$t('INVENTORY.SERVER.MAIN.TITLE')"
-                      use-total-count
-                      use-selected-count
-                      :total-count="typeOptionState.totalCount"
-                      :selected-count="tableState.selectedItems.length"
-                      @goBack="$router.go(-1)"
+        <p-heading v-else
+                   :title="$t('INVENTORY.SERVER.MAIN.TITLE')"
+                   use-total-count
+                   use-selected-count
+                   :total-count="typeOptionState.totalCount"
+                   :selected-count="tableState.selectedItems.length"
+                   @click-back-button="$router.go(-1)"
         />
         <div v-if="!checkIsEmpty(overviewState.period)"
              class="filter-wrapper"
@@ -155,7 +155,6 @@
 </template>
 
 <script lang="ts">
-
 import { debouncedWatch } from '@vueuse/core';
 import {
     reactive, computed, getCurrentInstance, watch,
@@ -165,7 +164,7 @@ import type { Vue } from 'vue/types/vue';
 
 import {
     PHorizontalLayout, PTab, PDynamicLayout,
-    PPageTitle, PEmpty, PTableCheckModal, PButton,
+    PHeading, PEmpty, PTableCheckModal, PButton,
 } from '@spaceone/design-system';
 import type {
     DynamicLayoutEventListener,
@@ -228,7 +227,7 @@ export default {
         PDynamicLayout,
         PTableCheckModal,
         PHorizontalLayout,
-        PPageTitle,
+        PHeading,
         PTab,
         PButton,
         PEmpty,

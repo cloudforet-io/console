@@ -1,11 +1,12 @@
 <template>
     <p-pane-layout>
-        <p-panel-top>
-            Download Template
+        <p-heading heading-type="sub"
+                   title="Download Template"
+        >
             <template #extra>
                 (optional)
             </template>
-        </p-panel-top>
+        </p-heading>
 
         <p-button style-type="primary"
                   icon-left="ic_download"
@@ -57,7 +58,7 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PButton, PPaneLayout, PPanelTop, PRadio,
+    PFieldGroup, PButton, PPaneLayout, PHeading, PRadio,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -88,7 +89,7 @@ export default {
         BudgetTargetSelect,
         BudgetPeriodSelect,
         PPaneLayout,
-        PPanelTop,
+        PHeading,
         PButton,
         PFieldGroup,
         PRadio,

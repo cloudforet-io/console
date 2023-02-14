@@ -4,9 +4,10 @@
                    class="cloud-service-history-log-tab"
     >
         <div v-if="tabs.length">
-            <p-panel-top :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG')"
-                         use-total-count
-                         :total-count="totalCount"
+            <p-heading heading-type="sub"
+                       :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG')"
+                       use-total-count
+                       :total-count="totalCount"
             />
             <p-button-tab v-if="tabs.length > 0"
                           :tabs="tabs"
@@ -73,7 +74,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButtonTab, PDynamicLayout, PPanelTop, PSelectStatus, PDataLoader,
+    PButtonTab, PDynamicLayout, PHeading, PSelectStatus, PDataLoader,
 } from '@spaceone/design-system';
 import type { DynamicLayoutEventListener } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
@@ -109,7 +110,7 @@ export default defineComponent<Props>({
     components: {
         PDynamicLayout: PDynamicLayout as any,
         PButtonTab,
-        PPanelTop,
+        PHeading,
         PSelectStatus,
         PDataLoader,
     },

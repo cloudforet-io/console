@@ -1,9 +1,9 @@
 <template>
     <section>
-        <p-page-title
-            child
+        <p-heading
+            show-back-button
             :title="policyName"
-            @goBack="$router.go(-1)"
+            @click-back-button="$router.go(-1)"
         >
             <template #title-right-extra>
                 <span v-if="type === POLICY_TYPES.MANAGED"
@@ -44,7 +44,7 @@
                     </p-button>
                 </div>
             </template>
-        </p-page-title>
+        </p-heading>
         <p-pane-layout class="policy-detail-info-wrapper">
             <div class="policy-detail-contents">
                 <p-field-title>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-field-title>
@@ -107,13 +107,12 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, defineComponent, onUnmounted,
 } from 'vue';
 
 import {
-    PPageTitle, PIconButton, PBadge, PPaneLayout, PFieldTitle, PTextEditor, PButton, PTextInput, PFieldGroup,
+    PHeading, PIconButton, PBadge, PPaneLayout, PFieldTitle, PTextEditor, PButton, PTextInput, PFieldGroup,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -135,7 +134,7 @@ import { administrationStore } from '@/services/administration/store';
 export default defineComponent<PolicyDetailPageProps>({
     name: 'PolicyDetailPage',
     components: {
-        PPageTitle,
+        PHeading,
         PIconButton,
         PBadge,
         PPaneLayout,

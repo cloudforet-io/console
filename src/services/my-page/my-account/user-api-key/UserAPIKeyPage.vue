@@ -1,8 +1,8 @@
 <template>
     <section class="api-key-wrapper">
-        <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
-                      :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')"
-                      class="page-title"
+        <p-heading :title="$t('IDENTITY.USER.MAIN.API_KEY')"
+                   :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')"
+                   class="page-title"
         />
         <user-a-p-i-key-table :user-id="userId" />
         <p-pane-layout class="sub-table-wrapper">
@@ -20,13 +20,12 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs,
 } from 'vue';
 
 import {
-    PDataTable, PPageTitle, PPaneLayout,
+    PDataTable, PHeading, PPaneLayout,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -51,7 +50,7 @@ export default {
         UserAPIKeyTable,
         PPaneLayout,
         PDataTable,
-        PPageTitle,
+        PHeading,
     },
     setup() {
         const state = reactive({
