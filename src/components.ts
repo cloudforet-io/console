@@ -44,7 +44,6 @@ export { default as PDatetimePicker } from './inputs/datetime-picker/PDatetimePi
 
 export { default as PSelectButtonGroup } from './inputs/buttons/select-button-group/PSelectButtonGroup.vue';
 export { default as PTooltipButton } from './others/deprecated/tooltip-button/PTooltipButton.vue';
-export { default as PChartLoader } from './others/console/charts/chart-loader/PChartLoader.vue';
 export { default as PContextMenu } from './inputs/context-menu/PContextMenu.vue';
 export { default as PDatePagination } from './navigation/pagination/date-pagination/PDatePagination.vue';
 export { default as PDefinition } from './data-display/tables/definition-table/definition/PDefinition.vue';
