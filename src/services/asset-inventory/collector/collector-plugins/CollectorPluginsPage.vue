@@ -51,15 +51,20 @@
                 <li v-for="item in plugins"
                     :key="item.name"
                 >
-                    <p-card-item :icon="item.icon"
-                                 :title="item.name"
-                                 :contents="item.tags.description"
-                    >
-                        <template #title>
-                            <span class="plugin-name">{{ item.name }}</span><span class="beta">{{ isBeta(item) ? $t('PLUGIN.COLLECTOR.PLUGINS.BETA'): '' }}</span>
+                    <p-board-item class="plugin-card">
+                        <template #left-content>
+                            <p-lazy-img :src="item.icon"
+                                        class="plugin-icon"
+                                        width="4.5rem"
+                                        height="4.5rem"
+                            />
                         </template>
-                        <template #extra>
-                            <div class="card-bottom">
+                        <template #content>
+                            <div class="plugin-card-content">
+                                <p class="plugin-name">
+                                    {{ item.name }}
+                                </p>
+                                <span class="beta">{{ isBeta(item) ? $t('PLUGIN.COLLECTOR.PLUGINS.BETA'): '' }}</span>
                                 <div v-if="item.labels">
                                     <p-badge v-for="(label, idx) in item.labels"
                                              :key="`${label}-${idx}`"
@@ -70,17 +75,16 @@
                                         {{ label }}
                                     </p-badge>
                                 </div>
-                                <div class="btns">
-                                    <p-button style-type="primary"
-                                              icon-left="ic_plus_bold"
-                                              @click="handlePluginCreate(item)"
-                                    >
-                                        {{ $t('PLUGIN.COLLECTOR.PLUGINS.CREATE') }}
-                                    </p-button>
-                                </div>
+                                <p-button style-type="primary"
+                                          icon-left="ic_plus_bold"
+                                          class="create-button"
+                                          @click="handlePluginCreate(item)"
+                                >
+                                    {{ $t('PLUGIN.COLLECTOR.PLUGINS.CREATE') }}
+                                </p-button>
                             </div>
                         </template>
-                    </p-card-item>
+                    </p-board-item>
                 </li>
             </ul>
         </p-data-loader>
@@ -94,8 +98,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PHeading, PCardItem,
-    PButton, PBadge, PI, PDivider, PDataLoader,
+    PHeading, PButton, PBadge, PI, PDivider, PDataLoader, PBoardItem, PLazyImg,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { get, range } from 'lodash';
@@ -154,7 +157,8 @@ interface RepositoryModel {
 export default {
     name: 'CollectorPluginPage',
     components: {
-        PCardItem,
+        PLazyImg,
+        PBoardItem,
         PHeading,
         PBadge,
         PI,
@@ -299,6 +303,24 @@ export default {
 .plugin-card-list {
     @apply flex flex-col flex-wrap gap-4;
     margin: auto;
+    .plugin-card {
+        .plugin-card-content {
+            position: relative;
+            .plugin-name {
+                @apply text-label-xl;
+                font-weight: bold;
+            }
+            .create-button {
+                position: absolute;
+                right: 0;
+                bottom: 0;
+            }
+        }
+        .plugin-icon {
+            flex-shrink: 0;
+            margin-right: 1.5rem;
+        }
+    }
 }
 .beta {
     @apply text-coral;
@@ -306,11 +328,5 @@ export default {
     font-weight: bold;
     vertical-align: super;
     margin-left: 0.2rem;
-}
-.card-bottom {
-    @apply flex w-full mt-4 overflow-hidden flex-wrap justify-between;
-}
-.btns {
-    @apply flex-grow inline-flex justify-end;
 }
 </style>
