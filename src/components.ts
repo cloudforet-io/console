@@ -17,7 +17,6 @@ export { default as PCopyButton } from './inputs/buttons/copy-button/PCopyButton
 export { default as PIconButton } from './inputs/buttons/icon-button/PIconButton.vue';
 export { default as PToggleButton } from './inputs/buttons/toggle-button/PToggleButton.vue';
 export { default as PCard } from './data-display/cards/card/PCard.vue';
-export { default as PCardItem } from './others/deprecated/card-item/PCardItem.vue';
 export { default as PListCard } from './data-display/cards/list-card/PListCard.vue';
 export { default as PBoard } from './data-display/board/PBoard.vue';
 export { default as PLabel } from './data-display/label/PLabel.vue';
