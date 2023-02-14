@@ -1,18 +1,20 @@
 <template>
-    <div class="p-page-title">
-        <div class="title-wrapper">
-            <span v-if="child"
-                  class="back-btn"
+    <div class="p-heading"
+         :class="`heading-${headingType}`"
+    >
+        <div class="heading-wrapper">
+            <span v-if="showBackButton"
+                  class="back-button"
             >
                 <p-icon-button name="ic_back"
-                               @click="$emit('goBack',$event)"
+                               @click="$emit('click-back-button',$event)"
                 />
             </span>
             <slot name="title-left-extra" />
             <h2 :class="{'has-left': !!$slots['title-left-extra'], 'has-right': useTotalCount || !!$slots['title-right-extra']}">
                 <slot>
                     <slot name="title">
-                        <span>{{ title }}&zwnj;</span>
+                        <span class="title">{{ title }}&zwnj;</span>
                     </slot>
                 </slot>
             </h2>
@@ -37,14 +39,18 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 
+import type { HeadingType } from '@/data-display/heading/config';
+import { HEADING_TYPE } from '@/data-display/heading/config';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { commaFormatter } from '@/utils/helpers';
 
 interface Props {
     title?: string;
-    child?: boolean;
+    headingType?: string;
+    showBackButton?: boolean;
     useTotalCount?: boolean;
     useSelectedCount?: boolean;
     totalCount?: number;
@@ -52,14 +58,18 @@ interface Props {
 }
 
 export default defineComponent<Props>({
-    name: 'PPageTitle',
+    name: 'PHeading',
     components: { PIconButton },
     props: {
         title: {
             type: String,
             default: 'Page',
         },
-        child: {
+        headingType: {
+            type: String as PropType<HeadingType>,
+            default: HEADING_TYPE.MAIN,
+        },
+        showBackButton: {
             type: Boolean,
             default: false,
         },
@@ -89,39 +99,69 @@ export default defineComponent<Props>({
 </script>
 
 <style lang="postcss">
-.p-page-title {
-    @apply mb-6 flex w-full items-start;
-    > .title-wrapper {
+.p-heading {
+    &.heading-main {
+        display: flex;
+        align-items: flex-start;
+        width: 100%;
+        margin-bottom: 1.5rem;
+        > .heading-wrapper {
+            font-weight: bold;
+            > h2 {
+                &.has-right {
+                    margin-right: 0.5rem;
+                }
+            }
+            > .total-count {
+                @apply text-gray-900;
+            }
+        }
+        > .extra {
+            margin-left: 0.5rem;
+        }
+    }
+    &.heading-sub {
+        display: flex;
+        align-items: center;
+        height: 2rem;
+        margin: 2rem 1rem 1rem 1rem;
+        > .heading-wrapper {
+            line-height: 1.2;
+            > .total-count {
+                @apply text-gray-500;
+                padding-left: 0.125rem;
+            }
+        }
+        > .extra {
+            padding-left: 1rem;
+        }
+    }
+    > .heading-wrapper {
         line-height: 2rem;
         vertical-align: middle;
         flex-grow: 99;
-        > .back-btn {
-            @apply mr-1;
+        > .back-button {
             display: inline-flex;
             line-height: inherit;
+            margin-right: 0.25rem;
         }
         > h2 {
+            @apply text-2xl;
             display: inline;
-            font-weight: bold;
-            font-size: 1.5rem;
-            line-height: inherit;
             word-break: break-all;
             &.has-left {
                 margin-left: 0.5rem;
-            }
-            &.has-right {
-                margin-right: 0.5rem;
             }
         }
         > .total-count {
             font-size: 1.125rem;
             line-height: inherit;
+            font-weight: normal;
             margin-right: 0.5rem;
         }
     }
     > .extra {
         flex-grow: 1;
-        margin-left: 0.5rem;
     }
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
     <div class="p-dynamic-layout-table">
-        <p-panel-top v-if="layoutName"
-                     class="panel-top"
-                     :use-total-count="true"
-                     :total-count="totalCount"
+        <p-heading v-if="layoutName"
+                   heading-type="sub"
+                   use-total-count
+                   :total-count="totalCount"
         >
             {{ layoutName }}
-        </p-panel-top>
+        </p-heading>
         <p-toolbox-table search-type="plain"
                          :fields="fields"
                          :items="rootData"
@@ -85,16 +85,16 @@ import type {
 import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
 import type { TableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
+import PHeading from '@/data-display/heading/PHeading.vue';
 import type { Options } from '@/data-display/tables/query-search-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
-import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 
 export default defineComponent<TableDynamicLayoutProps>({
     name: 'PDynamicLayoutTable',
     components: {
         PDynamicField,
-        PPanelTop,
         PToolboxTable,
+        PHeading,
     },
     props: {
         name: {

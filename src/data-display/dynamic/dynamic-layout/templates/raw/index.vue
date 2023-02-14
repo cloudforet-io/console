@@ -1,10 +1,15 @@
 <template>
     <div class="p-dynamic-layout-raw">
-        <p-panel-top v-if="layoutName">
+        <p-heading v-if="layoutName"
+                   heading-type="sub"
+        >
             {{ layoutName }}
-        </p-panel-top>
-        <p-text-editor class="m-4" :code="rootData" :loading="loading"
-                       folded read-only
+        </p-heading>
+        <p-text-editor class="m-4"
+                       :code="rootData"
+                       :loading="loading"
+                       folded
+                       read-only
         />
     </div>
 </template>
@@ -17,12 +22,15 @@ import type { Vue } from 'vue/types/vue';
 
 import type { RawDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
-import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
+import PHeading from '@/data-display/heading/PHeading.vue';
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 
 export default {
     name: 'PDynamicLayoutRaw',
-    components: { PTextEditor, PPanelTop },
+    components: {
+        PHeading,
+        PTextEditor,
+    },
     props: {
         name: {
             type: String,

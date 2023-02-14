@@ -1,50 +1,72 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import PPageTitle from '@/data-display/titles/page-title/PPageTitle.vue'; import {
-    getPageTitleArgTypes
-} from '@/data-display/titles/page-title/story-helper';
+import PHeading from '@/data-display/heading/PHeading.vue';
+import { getHeadingArgTypes } from '@/data-display/heading/story-helper';
 
-<Meta title='Data Display/Titles/Page Title' parameters={{
+<Meta title='Data Display/Heading' parameters={{
     design: {
         type: 'figma',
-        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124065',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=7823%3A421870&t=tyr8RcRHt8hwP1dM-4',
     }
-}} argTypes={getPageTitleArgTypes()}
+}} argTypes={getHeadingArgTypes()}
 />
 
 export const Template = (args,{argTypes})=>({
     props: Object.keys(argTypes),
-    components: { PPageTitle },
+    components: { PHeading },
     template: `
         <div class="w-full">
-            <p-page-title
+            <p-heading
                 :title="title"
-                :child="child"
+                :heading-type="headingType"
+                :show-back-button="showBackButton"
                 :use-total-count="useTotalCount"
                 :total-count="totalCount"
                 :use-selected-count="useSelectedCount"
                 :selected-count="selectedCount"
                 @goBack="onGoBack"
             >
-            </p-page-title>
+            </p-heading>
         </div>
     `,
 })
 
-# Page Title
+# Heading
 
 <br/>
 <br/>
 
-## Child Mode
+## Heading Type
 <Canvas>
-    <Story name="Child Mode">
+    <Story name="Heading Type">
         {{
-            components:{ PPageTitle },
+            components:{ PHeading },
             template: `
 <div class="w-full">
-    <p-page-title child>Page Title</p-page-title>
+    <div class="bg-gray-200">
+        <p-heading heading-type="main">Main Heading Type</p-heading>
+    </div>
+    <br/>
+    <div class="bg-gray-200">
+        <p-heading heading-type="sub">Sub Heading Type</p-heading>
+    </div>
+</div>`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Back Button Mode
+<Canvas>
+    <Story name="Back Button Mode">
+        {{
+            components:{ PHeading },
+            template: `
+<div class="w-full">
+    <p-heading show-back-button>Page Title</p-heading>
     <p class="my-4">When the title is ''</p>
-    <p-page-title child title=""></p-page-title>
+    <p-heading show-back-button title=""></p-heading>
 </div>`,
         }}
     </Story>
@@ -57,10 +79,12 @@ export const Template = (args,{argTypes})=>({
 <Canvas>
     <Story name="Total Count">
         {{
-            components:{ PPageTitle },
+            components:{ PHeading },
             template: `
 <div class="w-full">
-    <p-page-title use-total-count :total-count="32">Page Title With Total Count</p-page-title>
+    <p-heading use-total-count :total-count="32">Main Heading With Total Count</p-heading>
+    <br/>
+    <p-heading heading-type="sub" use-total-count :total-count="32">Sub Heading With Total Count</p-heading>
 </div>`,
         }}
     </Story>
@@ -73,10 +97,10 @@ export const Template = (args,{argTypes})=>({
 <Canvas>
     <Story name="Selected Count">
         {{
-            components:{ PPageTitle },
+            components:{ PHeading },
             template: `
 <div class="w-full">
-    <p-page-title use-total-count :total-count="32" use-selected-count :selected-count="2">Page Title With Selected Count</p-page-title>
+    <p-heading use-total-count :total-count="32" use-selected-count :selected-count="2">Page Title With Selected Count</p-heading>
 </div>`,
         }}
     </Story>
@@ -89,12 +113,12 @@ export const Template = (args,{argTypes})=>({
 <Canvas>
     <Story name="Long Title">
         {{
-            components:{ PPageTitle },
+            components:{ PHeading },
             template: `
 <div class="w-full">
-    <p-page-title use-total-count :total-count="32">
+    <p-heading use-total-count :total-count="32">
         long long long long long long long long long long long long long long long long long long long long title
-    </p-page-title>
+    </p-heading>
 </div>
 `,
         }}
@@ -108,16 +132,16 @@ export const Template = (args,{argTypes})=>({
 <Canvas>
     <Story name="Slots">
         {{
-            components:{ PPageTitle },
+            components:{ PHeading },
             template: `
 <div class="w-full">
-    <p-page-title use-total-count child>
+    <p-heading use-total-count show-back-button>
         <template #title-left-extra><span class="border border-primary">title-left-extra slot</span></template>
         <span class="border border-red">default slot with long long long long long long long long long long long long long long long long title</span>
         <template #title-right-extra><span class="border border-secondary">title-right-extra slot</span></template>
         <template #total-count><span class="border border-primary-1">total count slot</span></template>
         <template #extra><span class="border border-peacock-600 inline-block">extra slot</span></template>
-    </p-page-title>
+    </p-heading>
 </div>
     <!-- <div> -->
 `,

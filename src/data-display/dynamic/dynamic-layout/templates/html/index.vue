@@ -1,10 +1,13 @@
 <template>
     <div class="p-dynamic-layout-html">
-        <p-panel-top v-if="layoutName">
+        <p-heading v-if="layoutName"
+                   heading-type="sub"
+        >
             {{ layoutName }}
-        </p-panel-top>
+        </p-heading>
         <div class="inner">
-            <iframe ref="iframeRef" :title="name"
+            <iframe ref="iframeRef"
+                    :title="name"
                     scrolling="no"
                     :srcdoc="iframeData"
                     @load="onLoadIFrame"
@@ -23,7 +26,7 @@ import DOMPurify from 'dompurify';
 
 import type { HtmlDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
-import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
+import PHeading from '@/data-display/heading/PHeading.vue';
 
 import { iframeStyle } from './style';
 
@@ -37,7 +40,7 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
 });
 export default {
     name: 'PDynamicLayoutHtml',
-    components: { PPanelTop },
+    components: { PHeading },
     props: {
         name: {
             type: String,

@@ -1,6 +1,8 @@
 import type { ArgTypes } from '@storybook/addons';
 
-export const getPageTitleArgTypes = (): ArgTypes => ({
+import { HEADING_TYPE } from '@/data-display/heading/config';
+
+export const getHeadingArgTypes = (): ArgTypes => ({
     title: {
         name: 'title',
         type: { name: 'string' },
@@ -19,8 +21,27 @@ export const getPageTitleArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
-    child: {
-        name: 'child',
+    headingType: {
+        name: 'headingType',
+        type: { name: 'string' },
+        description: 'Type of heading.',
+        defaultValue: HEADING_TYPE.MAIN,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `"${HEADING_TYPE.MAIN}"`,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(HEADING_TYPE),
+        },
+    },
+    showBackButton: {
+        name: 'showBackButton',
         type: { name: 'boolean' },
         description: 'Whether to display back button or not.',
         defaultValue: false,
@@ -107,24 +128,6 @@ export const getPageTitleArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'number',
-        },
-    },
-    titleOverflow: {
-        name: 'titleOverflow',
-        type: { name: 'string' },
-        description: 'The value for title overflow style property.',
-        defaultValue: 'hidden',
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: '"hidden"',
-            },
-        },
-        control: {
-            type: 'text',
         },
     },
     // slots

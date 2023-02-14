@@ -1,8 +1,10 @@
 <template>
     <div>
-        <p-panel-top v-if="layoutName">
+        <p-heading v-if="layoutName"
+                   heading-type="sub"
+        >
             {{ layoutName }}
-        </p-panel-top>
+        </p-heading>
         <p-definition-table :fields="fields"
                             :data="rootData"
                             :loading="loading"
@@ -30,15 +32,15 @@ import type { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/typ
 import type { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import type { ItemDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/item/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
+import PHeading from '@/data-display/heading/PHeading.vue';
 import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable.vue';
 import type { DefinitionData, DefinitionField } from '@/data-display/tables/definition-table/type';
-import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 
 export default {
     name: 'PDynamicLayoutItem',
     components: {
         PDynamicField,
-        PPanelTop,
+        PHeading,
         PDefinitionTable,
     },
     props: {

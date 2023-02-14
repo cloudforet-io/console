@@ -1,8 +1,10 @@
 <template>
     <div>
-        <p-panel-top v-if="layoutName">
+        <p-heading v-if="layoutName"
+                   heading-type="sub"
+        >
             {{ layoutName }}
-        </p-panel-top>
+        </p-heading>
         <p-data-table :items="rootData"
                       :fields="fields"
                       :loading="loading"
@@ -48,8 +50,8 @@ import type {
     SimpleTableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
+import PHeading from '@/data-display/heading/PHeading.vue';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
-import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 
 
 export default {
@@ -57,8 +59,7 @@ export default {
     components: {
         PDynamicField,
         PDataTable,
-        PPanelTop,
-
+        PHeading,
     },
     props: {
         name: {

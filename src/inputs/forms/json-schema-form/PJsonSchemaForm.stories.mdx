@@ -7,7 +7,7 @@ import PJsonSchemaForm from '@/inputs/forms/json-schema-form/PJsonSchemaForm.vue
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 import PButton from "@/inputs/buttons/button/PButton";
 import PSelectDropdown from "@/inputs/dropdown/select-dropdown/PSelectDropdown";
-import PPanelTop from "@/data-display/titles/panel-top/PPanelTop";
+import PHeading from '@/data-display/heading/PHeading.vue';
 import {
      getJsonSchemaFormArgTypes,
 } from '@/inputs/forms/json-schema-form/story-helper';
@@ -138,12 +138,12 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 <Canvas>
     <Story name="Basic" >
         {{
-            components: { PJsonSchemaForm, PTextEditor, PPanelTop },
+            components: { PJsonSchemaForm, PTextEditor, PHeading },
             i18n,
             template: `
 <div class="grid gap-4 grid-cols-12">
     <div class="col-span-6 bg-blue-100 p-4">
-        <p-panel-top>Json Schema Form</p-panel-top>
+        <p-heading>Json Schema Form</p-heading>
         <p-json-schema-form :schema="schema"
                             :form-data.sync="formData"
                             :language="$i18n.locale"
@@ -151,13 +151,13 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
         />
     </div>
     <div class="col-span-6 bg-coral-100 p-4">
-        <p-panel-top>Schema</p-panel-top>
+        <p-heading>Schema</p-heading>
         <p-text-editor :code="JSON.stringify(schema, null, 2)"
                        mode="readOnly"
                        folded
                        style="height: auto"
         />
-        <p-panel-top>Form Data</p-panel-top>
+        <p-heading>Form Data</p-heading>
         <p-text-editor :code="JSON.stringify(formData, null, 2)"
                        mode="readOnly"
                        style="height: auto"
@@ -282,7 +282,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 <Canvas>
     <Story name="Validation Mode" >
         {{
-            components: { PJsonSchemaForm, PTextEditor, PSelectDropdown, PPanelTop },
+            components: { PJsonSchemaForm, PTextEditor, PSelectDropdown, PHeading },
             i18n,
             template: `
 <div class="grid grid-cols-12">
@@ -297,12 +297,12 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
         <span class="font-lg font-bold mb-2">Validation Mode: </span>
         <p-select-dropdown class="mb-4"
             :selected.sync="validationMode" :items="validationModes" />
-        <p-panel-top>Schema</p-panel-top>
+        <p-heading>Schema</p-heading>
         <p-text-editor :code="JSON.stringify(schema, null, 2)"
                        mode="readOnly"
                        folded
         />
-        <p-panel-top>Form Data</p-panel-top>
+        <p-heading>Form Data</p-heading>
         <p-text-editor :code="JSON.stringify(formData, null, 2)"
                        mode="readOnly"
                        style="height: auto"
@@ -333,25 +333,25 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 <Canvas>
     <Story name="Json Input Mode" >
         {{
-            components: { PJsonSchemaForm, PTextEditor, PPanelTop },
+            components: { PJsonSchemaForm, PTextEditor, PHeading },
             i18n,
             template: `
 <div class="grid gap-4 grid-cols-12">
     <div class="col-span-6 bg-blue-100 p-4">
-        <p-panel-top>Json Schema Form</p-panel-top>
+        <p-heading>Json Schema Form</p-heading>
         <p-json-schema-form :schema="schema"
                             :form-data.sync="formData"
                             :language="$i18n.locale"
         />
     </div>
     <div class="col-span-6 bg-coral-100 p-4">
-        <p-panel-top>Schema</p-panel-top>
+        <p-heading>Schema</p-heading>
         <p-text-editor :code="JSON.stringify(schema, null, 2)"
                        mode="readOnly"
                        folded
                        style="height: auto"
         />
-        <p-panel-top>Form Data</p-panel-top>
+        <p-heading>Form Data</p-heading>
         <p-text-editor :code="JSON.stringify(formData, null, 2)"
                        mode="readOnly"
                        style="height: auto"

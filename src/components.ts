@@ -34,7 +34,6 @@ export { default as PTextList } from './others/console/text-list/PTextList.vue';
 export { default as PMarkdown } from './data-display/markdown/PMarkdown.vue';
 export { default as PModal } from './feedbacks/modals/modal/PModal.vue';
 export { default as PBreadcrumbs } from './navigation/breadcrumbs/PBreadcrumbs.vue';
-export { default as PPanelTop } from './data-display/titles/panel-top/PPanelTop.vue';
 export { default as PProgressBar } from './data-display/progress-bar/PProgressBar.vue';
 export { default as PSearch } from './inputs/search/search/PSearch.vue';
 export { default as PStatus } from './data-display/status/PStatus.vue';
@@ -75,7 +74,7 @@ export { default as PSearchTable } from './data-display/tables/search-table/PSea
 export { default as PToolboxTable } from './data-display/tables/toolbox-table/PToolboxTable.vue';
 export { default as PButtonTab } from './navigation/tabs/button-tab/PButtonTab.vue';
 export { default as PTab } from './navigation/tabs/tab/PTab.vue';
-export { default as PPageTitle } from './data-display/titles/page-title/PPageTitle.vue';
+export { default as PHeading } from './data-display/heading/PHeading.vue';
 export { default as PTree } from './data-display/tree/PTree.vue';
 export { default as PProgressWizard } from './navigation/wizards/progress-wizard/PProgressWizard.vue';
 export { default as PSelectStatus } from './inputs/select-status/PSelectStatus.vue';

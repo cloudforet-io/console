@@ -1,8 +1,10 @@
 <template>
     <div class="p-dynamic-layout-markdown">
-        <p-panel-top v-if="layoutName">
+        <p-heading v-if="layoutName"
+                   heading-type="sub"
+        >
             {{ layoutName }}
-        </p-panel-top>
+        </p-heading>
         <p-markdown :markdown="options.markdown || ''"
                     :data="rootData"
                     :language="language"
@@ -21,14 +23,15 @@ import type {
     MarkdownDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/markdown/type';
 import { getValueByPath } from '@/data-display/dynamic/helper';
+import PHeading from '@/data-display/heading/PHeading.vue';
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
-import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 
 
 export default {
     name: 'PDynamicLayoutMarkdown',
     components: {
-        PPanelTop, PMarkdown,
+        PMarkdown,
+        PHeading,
     },
     props: {
         name: {
