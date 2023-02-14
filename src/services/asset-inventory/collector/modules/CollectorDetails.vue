@@ -1,6 +1,8 @@
 <template>
     <div>
-        <p-panel-top>{{ name }}</p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="name"
+        />
         <p-definition-table :fields="fields"
                             :data="data"
                             :loading="loading"
@@ -43,7 +45,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PPanelTop, PDefinitionTable, PLazyImg, PStatus, PTextList,
+    PHeading, PDefinitionTable, PLazyImg, PStatus, PTextList,
 } from '@spaceone/design-system';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
@@ -58,7 +60,7 @@ export default {
     components: {
         PStatus,
         PTextList,
-        PPanelTop,
+        PHeading,
         PDefinitionTable,
         PLazyImg,
     },

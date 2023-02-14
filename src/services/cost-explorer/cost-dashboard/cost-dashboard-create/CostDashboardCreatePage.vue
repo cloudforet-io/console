@@ -1,9 +1,9 @@
 <template>
     <div class="cost-dashboard-create-page">
         <nav>
-            <p-page-title :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.CREATE_DASHBOARD')"
-                          child
-                          @goBack="$router.go(-1)"
+            <p-heading :title="$t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.CREATE_DASHBOARD')"
+                       show-back-button
+                       @click-back-button="$router.go(-1)"
             />
         </nav>
         <cost-dashboard-create-form :manage-disabled="!hasManagePermission" />
@@ -24,10 +24,9 @@
 </template>
 
 <script lang="ts">
-
 import { computed, reactive, toRefs } from 'vue';
 
-import { PButton, PPageTitle } from '@spaceone/design-system';
+import { PButton, PHeading } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -57,7 +56,7 @@ export default {
     name: 'CostDashboardCreatePage',
     components: {
         CostDashboardCreateForm,
-        PPageTitle,
+        PHeading,
         PButton,
     },
 

@@ -1,9 +1,9 @@
 <template>
     <div class="service-account-detail-page">
-        <p-page-title :title="item.name"
-                      child
-                      class="page-title"
-                      @goBack="$router.go(-1)"
+        <p-heading :title="item.name"
+                   show-back-button
+                   class="page-title"
+                   @click-back-button="$router.go(-1)"
         >
             <template #title-left-extra>
                 <p-lazy-img :src="providerIcon"
@@ -32,10 +32,12 @@
                     </p-anchor>
                 </p-button>
             </template>
-        </p-page-title>
+        </p-heading>
         <div class="content-wrapper">
             <p-pane-layout class="service-account-account-type">
-                <p-panel-top :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE')" />
+                <p-heading heading-type="sub"
+                           :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE')"
+                />
                 <div class="badge-wrapper">
                     <service-account-badge :account-type="item.service_account_type"
                                            :is-managed="isManagedTrustedAccount"
@@ -85,7 +87,7 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PButton, PIconButton, PPageTitle, PLazyImg, PPaneLayout, PPanelTop,
+    PAnchor, PButton, PIconButton, PHeading, PLazyImg, PPaneLayout,
 } from '@spaceone/design-system';
 import { render } from 'ejs';
 
@@ -121,12 +123,11 @@ export default defineComponent({
         ServiceAccountBaseInformation,
         ServiceAccountBadge,
         PIconButton,
-        PPageTitle,
+        PHeading,
         PButton,
         PAnchor,
         PLazyImg,
         PPaneLayout,
-        PPanelTop,
     },
     props: {
         serviceAccountId: {

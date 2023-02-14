@@ -1,8 +1,8 @@
 <template>
     <p-pane-layout class="project-dependency">
-        <p-panel-top class="panel-title">
-            {{ $t('MONITORING.ALERT.DETAIL.PROJECT_DEPENDENCY.PROJECT_DEPENDENCY') }}
-        </p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="$t('MONITORING.ALERT.DETAIL.PROJECT_DEPENDENCY.PROJECT_DEPENDENCY')"
+        />
         <p v-if="projectList.length === 0">
             <p-empty class="empty-message">
                 {{ $t('MONITORING.ALERT.DETAIL.PROJECT_DEPENDENCY.NO_DATA') }}
@@ -31,7 +31,7 @@ import {
 } from 'vue';
 
 import {
-    PAnchor, PEmpty, PPaneLayout, PPanelTop,
+    PAnchor, PEmpty, PPaneLayout, PHeading,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -44,7 +44,7 @@ export default {
     name: 'AlertProjectDependency',
     components: {
         PPaneLayout,
-        PPanelTop,
+        PHeading,
         PAnchor,
         PEmpty,
     },
@@ -81,7 +81,7 @@ export default {
 .project-dependency {
     padding: 0 1rem 2.5rem 1rem;
 }
-.panel-title {
+.p-heading {
     @apply -ml-1;
 }
 .project-name {

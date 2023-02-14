@@ -1,8 +1,8 @@
 <template>
     <section class="notice-detail-page">
-        <p-page-title :title="noticePostData.title"
-                      child
-                      @goBack="$router.go(-1)"
+        <p-heading :title="noticePostData.title"
+                   show-back-button
+                   @click-back-button="$router.go(-1)"
         >
             <template #extra>
                 <div v-if="hasPermissionToEditOrDelete"
@@ -25,7 +25,7 @@
                     </p-button>
                 </div>
             </template>
-        </p-page-title>
+        </p-heading>
         <p-pane-layout class="notice-detail-page-layout">
             <p-data-loader :loading="loading"
                            :data="noticePostData"
@@ -111,13 +111,12 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
 import {
-    PBadge, PButton, PDataLoader, PDivider, PI, PPageTitle, PPaneLayout,
+    PBadge, PButton, PDataLoader, PDivider, PI, PHeading, PPaneLayout,
 } from '@spaceone/design-system';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
@@ -152,7 +151,7 @@ export default {
         PBadge,
         PI,
         PDivider,
-        PPageTitle,
+        PHeading,
         PButton,
         ListItem,
         DeleteModal,

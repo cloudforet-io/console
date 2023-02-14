@@ -1,6 +1,8 @@
 <template>
     <div>
-        <p-panel-top>{{ title }}</p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="title"
+        />
         <p-data-table
             :items="items"
             :loading="loading"
@@ -49,7 +51,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PPanelTop, PDataTable, PAnchor, PBadge,
+    PHeading, PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -82,7 +84,7 @@ export default {
     name: 'UserAssignedRole',
     components: {
         PDataTable,
-        PPanelTop,
+        PHeading,
         PAnchor,
         PBadge,
     },

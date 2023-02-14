@@ -1,10 +1,10 @@
 <template>
     <div class="collector-plugins-page">
-        <p-page-title :title="$t('PLUGIN.COLLECTOR.PLUGINS.TITLE')"
-                      use-total-count
-                      :total-count="totalCount"
-                      child
-                      @goBack="$router.go(-1)"
+        <p-heading :title="$t('PLUGIN.COLLECTOR.PLUGINS.TITLE')"
+                   use-total-count
+                   :total-count="totalCount"
+                   show-back-button
+                   @click-back-button="$router.go(-1)"
         />
         <p-divider class="divider" />
         <collector-plugins-toolbox class="collector-plugin-toolbox"
@@ -88,14 +88,13 @@
 </template>
 
 <script lang="ts">
-
 import {
     toRefs, reactive, watch, computed, getCurrentInstance,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PPageTitle, PCardItem,
+    PHeading, PCardItem,
     PButton, PBadge, PI, PDivider, PDataLoader,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -156,7 +155,7 @@ export default {
     name: 'CollectorPluginPage',
     components: {
         PCardItem,
-        PPageTitle,
+        PHeading,
         PBadge,
         PI,
         PluginFilter,

@@ -3,7 +3,7 @@
          :class="{'interactive-mode': !printMode}"
     >
         <section class="title-section">
-            <p-page-title :title="selectedQueryId ? title : defaultTitle">
+            <p-heading :title="selectedQueryId ? title : defaultTitle">
                 <template #title-left-extra>
                     <p-select-dropdown v-if="!printMode"
                                        :items="queryItemList"
@@ -63,7 +63,7 @@
                         </p-button>
                     </div>
                 </template>
-            </p-page-title>
+            </p-heading>
         </section>
         <save-query-form-modal v-if="!printMode"
                                :header-title="saveQueryFormState.title"
@@ -90,14 +90,13 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, PIconButton, PPageTitle, PSelectDropdown,
+    PButton, PIconButton, PHeading, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
@@ -136,7 +135,7 @@ export default {
         DeleteModal,
         SaveQueryFormModal,
         PdfDownloadButton,
-        PPageTitle,
+        PHeading,
         PIconButton,
         PSelectDropdown,
         PButton,

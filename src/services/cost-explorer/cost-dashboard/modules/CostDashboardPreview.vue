@@ -3,7 +3,7 @@
         <div ref="headerRef"
              class="top-wrapper"
         >
-            <p-page-title :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
+            <p-heading :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
                 <template #title-right-extra>
                     <div class="right-part">
                         <cost-dashboard-period-select-dropdown :dashboard-id="dashboardId"
@@ -14,7 +14,7 @@
                         />
                     </div>
                 </template>
-            </p-page-title>
+            </p-heading>
 
             <cost-dashboard-filter :dashboard-id="dashboardId"
                                    :filters="filters"
@@ -40,9 +40,7 @@ import {
     computed, onMounted, reactive, toRefs, watch,
 } from 'vue';
 
-import {
-    PPageTitle,
-} from '@spaceone/design-system';
+import { PHeading } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -67,7 +65,7 @@ export default {
         CostDashboardPeriodSelectDropdown,
         DashboardLayouts,
         CostDashboardFilter,
-        PPageTitle,
+        PHeading,
     },
     props: {
         dashboardId: {
@@ -180,7 +178,7 @@ export default {
     flex-direction: column;
     height: 100%;
 }
-.p-page-title {
+.p-heading {
     margin-bottom: 0;
 }
 .top-wrapper {

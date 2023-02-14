@@ -1,6 +1,8 @@
 <template>
     <div>
-        <p-panel-top>{{ title }}</p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="title"
+        />
         <p-definition-table :fields="fields"
                             :data="data"
                             :loading="loading"
@@ -44,7 +46,7 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PPanelTop, PDefinitionTable, PStatus } from '@spaceone/design-system';
+import { PHeading, PDefinitionTable, PStatus } from '@spaceone/design-system';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -85,7 +87,7 @@ export default {
     components: {
         PStatus,
         PDefinitionTable,
-        PPanelTop,
+        PHeading,
     },
     props: {
         userId: {

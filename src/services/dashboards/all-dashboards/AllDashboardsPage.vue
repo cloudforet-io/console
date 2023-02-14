@@ -1,8 +1,8 @@
 <template>
     <div class="all-dashboards-page">
-        <p-page-title :title="$t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARDS_TITLE')"
-                      use-total-count
-                      :total-count="dashboardTotalCount"
+        <p-heading :title="$t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARDS_TITLE')"
+                   use-total-count
+                   :total-count="dashboardTotalCount"
         >
             <template #extra>
                 <p-button v-if="!hasOnlyViewPermission && (workspaceDashboardList || projectDashboardList)"
@@ -12,7 +12,7 @@
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREATE') }}
                 </p-button>
             </template>
-        </p-page-title>
+        </p-heading>
         <p-divider class="dashboards-divider" />
         <all-dashboards-select-filter />
         <p-toolbox filters-visible
@@ -70,9 +70,8 @@ import {
     reactive, toRefs, watch,
 } from 'vue';
 
-
 import {
-    PPageTitle, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
+    PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
 } from '@spaceone/design-system';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
@@ -106,7 +105,7 @@ export default {
         DashboardBoardList,
         AllDashboardsSelectFilter,
         PButton,
-        PPageTitle,
+        PHeading,
         PDivider,
     },
     setup() {

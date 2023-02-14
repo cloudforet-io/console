@@ -3,15 +3,15 @@
         <p-breadcrumbs class="flex-grow"
                        :routes="routeState.routes"
         />
-        <p-page-title child
-                      class="page-title"
-                      @goBack="$router.go(-1)"
+        <p-heading show-back-button
+                   class="page-title"
+                   @click-back-button="$router.go(-1)"
         >
             <template #title>
                 <span>{{ $t('PROJECT.EVENT_RULE.EVENT_RULE') }}</span>
                 <info-message :message="$t('PROJECT.EVENT_RULE.TITLE_INFO_MESSAGE')" />
             </template>
-        </p-page-title>
+        </p-heading>
         <div v-if="!loading && !isEditMode && !cardData.length"
              class="no-data-wrapper"
         >
@@ -122,13 +122,12 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs,
 } from 'vue';
 
 import {
-    PPageTitle, PBreadcrumbs, PCard, PI, PButton,
+    PHeading, PBreadcrumbs, PCard, PI, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -160,7 +159,7 @@ export default {
         DeleteModal,
         InfoMessage,
         PBreadcrumbs,
-        PPageTitle,
+        PHeading,
         PCard,
         PI,
         PButton,

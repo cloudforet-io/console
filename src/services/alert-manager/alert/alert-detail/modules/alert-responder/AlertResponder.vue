@@ -1,8 +1,10 @@
 <template>
     <p-pane-layout class="alert-responder">
         <article class="responder-wrapper">
-            <p-panel-top class="panel-title">
-                {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER') }}
+            <p-heading heading-type="sub"
+                       :title="$t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER')"
+                       class="panel-title"
+            >
                 <template #extra>
                     <div class="w-full text-right">
                         <p-badge v-if="alertData.escalation_ttl === 0"
@@ -13,7 +15,7 @@
                         </p-badge>
                     </div>
                 </template>
-            </p-panel-top>
+            </p-heading>
             <p-collapsible-list :items="escalationRuleItems"
                                 theme="card"
                                 multi-unfoldable
@@ -64,7 +66,7 @@ import {
 import VueI18n from 'vue-i18n';
 
 import {
-    PBadge, PCollapsibleList, PPaneLayout, PPanelTop, PFilterableDropdown,
+    PBadge, PCollapsibleList, PPaneLayout, PHeading, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
@@ -99,7 +101,7 @@ export default {
     name: 'AlertResponder',
     components: {
         PPaneLayout,
-        PPanelTop,
+        PHeading,
         PCollapsibleList,
         PBadge,
         PFilterableDropdown,

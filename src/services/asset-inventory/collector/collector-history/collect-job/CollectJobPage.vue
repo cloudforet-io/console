@@ -1,8 +1,8 @@
 <template>
     <div>
-        <p-page-title :title="jobId"
-                      child
-                      @goBack="$router.go(-1)"
+        <p-heading :title="jobId"
+                   show-back-button
+                   @click-back-button="$router.go(-1)"
         />
         <div class="top-wrapper">
             <job-status-chart :job-id="jobId" />
@@ -30,7 +30,7 @@ import {
 } from 'vue';
 
 import {
-    PHorizontalLayout, PPageTitle,
+    PHorizontalLayout, PHeading,
 } from '@spaceone/design-system';
 
 import JobBasicInformation from '@/services/asset-inventory/collector/collector-history/collect-job/modules/JobBasicInformation.vue';
@@ -46,7 +46,7 @@ export default {
         JobTable,
         JobBasicInformation,
         JobStatusChart,
-        PPageTitle,
+        PHeading,
         PHorizontalLayout,
     },
     props: {

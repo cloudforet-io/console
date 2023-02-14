@@ -1,9 +1,9 @@
 <template>
     <section class="role-create-page">
-        <p-page-title
-            child
+        <p-heading
+            show-back-button
             :title="$t('IAM.ROLE.FORM.CREATE_TITLE')"
-            @goBack="$router.go(-1)"
+            @click-back-button="$router.go(-1)"
         />
         <role-update-form @update-validation="handleFormValidate"
                           @update-form-data="handleUpdateForm"
@@ -27,10 +27,9 @@
 </template>
 
 <script lang="ts">
-
 import { reactive, toRefs } from 'vue';
 
-import { PPageTitle, PButton } from '@spaceone/design-system';
+import { PHeading, PButton } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -48,7 +47,7 @@ export default {
     name: 'RoleCreatePage',
     components: {
         RoleUpdateForm,
-        PPageTitle,
+        PHeading,
         PButton,
     },
     setup() {

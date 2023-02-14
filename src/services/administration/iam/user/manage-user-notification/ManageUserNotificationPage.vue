@@ -3,9 +3,9 @@
         <p-breadcrumbs class="flex-grow"
                        :routes="routeState.routes"
         />
-        <p-page-title child
-                      :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')"
-                      @goBack="goToUserManagement"
+        <p-heading show-back-button
+                   :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')"
+                   @click-back-button="goToUserManagement"
         />
         <notification-channel-list :manage-disabled="!isManageable" />
     </div>
@@ -17,7 +17,7 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
+import { PBreadcrumbs, PHeading } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -28,7 +28,9 @@ import NotificationChannelList from '@/services/notification/modules/Notificatio
 export default {
     name: 'ManageNotificationPage',
     components: {
-        NotificationChannelList, PBreadcrumbs, PPageTitle,
+        NotificationChannelList,
+        PBreadcrumbs,
+        PHeading,
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;

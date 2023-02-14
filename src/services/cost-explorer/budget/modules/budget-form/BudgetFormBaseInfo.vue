@@ -1,8 +1,8 @@
 <template>
     <p-pane-layout>
-        <p-panel-top>
-            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.BASE_INFORMATION') }}
-        </p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.BASE_INFORMATION')"
+        />
         <div class="p-4">
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_NAME')"
                            :invalid="invalidState.name"
@@ -29,7 +29,7 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PPaneLayout, PPanelTop, PTextInput,
+    PFieldGroup, PPaneLayout, PHeading, PTextInput,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -49,7 +49,7 @@ export default {
     components: {
         BudgetCostTypeSelect,
         BudgetTargetSelect,
-        PPanelTop,
+        PHeading,
         PPaneLayout,
         PFieldGroup,
         PTextInput,
@@ -123,7 +123,7 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.p-panel-top {
+.p-heading {
     margin-bottom: 0.5rem;
 }
 

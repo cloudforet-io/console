@@ -1,10 +1,10 @@
 <template>
     <p-pane-layout class="cloud-service-history-detail-note">
-        <p-panel-top use-total-count
-                     :total-count="totalCount"
-        >
-            {{ $t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE') }}
-        </p-panel-top>
+        <p-heading heading-type="sub"
+                   use-total-count
+                   :total-count="totalCount"
+                   :title="$t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE')"
+        />
         <article class="note-wrapper">
             <p-collapsible-list :items="noteList"
                                 toggle-position="contents"
@@ -57,7 +57,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PCollapsibleList, PPaneLayout, PPanelTop, PTextarea, PSelectDropdown,
+    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown,
 } from '@spaceone/design-system';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
@@ -76,7 +76,7 @@ export default {
     name: 'CloudServiceHistoryDetailNote',
     components: {
         PPaneLayout,
-        PPanelTop,
+        PHeading,
         PTextarea,
         PButton,
         PCollapsibleList,

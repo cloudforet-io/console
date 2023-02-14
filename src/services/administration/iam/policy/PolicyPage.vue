@@ -1,6 +1,6 @@
 <template>
     <section>
-        <p-page-title
+        <p-heading
             :title="$t('IAM.POLICY.POLICY')"
             use-total-count
             :total-count="totalCount"
@@ -14,7 +14,7 @@
                     {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
                 </p-button>
             </template>
-        </p-page-title>
+        </p-heading>
         <policy-list-data-table :anchor-icon-visible="false" />
     </section>
 </template>
@@ -24,7 +24,7 @@ import {
     computed, reactive, toRefs,
 } from 'vue';
 
-import { PPageTitle, PButton } from '@spaceone/design-system';
+import { PHeading, PButton } from '@spaceone/design-system';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
@@ -35,7 +35,7 @@ import { administrationStore } from '@/services/administration/store';
 export default {
     name: 'PolicyPage',
     components: {
-        PPageTitle,
+        PHeading,
         PButton,
         PolicyListDataTable,
     },

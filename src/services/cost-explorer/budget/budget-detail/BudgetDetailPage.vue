@@ -1,9 +1,9 @@
 <template>
     <div>
         <section class="page-title-wrapper">
-            <p-page-title :child="!loading"
-                          :title="loading ? '' : budgetData.name"
-                          @goBack="$router.go(-1)"
+            <p-heading :show-back-button="!loading"
+                       :title="loading ? '' : budgetData.name"
+                       @click-back-button="$router.go(-1)"
             >
                 <template v-if="!loading"
                           #title-right-extra
@@ -15,7 +15,7 @@
                         />
                     </div>
                 </template>
-            </p-page-title>
+            </p-heading>
         </section>
         <section class="content">
             <budget-detail-info class="summary"
@@ -45,7 +45,7 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import { PPageTitle, PIconButton } from '@spaceone/design-system';
+import { PHeading, PIconButton } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -68,7 +68,7 @@ export default {
     name: 'BudgetDetailPage',
     components: {
         BudgetDeleteModal,
-        PPageTitle,
+        PHeading,
         PIconButton,
         BudgetDetailInfo,
         BudgetSummary,

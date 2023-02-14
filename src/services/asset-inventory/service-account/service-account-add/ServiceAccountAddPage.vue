@@ -1,9 +1,9 @@
 <template>
     <div class="service-account-add-page">
-        <p-page-title class="mb-6"
-                      child
-                      :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE')"
-                      @goBack="handleGoBack"
+        <p-heading class="mb-6"
+                   show-back-button
+                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE')"
+                   @click-back-button="handleGoBack"
         >
             <template #title-left-extra>
                 <p-lazy-img class="icon"
@@ -27,7 +27,7 @@
                     </template>
                 </info-button>
             </template>
-        </p-page-title>
+        </p-heading>
 
         <div class="content-wrapper">
             <service-account-account-type :provider="provider"
@@ -36,7 +36,9 @@
                                           @change="handleChangeAccountType"
             />
             <p-pane-layout class="form-wrapper">
-                <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')" />
+                <p-heading heading-type="sub"
+                           :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')"
+                />
                 <service-account-base-information-form :schema="baseInformationSchema"
                                                        :is-valid.sync="isBaseInformationFormValid"
                                                        @change="handleChangeBaseInformationForm"
@@ -45,7 +47,9 @@
             <p-pane-layout v-if="accountType === ACCOUNT_TYPE.GENERAL"
                            class="form-wrapper"
             >
-                <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')" />
+                <p-heading heading-type="sub"
+                           :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"
+                />
                 <service-account-project-form
                     :is-valid.sync="isProjectFormValid"
                     @change="handleChangeProjectForm"
@@ -54,7 +58,9 @@
             <p-pane-layout v-if="enableCredentialInput"
                            class="form-wrapper"
             >
-                <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')" />
+                <p-heading heading-type="sub"
+                           :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
+                />
                 <service-account-credentials-form
                     :service-account-type="accountType"
                     :provider="provider"
@@ -91,7 +97,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PLazyImg, PMarkdown, PPageTitle, PPaneLayout, PPanelTop,
+    PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout,
 } from '@spaceone/design-system';
 import { get } from 'lodash';
 
@@ -132,10 +138,9 @@ export default {
         InfoButton,
         PLazyImg,
         PMarkdown,
-        PPageTitle,
+        PHeading,
         PButton,
         PPaneLayout,
-        PPanelTop,
     },
     props: {
         provider: {

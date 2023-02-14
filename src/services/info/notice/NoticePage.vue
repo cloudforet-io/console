@@ -1,6 +1,6 @@
 <template>
     <div class="notice-page">
-        <p-page-title :title="$t('INFO.NOTICE.MAIN.NOTICE_TITLE')">
+        <p-heading :title="$t('INFO.NOTICE.MAIN.NOTICE_TITLE')">
             <template #extra>
                 <p-button v-if="hasDomainRoleUser || hasSystemRoleUser"
                           style-type="secondary"
@@ -10,7 +10,7 @@
                     {{ $t('INFO.NOTICE.FORM.CREATE_NOTICE') }}
                 </p-button>
             </template>
-        </p-page-title>
+        </p-heading>
         <notice-list />
     </div>
 </template>
@@ -19,7 +19,7 @@
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PButton, PPageTitle,
+    PButton, PHeading,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -32,7 +32,7 @@ import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 export default {
     name: 'NoticePage',
     components: {
-        PPageTitle,
+        PHeading,
         PButton,
         NoticeList,
     },

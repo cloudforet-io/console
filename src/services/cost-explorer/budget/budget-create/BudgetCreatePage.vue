@@ -1,8 +1,8 @@
 <template>
     <div>
-        <p-page-title :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE_BUDGET')"
-                      child
-                      @goBack="$router.go(-1)"
+        <p-heading :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE_BUDGET')"
+                   show-back-button
+                   @click-back-button="$router.go(-1)"
         />
         <budget-form @confirm="handleFormConfirm" />
     </div>
@@ -13,7 +13,7 @@ import {
     reactive, toRefs,
 } from 'vue';
 
-import { PPageTitle } from '@spaceone/design-system';
+import { PHeading } from '@spaceone/design-system';
 
 import BudgetForm from '@/services/cost-explorer/budget/modules/budget-form/BudgetForm.vue';
 
@@ -21,7 +21,7 @@ export default {
     name: 'BudgetCreatePage',
     components: {
         BudgetForm,
-        PPageTitle,
+        PHeading,
     },
     setup() {
         const state = reactive({

@@ -4,7 +4,9 @@
            class="alert-detail-timeline"
     >
         <template #pushed-event>
-            <p-panel-top>{{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT') }}</p-panel-top>
+            <p-heading heading-type="sub"
+                       :title="$t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT')"
+            />
             <alert-pushed-event :id="id" />
         </template>
         <template #details>
@@ -16,12 +18,11 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive,
 } from 'vue';
 
-import { PPanelTop, PTab } from '@spaceone/design-system';
+import { PHeading, PTab } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { i18n } from '@/translations';
@@ -35,7 +36,7 @@ export default {
         AlertPushedEvent,
         AlertDetails,
         PTab,
-        PPanelTop,
+        PHeading,
     },
     props: {
         id: {

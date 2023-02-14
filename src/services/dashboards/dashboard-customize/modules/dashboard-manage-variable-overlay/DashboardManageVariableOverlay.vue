@@ -2,17 +2,16 @@
     <overlay-page-layout :visible="visible"
                          class="dashboard-manage-variable-overay"
     >
-        <p-page-title :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
-                      child
-                      @goBack="handleClickGoBackButton"
+        <p-heading :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
+                   child
+                   @click-back-button="handleClickGoBackButton"
         />
         <div class="content-wrapper">
-            <p-panel-top :use-total-count="contentType === 'LIST'"
-                         :total-count="variableSchema.order.length"
+            <p-heading heading-type="sub"
+                       :use-total-count="contentType === 'LIST'"
+                       :total-count="variableSchema.order.length"
+                       :title="titleSet[contentType]"
             >
-                <template #default>
-                    {{ titleSet[contentType] }}
-                </template>
                 <template #extra>
                     <div class="add-button-wrapper">
                         <p-button v-if="contentType === 'LIST'"
@@ -30,7 +29,7 @@
                         </p-button>
                     </div>
                 </template>
-            </p-panel-top>
+            </p-heading>
             <dashboard-manage-variable-table v-if="contentType === 'LIST'"
                                              @delete="handleOpenDeleteModal"
                                              @edit="handleChangeEditContent"
@@ -60,9 +59,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 
 import {
-    PPanelTop,
-    PButton,
-    PPageTitle,
+    PButton, PHeading,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 

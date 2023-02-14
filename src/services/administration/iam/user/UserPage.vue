@@ -1,10 +1,10 @@
 <template>
     <section class="user-page">
-        <p-page-title :title="$t('IDENTITY.USER.MAIN.TITLE')"
-                      use-selected-count
-                      use-total-count
-                      :total-count="totalCount"
-                      :selected-count="selectedIndex.length"
+        <p-heading :title="$t('IDENTITY.USER.MAIN.TITLE')"
+                   use-selected-count
+                   use-total-count
+                   :total-count="totalCount"
+                   :selected-count="selectedIndex.length"
         />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
@@ -24,7 +24,7 @@ import {
 } from 'vue';
 
 import {
-    PHorizontalLayout, PPageTitle,
+    PHorizontalLayout, PHeading,
 } from '@spaceone/design-system';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -40,7 +40,7 @@ export default {
         UserManagementTable,
         UserManagementTab,
         PHorizontalLayout,
-        PPageTitle,
+        PHeading,
     },
     setup() {
         const state = reactive({

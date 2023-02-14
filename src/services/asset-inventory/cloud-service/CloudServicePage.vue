@@ -1,7 +1,7 @@
 <template>
     <div class="page-wrapper">
-        <p-page-title :title="storeState.providers[selectedProvider] ? storeState.providers[selectedProvider].name : selectedProvider"
-                      class="page-title"
+        <p-heading :title="storeState.providers[selectedProvider] ? storeState.providers[selectedProvider].name : selectedProvider"
+                   class="page-title"
         >
             <template #title-right-extra>
                 <service-provider-dropdown class="provider-dropdown"
@@ -10,7 +10,7 @@
                                            @update:selectedProvider="handleProviderSelect"
                 />
             </template>
-        </p-page-title>
+        </p-heading>
         <p-divider class="cloud-service-divider" />
         <cloud-service-toolbox :total-count="totalCount"
                                :handlers="handlerState"
@@ -70,7 +70,7 @@ import {
 } from 'vue';
 
 import {
-    PDataLoader, PDivider, PButton, PPageTitle,
+    PDataLoader, PDivider, PButton, PHeading,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -130,7 +130,7 @@ export default {
         ServiceProviderDropdown,
         PDivider,
         PButton,
-        PPageTitle,
+        PHeading,
         PDataLoader,
     },
     setup() {

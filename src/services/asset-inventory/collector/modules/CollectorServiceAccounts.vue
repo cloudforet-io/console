@@ -1,10 +1,10 @@
 <template>
     <div class="collector-credentials">
-        <p-panel-top use-total-count
-                     :total-count="totalCount"
-        >
-            {{ $t('PLUGIN.COLLECTOR.MAIN.SERVICE_ACCOUNT') }}
-        </p-panel-top>
+        <p-heading heading-type="sub"
+                   use-total-count
+                   :total-count="totalCount"
+                   :title="$t('PLUGIN.COLLECTOR.MAIN.SERVICE_ACCOUNT')"
+        />
         <p-query-search-table :items="items"
                               :fields="fields"
                               :loading="loading"
@@ -62,7 +62,7 @@ import {
 } from 'vue';
 
 import {
-    PQuerySearchTable, PPanelTop, PButton, PAnchor,
+    PQuerySearchTable, PHeading, PButton, PAnchor,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
@@ -101,7 +101,7 @@ export default {
     name: 'CollectorServiceAccounts',
     components: {
         PQuerySearchTable,
-        PPanelTop,
+        PHeading,
         PButton,
         PAnchor,
         CollectDataModal,
@@ -237,7 +237,7 @@ export default {
 
 <style lang="postcss" scoped>
 .collector-credentials {
-    .p-panel-top {
+    .p-heading {
         margin-bottom: 0;
     }
 }

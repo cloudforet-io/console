@@ -1,6 +1,8 @@
 <template>
     <p-pane-layout class="service-account-base-information">
-        <p-panel-top :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')">
+        <p-heading heading-type="sub"
+                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')"
+        >
             <template #extra>
                 <p-button v-if="mode === 'READ' && editable"
                           icon-left="ic_edit"
@@ -25,7 +27,7 @@
                     </p-button>
                 </div>
             </template>
-        </p-panel-top>
+        </p-heading>
         <div class="content-wrapper">
             <service-account-base-information-detail v-show="mode === 'READ'"
                                                      :provider="provider"
@@ -50,7 +52,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PPaneLayout, PPanelTop,
+    PButton, PPaneLayout, PHeading,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
@@ -85,7 +87,7 @@ export default defineComponent<Props>({
         ServiceAccountBaseInformationForm,
         ServiceAccountBaseInformationDetail,
         PPaneLayout,
-        PPanelTop,
+        PHeading,
         PButton,
     },
     props: {
@@ -213,8 +215,8 @@ export default defineComponent<Props>({
 </script>
 <style lang="postcss" scoped>
 .service-account-base-information {
-    /* custom design-system component - p-panel-top */
-    :deep(.p-panel-top) {
+    /* custom design-system component - p-heading */
+    :deep(.p-heading) {
         .extra {
             text-align: right;
         }

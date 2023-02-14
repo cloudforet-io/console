@@ -16,12 +16,13 @@
                                 @update-selected-policy-list="handleUpdatePolicy"
         >
             <template #panel-top>
-                <p-panel-top>
-                    {{ $t('IAM.ROLE.DETAIL.API_POLICY') }}
+                <p-heading heading-type="sub"
+                           :title="$t('IAM.ROLE.DETAIL.API_POLICY')"
+                >
                     <template #extra>
                         <span class="selected-count">({{ selectedPolicyList.length }} {{ $t('IAM.ROLE.FORM.SELECTED') }})</span>
                     </template>
-                </p-panel-top>
+                </p-heading>
             </template>
             <template #toolbox-table-bottom>
                 <div class="help-text-wrapper">
@@ -42,7 +43,7 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import { PPanelTop } from '@spaceone/design-system';
+import { PHeading } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -68,7 +69,7 @@ export default {
         RoleUpdatePageAccessForm,
         RoleUpdatePageBaseInformation,
         PolicyListDataTable,
-        PPanelTop,
+        PHeading,
     },
     props: {
         initialRoleData: {

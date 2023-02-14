@@ -1,8 +1,8 @@
 <template>
     <p-pane-layout class="alert-detail-note">
-        <p-panel-top>
-            {{ $t('MONITORING.ALERT.DETAIL.NOTE.NOTE') }}
-        </p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="$t('MONITORING.ALERT.DETAIL.NOTE.NOTE')"
+        />
         <article class="note-wrapper">
             <article class="add-note-wrapper">
                 <p-textarea :value="noteInput"
@@ -49,11 +49,10 @@
 </template>
 
 <script lang="ts">
-
 import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PButton, PCollapsibleList, PPaneLayout, PPanelTop, PTextarea, PSelectDropdown,
+    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown,
 } from '@spaceone/design-system';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
@@ -80,7 +79,7 @@ export default {
     name: 'AlertNote',
     components: {
         PPaneLayout,
-        PPanelTop,
+        PHeading,
         PTextarea,
         PButton,
         PCollapsibleList,

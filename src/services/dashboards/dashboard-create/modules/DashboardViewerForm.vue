@@ -1,7 +1,9 @@
 <template>
     <section>
         <p-pane-layout>
-            <p-panel-top :title="$t('DASHBOARDS.CREATE.LABEL_VIEWERS')" />
+            <p-heading heading-type="sub"
+                       :title="$t('DASHBOARDS.CREATE.LABEL_VIEWERS')"
+            />
             <div class="dashboard-viewers-wrapper">
                 <p-radio-group direction="vertical">
                     <div>
@@ -37,7 +39,7 @@ import type { SetupContext } from 'vue';
 import { reactive, toRefs } from 'vue';
 
 import {
-    PPaneLayout, PPanelTop, PRadioGroup, PRadio,
+    PPaneLayout, PHeading, PRadioGroup, PRadio,
 } from '@spaceone/design-system';
 
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
@@ -46,7 +48,7 @@ import type { DashboardViewer } from '@/services/dashboards/config';
 export default {
     name: 'DashboardViewerForm',
     components: {
-        PPanelTop,
+        PHeading,
         PPaneLayout,
         PRadioGroup,
         PRadio,

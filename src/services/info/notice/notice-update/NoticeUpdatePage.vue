@@ -1,8 +1,8 @@
 <template>
     <div class="notice-update-page">
-        <p-page-title :title="$t('INFO.NOTICE.FORM.EDIT_TITLE')"
-                      child
-                      @goBack="$router.go(-1)"
+        <p-heading :title="$t('INFO.NOTICE.FORM.EDIT_TITLE')"
+                   show-back-button
+                   @click-back-button="$router.go(-1)"
         />
         <notice-form :board-id="boardId"
                      type="EDIT"
@@ -12,10 +12,9 @@
 </template>
 
 <script lang="ts">
-
 import { reactive, toRefs, watch } from 'vue';
 
-import { PPageTitle } from '@spaceone/design-system';
+import { PHeading } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -31,7 +30,7 @@ export default {
     name: 'NoticeUpdatePage',
     components: {
         NoticeForm,
-        PPageTitle,
+        PHeading,
     },
     props: {
         boardId: {

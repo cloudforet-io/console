@@ -1,8 +1,9 @@
 <template>
     <div>
-        <p-panel-top :title="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.TITLE')"
-                     use-total-count
-                     :total-count="totalCount"
+        <p-heading heading-type="sub"
+                   :title="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.TITLE')"
+                   use-total-count
+                   :total-count="totalCount"
         />
 
         <p-toolbox-table :loading="loading"
@@ -85,7 +86,7 @@ import type { Vue } from 'vue/types/vue';
 
 import {
     PBadge, PButton,
-    PPanelTop, PTableCheckModal, PToolboxTable,
+    PHeading, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
@@ -136,7 +137,7 @@ const fields = [
 export default {
     name: 'ProjectMaintenanceWindowPage',
     components: {
-        PPanelTop,
+        PHeading,
         PToolboxTable,
         PTableCheckModal,
         PBadge,

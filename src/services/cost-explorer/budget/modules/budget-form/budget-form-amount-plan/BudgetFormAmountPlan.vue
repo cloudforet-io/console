@@ -1,8 +1,8 @@
 <template>
     <p-pane-layout class="budget-form-amount-plan">
-        <p-panel-top>
-            {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AMOUNT_PLANNING') }}
-        </p-panel-top>
+        <p-heading heading-type="sub"
+                   :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AMOUNT_PLANNING')"
+        />
         <div class="p-4">
             <budget-period-select class="mb-2"
                                   @update="handleUpdatePeriod"
@@ -45,7 +45,7 @@ import {
     reactive, toRefs, watch,
 } from 'vue';
 
-import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
+import { PPaneLayout, PHeading } from '@spaceone/design-system';
 
 import BudgetFormAmountPlanLastMonthsCost
     from '@/services/cost-explorer/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
@@ -85,7 +85,7 @@ export default {
         BudgetFormAmountPlanUnitSelect,
         BudgetPeriodSelect,
         PPaneLayout,
-        PPanelTop,
+        PHeading,
     },
     props: {
         budgetId: {
@@ -172,7 +172,7 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.p-panel-top {
+.p-heading {
     margin-bottom: 0.5rem;
 }
 </style>
