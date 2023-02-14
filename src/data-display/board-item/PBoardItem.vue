@@ -4,16 +4,16 @@
          v-on="$listeners"
     >
         <div class="content-area">
-            <div v-if="leftIcon"
-                 class="left-icon"
-            >
-                <slot name="left-content">
+            <slot name="left-content">
+                <div v-if="leftIcon"
+                     class="left-icon"
+                >
                     <p-i :name="leftIcon"
                          width="2.5rem"
                          height="2.5rem"
                     />
-                </slot>
-            </div>
+                </div>
+            </slot>
             <div class="content">
                 <slot name="content" />
             </div>
