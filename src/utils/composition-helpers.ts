@@ -20,16 +20,6 @@ export const makeByPassListeners = (listeners: Record<string, any | any[]>, name
     else if (typeof listeners[name] === 'function') listeners[name](...args);
 };
 
-/**
- * event by pass
- * @param emit
- * @param name
- * @return {function(...[*]=)}
- */
-export const makeByEvent = (emit: any, name: string) => (...event: any) => {
-    emit(name, ...event);
-};
-
 
 /**
  * make proxy computed that same name as props

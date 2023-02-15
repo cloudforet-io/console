@@ -1,15 +1,12 @@
 <template>
     <p-button-modal :header-title="headerTitle"
-                    :scrollable="scrollable"
-                    :size="size"
-                    :fade="fade"
-                    :backdrop="backdrop"
+                    :size="modalSize"
                     :visible.sync="proxyVisible"
                     :theme-color="themeColor"
                     :loading="loading"
-                    @cancel="cancel"
-                    @close="close"
-                    @confirm="confirm"
+                    @cancel="handleClose"
+                    @close="handleClose"
+                    @confirm="handleConfirm"
     >
         <template #body>
             <div>
@@ -54,29 +51,17 @@ import { orderBy } from 'lodash';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import { SizeMapping } from '@/feedbacks/modals/type';
-import { makeByEvent, makeProxy } from '@/utils/composition-helpers';
+import { useProxyValue } from '@/hooks';
 
 
 export default defineComponent({
     name: 'PTableCheckModal',
     components: { PButtonModal, PDataTable },
     props: {
-        fade: {
-            type: Boolean,
-            default: false,
-        },
-        scrollable: {
-            type: Boolean,
-            default: false,
-        },
-        size: {
+        modalSize: {
             type: String,
             default: 'md',
             validator: (value: any) => Object.keys(SizeMapping).includes(value),
-        },
-        backdrop: {
-            type: Boolean,
-            default: true,
         },
         visible: { // sync
             type: Boolean,
@@ -107,31 +92,31 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props, context) {
+    setup(props, { emit }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, context.emit),
-        });
-        const sortState = reactive({
+            proxyVisible: useProxyValue('visible', props, emit),
             sortBy: '',
             sortDesc: true,
+            sortedItems: computed(() => {
+                if (state.sortBy) {
+                    return orderBy(props.items, state.sortBy, state.sortDesc ? 'desc' : 'asc');
+                }
+                return props.items;
+            }),
         });
-        const confirm = () => {
-            context.emit('confirm', props.items);
+
+        /* Event */
+        const handleClose = () => {
+            emit('cancel');
+        };
+        const handleConfirm = () => {
+            emit('confirm', props.items);
         };
 
         return {
             ...toRefs(state),
-            ...toRefs(sortState),
-            sortedItems: computed(() => {
-                // todo: move this feather to p-data-table
-                if (sortState.sortBy) {
-                    return orderBy(props.items, sortState.sortBy, sortState.sortDesc ? 'desc' : 'asc');
-                }
-                return props.items;
-            }),
-            cancel: makeByEvent(context.emit, 'cancel'),
-            close: makeByEvent(context.emit, 'close'),
-            confirm,
+            handleClose,
+            handleConfirm,
         };
     },
 });

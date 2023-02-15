@@ -53,9 +53,9 @@ export { default as PHorizontalLayout } from './layouts/horizontal-layout/PHoriz
 export { default as PVerticalLayout } from './layouts/vertical-layout/PVerticalLayout.vue';
 export { default as PLazyImg } from './feedbacks/loading/lazy-img/PLazyImg.vue';
 export { default as PButtonModal } from './feedbacks/modals/button-modal/PButtonModal.vue';
-export { default as PDoubleCheckModal } from './others/console/modals/double-check-modal/PDoubleCheckModal.vue';
 export { default as PIconModal } from './feedbacks/modals/icon-modal/PIconModal.vue';
-export { default as PTableCheckModal } from './others/console/modals/table-modal/PTableCheckModal.vue';
+export { default as PDoubleCheckModal } from './feedbacks/modals/advanced/double-check-modal/PDoubleCheckModal.vue';
+export { default as PTableCheckModal } from './feedbacks/modals/advanced/table-check-modal/PTableCheckModal.vue';
 export { default as PPagination } from './navigation/pagination/pagination/PPagination.vue';
 export { default as PTextPagination } from './navigation/pagination/text-pagination/PTextPagination.vue';
 export { default as PAutocompleteSearch } from './inputs/search/autocomplete-search/PAutocompleteSearch.vue';
