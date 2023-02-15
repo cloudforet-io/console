@@ -6,12 +6,10 @@
         :sub-title="subTitle"
         :theme-color="themeColor"
         :fields="fields"
-        size="md"
-        :selectable="false"
         :items="selectedUsers"
+        modal-size="md"
         @confirm="checkModalConfirm"
         @cancel="handleClose"
-        @close="handleClose"
     >
         <template #col-state-format="{value}">
             <p-status v-bind="userStateFormatter(value)"

@@ -18,14 +18,13 @@
 
         <p-table-check-modal
             theme-color="alert"
-            size="md"
+            modal-size="md"
             :visible.sync="visibleDeleteModal"
             :header-title="$t('MONITORING.ALERT.ALERT_LIST.DELETE_CHECK_MODAL.TITLE')"
             :fields="TABLE_FIELDS"
             :items="selectedItems"
             :loading="deleteLoading"
-            :selectable="false"
-            @confirm="onDeleteConfirm"
+            @confirm="handleConfirmDelete"
         >
             <template #col-state-format="{ value }">
                 <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
@@ -187,7 +186,7 @@ export default {
 
         const alertDurationFormatter = (value) => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), state.timezone) || '--';
 
-        const onDeleteConfirm = async () => {
+        const handleConfirmDelete = async () => {
             state.closeLoading = true;
             try {
                 await SpaceConnector.client.monitoring.alert.delete({
@@ -230,7 +229,7 @@ export default {
         return {
             ...toRefs(state),
             onSelectAction,
-            onDeleteConfirm,
+            handleConfirmDelete,
             alertDurationFormatter,
             alertStateBadgeStyleTypeFormatter,
             iso8601Formatter,

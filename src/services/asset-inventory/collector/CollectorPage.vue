@@ -174,10 +174,8 @@
                              :sub-title="checkModalState.subTitle"
                              :theme-color="checkModalState.themeColor"
                              :fields="selectedDataFields"
-                             size="lg"
-                             centered
-                             :selectable="false"
                              :items="selectedItems"
+                             modal-size="lg"
                              @confirm="checkModalConfirm"
         >
             <template #col-plugin_info.plugin_id-format="{item}">
