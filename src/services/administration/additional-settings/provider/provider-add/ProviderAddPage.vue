@@ -12,13 +12,13 @@
                        :loading="loading"
         >
             <div class="provider-item-wrapper">
-                <provider-list-card v-for="item in providerList"
-                                    :key="item.name"
-                                    :provider-item="item"
-                                    :visible.sync="visibleInstallModal"
-                                    :selected-provider.sync="selectedProvider"
-                                    @select="handleSelectProvider"
-                />
+                <!--                <provider-list-card v-for="item in providerList"-->
+                <!--                                    :key="item.name"-->
+                <!--                                    :provider-item="item"-->
+                <!--                                    :visible.sync="visibleInstallModal"-->
+                <!--                                    :selected-provider.sync="selectedProvider"-->
+                <!--                                    @select="handleSelectProvider"-->
+                <!--                />-->
             </div>
         </p-data-loader>
         <!--song-lang-->
@@ -52,7 +52,6 @@ import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
-import ProviderListCard from '@/services/administration/additional-settings/provider/provider-add/modules/ProviderListCard.vue';
 
 export default {
     name: 'ProviderAddPage',
@@ -60,7 +59,6 @@ export default {
         PHeading,
         PDivider,
         PDataLoader,
-        ProviderListCard,
         PButtonModal,
         PIconModal,
     },
