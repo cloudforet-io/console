@@ -26,7 +26,9 @@
                     </div>
                 </template>
                 <template #default="{data}">
-                    <span class="note-content">{{ data.note }}</span>
+                    <p-text-beautifier class="note-content"
+                                       :value="data.note"
+                    />
                 </template>
             </p-collapsible-list>
         </article>
@@ -57,7 +59,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown,
+    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier,
 } from '@spaceone/design-system';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
@@ -81,6 +83,7 @@ export default {
         PButton,
         PCollapsibleList,
         PSelectDropdown,
+        PTextBeautifier,
         DeleteModal,
     },
     props: {

@@ -2,7 +2,9 @@
     <p v-if="!isEditMode"
        class="content-wrapper"
     >
-        <span class="description">{{ alertData.description }}&zwnj;</span>
+        <p-text-beautifier class="description"
+                           :value="alertData.description"
+        />&zwnj;
         <button class="edit-btn"
                 :class="{'disabled': manageDisabled}"
                 @click="startEdit(alertData.description)"
@@ -39,7 +41,7 @@
 <script lang="ts">
 import { toRefs } from 'vue';
 
-import { PTextarea, PButton } from '@spaceone/design-system';
+import { PTextarea, PButton, PTextBeautifier } from '@spaceone/design-system';
 
 import { useAlertInfoItem } from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/composables';
 import { EDIT_MODE } from '@/services/alert-manager/lib/config';
@@ -49,6 +51,7 @@ export default {
     components: {
         PTextarea,
         PButton,
+        PTextBeautifier,
     },
     props: {
         id: {
