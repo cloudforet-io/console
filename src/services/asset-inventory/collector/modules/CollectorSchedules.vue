@@ -83,10 +83,8 @@
                              :sub-title="$tc('PLUGIN.COLLECTOR.MAIN.SCHEDULE_DELETE_CHECK_MODAL_DESC', 1)"
                              theme-color="alert"
                              :fields="multiFields"
-                             size="lg"
-                             centered
-                             :selectable="false"
                              :items="multiItems"
+                             modal-size="lg"
                              @confirm="onConfirmDelete"
         />
     </div>

@@ -70,8 +70,7 @@
                              :items="selectedItems"
                              :loading="closeLoading"
                              theme-color="alert"
-                             size="md"
-                             :selectable="false"
+                             modal-size="md"
                              @confirm="closeMaintenanceWindow"
         />
     </div>

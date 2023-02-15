@@ -70,16 +70,14 @@
             :project-id="id"
             @confirm="listWebhooks()"
         />
-        <p-table-check-modal
-            :visible.sync="checkModalState.visible"
-            :header-title="checkModalState.title"
-            :sub-title="checkModalState.subTitle"
-            :theme-color="checkModalState.themeColor"
-            :fields="fields"
-            size="md"
-            :selectable="false"
-            :items="selectedItem"
-            @confirm="checkModalConfirm"
+        <p-table-check-modal :visible.sync="checkModalState.visible"
+                             :header-title="checkModalState.title"
+                             :sub-title="checkModalState.subTitle"
+                             :theme-color="checkModalState.themeColor"
+                             :fields="fields"
+                             :items="selectedItem"
+                             modal-size="md"
+                             @confirm="checkModalConfirm"
         >
             <template #col-plugin_info.plugin_id-format="{value}">
                 <p-lazy-img :src="plugins[value] ? plugins[value].icon : 'ic_webhook'"

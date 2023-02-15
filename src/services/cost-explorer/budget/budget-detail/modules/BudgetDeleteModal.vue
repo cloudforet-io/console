@@ -1,10 +1,10 @@
 <template>
-    <double-check-modal :visible="proxyVisible"
-                        :header-title="title"
-                        :verification-text="verificationText"
-                        size="sm"
-                        @confirm="handleConfirm"
-                        @update:visible="handleUpdate"
+    <p-double-check-modal :visible="proxyVisible"
+                          :header-title="title"
+                          :verification-text="verificationText"
+                          modal-size="sm"
+                          @confirm="handleConfirm"
+                          @update:visible="handleUpdate"
     />
 </template>
 
@@ -15,11 +15,12 @@ import {
 } from 'vue';
 import VueI18n from 'vue-i18n';
 
+import { PDoubleCheckModal } from '@spaceone/design-system';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
-import DoubleCheckModal from '@/common/components/modals/DoubleCheckModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import TranslateResult = VueI18n.TranslateResult;
@@ -27,7 +28,7 @@ import TranslateResult = VueI18n.TranslateResult;
 export default {
     name: 'BudgetDeleteModal',
     components: {
-        DoubleCheckModal,
+        PDoubleCheckModal,
     },
     props: {
         visible: {

@@ -1,12 +1,11 @@
 <template>
     <div class="service-account-delete-modal">
-        <double-check-modal v-if="proxyVisible && !attachedGeneralAccounts.length"
-                            :visible.sync="proxyVisible"
-                            :header-title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_TITLE')"
-                            :verification-text="serviceAccountName"
-                            theme-color="alert"
-                            size="sm"
-                            @confirm="handleConfirmDelete"
+        <p-double-check-modal v-if="proxyVisible && !attachedGeneralAccounts.length"
+                              :visible.sync="proxyVisible"
+                              :header-title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_TITLE')"
+                              :verification-text="serviceAccountName"
+                              modal-size="sm"
+                              @confirm="handleConfirmDelete"
         />
         <p-button-modal v-if="proxyVisible && !!attachedGeneralAccounts.length"
                         :visible.sync="proxyVisible"
@@ -32,7 +31,7 @@ import type { SetupContext, PropType } from 'vue';
 import { reactive, toRefs } from 'vue';
 
 import {
-    PButtonModal, PDataTable,
+    PButtonModal, PDataTable, PDoubleCheckModal,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -42,7 +41,6 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import DoubleCheckModal from '@/common/components/modals/DoubleCheckModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -52,7 +50,7 @@ import type { ServiceAccountModel } from '@/services/asset-inventory/service-acc
 export default {
     name: 'ServiceAccountDeleteModal',
     components: {
-        DoubleCheckModal,
+        PDoubleCheckModal,
         PButtonModal,
         PDataTable,
     },

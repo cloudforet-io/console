@@ -49,17 +49,15 @@
                               :endpoints="modalState.endpoints"
                               @clickButton="confirm"
         />
-        <p-table-check-modal
-            :fields="checkModalState.fields"
-            :mode="checkModalState.mode"
-            :items="selectedItems"
-            :header-title="checkModalState.title"
-            :sub-title="checkModalState.subTitle"
-            :theme-color="checkModalState.themeColor"
-            :loading="checkModalState.loading"
-            size="md"
-            :visible.sync="checkModalState.visible"
-            @confirm="checkModalConfirm"
+        <p-table-check-modal :visible.sync="checkModalState.visible"
+                             :fields="checkModalState.fields"
+                             :items="selectedItems"
+                             :header-title="checkModalState.title"
+                             :sub-title="checkModalState.subTitle"
+                             :theme-color="checkModalState.themeColor"
+                             :loading="checkModalState.loading"
+                             modal-size="md"
+                             @confirm="checkModalConfirm"
         >
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"

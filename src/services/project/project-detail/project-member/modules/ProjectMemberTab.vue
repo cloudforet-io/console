@@ -71,16 +71,14 @@
                                      :project-group-id="projectGroupId"
                                      @confirm="handleConfirm"
         />
-        <p-table-check-modal
-            mode="delete"
-            theme-color="alert"
-            size="md"
-            :fields="checkMemberDeleteState.fields"
-            :items="selectedItems"
-            :header-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_TITLE')"
-            :sub-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_CONTENT')"
-            :visible.sync="checkMemberDeleteState.visible"
-            @confirm="handleConfirmDeleteMember"
+        <p-table-check-modal :visible.sync="checkMemberDeleteState.visible"
+                             theme-color="alert"
+                             modal-size="md"
+                             :fields="checkMemberDeleteState.fields"
+                             :items="selectedItems"
+                             :header-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_TITLE')"
+                             :sub-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_CONTENT')"
+                             @confirm="handleConfirmDeleteMember"
         />
     </div>
 </template>

@@ -6,12 +6,10 @@
         :sub-title="subTitle"
         :theme-color="themeColor"
         :fields="fields"
-        size="md"
-        :selectable="false"
         :items="selectedUsers"
+        modal-size="md"
         @confirm="checkModalConfirm"
         @cancel="handleClose"
-        @close="handleClose"
     >
         <template #col-state-format="{value}">
             <p-status v-bind="userStateFormatter(value)"
@@ -123,7 +121,7 @@ export default {
         const enableUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.enable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_ENABLE', state.selectedIndex.length), '', vm);
+                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_ENABLE', state.selectedIndex.length), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', state.selectedIndex.length));
             } finally {
@@ -134,7 +132,7 @@ export default {
         const disableUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.disable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DISABLE', state.selectedIndex.length), '', vm);
+                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DISABLE', state.selectedIndex.length), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', state.selectedIndex.length));
             } finally {

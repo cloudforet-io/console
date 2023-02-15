@@ -134,8 +134,7 @@
                              :header-title="checkTableModalState.title"
                              :sub-title="checkTableModalState.subTitle"
                              :theme-color="checkTableModalState.themeColor"
-                             size="lg"
-                             :selectable="false"
+                             modal-size="lg"
                              @confirm="checkModalConfirm"
         >
             <p-dynamic-layout v-if="tableState.multiSchema"
