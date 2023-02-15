@@ -32,6 +32,9 @@
                 <g-n-b-dashboard-menu v-show="menuId === MENU_ID.DASHBOARDS"
                                       @close="hideMenu"
                 />
+                <issue-inventory-menu v-show="menuId === MENU_ID.ISSUE_INVENTORY"
+                                      @close="hideMenu"
+                />
             </div>
             <div v-else-if="hasSubMenu"
                  v-show="isOpened"
@@ -75,6 +78,8 @@ import { customMenuNameList } from '@/common/modules/navigations/gnb/config';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardMenu
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardMenu.vue';
+import IssueInventoryMenu
+    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/issue-inventory/IssueInventoryMenu.vue';
 
 interface SubMenu extends DisplayMenu {
     href?: string;
@@ -94,6 +99,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'GNBMenu',
     components: {
+        IssueInventoryMenu,
         GNBDashboardMenu,
         PI,
         GNBSubMenu,
@@ -220,7 +226,6 @@ export default defineComponent<Props>({
     .custom-menu-wrapper {
         @apply rounded-xs;
         cursor: auto;
-        width: 22.5rem;
         position: absolute;
         top: $gnb-height;
         margin-top: -0.5rem;

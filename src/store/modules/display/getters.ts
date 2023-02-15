@@ -65,6 +65,8 @@ const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayM
 
     const link = router.resolve(menu.to);
     if (link?.href !== '/') results.push(menu);
+    // It will be changed as planning materializes.
+    if (menu.id === MENU_ID.ISSUE_INVENTORY) results.push(menu);
 
     return results;
 }, [] as DisplayMenu[]);
@@ -99,7 +101,6 @@ const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d)
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
     const menuList = rootState.domain.billingEnabled ? MENU_LIST : MENU_LIST.filter((d) => d.id !== MENU_ID.COST_EXPLORER);
-
     let _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(menuList);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
