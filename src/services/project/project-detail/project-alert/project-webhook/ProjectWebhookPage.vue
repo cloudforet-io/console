@@ -73,6 +73,7 @@
         <p-table-check-modal :visible.sync="checkModalState.visible"
                              :header-title="checkModalState.title"
                              :sub-title="checkModalState.subTitle"
+                             w
                              :theme-color="checkModalState.themeColor"
                              :fields="fields"
                              :items="selectedItem"
