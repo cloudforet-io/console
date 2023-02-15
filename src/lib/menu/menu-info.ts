@@ -102,10 +102,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.ADMINISTRATION_POLICY',
         needPermissionByRole: true,
     },
-    [MENU_ID.ISSUE_INVENTORY]: {
-        translationId: 'MENU.ISSUE_INVENTORY',
-        needPermissionByRole: true,
-    },
     // [MENU_ID.ADMINISTRATION_SETTINGS]: {
     //     translationId: 'MENU.ADDITIONAL_SETTINGS',
     //     needPermissionByRole: true,

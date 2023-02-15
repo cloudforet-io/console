@@ -59,10 +59,6 @@ export const MENU_LIST: Menu[] = [
         ],
     },
     {
-        id: MENU_ID.ISSUE_INVENTORY,
-        hideOnSiteMap: true,
-    },
-    {
         id: MENU_ID.MY_PAGE,
         hideOnGNB: true,
         hideOnSiteMap: true,

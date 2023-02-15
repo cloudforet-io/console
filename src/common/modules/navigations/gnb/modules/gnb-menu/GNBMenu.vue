@@ -32,7 +32,7 @@
                 <g-n-b-dashboard-menu v-show="menuId === MENU_ID.DASHBOARDS"
                                       @close="hideMenu"
                 />
-                <issue-inventory-menu v-show="menuId === MENU_ID.ISSUE_INVENTORY"
+                <issue-inventory-menu v-show="menuId === 'issue_inventory'"
                                       @close="hideMenu"
                 />
             </div>
@@ -147,7 +147,8 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.menuId)),
+            isIssueInventory: computed<boolean>(() => props.label === 'Issue Inventory'),
+            hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.menuId) || state.isIssueInventory),
             hasSubMenu: computed<boolean>(() => props.subMenuList?.length > 0),
             isMenuWithAdditionalMenu: computed<boolean>(() => state.hasSubMenu || state.hasCustomMenu),
         });

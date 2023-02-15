@@ -73,7 +73,12 @@ export default defineComponent({
             showSiteMap: false,
             hasPermission: computed((() => store.getters['user/hasPermission'])),
             logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: HOME_DASHBOARD_ROUTE._NAME } : null)),
-            gnbMenuList: computed<GNBMenuType[]>(() => store.getters['display/GNBMenuList']),
+            issueInventoryMenu: {
+                id: 'issue_inventory',
+                label: 'Issue Inventory',
+                subMenuList: [],
+            },
+            gnbMenuList: computed<GNBMenuType[]>(() => [...store.getters['display/GNBMenuList'], state.issueInventoryMenu]),
             siteMapMenuList: computed<GNBMenuType[]>(() => store.getters['display/siteMapMenuList']),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
