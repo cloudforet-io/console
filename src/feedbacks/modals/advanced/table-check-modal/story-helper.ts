@@ -164,6 +164,28 @@ export const getTableCheckModalArgTypes = (): ArgTypes => ({
             category: 'slots',
         },
     },
+    subTitleSlot: {
+        name: 'sub-title',
+        description: '',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+    },
+    subTitleFormatSlot: {
+        name: 'sub-title-format',
+        description: '',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+    },
 
     // events
     onConfirm: {

@@ -6,7 +6,7 @@
                    class="list-item"
                    :class="{'line-break': isLineBreak && i < displayItems.length - 1}"
                    :href="getHref(item, i)"
-                   :target="target || undefined"
+                   :target="linkTarget || undefined"
         >
             <slot name="default"
                   v-bind="{...$props, index: i, item, value: item || ''}"
@@ -34,16 +34,15 @@ import {
 import { get } from 'lodash';
 
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
-import type { TextListItem } from '@/others/console/text-list/type';
+import type { TextListItem, TextListProps } from '@/others/console/text-list/type';
 import { isNotEmpty } from '@/utils/helpers';
 
-export default defineComponent({
+export default defineComponent<TextListProps>({
     name: 'PTextList',
     components: { PAnchor },
     props: {
         items: {
-            // FIXME:: below any type
-            type: Array as PropType<any>,
+            type: Array as PropType<TextListItem>,
             default: () => [],
         },
         delimiter: {
@@ -54,26 +53,18 @@ export default defineComponent({
             type: String,
             default: undefined,
         },
-        tag: {
-            type: String,
-            default: 'span',
-        },
         link: {
             type: String,
             default: undefined,
         },
-        target: {
+        linkTarget: {
             type: String,
-            default: undefined,
-        },
-        linkFormatter: {
-            type: Function,
             default: undefined,
         },
     },
     setup(props) {
         const state = reactive({
-            component: computed(() => (props.link ? PAnchor : (props.tag || 'span'))),
+            component: computed(() => (props.link ? PAnchor : 'span')),
             displayItems: computed(() => props.items.reduce((res, item) => {
                 let data;
                 if (typeof item === 'object' && props.subKey) {
@@ -86,9 +77,8 @@ export default defineComponent({
             isLineBreak: computed(() => ['<br>', '<br/>'].includes(props.delimiter)),
         });
 
-        const getHref = (item: TextListItem, idx: number) => {
+        const getHref = () => {
             if (props.link) return props.link;
-            if (props.linkFormatter) return props.linkFormatter(item, idx);
             return undefined;
         };
 
