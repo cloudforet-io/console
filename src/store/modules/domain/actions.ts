@@ -55,3 +55,14 @@ export const setBillingEnabled: Action<DomainState, any> = async ({ commit, root
 export const resetBillingEnabled: Action<DomainState, any> = async ({ commit }) => {
     commit('setBillingEnabled', false);
 };
+
+export const loadDomainConfig: Action<DomainState, any> = async ({ commit, rootState }) => {
+    if (rootState.domain.extraMenuSet) return;
+    try {
+        const { results } = await SpaceConnector.client.config.domainConfig.list({});
+        const extraMenuResult = results.find((config) => config.name === 'console:ext-menu');
+        commit('setExraMenus', extraMenuResult.data);
+    } catch (e) {
+        commit('setExraMenus', undefined);
+    }
+};

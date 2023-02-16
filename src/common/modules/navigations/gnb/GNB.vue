@@ -84,6 +84,12 @@ export default defineComponent({
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;
             }),
+            // integrationMenu: computed(() => {
+            //     const extraMenu = store.getters['domain/getDomainExtraMenu'];
+            //     return {
+            //
+            //     };
+            // }),
         });
 
         /* event */
@@ -98,6 +104,10 @@ export default defineComponent({
                 state.showSiteMap = false;
             }
         };
+
+        (async () => {
+            await store.dispatch('domain/loadDomainConfig');
+        })();
 
         return {
             ...toRefs(state),
