@@ -84,7 +84,7 @@ export const getPermissionOfPage = (menuId: MenuId, pagePermissions: PagePermiss
             result = permission;
             return true;
         }
-        // return MANAGE permission if user have any of reference route names in route case with reference route
+        // Check reference routes and return permission if user have any of reference route names in RouteConfig
         if (referenceRouteNames.includes(id)) {
             result = permission;
             return true;
