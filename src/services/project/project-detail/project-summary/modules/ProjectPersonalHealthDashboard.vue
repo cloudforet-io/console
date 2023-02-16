@@ -28,18 +28,17 @@
             </div>
 
             <widget-layout>
-                <p-search-table :loading="loading"
-                                :fields="fields"
-                                :items="data"
-                                :sort-by.sync="sortBy"
-                                :sort-desc.sync="sortDesc"
-                                :search-text.sync="search"
-                                :placeholder="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PLACEHOLDER')"
-                                :excel-visible="false"
-                                :page-size-visible="false"
-                                :selectable="false"
-                                class="search-table"
-                                @change="onChange"
+                <p-toolbox-table :loading="loading"
+                                 :fields="fields"
+                                 :items="data"
+                                 :sort-by.sync="sortBy"
+                                 :sort-desc.sync="sortDesc"
+                                 :search-text.sync="search"
+                                 :placeholder="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PLACEHOLDER')"
+                                 :page-size-changeable="false"
+                                 sortable
+                                 class="search-table"
+                                 @change="onChange"
                 >
                     <template #col-event-format="{ value }">
                         <p-anchor :to="value.to"
@@ -78,7 +77,7 @@
                     <template #no-data-format>
                         {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}
                     </template>
-                </p-search-table>
+                </p-toolbox-table>
             </widget-layout>
         </template>
     </div>
@@ -91,7 +90,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PAnchor, PSearchTable,
+    PAnchor, PToolboxTable,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import numeral from 'numeral';
@@ -132,7 +131,7 @@ export default {
     },
     components: {
         PAnchor,
-        PSearchTable,
+        PToolboxTable,
         WidgetLayout,
     },
     props: {
