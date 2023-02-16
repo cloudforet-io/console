@@ -33,13 +33,13 @@ export const getRouteAccessLevel = (route: Route): AccessLevel => {
     return closestRoute.meta.accessLevel ?? ACCESS_LEVEL.AUTHENTICATED;
 };
 
-export const getUserAccessLevel = (routeName?: string|null, pagePermissions: PagePermissionTuple[] = [], isTokenAlive = true): AccessLevel => {
+export const getUserAccessLevel = (routeName?: string|null, pagePermissions: PagePermissionTuple[] = [], isTokenAlive = true, referenceRouteNames?: string[]|undefined): AccessLevel => {
     if (!isTokenAlive) return ACCESS_LEVEL.EXCLUDE_AUTH;
 
     const menuId = getMenuIdByRouteName(routeName);
     if (!menuId) return ACCESS_LEVEL.AUTHENTICATED;
 
-    const permission = getPermissionOfPage(menuId, pagePermissions);
+    const permission = getPermissionOfPage(menuId, pagePermissions, referenceRouteNames);
     return getAccessTypeFromPermission(permission);
 };
 const getMenuAccessLevel = (id: MenuId): AccessLevel => (MENU_INFO_MAP[id]?.needPermissionByRole ? ACCESS_LEVEL.VIEW_PERMISSION : ACCESS_LEVEL.AUTHENTICATED);

@@ -16,6 +16,10 @@ export const PAGE_PERMISSION_TYPE = {
 
 export type PagePermissionType = typeof PAGE_PERMISSION_TYPE[keyof typeof PAGE_PERMISSION_TYPE];
 
+export interface AccessInfo {
+    referenceRouteNames: string[];
+}
+
 // backend data format of page permissions. page includes wildcard('*').
 export interface RawPagePermission {
     page: string;
