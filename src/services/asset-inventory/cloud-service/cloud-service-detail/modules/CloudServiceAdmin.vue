@@ -4,13 +4,12 @@
                    :title="$t('INVENTORY.CLOUD_SERVICE.ADMIN.MEMBER')"
                    :total-count="totalCount"
         />
-        <p-search-table :fields="fields"
-                        :items="items"
-                        :loading="loading"
-                        :total-count="totalCount"
-                        :selectable="false"
-                        :excel-visible="false"
-                        @change="onChange"
+        <p-toolbox-table :fields="fields"
+                         :items="items"
+                         :loading="loading"
+                         :total-count="totalCount"
+                         sortable
+                         @change="onChange"
         >
             <template #col-resource_id-format="{ value }">
                 {{ users[value].name }}
@@ -26,7 +25,7 @@
                     {{ label }}
                 </p-badge>
             </template>
-        </p-search-table>
+        </p-toolbox-table>
     </div>
 </template>
 
@@ -36,7 +35,7 @@ import {
 } from 'vue';
 
 import {
-    PHeading, PBadge, PSearchTable,
+    PHeading, PBadge, PToolboxTable,
 } from '@spaceone/design-system';
 import type { SearchTableListeners } from '@spaceone/design-system/types/data-display/tables/search-table/type';
 
@@ -54,7 +53,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 export default {
     name: 'CloudServiceAdmin',
     components: {
-        PHeading, PBadge, PSearchTable,
+        PHeading,
+        PBadge,
+        PToolboxTable,
     },
     props: {
         cloudServiceProjectId: {
