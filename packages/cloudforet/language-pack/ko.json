@@ -2435,6 +2435,14 @@
 				"PRIORITY_INVALID_MAX": "10 이하로 설정해주세요.",
 				"PRIORITY_INVALID_MIN": "1 이상으로 설정해주세요.",
 				"PRIORITY_LABEL": "우선 순위",
+				"PROGRESS_WIZARD": {
+					"CANCEL": "취소",
+					"CONFIRM": "확인",
+					"NEXT": "다음",
+					"OPTIONAL": "선택사항",
+					"PREV": "이전",
+					"STEP": "{step} 단계"
+				},
 				"TAB_ADD_TAG": "태그 추가",
 				"TAB_SET_COLLECTOR": "컬렉터 설정",
 				"TITLE": "컬렉터 생성",
