@@ -65,7 +65,6 @@ export { default as PQuerySearchTags } from './inputs/search/query-search-tags/P
 export { default as PFilterableQueryDropdown } from './inputs/dropdown/filterable-query-dropdown/PFilterableQueryDropdown.vue';
 export { default as PDataTable } from './data-display/tables/data-table/PDataTable.vue';
 export { default as PDefinitionTable } from './data-display/tables/definition-table/PDefinitionTable.vue';
-export { default as PQuerySearchTable } from './data-display/tables/query-search-table/PQuerySearchTable.vue';
 export { default as PSearchTable } from './data-display/tables/search-table/PSearchTable.vue';
 export { default as PToolboxTable } from './data-display/tables/toolbox-table/PToolboxTable.vue';
 export { default as PButtonTab } from './navigation/tabs/button-tab/PButtonTab.vue';

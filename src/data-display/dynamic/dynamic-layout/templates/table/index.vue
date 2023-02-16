@@ -86,8 +86,8 @@ import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data
 import type { TableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
-import type { Options } from '@/data-display/tables/query-search-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
+import type { ToolboxTableOptions } from '@/data-display/tables/toolbox-table/type';
 
 export default defineComponent<TableDynamicLayoutProps>({
     name: 'PDynamicLayoutTable',
@@ -228,7 +228,7 @@ export default defineComponent<TableDynamicLayoutProps>({
             emit('export');
         };
 
-        const onChange = (options: Options = {}) => {
+        const onChange = (options: ToolboxTableOptions = {}) => {
             emit('fetch', options);
         };
 

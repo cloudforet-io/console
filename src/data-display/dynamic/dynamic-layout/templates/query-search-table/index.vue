@@ -86,8 +86,8 @@ import type { QuerySearchTableOptions } from '@/data-display/dynamic/dynamic-lay
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
 import type { DataTableFieldType } from '@/data-display/tables/data-table/type';
-import type { Options } from '@/data-display/tables/query-search-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
+import type { ToolboxTableOptions } from '@/data-display/tables/toolbox-table/type';
 import type { KeyItemSet } from '@/inputs/search/query-search/type';
 
 
@@ -237,7 +237,7 @@ export default defineComponent<QuerySearchTableDynamicLayoutProps>({
             emit('export');
         };
 
-        const onChange = (options: Options = {}) => {
+        const onChange = (options: ToolboxTableOptions = {}) => {
             emit('fetch', options);
         };
 
