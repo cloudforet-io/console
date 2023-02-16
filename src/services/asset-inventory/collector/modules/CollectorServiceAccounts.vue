@@ -5,20 +5,20 @@
                    :total-count="totalCount"
                    :title="$t('PLUGIN.COLLECTOR.MAIN.SERVICE_ACCOUNT')"
         />
-        <p-query-search-table :items="items"
-                              :fields="fields"
-                              :loading="loading"
-                              :total-count="totalCount"
-                              :query-tags="queryTags"
-                              :key-item-sets="querySearchHandlers.keyItemSets"
-                              :value-handler-map="querySearchHandlers.valueHandlerMap"
-                              :sort-by.sync="sortBy"
-                              :sort-desc.sync="sortDesc"
-                              :page-size.sync="pageLimit"
-                              :selectable="false"
-                              :excel-visible="false"
-                              use-cursor-loading
-                              @change="onChange"
+        <p-toolbox-table search-type="query"
+                         :items="items"
+                         :fields="fields"
+                         :loading="loading"
+                         :total-count="totalCount"
+                         :query-tags="queryTags"
+                         :key-item-sets="querySearchHandlers.keyItemSets"
+                         :value-handler-map="querySearchHandlers.valueHandlerMap"
+                         :sort-by.sync="sortBy"
+                         :sort-desc.sync="sortDesc"
+                         :page-size.sync="pageLimit"
+                         searchable
+                         use-cursor-loading
+                         @change="onChange"
         >
             <template #col-service_account_id-format="{ value }">
                 <p-anchor :to="referenceRouter(
@@ -47,7 +47,7 @@
                     {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_COLLECT_DATA') }}
                 </p-button>
             </template>
-        </p-query-search-table>
+        </p-toolbox-table>
         <collect-data-modal v-if="collectDataVisible"
                             :visible.sync="collectDataVisible"
                             :collector-id="collectorId"
@@ -62,7 +62,7 @@ import {
 } from 'vue';
 
 import {
-    PQuerySearchTable, PHeading, PButton, PAnchor,
+    PHeading, PButton, PAnchor, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
@@ -100,7 +100,7 @@ interface SecretModel {
 export default {
     name: 'CollectorServiceAccounts',
     components: {
-        PQuerySearchTable,
+        PToolboxTable,
         PHeading,
         PButton,
         PAnchor,
