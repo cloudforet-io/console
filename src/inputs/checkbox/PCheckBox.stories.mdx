@@ -1,8 +1,8 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PCheckbox from './PCheckbox.vue';
 import { getCurrentInstance, reactive, toRefs } from 'vue';
-import { makeOptionalProxy } from '@/utils/composition-helpers';
 import { getCheckboxArgTypes } from '@/inputs/checkbox/story-helper';
+import { useProxyValue } from '@/hooks';
 
 
 <Meta title='Inputs/Checkbox' parameters={{
@@ -32,10 +32,9 @@ export const Template = (args, { argTypes }) => ({
             </p-checkbox>
         </div>
     `,
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy
+    setup(props, { emit }) {
         const state = reactive({
-            proxySelected: makeOptionalProxy('selected', vm, props.selected)
+            proxySelected: useProxyValue('selected', props, emit)
         })
         return {
             ...toRefs(state)

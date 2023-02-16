@@ -21,8 +21,8 @@
 import { defineComponent, reactive, toRefs } from 'vue';
 
 import { styleTypes } from '@/feedbacks/notification-bar/config';
+import { useProxyValue } from '@/hooks';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import { makeProxy } from '@/utils/composition-helpers';
 
 export default defineComponent({
     name: 'PNotificationBar',
@@ -47,7 +47,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
         });
         const onClose = () => {
             emit('close');

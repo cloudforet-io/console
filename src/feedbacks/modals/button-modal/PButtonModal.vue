@@ -111,10 +111,10 @@ import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
 import { SizeMapping } from '@/feedbacks/modals/type';
 import '@/feedbacks/modals/modal.pcss';
 import PI from '@/foundation/icons/PI.vue';
+import { useProxyValue } from '@/hooks';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import { makeProxy } from '@/utils/composition-helpers';
 
 
 export default defineComponent<ButtonModalProps>({
@@ -196,7 +196,7 @@ export default defineComponent<ButtonModalProps>({
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: useProxyValue('visible', props, emit),
             allBodyClass: computed(() => {
                 const res: string[] = [];
                 if (props.size) res.push(props.size);

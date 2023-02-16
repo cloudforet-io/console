@@ -56,7 +56,7 @@ import type {
     AutocompleteHandler,
 } from '@/inputs/search/autocomplete-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
-import { makeByPassListeners, makeOptionalProxy } from '@/utils/composition-helpers';
+import { makeByPassListeners } from '@/utils/composition-helpers';
 
 
 interface AutocompleteSearchProps {
@@ -155,9 +155,9 @@ export default defineComponent<AutocompleteSearchProps>({
         const state = reactive({
             proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
             menuRef: null,
-            proxyValue: makeOptionalProxy('value', vm, ''),
+            proxyValue: useProxyValue('value', props, emit),
             isAutoMode: computed(() => props.visibleMenu === undefined),
-            proxyIsFocused: makeOptionalProxy('isFocused', vm, props.focused),
+            proxyIsFocused: useProxyValue('isFocused', props, emit),
             filteredMenu: [] as MenuItem[],
             bindingMenu: computed<MenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
             searchableItems: computed<MenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),

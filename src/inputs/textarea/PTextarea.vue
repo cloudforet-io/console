@@ -12,11 +12,10 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    defineComponent, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
-import { makeOptionalProxy } from '@/utils/composition-helpers';
+import { useProxyValue } from '@/hooks';
 
 export default defineComponent({
     name: 'PTextarea',
@@ -50,11 +49,9 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-
+    setup(props, { emit }) {
         const state = reactive({
-            proxyValue: makeOptionalProxy('value', vm, props.value),
+            proxyValue: useProxyValue('value', props, emit),
         });
         return {
             ...toRefs(state),

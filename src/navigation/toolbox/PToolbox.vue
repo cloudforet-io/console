@@ -88,9 +88,8 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, getCurrentInstance, reactive, toRefs,
+    computed, defineComponent, nextTick, reactive, toRefs,
 } from 'vue';
-import type Vue from 'vue';
 
 import { groupBy } from 'lodash';
 
@@ -107,7 +106,6 @@ import PSearch from '@/inputs/search/search/PSearch.vue';
 import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import type { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
-import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 
 export default defineComponent<ToolboxProps>({
@@ -165,11 +163,11 @@ export default defineComponent<ToolboxProps>({
             validator(value?: number) {
                 return value === undefined || value > 0;
             },
-            default: undefined,
+            default: 1,
         },
         pageSize: {
             type: Number,
-            default: undefined,
+            default: 24,
         },
         totalCount: {
             type: Number,
@@ -201,7 +199,7 @@ export default defineComponent<ToolboxProps>({
         },
         searchText: {
             type: String,
-            default: undefined,
+            default: '',
         },
         timezone: {
             type: String,
@@ -209,14 +207,11 @@ export default defineComponent<ToolboxProps>({
         },
     },
     setup(props: ToolboxProps, { emit }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const initPageSize = props.pageSizeOptions ? props.pageSizeOptions[0] || 24 : 24;
-
         const proxyState = reactive({
-            thisPage: makeOptionalProxy<number>('thisPage', vm, 1),
-            pageSize: makeOptionalProxy<number>('pageSize', vm, initPageSize),
+            thisPage: useProxyValue<number>('thisPage', props, emit),
+            pageSize: useProxyValue<number>('pageSize', props, emit),
             sortBy: useProxyValue('sortBy', props, emit),
-            searchText: makeOptionalProxy<string>('searchText', vm, ''),
+            searchText: useProxyValue<string>('searchText', props, emit),
             queryTags: useProxyValue('queryTags', props, emit),
         });
         const sortByOptionsData = (props.sortable ? groupBy(props.sortByOptions, 'name') : undefined);
@@ -255,12 +250,12 @@ export default defineComponent<ToolboxProps>({
 
 
         const emitChange = (options: ToolboxOptions) => {
-            vm.$emit('change', options);
+            emit('change', options);
         };
 
         const onChangeThisPage = (thisPage: number) => {
             proxyState.thisPage = thisPage;
-            vm.$nextTick(() => {
+            nextTick(() => {
                 emitChange({ pageStart: state.pageStart });
             });
         };
@@ -281,13 +276,13 @@ export default defineComponent<ToolboxProps>({
             if (!val) {
                 proxyState.searchText = '';
                 proxyState.thisPage = 1;
-                vm.$nextTick(() => {
+                nextTick(() => {
                     emitChange({ searchText: '', pageStart: state.pageStart });
                 });
             } else if (typeof val === 'string') {
                 proxyState.searchText = val;
                 proxyState.thisPage = 1;
-                vm.$nextTick(() => {
+                nextTick(() => {
                     emitChange({ searchText: val, pageStart: state.pageStart });
                 });
             } else {
@@ -299,7 +294,7 @@ export default defineComponent<ToolboxProps>({
             if (proxyState.queryTags !== tags) {
                 proxyState.queryTags = tags;
                 proxyState.thisPage = 1;
-                vm.$nextTick(() => {
+                nextTick(() => {
                     emitChange({ queryTags: tags, pageStart: state.pageStart });
                 });
             }

@@ -1,9 +1,9 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PCheckboxGroup from './PCheckboxGroup.vue';
-import { getCurrentInstance, reactive, toRefs } from 'vue';
-import { makeOptionalProxy } from '@/utils/composition-helpers';
+import { reactive, toRefs } from 'vue';
 import { getRadioGroupArgTypes } from '@/inputs/radio-group/story-helper';
 import {PCheckbox} from "@";
+import { useProxyValue } from '@/hooks';
 
 
 <Meta title='Inputs/Checkbox Group' parameters={{
@@ -30,10 +30,9 @@ export const Template = (args, { argTypes }) => ({
             </p-checkbox-group>
         </div>
     `,
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy
+    setup(props, { emit }) {
         const state = reactive({
-            proxySelected: makeOptionalProxy('selected', vm, props.selected),
+            proxySelected: useProxyValue('selected', props, emit),
             values: [0, 1, 2, 3],
         })
         return {

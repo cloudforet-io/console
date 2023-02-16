@@ -1,11 +1,11 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import { getCurrentInstance, reactive, toRefs } from 'vue';
+import { reactive, toRefs } from 'vue';
 
-import { makeOptionalProxy } from '@/utils/composition-helpers';
 import { i18n } from '@/translations';
 
 import PCollapsibleToggle from './PCollapsibleToggle.vue';
 import { getCollapsibleToggleArgTypes } from '@/data-display/collapsible/collapsible-toggle/story-helper';
+import { useProxyValue } from '@/hooks';
 
 
 <Meta title='Data Display/Collapsible/Collapsible Toggle' parameters={{
@@ -32,10 +32,9 @@ export const Template = (args, { argTypes }) => ({
         <div v-if="!proxyIsCollapsed">sample text</div>
     </div>
     `,
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy
+    setup(props, { emit }) {
         const state= reactive({
-            proxyIsCollapsed: makeOptionalProxy('isCollapsed', vm, props.isCollapsed)
+            proxyIsCollapsed: useProxyValue('isCollapsed', props, emit)
         })
         return {
             ...toRefs(state)

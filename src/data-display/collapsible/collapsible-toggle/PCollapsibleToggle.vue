@@ -25,17 +25,16 @@
 
 <script lang="ts">
 import {
-    defineComponent, reactive, toRefs, getCurrentInstance,
+    defineComponent, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import type { CollapsibleToggleProps } from '@/data-display/collapsible/collapsible-toggle/type';
 import {
     COLLAPSIBLE_TOGGLE_TYPE,
 } from '@/data-display/collapsible/collapsible-toggle/type';
 import PI from '@/foundation/icons/PI.vue';
+import { useProxyValue } from '@/hooks';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton.vue';
-import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 export default defineComponent<CollapsibleToggleProps>({
     name: 'PCollapsibleToggle',
@@ -58,10 +57,9 @@ export default defineComponent<CollapsibleToggleProps>({
             },
         },
     },
-    setup(props: CollapsibleToggleProps) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+    setup(props: CollapsibleToggleProps, { emit }) {
         const state = reactive({
-            proxyIsCollapsed: makeOptionalProxy('isCollapsed', vm, props.isCollapsed),
+            proxyIsCollapsed: useProxyValue('isCollapsed', props, emit),
         });
 
         /* event */

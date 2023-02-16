@@ -126,12 +126,12 @@ import {
 import { size } from 'lodash';
 
 import PI from '@/foundation/icons/PI.vue';
+import { useProxyValue } from '@/hooks';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import type {
     ProgressWizardProps,
 } from '@/navigation/wizards/progress-wizard/type';
-import { makeProxy } from '@/utils/composition-helpers';
 
 
 export default {
@@ -167,7 +167,7 @@ export default {
     setup(props: ProgressWizardProps, { emit }) {
         const state = reactive({
             tabWidth: computed(() => `${100 / size(props.tabs)}%`),
-            proxyActiveIdx: makeProxy('activeIdx', props, emit),
+            proxyActiveIdx: useProxyValue('activeIdx', props, emit),
             activeTab: computed(() => props.tabs[state.proxyActiveIdx]),
             isFirstTab: computed(() => state.proxyActiveIdx - 1 < 0),
             isLastTab: computed(() => state.proxyActiveIdx + 1 >= props.tabs.length),

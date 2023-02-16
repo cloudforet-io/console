@@ -2,14 +2,14 @@ import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
 import { range } from 'lodash';
 import { faker } from '@faker-js/faker';
 import {
-    getCurrentInstance, reactive, toRefs
+    reactive, toRefs
 } from 'vue';
 
-import { makeOptionalProxy } from '@/utils/composition-helpers';
 import { getAllAvailableIcons } from '@/foundation/icons/story-helper';
 
 import PSelectStatus from './PSelectStatus.vue';
 import { getSelectStatusArgTypes } from '@/inputs/select-status/story-helper';
+import { useProxyValue } from '@/hooks';
 
 
 <Meta title='Inputs/Select Status' parameters={{
@@ -37,10 +37,9 @@ export const Template = (args, { argTypes }) => ({
         </p-select-status>
     </div>
     `,
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy
+    setup(props, { emit }) {
         const state = reactive({
-            proxySelected: makeOptionalProxy('selected', vm, props.selected)
+            proxySelected: useProxyValue('selected', props, emit)
         })
         return {
             ...toRefs(state)

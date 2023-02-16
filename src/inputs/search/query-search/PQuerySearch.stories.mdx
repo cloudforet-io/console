@@ -1,13 +1,12 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import { getCurrentInstance, reactive, toRefs } from 'vue';
-import { makeOptionalProxy } from '@/utils/composition-helpers';
+import { reactive, toRefs } from 'vue';
 import PQuerySearch from './PQuerySearch.vue';
 import { getQuerySearchArgTypes } from '@/inputs/search/query-search/story-helper';
-import { getKeyItems, getKeyItemSets, getValueHandlerMap, getValueItems } from '@/inputs/search/query-search/mock';
+import { getKeyItemSets, getValueHandlerMap, getValueItems } from '@/inputs/search/query-search/mock';
 import {
     getTextHighlightRegex
 } from "@/utils/helpers";
-
+import { useProxyValue } from '@/hooks';
 
 
 <Meta title='Inputs/Search/Query Search' parameters={{
@@ -29,10 +28,9 @@ export const Template = (args, { argTypes }) => ({
         ></p-query-search>
     </div>
     `,
-    setup() {
-        const vm = getCurrentInstance()?.proxy
+    setup(props, emit) {
         const state = reactive({
-            proxyValue: makeOptionalProxy('value', vm, '')
+            proxyValue: useProxyValue('value', props, emit)
         })
         return {
             ...toRefs(state)

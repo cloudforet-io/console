@@ -59,10 +59,10 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 
+import { useProxyValue } from '@/hooks';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import '../modal.pcss';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
-import { makeProxy } from '@/utils/composition-helpers';
 
 import { primaryDark } from '@/styles/colors.cjs';
 
@@ -87,7 +87,7 @@ const props = withDefaults(defineProps<IconModalProps>(), {
 });
 const emit = defineEmits<{(e: 'clickButton'): void;}>();
 const state = reactive({
-    proxyVisible: makeProxy('visible', props, emit),
+    proxyVisible: useProxyValue('visible', props, emit),
 });
 
 const handleClickButton = () => {

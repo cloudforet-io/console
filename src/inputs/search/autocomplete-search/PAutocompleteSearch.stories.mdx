@@ -1,14 +1,14 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import { getCurrentInstance, reactive, toRefs } from 'vue';
+import { reactive, toRefs } from 'vue';
 import Fuse from 'fuse.js'
 
-import { makeOptionalProxy } from '@/utils/composition-helpers';
 import PAutocompleteSearch from './PAutocompleteSearch.vue';
 import PButton from '@/inputs/buttons/button/PButton';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 
 import { getAutocompleteSearchArgTypes } from '@/inputs/search/autocomplete-search/story-helper';
 import {getAutocompleteMenu, getAutocompleteMenuWithMultiTypes} from '@/inputs/search/autocomplete-search/mock';
+import { useProxyValue } from '@/hooks';
 
 
 <Meta title='Inputs/Search/Auto Complete Search' parameters={{
@@ -46,10 +46,9 @@ export const Template = (args, { argTypes }) => ({
         >
         </p-autocomplete-search>
     `,
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy
+    setup(props, { emit }) {
         const state = reactive({
-            proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, props.visibleMenu)
+            proxyVisibleMenu: useProxyValue('visibleMenu', props, emit)
         })
         return {
             ...toRefs(state)

@@ -16,15 +16,14 @@
 
 <script lang="ts">
 import {
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    defineComponent, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import vueFilePond from 'vue-filepond';
 
+import { useProxyValue } from '@/hooks';
 import type { FileUploaderProps } from '@/inputs/file-uploader/type';
-import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 
 const FilePond = vueFilePond(
@@ -55,10 +54,9 @@ export default defineComponent<FileUploaderProps>({
             default: '',
         },
     },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+    setup(props, { emit }) {
         const state = reactive({
-            proxyUploadedFiles: makeOptionalProxy<File[]>('uploadedFiles', vm, props.uploadedFiles),
+            proxyUploadedFiles: useProxyValue<File[]>('uploadedFiles', props, emit),
             fileRef: null as Element|null,
         });
 

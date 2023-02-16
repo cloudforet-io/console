@@ -31,12 +31,11 @@
 </template>
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive,
+    computed, reactive,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
+import { useProxyValue } from '@/hooks';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 export default {
     name: 'PPagination',
@@ -45,13 +44,13 @@ export default {
         thisPage: {
             type: Number,
             validator(value) {
-                return undefined || value > 0;
+                return value > 0;
             },
-            default: undefined,
+            default: 1,
         },
         pageSize: {
             type: Number,
-            default: undefined,
+            default: 15,
         },
         totalCount: {
             type: Number,
@@ -59,7 +58,6 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         // pagination logic
         const paginate = (
             totalItems,
@@ -126,8 +124,8 @@ export default {
         const pageList = computed(() => paginate(props.totalCount, props.thisPage, props.pageSize, 10));
 
         const proxyState = reactive({
-            thisPage: makeOptionalProxy<number>('thisPage', vm, 1),
-            pageSize: makeOptionalProxy<number>('pageSize', vm, 15),
+            thisPage: useProxyValue<number>('thisPage', props, emit),
+            pageSize: useProxyValue<number>('pageSize', props, emit),
         });
 
         const clickPage = (page) => {

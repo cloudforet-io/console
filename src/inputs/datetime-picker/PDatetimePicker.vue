@@ -10,7 +10,7 @@
     >
         <div class="input-sizer">
             <input type="text"
-                   :placeholder="placeholder"
+                   :placeholder="dataType === DATA_TYPE.time ? $t('COMPONENT.DATETIME_PICKER.SELECT_TIME') : $t('COMPONENT.DATETIME_PICKER.SELECT_DATE')"
                    data-input
             >
         </div>
@@ -25,9 +25,8 @@
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from 'vue';
-import type Vue from 'vue';
 
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
@@ -35,12 +34,11 @@ import utc from 'dayjs/plugin/utc';
 import Flatpickr from 'flatpickr';
 import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect';
 
-
 import PI from '@/foundation/icons/PI.vue';
+import { useProxyValue } from '@/hooks';
 import type { DatetimePickerProps } from '@/inputs/datetime-picker/type';
 import { DATA_TYPE, SELECT_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
 import { i18n } from '@/translations';
-import { makeOptionalProxy } from '@/utils/composition-helpers';
 
 import { getLocaleFile } from '@/translations/vendors/flatpickr';
 
@@ -110,18 +108,11 @@ export default {
         },
     },
     setup(props: DatetimePickerProps, { emit }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             datePickerRef: null as null | HTMLElement,
             datePicker: null as null | Instance,
-            proxySelectedDates: makeOptionalProxy<string[]>('selectedDates', vm, props.selectedDates),
+            proxySelectedDates: useProxyValue<string[]>('selectedDates', props, emit),
             dateString: '',
-            placeholder: computed(() => {
-                if (props.dataType === DATA_TYPE.time) {
-                    return vm.$t('COMPONENT.DATETIME_PICKER.SELECT_TIME');
-                }
-                return vm.$t('COMPONENT.DATETIME_PICKER.SELECT_DATE');
-            }),
             visiblePicker: false,
             plugins: computed(() => (props.dataType === DATA_TYPE.yearToMonth ? [
                 monthSelectPlugin({

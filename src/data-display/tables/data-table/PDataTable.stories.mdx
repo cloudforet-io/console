@@ -1,7 +1,5 @@
 import {Meta, Canvas, Story, ArgsTable, Description} from '@storybook/addon-docs/blocks';
-import { getCurrentInstance, reactive, toRefs } from 'vue';
-
-import { makeOptionalProxy } from '@/utils/composition-helpers';
+import { reactive, toRefs } from 'vue';
 
 import PTextarea from '@/inputs/textarea/PTextarea';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
@@ -10,6 +8,7 @@ import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from './config';
 import { getDataTableArgsType } from '@/data-display/tables/data-table/story-helper';
 import { getUserFields, getUsers, getLongUsers } from '@/data-display/tables/data-table/mock';
+import { useProxyValue } from '@/hooks';
 
 
 <Meta title='Data Display/Tables/Data Table' parameters={{
@@ -59,12 +58,11 @@ export const Template = (args, { argTypes }) => ({
         </p-data-table>
     </div>
     `,
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy
+    setup(props, { emit }) {
         const state = reactive({
-            proxySortBy: makeOptionalProxy('sortBy', vm, props.sortBy),
-            proxySortDesc: makeOptionalProxy('sortDesc', vm, props.sortDesc),
-            proxySelectIndex: makeOptionalProxy('selectIndex', vm, props.selectIndex),
+            proxySortBy: useProxyValue('sortBy', props, emit),
+            proxySortDesc: useProxyValue('sortDesc', props, emit),
+            proxySelectIndex: useProxyValue('selectIndex', props, emit),
         });
         return {
             ...toRefs(state),
