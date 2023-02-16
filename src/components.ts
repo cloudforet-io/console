@@ -69,7 +69,6 @@ export { default as PButtonTab } from './navigation/tabs/button-tab/PButtonTab.v
 export { default as PTab } from './navigation/tabs/tab/PTab.vue';
 export { default as PHeading } from './data-display/heading/PHeading.vue';
 export { default as PTree } from './data-display/tree/PTree.vue';
-export { default as PProgressWizard } from './navigation/wizards/progress-wizard/PProgressWizard.vue';
 export { default as PSelectStatus } from './inputs/select-status/PSelectStatus.vue';
 
 export { default as PNotificationBar } from './feedbacks/notification-bar/PNotificationBar.vue';
