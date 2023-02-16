@@ -38,7 +38,13 @@ const dashboardsRoute: RouteConfig = {
                 {
                     path: 'create',
                     name: DASHBOARDS_ROUTE.CREATE._NAME,
-                    meta: { translationId: 'DASHBOARDS.CREATE.TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: {
+                        translationId: 'DASHBOARDS.CREATE.TITLE',
+                        accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
+                        accessInfo: {
+                            referenceRouteNames: [DASHBOARDS_ROUTE.PROJECT._NAME, DASHBOARDS_ROUTE.WORKSPACE._NAME],
+                        },
+                    },
                     component: DashboardCreatePage,
                 },
                 {

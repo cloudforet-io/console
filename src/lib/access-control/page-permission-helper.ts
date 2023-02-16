@@ -77,10 +77,15 @@ export const filterLNBMenuByPermission = (menuSet: LNBMenu[], pagePermissionList
     return results;
 }, [] as LNBMenu[]);
 
-export const getPermissionOfPage = (menuId: MenuId, pagePermissions: PagePermissionTuple[]): PagePermissionType|undefined => {
+export const getPermissionOfPage = (menuId: MenuId, pagePermissions: PagePermissionTuple[], referenceRouteNames: string[] = []): PagePermissionType|undefined => {
     let result: PagePermissionType|undefined;
     pagePermissions.some(([id, permission]) => {
         if (id === menuId) {
+            result = permission;
+            return true;
+        }
+        // return MANAGE permission if user have any of reference route names in route case with reference route
+        if (referenceRouteNames.includes(id)) {
             result = permission;
             return true;
         }

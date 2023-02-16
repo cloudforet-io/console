@@ -99,7 +99,7 @@ export default defineComponent({
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.CREATE_DASHBOARDS'),
                     to: { name: DASHBOARDS_ROUTE.CREATE._NAME },
-                    show: computed(() => !state.hasOnlyViewPermission),
+                    show: !state.hasOnlyViewPermission,
                 },
             ] as DisplayMenu[]),
             isOverflown: false,

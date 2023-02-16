@@ -57,7 +57,7 @@ export class SpaceRouter {
             const isTokenAlive = SpaceConnector.isTokenAlive;
             const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pagePermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
-            const userAccessLevel = getUserAccessLevel(to.name, userPagePermissions, isTokenAlive);
+            const userAccessLevel = getUserAccessLevel(to.name, userPagePermissions, isTokenAlive, to.meta?.accessInfo?.referenceRouteNames);
             const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
 
