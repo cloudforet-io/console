@@ -1,3 +1,5 @@
+import type { AccessInfo } from '@/lib/access-control/config';
+
 declare module 'vue-router' {
     import type { TranslateResult } from 'vue-i18n';
   import type {
@@ -32,6 +34,7 @@ import {
     copiable?: boolean; // for breadcrumbs
     isSignInPage?: boolean;
     accessLevel?: AccessLevel;
+    accessInfo?: AccessInfo;
   }
   export interface RouteConfigSingleView extends OriginRouteConfigSingleView {
       meta?: RouteMeta;
