@@ -4,13 +4,13 @@
                    show-back-button
                    @click-back-button="$router.go(-1)"
         />
-        <p-progress-wizard :tabs="tabState.tabs"
-                           :active-idx.sync="tabState.activeIdx"
-                           :invalid-state="tabState.invalidState"
-                           :loading="tabState.loading"
-                           :disabled="tabState.disabled"
-                           @cancel="onClickCancel"
-                           @confirm="onClickConfirm"
+        <collector-progress-wizard :tabs="tabState.tabs"
+                                   :active-idx.sync="tabState.activeIdx"
+                                   :invalid-state="tabState.invalidState"
+                                   :loading="tabState.loading"
+                                   :disabled="tabState.disabled"
+                                   @cancel="onClickCancel"
+                                   @confirm="onClickConfirm"
         >
             <template #contents-conf>
                 <div class="collector-input-wrapper">
@@ -59,7 +59,7 @@
                                   @update-tags="handleUpdateTags"
                 />
             </template>
-        </p-progress-wizard>
+        </collector-progress-wizard>
     </div>
 </template>
 
@@ -70,7 +70,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PProgressWizard, PSelectDropdown, PLazyImg, PFieldGroup, PTextInput, PHeading, PToggleButton,
+    PSelectDropdown, PLazyImg, PFieldGroup, PTextInput, PHeading, PToggleButton,
 } from '@spaceone/design-system';
 import { get, some } from 'lodash';
 
@@ -84,16 +84,17 @@ import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInput
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import CollectorProgressWizard from '@/services/asset-inventory/collector/create-collector/CollectorProgressWizard.vue';
 import { UPGRADE_MODE } from '@/services/asset-inventory/collector/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 export default {
     name: 'CreateCollectorPage',
     components: {
+        CollectorProgressWizard,
         PSelectDropdown,
         PTextInput,
         PFieldGroup,
-        PProgressWizard,
         TagsInputGroup,
         PHeading,
         PLazyImg,
