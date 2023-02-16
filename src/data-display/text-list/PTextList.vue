@@ -33,8 +33,8 @@ import {
 
 import { get } from 'lodash';
 
+import type { TextListItem, TextListProps } from '@/data-display/text-list/type';
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
-import type { TextListItem, TextListProps } from '@/others/console/text-list/type';
 import { isNotEmpty } from '@/utils/helpers';
 
 export default defineComponent<TextListProps>({

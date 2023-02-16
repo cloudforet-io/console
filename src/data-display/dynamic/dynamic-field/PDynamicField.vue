@@ -37,7 +37,7 @@ import type { ImportedComponent } from 'vue/types/options';
 import type { DynamicFieldProps, DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
 import type { DynamicFieldType } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import PTextList from '@/others/console/text-list/PTextList.vue';
+import PTextList from '@/data-display/text-list/PTextList.vue';
 
 const PDynamicField = () => ({
     // eslint-disable-next-line import/no-self-import
