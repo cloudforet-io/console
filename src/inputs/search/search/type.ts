@@ -1,5 +1,11 @@
 import type { MenuItem } from '@/inputs/context-menu/type';
-import type { AutocompleteHandler } from '@/inputs/search/autocomplete-search/type';
+
+
+interface HandlerRes {
+    results: MenuItem[];
+    totalCount?: number;
+}
+export type AutocompleteHandler = (inputText: string, list: MenuItem[]) => Promise<HandlerRes>|HandlerRes;
 
 export interface SearchProps {
     value: string; // sync
@@ -16,11 +22,4 @@ export interface SearchProps {
     handler?: AutocompleteHandler;
     disableHandler: boolean;
     useAutoComplete: boolean;
-}
-
-export interface InputListeners {
-    input: any;
-    blur: any;
-    focus: any;
-    keyup: any;
 }

@@ -58,7 +58,6 @@ export { default as PDoubleCheckModal } from './feedbacks/modals/advanced/double
 export { default as PTableCheckModal } from './feedbacks/modals/advanced/table-check-modal/PTableCheckModal.vue';
 export { default as PPagination } from './navigation/pagination/pagination/PPagination.vue';
 export { default as PTextPagination } from './navigation/pagination/text-pagination/PTextPagination.vue';
-export { default as PAutocompleteSearch } from './inputs/search/autocomplete-search/PAutocompleteSearch.vue';
 export { default as PFilterableDropdown } from './inputs/dropdown/filterable-dropdown/PFilterableDropdown.vue';
 export { default as PQuerySearch } from './inputs/search/query-search/PQuerySearch.vue';
 export { default as PQuerySearchTags } from './inputs/search/query-search-tags/PQuerySearchTags.vue';
