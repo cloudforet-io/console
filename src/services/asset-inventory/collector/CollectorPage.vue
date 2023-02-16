@@ -8,10 +8,7 @@
         >
             <template #extra>
                 <router-link :to="{name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME }">
-                    <!-- TODO: remove click binding after upgrade mirinae version. This is defense code for 1.10.4.6 -->
-                    <p-button style-type="tertiary"
-                              @click="() => {}"
-                    >
+                    <p-button style-type="tertiary">
                         {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE') }}
                     </p-button>
                 </router-link>
@@ -19,20 +16,25 @@
         </p-heading>
         <p-horizontal-layout>
             <template #container="{ height }">
-                <p-query-search-table :fields="fields"
-                                      :items="items"
-                                      :key-item-sets="handlerState.keyItemSets"
-                                      :value-handler-map="handlerState.valueHandlerMap"
-                                      :loading="loading"
-                                      :total-count="totalCount"
-                                      :query-tags="searchTags"
-                                      :sort-by.sync="sortBy"
-                                      :sort-desc.sync="sortDesc"
-                                      :page-size.sync="pageLimit"
-                                      :style="{height: `${height}px`}"
-                                      @select="onSelect"
-                                      @change="onChange"
-                                      @export="exportCollectorDataToExcel"
+                <p-toolbox-table search-type="query"
+                                 :fields="fields"
+                                 :items="items"
+                                 :key-item-sets="handlerState.keyItemSets"
+                                 :value-handler-map="handlerState.valueHandlerMap"
+                                 :loading="loading"
+                                 :total-count="totalCount"
+                                 :query-tags="searchTags"
+                                 :sort-by.sync="sortBy"
+                                 :sort-desc="true"
+                                 :page-size.sync="pageLimit"
+                                 :style="{height: `${height}px`}"
+                                 selectable
+                                 sortable
+                                 searchable
+                                 exportable
+                                 @select="handleSelect"
+                                 @change="handleChange"
+                                 @export="exportCollectorDataToExcel"
                 >
                     <template #toolbox-left>
                         <p-button style-type="primary"
@@ -45,7 +47,7 @@
                         <p-select-dropdown class="left-toolbox-item"
                                            :items="dropdown"
                                            :disabled="!hasManagePermission"
-                                           @select="onSelectDropdown"
+                                           @select="handleSelectDropdown"
                         >
                             {{ $t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
                         </p-select-dropdown>
@@ -78,7 +80,7 @@
                     <template #col-last_collected_at-format="{ value }">
                         {{ value ? iso8601Formatter(value,timezone) : '' }}
                     </template>
-                </p-query-search-table>
+                </p-toolbox-table>
             </template>
         </p-horizontal-layout>
 
@@ -219,8 +221,8 @@ import type { Component } from 'vue/types/umd';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PHorizontalLayout, PSelectDropdown, PLazyImg, PHeading, PDataTable, PQuerySearchTable,
-    PTab, PTableCheckModal, PButton, PStatus, PI, PEmpty,
+    PHorizontalLayout, PSelectDropdown, PLazyImg, PHeading, PDataTable,
+    PTab, PTableCheckModal, PButton, PStatus, PI, PEmpty, PToolboxTable,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
@@ -228,6 +230,7 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -258,6 +261,7 @@ const CollectorSchedules = (): Component => import('@/services/asset-inventory/c
 export default {
     name: 'CollectorPage',
     components: {
+        PToolboxTable,
         PI,
         PHeading,
         PLazyImg,
@@ -265,7 +269,6 @@ export default {
         PButton,
         PSelectDropdown,
         PDataTable,
-        PQuerySearchTable,
         PStatus,
         PTab,
         PTableCheckModal,
@@ -275,7 +278,6 @@ export default {
         CollectorDetails,
         CollectorServiceAccounts,
         CollectorSchedules,
-        // CollectionRule,
         TagsPanel,
     },
     setup() {
@@ -348,7 +350,6 @@ export default {
             pageLimit: 15,
             pageStart: 1,
             sortBy: null,
-            sortDesc: true,
             // dropdown action
             dropdown: computed<MenuItem[]>(() => [
                 {
@@ -409,26 +410,16 @@ export default {
         };
 
         // Table
-        const apiQuery = new ApiQueryHelper().setOnly(
-            'collector_id',
-            'name',
-            'last_collected_at',
-            'provider',
-            'tags',
-            'plugin_info',
-            'state',
-        );
-        const getQuery = () => {
-            apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(state.pageStart, state.pageLimit)
-                .setFilters(queryHelper.filters);
-            return apiQuery.data;
-        };
+        const collectorApiQueryHelper = new ApiQueryHelper()
+            .setOnly('collector_id', 'name', 'last_collected_at', 'provider', 'tags', 'plugin_info', 'state')
+            .setPage(state.pageStart, state.pageLimit)
+            .setSort(state.sortBy, true);
         const detailLinkQueryHelper = new QueryHelper();
-        const getCollectors = async () => {
+        const listCollectors = async () => {
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.inventory.collector.list({ query: getQuery() });
+                collectorApiQueryHelper.setFilters(queryHelper.filters);
+                const res = await SpaceConnector.client.inventory.collector.list({ query: collectorApiQueryHelper.data });
                 state.items = res.results.map((d) => ({
                     plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
                     plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
@@ -449,27 +440,17 @@ export default {
         };
 
         // Action events
-        const onSelect = (index) => {
+        const handleSelect = (index) => {
             state.selectedIndexes = index;
         };
-        const onChange = async (options) => {
-            if (options.sortBy !== undefined) {
-                state.sortBy = options.sortBy;
-                state.sortDesc = options.sortDesc;
-            }
-            if (options.pageStart !== undefined) state.pageStart = options.pageStart;
-            if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+        const handleChange = async (options) => {
+            setApiQueryWithToolboxOptions(collectorApiQueryHelper, options);
             if (options.queryTags !== undefined) {
                 state.searchTags = options.queryTags;
                 queryHelper.setFiltersAsQueryTag(options.queryTags);
                 await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             }
-
-            try {
-                await getCollectors();
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
+            await listCollectors();
         };
         const checkModalConfirm = async (): Promise<void> => {
             try {
@@ -497,7 +478,7 @@ export default {
             } finally {
                 if (checkModalState.mode === 'delete') state.selectedIndexes = [];
                 checkModalState.visible = false;
-                await getCollectors();
+                await listCollectors();
             }
         };
         const onClickUpdate = (): void => {
@@ -528,7 +509,7 @@ export default {
             state.collectDataModalVisible = true;
         };
 
-        const onSelectDropdown = (name) => {
+        const handleSelectDropdown = (name) => {
             switch (name) {
             case 'update': onClickUpdate(); break;
             case 'enable': onClickEnable(); break;
@@ -542,7 +523,7 @@ export default {
         const exportCollectorDataToExcel = async () => {
             await store.dispatch('file/downloadExcel', {
                 url: '/inventory/collector/list',
-                param: { query: getQuery() },
+                param: { query: collectorApiQueryHelper.data },
                 fields: state.excelFields,
                 file_name_prefix: FILE_NAME_PREFIX.collector,
             });
@@ -554,13 +535,13 @@ export default {
                 store.dispatch('reference/plugin/load'),
                 store.dispatch('reference/provider/load'),
             ]);
-            await Promise.all([setSearchTags(), getCollectors()]);
+            await Promise.all([setSearchTags(), listCollectors()]);
         };
         init();
 
         watch(() => state.updateModalVisible, (val) => {
             if (!val) {
-                getCollectors();
+                listCollectors();
             }
         }, {
             immediate: false,
@@ -573,9 +554,9 @@ export default {
             checkModalState,
             handlerState,
             ASSET_INVENTORY_ROUTE,
-            onSelect,
-            onChange,
-            onSelectDropdown,
+            handleSelect,
+            handleChange,
+            handleSelectDropdown,
             checkModalConfirm,
             exportCollectorDataToExcel,
             iso8601Formatter,
