@@ -32,7 +32,7 @@
                 <g-n-b-dashboard-menu v-show="menuId === MENU_ID.DASHBOARDS"
                                       @close="hideMenu"
                 />
-                <issue-inventory-menu v-show="menuId === 'issue_inventory'"
+                <integration-sub-menu v-show="menuId === 'Integrations'"
                                       @close="hideMenu"
                 />
             </div>
@@ -78,8 +78,8 @@ import { customMenuNameList } from '@/common/modules/navigations/gnb/config';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardMenu
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardMenu.vue';
-import IssueInventoryMenu
-    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/issue-inventory/IssueInventoryMenu.vue';
+import IntegrationSubMenu
+    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/Integration-menu/IntegrationSubMenu.vue';
 
 interface SubMenu extends DisplayMenu {
     href?: string;
@@ -99,7 +99,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'GNBMenu',
     components: {
-        IssueInventoryMenu,
+        IntegrationSubMenu,
         GNBDashboardMenu,
         PI,
         GNBSubMenu,
@@ -147,8 +147,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            isIssueInventory: computed<boolean>(() => props.label === 'Issue Inventory'),
-            hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.menuId) || state.isIssueInventory),
+            hasCustomMenu: computed<boolean>(() => customMenuNameList.includes(props.menuId)),
             hasSubMenu: computed<boolean>(() => props.subMenuList?.length > 0),
             isMenuWithAdditionalMenu: computed<boolean>(() => state.hasSubMenu || state.hasCustomMenu),
         });

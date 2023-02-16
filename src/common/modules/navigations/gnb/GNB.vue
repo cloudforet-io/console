@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, getCurrentInstance, defineComponent,
+    reactive, toRefs, computed, getCurrentInstance, defineComponent, onMounted,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
@@ -78,18 +78,21 @@ export default defineComponent({
                 label: 'Issue Inventory',
                 subMenuList: [],
             },
-            gnbMenuList: computed<GNBMenuType[]>(() => [...store.getters['display/GNBMenuList'], state.issueInventoryMenu]),
+            gnbMenuList: computed<GNBMenuType[]>(() => [...store.getters['display/GNBMenuList'], state.integrationMenu]),
             siteMapMenuList: computed<GNBMenuType[]>(() => store.getters['display/siteMapMenuList']),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;
             }),
-            // integrationMenu: computed(() => {
-            //     const extraMenu = store.getters['domain/getDomainExtraMenu'];
-            //     return {
-            //
-            //     };
-            // }),
+            integrationMenu: computed<GNBMenuType>(() => {
+                const extraMenu = store.getters['domain/getDomainExtraMenu'];
+                return {
+                    show: true,
+                    id: extraMenu?.title,
+                    label: extraMenu?.title,
+                    to: {},
+                };
+            }),
         });
 
         /* event */
@@ -105,9 +108,9 @@ export default defineComponent({
             }
         };
 
-        (async () => {
-            await store.dispatch('domain/loadDomainConfig');
-        })();
+        onMounted(() => {
+            store.dispatch('domain/loadDomainConfig');
+        });
 
         return {
             ...toRefs(state),
