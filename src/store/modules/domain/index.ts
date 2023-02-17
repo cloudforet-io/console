@@ -9,6 +9,7 @@ const state: DomainState = {
     extendedAuthType: undefined,
     authOptions: undefined,
     billingEnabled: false,
+    extraMenu: undefined,
 };
 
 export default {

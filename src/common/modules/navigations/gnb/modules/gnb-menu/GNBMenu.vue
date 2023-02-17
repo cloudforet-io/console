@@ -32,6 +32,9 @@
                 <g-n-b-dashboard-menu v-show="menuId === MENU_ID.DASHBOARDS"
                                       @close="hideMenu"
                 />
+                <integration-sub-menu v-show="menuId === DOMAIN_CONFIG_TYPE.EXTRA_MENU"
+                                      @close="hideMenu"
+                />
             </div>
             <div v-else-if="hasSubMenu"
                  v-show="isOpened"
@@ -67,6 +70,7 @@ import { PI } from '@spaceone/design-system';
 import { SpaceRouter } from '@/router';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
+import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -75,6 +79,8 @@ import { customMenuNameList } from '@/common/modules/navigations/gnb/config';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardMenu
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardMenu.vue';
+import IntegrationSubMenu
+    from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/Integration-menu/IntegrationSubMenu.vue';
 
 interface SubMenu extends DisplayMenu {
     href?: string;
@@ -94,6 +100,7 @@ interface Props {
 export default defineComponent<Props>({
     name: 'GNBMenu',
     components: {
+        IntegrationSubMenu,
         GNBDashboardMenu,
         PI,
         GNBSubMenu,
@@ -164,6 +171,7 @@ export default defineComponent<Props>({
             handleMenu,
             hideMenu,
             MENU_ID,
+            DOMAIN_CONFIG_TYPE,
         };
     },
 });
@@ -220,7 +228,6 @@ export default defineComponent<Props>({
     .custom-menu-wrapper {
         @apply rounded-xs;
         cursor: auto;
-        width: 22.5rem;
         position: absolute;
         top: $gnb-height;
         margin-top: -0.5rem;
