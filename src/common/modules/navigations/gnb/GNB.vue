@@ -87,10 +87,9 @@ export default defineComponent({
             }),
             integrationMenu: computed<GNBMenuType>(() => {
                 const extraMenu = store.getters['domain/getDomainExtraMenu'];
-                console.log(extraMenu);
                 return {
                     show: true,
-                    id: extraMenu?.title,
+                    id: DOMAIN_CONFIG_TYPE.EXTRA_MENU as MenuId,
                     label: extraMenu?.title,
                     to: {},
                 };

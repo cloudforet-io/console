@@ -32,7 +32,7 @@
                 <g-n-b-dashboard-menu v-show="menuId === MENU_ID.DASHBOARDS"
                                       @close="hideMenu"
                 />
-                <integration-sub-menu v-show="menuId === 'Integrations'"
+                <integration-sub-menu v-show="menuId === DOMAIN_CONFIG_TYPE.EXTRA_MENU"
                                       @close="hideMenu"
                 />
             </div>
@@ -70,6 +70,7 @@ import { PI } from '@spaceone/design-system';
 import { SpaceRouter } from '@/router';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
+import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -170,6 +171,7 @@ export default defineComponent<Props>({
             handleMenu,
             hideMenu,
             MENU_ID,
+            DOMAIN_CONFIG_TYPE,
         };
     },
 });

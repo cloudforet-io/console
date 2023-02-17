@@ -10,7 +10,6 @@ const state: DomainState = {
     extendedAuthType: undefined,
     authOptions: undefined,
     billingEnabled: false,
-    extraMenuSet: undefined,
     domainConfig: {
         [DOMAIN_CONFIG_TYPE.EXTRA_MENU]: undefined,
     } as DomainConfig,

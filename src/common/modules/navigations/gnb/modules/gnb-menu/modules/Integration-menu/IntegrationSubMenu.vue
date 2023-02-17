@@ -33,7 +33,7 @@
 <script setup lang="ts">
 
 import {
-    computed, onMounted, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from 'vue';
 
 import { PTab, PI } from '@spaceone/design-system';
@@ -47,11 +47,7 @@ import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSub
 const emit = defineEmits(['close']);
 
 const state = reactive({
-    integrationMenus: computed(() => {
-        const extraMenus = store.getters['domain/getDomainExtraMenu']?.contents ?? [];
-        console.log(extraMenus);
-        return extraMenus;
-    }),
+    integrationMenus: computed(() => store.getters['domain/getDomainExtraMenu']?.contents ?? []),
     tabs: computed(() => state.integrationMenus.map((menu) => ({
         label: menu.title,
         name: menu.title,
@@ -64,8 +60,8 @@ const hideMenu = () => {
     emit('close');
 };
 
-onMounted(() => {
-    if (state.integrationMenus.length) state.activeTab = state.integrationMenus[0].title;
+watch(() => state.integrationMenus, (_integrationMenus) => {
+    if (_integrationMenus.length) state.activeTab = _integrationMenus[0].title;
 });
 
 const {
@@ -83,7 +79,8 @@ const {
         @apply absolute bg-white rounded-xs border border-gray-200;
         display: flex;
         flex-direction: column;
-        width: 27.5rem;
+        width: 20rem;
+        max-width: 27.5rem;
         min-height: auto;
         box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
         .tab-pane {
@@ -93,6 +90,9 @@ const {
 
     .integration-tab-content-wrapper {
         padding: 0.5rem;
+        min-height: 10rem;
+        overflow-y: auto;
+        max-height: calc(85vh - 9rem);
     }
 }
 </style>
