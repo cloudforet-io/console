@@ -43,6 +43,7 @@ import { includes } from 'lodash';
 import { store } from '@/store';
 
 import type { DisplayMenu as GNBMenuType } from '@/store/modules/display/type';
+import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import type { MenuId } from '@/lib/menu/config';
@@ -86,6 +87,7 @@ export default defineComponent({
             }),
             integrationMenu: computed<GNBMenuType>(() => {
                 const extraMenu = store.getters['domain/getDomainExtraMenu'];
+                console.log(extraMenu);
                 return {
                     show: true,
                     id: extraMenu?.title,
@@ -109,7 +111,7 @@ export default defineComponent({
         };
 
         onMounted(() => {
-            store.dispatch('domain/loadDomainConfig');
+            store.dispatch('domain/loadDomainConfig', DOMAIN_CONFIG_TYPE.EXTRA_MENU);
         });
 
         return {

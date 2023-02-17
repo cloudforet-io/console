@@ -3,16 +3,28 @@
         <p-tab :tabs="tabs"
                :active-tab.sync="activeTab"
         >
-            <template v-for="({title, sub_menu}) in integrationMenus"
+            <template v-for="({title, sub_menu}, index) in integrationMenus"
                       #[title]
             >
-                <template v-for="(menu, idx) in sub_menu">
-                    <g-n-b-sub-menu :key="`extra-${menu.label}-${idx}`"
-                                    :label="menu.label"
-                                    :href="menu.link"
-                                    @navigate="hideMenu"
-                    />
-                </template>
+                <div :key="`${title}-${index}`"
+                     class="integration-tab-content-wrapper"
+                >
+                    <template v-for="(menu, idx) in sub_menu">
+                        <g-n-b-sub-menu :key="`extra-${menu.label}-${idx}`"
+                                        :label="menu.label"
+                                        :href="menu.link"
+                                        @navigate="hideMenu"
+                        >
+                            <template #extra-mark>
+                                <p-i name="ic_external-link"
+                                     height="1em"
+                                     width="1em"
+                                     color="inherit"
+                                />
+                            </template>
+                        </g-n-b-sub-menu>
+                    </template>
+                </div>
             </template>
         </p-tab>
     </div>
@@ -21,10 +33,11 @@
 <script setup lang="ts">
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, onMounted, reactive, toRefs,
 } from 'vue';
 
-import { PTab } from '@spaceone/design-system';
+import { PTab, PI } from '@spaceone/design-system';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { store } from '@/store';
 
@@ -35,7 +48,7 @@ const emit = defineEmits(['close']);
 
 const state = reactive({
     integrationMenus: computed(() => {
-        const extraMenus = store.getters['domain/getDomainExtraMenu'].contents ?? [];
+        const extraMenus = store.getters['domain/getDomainExtraMenu']?.contents ?? [];
         console.log(extraMenus);
         return extraMenus;
     }),
@@ -43,7 +56,7 @@ const state = reactive({
         label: menu.title,
         name: menu.title,
         keepAlive: true,
-    }))),
+    })) as TabItem[]),
     activeTab: '',
 });
 
@@ -51,12 +64,9 @@ const hideMenu = () => {
     emit('close');
 };
 
-watch(() => state.integrationMenus, (_integrationMenus) => {
-    if (_integrationMenus.length) {
-        state.activeTab = _integrationMenus[0].title;
-    }
+onMounted(() => {
+    if (state.integrationMenus.length) state.activeTab = state.integrationMenus[0].title;
 });
-
 
 const {
     integrationMenus,
@@ -75,11 +85,14 @@ const {
         flex-direction: column;
         width: 27.5rem;
         min-height: auto;
-        height: 20rem;
         box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
         .tab-pane {
             padding-bottom: 0;
         }
+    }
+
+    .integration-tab-content-wrapper {
+        padding: 0.5rem;
     }
 }
 </style>

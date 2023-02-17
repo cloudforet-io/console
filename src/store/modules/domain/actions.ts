@@ -4,7 +4,8 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { DomainState, ExtendedAuthType } from './type';
+import type { DomainState, ExtendedAuthType, DomainConfigType } from './type';
+import { DOMAIN_CONFIG_TYPE } from './type';
 
 const EXTENDED_AUTH_TYPE_MAP = {
     google_oauth2: 'GOOGLE_OAUTH2',
@@ -56,13 +57,17 @@ export const resetBillingEnabled: Action<DomainState, any> = async ({ commit }) 
     commit('setBillingEnabled', false);
 };
 
-export const loadDomainConfig: Action<DomainState, any> = async ({ commit, rootState }) => {
-    if (rootState.domain.extraMenuSet) return;
+const setCommitByConfigType = {
+    [DOMAIN_CONFIG_TYPE.EXTRA_MENU]: 'setExtraMenus',
+};
+
+export const loadDomainConfig: Action<DomainState, any> = async ({ commit, rootState }, configType: DomainConfigType) => {
+    if (rootState.domain.domainConfig[configType]) return;
     try {
         const { results } = await SpaceConnector.client.config.domainConfig.list({});
-        const extraMenuResult = results.find((config) => config.name === 'console:ext-menu');
-        commit('setExraMenus', extraMenuResult.data);
+        const domainConfigResult = results.find((config) => config.name === configType);
+        commit(setCommitByConfigType[configType], domainConfigResult.data);
     } catch (e) {
-        commit('setExraMenus', undefined);
+        commit(setCommitByConfigType[configType], undefined);
     }
 };
