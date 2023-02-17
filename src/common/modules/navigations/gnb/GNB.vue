@@ -74,20 +74,27 @@ export default defineComponent({
             showSiteMap: false,
             hasPermission: computed((() => store.getters['user/hasPermission'])),
             logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: HOME_DASHBOARD_ROUTE._NAME } : null)),
-            gnbMenuList: computed<GNBMenuType[]>(() => [...store.getters['display/GNBMenuList'], state.integrationMenu]),
+            gnbMenuList: computed<GNBMenuType[]>(() => {
+                let result = [...store.getters['display/GNBMenuList']];
+                if (state.integrationMenu) result = [...result, state.integrationMenu];
+                return result;
+            }),
             siteMapMenuList: computed<GNBMenuType[]>(() => store.getters['display/siteMapMenuList']),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;
             }),
-            integrationMenu: computed<GNBMenuType>(() => {
+            integrationMenu: computed<GNBMenuType | undefined>(() => {
                 const extraMenu = store.getters['domain/getDomainExtraMenu'];
-                return {
-                    show: true,
-                    id: DOMAIN_CONFIG_TYPE.EXTRA_MENU as MenuId,
-                    label: extraMenu?.title,
-                    to: {},
-                };
+                if (extraMenu) {
+                    return {
+                        show: true,
+                        id: DOMAIN_CONFIG_TYPE.EXTRA_MENU as MenuId,
+                        label: extraMenu?.title,
+                        to: {},
+                    };
+                }
+                return undefined;
             }),
         });
 
