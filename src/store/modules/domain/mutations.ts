@@ -1,5 +1,4 @@
-import type { DomainState, ExtraMenuSet } from './type';
-import { DOMAIN_CONFIG_TYPE } from './type';
+import type { DomainState, DomainConfigModel } from './type';
 
 export const setDomain = (state: DomainState, domainInfo: DomainState): void => {
     state.domainId = domainInfo.domainId;
@@ -12,6 +11,10 @@ export const setBillingEnabled = (state: DomainState, billingEnabled: boolean) =
     state.billingEnabled = billingEnabled;
 };
 
-export const setExtraMenus = (state: DomainState, extraMenus: ExtraMenuSet | undefined) => {
-    state.domainConfig[DOMAIN_CONFIG_TYPE.EXTRA_MENU] = extraMenus;
+export const setDomainConfig = (state: DomainState, domainConfig: DomainConfigModel|undefined) => {
+    if (domainConfig?.length) {
+        domainConfig.forEach((config) => {
+            state.domainConfig[config.name] = config.data;
+        });
+    }
 };

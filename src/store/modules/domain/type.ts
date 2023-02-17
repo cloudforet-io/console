@@ -6,10 +6,16 @@ export interface DomainState {
     extendedAuthType?: ExtendedAuthType;
     authOptions?: Record<string, any>;
     billingEnabled: boolean;
-    domainConfig: DomainConfig;
+    domainConfig: DomainConfigMap;
 }
 
-export type DomainConfig = Record<DomainConfigType, ExtraMenuSet|undefined>;
+export type DomainConfigMap = Record<DomainConfigType, any | undefined>;
+
+export type DomainConfigModel = DomainConfig[];
+export interface DomainConfig {
+    name: string;
+    data: ExtraMenuSet[];
+}
 
 export interface ExtraMenuSet {
     contents: ExtraMenu[];
