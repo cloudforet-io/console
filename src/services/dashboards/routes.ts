@@ -42,7 +42,7 @@ const dashboardsRoute: RouteConfig = {
                         translationId: 'DASHBOARDS.CREATE.TITLE',
                         accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
                         accessInfo: {
-                            referenceRouteNames: [DASHBOARDS_ROUTE.PROJECT._NAME, DASHBOARDS_ROUTE.WORKSPACE._NAME],
+                            referenceMenuIds: [MENU_ID.DASHBOARDS_PROJECT, MENU_ID.DASHBOARDS_WORKSPACE],
                         },
                     },
                     component: DashboardCreatePage,
