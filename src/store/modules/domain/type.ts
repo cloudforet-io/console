@@ -6,15 +6,7 @@ export interface DomainState {
     extendedAuthType?: ExtendedAuthType;
     authOptions?: Record<string, any>;
     billingEnabled: boolean;
-    domainConfig: DomainConfigMap;
-}
-
-export type DomainConfigMap = Record<DomainConfigType, any | undefined>;
-
-export type DomainConfigModel = DomainConfig[];
-export interface DomainConfig {
-    name: string;
-    data: ExtraMenuSet[];
+    extraMenu?: ExtraMenuSet;
 }
 
 export interface ExtraMenuSet {
@@ -35,5 +27,3 @@ export interface ExtraSubMenu {
 export const DOMAIN_CONFIG_TYPE = {
     EXTRA_MENU: 'console:ext-menu',
 } as const;
-
-export type DomainConfigType = typeof DOMAIN_CONFIG_TYPE[keyof typeof DOMAIN_CONFIG_TYPE];

@@ -1,8 +1,7 @@
 import * as actions from './actions';
 import * as getters from './getters';
 import * as mutations from './mutations';
-import type { DomainState, DomainConfigMap } from './type';
-import { DOMAIN_CONFIG_TYPE } from './type';
+import type { DomainState } from './type';
 
 const state: DomainState = {
     domainId: undefined,
@@ -10,9 +9,7 @@ const state: DomainState = {
     extendedAuthType: undefined,
     authOptions: undefined,
     billingEnabled: false,
-    domainConfig: {
-        [DOMAIN_CONFIG_TYPE.EXTRA_MENU]: undefined,
-    } as DomainConfigMap,
+    extraMenu: undefined,
 };
 
 export default {

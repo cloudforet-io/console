@@ -90,7 +90,7 @@ export default defineComponent({
                     return {
                         show: true,
                         id: DOMAIN_CONFIG_TYPE.EXTRA_MENU as MenuId,
-                        label: extraMenu?.title,
+                        label: extraMenu.title,
                         to: {},
                     };
                 }
@@ -112,7 +112,7 @@ export default defineComponent({
         };
 
         onMounted(() => {
-            store.dispatch('domain/loadDomainConfig', DOMAIN_CONFIG_TYPE.EXTRA_MENU);
+            store.dispatch('domain/loadExtraMenu');
         });
 
         return {
