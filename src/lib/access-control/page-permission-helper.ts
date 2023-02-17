@@ -84,11 +84,6 @@ export const getPermissionOfPage = (menuId: MenuId, pagePermissions: PagePermiss
             result = permission;
             return true;
         }
-        // Check reference routes and return permission if user have any of reference route names in RouteConfig
-        if (referenceRouteNames.includes(id)) {
-            result = permission;
-            return true;
-        }
         // return VIEW permission if user has permission to children menu
         if (id.startsWith(`${menuId}.`)) {
             result = PAGE_PERMISSION_TYPE.VIEW;
@@ -96,5 +91,13 @@ export const getPermissionOfPage = (menuId: MenuId, pagePermissions: PagePermiss
         }
         return false;
     });
+    // Check reference routes and return permission if user have any of reference route names in RouteConfig
+    if (referenceRouteNames.length) {
+        pagePermissions.forEach(([id, permission]) => {
+            if (referenceRouteNames.includes(id) && permission === PAGE_PERMISSION_TYPE.MANAGE) {
+                result = permission;
+            }
+        });
+    }
     return result;
 };
