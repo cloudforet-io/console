@@ -77,27 +77,19 @@ export const filterLNBMenuByPermission = (menuSet: LNBMenu[], pagePermissionList
     return results;
 }, [] as LNBMenu[]);
 
-export const getPermissionOfPage = (menuId: MenuId, pagePermissions: PagePermissionTuple[], referenceRouteNames: string[] = []): PagePermissionType|undefined => {
+export const getPermissionOfPage = (routeName: string, pagePermissions: PagePermissionTuple[]): PagePermissionType|undefined => {
     let result: PagePermissionType|undefined;
     pagePermissions.some(([id, permission]) => {
-        if (id === menuId) {
+        if (id === routeName) {
             result = permission;
             return true;
         }
         // return VIEW permission if user has permission to children menu
-        if (id.startsWith(`${menuId}.`)) {
+        if (id.startsWith(`${routeName}.`)) {
             result = PAGE_PERMISSION_TYPE.VIEW;
             return true;
         }
         return false;
     });
-    // Check reference routes and return permission if user have any of reference route names in RouteConfig
-    if (referenceRouteNames.length) {
-        pagePermissions.forEach(([id, permission]) => {
-            if (referenceRouteNames.includes(id) && permission === PAGE_PERMISSION_TYPE.MANAGE) {
-                result = permission;
-            }
-        });
-    }
     return result;
 };

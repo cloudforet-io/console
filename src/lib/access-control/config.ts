@@ -1,3 +1,4 @@
+import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
 export const ACCESS_LEVEL = {
@@ -17,7 +18,7 @@ export const PAGE_PERMISSION_TYPE = {
 export type PagePermissionType = typeof PAGE_PERMISSION_TYPE[keyof typeof PAGE_PERMISSION_TYPE];
 
 export interface AccessInfo {
-    referenceRouteNames: string[];
+    referenceMenuIds: MenuId[];
 }
 
 // backend data format of page permissions. page includes wildcard('*').

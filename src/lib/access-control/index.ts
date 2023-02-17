@@ -33,13 +33,30 @@ export const getRouteAccessLevel = (route: Route): AccessLevel => {
     return closestRoute.meta.accessLevel ?? ACCESS_LEVEL.AUTHENTICATED;
 };
 
-export const getUserAccessLevel = (routeName?: string|null, pagePermissions: PagePermissionTuple[] = [], isTokenAlive = true, referenceRouteNames?: string[]|undefined): AccessLevel => {
+// extract higher permission from userPagePermissions that exist in referenceMenuIds.
+const getPermissionByReferenceMenuIds = (referenceMenuIds: MenuId[], pagePermissions: PagePermissionTuple[]): PagePermissionType|undefined => {
+    let result;
+    referenceMenuIds.forEach((menuId) => {
+        if (result === PAGE_PERMISSION_TYPE.MANAGE) return;
+        const permission = pagePermissions.find(([id]) => id === menuId);
+        if (permission) result = permission[1];
+    });
+    return result;
+};
+
+export const getUserAccessLevel = (routeName?: string|null, pagePermissions: PagePermissionTuple[] = [], isTokenAlive = true, referenceMenuIds?: MenuId[]|undefined): AccessLevel => {
     if (!isTokenAlive) return ACCESS_LEVEL.EXCLUDE_AUTH;
 
-    const menuId = getMenuIdByRouteName(routeName);
-    if (!menuId) return ACCESS_LEVEL.AUTHENTICATED;
+    let permission;
 
-    const permission = getPermissionOfPage(menuId, pagePermissions, referenceRouteNames);
+    if (referenceMenuIds?.length) {
+        permission = getPermissionByReferenceMenuIds(referenceMenuIds, pagePermissions);
+    } else {
+        const menuId = getMenuIdByRouteName(routeName);
+        if (!menuId) return ACCESS_LEVEL.AUTHENTICATED;
+        permission = getPermissionOfPage(menuId, pagePermissions);
+    }
+
     return getAccessTypeFromPermission(permission);
 };
 const getMenuAccessLevel = (id: MenuId): AccessLevel => (MENU_INFO_MAP[id]?.needPermissionByRole ? ACCESS_LEVEL.VIEW_PERMISSION : ACCESS_LEVEL.AUTHENTICATED);
