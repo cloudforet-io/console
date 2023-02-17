@@ -65,9 +65,9 @@ export const loadExtraMenu: Action<DomainState, any> = async ({ commit, state })
         const { results } = await SpaceConnector.client.config.domainConfig.list({
             name: DOMAIN_CONFIG_TYPE.EXTRA_MENU,
         });
-        commit('setDomainConfig', results[0]?.data ?? {});
+        commit('setExtraMenu', results[0]?.data ?? {});
     } catch (e) {
         ErrorHandler.handleError(e);
-        commit('setDomainConfig', {});
+        commit('setExtraMenu', {});
     }
 };

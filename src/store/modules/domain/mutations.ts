@@ -13,6 +13,6 @@ export const setBillingEnabled = (state: DomainState, billingEnabled: boolean) =
     state.billingEnabled = billingEnabled;
 };
 
-export const setDomainConfig = (state: DomainState, extraMenu: ExtraMenuSet|undefined) => {
+export const setExtraMenu = (state: DomainState, extraMenu: ExtraMenuSet) => {
     state.extraMenu = extraMenu;
 };
