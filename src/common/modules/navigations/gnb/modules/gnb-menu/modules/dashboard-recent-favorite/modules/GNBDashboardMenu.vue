@@ -148,6 +148,8 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .g-n-b-dashboard-menu {
+    width: 22.5rem;
+
     /* custom design-system component - p-tab */
     :deep(.p-tab) {
         @apply absolute bg-white rounded-xs border border-gray-200;

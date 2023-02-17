@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, getCurrentInstance, defineComponent,
+    reactive, toRefs, computed, getCurrentInstance, defineComponent, onMounted,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
@@ -43,6 +43,7 @@ import { includes } from 'lodash';
 import { store } from '@/store';
 
 import type { DisplayMenu as GNBMenuType } from '@/store/modules/display/type';
+import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import type { MenuId } from '@/lib/menu/config';
@@ -73,11 +74,27 @@ export default defineComponent({
             showSiteMap: false,
             hasPermission: computed((() => store.getters['user/hasPermission'])),
             logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: HOME_DASHBOARD_ROUTE._NAME } : null)),
-            gnbMenuList: computed<GNBMenuType[]>(() => store.getters['display/GNBMenuList']),
+            gnbMenuList: computed<GNBMenuType[]>(() => {
+                let result = [...store.getters['display/GNBMenuList']];
+                if (state.integrationMenu) result = [...result, state.integrationMenu];
+                return result;
+            }),
             siteMapMenuList: computed<GNBMenuType[]>(() => store.getters['display/siteMapMenuList']),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;
+            }),
+            integrationMenu: computed<GNBMenuType | undefined>(() => {
+                const extraMenu = store.getters['domain/domainExtraMenu'];
+                if (extraMenu?.title) {
+                    return {
+                        show: true,
+                        id: DOMAIN_CONFIG_TYPE.EXTRA_MENU as MenuId,
+                        label: extraMenu.title,
+                        to: {},
+                    };
+                }
+                return undefined;
             }),
         });
 
@@ -93,6 +110,10 @@ export default defineComponent({
                 state.showSiteMap = false;
             }
         };
+
+        onMounted(() => {
+            store.dispatch('domain/loadExtraMenu');
+        });
 
         return {
             ...toRefs(state),

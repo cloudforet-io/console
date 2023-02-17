@@ -1,4 +1,6 @@
-import type { DomainState } from './type';
+import type {
+    DomainState, ExtraMenuSet,
+} from './type';
 
 export const setDomain = (state: DomainState, domainInfo: DomainState): void => {
     state.domainId = domainInfo.domainId;
@@ -9,4 +11,8 @@ export const setDomain = (state: DomainState, domainInfo: DomainState): void => 
 
 export const setBillingEnabled = (state: DomainState, billingEnabled: boolean) => {
     state.billingEnabled = billingEnabled;
+};
+
+export const setExtraMenu = (state: DomainState, extraMenu: ExtraMenuSet) => {
+    state.extraMenu = extraMenu;
 };

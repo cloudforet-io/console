@@ -4,7 +4,10 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 import type { DomainState, ExtendedAuthType } from './type';
+import { DOMAIN_CONFIG_TYPE } from './type';
 
 const EXTENDED_AUTH_TYPE_MAP = {
     google_oauth2: 'GOOGLE_OAUTH2',
@@ -54,4 +57,17 @@ export const setBillingEnabled: Action<DomainState, any> = async ({ commit, root
 
 export const resetBillingEnabled: Action<DomainState, any> = async ({ commit }) => {
     commit('setBillingEnabled', false);
+};
+
+export const loadExtraMenu: Action<DomainState, any> = async ({ commit, state }) => {
+    if (state.extraMenu) return;
+    try {
+        const { results } = await SpaceConnector.client.config.domainConfig.list({
+            name: DOMAIN_CONFIG_TYPE.EXTRA_MENU,
+        });
+        commit('setExtraMenu', results[0]?.data ?? {});
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        commit('setExtraMenu', {});
+    }
 };
