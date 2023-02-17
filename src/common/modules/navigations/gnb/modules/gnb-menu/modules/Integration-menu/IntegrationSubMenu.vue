@@ -47,7 +47,7 @@ import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSub
 const emit = defineEmits(['close']);
 
 const state = reactive({
-    integrationMenus: computed(() => store.getters['domain/getDomainExtraMenu']?.contents ?? []),
+    integrationMenus: computed(() => store.getters['domain/domainExtraMenu']?.contents ?? []),
     tabs: computed(() => state.integrationMenus.map((menu) => ({
         label: menu.title,
         name: menu.title,

@@ -85,7 +85,7 @@ export default defineComponent({
                 return pathRegex ? pathRegex[1] : null;
             }),
             integrationMenu: computed<GNBMenuType | undefined>(() => {
-                const extraMenu = store.getters['domain/getDomainExtraMenu'];
+                const extraMenu = store.getters['domain/domainExtraMenu'];
                 if (extraMenu) {
                     return {
                         show: true,
