@@ -74,11 +74,6 @@ export default defineComponent({
             showSiteMap: false,
             hasPermission: computed((() => store.getters['user/hasPermission'])),
             logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: HOME_DASHBOARD_ROUTE._NAME } : null)),
-            issueInventoryMenu: {
-                id: 'issue_inventory',
-                label: 'Issue Inventory',
-                subMenuList: [],
-            },
             gnbMenuList: computed<GNBMenuType[]>(() => [...store.getters['display/GNBMenuList'], state.integrationMenu]),
             siteMapMenuList: computed<GNBMenuType[]>(() => store.getters['display/siteMapMenuList']),
             selectedMenu: computed(() => {
