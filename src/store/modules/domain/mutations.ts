@@ -1,4 +1,4 @@
-import type { DomainState, DomainConfigModel } from './type';
+import type { DomainState, DomainConfigModel, DomainConfigMap } from './type';
 
 export const setDomain = (state: DomainState, domainInfo: DomainState): void => {
     state.domainId = domainInfo.domainId;
@@ -13,8 +13,10 @@ export const setBillingEnabled = (state: DomainState, billingEnabled: boolean) =
 
 export const setDomainConfig = (state: DomainState, domainConfig: DomainConfigModel|undefined) => {
     if (domainConfig?.length) {
+        const result = {} as DomainConfigMap;
         domainConfig.forEach((config) => {
-            state.domainConfig[config.name] = config.data;
+            result[config.name] = config.data;
         });
+        state.domainConfig = result;
     }
 };
