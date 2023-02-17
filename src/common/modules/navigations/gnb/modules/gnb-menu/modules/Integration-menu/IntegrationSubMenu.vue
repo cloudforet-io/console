@@ -33,7 +33,7 @@
 <script setup lang="ts">
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, onMounted, reactive, toRefs,
 } from 'vue';
 
 import { PTab, PI } from '@spaceone/design-system';
@@ -60,8 +60,8 @@ const hideMenu = () => {
     emit('close');
 };
 
-watch(() => state.integrationMenus, (_integrationMenus) => {
-    if (_integrationMenus.length) state.activeTab = _integrationMenus[0].title;
+onMounted(() => {
+    if (state.integrationMenus.length) state.activeTab = state.integrationMenus[0].title;
 });
 
 const {
