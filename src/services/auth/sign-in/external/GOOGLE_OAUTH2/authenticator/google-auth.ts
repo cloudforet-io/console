@@ -1,4 +1,3 @@
-import { loadGapiInsideDOM } from 'gapi-script';
 
 import { store } from '@/store';
 
@@ -7,6 +6,21 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { Authenticator } from '@/services/auth/authenticator';
 
 let { gapi } = window as any;
+
+const loadGapiInsideDOM = async () => new Promise((resolve) => {
+    const element = document.getElementsByTagName('script')[0];
+    const js = document.createElement('script');
+    js.id = 'google-platform';
+    js.src = 'https://apis.google.com/js/platform.js?onload=init';
+    js.async = true;
+    js.defer = true;
+    element?.parentNode?.insertBefore(js, element);
+    js.onload = async () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        resolve(window?.gapi);
+    };
+});
 
 class GoogleAuth extends Authenticator {
     static async signOut() {
