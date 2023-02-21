@@ -116,7 +116,7 @@ const state = reactive({
     legends: [] as Legend[],
     chartData: computed(() => {
         const valueKey = `${state.fieldsKey}_sum`;
-        const _chartData = getRefinedXYChartData(state.data?.results, state.groupBy, GROUP_BY.TYPE, valueKey, true);
+        const _chartData = getRefinedXYChartData(state.data?.results, state.groupBy, GROUP_BY.TYPE, valueKey, true, props.allReferenceTypeInfo);
         return _chartData.reverse();
     }),
     tableFields: computed<Field[]>(() => {
