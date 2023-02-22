@@ -101,6 +101,11 @@
                                        :provider="tableState.selectedItems[0].provider"
                 />
             </template>
+            <template #log>
+                <cloud-service-history-log-tab :cloud-service-id="tableState.selectedItems[0].cloud_service_id"
+                                               :provider="tableState.selectedItems[0].provider"
+                />
+            </template>
             <template #monitoring>
                 <monitoring :resources="monitoringState.resources" />
             </template>
@@ -200,6 +205,7 @@ import CloudServiceUsageOverview
 import CloudServiceAdmin from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceAdmin.vue';
 import CloudServiceDetail from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceDetail.vue';
 import CloudServiceHistory from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistory.vue';
+import CloudServiceHistoryLogTab from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryLogTab.vue';
 import CloudServiceTagsPanel
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceTagsPanel.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
@@ -216,6 +222,7 @@ const TABLE_MIN_HEIGHT = 400;
 export default {
     name: 'CloudServiceDetailPage',
     components: {
+        CloudServiceHistoryLogTab,
         CloudServiceTagsPanel,
         CloudServicePeriodFilter,
         CloudServiceUsageOverview,
@@ -494,6 +501,7 @@ export default {
                 { name: 'tag', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_TAG') },
                 { name: 'member', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MEMBER') },
                 { name: 'history', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_HISTORY') },
+                { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
                 { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
             ])),
             activeTab: 'detail',
