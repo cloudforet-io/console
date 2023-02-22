@@ -1867,11 +1867,9 @@
 					"HISTORY_DETAIL": "History Detail",
 					"LOG": "Log",
 					"LOG_TAB": {
-						"AUTO": "Auto",
-						"LAST_12_HRS": "Last 12 hrs",
 						"LAST_1_DAY": "Last 1 day",
-						"LAST_2_DAYS": "Last 2 days",
-						"LAST_6_HRS": "Last 6 hrs",
+						"LAST_3_DAYS": "Last 3 days",
+						"LAST_A_WEEK": "Last a week",
 						"NO_LOG_HELP_TEXT": "No log available for this provider",
 						"TIME_WITHIN": "Time Within"
 					},
@@ -1938,6 +1936,7 @@
 				"TAB_DATA": "Data ",
 				"TAB_DETAILS": "Details",
 				"TAB_HISTORY": "History",
+				"TAB_LOG": "Log",
 				"TAB_MEMBER": "Related Member",
 				"TAB_MONITORING": "Monitoring",
 				"TAB_SELECTED_DATA": "Selected Data",

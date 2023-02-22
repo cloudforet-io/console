@@ -116,7 +116,7 @@ import CloudServiceHistoryChangesTab
 import CloudServiceHistoryDetailNote
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailNoteTab.vue';
 import CloudServiceHistoryLogTab
-    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryLogTab.vue';
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryLogTab.vue';
 import type { CloudServiceHistoryItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
