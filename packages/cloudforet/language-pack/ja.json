@@ -1867,11 +1867,9 @@
 					"HISTORY_DETAIL": "変更履歴詳細",
 					"LOG": "ログ",
 					"LOG_TAB": {
-						"AUTO": "自動",
-						"LAST_12_HRS": "過去12時間",
 						"LAST_1_DAY": "過去1日",
-						"LAST_2_DAYS": "過去2日",
-						"LAST_6_HRS": "過去6時間",
+						"LAST_3_DAYS": "過去3日",
+						"LAST_A_WEEK": "",
 						"NO_LOG_HELP_TEXT": "該当のクラウドプロバイダは、現在別途のログを提供していません。",
 						"TIME_WITHIN": "照会期間"
 					},

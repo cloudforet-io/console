@@ -1867,11 +1867,9 @@
 					"HISTORY_DETAIL": "변경 이력 상세",
 					"LOG": "로그",
 					"LOG_TAB": {
-						"AUTO": "자동",
-						"LAST_12_HRS": "지난 12시간",
 						"LAST_1_DAY": "지난 1일",
-						"LAST_2_DAYS": "지난 2일",
-						"LAST_6_HRS": "지난 6시간",
+						"LAST_3_DAYS": "지난 3일",
+						"LAST_A_WEEK": "지난 1주",
 						"NO_LOG_HELP_TEXT": "해당 클라우드 프로바이더는 현재 별도의 로그를 제공하고 있지 않습니다.",
 						"TIME_WITHIN": "조회 기간"
 					},
