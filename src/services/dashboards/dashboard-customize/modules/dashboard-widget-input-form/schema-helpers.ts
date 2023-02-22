@@ -70,6 +70,7 @@ export const getWidgetOptionSchema = (
     variablesSchema: DashboardVariablesSchema,
     referenceStoreState: ReferenceStoreState,
     isInherit: boolean,
+    projectId?: string,
 ) => {
     let refinedPropertySchema;
     if (isInherit) {
@@ -78,6 +79,13 @@ export const getWidgetOptionSchema = (
     } else {
         // non inherit case
         refinedPropertySchema = refineOptionSchema(propertyName, propertySchema, referenceStoreState);
+    }
+    const referenceType = propertyName.replace('filters.', '');
+    if (projectId && referenceType === REFERENCE_TYPE_INFO.project.type) {
+        refinedPropertySchema = {
+            ...refinedPropertySchema,
+            disabled: true,
+        };
     }
     return refinedPropertySchema;
 };
@@ -103,15 +111,8 @@ export const getRefinedWidgetOptionsSchema = (
     Object.entries(schema.properties).forEach(([propertyName, propertySchema]) => {
         // set properties declared in defaultSchemaProperties only
         if (!defaultSchemaProperties.includes(propertyName)) return;
-        const referenceType = propertyName.replace('filters.', '');
         const isInherit = !!inheritOptions[propertyName]?.enabled;
-        refinedJsonSchema.properties[propertyName] = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, referenceStoreState, isInherit);
-        if (projectId && referenceType === REFERENCE_TYPE_INFO.project.type) {
-            refinedJsonSchema.properties[propertyName] = {
-                ...refinedJsonSchema.properties[propertyName],
-                disabled: true,
-            };
-        }
+        refinedJsonSchema.properties[propertyName] = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, referenceStoreState, isInherit, projectId);
     });
 
     return refinedJsonSchema;
