@@ -140,42 +140,27 @@ export default defineComponent<Props>({
             pageLimit: 15,
             tabs: [] as TabItem[],
             activeTab: '',
-            timeWithinList: computed<PeriodItem[]>(() => {
-                const checkDate = props.prevDate ? dayjs.utc(props.date).diff(props.prevDate, 'day') < 2 : false;
-                return ([
-                    {
-                        name: 'auto',
-                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.AUTO'),
-                        start: checkDate ? dayjs.utc(props.prevDate) : dayjs.utc(props.date).subtract(2, 'day'),
-                        end: dayjs.utc(props.date),
-                    },
-                    {
-                        name: 'last6hrs',
-                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_6_HRS'),
-                        start: dayjs.utc(props.date).subtract(6, 'hour'),
-                        end: dayjs.utc(props.date),
-                    },
-                    {
-                        name: 'last12hrs',
-                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_12_HRS'),
-                        start: dayjs.utc(props.date).subtract(12, 'hour'),
-                        end: dayjs.utc(props.date),
-                    },
-                    {
-                        name: 'last1day',
-                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_1_DAY'),
-                        start: dayjs.utc(props.date).subtract(1, 'day'),
-                        end: dayjs.utc(props.date),
-                    },
-                    {
-                        name: 'last2day',
-                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_2_DAYS'),
-                        start: dayjs.utc(props.date).subtract(2, 'day'),
-                        end: dayjs.utc(props.date),
-                    },
-                ]);
-            }),
-            selectedTimeWithin: 'auto',
+            timeWithinList: computed<PeriodItem[]>(() => ([
+                {
+                    name: 'last1day',
+                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_1_DAY'),
+                    start: dayjs.utc(props.date).subtract(1, 'day'),
+                    end: dayjs.utc(props.date),
+                },
+                {
+                    name: 'last2day',
+                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_3_DAYS'),
+                    start: dayjs.utc(props.date).subtract(3, 'day'),
+                    end: dayjs.utc(props.date),
+                },
+                {
+                    name: 'last1week',
+                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_A_WEEK'),
+                    start: dayjs.utc(props.date).subtract(1, 'week'),
+                    end: dayjs.utc(props.date),
+                },
+            ])),
+            selectedTimeWithin: 'last1day',
             layouts: [] as DynamicLayout[],
             currentLayout: computed(() => state.layouts.find((layout) => layout.name === state.activeTab)),
             dataSourceIds: {} as { [key: string]: string },
