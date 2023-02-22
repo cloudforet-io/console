@@ -185,6 +185,7 @@ export default defineComponent<Props>({
                 dashboardDetailState.variablesSchema,
                 widgetFormState.inheritOptions,
                 properties,
+                dashboardDetailState.projectId,
             );
         };
 
@@ -320,6 +321,7 @@ export default defineComponent<Props>({
                 dashboardDetailState.variablesSchema,
                 widgetFormState.inheritOptions,
                 widgetFormState.defaultSchemaProperties,
+                dashboardDetailState.projectId,
             );
         };
         const setStatesForEditMode = (widgetKey: string) => {
@@ -341,6 +343,7 @@ export default defineComponent<Props>({
                 dashboardDetailState.variablesSchema,
                 widgetFormState.inheritOptions,
                 widgetFormState.defaultSchemaProperties,
+                dashboardDetailState.projectId,
             );
             // init form data
             state.schemaFormData = getFormDataFromWidgetInfo(widgetInfo);

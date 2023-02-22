@@ -3,6 +3,8 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
     useReferenceStore,
@@ -85,6 +87,7 @@ export const getRefinedWidgetOptionsSchema = (
     variablesSchema: DashboardVariablesSchema,
     inheritOptions: InheritOptions,
     defaultSchemaProperties: string[],
+    projectId?: string,
 ): WidgetOptionsSchema['schema'] => {
     const schema = widgetOptionsSchema?.schema;
 
@@ -100,8 +103,15 @@ export const getRefinedWidgetOptionsSchema = (
     Object.entries(schema.properties).forEach(([propertyName, propertySchema]) => {
         // set properties declared in defaultSchemaProperties only
         if (!defaultSchemaProperties.includes(propertyName)) return;
+        const referenceType = propertyName.replace('filters.', '');
         const isInherit = !!inheritOptions[propertyName]?.enabled;
         refinedJsonSchema.properties[propertyName] = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, referenceStoreState, isInherit);
+        if (projectId && referenceType === REFERENCE_TYPE_INFO.project.type) {
+            refinedJsonSchema.properties[propertyName] = {
+                ...refinedJsonSchema.properties[propertyName],
+                disabled: true,
+            };
+        }
     });
 
     return refinedJsonSchema;
