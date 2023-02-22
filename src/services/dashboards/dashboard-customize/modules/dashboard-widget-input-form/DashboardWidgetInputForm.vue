@@ -37,6 +37,7 @@
                               :class="{inherit: inheritableProperties.includes(propertyName)}"
                         >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                         <p-toggle-button :value="inheritableProperties.includes(propertyName)"
+                                         :disabled="disableInheritToggle(propertyName)"
                                          @change="handleChangeInheritToggle(propertyName, $event)"
                         />
                     </div>
@@ -57,7 +58,6 @@
     </div>
 </template>
 <script lang="ts">
-
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
@@ -69,6 +69,8 @@ import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/i
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import { cloneDeep, isEmpty, union } from 'lodash';
+
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import {
     useReferenceStore,
@@ -245,6 +247,12 @@ export default defineComponent<Props>({
             // update form data
             state.schemaFormData = { ...state.schemaFormData, [propertyName]: undefined };
         };
+        const disableInheritToggle = (propertyName: string) => {
+            // In the case of the project dashboard, project customization is not possible.
+            if (!dashboardDetailState.projectId) return false;
+            const referenceType = propertyName.replace('filters.', '');
+            return referenceType === REFERENCE_TYPE_INFO.project.type;
+        };
 
         /* schema refining helpers */
         const getRefinedDefaultSchemaProperties = (widgetOptionsSchema: WidgetOptionsSchema): string[] => {
@@ -387,6 +395,7 @@ export default defineComponent<Props>({
             handleUpdateDefaultSchemaProperties,
             /* inherit */
             handleChangeInheritToggle,
+            disableInheritToggle,
             //
             isSelected,
             handleFormValidate,
