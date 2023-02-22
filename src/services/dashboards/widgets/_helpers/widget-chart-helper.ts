@@ -29,12 +29,19 @@ export const getRefinedXYChartData = (
     categoryKey = 'date',
     valueKey = 'usd_cost_sum',
     isHorizontal = false,
+    allReferenceTypeInfo?: AllReferenceTypeInfo,
 ): XYChartData[] => {
     if (!rawData) return [];
 
     let chartData: XYChartData[] = [];
     rawData.forEach((data) => {
-        let groupByName = groupBy ? data[groupBy] : 'value'; // AmazonCloudFront
+        let groupByName;
+        if (groupBy) {
+            const referenceMap = Object.values(allReferenceTypeInfo ?? {}).find((info) => info.key === groupBy)?.referenceMap;
+            groupByName = referenceMap ? referenceMap[data[groupBy]]?.label : data[groupBy]; // AmazonCloudFront
+        } else {
+            groupByName = 'value';
+        }
         if (!groupByName) groupByName = `no_${groupBy}`;
         const valueList = data[valueKey]; // [{date: '2022-11', value: 34}, ...]
         const refinedList: Record<string, any>[] = valueList.map((valueSet) => {
