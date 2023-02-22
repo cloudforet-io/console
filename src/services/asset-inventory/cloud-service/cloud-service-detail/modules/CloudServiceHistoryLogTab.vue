@@ -95,7 +95,6 @@ interface Props {
     provider: string;
     cloudServiceId: string;
     date: string;
-    prevDate: string | undefined;
 }
 interface PeriodItem {
     name: string;
@@ -124,11 +123,7 @@ export default defineComponent<Props>({
         },
         date: {
             type: String,
-            default: '',
-        },
-        prevDate: {
-            type: String,
-            default: undefined,
+            default: dayjs.utc().format(),
         },
     },
     setup(props) {
@@ -256,7 +251,7 @@ export default defineComponent<Props>({
         })();
 
         // watcher
-        watch([() => state.selectedTimeWithin, () => props.date], () => {
+        watch([() => state.selectedTimeWithin, () => props.date, () => props.cloudServiceId], () => {
             if (state.totalLayoutCount) getLogData();
         });
         return {
