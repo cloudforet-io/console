@@ -30,7 +30,7 @@
                 <p-button class="manage-variable-button"
                           style-type="secondary"
                           icon-left="ic_setting"
-                          :disabled="!props.isManagable"
+                          :disabled="!props.isManageable"
                           @click="handleOpenOverlay"
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE') }}
@@ -59,7 +59,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-det
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 interface Props {
-    isManagable: boolean;
+    isManageable: boolean;
 }
 
 const props = defineProps<Props>();
@@ -84,7 +84,7 @@ const state = reactive({
         state.variableSchema.order.forEach((property) => {
             const currentProperty = state.variableSchema.properties[property];
             if (!currentProperty?.use) return;
-            result.push({ name: property, label: currentProperty.name });
+            result.push({ name: property, label: currentProperty.name, disabled: currentProperty.disabled });
         });
         return result;
     }),
