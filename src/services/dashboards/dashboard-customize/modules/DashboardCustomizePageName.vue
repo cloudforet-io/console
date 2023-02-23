@@ -22,7 +22,7 @@
                           class="title-area"
                           @click="handleClickTitle"
                     >
-                        {{ state.name }}
+                        {{ nameInput }}
                     </span>
                 </template>
             </p-field-group>
@@ -31,7 +31,7 @@
                         height="1.5rem"
             />
         </template>
-        <template v-else-if="props.dashboardId === undefined">
+        <template v-else>
             <p-field-group
                 :invalid="invalidState.nameInput"
                 :invalid-text="invalidTexts.nameInput"
@@ -65,7 +65,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 
@@ -81,7 +80,6 @@ const dashboardDetailState = dashboardDetailStore.state;
 const dashboardDetailValidationState = dashboardDetailStore.validationState;
 
 const state = reactive({
-    name: useProxyValue('name', props, emit),
     placeHolder: dashboardDetailState.placeholder,
     editMode: false,
     dashboardNameList: computed<string[]>(() => store.getters['dashboard/getDashboardNameList'](dashboardDetailState.projectId, dashboardDetailState.name)),
@@ -108,12 +106,14 @@ const inputRef = ref<HTMLElement|null>(null);
 const { focused: isInputFocused } = useFocus(inputRef, { initialValue: true });
 const isTextInputFocused = ref(true);
 
+const updateName = (name: string) => {
+    setForm('nameInput', name);
+    emit('update:name', name);
+};
+
 // handlers for <p-text-input /> (creating feature)
 const handlePTextInput = (t: string) => {
-    setForm('nameInput', t);
-    if (invalidState.nameInput === false) {
-        state.name = nameInput.value;
-    }
+    updateName(t);
 };
 
 // handlers for <input /> (customizing feature)
@@ -123,26 +123,24 @@ const handleClickTitle = async () => {
     isInputFocused.value = true;
 };
 const handleInput = (e: InputEvent): void => {
-    setForm('nameInput', (e.target as HTMLInputElement).value);
+    updateName((e.target as HTMLInputElement).value);
 };
 const handleEscape = () => {
     if (!state.editMode) return;
     state.editMode = false;
-    setForm('nameInput', props.name);
+    updateName(props.name);
 };
 const handleEnter = () => {
     state.editMode = false;
-    if (invalidState.nameInput === false) {
-        state.name = nameInput.value;
-    } else {
-        setForm('nameInput', props.name);
-        state.name = props.name;
+    if (invalidState.nameInput) {
+        updateName(props.name);
     }
 };
 
 watch(() => props.name, (d) => {
-    // for creating dashboard
-    if (!d) setForm('nameInput', '');
+    if (d === nameInput.value) return;
+    if (d) updateName(d);
+    else updateName('');
 }, { immediate: true });
 
 watch(() => invalidState.nameInput, (invalid) => {
