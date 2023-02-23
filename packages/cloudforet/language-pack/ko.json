@@ -1868,7 +1868,10 @@
 					"LOG": "로그",
 					"LOG_TAB": {
 						"LAST_1_DAY": "지난 1일",
+						"LAST_1_MONTH": "지난 1개월",
+						"LAST_2_WEEKS": "지난 2주",
 						"LAST_3_DAYS": "지난 3일",
+						"LAST_3_MONTHS": "지난 3개월",
 						"LAST_A_WEEK": "지난 1주",
 						"NO_LOG_HELP_TEXT": "해당 클라우드 프로바이더는 현재 별도의 로그를 제공하고 있지 않습니다.",
 						"TIME_WITHIN": "조회 기간"
