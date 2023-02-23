@@ -722,6 +722,10 @@ export default {
         data: makeTableData(),
     },
     rawTable: {
+        options: {
+            headers: ['information', 'age', 'name', 'job'],
+            disable_search: false,
+        },
         data: makeTableData(),
     },
     querySearchTable: {

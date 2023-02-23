@@ -51,6 +51,7 @@ export interface SimpleTableOptions extends CommonOptions {
 
 export interface RawTableOptions extends CommonOptions {
     disable_search?: boolean;
+    headers?: string[];
 }
 
 export interface TableOptions extends CommonOptions {

@@ -6,6 +6,7 @@ import { getDynamicLayoutArgTypes } from '@/data-display/dynamic/dynamic-layout/
 export const getDynamicLayoutRawTableArgTypes = (): ArgTypes => {
     const argTypes = getDynamicLayoutArgTypes();
 
+    argTypes.options.defaultValue = mock.rawTable.options;
     argTypes.data.defaultValue = mock.rawTable.data;
 
     return {
