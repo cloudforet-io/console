@@ -91,6 +91,7 @@ export interface DashboardVariableSchemaProperty {
     selection_type: VariableSelectionType;
     options?: string[];
     name: string;
+    disabled?: boolean;
 }
 export interface DashboardVariablesSchema {
     properties: {

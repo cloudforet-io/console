@@ -6,6 +6,7 @@
         <button ref="targetRef"
                 class="dropdown-box"
                 :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
+                :disabled="state.variableProperty.disabled"
                 @click="toggleMenu"
         >
             <span class="variable-contents">
@@ -22,7 +23,8 @@
                 >
                     +{{ state.selected.length - 1 }}
                 </p-badge>
-                <button class="option-delete-button"
+                <button v-if="!state.variableProperty.disabled"
+                        class="option-delete-button"
                         @click.stop="handleClearSelected"
                 >
                     <p-i name="ic_delete"
@@ -203,6 +205,11 @@ const {
         height: 2rem;
         padding: 0 0.25rem 0 0.75rem;
 
+        &[disabled=disabled] {
+            @apply bg-gray-100;
+            cursor: not-allowed;
+        }
+
         .variable-contents {
             @apply inline-flex text-gray-900 text-label-md flex-shrink w-full;
             max-width: 16.375rem;
@@ -242,11 +249,11 @@ const {
             @apply flex-shrink-0;
         }
 
-        &:hover {
+        &:hover:not([disabled=disabled]) {
             @apply border-blue-600 bg-blue-100;
         }
 
-        &.filled-value {
+        &.filled-value:not([disabled=disabled]) {
             @apply border-blue-400 bg-blue-200;
 
             &.is-visible {

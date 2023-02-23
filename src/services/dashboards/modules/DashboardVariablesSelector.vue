@@ -7,7 +7,7 @@
                                         :reference-map="variableState.allReferenceTypeInfo[propertyName]?.referenceMap"
             />
         </template>
-        <variable-more-button-dropdown :is-managable="props.hasManagePermission" />
+        <variable-more-button-dropdown :is-manageable="props.isManageable" />
         <button class="reset-button"
                 @click="resetVariables"
         >
@@ -40,7 +40,7 @@ import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/
 import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 
 interface Props {
-    hasManagePermission: boolean;
+    isManageable: boolean;
 }
 
 const props = defineProps<Props>();
@@ -58,6 +58,7 @@ const variableState = reactive({
     order: computed(() => dashboardDetailState.variablesSchema.order),
     allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
 });
+
 </script>
 
 <style lang="postcss" scoped>
