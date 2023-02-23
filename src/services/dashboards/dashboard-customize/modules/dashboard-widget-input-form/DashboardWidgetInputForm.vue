@@ -37,6 +37,7 @@
                               :class="{inherit: inheritableProperties.includes(propertyName)}"
                         >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                         <p-toggle-button :value="inheritableProperties.includes(propertyName)"
+                                         :disabled="widgetOptionsJsonSchema.properties?.[propertyName]?.disabled"
                                          @change="handleChangeInheritToggle(propertyName, $event)"
                         />
                     </div>
@@ -57,7 +58,6 @@
     </div>
 </template>
 <script lang="ts">
-
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
@@ -183,6 +183,7 @@ export default defineComponent<Props>({
                 dashboardDetailState.variablesSchema,
                 widgetFormState.inheritOptions,
                 properties,
+                dashboardDetailState.projectId,
             );
         };
 
@@ -312,6 +313,7 @@ export default defineComponent<Props>({
                 dashboardDetailState.variablesSchema,
                 widgetFormState.inheritOptions,
                 widgetFormState.defaultSchemaProperties,
+                dashboardDetailState.projectId,
             );
         };
         const setStatesForEditMode = (widgetKey: string) => {
@@ -333,6 +335,7 @@ export default defineComponent<Props>({
                 dashboardDetailState.variablesSchema,
                 widgetFormState.inheritOptions,
                 widgetFormState.defaultSchemaProperties,
+                dashboardDetailState.projectId,
             );
             // init form data
             state.schemaFormData = getFormDataFromWidgetInfo(widgetInfo);

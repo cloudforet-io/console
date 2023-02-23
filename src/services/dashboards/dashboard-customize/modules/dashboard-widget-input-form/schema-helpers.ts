@@ -3,6 +3,8 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
     useReferenceStore,
@@ -68,6 +70,7 @@ export const getWidgetOptionSchema = (
     variablesSchema: DashboardVariablesSchema,
     referenceStoreState: ReferenceStoreState,
     isInherit: boolean,
+    projectId?: string,
 ) => {
     let refinedPropertySchema;
     if (isInherit) {
@@ -77,6 +80,13 @@ export const getWidgetOptionSchema = (
         // non inherit case
         refinedPropertySchema = refineOptionSchema(propertyName, propertySchema, referenceStoreState);
     }
+    const referenceType = propertyName.replace('filters.', '');
+    if (projectId && referenceType === REFERENCE_TYPE_INFO.project.type) {
+        refinedPropertySchema = {
+            ...refinedPropertySchema,
+            disabled: true,
+        };
+    }
     return refinedPropertySchema;
 };
 export const getRefinedWidgetOptionsSchema = (
@@ -85,6 +95,7 @@ export const getRefinedWidgetOptionsSchema = (
     variablesSchema: DashboardVariablesSchema,
     inheritOptions: InheritOptions,
     defaultSchemaProperties: string[],
+    projectId?: string,
 ): WidgetOptionsSchema['schema'] => {
     const schema = widgetOptionsSchema?.schema;
 
@@ -101,7 +112,7 @@ export const getRefinedWidgetOptionsSchema = (
         // set properties declared in defaultSchemaProperties only
         if (!defaultSchemaProperties.includes(propertyName)) return;
         const isInherit = !!inheritOptions[propertyName]?.enabled;
-        refinedJsonSchema.properties[propertyName] = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, referenceStoreState, isInherit);
+        refinedJsonSchema.properties[propertyName] = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, referenceStoreState, isInherit, projectId);
     });
 
     return refinedJsonSchema;
