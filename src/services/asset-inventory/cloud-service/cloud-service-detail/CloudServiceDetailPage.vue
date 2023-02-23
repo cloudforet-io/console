@@ -102,8 +102,8 @@
                 />
             </template>
             <template #log>
-                <cloud-service-history-log-tab :cloud-service-id="tableState.selectedItems[0].cloud_service_id"
-                                               :provider="tableState.selectedItems[0].provider"
+                <cloud-service-log-tab :cloud-service-id="tableState.selectedItems[0].cloud_service_id"
+                                       :provider="tableState.selectedItems[0].provider"
                 />
             </template>
             <template #monitoring>
@@ -206,7 +206,7 @@ import CloudServiceUsageOverview
 import CloudServiceAdmin from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceAdmin.vue';
 import CloudServiceDetail from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceDetail.vue';
 import CloudServiceHistory from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistory.vue';
-import CloudServiceHistoryLogTab from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryLogTab.vue';
+import CloudServiceLogTab from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceLogTab.vue';
 import CloudServiceTagsPanel
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceTagsPanel.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
@@ -223,7 +223,7 @@ const TABLE_MIN_HEIGHT = 400;
 export default {
     name: 'CloudServiceDetailPage',
     components: {
-        CloudServiceHistoryLogTab,
+        CloudServiceLogTab,
         CloudServiceTagsPanel,
         CloudServicePeriodFilter,
         CloudServiceUsageOverview,
