@@ -76,6 +76,30 @@ const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
     },
 });
 
+const refineVariablesSchema = (variablesSchemaInfo?: DashboardVariablesSchema): DashboardVariablesSchema => ({
+    properties: { ...managedDashboardVariablesSchema.properties, ...variablesSchemaInfo?.properties ?? {} },
+    order: union(managedDashboardVariablesSchema.order, variablesSchemaInfo?.order ?? []),
+});
+const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema): DashboardVariablesSchema => {
+    const projectPropertySchema = { ...managedDashboardVariablesSchema.properties.project, disabled: true };
+    const properties = { ...variablesSchemaInfo.properties, project: projectPropertySchema };
+
+    const order = [...variablesSchemaInfo.order];
+    const projectIdx = variablesSchemaInfo.order.findIndex((property) => property === 'project');
+    if (projectIdx !== -1) order.splice(projectIdx, 1);
+    order.splice(0, 0, 'project');
+
+    return {
+        properties,
+        order,
+    };
+};
+const refineProjectDashboardVariables = (variables: DashboardVariables, projectId: string): DashboardVariables => {
+    const _variables = { ...variables };
+    _variables.project = [projectId];
+    return _variables;
+};
+
 export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', () => {
     // CAUTION: don't directly access and modify originState outside this store.
     const originState = reactive<DashboardDetailInfoOriginState>({
@@ -156,11 +180,16 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             },
             refresh_interval_option: _dashboardInfo.settings?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
-        state.variablesSchema = {
-            properties: { ...managedDashboardVariablesSchema.properties, ..._dashboardInfo.variables_schema?.properties ?? {} },
-            order: union(managedDashboardVariablesSchema.order, _dashboardInfo.variables_schema?.order ?? []),
-        };
-        state.variables = _dashboardInfo.variables ?? {};
+
+        let _variablesSchema = refineVariablesSchema(_dashboardInfo.variables_schema);
+        let _variables = _dashboardInfo.variables ?? {};
+        if (state.projectId) {
+            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema);
+            _variables = refineProjectDashboardVariables(_variables, state.projectId);
+        }
+        state.variablesSchema = _variablesSchema;
+        state.variables = _variables;
+
         state.labels = _dashboardInfo.labels;
         state.dashboardWidgetInfoList = _dashboardInfo?.layouts?.flat()?.map((info) => ({
             ...info,
@@ -223,20 +252,23 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         validationState.widgetValidMap = _widgetValidMap;
     };
     const resetVariables = () => {
-        const originProperties = { ...managedDashboardVariablesSchema.properties, ...originState.dashboardInfo.variables_schema.properties };
-        const originOrder = union(managedDashboardVariablesSchema.order, originState.dashboardInfo.variables_schema.order);
+        const {
+            properties: originProperties,
+            order: originOrder,
+        } = refineVariablesSchema(originState.dashboardInfo.variables_schema);
         const originVariables = originState.dashboardInfo.variables;
 
         // reset variables schema
-        const _variableSchema = cloneDeep(state.variablesSchema);
+        let _variableSchema = cloneDeep(state.variablesSchema);
         state.variablesSchema.order.forEach((property) => {
             if (!originProperties[property]) return;
             _variableSchema.properties[property].use = originProperties[property].use;
         });
+        if (state.projectId) _variableSchema = refineProjectDashboardVariablesSchema(_variableSchema);
         state.variablesSchema = _variableSchema;
 
         // reset variables
-        const _variables = cloneDeep(state.variables);
+        let _variables = cloneDeep(state.variables);
         originOrder.forEach((property) => {
             // CASE: existing variable is deleted.
             if (!state.variablesSchema.properties[property]) return;
@@ -244,6 +276,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 _variables[property] = originVariables[property];
             }
         });
+        if (state.projectId) _variables = refineProjectDashboardVariables(_variables, state.projectId);
         state.variables = _variables;
     };
 

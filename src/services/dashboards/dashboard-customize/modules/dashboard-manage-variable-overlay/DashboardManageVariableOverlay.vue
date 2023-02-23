@@ -3,7 +3,7 @@
                          class="dashboard-manage-variable-overay"
     >
         <p-heading :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
-                   child
+                   show-back-button
                    @click-back-button="handleClickGoBackButton"
         />
         <div class="content-wrapper">
