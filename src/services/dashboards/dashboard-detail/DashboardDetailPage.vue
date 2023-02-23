@@ -58,7 +58,7 @@
         <p-divider class="divider" />
         <div class="dashboard-selectors">
             <dashboard-variables-selector class="variable-selector-wrapper"
-                                          :has-manage-permission="state.hasManagePermission"
+                                          :is-manageable="state.hasManagePermission"
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                         :interval-option.sync="dashboardDetailState.settings.refresh_interval_option"

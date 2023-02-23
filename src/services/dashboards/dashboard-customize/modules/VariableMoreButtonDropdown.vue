@@ -20,7 +20,7 @@
                         :selected="state.selected"
                         multi-selectable
                         show-select-marker
-                        show-clear-selection
+                        :show-clear-selection="props.isManageable"
                         @click-show-more="showMoreMenu"
                         @keyup:down:end="focusOnContextMenu()"
                         @update:selected="handleSelectVariable"
@@ -30,7 +30,7 @@
                 <p-button class="manage-variable-button"
                           style-type="secondary"
                           icon-left="ic_setting"
-                          :disabled="!props.isManagable"
+                          :disabled="!props.isManageable"
                           @click="handleOpenOverlay"
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE') }}
@@ -59,7 +59,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-det
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 interface Props {
-    isManagable: boolean;
+    isManageable: boolean;
 }
 
 const props = defineProps<Props>();
