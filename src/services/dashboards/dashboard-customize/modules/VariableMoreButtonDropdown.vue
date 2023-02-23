@@ -20,7 +20,7 @@
                         :selected="state.selected"
                         multi-selectable
                         show-select-marker
-                        :show-clear-selection="props.isManageable"
+                        show-clear-selection
                         @click-show-more="showMoreMenu"
                         @keyup:down:end="focusOnContextMenu()"
                         @update:selected="handleSelectVariable"
@@ -84,7 +84,7 @@ const state = reactive({
         state.variableSchema.order.forEach((property) => {
             const currentProperty = state.variableSchema.properties[property];
             if (!currentProperty?.use) return;
-            result.push({ name: property, label: currentProperty.name });
+            result.push({ name: property, label: currentProperty.name, disabled: currentProperty.disabled });
         });
         return result;
     }),
