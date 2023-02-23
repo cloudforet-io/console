@@ -48,7 +48,7 @@
                                :readonly="readonly"
                                @click.stop="handleClickClearSelection"
                 >
-                    {{ $t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }} ({{ state.selectedCount }})
+                    {{ $t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }} ({{ state.clearableSelectedCount }})
                 </p-text-button>
                 <slot name="items">
                     <template v-for="(item, index) in props.menu">
@@ -223,6 +223,7 @@ const state = reactive({
     }),
     selectableMenuItems: computed(() => props.menu.filter((d) => !d.disabled && (d.type === undefined || d.type === 'item'))),
     selectedCount: computed(() => state.proxySelected.length),
+    clearableSelectedCount: computed(() => state.proxySelected.filter((item) => !item.disabled).length),
     menuItemLength: computed(() => props.menu.filter((d) => d.type === undefined || d.type === 'item').length),
 });
 
@@ -297,7 +298,7 @@ const onClickEsc = (e: MouseEvent) => {
     blur();
 };
 const handleClickClearSelection = () => {
-    state.proxySelected = [];
+    state.proxySelected = state.proxySelected.filter((item) => item.disabled);
 };
 const handleUpdateSearchText = async (value: string) => {
     state.proxySearchText = value;
