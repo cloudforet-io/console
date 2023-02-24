@@ -74,10 +74,9 @@
                             />
                         </template>
                         <template #log>
-                            <cloud-service-history-log-tab :provider="provider"
-                                                           :cloud-service-id="cloudServiceId"
-                                                           :date="selectedHistoryRecordDate"
-                                                           :prev-date="selectedPrevHistoryRecordDate"
+                            <cloud-service-log-tab :provider="provider"
+                                                   :cloud-service-id="cloudServiceId"
+                                                   :date="selectedHistoryRecordDate"
                             />
                         </template>
                         <template #note>
@@ -116,8 +115,8 @@ import CloudServiceHistoryChangesTab
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryChangesTab.vue';
 import CloudServiceHistoryDetailNote
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceHistoryDetailNoteTab.vue';
-import CloudServiceHistoryLogTab
-    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistoryLogTab.vue';
+import CloudServiceLogTab
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceLogTab.vue';
 import type { CloudServiceHistoryItem } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 
@@ -142,7 +141,7 @@ export default defineComponent<Props>({
     name: 'CloudServiceHistoryDetailOverlay',
     components: {
         CloudServiceHistoryChangesTab,
-        CloudServiceHistoryLogTab,
+        CloudServiceLogTab,
         VerticalTimeline,
         PPaneLayout,
         PHeading,
@@ -191,7 +190,6 @@ export default defineComponent<Props>({
             timelineWrapperRef: null as null | HTMLElement,
             selectedHistoryRecordId: '',
             selectedHistoryRecordDate: '',
-            selectedPrevHistoryRecordDate: '' as CloudServiceHistoryItem['date']|undefined,
             proxySelectedHistoryItem: useProxyValue('selectedHistoryItem', props, emit),
             tabs: computed(() => ([
                 { name: 'changed', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.CHANGES') },
@@ -207,7 +205,6 @@ export default defineComponent<Props>({
         /* Event */
         const handleClickTimeline = (selectedItem: SelectedCloudServiceHistoryItem) => {
             state.proxySelectedHistoryItem = selectedItem.cur;
-            state.selectedPrevHistoryRecordDate = selectedItem.prev?.date;
         };
         const handleRefreshNoteCount = () => {
             emit('refresh-note-count');
