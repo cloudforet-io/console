@@ -24,12 +24,13 @@
                                           :options="layout.options"
                                           :data="data.slice(pageStart - 1, pageStart + pageLimit - 1)"
                                           :type-options="{
-                                              searchText,
                                               totalCount,
                                               sortable: false,
                                           }"
                                           :fetch-options="{
                                               pageLimit,
+                                              pageStart,
+                                              searchText,
                                           }"
                                           v-on="dynamicLayoutListeners"
                         >
@@ -79,6 +80,7 @@ import type { DynamicLayout } from '@spaceone/design-system/types/data-display/d
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
+import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -241,10 +243,13 @@ export default defineComponent<Props>({
         // handler
         const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
             fetch(options) {
+                if (isEmpty(options)) { // refresh case
+                    getLogData();
+                    return;
+                }
                 if (options?.pageStart) state.pageStart = options.pageStart;
                 if (options?.pageLimit) state.pageLimit = options.pageLimit;
-                if (!state.searchText && !options?.searchText) return;
-                if (state.searchText !== options?.searchText) {
+                if (options?.searchText !== undefined && state.searchText !== options?.searchText) {
                     state.searchText = options?.searchText ?? '';
                     getLogData();
                 }
