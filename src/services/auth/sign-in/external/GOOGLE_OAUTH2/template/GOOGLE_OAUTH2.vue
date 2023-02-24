@@ -1,59 +1,80 @@
 <template>
     <div class="google-oauth-wrapper">
-        <div id="g-sign-in-btn" />
+        <button class="google-signin-button"
+                @click="handleLogin"
+        >
+            <p-i name="logo_googleg_48dp"
+                 width="18px"
+                 height="18px"
+                 class="mr-2"
+            />
+            <span class="google-signin-button-label">Sign in with Google</span>
+        </button>
     </div>
 </template>
 
-<script lang="ts">
-import type { SetupContext } from 'vue';
+<script setup lang="ts">
 import {
-    defineComponent, onMounted,
+    computed,
+    reactive,
 } from 'vue';
+
+import { PI } from '@spaceone/design-system';
+
+import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
 
-export default defineComponent({
-    name: 'GoogleSignIn',
-    setup(props, context: SetupContext) {
-        const onSignIn = (userId:string) => {
-            context.emit('sign-in', userId);
-        };
-        const goToAdminSignIn = () => {
-            context.emit('go-to-admin-sign-in');
-        };
+const emit = defineEmits(['sign-in', 'go-to-admin-sign-in']);
 
-        onMounted(async () => {
-            try {
-                await loadAuth('GOOGLE_OAUTH2').signIn(onSignIn);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        });
-        return {
-            goToAdminSignIn,
-        };
-    },
+const state = reactive({
+    userId: computed(() => store.state.user.userId),
 });
+
+const onSignIn = () => {
+    emit('sign-in', state.userId);
+};
+
+const handleLogin = async () => {
+    try {
+        await loadAuth('GOOGLE_OAUTH2').signIn(onSignIn);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
 </script>
 
 <style lang="postcss" scoped>
-:deep(#g-sign-in-btn) {
-    @apply border border-gray-900 rounded-xs;
-    box-shadow: none;
-    overflow: hidden;
-    .abcRioButtonIcon {
-        display: inline-flex;
-        float: none;
-    }
-    .abcRioButtonContents {
-        vertical-align: unset;
-        font-weight: normal;
-    }
-    span {
-        @apply text-gray-900;
-        line-height: 40px;
-    }
+.google-signin-button {
+    @apply bg-white;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    height: 2.25rem;
+    width: 100%;
+    font-family: Roboto, sans-serif;
+    padding: 0 1rem;
+    cursor: pointer;
 }
+
+.google-signin-button:hover {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    border-color: #dadce0;
+    background-color: #d2e3fc;
+}
+
+.google-signin-button:focus {
+    outline: none;
+}
+
+.google-signin-button-label {
+    font-size: 0.875rem;
+}
+
 </style>
