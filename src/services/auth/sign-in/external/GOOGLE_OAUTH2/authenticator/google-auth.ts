@@ -23,12 +23,14 @@ const loadGapiInsideDOM = async () => new Promise((resolve) => {
 });
 
 class GoogleAuth extends Authenticator {
-    static accessToken: string;
+    static #accessToken: string|null = null;
 
     static async signOut() {
         try {
             await GoogleAuth.loadGapi();
-            await GoogleAuth.disconnectGoogleSession(GoogleAuth.accessToken);
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            GoogleAuth.disconnectGoogleSession(GoogleAuth.#accessToken);
             await super.signOut();
         } catch (e) {
             ErrorHandler.handleError(e);
@@ -37,7 +39,7 @@ class GoogleAuth extends Authenticator {
 
     static async onSuccess(accessToken) {
         try {
-            GoogleAuth.accessToken = accessToken;
+            // GoogleAuth.#accessToken = accessToken;
             const credentials = {
                 access_token: accessToken,
             };
@@ -73,7 +75,10 @@ class GoogleAuth extends Authenticator {
 
     private static disconnectGoogleSession = (accessToken:string) => {
         try {
-            google.accounts.oauth2.revoke(accessToken);
+            if (accessToken) google.accounts.oauth2.revoke(accessToken);
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            GoogleAuth.#accessToken = null;
         } catch (e) {
             ErrorHandler.handleError(e);
         }
