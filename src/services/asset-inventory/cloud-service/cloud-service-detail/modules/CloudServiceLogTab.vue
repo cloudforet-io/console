@@ -181,7 +181,7 @@ export default defineComponent<Props>({
                 if (props.date) return timeWithinList.filter((d) => HISTORY_LOG_PERIOD_LIST.includes(d.name));
                 return timeWithinList.filter((d) => CLOUD_SERVICE_LOG_PERIOD_LIST.includes(d.name));
             }),
-            selectedTimeWithin: props.date ? 'last1day' : 'last1week',
+            selectedTimeWithin: props.date ? HISTORY_LOG_PERIOD_LIST[0] : CLOUD_SERVICE_LOG_PERIOD_LIST[0],
             layouts: [] as DynamicLayout[],
             currentLayout: computed(() => state.layouts.find((layout) => layout.name === state.activeTab)),
             dataSourceIds: {} as { [key: string]: string },
