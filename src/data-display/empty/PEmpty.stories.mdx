@@ -19,8 +19,15 @@ export const Template = (args, {argTypes}) => ({
     components: { PEmpty },
     template: `
         <div class="h-full w-full overflow p-8">
-            <p-empty>
-                <div v-if="defaultSlot" v-html="defaultSlot"/>
+            <p-empty
+                :show-image="showImage"
+                :image-size="imageSize"
+                :title="title"
+                :show-button="showButton"
+                :button-style-type="buttonStyleType"
+                :button-title="buttonTitle"
+            >
+                {{$props.defaultSlot}}
             </p-empty>
         </div>
     `,
@@ -33,6 +40,122 @@ export const Template = (args, {argTypes}) => ({
 # Empty
 <br/>
 <br/>
+
+## Show Image
+
+<Canvas>
+    <Story name="Show Image">
+        {{
+            components: {PEmpty},
+            template: `
+                <div class="h-full w-full overflow p-8">
+                <p-empty
+                    show-image
+                    image-size="sm"
+                >
+                    No Items
+                </p-empty>
+                </div>
+            `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Image Size
+
+<Canvas>
+    <Story name="Image Size">
+        {{
+            components: {PEmpty},
+            template: `
+                <div class="flex justify-evenly h-full w-full overflow p-8">
+                    <p-empty
+                        show-image
+                        image-size="sm"
+                    >
+                        No Items
+                    </p-empty>
+                    <p-empty
+                        show-image
+                        image-size="md"
+                    >
+                        No Items
+                    </p-empty>
+                    <p-empty
+                        show-image
+                        image-size="lg"
+                    >
+                        No Items
+                    </p-empty>
+                </div>
+            `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Title
+
+<Canvas>
+    <Story name="Title">
+        {{
+            components: {PEmpty},
+            template: `
+                <div class="flex justify-evenly h-full w-full overflow p-8">
+                <p-empty
+                    title="No Items"
+                >
+                    No Items
+                </p-empty>
+                <p-empty
+                    show-image
+                    image-size="sm"
+                    title="No Items"
+                >
+                    No Items
+                </p-empty>
+                </div>
+            `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Button
+
+<Canvas>
+    <Story name="Button">
+        {{
+            components: {PEmpty},
+            template: `
+                <div class="flex justify-evenly h-full w-full overflow p-8">
+                <p-empty
+                    show-button
+                >
+                    No Items
+                </p-empty>
+                <p-empty
+                    show-image
+                    image-size="sm"
+                    show-button
+                >
+                    No Items
+                </p-empty>
+                </div>
+            `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
 
 ## Playground
 
