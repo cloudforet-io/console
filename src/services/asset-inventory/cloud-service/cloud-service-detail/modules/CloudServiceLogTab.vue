@@ -22,14 +22,15 @@
                     >
                         <p-dynamic-layout :type="layout.type"
                                           :options="layout.options"
-                                          :data="data"
+                                          :data="data.slice(pageStart - 1, pageStart + pageLimit - 1)"
                                           :type-options="{
-                                              searchText,
                                               totalCount,
                                               sortable: false,
                                           }"
                                           :fetch-options="{
                                               pageLimit,
+                                              pageStart,
+                                              searchText,
                                           }"
                                           v-on="dynamicLayoutListeners"
                         >
@@ -66,7 +67,6 @@
     </p-data-loader>
 </template>
 <script lang="ts">
-
 import {
     reactive, toRefs, computed, defineComponent, watch,
 } from 'vue';
@@ -80,6 +80,7 @@ import type { DynamicLayout } from '@spaceone/design-system/types/data-display/d
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
+import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -96,15 +97,19 @@ interface Props {
     cloudServiceId: string;
     date: string;
 }
+type PeriodType = 'last1day' | 'last3days' | 'last1week' | 'last2weeks' | 'last1month' | 'last3months';
 interface PeriodItem {
-    name: string;
+    name: PeriodType;
     label: TranslateResult;
     start: Dayjs;
     end: Dayjs;
 }
 
+const HISTORY_LOG_PERIOD_LIST: PeriodType[] = ['last1day', 'last3days', 'last1week'];
+const CLOUD_SERVICE_LOG_PERIOD_LIST: PeriodType[] = ['last1week', 'last2weeks', 'last1month', 'last3months'];
+
 export default defineComponent<Props>({
-    name: 'CloudServiceHistoryLogTab',
+    name: 'CloudServiceLogTab',
     components: {
         PDynamicLayout: PDynamicLayout as any,
         PButtonTab,
@@ -123,7 +128,7 @@ export default defineComponent<Props>({
         },
         date: {
             type: String,
-            default: dayjs.utc().format(),
+            default: undefined,
         },
     },
     setup(props) {
@@ -135,27 +140,50 @@ export default defineComponent<Props>({
             pageLimit: 15,
             tabs: [] as TabItem[],
             activeTab: '',
-            timeWithinList: computed<PeriodItem[]>(() => ([
-                {
-                    name: 'last1day',
-                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_1_DAY'),
-                    start: dayjs.utc(props.date).subtract(1, 'day'),
-                    end: dayjs.utc(props.date),
-                },
-                {
-                    name: 'last2day',
-                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_3_DAYS'),
-                    start: dayjs.utc(props.date).subtract(3, 'day'),
-                    end: dayjs.utc(props.date),
-                },
-                {
-                    name: 'last1week',
-                    label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_A_WEEK'),
-                    start: dayjs.utc(props.date).subtract(1, 'week'),
-                    end: dayjs.utc(props.date),
-                },
-            ])),
-            selectedTimeWithin: 'last1day',
+            timeWithinList: computed<PeriodItem[]>(() => {
+                const _date = props.date ? dayjs.utc(props.date) : dayjs.utc();
+                const timeWithinList: PeriodItem[] = [
+                    {
+                        name: 'last1day',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_1_DAY'),
+                        start: _date.subtract(1, 'day'),
+                        end: _date,
+                    },
+                    {
+                        name: 'last3days',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_3_DAYS'),
+                        start: _date.subtract(3, 'day'),
+                        end: _date,
+                    },
+                    {
+                        name: 'last1week',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_A_WEEK'),
+                        start: _date.subtract(1, 'week'),
+                        end: _date,
+                    },
+                    {
+                        name: 'last2weeks',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_2_WEEKS'),
+                        start: _date.subtract(2, 'week'),
+                        end: _date,
+                    },
+                    {
+                        name: 'last1month',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_1_MONTH'),
+                        start: _date.subtract(1, 'month'),
+                        end: _date,
+                    },
+                    {
+                        name: 'last3months',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_3_MONTHS'),
+                        start: _date.subtract(3, 'month'),
+                        end: _date,
+                    },
+                ];
+                if (props.date) return timeWithinList.filter((d) => HISTORY_LOG_PERIOD_LIST.includes(d.name));
+                return timeWithinList.filter((d) => CLOUD_SERVICE_LOG_PERIOD_LIST.includes(d.name));
+            }),
+            selectedTimeWithin: props.date ? HISTORY_LOG_PERIOD_LIST[0] : CLOUD_SERVICE_LOG_PERIOD_LIST[0],
             layouts: [] as DynamicLayout[],
             currentLayout: computed(() => state.layouts.find((layout) => layout.name === state.activeTab)),
             dataSourceIds: {} as { [key: string]: string },
@@ -177,7 +205,7 @@ export default defineComponent<Props>({
                     end: selectedTimeWithin?.end.toISOString(),
                 });
                 state.totalCount = results.length;
-                state.data = results.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1);
+                state.data = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.data = [];
@@ -215,14 +243,16 @@ export default defineComponent<Props>({
         // handler
         const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
             fetch(options) {
-                if (options?.pageStart) {
-                    state.pageStart = options.pageStart;
+                if (isEmpty(options)) { // refresh case
+                    getLogData();
+                    return;
                 }
-                if (options?.pageLimit) {
-                    state.pageLimit = options.pageLimit;
+                if (options?.pageStart) state.pageStart = options.pageStart;
+                if (options?.pageLimit) state.pageLimit = options.pageLimit;
+                if (options?.searchText !== undefined && state.searchText !== options?.searchText) {
+                    state.searchText = options?.searchText ?? '';
+                    getLogData();
                 }
-                state.searchText = options?.searchText ?? '';
-                getLogData();
             },
             async export() {
                 const fields = state.currentLayout?.options?.fields;
@@ -239,7 +269,7 @@ export default defineComponent<Props>({
                         query: {},
                     },
                     fields: dynamicFieldsToExcelDataFields(fields),
-                    file_name_prefix: FILE_NAME_PREFIX.cloudServiceHistoryLog,
+                    file_name_prefix: FILE_NAME_PREFIX.cloudServiceLog,
                 });
             },
         };
@@ -270,7 +300,7 @@ export default defineComponent<Props>({
     max-width: calc(100vw - 3rem);
 }
 .data-loader {
-    height: 26.125rem;
+    min-height: 26.125rem;
 }
 
 /* custom design-system component - p-dynamic-layout */

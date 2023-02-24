@@ -1868,7 +1868,10 @@
 					"LOG": "Log",
 					"LOG_TAB": {
 						"LAST_1_DAY": "Last 1 day",
+						"LAST_1_MONTH": "Last 1 month",
+						"LAST_2_WEEKS": "Last 2 weeks",
 						"LAST_3_DAYS": "Last 3 days",
+						"LAST_3_MONTHS": "Last 3 months",
 						"LAST_A_WEEK": "Last a week",
 						"NO_LOG_HELP_TEXT": "No log available for this provider",
 						"TIME_WITHIN": "Time Within"

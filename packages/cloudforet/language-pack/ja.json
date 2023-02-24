@@ -1868,7 +1868,10 @@
 					"LOG": "ログ",
 					"LOG_TAB": {
 						"LAST_1_DAY": "過去1日",
+						"LAST_1_MONTH": "過去1ヶ月間",
+						"LAST_2_WEEKS": "",
 						"LAST_3_DAYS": "過去3日",
+						"LAST_3_MONTHS": "過去3ヶ月間",
 						"LAST_A_WEEK": "",
 						"NO_LOG_HELP_TEXT": "該当のクラウドプロバイダは、現在別途のログを提供していません。",
 						"TIME_WITHIN": "照会期間"
