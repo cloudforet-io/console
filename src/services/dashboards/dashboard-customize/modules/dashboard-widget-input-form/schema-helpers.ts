@@ -13,6 +13,7 @@ import type {
     InheritOptions,
     WidgetOptionsSchema,
     WidgetOptionsSchemaProperty,
+    DashboardLayoutWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
 
 type ReferenceStoreState = ReturnType<typeof useReferenceStore>['referenceStoreState'];
@@ -73,19 +74,21 @@ export const getWidgetOptionSchema = (
     projectId?: string,
 ) => {
     let refinedPropertySchema;
-    if (isInherit) {
+    const _referenceType = propertyName.replace('filters.', '');
+    const _isProjectDashboard = projectId && _referenceType === REFERENCE_TYPE_INFO.project.type;
+    if (isInherit || _isProjectDashboard) {
         // inherit case
         refinedPropertySchema = refineOptionSchemaByVariablesSchema(propertySchema, variablesSchema);
+        if (_isProjectDashboard) {
+            refinedPropertySchema = {
+                ...refinedPropertySchema,
+                disabled: true,
+                default: REFERENCE_TYPE_INFO.project.type,
+            };
+        }
     } else {
         // non inherit case
         refinedPropertySchema = refineOptionSchema(propertyName, propertySchema, referenceStoreState);
-    }
-    const referenceType = propertyName.replace('filters.', '');
-    if (projectId && referenceType === REFERENCE_TYPE_INFO.project.type) {
-        refinedPropertySchema = {
-            ...refinedPropertySchema,
-            disabled: true,
-        };
     }
     return refinedPropertySchema;
 };
@@ -116,4 +119,16 @@ export const getRefinedWidgetOptionsSchema = (
     });
 
     return refinedJsonSchema;
+};
+export const getRefinedWidgetInheritOptions = (widgetInfo: DashboardLayoutWidgetInfo, projectId?: string): InheritOptions => {
+    let inheritOptions = widgetInfo.inherit_options ?? {};
+    if (projectId) {
+        inheritOptions = {
+            ...inheritOptions,
+            [`filters.${REFERENCE_TYPE_INFO.project.type}`]: {
+                enabled: true,
+            },
+        };
+    }
+    return inheritOptions;
 };

@@ -82,6 +82,7 @@ import {
     getReferenceHandler,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/reference-handler-helpers';
 import {
+    getRefinedWidgetInheritOptions,
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/schema-helpers';
 import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
@@ -326,7 +327,7 @@ export default defineComponent<Props>({
             // init title
             updateTitle(widgetInfo.title);
             // init widget form store states
-            widgetFormState.inheritOptions = widgetInfo.inherit_options ?? {};
+            widgetFormState.inheritOptions = getRefinedWidgetInheritOptions(widgetInfo, dashboardDetailState.projectId);
             widgetFormState.defaultSchemaProperties = getDefaultSchemaPropertiesFromWidgetInfo(widgetInfo);
             // init options schema
             state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
