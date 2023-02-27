@@ -49,14 +49,12 @@ const handleLogin = async () => {
 
 <style lang="postcss" scoped>
 .google-signin-button {
-    @apply bg-white;
-    border: 1px solid #dadce0;
-    border-radius: 4px;
+    @apply bg-white text-gray-800 rounded-md border border-gray-400;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-    height: 2.25rem;
+    height: 2.5rem;
     width: 100%;
     font-family: Roboto, sans-serif;
     padding: 0 1rem;
@@ -64,9 +62,8 @@ const handleLogin = async () => {
 }
 
 .google-signin-button:hover {
+    @apply bg-blue-100 border-gray-400;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-    border-color: #dadce0;
-    background-color: #d2e3fc;
 }
 
 .google-signin-button:focus {
@@ -75,6 +72,7 @@ const handleLogin = async () => {
 
 .google-signin-button-label {
     font-size: 0.875rem;
+    line-height: 1.6;
 }
 
 </style>
