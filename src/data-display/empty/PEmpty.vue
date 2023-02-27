@@ -1,30 +1,39 @@
 <template>
     <div class="p-empty">
-        <slot name="image">
-            <img v-if="props.showImage"
-                 alt="empty-default-image"
-                 class="image-wrapper"
-                 :class="props.imageSize"
-                 :src="imgGhost"
-            >
-        </slot>
+        <div v-if="props.showImage"
+             class="image-wrapper"
+             :class="props.imageSize"
+        >
+            <slot name="image">
+                <img
+                    alt="empty-default-image"
+                    :src="imgGhost"
+                >
+            </slot>
+        </div>
         <div class="contents-wrapper">
             <p v-if="props.title"
                class="title"
             >
                 {{ props.title }}
             </p>
-            <slot name="default" />
+            <p class="description">
+                <slot name="default" />
+            </p>
         </div>
-        <slot name="button">
-            <p-button v-if="props.showButton"
-                      class="button-wrapper"
-                      :style-type="props.buttonStyleType"
-                      @click.stop="handleClickButton"
-            >
-                {{ props.buttonTitle }}
-            </p-button>
-        </slot>
+        <div
+            v-if="props.showButton"
+            class="button-wrapper"
+        >
+            <slot name="button">
+                <p-button
+                    :style-type="props.buttonStyleType"
+                    @click.stop="handleClickButton"
+                >
+                    {{ props.buttonTitle }}
+                </p-button>
+            </slot>
+        </div>
     </div>
 </template>
 
@@ -71,16 +80,31 @@ const handleClickButton = () => {
         &.sm {
             width: 5rem;
             height: 5rem;
+            > img {
+                width: 5rem;
+                height: 5rem;
+            }
         }
         &.md {
             width: 8rem;
             height: 8rem;
+            > img {
+                width: 8rem;
+                height: 8rem;
+            }
+        }
+        &.lg {
+            width: 12rem;
+            height: 12rem;
+            > img {
+                width: 12rem;
+                height: 12rem;
+            }
         }
     }
     .contents-wrapper {
+        @apply text-paragraph-md;
         text-align: center;
-
-        @apply text-label-md;
 
         .title {
             @apply font-bold text-violet-300;
@@ -88,6 +112,11 @@ const handleClickButton = () => {
     }
     .button-wrapper {
         margin-top: 1rem;
+        .p-button {
+            min-width: auto;
+            width: fit-content;
+            max-width: 100%;
+        }
     }
 }
 </style>

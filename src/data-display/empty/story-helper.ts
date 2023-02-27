@@ -119,7 +119,7 @@ export const getEmptyArgTypes = (): ArgTypes => ({
         name: 'default',
         type: { name: 'string' },
         description: 'Slot for contents of empty',
-        defaultValue: 'No Items',
+        defaultValue: 'No Data',
         table: {
             type: {
                 summary: null,
