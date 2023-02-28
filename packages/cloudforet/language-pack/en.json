@@ -972,7 +972,7 @@
 				"DAY": "Day",
 				"MONTH": "Month",
 				"NETWORKING": "Networking",
-				"NO_SERVICE": "No {service}",
+				"NO_SERVICE": "No Database",
 				"OVERALL_SPENDINGS": "Overall-Spendings",
 				"REGION_SERVICE": "Region Service",
 				"REGION_SERVICE_TITLE": "Region",
@@ -982,7 +982,7 @@
 				"STORAGE": "Storage",
 				"TITLE": "General",
 				"TREND_TITLE": "Trend",
-				"TYPE_TITLE": "{service} Type"
+				"TYPE_TITLE": "Database Type"
 			},
 			"BILLING": {
 				"DAY": "Day",
@@ -1049,7 +1049,8 @@
 				"HOUR": "hr | hrs",
 				"LAST_UPDATE": "Last Update",
 				"MORE": "more",
-				"NO_DATA": "No updated data",
+				"NO_DATA": "Add Service Account to create a dashboard.",
+				"NO_DATA_TITLE": "No Personal Health Dashboard",
 				"PAST_7_DAYS": "Past 7 days",
 				"PLACEHOLDER": "Search Event",
 				"SUMMARY_ISSUE": "Open Issues",
@@ -1064,7 +1065,7 @@
 			"RESOURCE_BY_REGION_SERVER": "Server",
 			"RESOURCE_BY_REGION_TITLE": "Resources By Region",
 			"RESOURCE_MAP": {
-				"NO_REGION": "No running resources."
+				"NO_REGION": "No Region."
 			},
 			"RUN_COLLECTOR": "Run Collectors",
 			"RUN_COLLECTOR_COLLECTOR": "Collector",
@@ -1074,6 +1075,7 @@
 			"SERVICE_ACCOUNTS": "Service Accounts",
 			"SERVICE_ACCOUNTS_ACCOUNT": "Account",
 			"SERVICE_ACCOUNTS_ADD": "Add",
+			"SERVICE_ACCOUNTS_NO_ACCOUNT": "No Service Accounts",
 			"SERVICE_ACCOUNTS_PROJECT": "Project",
 			"SERVICE_ACCOUNTS_PROVIDER": "Provider",
 			"SERVICE_ACCOUNT_TABLE": {
@@ -1091,7 +1093,8 @@
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "Create Project",
 				"NO_PROJECT": "No Project",
-				"NO_PROJECT_HELP_TEXT": "Getting started with grouping your scattered resource and accounts with your own project."
+				"NO_PROJECT_HELP_TEXT": "",
+				"RESOURCE_MAP": "Getting started with grouping your scattered resource and accounts with your own project."
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "Cloud Service",
 			"TOP_PROJECT_CREATE_PROJECT": "Create Project",
@@ -1113,6 +1116,7 @@
 				"LABEL_SERVICE_LIMITS": "Service Limits",
 				"LABEL_WARNING": "Investigation recommended",
 				"NO_DATA": "No AWS Trusted Advisor",
+				"NO_DATA_DESC": "Add Service Account to create a dashboard.",
 				"SUB_TITLE_OVERALL": "Overall",
 				"SUB_TITLE_PROJECT_SUMMARY": "Project Summary",
 				"TITLE": "Trusted Advisor"

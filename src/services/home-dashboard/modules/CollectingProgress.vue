@@ -58,12 +58,16 @@
         <div v-else
              class="no-data-wrapper"
         >
-            <img src="@/assets/images/illust_star.svg"
-                 class="no-data-img"
+            <p-empty
+                show-image
+                :title="$t('COMMON.WIDGETS.COLLECTING_JOBS_NO_RUNNING')"
             >
-            <p class="no-data-text">
-                {{ $t('COMMON.WIDGETS.COLLECTING_JOBS_NO_RUNNING') }}
-            </p>
+                <template #image>
+                    <img src="@/assets/images/illust_star.svg"
+                         alt="empty-image"
+                    >
+                </template>
+            </p-empty>
         </div>
     </widget-layout>
 </template>
@@ -74,7 +78,7 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
-import { PSkeleton, PI } from '@spaceone/design-system';
+import { PSkeleton, PI, PEmpty } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
@@ -124,6 +128,7 @@ export default {
         WidgetLayout,
         PSkeleton,
         PI,
+        PEmpty,
     },
     props: {
         extraParams: {
@@ -242,17 +247,6 @@ export default {
     width: 100%;
     left: 0;
     top: 6rem;
-    .no-data-img {
-        @apply mx-auto mb-4 flex-shrink-0;
-        width: 3.75rem;
-        opacity: 0.7;
-    }
-    .no-data-text {
-        @apply text-center text-primary2;
-        font-weight: bold;
-        font-size: 0.875rem;
-        line-height: 150%;
-    }
 }
 .card {
     @apply rounded-md;

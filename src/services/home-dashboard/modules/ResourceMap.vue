@@ -37,8 +37,9 @@
             <p-data-loader
                 :loading="loading"
                 class="col-span-12 lg:col-span-3 resource-info-wrapper"
+                :data="data"
             >
-                <template v-if="data.length > 0">
+                <div class="resource-info-wrapper">
                     <div class="resource-info-title">
                         <span class="resource-info-provider"
                               :style="{color: providers[selectedProvider] ? providers[selectedProvider].color : 'gray' }"
@@ -47,7 +48,7 @@
                         <span class="resource-info-region">{{ selectedRegionLabel }}</span>
                     </div>
                     <div class="grid-cols-1 sm:grid-cols-2 lg:grid-cols-1
-                                        progress-bar-wrapper"
+                                                                                        progress-bar-wrapper"
                     >
                         <router-link v-for="(item, index) in resourceDataByRegion"
                                      :key="index"
@@ -65,17 +66,20 @@
                             />
                         </router-link>
                     </div>
-                </template>
-                <div v-if="resourceDataByRegion.length === 0 || data.length === 0"
-                     class="no-data-wrapper"
-                >
-                    <img src="@/assets/images/illust_microscope.svg"
-                         class="no-data-img"
-                    >
-                    <p class="no-data-text">
-                        {{ $t('COMMON.WIDGETS.RESOURCE_MAP.NO_REGION') }}
-                    </p>
                 </div>
+                <template #no-data>
+                    <p-empty
+                        show-image
+                        image-size="md"
+                        :title="$t('COMMON.WIDGETS.RESOURCE_MAP.NO_REGION')"
+                    >
+                        <template #image>
+                            <img src="@/assets/images/illust_microscope.svg"
+                                 alt="illust_microscope"
+                            >
+                        </template>
+                    </p-empty>
+                </template>
             </p-data-loader>
         </div>
     </widget-layout>
@@ -92,7 +96,7 @@ import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import type { MapChart } from '@amcharts/amcharts4/maps';
-import { PDataLoader, PProgressBar } from '@spaceone/design-system';
+import { PDataLoader, PProgressBar, PEmpty } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -140,6 +144,7 @@ export default {
         WidgetLayout,
         PDataLoader,
         PProgressBar,
+        PEmpty,
     },
     props: {
         extraParams: {
@@ -439,36 +444,6 @@ export default {
             line-height: 1.5;
         }
     }
-    .no-data-wrapper {
-        @apply col-span-12 flex flex-col;
-        justify-self: center;
-        opacity: 0.7;
-        .no-data-img {
-            @apply mx-auto;
-        }
-        .no-data-text {
-            @apply text-primary2;
-            font-size: 0.875rem;
-            line-height: 140%;
-            text-align: center;
-            margin-top: 0.5rem;
-        }
-
-        @screen lg {
-            @apply col-span-3;
-            padding-top: 50%;
-        }
-
-        @screen xl {
-            @apply col-span-3;
-            padding-top: 50%;
-        }
-
-        @screen 2xl {
-            @apply col-span-3;
-            padding-top: 50%;
-        }
-    }
 }
 .resource-info-wrapper {
     width: 100%;
@@ -535,6 +510,25 @@ export default {
             height: 0.25rem;
             margin-top: -0.25rem;
         }
+    }
+}
+:deep(.p-empty) {
+    @apply col-span-12 flex flex-col;
+    justify-self: center;
+
+    @screen lg {
+        @apply col-span-3;
+        padding-top: 50%;
+    }
+
+    @screen xl {
+        @apply col-span-3;
+        padding-top: 50%;
+    }
+
+    @screen 2xl {
+        @apply col-span-3;
+        padding-top: 50%;
     }
 }
 </style>

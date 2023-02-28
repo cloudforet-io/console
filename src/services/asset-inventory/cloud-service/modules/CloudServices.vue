@@ -31,64 +31,73 @@
             </div>
         </template>
         <template #default>
-            <div v-if="loading"
-                 class="card-wrapper"
+            <p-data-loader
+                :loading="loading"
+                :data="data"
             >
-                <div v-for="v in skeletons"
-                     :key="v"
-                     class="flex items-center p-4"
-                >
-                    <p-skeleton width="2rem"
-                                height="2rem"
-                                class="mr-4"
-                    />
-                    <div class="grid grid-cols-1 gap-1 w-full">
-                        <p-skeleton width="80%"
-                                    height="0.625rem"
-                        />
-                        <p-skeleton width="100%"
-                                    height="0.625rem"
-                        />
-                    </div>
-                </div>
-            </div>
-            <div v-else-if="data.length === 0"
-                 class="no-data-wrapper"
-            >
-                <img src="@/assets/images/illust_circle_boy.svg">
-                <div class="text">
-                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE.NO_DATA') }}
-                </div>
-            </div>
-            <div v-else
-                 class="card-wrapper"
-            >
-                <router-link v-for="(item, index) in data"
-                             :key="index"
-                             :to="item.href"
-                >
-                    <div class="card">
-                        <div class="content-wrapper">
-                            <p-lazy-img :src="iconUrl(item)"
-                                        width="2rem"
+                <template #loader>
+                    <div class="card-wrapper">
+                        <div v-for="v in skeletons"
+                             :key="v"
+                             class="flex items-center p-4"
+                        >
+                            <p-skeleton width="2rem"
                                         height="2rem"
-                                        class="icon"
+                                        class="mr-4"
                             />
-                            <div class="content">
-                                <div class="group-name">
-                                    {{ item.group }}
-                                </div>
-                                <div class="name">
-                                    {{ item.name }}
-                                </div>
+                            <div class="grid grid-cols-1 gap-1 w-full">
+                                <p-skeleton width="80%"
+                                            height="0.625rem"
+                                />
+                                <p-skeleton width="100%"
+                                            height="0.625rem"
+                                />
                             </div>
                         </div>
-                        <div class="extra">
-                            <span class="count">{{ item.count || 0 }}</span>
-                        </div>
                     </div>
-                </router-link>
-            </div>
+                </template>
+                <div class="card-wrapper">
+                    <router-link v-for="(item, index) in data"
+                                 :key="index"
+                                 :to="item.href"
+                    >
+                        <div class="card">
+                            <div class="content-wrapper">
+                                <p-lazy-img :src="iconUrl(item)"
+                                            width="2rem"
+                                            height="2rem"
+                                            class="icon"
+                                />
+                                <div class="content">
+                                    <div class="group-name">
+                                        {{ item.group }}
+                                    </div>
+                                    <div class="name">
+                                        {{ item.name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="extra">
+                                <span class="count">{{ item.count || 0 }}</span>
+                            </div>
+                        </div>
+                    </router-link>
+                </div>
+                <template #no-data>
+                    <div class="no-data-wrapper">
+                        <p-empty
+                            show-image
+                            :title="$t('COMMON.WIDGETS.CLOUD_SERVICE.NO_DATA')"
+                        >
+                            <template #image>
+                                <img src="@/assets/images/illust_circle_boy.svg"
+                                     alt="empty-image"
+                                >
+                            </template>
+                        </p-empty>
+                    </div>
+                </template>
+            </p-data-loader>
         </template>
     </widget-layout>
 </template>
@@ -96,7 +105,9 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import { PSkeleton, PI, PLazyImg } from '@spaceone/design-system';
+import {
+    PSkeleton, PI, PLazyImg, PEmpty, PDataLoader,
+} from '@spaceone/design-system';
 import { range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -128,6 +139,8 @@ export default {
         PSkeleton,
         PI,
         PLazyImg,
+        PEmpty,
+        PDataLoader,
     },
     props: {
         providers: {
@@ -351,12 +364,8 @@ export default {
 }
 .no-data-wrapper {
     @apply flex w-full h-full flex-col justify-center items-center;
-    .text {
-        @apply mt-5 text-center text-primary2;
-        font-weight: bold;
-        font-size: 0.875rem;
-        line-height: 1.6;
-    }
+    padding-top: 4.81rem;
+    padding-bottom: 6.12rem;
 }
 
 </style>

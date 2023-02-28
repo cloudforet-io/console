@@ -972,7 +972,7 @@
 				"DAY": "日",
 				"MONTH": "月",
 				"NETWORKING": "ネットワーキング",
-				"NO_SERVICE": "{service} なし",
+				"NO_SERVICE": "データがありません",
 				"OVERALL_SPENDINGS": "総支出",
 				"REGION_SERVICE": "リージョン·サービス",
 				"REGION_SERVICE_TITLE": "リージョン",
@@ -982,7 +982,7 @@
 				"STORAGE": "ストレージ",
 				"TITLE": "一般",
 				"TREND_TITLE": "トレンド",
-				"TYPE_TITLE": "{service}タイプ"
+				"TYPE_TITLE": ""
 			},
 			"BILLING": {
 				"DAY": "日",
@@ -1049,7 +1049,8 @@
 				"HOUR": "時間",
 				"LAST_UPDATE": "最終更新",
 				"MORE": "もっと見る",
-				"NO_DATA": "更新されたデータがありません。",
+				"NO_DATA": "",
+				"NO_DATA_TITLE": "",
 				"PAST_7_DAYS": "過去7日間",
 				"PLACEHOLDER": "イベント検索",
 				"SUMMARY_ISSUE": "発生した問題",
@@ -1074,6 +1075,7 @@
 			"SERVICE_ACCOUNTS": "サービスアカウント",
 			"SERVICE_ACCOUNTS_ACCOUNT": "アカウント",
 			"SERVICE_ACCOUNTS_ADD": "追加",
+			"SERVICE_ACCOUNTS_NO_ACCOUNT": "",
 			"SERVICE_ACCOUNTS_PROJECT": "プロジェクト ",
 			"SERVICE_ACCOUNTS_PROVIDER": "プロバイダー ",
 			"SERVICE_ACCOUNT_TABLE": {
@@ -1091,7 +1093,8 @@
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "プロジェクト作成",
 				"NO_PROJECT": "プロジェクトなし",
-				"NO_PROJECT_HELP_TEXT": "分散されているリソースやアカウントを独自のプロジェクトでグループ化をしてみましょう"
+				"NO_PROJECT_HELP_TEXT": "分散されているリソースやアカウントを独自のプロジェクトでグループ化をしてみましょう",
+				"RESOURCE_MAP": ""
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "クラウドサービス",
 			"TOP_PROJECT_CREATE_PROJECT": "プロジェクト作成",
@@ -1113,6 +1116,7 @@
 				"LABEL_SERVICE_LIMITS": "サービス制限",
 				"LABEL_WARNING": "調査を推奨",
 				"NO_DATA": "データがありません。",
+				"NO_DATA_DESC": "",
 				"SUB_TITLE_OVERALL": "サマリ",
 				"SUB_TITLE_PROJECT_SUMMARY": "サマリ情報",
 				"TITLE": "Trusted Advisor"

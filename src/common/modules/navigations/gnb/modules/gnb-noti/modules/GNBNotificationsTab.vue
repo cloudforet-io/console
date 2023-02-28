@@ -29,17 +29,18 @@
                 />
             </div>
             <template #no-data>
-                <div class="no-data">
-                    <img class="img"
-                         src="@/assets/images/illust_astronaut_radio.svg"
-                    >
-                    <p class="title">
-                        {{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION') }}
-                    </p>
-                    <p class="desc">
-                        <span>{{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION_DESC') }}</span>
-                    </p>
-                </div>
+                <p-empty
+                    class="no-data"
+                    :title="$t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION')"
+                >
+                    <template #image>
+                        <img class="img"
+                             alt="illust_astronaut_radio"
+                             src="@/assets/images/illust_astronaut_radio.svg"
+                        >
+                    </template>
+                    {{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION_DESC') }}
+                </p-empty>
             </template>
         </p-data-loader>
         <p-button-modal class="notification-modal"
@@ -104,7 +105,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PDataLoader, PButtonModal, PI, PAnchor, PDefinitionTable, PButton,
+    PDataLoader, PButtonModal, PI, PAnchor, PDefinitionTable, PButton, PEmpty,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -153,6 +154,7 @@ export default {
         PAnchor,
         PDefinitionTable,
         PButton,
+        PEmpty,
     },
     props: {
         visible: {

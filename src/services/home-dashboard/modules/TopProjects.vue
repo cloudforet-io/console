@@ -30,23 +30,21 @@
                      class="chart"
                 />
             </p-data-loader>
-            <div v-if="!loading && items.length === 0"
-                 class="no-data-wrapper"
+            <p-empty v-if="!loading && items.length === 0"
+                     :title="$t('COMMON.WIDGETS.TOP_PROJECTS.NO_PROJECT')"
+                     show-button
             >
-                <p class="title">
-                    {{ $t('COMMON.WIDGETS.TOP_PROJECTS.NO_PROJECT') }}
-                </p>
-                <p class="text">
-                    {{ $t('COMMON.WIDGETS.TOP_PROJECTS.NO_PROJECT_HELP_TEXT') }}
-                </p>
-                <router-link :to="{ name: PROJECT_ROUTE._NAME }">
-                    <p-button style-type="substitutive"
-                              icon-left="ic_plus"
-                    >
-                        <span>{{ $t('COMMON.WIDGETS.TOP_PROJECTS.CREATE_PROJECT') }}</span>
-                    </p-button>
-                </router-link>
-            </div>
+                {{ $t('COMMON.WIDGETS.TOP_PROJECTS.RESOURCE_MAP') }}
+                <template #button>
+                    <router-link :to="{ name: PROJECT_ROUTE._NAME }">
+                        <p-button style-type="substitutive"
+                                  icon-left="ic_plus"
+                        >
+                            <span>{{ $t('COMMON.WIDGETS.TOP_PROJECTS.CREATE_PROJECT') }}</span>
+                        </p-button>
+                    </router-link>
+                </template>
+            </p-empty>
             <template v-else>
                 <p-data-table
                     :loading="loading"
@@ -108,7 +106,7 @@ import type { Location } from 'vue-router';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import {
-    PButton, PDataLoader, PDataTable, PI, PSkeleton,
+    PButton, PDataLoader, PDataTable, PI, PSkeleton, PEmpty,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
 import { range } from 'lodash';
@@ -158,6 +156,7 @@ export default {
         PDataLoader,
         PSkeleton,
         PI,
+        PEmpty,
     },
     props: {
         extraParams: {
@@ -392,25 +391,6 @@ export default {
 }
 .contents-container {
     @apply pt-4 flex flex-col h-full;
-
-    .no-data-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 1.25rem 0;
-
-        .title {
-            @apply text-primary2;
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-        .text {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            line-height: 1.6;
-            padding-bottom: 0.5rem;
-        }
-    }
 }
 .chart {
     min-height: 13rem;
@@ -437,5 +417,8 @@ export default {
             }
         }
     }
+}
+:deep(.p-empty) {
+    padding: 1.25rem 0;
 }
 </style>

@@ -6,76 +6,94 @@
                 <span>{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.TITLE') }}</span>
             </div>
         </template>
-        <div class="content-wrapper">
-            <trusted-advisor-overall :extra-params="extraParams" />
-            <div class="project-summary-wrapper">
-                <div class="title">
-                    <span class="text">{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.SUB_TITLE_PROJECT_SUMMARY') }}</span>
-                    <p-text-pagination
-                        :this-page.sync="thisPage"
-                        :all-page="allPage"
-                        @pageChange="changePageNumber"
-                    />
-                </div>
-                <div class="table-wrapper">
-                    <div v-for="rowNum of range(-1, 5)"
-                         :key="rowNum"
-                         class="table-row"
-                         :class="{ 'project-name-row': rowNum === -1 }"
-                    >
-                        <div class="left-part">
-                            <div v-if="rowNum > -1"
-                                 class="label-wrapper"
-                            >
-                                <p-i :name="tableData[rowNum].icon"
-                                     width="0.875rem"
-                                     height="0.875rem"
-                                     color="inherit transparent"
-                                />
-                                <span class="text hidden lg:inline-block">{{ tableData[rowNum].label }}</span>
+        <p-data-loader
+            :loading="false"
+            :data="projectSummaryData"
+        >
+            <div class="content-wrapper">
+                <trusted-advisor-overall :extra-params="extraParams" />
+                <div class="project-summary-wrapper">
+                    <div class="title">
+                        <span class="text">{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.SUB_TITLE_PROJECT_SUMMARY') }}</span>
+                        <p-text-pagination
+                            :this-page.sync="thisPage"
+                            :all-page="allPage"
+                            @pageChange="changePageNumber"
+                        />
+                    </div>
+                    <div class="table-wrapper">
+                        <div v-for="rowNum of range(-1, 5)"
+                             :key="rowNum"
+                             class="table-row"
+                             :class="{ 'project-name-row': rowNum === -1 }"
+                        >
+                            <div class="left-part">
+                                <div v-if="rowNum > -1"
+                                     class="label-wrapper"
+                                >
+                                    <p-i :name="tableData[rowNum].icon"
+                                         width="0.875rem"
+                                         height="0.875rem"
+                                         color="inherit transparent"
+                                    />
+                                    <span class="text hidden lg:inline-block">{{ tableData[rowNum].label }}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="right-part grid grid-cols-12 gap-1">
-                            <div v-for="colNum of range(1, 7)"
-                                 :key="colNum"
-                                 class="col-wrapper col-span-2"
-                            >
-                                <template v-if="rowNum === -1">
-                                    <span v-if="projectSummaryData[colNum * thisPage - 1]"
-                                          v-tooltip.top="projectSummaryData[colNum * thisPage - 1].tooltipText"
-                                          class="project-name"
-                                    >
-                                        <p-i v-if="projectSummaryData[colNum * thisPage - 1].isFavorite"
-                                             name="ic_bookmark"
-                                             class="favorite-icon"
-                                             width="0.625rem"
-                                             height="0.625rem"
-                                        />
-                                        <span>{{ projectSummaryData[colNum * thisPage - 1].projectName }}</span>
-                                    </span>
-                                </template>
-                                <template v-else>
-                                    <router-link v-if="getProjectBoxCount(rowNum, colNum * thisPage - 1) > 0"
-                                                 :to="projectSummaryLinkFormatter(rowNum, colNum * thisPage - 1)"
-                                    >
-                                        <div class="box"
-                                             :class="getProjectBoxStatus(rowNum, colNum * thisPage - 1)"
+                            <div class="right-part grid grid-cols-12 gap-1">
+                                <div v-for="colNum of range(1, 7)"
+                                     :key="colNum"
+                                     class="col-wrapper col-span-2"
+                                >
+                                    <template v-if="rowNum === -1">
+                                        <span v-if="projectSummaryData[colNum * thisPage - 1]"
+                                              v-tooltip.top="projectSummaryData[colNum * thisPage - 1].tooltipText"
+                                              class="project-name"
                                         >
-                                            <span class="box-text">{{ getProjectBoxCount(rowNum, colNum * thisPage - 1) }}</span>
+                                            <p-i v-if="projectSummaryData[colNum * thisPage - 1].isFavorite"
+                                                 name="ic_bookmark"
+                                                 class="favorite-icon"
+                                                 width="0.625rem"
+                                                 height="0.625rem"
+                                            />
+                                            <span>{{ projectSummaryData[colNum * thisPage - 1].projectName }}</span>
+                                        </span>
+                                    </template>
+                                    <template v-else>
+                                        <router-link v-if="getProjectBoxCount(rowNum, colNum * thisPage - 1) > 0"
+                                                     :to="projectSummaryLinkFormatter(rowNum, colNum * thisPage - 1)"
+                                        >
+                                            <div class="box"
+                                                 :class="getProjectBoxStatus(rowNum, colNum * thisPage - 1)"
+                                            >
+                                                <span class="box-text">{{ getProjectBoxCount(rowNum, colNum * thisPage - 1) }}</span>
+                                            </div>
+                                        </router-link>
+                                        <div v-else
+                                             class="box empty"
+                                        >
+                                            <span class="box-text">0</span>
                                         </div>
-                                    </router-link>
-                                    <div v-else
-                                         class="box empty"
-                                    >
-                                        <span class="box-text">0</span>
-                                    </div>
-                                </template>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <template #no-data>
+                <p-empty
+                    show-image
+                    :title="$t('COMMON.WIDGETS.TRUSTED_ADVISOR.NO_DATA')"
+                >
+                    <template #image>
+                        <img alt="illust_planet"
+                             src="@/assets/images/illust_planet.svg"
+                        >
+                    </template>
+                    {{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.NO_DATA_DESC') }}
+                </p-empty>
+            </template>
+        </p-data-loader>
     </widget-layout>
 </template>
 
@@ -84,7 +102,9 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import { PTextPagination, PI } from '@spaceone/design-system';
+import {
+    PTextPagination, PI, PEmpty, PDataLoader,
+} from '@spaceone/design-system';
 import {
     find, forEach, range, size,
 } from 'lodash';
@@ -139,6 +159,8 @@ export default {
         PTextPagination,
         WidgetLayout,
         PI,
+        PEmpty,
+        PDataLoader,
     },
     props: {
         extraParams: {
@@ -285,13 +307,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-/* customize widget-layout */
-:deep(.widget-layout) {
-    .title {
-        font-size: 1.125rem;
-        font-weight: bold;
-        line-height: 1.2;
-    }
+.title {
+    @apply font-bold text-label-xl;
+    line-height: 1.2;
 }
 .content-wrapper {
     @apply grid grid-cols-12 gap-6;
@@ -417,5 +435,9 @@ export default {
             }
         }
     }
+}
+:deep(.p-empty) {
+    padding-top: 2.5rem;
+    padding-bottom: 1.25rem;
 }
 </style>

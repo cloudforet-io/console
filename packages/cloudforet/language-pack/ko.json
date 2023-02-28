@@ -972,7 +972,7 @@
 				"DAY": "일",
 				"MONTH": "월",
 				"NETWORKING": "네트워킹",
-				"NO_SERVICE": "{service} 없음",
+				"NO_SERVICE": "데이터가 없습니다.",
 				"OVERALL_SPENDINGS": "총 지출 비용",
 				"REGION_SERVICE": "리전 서비스",
 				"REGION_SERVICE_TITLE": "지역",
@@ -982,7 +982,7 @@
 				"STORAGE": "저장소",
 				"TITLE": "일반",
 				"TREND_TITLE": "트렌드",
-				"TYPE_TITLE": "{service} 타입"
+				"TYPE_TITLE": ""
 			},
 			"BILLING": {
 				"DAY": "일",
@@ -1049,7 +1049,8 @@
 				"HOUR": "시간",
 				"LAST_UPDATE": "마지막 업데이트",
 				"MORE": "더보기",
-				"NO_DATA": "업데이트된 데이터가 없습니다.",
+				"NO_DATA": "",
+				"NO_DATA_TITLE": "",
 				"PAST_7_DAYS": "지난 7 일",
 				"PLACEHOLDER": "이벤트 검색",
 				"SUMMARY_ISSUE": "발생 이슈",
@@ -1074,6 +1075,7 @@
 			"SERVICE_ACCOUNTS": "서비스 어카운트 ",
 			"SERVICE_ACCOUNTS_ACCOUNT": "계정 ",
 			"SERVICE_ACCOUNTS_ADD": "추가",
+			"SERVICE_ACCOUNTS_NO_ACCOUNT": "",
 			"SERVICE_ACCOUNTS_PROJECT": "프로젝트 ",
 			"SERVICE_ACCOUNTS_PROVIDER": "서비스 제공자 ",
 			"SERVICE_ACCOUNT_TABLE": {
@@ -1091,7 +1093,8 @@
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "프로젝트 생성",
 				"NO_PROJECT": "프로젝트 없음",
-				"NO_PROJECT_HELP_TEXT": "분산되어 있는 리소스와 계정을 프로젝트로 그룹화해보세요."
+				"NO_PROJECT_HELP_TEXT": "분산되어 있는 리소스와 계정을 프로젝트로 그룹화해보세요.",
+				"RESOURCE_MAP": ""
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "클라우드 서비스 ",
 			"TOP_PROJECT_CREATE_PROJECT": "프로젝트 생성",
@@ -1113,6 +1116,7 @@
 				"LABEL_SERVICE_LIMITS": "서비스 한도",
 				"LABEL_WARNING": "조사 권고",
 				"NO_DATA": "데이터가 없습니다.",
+				"NO_DATA_DESC": "",
 				"SUB_TITLE_OVERALL": "전체요약",
 				"SUB_TITLE_PROJECT_SUMMARY": "요약 정보",
 				"TITLE": "Trusted Advisor"

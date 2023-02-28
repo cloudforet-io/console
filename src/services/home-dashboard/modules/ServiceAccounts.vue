@@ -26,43 +26,47 @@
                          class="w-full h-full"
                     />
                 </template>
-                <template #no-data>
-                    <div class="no-data-wrapper">
-                        <img src="@/assets/images/illust_ghost.svg">
-                    </div>
-                </template>
-                <div ref="chartRef"
-                     class="w-full h-full"
-                />
-            </p-data-loader>
-        </div>
-        <div class="legends">
-            <template v-if="loading">
-                <div v-for="v in skeletons"
-                     :key="v"
-                     class="flex items-center p-4"
-                >
-                    <p-skeleton width="1.5rem"
-                                height="1.5rem"
-                                class="mr-4 flex-shrink-0"
+                <div>
+                    <div ref="chartRef"
+                         class="w-full h-full"
                     />
-                    <p-skeleton class="flex-grow" />
+                    <div class="legends">
+                        <template v-if="loading">
+                            <div v-for="v in skeletons"
+                                 :key="v"
+                                 class="flex items-center p-4"
+                            >
+                                <p-skeleton width="1.5rem"
+                                            height="1.5rem"
+                                            class="mr-4 flex-shrink-0"
+                                />
+                                <p-skeleton class="flex-grow" />
+                            </div>
+                        </template>
+                        <p-data-table v-else
+                                      :loading="loading"
+                                      :fields="fields"
+                                      :items="data"
+                                      :bordered="false"
+                        >
+                            <template #col-provider-format="{ item }">
+                                <router-link :to="getLink(item)">
+                                    <span :style="{color: item.color}"
+                                          class="provider-label"
+                                    >{{ providers[item.provider].label }}</span>
+                                </router-link>
+                            </template>
+                        </p-data-table>
+                    </div>
                 </div>
-            </template>
-            <p-data-table v-else
-                          :loading="loading"
-                          :fields="fields"
-                          :items="data"
-                          :bordered="false"
-            >
-                <template #col-provider-format="{ item }">
-                    <router-link :to="getLink(item)">
-                        <span :style="{color: item.color}"
-                              class="provider-label"
-                        >{{ providers[item.provider].label }}</span>
-                    </router-link>
+                <template #no-data>
+                    <p-empty
+                        show-image
+                        class="no-data-wrapper"
+                        :title="$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_NO_ACCOUNT')"
+                    />
                 </template>
-            </p-data-table>
+            </p-data-loader>
         </div>
     </widget-layout>
 </template>
@@ -76,7 +80,7 @@ import type { Location } from 'vue-router';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import {
-    PDataLoader, PDataTable, PI, PSkeleton,
+    PDataLoader, PDataTable, PI, PSkeleton, PEmpty,
 } from '@spaceone/design-system';
 import { forEach, range, isEmpty } from 'lodash';
 
@@ -118,6 +122,7 @@ export default {
         PDataTable,
         PSkeleton,
         PDataLoader,
+        PEmpty,
     },
     props: {
         extraParams: {
@@ -279,7 +284,7 @@ export default {
     }
 }
 .chart {
-    height: 11.25rem;
+    min-height: 11.25rem;
     width: 100%;
 }
 
@@ -294,9 +299,6 @@ export default {
         .no-data-wrapper {
             display: flex;
             height: 100%;
-            img {
-                margin: auto;
-            }
         }
     }
 }
@@ -322,5 +324,10 @@ export default {
     &:hover {
         text-decoration: underline;
     }
+}
+
+/* custom design-system component - p-empty */
+:deep(.p-empty) {
+    padding-top: 1.25rem;
 }
 </style>
