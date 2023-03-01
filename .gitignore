@@ -35,3 +35,7 @@ src/assets
 
 # Skaffold
 skaffold.yaml
+/test-results/
+/playwright-report/
+/playwright/.cache/
+playwright.env
