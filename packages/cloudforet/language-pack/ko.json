@@ -1000,7 +1000,7 @@
 			},
 			"CLOUD_SERVICE": {
 				"HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",
-				"NO_DATA": "데이터가 없습니다.",
+				"NO_DATA": "",
 				"SEE_MORE": "더보기 ",
 				"TITLE": "클라우드 서비스 "
 			},
@@ -1134,7 +1134,7 @@
 			"FILTER_PRIVATE": "비공개",
 			"FILTER_PUBLIC": "공개",
 			"FILTER_SINGLE_PROJECT": "개별 프로젝트",
-			"HELP_TEXT_CREATE": "커스텀 대시보드를 생성하고, 클라우드 데이터 한눈에 파악하세요. ",
+			"HELP_TEXT_CREATE": "",
 			"LABEL_PRIVATE": "비공개",
 			"LABEL_PUBLIC": "공개",
 			"LABEL_SCOPE": "범위",
@@ -1156,7 +1156,7 @@
 			"LABEL_SCOPE": "대시보드 범위",
 			"LABEL_START_FROM": "기본 생성 폼",
 			"LABEL_VIEWERS": "공개 여부",
-			"NO_ITEMS": "아이템이 없습니다",
+			"NO_DATA": "",
 			"PREVIEW": "미리보기",
 			"PRIVATE": "비공개",
 			"PRIVATE_DESC": "나만보기",

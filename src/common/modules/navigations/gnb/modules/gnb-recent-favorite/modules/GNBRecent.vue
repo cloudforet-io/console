@@ -10,14 +10,16 @@
                                    @select="handleSelect"
             />
             <template #no-data>
-                <div class="no-data">
-                    <img class="img"
-                         src="@/assets/images/illust_spaceship_3.svg"
-                    >
-                    <p class="text">
-                        {{ $t('COMMON.GNB.RECENT.RECENT_HELP_TEXT') }}
-                    </p>
-                </div>
+                <p-empty
+                    show-image
+                >
+                    <template #image>
+                        <img alt="empty-image"
+                             src="@/assets/images/illust_spaceship_3.svg"
+                        >
+                    </template>
+                    {{ $t('COMMON.GNB.RECENT.RECENT_HELP_TEXT') }}
+                </p-empty>
             </template>
         </p-data-loader>
     </div>
@@ -30,7 +32,7 @@ import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
-import { PDataLoader } from '@spaceone/design-system';
+import { PDataLoader, PEmpty } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
 
 import { SpaceRouter } from '@/router';
@@ -68,6 +70,7 @@ export default defineComponent({
     components: {
         GNBSuggestionList,
         PDataLoader,
+        PEmpty,
     },
     props: {
         visible: {
@@ -173,17 +176,11 @@ export default defineComponent({
             padding: 1rem 0;
         }
     }
-    .no-data {
-        text-align: center;
-        padding: 3rem 3.25rem;
-        .img {
-            margin: auto;
-        }
-        .text {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-    }
+}
+
+/* custom design-system component - p-empty */
+:deep(.p-empty) {
+    text-align: center;
+    padding: 3rem 3.25rem;
 }
 </style>

@@ -95,8 +95,11 @@
                                         </div>
                                     </template>
                                 </p-board>
-                                <p-empty v-show="!existingTemplateState.boardSets.length">
-                                    {{ $t('DASHBOARDS.CREATE.NO_ITEMS') }}
+                                <p-empty
+                                    v-show="!existingTemplateState.boardSets.length"
+                                    show-image
+                                >
+                                    {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
                                 </p-empty>
                             </div>
                             <p-text-pagination
@@ -244,7 +247,7 @@ const handleInputSearch = () => {
             }
         }
         .p-empty {
-            @apply absolute;
+            padding-top: 3.25rem;
         }
         .p-search {
             margin-bottom: 8px;

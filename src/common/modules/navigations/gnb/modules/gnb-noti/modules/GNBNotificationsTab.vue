@@ -30,12 +30,11 @@
             </div>
             <template #no-data>
                 <p-empty
-                    class="no-data"
+                    show-image
                     :title="$t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION')"
                 >
                     <template #image>
-                        <img class="img"
-                             alt="illust_astronaut_radio"
+                        <img alt="illust_astronaut_radio"
                              src="@/assets/images/illust_astronaut_radio.svg"
                         >
                     </template>
@@ -401,27 +400,6 @@ export default {
             right: 0.5rem;
         }
     }
-    .no-data {
-        text-align: center;
-        padding: 4rem 3.25rem;
-        .img {
-            margin: auto;
-            padding-bottom: 1.5rem;
-        }
-        .title {
-            @apply text-violet-300;
-            font-size: 1.125rem;
-            font-weight: 700;
-            opacity: 0.8;
-            line-height: 1.25;
-            margin-bottom: 0.25rem;
-        }
-        .desc {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-    }
     .notification-modal {
         .header-wrapper {
             display: flex;
@@ -450,22 +428,11 @@ export default {
             margin-bottom: 0.75rem;
         }
     }
+}
 
-    @screen mobile {
-        .no-data-wrapper {
-            img {
-                margin-top: 2.5rem;
-                max-height: 8.75rem;
-            }
-            .title {
-                font-weight: normal;
-            }
-            .desc {
-                span:first-of-type {
-                    display: block;
-                }
-            }
-        }
-    }
+/* custom design-system component - p-empty */
+:deep(.p-empty) {
+    text-align: center;
+    padding: 4rem 3.25rem;
 }
 </style>

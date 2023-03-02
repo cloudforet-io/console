@@ -31,20 +31,21 @@
                        class="dashboard-list-wrapper"
         >
             <template #no-data>
-                <div class="empty-case">
-                    <img class="empty-image"
-                         src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
-                    >
-                    <p-empty class="empty-text">
-                        {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
-                    </p-empty>
-                    <p-button icon-left="ic_plus"
-                              :disabled="hasOnlyViewPermission"
-                              @click="handleCreateDashboard"
-                    >
-                        {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREAT_NEW_DASHBOARD') }}
-                    </p-button>
-                </div>
+                <p-empty
+                    show-image
+                    show-button
+                >
+                    <template #button>
+                        <p-button style-type="substitutive"
+                                  icon-left="ic_plus"
+                                  :disabled="hasOnlyViewPermission"
+                                  @click="handleCreateDashboard"
+                        >
+                            {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREAT_NEW_DASHBOARD') }}
+                        </p-button>
+                    </template>
+                    {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
+                </p-empty>
             </template>
             <dashboard-board-list v-if="(scopeStatus !== SCOPE_TYPE.PROJECT) && workspaceDashboardList.length"
                                   :scope-type="DASHBOARD_SCOPE.DOMAIN"
@@ -257,15 +258,6 @@ export default {
     @screen tablet {
         .dashboard-list-wrapper {
             display: block;
-        }
-    }
-
-    .empty-case {
-        @apply flex flex-col items-center;
-        padding-top: 1.5rem;
-        .empty-text {
-            margin: 1rem 0 1.5rem;
-            text-align: center;
         }
     }
 }

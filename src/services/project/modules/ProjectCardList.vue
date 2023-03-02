@@ -101,10 +101,11 @@
                 </div>
             </div>
             <template #no-data>
-                <div v-if="(noProjectGroup || noProject)"
-                     class="empty-container"
+                <p-empty
+                    v-if="noProjectGroup"
+                    show-button
                 >
-                    <div v-if="noProjectGroup">
+                    <div class="description-content">
                         <p class="title">
                             {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_TITLE') }}<br>
                         </p>
@@ -117,6 +118,8 @@
                         <p class="content-order">
                             <strong>2.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_2') }}
                         </p>
+                    </div>
+                    <template #button>
                         <p-button style-type="primary"
                                   class="mt-6"
                                   icon-left="ic_plus_bold"
@@ -125,18 +128,19 @@
                         >
                             {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_CREATE_BTN') }}
                         </p-button>
-                    </div>
-                    <div v-else-if="noProject"
-                         class="empty-project"
-                    >
-                        <img class="img"
+                    </template>
+                </p-empty>
+                <p-empty
+                    v-if="noProject"
+                    show-image
+                >
+                    <template #image>
+                        <img alt="empty-image"
                              src="@/assets/images/illust_star.svg"
                         >
-                        <p class="text-primary2">
-                            {{ $t('PROJECT.LANDING.EMPTY_PROJECT_MSG') }}
-                        </p>
-                    </div>
-                </div>
+                    </template>
+                    {{ $t('PROJECT.LANDING.EMPTY_PROJECT_MSG') }}
+                </p-empty>
             </template>
         </p-data-loader>
 
@@ -156,7 +160,7 @@ import {
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PSkeleton, PI, PButton, PToolbox, PDataLoader,
+    PSkeleton, PI, PButton, PToolbox, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -205,6 +209,7 @@ export default {
         PSkeleton,
         PToolbox,
         PDataLoader,
+        PEmpty,
     },
     props: {
         parentGroups: {
@@ -450,33 +455,6 @@ export default {
     }
 }
 
-.empty-container {
-    @apply flex-col text-center justify-start;
-    .title {
-        @apply mb-4 text-primary-dark;
-        margin-top: 5rem;
-        font-size: 1.5rem;
-        font-weight: bold;
-        line-height: 1.2;
-    }
-    .content {
-        @apply mb-4 text-gray-600;
-        font-size: 0.875rem;
-        line-height: 1.5;
-    }
-    .content-order {
-        @apply text-gray-dark;
-        font-size: 0.875rem;
-        line-height: 1.5;
-    }
-    .empty-project {
-        @apply text-gray-300 text-center text-base;
-        img {
-            margin: 0 auto 0.5rem;
-        }
-    }
-}
-
 .project-cards {
     @apply grid;
     gap: 1rem;
@@ -610,6 +588,33 @@ export default {
             &:last-child {
                 @apply border-0;
             }
+        }
+    }
+}
+
+:deep(.p-empty) {
+    @apply flex-col text-center justify-start;
+    .title {
+        @apply mb-4 text-primary-dark;
+        margin-top: 5rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.2;
+    }
+    .content {
+        @apply mb-4 text-gray-600;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    .content-order {
+        @apply text-gray-dark;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    .empty-project {
+        @apply text-gray-300 text-center text-base;
+        img {
+            margin: 0 auto 0.5rem;
         }
     }
 }
