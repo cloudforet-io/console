@@ -10,7 +10,7 @@
         <template #item="{item, index}">
             <div v-if="index < 15">
                 <div class="title-wrapper">
-                    <p-i name="ic_spanner"
+                    <p-i name="ic_spanner-filled"
                          width="1em"
                          height="1em"
                          color="inherit transparent"

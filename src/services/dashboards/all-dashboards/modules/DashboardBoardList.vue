@@ -37,7 +37,7 @@
                 <div class="label-wrapper">
                     <p-label :class="{'item-label': true, 'viewers-label': true, 'private-label': board.viewers === DASHBOARD_VIEWER.PRIVATE}"
                              :text="board.viewers === DASHBOARD_VIEWER.PUBLIC ? $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PUBLIC') : $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PRIVATE')"
-                             :left-icon="board.viewers === DASHBOARD_VIEWER.PUBLIC ? 'ic_public' : 'ic_private'"
+                             :left-icon="board.viewers === DASHBOARD_VIEWER.PUBLIC ? 'ic_globe-filled' : 'ic_lock-filled'"
                     />
                     <p-label v-for="(label, idx) in board.labels"
                              :key="`${board.name}-label-${idx}`"
@@ -207,7 +207,7 @@ export default defineComponent<DashboardBoardListProps>({
                 },
             },
             {
-                iconName: 'ic_trashcan',
+                iconName: 'ic_delete',
                 tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
                 /* TODO: Implementation */
                 eventAction: () => handleClickDeleteDashboard(dashboardItem[state.dashboardScopeKey]),

@@ -3,7 +3,7 @@
         <p-select-dropdown class="more-button"
                            :items="moreMenuItems"
                            style-type="icon-button"
-                           button-icon="ic_more"
+                           button-icon="ic_ellipsis-horizontal"
                            menu-position="left"
                            @select="handleSelectMoreMenu"
         />

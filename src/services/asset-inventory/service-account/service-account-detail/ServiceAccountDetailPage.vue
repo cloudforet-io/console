@@ -8,7 +8,7 @@
             <template #title-left-extra>
                 <p-lazy-img :src="providerIcon"
                             :loading="providerLoading || loading"
-                            error-icon="ic_provider_other"
+                            error-icon="ic_cloud-filled"
                 />
             </template>
             <template v-if="hasManagePermission && !isManagedTrustedAccount"

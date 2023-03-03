@@ -40,7 +40,7 @@
                     />
                     <p-button class="sort-box"
                               style-type="tertiary"
-                              :icon-left="sort.desc ? 'ic_arrow-down' : 'ic_arrow-up'"
+                              :icon-left="sort.desc ? 'ic_arrow-down-bold' : 'ic_arrow-up-bold'"
                               @click="handleSortType"
                     >
                         <span>{{ sort.desc ? $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DESC') : $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.ASC') }}</span>

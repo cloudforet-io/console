@@ -31,7 +31,7 @@
         >
             <div class="options-wrapper">
                 <p-button class="option-add-button"
-                          icon-left="ic_plus"
+                          icon-left="ic_plus_bold"
                           style-type="secondary"
                           @click="handleAddOption"
                 >
@@ -58,7 +58,7 @@
                         />
                         <div class="option-delete-area">
                             <p-icon-button v-if="options.length > 1"
-                                           name="ic_trashcan"
+                                           name="ic_delete"
                                            @click="handleDeleteOption(option.key)"
                             />
                         </div>

@@ -68,12 +68,12 @@
             <div class="col-span-12 detail-wrapper">
                 <div class="table-button-wrapper">
                     <p-icon-button class="text"
-                                   name="ic_arrow_left"
+                                   name="ic_chevron-left"
                                    color="inherit transparent"
                                    @click="handleClickDateButton('prev')"
                     />
                     <p-icon-button class="text"
-                                   name="ic_arrow_right"
+                                   name="ic_chevron-right"
                                    color="inherit transparent"
                                    :disabled="tableState.nextButtonDisabled"
                                    @click="handleClickDateButton('next')"

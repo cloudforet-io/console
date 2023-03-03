@@ -85,7 +85,7 @@
                     </template>
                     <template #right-extra="{node, path}">
                         <p-icon-button v-if="treeEditMode && node.data.item_type !== 'PROJECT' && permissionInfo[node.data.id]"
-                                       name="ic_delete"
+                                       name="ic_close"
                                        class="group-delete-btn"
                                        size="sm"
                                        color="inherit"

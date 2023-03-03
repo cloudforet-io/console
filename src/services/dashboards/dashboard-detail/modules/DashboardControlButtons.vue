@@ -1,6 +1,6 @@
 <template>
     <div class="dashboard-control-buttons">
-        <p-button icon-left="dashboard-customize"
+        <p-button icon-left="ic_dashboard-customize"
                   style-type="tertiary"
                   @click="handleClickCustomize"
         >
@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-
 import { PButton } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';

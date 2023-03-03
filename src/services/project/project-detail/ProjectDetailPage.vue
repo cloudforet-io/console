@@ -19,7 +19,7 @@
                                                  :favorite-type="FAVORITE_TYPE.PROJECT"
                                 />
                             </span>
-                            <p-icon-button name="ic_trashcan"
+                            <p-icon-button name="ic_delete"
                                            class="delete-btn"
                                            :disabled="!hasManagePermission"
                                            @click="openProjectDeleteForm"
@@ -40,7 +40,7 @@
                             </p>
                             <p-button v-if="hasAlertPermission"
                                       style-type="tertiary"
-                                      icon-left="ic_state_manual"
+                                      icon-left="ic_spanner-filled"
                                       class="ml-3"
                                       :disabled="!hasManagePermission"
                                       @click="maintenanceWindowFormVisible = true"

@@ -15,13 +15,13 @@
                 <template #extra>
                     <div class="add-button-wrapper">
                         <p-button v-if="contentType === 'LIST'"
-                                  icon-left="ic_plus"
+                                  icon-left="ic_plus_bold"
                                   @click="handleChangeAddContent"
                         >
                             {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD') }}
                         </p-button>
                         <p-button v-else-if="contentType === 'EDIT'"
-                                  icon-left="ic_trashcan"
+                                  icon-left="ic_delete"
                                   style-type="negative-secondary"
                                   @click="handleOpenDeleteModal"
                         >

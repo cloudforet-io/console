@@ -8,7 +8,7 @@
                 <section class="header">
                     <span class="title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS') }}</span>
                     <p-icon-button v-if="hasBudgetAlert"
-                                   name="ic_trashcan"
+                                   name="ic_delete"
                                    :disabled="manageDisabled"
                                    @click="handleDelete"
                     />
@@ -41,7 +41,7 @@
                                 </li>
                             </ul>
                             <p-button style-type="tertiary"
-                                      icon-left="ic_setting"
+                                      icon-left="ic_settings-filled"
                                       :disabled="manageDisabled || !budgetTargetId"
                                       @click="handleSetNotifications"
                             >
@@ -73,7 +73,7 @@
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.BUDGET_NOTIFICATIONS_DESC') }}
                             </p>
                             <p-button style-type="tertiary"
-                                      icon-left="ic_setting"
+                                      icon-left="ic_settings-filled"
                                       :disabled="manageDisabled || !budgetTargetId"
                                       @click="handleSetNotifications"
                             >

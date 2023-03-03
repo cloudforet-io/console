@@ -30,7 +30,7 @@
                                    :disabled="!state.hasManagePermission && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    @click="handleVisibleNameEditModal"
                     />
-                    <p-icon-button name="ic_trashcan"
+                    <p-icon-button name="ic_delete"
                                    width="1.5rem"
                                    height="1.5rem"
                                    :disabled="!state.hasManagePermission && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"

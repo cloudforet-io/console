@@ -1,6 +1,6 @@
 <template>
     <p-icon-modal :visible.sync="proxyVisible"
-                  icon-name="ic_done"
+                  icon-name="ic_check-circle"
                   size="md"
                   :header-title="$t('IDENTITY.USER.API_KEY.MODAL_TITLE')"
                   :button-text="$t('COMPONENT.BUTTON_MODAL.CONFIRM')"

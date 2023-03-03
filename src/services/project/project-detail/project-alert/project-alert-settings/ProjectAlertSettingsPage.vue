@@ -174,7 +174,7 @@ export default {
                 {
                     name: NOTIFICATION_URGENCY.HIGH_ONLY,
                     label: i18n.t('PROJECT.DETAIL.ALERT.HIGH_URGENCY_NOTIFICATIONS'),
-                    icon: 'ic_alert',
+                    icon: 'ic_error-filled',
                 },
             ])),
             projectAlertConfig: {},

@@ -58,7 +58,7 @@ const providersMap = computed<ProviderReferenceMap>(() => ({
     custom: {
         label: 'Custom',
         key: 'custom',
-        icon: 'ic_provider_other',
+        icon: 'ic_cloud-filled',
     },
 }));
 const providers = computed<ProviderReferenceItem[]>(() => Object.values(providersMap.value));

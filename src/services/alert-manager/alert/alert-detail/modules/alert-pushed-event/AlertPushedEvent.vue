@@ -72,14 +72,9 @@
             <template #footer-extra>
                 <div class="footer-extra">
                     <p-button style-type="tertiary"
+                              icon-left="ic_copy"
                               @click="onCopyClick"
                     >
-                        <p-i name="ic_copy"
-                             width="1em"
-                             height="1em"
-                             color="inherit transparent"
-                             class="mr-2"
-                        />
                         {{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.COPY_ALL') }}
                     </p-button>
                     <transition name="fade">

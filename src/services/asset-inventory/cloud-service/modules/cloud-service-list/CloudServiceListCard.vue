@@ -11,7 +11,7 @@
                     <p-lazy-img width="1.25rem"
                                 height="1.25rem"
                                 :src="assetUrlConverter(item.icon) || (providers[item.provider] ? providers[item.provider].icon : '')"
-                                error-icon="ic_provider_other"
+                                error-icon="ic_cloud-filled"
                                 :alt="item.name"
                                 class="icon"
                     />

@@ -167,7 +167,7 @@ export default {
                         type: 'PROJECT_GROUP',
                         count: state.projectGroupTotalCount,
                         showMore: state.projectGroupTotalCount >= state.projectGroupStart + LIMIT,
-                        icon: 'ic_tree_project-group',
+                        icon: 'ic_folder-filled',
                     });
                 }
                 menuOptions.push({
@@ -176,7 +176,7 @@ export default {
                     type: 'PROJECT',
                     count: state.projectTotalCount,
                     showMore: state.projectTotalCount >= state.projectStart + LIMIT,
-                    icon: 'ic_tree_project',
+                    icon: 'ic_document-filled',
                 });
                 return makeMenuItems(...menuOptions);
             }),

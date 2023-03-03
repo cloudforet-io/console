@@ -13,7 +13,7 @@
             <div class="filter-wrapper">
                 <span class="filters-count">{{ selectedFiltersCount }}</span>
                 <p-button style-type="tertiary"
-                          icon-left="ic_setting"
+                          icon-left="ic_settings-filled"
                           size="sm"
                           @click="handleClickSet"
                 >

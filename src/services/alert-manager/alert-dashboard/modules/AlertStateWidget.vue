@@ -212,12 +212,12 @@ export default {
                 {
                     name: ALERT_URGENCY.HIGH,
                     label: i18n.t('MONITORING.ALERT.DASHBOARD.HIGH'),
-                    icon: 'ic_alert',
+                    icon: 'ic_error-filled',
                 },
                 {
                     name: ALERT_URGENCY.LOW,
                     label: i18n.t('MONITORING.ALERT.DASHBOARD.LOW'),
-                    icon: 'ic_urgency_low',
+                    icon: 'ic_warning-filled',
                 },
             ])),
             assignedStateList: computed(() => [

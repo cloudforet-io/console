@@ -52,15 +52,11 @@
             <template #col-edit_button-format="{ item }">
                 <p-button size="sm"
                           style-type="tertiary"
+                          icon-left="ic_edit"
                           :disabled="manageDisabled"
                           @click="handleEditRole(item.role_id)"
                 >
-                    <p-i class="mr-1"
-                         name="ic_edit"
-                         width="1rem"
-                         height="1rem"
-                         color="inherit"
-                    />{{ $t('IAM.ROLE.EDIT') }}
+                    {{ $t('IAM.ROLE.EDIT') }}
                 </p-button>
             </template>
         </p-toolbox-table>
@@ -72,14 +68,13 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import {
     PToolboxTable, PSelectDropdown,
-    PBadge, PButton, PI,
+    PBadge, PButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -116,7 +111,6 @@ export default defineComponent({
         PSelectDropdown,
         PBadge,
         PButton,
-        PI,
     },
     props: {
         tableHeight: {

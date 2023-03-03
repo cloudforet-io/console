@@ -54,7 +54,7 @@
                     </p-button>
                     <p-button class="manage-button"
                               style-type="negative-secondary"
-                              icon-left="ic_trashcan"
+                              icon-left="ic_delete"
                               size="sm"
                               @click="handleDeleteVariable(value)"
                     >

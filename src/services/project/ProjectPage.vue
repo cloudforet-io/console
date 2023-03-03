@@ -69,7 +69,7 @@
                                     <p-select-dropdown v-if="storeState.groupId && hasManagePermission && !isPermissionDenied"
                                                        :items="settingMenu"
                                                        style-type="icon-button"
-                                                       button-icon="ic_setting"
+                                                       button-icon="ic_settings-filled"
                                                        class="settings-button"
                                                        @select="onSelectSettingDropdown"
                                     />

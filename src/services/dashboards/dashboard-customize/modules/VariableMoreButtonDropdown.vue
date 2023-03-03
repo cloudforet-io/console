@@ -4,7 +4,7 @@
          :class="{'open-menu': visibleMenu}"
     >
         <p-button ref="targetRef"
-                  icon-left="ic_plus"
+                  icon-left="ic_plus_bold"
                   style-type="highlight"
                   @click="handleClickButton"
         >
@@ -29,7 +29,7 @@
             <template #bottom>
                 <p-button class="manage-variable-button"
                           style-type="secondary"
-                          icon-left="ic_setting"
+                          icon-left="ic_settings-filled"
                           :disabled="!props.isManageable"
                           @click="handleOpenOverlay"
                 >

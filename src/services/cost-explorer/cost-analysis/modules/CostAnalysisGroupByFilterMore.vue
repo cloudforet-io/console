@@ -16,7 +16,7 @@
         <p-popover position="bottom-end"
                    :is-visible.sync="popoverVisible"
         >
-            <p-icon-button name="ic_setting"
+            <p-icon-button name="ic_settings-filled"
                            size="sm"
                            style-type="transparent"
                            @click="handleClickSettingButton"
@@ -40,7 +40,7 @@
                             >
                                 {{ item.key }}
                             </p-checkbox>
-                            <p-icon-button name="ic_trashcan"
+                            <p-icon-button name="ic_delete"
                                            size="sm"
                                            @click="handleDeleteItem(item)"
                             />

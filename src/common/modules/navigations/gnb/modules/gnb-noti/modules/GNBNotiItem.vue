@@ -27,7 +27,7 @@
             </div>
             <p-icon-button v-if="deletable"
                            class="delete-button"
-                           name="ic_delete"
+                           name="ic_close"
                            size="sm"
                            @click="handleClickDeleteButton"
             />

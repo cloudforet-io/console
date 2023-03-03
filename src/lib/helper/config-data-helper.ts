@@ -49,7 +49,7 @@ export const convertProjectConfigToReferenceData = (config: ConfigData[]|null, p
                     ...d,
                     name: d.itemId,
                     label: resource.name || d.itemId,
-                    icon: 'ic_tree_project',
+                    icon: 'ic_document-filled',
                     updatedAt: d?.updatedAt,
                 };
                 if (resource?.data?.groupInfo?.id) {
@@ -75,7 +75,7 @@ export const convertProjectGroupConfigToReferenceData = (config: ConfigData[]|nu
                     ...d,
                     name: d.itemId,
                     label: resource?.name || d.itemId,
-                    icon: 'ic_tree_project-group',
+                    icon: 'ic_folder-filled',
                     updatedAt: d?.updatedAt,
                 };
                 if (resource?.data?.parentGroupInfo?.id) {

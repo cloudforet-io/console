@@ -72,7 +72,7 @@
                                 {{ types.find(d => d.name === condition.notification_type).label }}
                             </span>
                         </p-select-dropdown>
-                        <p-icon-button name="ic_trashcan"
+                        <p-icon-button name="ic_delete"
                                        class="delete-button"
                                        @click="handleDeleteCondition(idx)"
                         />

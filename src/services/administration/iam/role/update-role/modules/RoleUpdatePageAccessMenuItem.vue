@@ -4,7 +4,7 @@
     >
         <div class="left-part">
             <p-icon-button v-if="!isSubMenu"
-                           :name="menu.hideMenu ? 'ic_tree_arrow' : 'ic_tree_arrow--opened'"
+                           :name="menu.hideMenu ? 'ic_caret-right' : 'ic_caret-down-filled-alt'"
                            size="sm"
                            :disabled="isDisabled"
                            @click="handleToggleMenuVisible"

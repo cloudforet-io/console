@@ -37,13 +37,10 @@
                     <template #col-edit_button-format="{ item }">
                         <p-button size="sm"
                                   style-type="tertiary"
+                                  icon-left="ic_edit"
                                   @click="handleEditRole(item.role_id)"
                         >
-                            <p-i class="mr-1"
-                                 name="ic_edit"
-                                 width="1rem"
-                                 height="1rem"
-                            />Edit
+                            {{ $t('IAM.ROLE.EDIT') }}
                         </p-button>
                     </template>
                 </p-data-table>
@@ -63,7 +60,7 @@ import {
 } from 'vue';
 
 import {
-    PEmpty, PTab, PDataTable, PI, PBadge, PButton,
+    PEmpty, PTab, PDataTable, PBadge, PButton,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
@@ -83,7 +80,6 @@ export default {
         PEmpty,
         PTab,
         PDataTable,
-        PI,
         PBadge,
         PButton,
         RoleDetail,

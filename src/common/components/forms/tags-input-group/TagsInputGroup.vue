@@ -54,7 +54,7 @@
                         />
                     </template>
                 </p-field-group>
-                <p-icon-button name="ic_delete"
+                <p-icon-button name="ic_close"
                                :disabled="disabled"
                                @click="handleDeletePair(idx)"
                 />

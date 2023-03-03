@@ -9,7 +9,7 @@
                           #title-right-extra
                 >
                     <div class="title-button-group">
-                        <p-icon-button name="ic_trashcan"
+                        <p-icon-button name="ic_delete"
                                        :disabled="!hasManagePermission"
                                        @click="handleClickDelete"
                         />

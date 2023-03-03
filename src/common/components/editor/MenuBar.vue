@@ -2,13 +2,13 @@
     <div class="menu-bar">
         <p-icon-button class="menu-button"
                        style-type="transparent"
-                       name="ic_undo"
+                       name="ic_arrows-uturn-left"
                        :disabled="!editor.can().undo()"
                        @click="editor.chain().focus().undo().run()"
         />
         <p-icon-button class="menu-button"
                        style-type="transparent"
-                       name="ic_redo"
+                       name="ic_arrows-uturn-right"
                        :disabled="!editor.can().redo()"
                        @click="editor.chain().focus().redo().run()"
         />
@@ -104,7 +104,7 @@
 
         <p-icon-button class="menu-button"
                        style-type="transparent"
-                       name="ic_list-bulleted"
+                       name="ic_list-bulleted-2"
                        :class="{ 'selected': editor.isActive('bulletList') }"
                        @click="editor.chain().focus().toggleBulletList().run()"
         />

@@ -8,7 +8,7 @@
                     <p-select-dropdown v-if="!printMode"
                                        :items="queryItemList"
                                        style-type="icon-button"
-                                       button-icon="ic_list"
+                                       button-icon="ic_list-bulleted-3"
                                        class="list-button"
                                        @select="handleClickQueryItem"
                     >
@@ -22,7 +22,7 @@
                                 <div v-if="item.name"
                                      class="button-wrapper"
                                 >
-                                    <p-icon-button name="ic_trashcan"
+                                    <p-icon-button name="ic_delete"
                                                    size="sm"
                                                    @click.stop="handleClickDeleteQuery(item.name)"
                                     />
@@ -41,7 +41,7 @@
                     <div v-if="!printMode && selectedQueryId"
                          class="button-wrapper"
                     >
-                        <p-icon-button name="ic_trashcan"
+                        <p-icon-button name="ic_delete"
                                        @click.stop="handleClickDeleteQuery(selectedQueryId)"
                         />
                         <p-icon-button name="ic_edit-text"

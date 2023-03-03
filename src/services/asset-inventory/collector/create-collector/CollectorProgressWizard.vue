@@ -73,11 +73,10 @@
                               :disabled="loading"
                               style-type="highlight"
                               size="lg"
+                              icon-left="ic_arrow-left"
                               @click="onClickPrev"
                     >
-                        <p-i name="ic_arrow-left"
-                             color="inherit"
-                        />{{ $t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.PREV') }}
+                        {{ $t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.PREV') }}
                     </p-button>
                     <p-button v-if="!isLastTab"
                               :disabled="loading"

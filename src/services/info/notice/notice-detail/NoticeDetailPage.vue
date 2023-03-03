@@ -15,7 +15,7 @@
                         {{ $t('INFO.NOTICE.FORM.EDIT') }}
                     </p-button>
                     <!--        TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외-->
-                    <!--                    <p-button :outline="true" style-type="gray-border" icon="ic_send">-->
+                    <!--                    <p-button :outline="true" style-type="gray-border" icon="ic_paper-airplane">-->
                     <!--                        {{ $t('Send Email') }}-->
                     <!--                    </p-button>-->
                     <p-button style-type="negative-secondary"
