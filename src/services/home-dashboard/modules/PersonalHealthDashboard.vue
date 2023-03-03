@@ -8,7 +8,7 @@
         </template>
         <p-data-loader
             :data="data"
-            :loading="false"
+            :loading="loading"
         >
             <p-data-table
                 :loading="loading"
