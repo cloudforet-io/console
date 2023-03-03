@@ -120,7 +120,7 @@
                         >
                             <p-text-button style-type="highlight"
                                            size="sm"
-                                           icon-right="ic_arrow_bottom"
+                                           icon-right="ic_chevron-down"
                                            :disabled="loading"
                                            @click="$emit('click-show-more', item, index, $event)"
                             >
