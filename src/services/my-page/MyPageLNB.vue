@@ -55,9 +55,9 @@ export default defineComponent({
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
             icon: computed(() => {
-                if (state.isDomainOwner) return 'root-account';
-                if (state.hasDomainRole) return 'admin';
-                return 'user';
+                if (state.isDomainOwner) return 'img_avatar_root-account';
+                if (state.hasDomainRole) return 'img_avatar_admin';
+                return 'img_avatar_user';
             }),
             memberType: computed(() => {
                 if (state.isDomainOwner) return i18n.t('IDENTITY.USER.MAIN.ROOT_ACCOUNT');

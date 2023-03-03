@@ -18,7 +18,7 @@
                 <span>{{ label }}</span>
                 <p-i v-if="isMenuWithAdditionalMenu"
                      class="arrow-button"
-                     :name="isOpened ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
+                     :name="isOpened ? 'ic_chevron-small-up' : 'ic_chevron-small-down'"
                      width="0.5rem"
                      height="0.5rem"
                      color="inherit transparent"

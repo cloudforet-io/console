@@ -14,7 +14,7 @@
         >
             <template #col-project-format="{ value }">
                 <div class="col-project">
-                    <p-i :name="value.projectId ? 'ic_project' : 'ic_tree_project-group'"
+                    <p-i :name="value.projectId ? 'ic_service_project' : 'ic_folder-filled'"
                          width="1rem"
                          height="1rem"
                          class="project-icon"

@@ -10,7 +10,7 @@
                 <div class="help">
                     <p-i v-if="projectId"
                          v-tooltip.top="$t('COMMON.WIDGETS.CLOUD_SERVICE.HELP')"
-                         name="ic_tooltip"
+                         name="ic_question-mark-circle-filled"
                          width="1rem"
                          height="1rem"
                          class="icon"
@@ -22,7 +22,7 @@
                              class="more"
                 >
                     <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE.SEE_MORE') }}</span>
-                    <p-i name="ic_arrow_right"
+                    <p-i name="ic_chevron-right"
                          width="1rem"
                          height="1rem"
                          color="inherit transparent"

@@ -51,7 +51,7 @@
                             </div>
                         </div>
                     </div>
-                    <p-i :name="languageMenuVisible ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                    <p-i :name="languageMenuVisible ? 'ic_chevron-up' : 'ic_chevron-down'"
                          class="arrow-icon"
                          width="1rem"
                          height="1rem"
@@ -180,9 +180,9 @@ export default defineComponent<Props>({
 
         const state = reactive({
             userIcon: computed(() => {
-                if (state.isDomainOwner) return 'root-account';
-                if (state.hasDomainRole) return 'admin';
-                return 'user';
+                if (state.isDomainOwner) return 'img_avatar_root-account';
+                if (state.hasDomainRole) return 'img_avatar_admin';
+                return 'img_avatar_user';
             }),
             name: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),

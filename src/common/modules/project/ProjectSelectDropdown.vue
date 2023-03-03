@@ -53,7 +53,7 @@
                                        class="mr-1"
                                        @change="handleChangeSelectState(node, path, ...arguments)"
                             />
-                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_tree_project-group' : 'ic_tree_project'" />
+                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_folder-filled' : 'ic_document-filled'" />
                         </span>
                     </template>
                 </p-tree>

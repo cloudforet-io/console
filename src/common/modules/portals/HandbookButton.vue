@@ -4,7 +4,7 @@
               class="handbook-button"
               @click="handleHandbookButton"
         >
-            <p-i name="ic_help"
+            <p-i name="ic_question-mark-circle"
                  width="0.875rem"
                  height="0.875rem"
                  color="inherit"

@@ -15,7 +15,7 @@
                       #title-right-extra
             >
                 <div class="title-right-wrapper">
-                    <p-icon-button name="ic_trashcan"
+                    <p-icon-button name="ic_delete"
                                    class="w-full delete-button"
                                    @click="handleOpenDeleteModal"
                     />

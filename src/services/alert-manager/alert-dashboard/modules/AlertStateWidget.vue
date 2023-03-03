@@ -92,7 +92,7 @@
                     </template>
                     <template #no-data>
                         <div>
-                            <p-i name="ic_alert"
+                            <p-i name="ic_error-filled"
                                  color="inherit transparent"
                             />
                             <p class="text">

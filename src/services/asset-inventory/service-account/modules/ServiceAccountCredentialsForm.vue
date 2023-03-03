@@ -56,7 +56,7 @@
                         <div v-if="formState.attachTrustedAccount && formState.attachedTrustedAccountId"
                              class="copy-text-wrapper"
                         >
-                            <p-i name="ic_outlined-info"
+                            <p-i name="ic_info-circle"
                                  width="0.875rem"
                                  height="0.875rem"
                             />

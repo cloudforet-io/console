@@ -18,7 +18,7 @@
                                  @click="handleClickShowAll(item.itemType)"
                             >
                                 <span class="text">{{ $t('COMMON.GNB.FAVORITES.SHOW_ALL') }}</span>
-                                <p-i name="ic_arrow_right"
+                                <p-i name="ic_chevron-right"
                                      width="1rem"
                                      height="1rem"
                                      color="inherit"
@@ -28,7 +28,7 @@
                     </template>
                     <template v-else>
                         <div class="all-items-header">
-                            <p-icon-button name="ic_back"
+                            <p-icon-button name="ic_arrow-left"
                                            size="sm"
                                            @click="handleGoBack"
                             />

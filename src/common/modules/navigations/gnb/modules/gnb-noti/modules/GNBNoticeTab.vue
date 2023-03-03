@@ -9,7 +9,7 @@
             >
                 <template v-if="!!pinnedItems.length">
                     <div class="pinned-header-wrapper">
-                        <p-i name="ic_pin"
+                        <p-i name="ic_pin-filled"
                              width="1rem"
                              height="1rem"
                              class="mr-1"

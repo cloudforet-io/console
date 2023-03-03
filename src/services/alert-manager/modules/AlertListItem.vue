@@ -2,7 +2,7 @@
     <div class="alert-list-item">
         <div class="content-wrapper">
             <div class="left-part">
-                <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_urgency_low'"
+                <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
                      width="1em"
                      height="1em"
                 />
@@ -41,7 +41,7 @@
         <div v-if="showStatusMessage && item.status_message"
              class="status-message"
         >
-            <p-i name="ic_reply"
+            <p-i name="ic_subdirectory-arrow-right"
                  width="1rem"
                  height="1rem"
             />

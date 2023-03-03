@@ -70,7 +70,7 @@
                     <template #col-collector_history-format="{item}">
                         <router-link :to="item.detailLink">
                             <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
-                                <p-i name="ic_arrow_right"
+                                <p-i name="ic_chevron-right"
                                      width="1rem"
                                      color="inherit transparent"
                                 />
@@ -142,7 +142,7 @@
                     <template #col-collector_history-format="{item}">
                         <router-link :to="item.detailLink">
                             <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
-                                <p-i name="ic_arrow_right"
+                                <p-i name="ic_chevron-right"
                                      width="1rem"
                                      color="inherit transparent"
                                 />
@@ -198,7 +198,7 @@
             <template #col-collector_history-format="{item}">
                 <router-link :to="item.detailLink">
                     <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
-                        <p-i name="ic_arrow_right"
+                        <p-i name="ic_chevron-right"
                              width="1rem"
                              color="inherit transparent"
                         />

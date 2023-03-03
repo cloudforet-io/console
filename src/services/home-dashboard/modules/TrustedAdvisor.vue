@@ -50,7 +50,7 @@
                                               class="project-name"
                                         >
                                             <p-i v-if="projectSummaryData[colNum * thisPage - 1].isFavorite"
-                                                 name="ic_bookmark"
+                                                 name="ic_favorite"
                                                  class="favorite-icon"
                                                  width="0.625rem"
                                                  height="0.625rem"
@@ -179,23 +179,23 @@ export default {
             tableData: computed(() => ([
                 {
                     label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_COST_OPTIMIZATION'),
-                    icon: 'ic_cost_optimization',
+                    icon: 'ic_coin-filled',
                 },
                 {
                     label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_PERFORMANCE'),
-                    icon: 'ic_performance',
+                    icon: 'ic_performance-filled',
                 },
                 {
                     label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SECURITY'),
-                    icon: 'ic_security',
+                    icon: 'ic_lock-filled',
                 },
                 {
                     label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_FAULT_TOLERANCE'),
-                    icon: 'ic_fault_tolerance',
+                    icon: 'ic_spanner-filled',
                 },
                 {
                     label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SERVICE_LIMITS'),
-                    icon: 'ic_service_limits',
+                    icon: 'ic_limit-filled',
                 },
             ])),
             projectSummaryData: [] as ProjectSummaryData[],

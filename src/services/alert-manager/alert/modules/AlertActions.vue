@@ -34,11 +34,10 @@
                 </p-badge>
             </template>
             <template #col-urgency-format="{ value }">
-                <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_state_duplicated'"
+                <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
                      width="1em"
                      height="1em"
                      class="mr-1"
-                     :class="{'ic_state_duplicated': !(value === ALERT_URGENCY.HIGH)}"
                 />
                 <span>{{ urgencyI18n[value] }}</span>
             </template>

@@ -10,7 +10,7 @@
                       :class="{ inactivated: !isActivated }"
                 >{{ channelData.protocol_name }}</span>
             </div>
-            <p-icon-button name="ic_trashcan"
+            <p-icon-button name="ic_delete"
                            width="1.5rem"
                            height="1.5rem"
                            :disabled="manageDisabled"

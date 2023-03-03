@@ -3,7 +3,7 @@
         <p class="title">
             <span>{{ $t('COMMON.WIDGETS.FAVORITES_WIDGET.TITLE') }}</span>
             <p-i class="icon"
-                 name="ic_bookmark"
+                 name="ic_favorite"
                  height="1rem"
                  width="1rem"
                  color="inherit"
@@ -45,7 +45,7 @@
                  @click="handleClickToggle"
         >
             {{ isExpanded ? $t('COMMON.WIDGETS.FAVORITES_WIDGET.TOGGLE_LESS') : $t('COMMON.WIDGETS.FAVORITES_WIDGET.TOGGLE_MORE') }}
-            <p-i :name="isExpanded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+            <p-i :name="isExpanded ? 'ic_chevron-up' : 'ic_chevron-down'"
                  height="1rem"
                  width="1rem"
                  color="inherit transparent"

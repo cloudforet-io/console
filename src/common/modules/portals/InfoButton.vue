@@ -5,7 +5,7 @@
                    class="info-button"
                    @click.stop="href ? undefined : $store.dispatch('display/showInfo')"
         >
-            <p-i name="ic_outlined-info"
+            <p-i name="ic_info-circle"
                  width="0.875rem"
                  height="0.875rem"
                  color="inherit"

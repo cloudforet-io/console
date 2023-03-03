@@ -33,13 +33,13 @@
                                @select="changeAlertUrgency"
             >
                 <p-i v-if="alertUrgency === ALERT_URGENCY.HIGH"
-                     name="ic_alert"
+                     name="ic_error-filled"
                      width="1em"
                      height="1em"
                      class="mr-2"
                 />
                 <p-i v-if="alertUrgency === ALERT_URGENCY.LOW"
-                     name="ic_urgency_low"
+                     name="ic_warning-filled"
                      width="1em"
                      height="1em"
                      class="mr-2"

@@ -26,7 +26,7 @@
                 <div class="board-item-description">
                     <template v-if="board.tags.created_by">
                         <span>{{ board.tags.created_by }}</span>
-                        <p-i name="ic_divider-dot"
+                        <p-i name="ic_dot"
                              width="0.125rem"
                              height="0.125rem"
                         />

@@ -13,7 +13,7 @@
             </div>
             <div class="content-wrapper">
                 <p-i v-if="notificationUrgency"
-                     :name="notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_bell' : 'ic_alert'"
+                     :name="notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_gnb_bell' : 'ic_error-filled'"
                 />
                 <span class="text">{{ notificationOptionFormatter(notificationUrgency) }}</span>
             </div>
@@ -28,7 +28,7 @@
             </div>
             <div class="content-wrapper">
                 <p-i v-if="recoveryMode === RECOVERY_MODE.AUTO"
-                     name="ic_automation"
+                     name="ic_service_automation"
                 />
                 <span class="text">{{ recoveryMode === RECOVERY_MODE.AUTO ? $t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : $t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
             </div>

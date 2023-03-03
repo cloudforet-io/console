@@ -14,7 +14,7 @@
                                        @delete="onFavoriteDelete"
                         >
                             <template #icon="{item}">
-                                <p-i :name="item.itemType === FAVORITE_TYPE.PROJECT ? 'ic_tree_project' : 'ic_tree_project-group'"
+                                <p-i :name="item.itemType === FAVORITE_TYPE.PROJECT ? 'ic_document-filled' : 'ic_folder-filled'"
                                      width="1rem"
                                      height="1rem"
                                      color="inherit inherit"
@@ -80,7 +80,7 @@
                                          @click="openProjectGroupMemberPage"
                                     >
                                         <div>
-                                            <p-i name="ic_member"
+                                            <p-i name="ic_users"
                                                  width="1rem"
                                                  height="1rem"
                                                  color="inherit transparent"

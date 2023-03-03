@@ -16,12 +16,12 @@
                       :class="[{safe: increaseRate < 0}, {alert: increaseRate > 0}]"
                 >
                     <p-i v-if="increaseRate < 0"
-                         name="ic_arrow-down"
+                         name="ic_arrow-down-bold"
                          width="1rem"
                          height="1rem"
                     />
                     <p-i v-else
-                         name="ic_arrow-up"
+                         name="ic_arrow-up-bold"
                          width="1rem"
                          height="1rem"
                     />
@@ -29,12 +29,12 @@
                 </span>
                 <span class="increase increase-amount">
                     <p-i v-if="increaseCost < 0"
-                         name="ic_arrow-down"
+                         name="ic_arrow-down-bold"
                          width="1rem"
                          height="1rem"
                     />
                     <p-i v-else
-                         name="ic_arrow-up"
+                         name="ic_arrow-up-bold"
                          width="1rem"
                          height="1rem"
                     />

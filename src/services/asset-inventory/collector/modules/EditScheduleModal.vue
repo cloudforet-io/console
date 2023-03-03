@@ -52,7 +52,7 @@
                                 <p-i class="radio-icon"
                                      width="1.25rem"
                                      height="1.25rem"
-                                     :name="formState.scheduleType === type ? 'ic_checkbox_circle--checked' : 'ic_radio'"
+                                     :name="formState.scheduleType === type ? 'ic_checkbox-circle-selected' : 'ic_radio'"
                                 />
                             </template>
                         </p-radio>

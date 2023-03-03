@@ -9,7 +9,7 @@
               tag="p"
         >
             <template #icon>
-                <p-i name="ic_bookmark"
+                <p-i name="ic_favorite-filled"
                      width="0.875rem"
                      height="0.875rem"
                      color="inherit"
@@ -38,7 +38,7 @@
                     <span class="name">{{ item.label }}</span>
                 </router-link>
                 <p-icon-button v-if="hoveredItem && hoveredItem.itemId === item.itemId"
-                               name="ic_delete"
+                               name="ic_close"
                                size="sm"
                                class="delete-btn"
                                @click.prevent.stop="handleClickDelete(item)"
@@ -49,7 +49,7 @@
                      @click.stop="handleClickToggle"
             >
                 {{ isExpanded ? $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_LESS') : $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.TOGGLE_MORE') }}
-                <p-i :name="isExpanded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                <p-i :name="isExpanded ? 'ic_chevron-up' : 'ic_chevron-down'"
                      height="1rem"
                      width="1rem"
                      color="inherit transparent"

@@ -12,7 +12,7 @@
                        class="project-required-tooltip"
                        :contents="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.PROJECT_REQUIRED_HELP_TEXT')"
             >
-                <p-i name="ic_tooltip"
+                <p-i name="ic_question-mark-circle-filled"
                      width="1rem"
                      height="1rem"
                 />

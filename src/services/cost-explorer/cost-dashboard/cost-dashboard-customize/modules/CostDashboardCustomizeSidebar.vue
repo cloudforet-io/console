@@ -30,7 +30,7 @@
                         :key="idx"
                         class="widget-item"
                     >
-                        <p-i name="ic_drag-handle"
+                        <p-i name="ic_drag-handle-alt"
                              width="1rem"
                              height="1rem"
                              class="drag-icon"

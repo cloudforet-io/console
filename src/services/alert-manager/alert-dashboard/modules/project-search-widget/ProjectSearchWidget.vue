@@ -43,7 +43,7 @@
         <p-pane-layout v-if="isHealthy"
                        class="project-healthy"
         >
-            <p-i name="smile-face"
+            <p-i name="ic_face-smile"
                  width="3rem"
                  height="3rem"
                  color="inherit"

@@ -46,7 +46,7 @@
                          class="draggable-item"
                     >
                         <p-i class="grab-area"
-                             name="ic_drag-handle--slim"
+                             name="ic_drag-handle"
                              width="1rem"
                              height="1rem"
                         />

@@ -47,7 +47,7 @@
                 >
                     <template v-if="getIsRaised(item, field.name)">
                         <span class="cell-text raised">{{ currencyMoneyFormatter(value, currency, currencyRates, true) }}</span>
-                        <p-i name="ic_bold-arrow-up"
+                        <p-i name="ic_arrow-up-bold-alt"
                              width="0.75rem"
                              height="0.75rem"
                         />

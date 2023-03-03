@@ -28,7 +28,7 @@
                             <div class="list-item-title">
                                 <span class="severity">[{{ item.severity }}]</span>
                                 <span>{{ item.title }}</span>
-                                <p-i name="ic_arrow_right"
+                                <p-i name="ic_chevron-right"
                                      width="1rem"
                                      height="1rem"
                                      color="inherit"
@@ -87,7 +87,7 @@
                              ref="alertRef"
                              class="copy-button-alert"
                         >
-                            <p-i name="ic_state_active"
+                            <p-i name="ic_check"
                                  color="white"
                                  width="1rem"
                                  height="1rem"

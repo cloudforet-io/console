@@ -38,17 +38,17 @@
                     </p-badge>
                     <span>{{ iso8601Formatter(noticePostData.created_at, timezone) }}
                     </span><p-i width="0.125rem"
-                                name="ic_divider-dot"
+                                name="ic_dot"
                     />
                     <span> {{ noticePostData.writer }}</span>
                     <p-i v-if="hasDomainRoleUser || hasSystemRoleUser"
                          width="0.125rem"
-                         name="ic_divider-dot"
+                         name="ic_dot"
                     />
                     <span v-if="hasDomainRoleUser || hasSystemRoleUser"
                           class="view-count"
                     >
-                        <p-i name="ic_view"
+                        <p-i name="ic_eye"
                              width="1.125rem"
                         /> {{ noticePostData.view_count }}
                     </span>

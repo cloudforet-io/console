@@ -19,7 +19,7 @@
                         >
                             <span>{{ commaFormatter(Math.abs(item.increase)) }}</span>
                             <p-i v-if="item.increase !== 0"
-                                 :name="item.increase > 0 ? 'ic_increase' : 'ic_decrease'"
+                                 :name="item.increase > 0 ? 'ic_caret-up-filled-alt' : 'ic_caret-down-filled-alt'"
                                  height="0.75rem"
                                  width="0.75rem"
                                  color="inherit"

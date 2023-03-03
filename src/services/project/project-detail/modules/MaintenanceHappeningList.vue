@@ -8,14 +8,14 @@
             <div class="header-wrapper"
                  @click="onClickHeader"
             >
-                <p-i name="ic_state_duplicated"
+                <p-i name="ic_warning-filled"
                      height="1.25rem"
                      width="1.25rem"
                      color="inherit"
                      class="icon"
                 />
                 <span class="text">{{ $t('PROJECT.DETAIL.NOW_HAPPENING_MAINTENANCE') }}</span>
-                <p-i name="ic_delete"
+                <p-i name="ic_close"
                      height="1.25rem"
                      width="1.25rem"
                      color="inherit"

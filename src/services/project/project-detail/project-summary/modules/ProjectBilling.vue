@@ -52,7 +52,7 @@
                             <span class="in-process-text">({{ $t('COMMON.WIDGETS.BILLING.IN_PROCESS') }})</span>
                             <div class="help">
                                 <p-i v-tooltip.top="$t('COMMON.WIDGETS.BILLING.TOOLTIP_TEXT')"
-                                     name="ic_tooltip"
+                                     name="ic_question-mark-circle-filled"
                                      width="1rem"
                                      height="1rem"
                                      color="inherit transparent"

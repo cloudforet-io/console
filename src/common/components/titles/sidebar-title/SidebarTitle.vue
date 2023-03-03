@@ -5,7 +5,7 @@
         >
             <slot name="default">{{ title }}</slot>
             <p-i v-if="styleType === SIDEBAR_STYLE.LINK"
-                 name="ic_arrow_right"
+                 name="ic_chevron-right"
                  width="1rem"
                  height="1rem"
                  color="inherit transparent"

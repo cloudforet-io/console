@@ -17,7 +17,7 @@
             >
                 <div class="error-title">
                     <span class="error-icon-wrapper">
-                        <p-i name="ic_alert"
+                        <p-i name="ic_error-filled"
                              height="1.5rem"
                              width="1.5rem"
                              color="inherit"

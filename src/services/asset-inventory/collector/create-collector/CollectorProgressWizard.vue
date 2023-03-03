@@ -29,7 +29,7 @@
                 <aside v-if="activeTab.alert"
                        class="caution"
                 >
-                    <p-i name="ic_alert"
+                    <p-i name="ic_error-filled"
                          height="1rem"
                          width="1rem"
                     />
@@ -38,7 +38,7 @@
                 <aside v-if="activeTab.warning"
                        class="caution warning"
                 >
-                    <p-i name="ic_alert"
+                    <p-i name="ic_error-filled"
                          height="1rem"
                          width="1rem"
                          color="inherit"
@@ -75,7 +75,7 @@
                               size="lg"
                               @click="onClickPrev"
                     >
-                        <p-i name="ic_back"
+                        <p-i name="ic_arrow-left"
                              color="inherit"
                         />{{ $t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.PREV') }}
                     </p-button>
@@ -86,7 +86,7 @@
                               @click="onClickNext"
                     >
                         {{ $t('PLUGIN.COLLECTOR.CREATE.PROGRESS_WIZARD.NEXT') }}
-                        <p-i name="ic_back"
+                        <p-i name="ic_arrow-left"
                              color="inherit"
                              dir="down"
                         />

@@ -8,7 +8,7 @@
         >
             <template #after-text="{item}">
                 <p-i v-if="item.id === homeDashboardId"
-                     name="ic_home"
+                     name="ic_home-filled"
                      width="1rem"
                      height="1rem"
                      class="ml-1"

@@ -12,7 +12,7 @@
         >
             <p-i class="menu-icon"
                  :class="{ disabled: isNoRoleUser }"
-                 :name="hasNotifications ? 'ic_bell_noti' : 'ic_bell'"
+                 :name="hasNotifications ? 'ic_gnb_bell-unread' : 'ic_gnb_bell'"
                  :color="hasNotifications ? undefined : 'inherit'"
             />
         </span>

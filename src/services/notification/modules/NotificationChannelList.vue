@@ -44,7 +44,7 @@
                 <p v-if="projectId"
                    class="spaceone-desc"
                 >
-                    <p-i name="ic_notifications_member"
+                    <p-i name="ic_users"
                          width="1.125rem"
                          class="mr-2"
                     />

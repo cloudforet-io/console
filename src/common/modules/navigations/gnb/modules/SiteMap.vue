@@ -13,7 +13,7 @@
              @keydown.esc="hideSiteMap"
         >
             <p-i class="sitemap-icon"
-                 :name="visible ? 'ic_delete' : 'ic_gnb_menu'"
+                 :name="visible ? 'ic_close' : 'ic_gnb_menu'"
                  color="inherit"
                  width="2rem"
                  height="2rem"

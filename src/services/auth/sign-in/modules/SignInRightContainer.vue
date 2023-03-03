@@ -27,7 +27,7 @@
                  class="error-msg-box"
             >
                 <span class="error-msg">{{ $t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
-                <p-i name="ic_delete"
+                <p-i name="ic_close"
                      width="1.5rem"
                      height="1.5rem"
                      class="cursor-pointer"
@@ -42,7 +42,7 @@
                 <span class="sign-in-button-wrapper"
                       @click="goToUserSignIn"
                 >
-                    <p-i name="ic_arrow_left_sm"
+                    <p-i name="ic_chevron-small-left"
                          width="0.5rem"
                          height="0.5rem"
                          color="inherit"
@@ -55,7 +55,7 @@
                 <span class="sign-in-button-wrapper"
                       @click="goToAdminSignIn"
                 >
-                    <p-i name="root-account"
+                    <p-i name="img_avatar_root-account"
                          width="1.5rem"
                          height="1.5rem"
                          class="admin-icon"

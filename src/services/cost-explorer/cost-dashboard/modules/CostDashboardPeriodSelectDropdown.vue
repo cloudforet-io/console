@@ -13,7 +13,7 @@
                        :contents="$t('BILLING.COST_MANAGEMENT.DASHBOARD.FIXED_DATE_TOOLTIP')"
                        :position="'bottom'"
             >
-                <p-i name="ic_tooltip"
+                <p-i name="ic_question-mark-circle-filled"
                      width="1rem"
                      height="1rem"
                 />

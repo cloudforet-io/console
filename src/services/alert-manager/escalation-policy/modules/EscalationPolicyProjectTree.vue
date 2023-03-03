@@ -23,7 +23,7 @@
         </template>
         <template #toggle-right="{node}">
             <p-i v-if="node.data.item_type === 'PROJECT_GROUP'"
-                 name="ic_tree_project-group"
+                 name="ic_folder-filled"
                  class="project-group-icon"
                  width="1rem"
                  height="1rem"

@@ -19,7 +19,7 @@
                     <span>{{ field.label }}</span>
                     <p-i v-if="field.tooltipText"
                          v-tooltip.bottom="field.tooltipText"
-                         name="ic_tooltip"
+                         name="ic_question-mark-circle-filled"
                          width="0.875rem"
                          height="0.875rem"
                     />

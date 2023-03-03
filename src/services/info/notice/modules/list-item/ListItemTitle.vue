@@ -2,7 +2,7 @@
     <div class="list-title">
         <p-i v-if="isPinned"
              class="pin"
-             name="ic_pin"
+             name="ic_pin-filled"
              width="1.125rem"
         />
         <text-highlighting class="title"

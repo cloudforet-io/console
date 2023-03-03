@@ -46,7 +46,7 @@
                                       class="input"
                         />
                     </div>
-                    <p-icon-button name="ic_trashcan"
+                    <p-icon-button name="ic_delete"
                                    class="delete-button"
                                    :class="{ opacity: proxyConditions.length < 2}"
                                    @click="onClickDelete(idx)"

@@ -6,7 +6,7 @@
             </div>
             <div class="sm:flex-col-reverse ">
                 <span class="email">
-                    <p-i name="ic_footer_email"
+                    <p-i name="ic_envelope-filled"
                          width="1rem"
                          height="1rem"
                          color="gray-200"

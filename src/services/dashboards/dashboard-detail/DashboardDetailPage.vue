@@ -8,7 +8,7 @@
             <template v-if="dashboardDetailState.name && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
-                <p-i name="ic_public"
+                <p-i name="ic_globe-filled"
                      width="1rem"
                      height="1rem"
                      :color="PUBLIC_ICON_COLOR"

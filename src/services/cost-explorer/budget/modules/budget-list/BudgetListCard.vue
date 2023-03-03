@@ -28,7 +28,7 @@
                           :class="{target: index === projects.length - 1}"
                     >
                         <p-i v-if="index === projects.length - 1"
-                             :name="isProject ? 'ic_tree_project' : 'ic_tree_project-group'"
+                             :name="isProject ? 'ic_document-filled' : 'ic_folder-filled'"
                              color="inherit"
                              width="1em"
                              height="1em"
@@ -36,7 +36,7 @@
                         />
                         {{ name }}
                         <p-i v-if="index < projects.length - 1"
-                             name="ic_breadcrumb_arrow"
+                             name="ic_chevron-left-thin"
                              width="1em"
                              height="1em"
                         />

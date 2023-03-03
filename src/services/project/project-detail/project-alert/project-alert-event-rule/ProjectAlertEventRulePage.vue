@@ -43,7 +43,7 @@
                                   class="arrow-button"
                                   @click="onClickUpButton(data)"
                             >
-                                <p-i name="ic_up"
+                                <p-i name="ic_arrow-up"
                                      width="1.5rem"
                                      height="1.5rem"
                                      color="inherit transparent"
@@ -53,7 +53,7 @@
                                   class="arrow-button"
                                   @click="onClickDownButton(data)"
                             >
-                                <p-i name="ic_down"
+                                <p-i name="ic_arrow-down"
                                      width="1.5rem"
                                      height="1.5rem"
                                      color="inherit transparent"

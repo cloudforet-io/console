@@ -11,7 +11,7 @@
                          class="back-link"
                          :to="backLink.to"
             >
-                <p-i name="ic_arrow_left"
+                <p-i name="ic_chevron-left"
                      width="1rem"
                      height="1rem"
                      color="inherit transparent"
