@@ -8,7 +8,7 @@
                     <slot />
                 </div>
                 <p-icon-button class="close-btn"
-                               name="ic_delete"
+                               name="ic_close"
                                size="lg"
                                @click.stop="onClose"
                 />

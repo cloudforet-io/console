@@ -4,20 +4,25 @@
           :class="{deletable: deletable, selected: selected, outline: outline, invalid: invalid}"
           v-on="$listeners"
     >
-        <p-i v-if="invalid" class="invalid-icon"
-             name="ic_alert"
+        <p-i v-if="invalid"
+             class="invalid-icon"
+             name="ic_error-filled"
              width="0.8rem"
              height="0.8rem"
         />
         <span class="tag-contents">
             <slot name="default">
-                <span v-if="categoryItem" class="category"><slot name="category">[{{ categoryItem.label || categoryItem.name }}]</slot></span>
-                <span v-if="keyItem" class="key"><slot name="key">{{ keyItem.label || keyItem.name }}:</slot></span>
+                <span v-if="categoryItem"
+                      class="category"
+                ><slot name="category">[{{ categoryItem.label || categoryItem.name }}]</slot></span>
+                <span v-if="keyItem"
+                      class="key"
+                ><slot name="key">{{ keyItem.label || keyItem.name }}:</slot></span>
                 <span v-if="valueItem"><slot name="value">{{ valueItem.label || valueItem.name }}</slot></span>
             </slot>
         </span>
         <p-i v-if="deletable"
-             name="ic_delete"
+             name="ic_close"
              width="1rem"
              height="1rem"
              class="delete-icon"

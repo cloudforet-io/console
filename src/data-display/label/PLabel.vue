@@ -19,7 +19,7 @@
         </span>
 
         <p-i v-if="deletable"
-             name="ic_delete"
+             name="ic_close"
              width="1rem"
              height="1rem"
              class="label-delete-icon"

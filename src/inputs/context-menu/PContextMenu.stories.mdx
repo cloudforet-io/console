@@ -283,7 +283,7 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
                 <p-context-menu :menu="menu">
                     <template #item--format="{item}">
                         <div>
-                            <p-i name="btn_gnb_top-logo"/>
+                            <p-i name="ic_favorite-filled" width="1rem" height="1rem" />
                             {{item.label}}
                         </div>
                     </template>
@@ -333,7 +333,7 @@ ${contextMenuSlots.map(([name, description]) => `|${name}|${description}|`).join
                 <p-context-menu :menu="menu">
                     <template #header-others="{item}">
                         <div>
-                            <p-i name="btn_gnb_top-logo"/>
+                            <p-i name="ic_favorite-filled" width="1rem" height="1rem" />
                             This is custom header for <strong>{{item.label}}</strong>
                         </div>
                     </template>

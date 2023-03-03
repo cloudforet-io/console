@@ -14,7 +14,7 @@ export const standardIconActionSet: IconSet[] = [
         eventAction: () => {},
     },
     {
-        iconName: 'ic_trashcan',
+        iconName: 'ic_delete',
         tooltipText: 'Delete',
         eventAction: () => {},
     },
@@ -30,7 +30,7 @@ export const extraIconActionSet: IconSet[] = [
         eventAction: () => {},
     },
     {
-        iconName: 'ic_trashcan',
+        iconName: 'ic_delete',
         eventAction: () => {},
     },
     {

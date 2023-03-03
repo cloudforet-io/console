@@ -1,8 +1,13 @@
 <template>
-    <transition-group name="fade-in" tag="span" class="p-lazy-img"
+    <transition-group name="fade-in"
+                      tag="span"
+                      class="p-lazy-img"
                       :style="{height, width}"
     >
-        <span v-if="!loading" key="img" class="img-container">
+        <span v-if="!loading"
+              key="img"
+              class="img-container"
+        >
             <img v-show="status === LOAD_STATUS.succeed"
                  :style="{height, width}"
                  :src="src || ''"
@@ -11,17 +16,31 @@
                  @error="onError"
             >
         </span>
-        <span v-show="!loading && status === LOAD_STATUS.errored" key="error-img" class="img-container error">
-            <slot name="error" v-bind="{...$props, ...$data}">
-                <p-i :name="errorIcon || 'ic_collector_tags'" :style="{height, width}"
-                     :height="height" :color="errorIconColor"
+        <span v-show="!loading && status === LOAD_STATUS.errored"
+              key="error-img"
+              class="img-container error"
+        >
+            <slot name="error"
+                  v-bind="{...$props, ...$data}"
+            >
+                <p-i :name="errorIcon || 'ic_resource_hexagon'"
+                     :style="{height, width}"
+                     :height="height"
+                     :color="errorIconColor"
                      :width="width"
                 />
             </slot>
         </span>
-        <span v-show="loading || status === LOAD_STATUS.loading" key="loader" class="img-container">
-            <slot name="preloader" v-bind="{...$props, ...$data}">
-                <p-skeleton :height="height" :width="width" />
+        <span v-show="loading || status === LOAD_STATUS.loading"
+              key="loader"
+              class="img-container"
+        >
+            <slot name="preloader"
+                  v-bind="{...$props, ...$data}"
+            >
+                <p-skeleton :height="height"
+                            :width="width"
+                />
             </slot>
         </span>
     </transition-group>
@@ -73,7 +92,7 @@ export default defineComponent<Props>({
         },
         errorIcon: {
             type: String,
-            default: 'ic_collector_tags',
+            default: 'ic_resource_hexagon',
         },
         errorIconColor: {
             type: String,

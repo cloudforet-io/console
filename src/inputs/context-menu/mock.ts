@@ -23,7 +23,7 @@ export const menuItems: MenuItem[] = [
         label: 'ImageUrl', name: 'image-url', imageUrl: 'test',
     },
     {
-        label: 'Icon', name: 'icon', icon: 'ic_trashcan',
+        label: 'Icon', name: 'icon', icon: 'ic_delete',
     },
     { type: 'divider', name: 'collect-divider' },
     {

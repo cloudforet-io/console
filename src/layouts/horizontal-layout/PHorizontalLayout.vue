@@ -15,7 +15,7 @@
                 <p-i color="inherit"
                      width="1.5rem"
                      height="1.5rem"
-                     name="btn_height-modifier"
+                     name="ic_double-line-drag-handle"
                 />
             </span>
         </div>

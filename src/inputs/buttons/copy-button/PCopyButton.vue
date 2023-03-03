@@ -14,7 +14,7 @@
              :class="{active: click}"
              width="1em"
              height="1em"
-             :name="click ? 'ic_copied' : 'ic_copy'"
+             :name="click ? 'ic_copy-filled' : 'ic_copy'"
              color="inherit"
              v-on="$listeners"
              @mousedown.native="click = true"
@@ -26,7 +26,7 @@
                  class="copy-button-alert"
                  :style="alertStyle"
             >
-                <p-i name="ic_state_active"
+                <p-i name="ic_check"
                      color="white"
                      width="1rem"
                      height="1rem"

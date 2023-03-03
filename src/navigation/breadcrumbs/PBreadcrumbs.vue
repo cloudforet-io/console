@@ -21,7 +21,7 @@
                         />
                     </span>
                     <span v-if="idx < routes.length - 1">
-                        <p-i name="ic_breadcrumb_arrow"
+                        <p-i name="ic_chevron-left-thin"
                              width="1rem"
                              height="1rem"
                              class="arrow-icon"
@@ -47,7 +47,7 @@
                         />
                     </span>
                     <span v-if="idx < routes.length - 1">
-                        <p-i name="ic_breadcrumb_arrow"
+                        <p-i name="ic_chevron-left-thin"
                              width="1rem"
                              height="1rem"
                              class="arrow-icon"
@@ -60,7 +60,7 @@
                 <span class="link"
                       @click="showHidden"
                 >...</span>
-                <p-i name="ic_breadcrumb_arrow"
+                <p-i name="ic_chevron-left-thin"
                      width="1rem"
                      height="1rem"
                      class="arrow-icon"

@@ -10,7 +10,7 @@
             </span>
             <p-i width="0.875rem"
                  height="0.875rem"
-                 :name="proxyIsCollapsed ? 'ic_arrow_bottom' : 'ic_arrow_top'"
+                 :name="proxyIsCollapsed ? 'ic_chevron-down' : 'ic_chevron-up'"
                  color="inherit"
             />
         </span>

@@ -14,7 +14,7 @@
                    data-input
             >
         </div>
-        <p-i :name="dataType === DATA_TYPE.time ? 'ic_clock' : 'ic_calendar'"
+        <p-i :name="dataType === DATA_TYPE.time ? 'ic_alarm-clock' : 'ic_calendar'"
              color="inherit"
              data-toggle
              width="1.25rem"

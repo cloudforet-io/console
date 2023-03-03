@@ -12,7 +12,7 @@
     >
         <p-icon-button v-if="styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
                        ref="targetRef"
-                       :name="buttonIcon || (proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom')"
+                       :name="buttonIcon || (proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down')"
                        :activated="proxyVisibleMenu"
                        :disabled="disabled"
                        color="inherit"
@@ -40,7 +40,7 @@
                 </slot>
             </span>
             <p-i v-if="!(styleType === SELECT_DROPDOWN_STYLE_TYPE.TRANSPARENT && readOnly)"
-                 :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                 :name="proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
                  :activated="proxyVisibleMenu"
                  :disabled="disabled"
                  color="inherit"

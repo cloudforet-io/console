@@ -25,7 +25,7 @@
                                 <div class="modal-header"
                                      :class="[`${themeColor}-header`]"
                                 >
-                                    <p-i name="ic_alert"
+                                    <p-i name="ic_error-filled"
                                          :class="[`modal-${themeColor}`]"
                                          class="header-img"
                                     />
@@ -33,7 +33,7 @@
                                 </div>
                             </slot>
                             <p-icon-button v-if="!hideHeaderCloseButton"
-                                           name="ic_delete"
+                                           name="ic_close"
                                            color="inherit"
                                            class="close-button"
                                            :class="[{disabled: loading},

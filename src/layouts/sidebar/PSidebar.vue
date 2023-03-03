@@ -22,7 +22,7 @@
                     </p>
                     <p-icon-button v-if="!hideCloseButton"
                                    class="close-button"
-                                   name="ic_delete"
+                                   name="ic_close"
                                    size="lg"
                                    @click.stop="onClickClose"
                     />

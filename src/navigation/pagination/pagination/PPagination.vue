@@ -1,7 +1,7 @@
 <template>
     <nav class="pagination">
         <p-icon-button class="text"
-                       name="ic_arrow_left"
+                       name="ic_chevron-left"
                        color="inherit transparent"
                        :disabled="proxyState.thisPage === 1"
                        @click="prevPage"
@@ -22,7 +22,7 @@
             </div>
         </div>
         <p-icon-button class="text"
-                       name="ic_arrow_right"
+                       name="ic_chevron-right"
                        color="inherit transparent"
                        :disabled="proxyState.thisPage === pageList.totalPages"
                        @click="nextPage"

@@ -63,7 +63,7 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                     />
                 </template>
                 <template #toggle-right>
-                    <p-i name="ic_bookmark"
+                    <p-i name="ic_favorite-filled"
                          width="1rem" height="1rem"
                          color="inherit"
                     />
@@ -71,11 +71,11 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                 <template #icon="{node}">
                     <template v-if="editMode">
                         <p-i v-if="node.data.item_type === 'PROJECT_GROUP'"
-                             :name="permissionInfo[node.data.id] ? 'ic_tree_project-group' : 'ic_tree_project-group_locked'"
+                             :name="permissionInfo[node.data.id] ? 'ic_folder-filled' : 'ic_lock-filled'"
                              width="1rem" height="1rem" color="inherit"
                         />
                     </template>
-                    <p-i v-else :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' : 'ic_tree_project-group'"
+                    <p-i v-else :name="node.data.item_type === 'PROJECT' ? 'ic_document-filled' : 'ic_folder-filled'"
                          width="1rem" height="1rem" color="inherit"
                     />
                 </template>

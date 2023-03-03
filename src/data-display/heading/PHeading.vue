@@ -6,7 +6,7 @@
             <span v-if="showBackButton"
                   class="back-button"
             >
-                <p-icon-button name="ic_back"
+                <p-icon-button name="ic_arrow-left"
                                @click="$emit('click-back-button',$event)"
                 />
             </span>

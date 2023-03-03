@@ -1,21 +1,32 @@
 <template>
-    <div class="p-box-tab" :class="styleType">
+    <div class="p-box-tab"
+         :class="styleType"
+    >
         <div class="box-group">
             <button v-for="(tab, idx) in tabItems"
                     :key="tab.name"
                     :class="{ active: activeTab && activeTab === tab.name}"
                     @click="handleClickTab(tab, idx)"
             >
-                <p-i v-show="activeTab && activeTab === tab.name" name="ic_check" color="inherit" />
+                <p-i v-show="activeTab && activeTab === tab.name"
+                     name="ic_check"
+                     color="inherit"
+                />
                 <span>{{ tab.label }}</span>
             </button>
         </div>
         <div class="tab-pane">
             <slot />
             <keep-alive>
-                <slot v-if="keepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+                <slot v-if="keepAliveTabNames.includes(activeTab)"
+                      :name="activeTab"
+                      v-bind="currentTabItem"
+                />
             </keep-alive>
-            <slot v-if="nonKeepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+            <slot v-if="nonKeepAliveTabNames.includes(activeTab)"
+                  :name="activeTab"
+                  v-bind="currentTabItem"
+            />
         </div>
     </div>
 </template>

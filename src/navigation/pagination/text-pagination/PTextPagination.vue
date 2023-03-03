@@ -1,7 +1,7 @@
 <template>
     <nav class="text-pagination">
         <p-icon-button class="text"
-                       name="ic_arrow_left"
+                       name="ic_chevron-left"
                        color="inherit transparent"
                        :disabled="thisPage === 1"
                        @click="update(thisPage - 1)"
@@ -18,7 +18,7 @@
         </div>
 
         <p-icon-button class="text"
-                       name="ic_arrow_right"
+                       name="ic_chevron-right"
                        color="inherit transparent"
                        :disabled="thisPage === allPage || disableNextPage"
                        @click="update(thisPage + 1)"

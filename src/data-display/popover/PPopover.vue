@@ -9,14 +9,22 @@
         >
             <slot />
         </span>
-        <div ref="contentRef" class="popper" :class="{ 'visible': proxyIsVisible }">
+        <div ref="contentRef"
+             class="popper"
+             :class="{ 'visible': proxyIsVisible }"
+        >
             <div class="popper-content-wrapper">
                 <slot name="content" />
-                <p-icon-button name="ic_delete" color="inherit" size="sm"
-                               class="delete-icon" @click="handleClickDeleteIcon"
+                <p-icon-button name="ic_close"
+                               color="inherit"
+                               size="sm"
+                               class="delete-icon"
+                               @click="handleClickDeleteIcon"
                 />
             </div>
-            <div class="arrow" data-popper-arrow />
+            <div class="arrow"
+                 data-popper-arrow
+            />
         </div>
     </component>
 </template>

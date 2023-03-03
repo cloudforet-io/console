@@ -49,7 +49,7 @@
                           @click="onDeleteAll"
                     >
                         <p-i class="icon"
-                             name="ic_delete"
+                             name="ic_close"
                              height="1rem"
                              width="1rem"
                         />
@@ -59,7 +59,7 @@
                           @click="handleClickDropdownButton"
                     >
                         <p-i class="icon"
-                             :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                             :name="proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
                              color="inherit"
                         />
                     </span>

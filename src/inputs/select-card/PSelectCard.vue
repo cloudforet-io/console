@@ -7,15 +7,22 @@
          @keydown="handleKeydown"
     >
         <p-i :name="markerIconName"
-             class="marker" width="1.25rem" height="1.25rem"
+             class="marker"
+             width="1.25rem"
+             height="1.25rem"
         />
         <div class="contents">
             <slot v-bind="{isSelected}">
-                <p-lazy-img v-if="imageUrl || icon" :src="imageUrl" :error-icon="errorIcon"
+                <p-lazy-img v-if="imageUrl || icon"
+                            :src="imageUrl"
+                            :error-icon="errorIcon"
                             :error-icon-color="typeof icon === 'boolean' && icon ? 'inherit' : iconColor"
-                            :width="block ? '1rem' : '3rem'" :height="block ? '1rem' : '3rem'"
+                            :width="block ? '1rem' : '3rem'"
+                            :height="block ? '1rem' : '3rem'"
                 />
-                <span v-if="label" class="label">{{ label }}</span>
+                <span v-if="label"
+                      class="label"
+                >{{ label }}</span>
             </slot>
             <slot name="bottom" />
         </div>
@@ -118,17 +125,17 @@ export default defineComponent<Props>({
         const state = reactive({
             markerIconName: computed(() => {
                 if (props.multiSelectable) {
-                    if (props.disabled) return 'ic_checkbox--disabled';
-                    if (isSelected.value) return 'ic_checkbox--checked';
+                    if (props.disabled) return 'ic_checkbox-disabled';
+                    if (isSelected.value) return 'ic_checkbox-selected';
                     return 'ic_checkbox';
                 }
-                if (props.disabled) return 'ic_radio--disabled';
-                if (isSelected.value) return 'ic_checkbox_circle--checked';
+                if (props.disabled) return 'ic_radio-disabled';
+                if (isSelected.value) return 'ic_checkbox-circle-selected';
                 return '';
             }),
             errorIcon: computed(() => {
                 if (typeof props.icon === 'string') return props.icon;
-                if (props.icon) return 'smile-face';
+                if (props.icon) return 'ic_face-smile';
                 return '';
             }),
         });

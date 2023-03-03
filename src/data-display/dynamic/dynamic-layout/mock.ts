@@ -74,7 +74,8 @@ export default {
                                 type: 'state',
                                 options: {
                                     icon: {
-                                        image: 'ic_state_active',
+                                        image: 'ic_check',
+                                        color: 'green.500',
                                     },
                                 },
                             },
@@ -82,7 +83,7 @@ export default {
                                 type: 'state',
                                 options: {
                                     icon: {
-                                        image: 'ic_state_duplicated',
+                                        image: 'ic_warning-filled',
                                     },
                                 },
                             },
@@ -90,7 +91,7 @@ export default {
                                 type: 'state',
                                 options: {
                                     icon: {
-                                        image: 'ic_state_disconnected',
+                                        image: 'ic_plug-filled',
                                     },
                                 },
                             },
@@ -98,7 +99,7 @@ export default {
                                 type: 'state',
                                 options: {
                                     icon: {
-                                        image: 'ic_state_manual',
+                                        image: 'ic_spanner',
                                     },
                                 },
                             },
@@ -406,7 +407,8 @@ export default {
                         type: 'state',
                         options: {
                             icon: {
-                                image: 'ic_state_active',
+                                image: 'ic_check',
+                                color: 'green.500',
                             },
                         },
                     },
@@ -414,7 +416,7 @@ export default {
                         type: 'state',
                         options: {
                             icon: {
-                                image: 'ic_state_duplicated',
+                                image: 'ic_warning-filled',
                             },
                         },
                     },
@@ -422,7 +424,7 @@ export default {
                         type: 'state',
                         options: {
                             icon: {
-                                image: 'ic_state_disconnected',
+                                image: 'ic_plug-filled',
                             },
                         },
                     },
@@ -430,7 +432,7 @@ export default {
                         type: 'state',
                         options: {
                             icon: {
-                                image: 'ic_state_manual',
+                                image: 'ic_spanner',
                             },
                         },
                     },

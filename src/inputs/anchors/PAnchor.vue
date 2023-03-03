@@ -12,7 +12,7 @@
                    :href="props.to ? (toHref || props.href ): props.href"
                    @click.stop="navigate"
                 >
-                    <p-i v-if="props.hideIcon && hasText && props.iconPosition === IconPosition.left"
+                    <p-i v-if="!props.hideIcon && hasText && props.iconPosition === IconPosition.left"
                          :name="props.iconName"
                          height="1.1em"
                          width="1.1em"
@@ -24,7 +24,7 @@
                             {{ props.text }}
                         </slot>
                     </span>
-                    <p-i v-if="props.hideIcon && hasText && props.iconPosition === IconPosition.right"
+                    <p-i v-if="!props.hideIcon && hasText && props.iconPosition === IconPosition.right"
                          :name="props.iconName"
                          height="1.1em"
                          width="1.1em"

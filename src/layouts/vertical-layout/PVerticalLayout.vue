@@ -27,7 +27,7 @@
                         <p-i class="resizer-button"
                              width="1.25rem"
                              height="1.25rem"
-                             :name="hide ? 'btn_ic_tree_hidden—folded' : 'btn_ic_tree_hidden'"
+                             :name="hide ? 'ic_chevron-right-circle-filled' : 'ic_chevron-right-circle'"
                              :color="hide ? 'primary2 white' : 'white inherit'"
                         />
                     </slot>

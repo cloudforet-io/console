@@ -84,10 +84,10 @@ export default defineComponent<CheckboxProps>({
 
         const iconName = computed(() => {
             if (props.disabled) {
-                if (isSelected.value) return 'ic_checkbox-disabled-check';
-                return 'ic_checkbox--disabled';
+                if (isSelected.value) return 'ic_checkbox-disabled-selected';
+                return 'ic_checkbox-disabled';
             }
-            if (isSelected.value) return 'ic_checkbox--checked';
+            if (isSelected.value) return 'ic_checkbox-selected';
             return 'ic_checkbox';
         });
 

@@ -151,7 +151,7 @@ export const getSelectCardArgTypes = (): ArgTypes => ({
         It has a lower priority than \`imageUrl\` props.
         So it is rendered only when there is no value in \`imageUrl\` props or when the image load fails.
         If it is \`true\`, default icon will be rendered.`,
-        defaultValue: 'ic_service_compute-engine',
+        defaultValue: 'img_avatar_admin',
         table: {
             type: {
                 summary: 'string, boolean',

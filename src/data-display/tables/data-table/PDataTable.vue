@@ -68,11 +68,11 @@
                                             <template v-if="isFieldSortable(field.sortable)">
                                                 <p-i
                                                     v-if="sortable && (field.sortKey|| field.name) === sortBy"
-                                                    :name="proxyState.proxySortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'"
+                                                    :name="proxyState.proxySortDesc ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
                                                     class="sort-icon"
                                                 />
                                                 <p-i v-else
-                                                     name="ic_table_sort"
+                                                     name="ic_caret-down"
                                                      class="sort-icon"
                                                 />
                                             </template>

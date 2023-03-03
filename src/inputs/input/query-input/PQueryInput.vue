@@ -67,7 +67,7 @@
                       @click="handleDeleteAll"
                 >
                     <p-i class="icon"
-                         name="ic_delete"
+                         name="ic_close"
                          height="1rem"
                          width="1rem"
                     />

@@ -45,7 +45,7 @@ export const getIconModalArgTypes = (): ArgTypes => ({
         name: 'iconName',
         type: { name: 'string' },
         description: 'Icon name.',
-        defaultValue: 'ic_dashboard',
+        defaultValue: 'ic_service_dashboard',
         table: {
             type: {
                 summary: 'string',

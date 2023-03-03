@@ -154,13 +154,13 @@ export default defineComponent<ContextMenuItemProps>({
             selectIcon: computed<string|undefined>(() => {
                 if (props.selectMarker === 'checkbox') {
                     if (props.selected) {
-                        return props.disabled ? 'ic_checkbox-disabled-check' : 'ic_checkbox--checked';
+                        return props.disabled ? 'ic_checkbox-disabled-selected' : 'ic_checkbox-selected';
                     }
-                    return props.disabled ? 'ic_checkbox--disabled' : 'ic_checkbox';
+                    return props.disabled ? 'ic_checkbox-disabled' : 'ic_checkbox';
                 }
                 if (props.selectMarker === 'radio') {
-                    if (props.disabled) return 'ic_radio--disabled';
-                    return props.selected ? 'ic_radio--checked' : 'ic_radio';
+                    if (props.disabled) return 'ic_radio-disabled';
+                    return props.selected ? 'ic_radio-selected' : 'ic_radio';
                 }
                 return undefined;
             }),

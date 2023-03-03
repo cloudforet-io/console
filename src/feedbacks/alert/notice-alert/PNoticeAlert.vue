@@ -10,19 +10,20 @@
                  @click="close"
             >
                 <p-i v-if="item.type === 'success'"
-                     name="ic_state_active"
+                     name="ic_check"
                      class="item-type-icon"
                      width="1.5rem"
                      height="1.5rem"
+                     :color="safe"
                 />
                 <p-i v-if="item.type === 'warning'"
-                     name="ic_list_duplication"
+                     name="ic_warning-filled"
                      class="item-type-icon"
                      width="1.5rem"
                      height="1.5rem"
                 />
                 <p-i v-if="item.type === 'alert'"
-                     name="ic_alert"
+                     name="ic_error-filled"
                      class="item-type-icon"
                      width="1.5rem"
                      height="1.5rem"
@@ -42,6 +43,8 @@ import { computed, reactive } from 'vue';
 import type { NoticeGroup, NoticePosition } from '@/feedbacks/alert/notice-alert/config';
 import { NOTICE_GROUP, NOTICE_GROUP_POSITION_MAP } from '@/feedbacks/alert/notice-alert/config';
 import PI from '@/foundation/icons/PI.vue';
+
+import { safe } from '@/styles/colors.cjs';
 
 /**
  * Used library: vue-notification

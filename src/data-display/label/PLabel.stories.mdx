@@ -59,13 +59,13 @@ export const Template = (args, {argTypes}) => ({
                     <div class="flex items-center">
                         <p-label text="Label"/>
                         <p-label text="Label" clickable/>
-                        <p-label left-icon="ic_private" text="Label"/>
+                        <p-label left-icon="ic_lock-filled" text="Label"/>
                     </div>
                     <br/>
                     <div class="flex items-center">
                         <p-label text="Label" deletable/>
                         <p-label text="Label" deletable clickable/>
-                        <p-label left-icon="ic_public" text="Label" deletable/>
+                        <p-label left-icon="ic_globe-filled" text="Label" deletable/>
                     </div>
                 </div>
             `
@@ -160,9 +160,9 @@ export const Template = (args, {argTypes}) => ({
             components: { PLabel },
             template: `
                 <div class="h-full w-full overflow p-8">
-                    <p-label left-icon="ic_private" text="Label"/>
-                    <p-label left-icon="ic_public" text="Label"/>
-                    <p-label left-icon="ic_tooltip" text="Label"/>
+                    <p-label left-icon="ic_lock-filled" text="Label"/>
+                    <p-label left-icon="ic_globe-filled" text="Label"/>
+                    <p-label left-icon="ic_question-mark-circle-filled" text="Label"/>
                 </div>
             `
         }}

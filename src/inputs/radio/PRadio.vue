@@ -87,8 +87,8 @@ export default defineComponent<Props>({
         });
 
         const iconName = computed(() => {
-            if (props.disabled) return 'ic_radio--disabled';
-            if (isSelected.value) return 'ic_radio--checked';
+            if (props.disabled) return 'ic_radio-disabled';
+            if (isSelected.value) return 'ic_radio-selected';
             return 'ic_radio';
         });
 

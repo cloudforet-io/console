@@ -6,12 +6,12 @@
             </div>
         </div>
         <p-icon-button class="text"
-                       name="ic_arrow_left"
+                       name="ic_chevron-left"
                        color="inherit transparent"
                        @click="onClickPrev"
         />
         <p-icon-button class="text"
-                       name="ic_arrow_right"
+                       name="ic_chevron-right"
                        color="inherit transparent"
                        :disabled="nextButtonDisabled"
                        @click="onClickNext"

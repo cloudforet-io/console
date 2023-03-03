@@ -81,7 +81,7 @@
             <p-i v-else
                  v-show="(isInputFocused || isSelectedInvalid)"
                  class="delete-all-icon"
-                 name="ic_delete"
+                 name="ic_close"
                  height="1rem"
                  width="1rem"
                  color="inherit transparent"

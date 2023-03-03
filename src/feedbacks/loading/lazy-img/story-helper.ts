@@ -59,13 +59,13 @@ export const getLazyImgArgTypes = (): ArgTypes => ({
         name: 'errorIcon',
         type: { name: 'string' },
         description: 'Alternative icon name when failed to load image. Refer to Icon component.',
-        defaultValue: 'ic_collector_tags',
+        defaultValue: 'ic_resource_hexagon',
         table: {
             type: {
                 summary: 'string',
             },
             defaultValue: {
-                summary: '"ic_collector_tags"',
+                summary: '"ic_resource_hexagon"',
             },
             category: 'props',
         },

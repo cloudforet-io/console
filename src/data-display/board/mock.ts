@@ -42,23 +42,23 @@ export const basicItemSets: BoardSet[] = [
 
 export const boardStandardItemSets: BoardSet[] = [
     {
-        leftIcon: 'admin',
+        leftIcon: 'img_avatar_admin',
         iconButtonSets: standardIconActionSet,
     },
     {
-        leftIcon: 'aws-network',
+        leftIcon: 'img_avatar_project-admin',
         iconButtonSets: standardIconActionSet,
     },
     {
-        leftIcon: 'aws-ec2',
+        leftIcon: 'img_resource_default',
         iconButtonSets: standardIconActionSet,
     },
     {
-        leftIcon: 'ic_collector_tags',
+        leftIcon: 'ic_resource_hexagon',
         iconButtonSets: standardIconActionSet,
     },
     {
-        leftIcon: 'ic_server',
+        leftIcon: 'img_resource_server',
         iconButtonSets: standardIconActionSet,
     },
 ];

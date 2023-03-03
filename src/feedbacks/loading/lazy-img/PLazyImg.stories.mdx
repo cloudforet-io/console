@@ -70,7 +70,7 @@ export const Template = (args, { argTypes }) => ({
         </div>
         <div class="flex items-center mb-4">
             <h2 class=" mr-4">Custom Error Icon: </h2>
-            <p-lazy-img src="" error-icon="admin" />
+            <p-lazy-img src="" error-icon="img_avatar_admin" />
         </div>
         <div class="flex items-center">
             <h2 class=" mr-4">Using Error Slot: </h2>
@@ -103,7 +103,7 @@ export const Template = (args, { argTypes }) => ({
             template: `
     <p-lazy-img loading>
         <template #preloader>
-            <p-i name="ic_setting" animation="spin" :size="2"></p-i>
+            <p-i name="ic_settings-filled" animation="spin" :size="2"></p-i>
         </template>
     </p-lazy-img>
 `

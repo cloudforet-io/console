@@ -42,7 +42,7 @@
                                        size="sm"
                             />
                             <p-i v-else-if="!toggleOptions.validator || (toggleOptions.validator && toggleOptions.validator(node))"
-                                 :name="node.$folded ? 'ic_tree_arrow' : 'ic_tree_arrow--opened'"
+                                 :name="node.$folded ? 'ic_caret-right' : 'ic_caret-down-filled-alt'"
                                  width="1em"
                                  height="1em"
                                  color="inherit"

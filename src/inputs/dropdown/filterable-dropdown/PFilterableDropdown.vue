@@ -42,7 +42,7 @@
                       class="delete-all-button"
                       @click.stop="handleClickDeleteAll"
                 >
-                    <p-i name="ic_delete"
+                    <p-i name="ic_close"
                          width="1rem"
                          height="1rem"
                          color="inherit"
@@ -52,7 +52,7 @@
             <span class="arrow-button"
                   @click.stop="toggleMenu"
             >
-                <p-i :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                <p-i :name="proxyVisibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
                      width="1.5rem"
                      height="1.5rem"
                      color="inherit"

@@ -61,7 +61,7 @@
                     <div v-if="settingsVisible"
                          class="tool"
                     >
-                        <p-icon-button name="ic_setting"
+                        <p-icon-button name="ic_settings-filled"
                                        @click="$emit('click-settings', $event)"
                         />
                     </div>

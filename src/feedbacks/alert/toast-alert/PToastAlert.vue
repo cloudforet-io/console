@@ -12,20 +12,23 @@
                  @click="close"
             >
                 <div class="icon-wrapper">
-                    <p-i v-if="item.type === 'success'"
-                         name="ic_state_active"
-                         class="item-type-icon"
-                         width="1.5rem"
-                         height="1.5rem"
-                    />
+                    <span class="text-safe">
+                        <p-i v-if="item.type === 'success'"
+                             name="ic_check"
+                             class="item-type-icon"
+                             width="1.5rem"
+                             height="1.5rem"
+                             color="inherit"
+                        />
+                    </span>
                     <p-i v-if="item.type === 'warning'"
-                         name="ic_list_duplication"
+                         name="ic_warning-filled"
                          class="item-type-icon"
                          width="1.5rem"
                          height="1.5rem"
                     />
                     <p-i v-if="item.type === 'alert'"
-                         name="ic_alert"
+                         name="ic_error-filled"
                          class="item-type-icon"
                          width="1.5rem"
                          height="1.5rem"
@@ -45,7 +48,7 @@
                     </div>
                 </div>
                 <div class="button-wrapper">
-                    <p-i name="ic_delete"
+                    <p-i name="ic_close"
                          class="delete-icon"
                          width="1.5rem"
                          height="1.5rem"
