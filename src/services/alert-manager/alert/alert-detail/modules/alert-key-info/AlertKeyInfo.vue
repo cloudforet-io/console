@@ -155,7 +155,7 @@ export default {
                     copyValueFormatter: () => state.data.triggered_by,
                 },
                 { name: 'account', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), copyValueFormatter: () => state.data.account },
-                { name: 'reference.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
+                { name: 'resource.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
             ]),
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
