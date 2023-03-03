@@ -37,7 +37,7 @@
             </div>
             <p-data-loader
                 v-else
-                :loading="false"
+                :loading="loading"
                 :data="data"
                 class="card-wrapper"
             >
