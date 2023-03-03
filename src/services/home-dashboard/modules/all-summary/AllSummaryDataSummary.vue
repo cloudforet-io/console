@@ -5,6 +5,7 @@
         </div>
         <p-data-loader :loading="loading"
                        :data="summaryData"
+                       loader-type="skeleton"
         >
             <div class="summary-content-wrapper">
                 <router-link :to="getAllServiceLocation()"
@@ -42,14 +43,9 @@
                 </div>
             </template>
             <template #no-data>
-                <div class="m-auto">
-                    <img src="@/assets/images/illust_cloud.svg"
-                         class="empty-image"
-                    >
-                    <p class="text">
-                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: label }) }}
-                    </p>
-                </div>
+                <p-empty
+                    :title="$t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: label })"
+                />
             </template>
         </p-data-loader>
     </div>
@@ -61,7 +57,7 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PSkeleton, PDataLoader } from '@spaceone/design-system';
+import { PSkeleton, PDataLoader, PEmpty } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
@@ -94,6 +90,7 @@ interface SummaryData {
 export default {
     name: 'AllSummaryDataSummary',
     components: {
+        PEmpty,
         PSkeleton,
         PDataLoader,
     },
@@ -375,38 +372,16 @@ export default {
         }
     }
 
-    /* custom design-system component - p-data-loader */
-    :deep(.p-data-loader) {
-        .no-data-wrapper {
-            display: grid;
-            height: 13rem;
+    /* custom design-system component - p-empty */
+    :deep(.p-empty) {
+        height: 13rem;
 
-            @screen tablet {
-                height: 5rem;
-            }
+        @screen tablet {
+            height: 5rem;
+        }
 
-            @screen mobile {
-                height: 8rem;
-            }
-
-            .empty-image {
-                @apply block;
-                margin: 0 auto 0.5rem auto;
-
-                @screen tablet {
-                    @apply hidden;
-                }
-            }
-
-            .text {
-                @apply text-primary2;
-                font-size: 0.875rem;
-                font-weight: 700;
-                line-height: 1.5;
-                text-align: center;
-                opacity: 0.7;
-                margin-bottom: 0.625rem;
-            }
+        @screen mobile {
+            height: 8rem;
         }
     }
 }

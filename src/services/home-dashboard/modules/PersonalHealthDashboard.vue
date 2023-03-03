@@ -1,78 +1,97 @@
 <template>
     <widget-layout>
         <template #title>
-            <div class="title">
+            <p class="title">
                 <span :style="{ 'color': providers.aws ? providers.aws.color : '' }">AWS </span>
                 <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>
-            </div>
+            </p>
         </template>
-        <p-data-table
+        <p-data-loader
+            :data="data"
             :loading="loading"
-            :fields="fields"
-            :items="data"
-            :bordered="false"
         >
-            <template #col-event-format="{ index, value }">
-                <div class="col-event">
-                    <span class="event-name">
-                        <router-link :to="value.to"
-                                     class="link-text"
-                        >
-                            <span>{{ value.name }}</span>
-                        </router-link>
-                    </span>
-                    <span class="event-time"
-                          :class="{ 'show-all': data[index].showAll }"
-                    >
-                        {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.LAST_UPDATE') }} : {{ value.lastUpdate }}
-                    </span>
-                </div>
-            </template>
-            <template #col-region-format="{ value }">
-                <span class="region">{{ value }}</span>
-            </template>
-            <template #col-affected_projects-format="{ index, value }">
-                <div class="affected-projects-wrapper grid grid-cols-12 gap-2">
-                    <div class="count col-span-1"
-                         :class="{ 'show-all': data[index].showAll }"
-                    >
-                        {{ value.length }}
-                    </div>
-                    <div class="col-span-9 project-link-group"
-                         :class="{ 'show-all': data[index].showAll }"
-                    >
-                        <div v-for="(project, pIndex) in value"
-                             :key="`project-link-${project.name}-${pIndex}`"
-                        >
-                            <p-i v-if="project.isFavorite"
-                                 name="ic_bookmark"
-                                 class="favorite-icon"
-                                 width="0.625rem"
-                                 height="0.625rem"
-                            />
-                            <router-link :to="project.to"
-                                         class="project-link"
+            <p-data-table
+                :loading="loading"
+                :fields="fields"
+                :items="data"
+                :bordered="false"
+            >
+                <template #col-event-format="{ index, value }">
+                    <div class="col-event">
+                        <span class="event-name">
+                            <router-link :to="value.to"
+                                         class="link-text"
                             >
-                                {{ project.name }}
+                                <span>{{ value.name }}</span>
                             </router-link>
-                        </div>
-                    </div>
-                    <div class="col-span-2">
-                        <div v-show="value.length > 1"
-                             class="toggle-button"
-                             @click="handleClickToggle(index)"
+                        </span>
+                        <span class="event-time"
+                              :class="{ 'show-all': data[index].showAll }"
                         >
-                            {{ data[index].showAll ? $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.HIDE') : $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ALL') }}
-                            <p-i :name="data[index].showAll ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                                 height="1rem"
-                                 width="1rem"
-                                 color="inherit transparent"
-                            />
+                            {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.LAST_UPDATE') }} : {{ value.lastUpdate }}
+                        </span>
+                    </div>
+                </template>
+                <template #col-region-format="{ value }">
+                    <span class="region">{{ value }}</span>
+                </template>
+                <template #col-affected_projects-format="{ index, value }">
+                    <div class="affected-projects-wrapper grid grid-cols-12 gap-2">
+                        <div class="count col-span-1"
+                             :class="{ 'show-all': data[index].showAll }"
+                        >
+                            {{ value.length }}
+                        </div>
+                        <div class="col-span-9 project-link-group"
+                             :class="{ 'show-all': data[index].showAll }"
+                        >
+                            <div v-for="(project, pIndex) in value"
+                                 :key="`project-link-${project.name}-${pIndex}`"
+                            >
+                                <p-i v-if="project.isFavorite"
+                                     name="ic_bookmark"
+                                     class="favorite-icon"
+                                     width="0.625rem"
+                                     height="0.625rem"
+                                />
+                                <router-link :to="project.to"
+                                             class="project-link"
+                                >
+                                    {{ project.name }}
+                                </router-link>
+                            </div>
+                        </div>
+                        <div class="col-span-2">
+                            <div v-show="value.length > 1"
+                                 class="toggle-button"
+                                 @click="handleClickToggle(index)"
+                            >
+                                {{ data[index].showAll ? $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.HIDE') : $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ALL') }}
+                                <p-i :name="data[index].showAll ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                                     height="1rem"
+                                     width="1rem"
+                                     color="inherit transparent"
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
+                </template>
+            </p-data-table>
+            <template #no-data>
+                <p-empty
+                    show-image
+                    image-size="md"
+                    :title="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA_TITLE')"
+                >
+                    <template #image>
+                        <img alt="illust_astronaut_radio"
+                             src="@/assets/images/illust_astronaut_radio.svg"
+                        >
+                    </template>
+                    {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}
+                </p-empty>
             </template>
-        </p-data-table>
+        </p-data-loader>
     </widget-layout>
 </template>
 
@@ -81,7 +100,9 @@ import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
-import { PDataTable, PI } from '@spaceone/design-system';
+import {
+    PDataTable, PI, PEmpty, PDataLoader,
+} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find } from 'lodash';
 
@@ -108,6 +129,8 @@ export default {
         PI,
         PDataTable,
         WidgetLayout,
+        PEmpty,
+        PDataLoader,
     },
     props: {
         extraParams: {
@@ -199,13 +222,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-/* customize widget-layout */
-:deep(.widget-layout) {
-    .title {
-        font-size: 1.125rem;
-        font-weight: bold;
-        line-height: 1.2;
-    }
+.title {
+    @apply font-bold text-label-xl;
+    line-height: 1.2;
 }
 
 /* custom design-system component - p-data-table */
@@ -303,5 +322,11 @@ export default {
             }
         }
     }
+}
+
+/* custom design-system component - p-empty */
+:deep(.p-empty) {
+    padding-top: 2.5rem;
+    padding-bottom: 1.5rem;
 }
 </style>

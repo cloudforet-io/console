@@ -982,7 +982,7 @@
 				"STORAGE": "Storage",
 				"TITLE": "General",
 				"TREND_TITLE": "Trend",
-				"TYPE_TITLE": "{service} Type"
+				"TYPE_TITLE": "Database Type"
 			},
 			"BILLING": {
 				"DAY": "Day",
@@ -1000,7 +1000,7 @@
 			},
 			"CLOUD_SERVICE": {
 				"HELP": "Displays only major services in cloud service.",
-				"NO_DATA": "No Cloud Service",
+				"NO_DATA": "No Cloud Resources",
 				"SEE_MORE": "more",
 				"TITLE": "Cloud Services"
 			},
@@ -1049,7 +1049,8 @@
 				"HOUR": "hr | hrs",
 				"LAST_UPDATE": "Last Update",
 				"MORE": "more",
-				"NO_DATA": "No updated data",
+				"NO_DATA": "Add Service Account to create a dashboard.",
+				"NO_DATA_TITLE": "No Personal Health Dashboard",
 				"PAST_7_DAYS": "Past 7 days",
 				"PLACEHOLDER": "Search Event",
 				"SUMMARY_ISSUE": "Open Issues",
@@ -1064,7 +1065,7 @@
 			"RESOURCE_BY_REGION_SERVER": "Server",
 			"RESOURCE_BY_REGION_TITLE": "Resources By Region",
 			"RESOURCE_MAP": {
-				"NO_REGION": "No running resources."
+				"NO_REGION": "No Region."
 			},
 			"RUN_COLLECTOR": "Run Collectors",
 			"RUN_COLLECTOR_COLLECTOR": "Collector",
@@ -1074,6 +1075,7 @@
 			"SERVICE_ACCOUNTS": "Service Accounts",
 			"SERVICE_ACCOUNTS_ACCOUNT": "Account",
 			"SERVICE_ACCOUNTS_ADD": "Add",
+			"SERVICE_ACCOUNTS_NO_ACCOUNT": "No Service Accounts",
 			"SERVICE_ACCOUNTS_PROJECT": "Project",
 			"SERVICE_ACCOUNTS_PROVIDER": "Provider",
 			"SERVICE_ACCOUNT_TABLE": {
@@ -1091,7 +1093,8 @@
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "Create Project",
 				"NO_PROJECT": "No Project",
-				"NO_PROJECT_HELP_TEXT": "Getting started with grouping your scattered resource and accounts with your own project."
+				"NO_PROJECT_HELP_TEXT": "",
+				"RESOURCE_MAP": "Getting started with grouping your scattered resource and accounts with your own project."
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "Cloud Service",
 			"TOP_PROJECT_CREATE_PROJECT": "Create Project",
@@ -1113,6 +1116,7 @@
 				"LABEL_SERVICE_LIMITS": "Service Limits",
 				"LABEL_WARNING": "Investigation recommended",
 				"NO_DATA": "No AWS Trusted Advisor",
+				"NO_DATA_DESC": "Add Service Account to create a dashboard.",
 				"SUB_TITLE_OVERALL": "Overall",
 				"SUB_TITLE_PROJECT_SUMMARY": "Project Summary",
 				"TITLE": "Trusted Advisor"
@@ -1130,7 +1134,7 @@
 			"FILTER_PRIVATE": "Private",
 			"FILTER_PUBLIC": "Pubilc",
 			"FILTER_SINGLE_PROJECT": "Single Project",
-			"HELP_TEXT_CREATE": "Create your own custom dashboard and view your cloud usage status at a glance.",
+			"HELP_TEXT_CREATE": "Create a dashboard to get insights at a glace.",
 			"LABEL_PRIVATE": "Private",
 			"LABEL_PUBLIC": "Public",
 			"LABEL_SCOPE": "Scope",
@@ -1152,7 +1156,7 @@
 			"LABEL_SCOPE": "Dashboard Scope",
 			"LABEL_START_FROM": "Start From",
 			"LABEL_VIEWERS": "Viewers",
-			"NO_ITEMS": "No Items",
+			"NO_DATA": "No Data",
 			"PREVIEW": "Preview",
 			"PRIVATE": "Private",
 			"PRIVATE_DESC": "Only me",
@@ -1894,7 +1898,7 @@
 				"CHECK_MODAL_DELETE_DESC": "Are you sure you want to Delete selected item?",
 				"CHECK_MODAL_DELETE_TITLE": "Delete Cloud Service",
 				"CLOSE": "Close",
-				"EMPTY_CLOUD_SERVICE": "Please, register Service Account first to collect cloud service resouces. ",
+				"EMPTY_CLOUD_SERVICE": "We need your registration for monitoring cloud resources.",
 				"FAVORITES": "Favorites",
 				"FILTER": "Filter",
 				"FILTERED_BY_DATE": "Filtered by Date",

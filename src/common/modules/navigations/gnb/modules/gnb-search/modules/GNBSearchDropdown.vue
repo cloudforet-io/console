@@ -35,22 +35,27 @@
                 <p>{{ $t('COMMON.GNB.SEARCH.TOO_MANY_RESULTS') }} <br> {{ $t('COMMON.GNB.SEARCH.TRY_SEARCH_AGAIN') }}</p>
             </div>
             <template #no-data>
-                <div v-if="isRecent"
-                     class="no-data"
+                <p-empty
+                    v-if="isRecent"
+                    show-image
+                    image-size="md"
                 >
-                    <img src="@/assets/images/illust_microscope.svg"
-                         class="img-help"
-                    >
-                    <p class="no-data-text">
-                        {{ $t('COMMON.GNB.SEARCH.HELP_TEXT') }}
-                    </p>
-                </div>
-                <div v-if="inputText"
-                     class="no-data"
+                    <template #image>
+                        <img src="@/assets/images/illust_microscope.svg"
+                             alt="empty-image"
+                        >
+                    </template>
+                    {{ $t('COMMON.GNB.SEARCH.HELP_TEXT') }}
+                </p-empty>
+                <p-empty
+                    v-if="inputText"
+                    show-image
                 >
-                    <img src="@/assets/images/illust_ghost.svg"
-                         class="img-no-data"
-                    >
+                    <template #image>
+                        <img src="@/assets/images/illust_ghost.svg"
+                             alt="empty-image"
+                        >
+                    </template>
                     <p class="no-data-text">
                         <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
                             <template #inputText>
@@ -59,7 +64,7 @@
                         </i18n>
                         <br>{{ $t('COMMON.GNB.SEARCH.NO_RESULT_2') }}
                     </p>
-                </div>
+                </p-empty>
             </template>
         </p-data-loader>
     </div>
@@ -73,7 +78,7 @@ import {
     reactive, toRefs, watch,
 } from 'vue';
 
-import { PDataLoader } from '@spaceone/design-system';
+import { PDataLoader, PEmpty } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
@@ -100,6 +105,7 @@ export default defineComponent<Props>({
     components: {
         GNBSuggestionList,
         PDataLoader,
+        PEmpty,
     },
     props: {
         inputText: {
@@ -235,34 +241,6 @@ export default defineComponent<Props>({
         }
     }
 
-    .no-data {
-        margin: 2.5rem 0;
-        > img {
-            @apply ml-auto mr-auto;
-
-            &.img-help {
-                width: 7.75rem;
-                opacity: 0.7;
-            }
-
-            &.img-no-data {
-                width: 6.44rem;
-                opacity: 0.5;
-            }
-        }
-
-        .no-data-text {
-            @apply text-gray-400;
-            margin-top: 1.5rem;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            word-break: break-word;
-            em {
-                @apply font-bold text-gray-500;
-            }
-        }
-    }
-
     .too-many-results-wrapper {
         @apply text-gray-400;
         font-size: 0.75rem;
@@ -306,6 +284,17 @@ export default defineComponent<Props>({
                     width: 100%;
                 }
             }
+        }
+    }
+}
+
+/* custom design-system component - p-empty */
+:deep(.p-empty) {
+    margin: 2.5rem 0;
+
+    .no-data-text {
+        em {
+            @apply font-bold text-gray-500;
         }
     }
 }

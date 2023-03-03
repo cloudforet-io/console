@@ -43,17 +43,17 @@
                 </div>
             </div>
             <template #no-data>
-                <div class="no-data">
-                    <img class="img"
-                         src="@/assets/images/illust_ghost.svg"
-                    >
-                    <p class="title">
-                        {{ $t('COMMON.GNB.NOTICE.NO_NOTICE') }}
-                    </p>
-                    <p class="desc">
-                        <span>{{ $t('COMMON.GNB.NOTICE.NO_NOTICE_DESC') }}</span>
-                    </p>
-                </div>
+                <p-empty
+                    show-image
+                    :title="$t('COMMON.GNB.NOTICE.NO_NOTICE')"
+                >
+                    <template #image>
+                        <img alt="empty-image"
+                             src="@/assets/images/illust_ghost.svg"
+                        >
+                    </template>
+                    {{ $t('COMMON.GNB.NOTICE.NO_NOTICE_DESC') }}
+                </p-empty>
             </template>
         </p-data-loader>
     </div>
@@ -67,7 +67,7 @@ import {
 } from 'vue';
 
 import {
-    PDataLoader, PI, PDivider,
+    PDataLoader, PI, PDivider, PEmpty,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -107,6 +107,7 @@ export default {
         PDataLoader,
         PI,
         PDivider,
+        PEmpty,
     },
     props: {
         visible: {
@@ -265,43 +266,11 @@ export default {
             }
         }
     }
-    .no-data {
-        text-align: center;
-        padding: 4rem 3.25rem;
-        .img {
-            margin: auto;
-            padding-bottom: 1.5rem;
-        }
-        .title {
-            @apply text-violet-300;
-            font-size: 1.125rem;
-            font-weight: 700;
-            opacity: 0.8;
-            line-height: 1.25;
-            margin-bottom: 0.25rem;
-        }
-        .desc {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-    }
+}
 
-    @screen mobile {
-        .no-data-wrapper {
-            img {
-                margin-top: 2.5rem;
-                max-height: 8.75rem;
-            }
-            .title {
-                font-weight: normal;
-            }
-            .desc {
-                span:first-of-type {
-                    display: block;
-                }
-            }
-        }
-    }
+/* custom design-system component - p-empty */
+:deep(.p-empty) {
+    text-align: center;
+    padding: 4rem 3.25rem;
 }
 </style>

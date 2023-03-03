@@ -12,6 +12,7 @@
                 </p>
             </div>
         </template>
+
         <template #default>
             <div v-if="loading"
                  class="overflow-hidden"
@@ -34,23 +35,27 @@
                     </div>
                 </div>
             </div>
-
-            <div v-else-if="data.length === 0 && warningData.length === 0"
-                 class="w-full h-full flex items-center"
+            <p-data-loader
+                v-else
+                :loading="loading"
+                :data="data"
+                class="card-wrapper"
             >
-                <div class="no-data-wrapper">
-                    <img class="no-data-img"
-                         src="@/assets/images/illust_spaceship_3.svg"
+                <template #no-data>
+                    <p-empty
+                        v-if="warningData.length === 0"
+                        show-image
+                        image-size="md"
+                        :title="$t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA')"
                     >
-                    <p class="no-data-text">
-                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA') }}
-                    </p>
-                </div>
-            </div>
+                        <template #image>
+                            <img alt="empty-image"
+                                 src="@/assets/images/illust_spaceship_3.svg"
+                            >
+                        </template>
+                    </p-empty>
+                </template>
 
-            <div v-else
-                 class="card-wrapper"
-            >
                 <div v-if="warningData.length > 0"
                      class="daily-update-card-alert"
                 >
@@ -129,7 +134,7 @@
                         <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}</span>
                     </router-link>
                 </div>
-            </div>
+            </p-data-loader>
         </template>
     </widget-layout>
 </template>
@@ -140,7 +145,9 @@ import {
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PLazyImg, PSkeleton, PI } from '@spaceone/design-system';
+import {
+    PLazyImg, PSkeleton, PI, PDataLoader, PEmpty,
+} from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { find, range } from 'lodash';
 
@@ -191,6 +198,8 @@ export default {
         PLazyImg,
         PI,
         PSkeleton,
+        PDataLoader,
+        PEmpty,
     },
     props: {
         projectId: {
@@ -315,7 +324,6 @@ export default {
 
     /* custom widget-layout */
     :deep(&.widget-contents) {
-        @apply h-full;
         padding: 0;
     }
 
@@ -324,8 +332,7 @@ export default {
         @apply rounded;
     }
 
-    min-height: 25rem;
-    max-height: 35rem;
+    max-height: 25rem;
 }
 
 @screen lg {
@@ -369,27 +376,9 @@ export default {
     margin-top: -0.5rem;
 }
 
-.no-data-wrapper {
-    @apply w-full;
-    display: flex;
-    flex-direction: column;
-    height: 12.5rem;
-    text-align: center;
-    .no-data-img {
-        @apply h-full w-full;
-    }
-    .no-data-text {
-        @apply mb-0 text-center text-primary2;
-        margin-top: -2.25rem;
-        font-weight: bold;
-        font-size: 0.875rem;
-        line-height: 1.6;
-        opacity: 0.7;
-    }
-}
-
 .card-wrapper {
     @apply overflow-hidden whitespace-no-wrap w-full rounded-md;
+    height: 100%;
     .daily-update-card {
         @apply flex items-center w-full content-between overflow-hidden;
         padding-left: 1rem;

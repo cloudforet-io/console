@@ -32,33 +32,38 @@
                 />
             </div>
             <template #no-data>
-                <div class="text-center empty-cloud-service">
-                    <img v-if="!Object.keys(storeState.serviceAccounts).length"
-                         class="empty-cloud-service-img"
-                         src="@/assets/images/illust_satellite.svg"
-                    >
-                    <img v-else
-                         class="empty-cloud-service-img"
-                         src="@/assets/images/illust_microscope.svg"
-                    >
-                    <p class="text-primary2 mb-12">
-                        {{ Object.keys(storeState.serviceAccounts).length ? $t('COMMON.WIDGETS.CLOUD_SERVICE.NO_DATA')
-                            : $t('INVENTORY.CLOUD_SERVICE.MAIN.EMPTY_CLOUD_SERVICE')
-                        }}
-                    </p>
-                    <router-link
-                        v-if="!Object.keys(storeState.serviceAccounts).length"
-                        :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: selectedProvider}}"
-                    >
-                        <p-button style-type="primary"
-                                  icon-left="ic_plus_bold"
-                                  class="mx-auto text-center"
-                                  :disabled="!hasManagePermission"
+                <p-empty
+                    show-image
+                    image-size="md"
+                    :show-button="!Object.keys(storeState.serviceAccounts).length"
+                >
+                    <template #image>
+                        <img v-if="!Object.keys(storeState.serviceAccounts).length"
+                             alt="empty-cloud-service-img"
+                             src="@/assets/images/illust_satellite.svg"
                         >
-                            {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.ADD_SERVICE_ACCOUNT') }}
-                        </p-button>
-                    </router-link>
-                </div>
+                        <img v-else
+                             alt="empty-cloud-service-img"
+                             src="@/assets/images/illust_microscope.svg"
+                        >
+                    </template>
+                    <template #button>
+                        <router-link
+                            :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: selectedProvider}}"
+                        >
+                            <p-button style-type="substitutive"
+                                      icon-left="ic_plus_bold"
+                                      class="mx-auto text-center"
+                                      :disabled="!hasManagePermission"
+                            >
+                                {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.ADD_SERVICE_ACCOUNT') }}
+                            </p-button>
+                        </router-link>
+                    </template>
+                    {{ Object.keys(storeState.serviceAccounts).length ? $t('COMMON.WIDGETS.CLOUD_SERVICE.NO_DATA')
+                        : $t('INVENTORY.CLOUD_SERVICE.MAIN.EMPTY_CLOUD_SERVICE')
+                    }}
+                </p-empty>
             </template>
         </p-data-loader>
     </div>
@@ -70,7 +75,7 @@ import {
 } from 'vue';
 
 import {
-    PDataLoader, PDivider, PButton, PHeading,
+    PDataLoader, PDivider, PButton, PHeading, PEmpty,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -132,6 +137,7 @@ export default {
         PButton,
         PHeading,
         PDataLoader,
+        PEmpty,
     },
     setup() {
         const storeState = reactive({
@@ -320,11 +326,10 @@ export default {
     @apply capitalize;
     margin-bottom: 0;
 }
-.empty-cloud-service {
+
+/* custom design-system component - p-empty */
+:deep(.p-empty) {
     @apply w-full h-full;
-    .empty-cloud-service-img {
-        @apply w-48 mx-auto pt-19 mb-8;
-    }
 }
 
 @screen tablet {

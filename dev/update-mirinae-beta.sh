@@ -1,1 +1,1 @@
-npm install --save @spaceone/design-system@beta
+npm install --save-exact @spaceone/design-system@beta

@@ -29,17 +29,17 @@
                 />
             </div>
             <template #no-data>
-                <div class="no-data">
-                    <img class="img"
-                         src="@/assets/images/illust_astronaut_radio.svg"
-                    >
-                    <p class="title">
-                        {{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION') }}
-                    </p>
-                    <p class="desc">
-                        <span>{{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION_DESC') }}</span>
-                    </p>
-                </div>
+                <p-empty
+                    show-image
+                    :title="$t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION')"
+                >
+                    <template #image>
+                        <img alt="illust_astronaut_radio"
+                             src="@/assets/images/illust_astronaut_radio.svg"
+                        >
+                    </template>
+                    {{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION_DESC') }}
+                </p-empty>
             </template>
         </p-data-loader>
         <p-button-modal class="notification-modal"
@@ -104,7 +104,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PDataLoader, PButtonModal, PI, PAnchor, PDefinitionTable, PButton,
+    PDataLoader, PButtonModal, PI, PAnchor, PDefinitionTable, PButton, PEmpty,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -153,6 +153,7 @@ export default {
         PAnchor,
         PDefinitionTable,
         PButton,
+        PEmpty,
     },
     props: {
         visible: {
@@ -399,27 +400,6 @@ export default {
             right: 0.5rem;
         }
     }
-    .no-data {
-        text-align: center;
-        padding: 4rem 3.25rem;
-        .img {
-            margin: auto;
-            padding-bottom: 1.5rem;
-        }
-        .title {
-            @apply text-violet-300;
-            font-size: 1.125rem;
-            font-weight: 700;
-            opacity: 0.8;
-            line-height: 1.25;
-            margin-bottom: 0.25rem;
-        }
-        .desc {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-    }
     .notification-modal {
         .header-wrapper {
             display: flex;
@@ -448,22 +428,11 @@ export default {
             margin-bottom: 0.75rem;
         }
     }
+}
 
-    @screen mobile {
-        .no-data-wrapper {
-            img {
-                margin-top: 2.5rem;
-                max-height: 8.75rem;
-            }
-            .title {
-                font-weight: normal;
-            }
-            .desc {
-                span:first-of-type {
-                    display: block;
-                }
-            }
-        }
-    }
+/* custom design-system component - p-empty */
+:deep(.p-empty) {
+    text-align: center;
+    padding: 4rem 3.25rem;
 }
 </style>

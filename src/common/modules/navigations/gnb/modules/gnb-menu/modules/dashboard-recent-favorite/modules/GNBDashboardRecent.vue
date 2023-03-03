@@ -25,14 +25,16 @@
                 </g-n-b-sub-menu>
             </div>
             <template #no-data>
-                <div class="no-data">
-                    <img class="img"
-                         src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
-                    >
-                    <p class="text">
-                        {{ $t('COMMON.GNB.DASHBOARDS.NO_ITEMS') }}
-                    </p>
-                </div>
+                <p-empty
+                    show-image
+                >
+                    <template #image>
+                        <img alt="empty-image"
+                             src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
+                        >
+                    </template>
+                    {{ $t('COMMON.GNB.DASHBOARDS.NO_ITEMS') }}
+                </p-empty>
             </template>
         </p-data-loader>
     </div>
@@ -46,7 +48,7 @@ import {
     defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
-import { PDataLoader } from '@spaceone/design-system';
+import { PDataLoader, PEmpty } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
@@ -75,6 +77,7 @@ export default defineComponent<Props>({
         FavoriteButton,
         GNBSubMenu,
         PDataLoader,
+        PEmpty,
     },
     props: {
         visible: {
@@ -158,19 +161,6 @@ export default defineComponent<Props>({
         max-height: unset;
         .dashboard-recent-item {
             width: 100%;
-        }
-    }
-
-    .no-data {
-        text-align: center;
-        padding: 1.875rem 3.25rem;
-        .img {
-            margin-bottom: 0.9375rem;
-        }
-        .text {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            line-height: 1.5;
         }
     }
 }

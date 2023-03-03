@@ -972,7 +972,7 @@
 				"DAY": "日",
 				"MONTH": "月",
 				"NETWORKING": "ネットワーキング",
-				"NO_SERVICE": "{service} なし",
+				"NO_SERVICE": "{service}がありません",
 				"OVERALL_SPENDINGS": "総支出",
 				"REGION_SERVICE": "リージョン·サービス",
 				"REGION_SERVICE_TITLE": "リージョン",
@@ -982,7 +982,7 @@
 				"STORAGE": "ストレージ",
 				"TITLE": "一般",
 				"TREND_TITLE": "トレンド",
-				"TYPE_TITLE": "{service}タイプ"
+				"TYPE_TITLE": ""
 			},
 			"BILLING": {
 				"DAY": "日",
@@ -1000,7 +1000,7 @@
 			},
 			"CLOUD_SERVICE": {
 				"HELP": "サービスしている主要なクラウドサービスリストを表示します",
-				"NO_DATA": "データがありません。",
+				"NO_DATA": "",
 				"SEE_MORE": "もっと見る",
 				"TITLE": "クラウドサービス"
 			},
@@ -1049,7 +1049,8 @@
 				"HOUR": "時間",
 				"LAST_UPDATE": "最終更新",
 				"MORE": "もっと見る",
-				"NO_DATA": "更新されたデータがありません。",
+				"NO_DATA": "",
+				"NO_DATA_TITLE": "",
 				"PAST_7_DAYS": "過去7日間",
 				"PLACEHOLDER": "イベント検索",
 				"SUMMARY_ISSUE": "発生した問題",
@@ -1074,6 +1075,7 @@
 			"SERVICE_ACCOUNTS": "サービスアカウント",
 			"SERVICE_ACCOUNTS_ACCOUNT": "アカウント",
 			"SERVICE_ACCOUNTS_ADD": "追加",
+			"SERVICE_ACCOUNTS_NO_ACCOUNT": "",
 			"SERVICE_ACCOUNTS_PROJECT": "プロジェクト ",
 			"SERVICE_ACCOUNTS_PROVIDER": "プロバイダー ",
 			"SERVICE_ACCOUNT_TABLE": {
@@ -1091,7 +1093,8 @@
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "プロジェクト作成",
 				"NO_PROJECT": "プロジェクトなし",
-				"NO_PROJECT_HELP_TEXT": "分散されているリソースやアカウントを独自のプロジェクトでグループ化をしてみましょう"
+				"NO_PROJECT_HELP_TEXT": "分散されているリソースやアカウントを独自のプロジェクトでグループ化をしてみましょう",
+				"RESOURCE_MAP": ""
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "クラウドサービス",
 			"TOP_PROJECT_CREATE_PROJECT": "プロジェクト作成",
@@ -1113,6 +1116,7 @@
 				"LABEL_SERVICE_LIMITS": "サービス制限",
 				"LABEL_WARNING": "調査を推奨",
 				"NO_DATA": "データがありません。",
+				"NO_DATA_DESC": "",
 				"SUB_TITLE_OVERALL": "サマリ",
 				"SUB_TITLE_PROJECT_SUMMARY": "サマリ情報",
 				"TITLE": "Trusted Advisor"
@@ -1130,7 +1134,7 @@
 			"FILTER_PRIVATE": "非公開",
 			"FILTER_PUBLIC": "公開",
 			"FILTER_SINGLE_PROJECT": "個別プロジェクト",
-			"HELP_TEXT_CREATE": "カスタマダッシュボードを作成し、クラウドの利用状況を一目で確認できます。",
+			"HELP_TEXT_CREATE": "",
 			"LABEL_PRIVATE": "非公開",
 			"LABEL_PUBLIC": "公開",
 			"LABEL_SCOPE": "スコープ",
@@ -1152,7 +1156,7 @@
 			"LABEL_SCOPE": "ダッシュボードの範囲",
 			"LABEL_START_FROM": "基本生成フォーム",
 			"LABEL_VIEWERS": "公開可否",
-			"NO_ITEMS": "アイテムがありません",
+			"NO_DATA": "",
 			"PREVIEW": "プレビュー",
 			"PRIVATE": "非公開",
 			"PRIVATE_DESC": "非公開",

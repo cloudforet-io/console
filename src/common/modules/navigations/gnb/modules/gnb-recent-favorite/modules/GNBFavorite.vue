@@ -38,14 +38,16 @@
                 </template>
             </g-n-b-suggestion-list>
             <template #no-data>
-                <div class="no-data">
-                    <img class="img"
-                         src="@/assets/images/illust_star.svg"
-                    >
-                    <p class="text">
-                        {{ $t('COMMON.GNB.FAVORITES.FAVORITES_HELP_TEXT') }}
-                    </p>
-                    <div class="button-wrapper">
+                <p-empty
+                    show-image
+                    show-button
+                >
+                    <template #image>
+                        <img alt="empty-image"
+                             src="@/assets/images/illust_star.svg"
+                        >
+                    </template>
+                    <template #button>
                         <p-button style-type="tertiary"
                                   size="md"
                                   @click="handleClickMenuButton(FAVORITE_TYPE.PROJECT)"
@@ -58,8 +60,9 @@
                         >
                             {{ $t('COMMON.GNB.FAVORITES.GO_TO_CLOUD_SERVICE') }}
                         </p-button>
-                    </div>
-                </div>
+                    </template>
+                    {{ $t('COMMON.GNB.FAVORITES.FAVORITES_HELP_TEXT') }}
+                </p-empty>
             </template>
         </p-data-loader>
     </div>
@@ -71,7 +74,7 @@ import { computed, reactive, toRefs } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, PI, PIconButton, PDataLoader,
+    PButton, PI, PIconButton, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -111,6 +114,7 @@ export default {
         PButton,
         PI,
         PIconButton,
+        PEmpty,
     },
     props: {},
     setup(props, { emit }: SetupContext) {
@@ -314,27 +318,16 @@ export default {
             padding-bottom: 0.5rem;
         }
     }
-    .no-data {
-        text-align: center;
-        padding: 3rem 3.25rem;
-        .img {
-            margin: auto;
-        }
-        .text {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            padding-top: 1.5rem;
-        }
-        .button-wrapper {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: center;
-            padding-top: 1rem;
-            .p-button {
-                width: 10.5rem;
-            }
-        }
+}
+
+/* custom design-system component - p-empty */
+:deep(.p-empty) {
+    text-align: center;
+    padding: 3rem 3.25rem;
+    .button-wrapper {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
     }
 }
 </style>
