@@ -239,7 +239,7 @@ export default {
             }
         }, { immediate: false });
 
-        watch(() => props.currency, (currency) => {
+        watch([() => props.currency, () => state.USDChartData], ([currency]) => {
             if (state.proxyChart) {
                 state.proxyChart.data = getCurrencyAppliedChartData(state.USDChartData, currency, props.currencyRates);
             }
