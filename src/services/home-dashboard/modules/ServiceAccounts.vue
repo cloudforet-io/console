@@ -36,10 +36,6 @@
                                  :key="v"
                                  class="flex items-center p-4"
                             >
-                                <p-skeleton width="1.5rem"
-                                            height="1.5rem"
-                                            class="mr-4 flex-shrink-0"
-                                />
                                 <p-skeleton class="flex-grow" />
                             </div>
                         </template>
