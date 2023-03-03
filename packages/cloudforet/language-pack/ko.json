@@ -972,7 +972,7 @@
 				"DAY": "일",
 				"MONTH": "월",
 				"NETWORKING": "네트워킹",
-				"NO_SERVICE": "데이터가 없습니다.",
+				"NO_SERVICE": "{service}가 없습니다.",
 				"OVERALL_SPENDINGS": "총 지출 비용",
 				"REGION_SERVICE": "리전 서비스",
 				"REGION_SERVICE_TITLE": "지역",

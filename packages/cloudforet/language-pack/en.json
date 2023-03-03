@@ -972,7 +972,7 @@
 				"DAY": "Day",
 				"MONTH": "Month",
 				"NETWORKING": "Networking",
-				"NO_SERVICE": "No Database",
+				"NO_SERVICE": "No {service}",
 				"OVERALL_SPENDINGS": "Overall-Spendings",
 				"REGION_SERVICE": "Region Service",
 				"REGION_SERVICE_TITLE": "Region",

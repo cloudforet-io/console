@@ -972,7 +972,7 @@
 				"DAY": "日",
 				"MONTH": "月",
 				"NETWORKING": "ネットワーキング",
-				"NO_SERVICE": "データがありません",
+				"NO_SERVICE": "{service}がありません",
 				"OVERALL_SPENDINGS": "総支出",
 				"REGION_SERVICE": "リージョン·サービス",
 				"REGION_SERVICE_TITLE": "リージョン",
