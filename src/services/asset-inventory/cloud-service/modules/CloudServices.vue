@@ -308,7 +308,8 @@ export default {
     }
 
     .loading-wrapper {
-        @apply grid grid-cols-1 gap-1 w-full; }
+        @apply grid grid-cols-1 gap-1 w-full;
+    }
 }
 
 .item-container.card .contents {
