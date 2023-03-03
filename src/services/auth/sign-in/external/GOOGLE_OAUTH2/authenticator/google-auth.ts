@@ -39,7 +39,9 @@ class GoogleAuth extends Authenticator {
 
     static async onSuccess(accessToken) {
         try {
-            // GoogleAuth.#accessToken = accessToken;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            GoogleAuth.#accessToken = accessToken;
             const credentials = {
                 access_token: accessToken,
             };
