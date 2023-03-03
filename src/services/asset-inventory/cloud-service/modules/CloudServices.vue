@@ -45,7 +45,7 @@
                                         height="2rem"
                                         class="mr-4"
                             />
-                            <div class="grid grid-cols-1 gap-1 w-full">
+                            <div class="loading-wrapper">
                                 <p-skeleton width="80%"
                                             height="0.625rem"
                                 />
@@ -306,6 +306,9 @@ export default {
             }
         }
     }
+
+    .loading-wrapper {
+        @apply grid grid-cols-1 gap-1 w-full; }
 }
 
 .item-container.card .contents {
@@ -364,8 +367,8 @@ export default {
 }
 .no-data-wrapper {
     @apply flex w-full h-full flex-col justify-center items-center;
-    padding-top: 4.81rem;
-    padding-bottom: 6.12rem;
+    padding-top: 4.75rem;
+    padding-bottom: 6.125rem;
 }
 
 </style>
