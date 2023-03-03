@@ -324,12 +324,6 @@ export default {
 :deep(.p-empty) {
     text-align: center;
     padding: 3rem 3.25rem;
-    .text {
-        @apply text-gray-400;
-        font-size: 0.875rem;
-        line-height: 1.5;
-        padding-top: 1.5rem;
-    }
     .button-wrapper {
         display: flex;
         gap: 0.5rem;

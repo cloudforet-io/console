@@ -48,7 +48,7 @@
                         <span class="resource-info-region">{{ selectedRegionLabel }}</span>
                     </div>
                     <div class="grid-cols-1 sm:grid-cols-2 lg:grid-cols-1
-                                                                                        progress-bar-wrapper"
+                                                                                                        progress-bar-wrapper"
                     >
                         <router-link v-for="(item, index) in resourceDataByRegion"
                                      :key="index"
@@ -512,23 +512,17 @@ export default {
         }
     }
 }
+
+/* custom design-system component - p-data-loader */
+:deep(.p-data-loader) {
+    .no-data-wrapper {
+        max-height: initial;
+    }
+}
+
+/* custom design-system component - p-empty */
 :deep(.p-empty) {
     @apply col-span-12 flex flex-col;
     justify-self: center;
-
-    @screen lg {
-        @apply col-span-3;
-        padding-top: 50%;
-    }
-
-    @screen xl {
-        @apply col-span-3;
-        padding-top: 50%;
-    }
-
-    @screen 2xl {
-        @apply col-span-3;
-        padding-top: 50%;
-    }
 }
 </style>
