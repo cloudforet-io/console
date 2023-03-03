@@ -7,7 +7,7 @@
             </div>
         </template>
         <p-data-loader
-            :loading="false"
+            :loading="loading"
             :data="projectSummaryData"
         >
             <div class="content-wrapper">
