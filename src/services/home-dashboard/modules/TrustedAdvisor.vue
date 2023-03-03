@@ -436,6 +436,8 @@ export default {
         }
     }
 }
+
+/* custom design-system component - p-empty */
 :deep(.p-empty) {
     padding-top: 2.5rem;
     padding-bottom: 1.25rem;

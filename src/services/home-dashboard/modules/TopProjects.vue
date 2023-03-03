@@ -418,6 +418,8 @@ export default {
         }
     }
 }
+
+/* custom design-system component - p-empty */
 :deep(.p-empty) {
     padding: 1.25rem 0;
 }

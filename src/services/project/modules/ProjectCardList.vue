@@ -592,6 +592,7 @@ export default {
     }
 }
 
+/* custom design-system component - p-empty */
 :deep(.p-empty) {
     @apply flex-col text-center justify-start;
     .title {
