@@ -46,7 +46,7 @@
                                                      }"
                                                      class="icon-link"
                                                      :style="{
-                                                         backgroundImage: `url('${getProvider(provider).icon || require('@/assets/icons/ic_cloud-filled.svg')}')`
+                                                         backgroundImage: `url('${getProvider(provider).icon || require('@/assets/icons/ic_provider_other.svg')}')`
                                                      }"
                                         />
                                     </div>
