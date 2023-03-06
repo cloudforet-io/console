@@ -176,8 +176,7 @@ module.exports = {
         ],
         'import/namespace': [0, { allowComputed: true }],
     },
-    ignorePatterns: ['src/assets/**', '**/node_modules/**',
-        'dist/**', '.out/**'],
+    ignorePatterns: ['**/node_modules/**', 'dist/**', '.out/**'],
     parser: 'vue-eslint-parser',
     parserOptions: {
         parser: '@typescript-eslint/parser',
