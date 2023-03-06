@@ -2,19 +2,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { defineConfig, devices } from '@playwright/test';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
-
 dotenv.config({ path: path.resolve(path.dirname(__filename), 'playwright.env') });
-
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// require('dotenv').config();
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -42,27 +33,29 @@ export default defineConfig({
     reporter: 'html',
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {
-    /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
+        bypassCSP: true,
+        /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
         actionTimeout: 0,
         /* Base URL to use in actions like `await page.goto('/')`. */
-        baseURL: 'http://localhost:8080',
+        baseURL: process.env.BASEURL ?? 'http://localhost:8080',
 
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-        trace: 'on',
-        video: 'on',
-
-        // proxy: {
-        //     server: 'http://localhost:8080/',
-        // },
+        trace: 'on-first-retry',
+        video: 'on-first-retry',
     },
 
     /* Configure projects for major browsers */
     projects: [
         {
             name: 'chromium',
-            use: { ...devices['Desktop Chrome'] },
+            use: {
+                ...devices['Desktop Chrome'],
+                launchOptions: {
+                    args: ['--disable-site-isolation-trials', '--disable-web-security'],
+                },
+                // ignoreHTTPSErrors: true,
+            },
         },
-
         // {
         //     name: 'firefox',
         //     use: { ...devices['Desktop Firefox'] },
@@ -98,7 +91,7 @@ export default defineConfig({
     // outputDir: 'test-results/',
 
     /* Run your local dev server before starting the tests */
-    webServer: {
+    webServer: process.env.BASEURL ? undefined : {
         command: 'npm run build --workspace=@cloudforet/core-lib && npm run serve',
         port: 8080,
     },
