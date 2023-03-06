@@ -10,7 +10,7 @@
                             :src="providerIcon"
                             :alt="provider"
                             :loading="providerLoading"
-                            error-icon="ic_provider_other"
+                            error-icon="ic_cloud-filled"
                 />
             </template>
             <template #extra>

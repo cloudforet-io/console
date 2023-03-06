@@ -76,11 +76,11 @@
                     </p-badge>
                 </template>
                 <template #col-urgency-format="{ value }">
-                    <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_urgency_low'"
+                    <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_error-filled' : 'ic_warning-filled'"
                          width="1em"
                          height="1em"
                          class="mr-1"
-                         :class="{'ic_urgency_low': !(value === ALERT_URGENCY.HIGH)}"
+                         :color="value === ALERT_URGENCY.HIGH ? red[400] : red[300]"
                     />
                     <span>{{ urgencyLabels[value] }}</span>
                 </template>
@@ -149,6 +149,8 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { red } from '@/styles/colors';
+
 import AlertActions from '@/services/alert-manager/alert/modules/AlertActions.vue';
 import AlertFormModal from '@/services/alert-manager/alert/modules/AlertFormModal.vue';
 import AlertTableBottomFilters from '@/services/alert-manager/alert/modules/AlertTableBottomFilters.vue';
@@ -163,6 +165,7 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
 import type {
     AlertBottomFilters, AlertListTableFilters,
 } from '@/services/alert-manager/type';
+
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
@@ -447,6 +450,7 @@ export default {
 
         return {
             ...toRefs(state),
+            red,
             querySearchHandlerState,
             storeState,
             ALERT_STATE,

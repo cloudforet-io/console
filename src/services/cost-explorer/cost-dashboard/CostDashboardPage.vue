@@ -6,7 +6,7 @@
             <p-heading :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
                 <template #title-left-extra>
                     <p-i v-if="dashboardType === DASHBOARD_TYPE.PUBLIC"
-                         name="ic_public"
+                         name="ic_globe-filled"
                          width="1rem"
                          height="1rem"
                          :color="PUBLIC_ICON_COLOR"

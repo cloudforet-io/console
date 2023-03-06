@@ -82,7 +82,7 @@
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_CREATED') }}  <br>
                             <span class="text-blue-600 font-bold text-sm">{{ item.createdCount || 0 }}
                                 <p-i v-if="item.isCreateWarning"
-                                     name="ic_state_duplicated"
+                                     name="ic_warning-filled"
                                      width="0.75rem"
                                      height="0.75rem"
                                 />
@@ -95,7 +95,7 @@
                             {{ $t('COMMON.WIDGETS.DAILY_UPDATE_DELETED') }} <br>
                             <span class="text-red-500 font-bold text-sm"> {{ item.deletedCount || 0 }}
                                 <p-i v-if="item.isDeleteWarning"
-                                     name="ic_state_duplicated"
+                                     name="ic_warning-filled"
                                      width="0.75rem"
                                      height="0.75rem"
                                 />

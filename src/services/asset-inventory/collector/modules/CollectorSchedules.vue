@@ -53,7 +53,7 @@
                 </span>
                 <span v-else>
                     <p-i class="inline-block mr-1"
-                         name="ic_setting"
+                         name="ic_settings-filled"
                          animation="spin"
                          width="1rem"
                          height="1rem"

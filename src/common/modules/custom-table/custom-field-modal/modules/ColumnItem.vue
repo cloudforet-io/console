@@ -15,7 +15,7 @@
                   class="ml-1 text-gray-400"
             >{{ item.options.field_description }}</span>
         </p-checkbox>
-        <p-i name="ic_drag-handle"
+        <p-i name="ic_drag-handle-alt"
              width="1rem"
              height="1rem"
              class="drag-icon"

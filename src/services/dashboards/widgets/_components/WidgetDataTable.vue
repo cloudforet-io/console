@@ -34,7 +34,7 @@
                                             </slot>
                                             <template v-if="field.tooltipText">
                                                 <p-tooltip :contents="field.tooltipText">
-                                                    <p-i name="ic_tooltip"
+                                                    <p-i name="ic_question-mark-circle-filled"
                                                          width="0.875rem"
                                                          height="0.875rem"
                                                          :color="gray[300]"
@@ -115,7 +115,7 @@
                                                         </router-link>
                                                         <div v-else-if="getHandler(field.rapidIncrease, item)"
                                                              class="rapid-increase"
-                                                        ><span>{{ getValue(item, field) }}</span> <p-i name="ic_bold-arrow-up"
+                                                        ><span>{{ getValue(item, field) }}</span> <p-i name="ic_arrow-up-bold-alt"
                                                                                                        width="1rem"
                                                                                                        height="1rem"
                                                         />

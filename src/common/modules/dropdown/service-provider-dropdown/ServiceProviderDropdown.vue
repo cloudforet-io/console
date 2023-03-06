@@ -16,7 +16,7 @@
         <span v-else-if="hasAll"
               class="text"
         >
-            <p-lazy-img error-icon="ic_provider_other"
+            <p-lazy-img error-icon="ic_cloud-filled"
                         width="1rem"
                         height="1rem"
                         class="mr-1"
@@ -26,7 +26,7 @@
             <div class="content-menu-item">
                 <p-lazy-img width="1rem"
                             height="1rem"
-                            error-icon="ic_provider_other"
+                            error-icon="ic_cloud-filled"
                             :src="item.icon"
                             class="mr-1"
                 /><span>{{ item.label }}</span>

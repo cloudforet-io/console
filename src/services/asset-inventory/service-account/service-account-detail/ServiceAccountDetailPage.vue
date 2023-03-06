@@ -8,14 +8,14 @@
             <template #title-left-extra>
                 <p-lazy-img :src="providerIcon"
                             :loading="providerLoading || loading"
-                            error-icon="ic_provider_other"
+                            error-icon="ic_cloud-filled"
                 />
             </template>
             <template v-if="hasManagePermission && !isManagedTrustedAccount"
                       #title-right-extra
             >
                 <div class="title-right-wrapper">
-                    <p-icon-button name="ic_trashcan"
+                    <p-icon-button name="ic_delete"
                                    class="w-full delete-button"
                                    @click="handleOpenDeleteModal"
                     />

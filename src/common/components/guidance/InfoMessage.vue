@@ -2,7 +2,7 @@
     <span class="info-message"
           :class="{[styleType]: true, block}"
     >
-        <p-i name="ic_outlined-info"
+        <p-i name="ic_info-circle"
              color="inherit"
              height="1em"
              width="1em"

@@ -27,7 +27,7 @@
                         class="option-delete-button"
                         @click.stop="handleClearSelected"
                 >
-                    <p-i name="ic_delete"
+                    <p-i name="ic_close"
                          width="1rem"
                          height="1rem"
                          color="inherit"
@@ -35,7 +35,7 @@
                 </button>
             </template>
 
-            <p-i :name="visibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+            <p-i :name="visibleMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
                  :activated="visibleMenu"
                  color="inherit"
                  class="dropdown-icon"

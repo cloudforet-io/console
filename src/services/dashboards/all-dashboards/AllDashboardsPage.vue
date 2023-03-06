@@ -6,7 +6,7 @@
         >
             <template #extra>
                 <p-button v-if="!hasOnlyViewPermission && (workspaceDashboardList || projectDashboardList)"
-                          icon-left="ic_plus"
+                          icon-left="ic_plus_bold"
                           @click="handleCreateDashboard"
                 >
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREATE') }}
@@ -37,7 +37,7 @@
                 >
                     <template #button>
                         <p-button style-type="substitutive"
-                                  icon-left="ic_plus"
+                                  icon-left="ic_plus_bold"
                                   :disabled="hasOnlyViewPermission"
                                   @click="handleCreateDashboard"
                         >

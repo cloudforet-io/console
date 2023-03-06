@@ -19,7 +19,7 @@
                     </div>
                     <div class="cost-info">
                         <p-i v-if="typeof state.isDecreased === 'boolean'"
-                             :name="state.isDecreased ? 'ic_decrease' : 'ic_increase'"
+                             :name="state.isDecreased ? 'ic_caret-down-filled-alt' : 'ic_caret-up-filled-alt'"
                              fill
                              width="1rem"
                              height="1rem"

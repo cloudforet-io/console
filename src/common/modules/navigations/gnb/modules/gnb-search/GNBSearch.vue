@@ -21,7 +21,7 @@
               @keydown.esc="hideSearchMenu"
               @keydown.enter="showSearchMenu"
         >
-            <p-i name="ic_search--bold"
+            <p-i name="ic_gnb_search"
                  height="1.5rem"
                  width="1.5rem"
                  color="inherit"

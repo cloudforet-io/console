@@ -3,7 +3,7 @@
         <p-pane-layout class="page-wrapper">
             <div class="page-nav">
                 <div class="left">
-                    <p-icon-button name="ic_back"
+                    <p-icon-button name="ic_arrow-left"
                                    size="lg"
                                    class="go-back-button mr-2"
                                    @click="$emit('close')"

@@ -152,27 +152,27 @@ export default {
                 {
                     label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_COST_OPTIMIZATION'),
                     name: CATEGORY.costOptimizing,
-                    icon: 'ic_cost_optimization',
+                    icon: 'ic_coin-filled',
                 },
                 {
                     label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_PERFORMANCE'),
                     name: CATEGORY.performance,
-                    icon: 'ic_performance',
+                    icon: 'ic_performance-filled',
                 },
                 {
                     label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SECURITY'),
                     name: CATEGORY.security,
-                    icon: 'ic_security',
+                    icon: 'ic_lock-filled',
                 },
                 {
                     label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_FAULT_TOLERANCE'),
                     name: CATEGORY.faultTolerance,
-                    icon: 'ic_fault_tolerance',
+                    icon: 'ic_spanner-filled',
                 },
                 {
                     label: vm.$t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_SERVICE_LIMITS'),
                     name: CATEGORY.serviceLimits,
-                    icon: 'ic_service_limits',
+                    icon: 'ic_limit-filled',
                 },
             ])),
             data: null as any,

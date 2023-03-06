@@ -11,7 +11,7 @@
               @click.stop="handleRecentFavoriteButtonClick"
         >
             <p-i class="menu-icon"
-                 name="ic_recent_and_favorite"
+                 name="ic_gnb_recent-favorite"
                  height="1.5rem"
                  width="1.5rem"
                  color="inherit"

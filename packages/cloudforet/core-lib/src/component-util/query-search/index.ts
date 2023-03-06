@@ -262,7 +262,7 @@ export function makeCloudServiceTagValueHandler(
                 {
                     label: 'Custom',
                     name: 'custom',
-                    icon: 'ic_provider_other',
+                    icon: 'ic_cloud-filled',
                 },
             ];
             providerMenuItemList = providerMenuItemList.filter((item) => item.label.toLowerCase().includes(inputText));

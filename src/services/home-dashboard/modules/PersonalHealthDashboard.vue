@@ -49,7 +49,7 @@
                                  :key="`project-link-${project.name}-${pIndex}`"
                             >
                                 <p-i v-if="project.isFavorite"
-                                     name="ic_bookmark"
+                                     name="ic_favorite"
                                      class="favorite-icon"
                                      width="0.625rem"
                                      height="0.625rem"
@@ -67,7 +67,7 @@
                                  @click="handleClickToggle(index)"
                             >
                                 {{ data[index].showAll ? $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.HIDE') : $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ALL') }}
-                                <p-i :name="data[index].showAll ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                                <p-i :name="data[index].showAll ? 'ic_chevron-up' : 'ic_chevron-down'"
                                      height="1rem"
                                      width="1rem"
                                      color="inherit transparent"

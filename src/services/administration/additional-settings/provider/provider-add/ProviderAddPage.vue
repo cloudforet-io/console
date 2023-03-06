@@ -31,7 +31,7 @@
         <!--song-lang-->
         <p-icon-modal
             :visible.sync="visibleResultModal"
-            icon-name="ic_done"
+            icon-name="ic_check-circle"
             :header-title="$t('has been successfully added.', {provider: selectedProvider})"
             :button-text="$t('Done')"
             size="md"

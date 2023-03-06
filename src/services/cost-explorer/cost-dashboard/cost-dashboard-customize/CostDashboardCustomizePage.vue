@@ -2,7 +2,7 @@
     <div class="cost-dashboard-customize-page">
         <section class="header">
             <p-icon-button
-                name="ic_back"
+                name="ic_arrow-left"
                 @click="handleClickCancel"
             />
             <p-text-input v-model="dashboardTitle"

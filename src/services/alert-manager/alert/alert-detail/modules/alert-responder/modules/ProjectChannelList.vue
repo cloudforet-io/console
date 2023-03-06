@@ -10,7 +10,7 @@
             <p class="title">
                 [{{ protocolNameFormatter(channel.protocol_id) }}] {{ channel.name }}
                 <span class="on-off">
-                    <p-i name="ic_bell"
+                    <p-i name="ic_gnb_bell"
                          color="inherit"
                          class="ml-1"
                          width="1rem"

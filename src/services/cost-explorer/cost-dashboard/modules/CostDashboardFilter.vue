@@ -14,7 +14,7 @@
             {{ $t('BILLING.COST_MANAGEMENT.MAIN.VIEW_FILTER') }}
         </p-button>
         <p-icon-button v-if="showSetting"
-                       name="ic_setting"
+                       name="ic_settings-filled"
                        style-type="tertiary"
                        size="sm"
                        @click="handleClickSelectFilter"

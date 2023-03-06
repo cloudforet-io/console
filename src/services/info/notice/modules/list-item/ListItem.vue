@@ -14,7 +14,7 @@
             <div class="title">
                 <p-i v-if="isPinned"
                      class="pin"
-                     name="ic_pin"
+                     name="ic_pin-filled"
                      width="1.125rem"
                 />
                 <text-highlighting class="title"
@@ -31,15 +31,15 @@
                 >
                     {{ noticeTypeBadge.label }}
                 </p-badge><span>{{ date }}</span><p-i width="0.125rem"
-                                                      name="ic_divider-dot"
+                                                      name="ic_dot"
                 />
                 <span>{{ post.writer }}</span><p-i v-if="hasDomainRoleUser || hasSystemRoleUser"
                                                    width="0.125rem"
-                                                   name="ic_divider-dot"
+                                                   name="ic_dot"
                 />
                 <span v-if="hasDomainRoleUser || hasSystemRoleUser"
                       class="view-count"
-                ><p-i name="ic_view"
+                ><p-i name="ic_eye"
                       width="1.125rem"
                 /> {{ post.view_count }}</span>
                 <span v-if="hasSystemRoleUser"
@@ -120,7 +120,7 @@ export default defineComponent<Props>({
             date: computed(() => dateFormatter(props.post?.created_at)),
             isPinned: computed(() => props.post?.options?.is_pinned),
             isPostExist: computed(() => props.post),
-            postDirectionIcon: computed(() => ((props.postDirection === 'prev') ? 'ic_arrow-bottom-alt' : 'ic_arrow-top-alt')),
+            postDirectionIcon: computed(() => ((props.postDirection === 'prev') ? 'ic_arrow-down' : 'ic_arrow-up')),
             domainName: '',
         });
 

@@ -17,7 +17,7 @@
             >
                 <div class="error-title">
                     <span class="error-icon-wrapper">
-                        <p-i name="ic_alert"
+                        <p-i name="ic_error-filled"
                              height="1.5rem"
                              width="1.5rem"
                              color="inherit"
@@ -190,7 +190,7 @@ const state = reactive({
     editModeIconButtonList: computed<IconConfig[]>(() => [
         {
             isAvailable: !(props.disableFullSize || props.isOnlyFullSize),
-            name: state.isFull ? 'ic_collapse-angle' : 'ic_expand-angle',
+            name: state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all',
             handleClick: () => {
                 dashboardDetailStore.toggleWidgetSize(props.widgetKey);
                 if (props.refreshOnResize) emit('refresh');
@@ -203,7 +203,7 @@ const state = reactive({
         },
         {
             isAvailable: !props.disableDeleteIcon,
-            name: 'ic_trashcan',
+            name: 'ic_delete',
             handleClick: () => {
                 state.visibleDeleteModal = true;
             },

@@ -5,7 +5,7 @@
         <p-pane-layout class="page-wrapper">
             <div class="page-navigation">
                 <div class="title-wrapper">
-                    <p-icon-button name="ic_back"
+                    <p-icon-button name="ic_arrow-left"
                                    class="mr-2"
                                    @click="goBack()"
                     />

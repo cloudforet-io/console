@@ -25,7 +25,7 @@
                 <div v-if="showTrustedAccount"
                      class="information-wrapper"
                 >
-                    <p-i name="ic_outlined-info"
+                    <p-i name="ic_info-circle"
                          height="0.875rem"
                          width="0.875rem"
                          color="inherit"

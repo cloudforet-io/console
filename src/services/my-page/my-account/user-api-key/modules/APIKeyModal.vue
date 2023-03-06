@@ -1,6 +1,6 @@
 <template>
     <p-icon-modal :visible.sync="proxyVisible"
-                  icon-name="ic_done"
+                  icon-name="ic_check-circle"
                   size="md"
                   :header-title="$t('IDENTITY.USER.API_KEY.MODAL_TITLE')"
                   :button-text="$t('COMPONENT.BUTTON_MODAL.CONFIRM')"
@@ -9,7 +9,7 @@
         <template #body>
             <article class="alert-wrapper">
                 <span class="alert-message">
-                    <p-i name="ic_state_duplicated"
+                    <p-i name="ic_warning-filled"
                          width="0.75rem"
                          height="0.75rem"
                          class="alert-icon"
@@ -48,7 +48,7 @@
                 <span class="box-header">
                     {{ $t('IDENTITY.USER.API_KEY.SPACECTL') }}
                     <div class="box-header-desc">
-                        <p-i name="ic_outlined-info"
+                        <p-i name="ic_info-circle"
                              width="1rem"
                              height="1rem"
                              color="inherit"

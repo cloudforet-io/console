@@ -25,7 +25,7 @@
                 >
                     <p-i width="1rem"
                          height="1rem"
-                         :name="isFolded ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                         :name="isFolded ? 'ic_chevron-up' : 'ic_chevron-down'"
                          color="inherit transparent"
                     />
                 </span>

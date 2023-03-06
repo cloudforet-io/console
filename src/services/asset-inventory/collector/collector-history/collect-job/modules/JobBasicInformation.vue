@@ -21,7 +21,7 @@
                 <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PLUGIN') }}</label>
                 <span class="contents align-middle">
                     <p-lazy-img :src="plugin.icon"
-                                error-icon="ic_provider_other"
+                                error-icon="ic_cloud-filled"
                                 :loading="!plugin.id"
                                 :alt="plugin.label"
                                 width="1rem"

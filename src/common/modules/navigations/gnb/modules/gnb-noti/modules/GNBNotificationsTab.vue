@@ -55,6 +55,7 @@
                          :name="selectedItem.icon"
                          width="1.5rem"
                          class="icon"
+                         :color="selectedItem.iconColor"
                     />
                     <span>{{ selectedItem.title }}</span>
                 </div>
@@ -94,7 +95,6 @@
 </template>
 
 <script lang="ts">
-
 import { useInfiniteScroll } from '@vueuse/core';
 import type { SetupContext } from 'vue';
 import {
@@ -123,7 +123,10 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
+import { safe } from '@/styles/colors';
+
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+
 
 interface NotificationItem {
     notificationId: string;
@@ -132,14 +135,15 @@ interface NotificationItem {
     isRead: boolean;
     title?: string;
     icon: string;
+    iconColor?: string;
     message: any;
 }
 
 const NOTIFICATION_TYPE_ICONS = {
     INFO: '',
-    ERROR: 'ic_alert',
-    SUCCESS: 'ic_state_active',
-    WARNING: 'ic_state_duplicated',
+    ERROR: 'ic_error-filled',
+    SUCCESS: 'ic_check',
+    WARNING: 'ic_warning-filled',
 } as const;
 const NOTIFICATIONS_ITEM_LIMIT = 15;
 
@@ -225,6 +229,7 @@ export default {
                     isRead: d.is_read,
                     title: d.message?.title,
                     icon: NOTIFICATION_TYPE_ICONS[d.notification_type],
+                    iconColor: d.notification_type === 'SUCCESS' ? safe : undefined,
                     message: d.message,
                 };
                 results.push(result);
@@ -357,6 +362,7 @@ export default {
         return {
             ...toRefs(state),
             ADMINISTRATION_ROUTE,
+            NOTIFICATION_TYPE_ICONS,
             handleSelectNotification,
             handleDeleteNotification,
             handleCloseNotificationModal,

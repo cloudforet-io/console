@@ -10,6 +10,7 @@
                     width="1rem"
                     height="1rem"
                     :animation="status === JOB_STATUS.progress ? 'spin' : undefined"
+                    :color="status === JOB_STATUS.success ? SUCCEEDED_COLOR : undefined"
                 />
                 {{ statusText }}
             </span>
@@ -40,7 +41,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     computed,
     getCurrentInstance,
@@ -109,9 +109,9 @@ export default {
 
         /* util */
         const statusIconFormatter = (status) => {
-            if (status === JOB_STATUS.success || status === JOB_STATUS.created) return 'ic_state_active';
-            if (status === JOB_STATUS.progress) return 'ic_in-progress';
-            return 'ic_alert';
+            if (status === JOB_STATUS.success || status === JOB_STATUS.created) return 'ic_check';
+            if (status === JOB_STATUS.progress) return 'ic_gear-filled';
+            return 'ic_error-filled';
         };
 
         /* api */

@@ -4,7 +4,7 @@
     >
         <div class="left-part">
             <p-icon-button v-if="!isSubMenu"
-                           :name="menu.hideMenu ? 'ic_tree_arrow' : 'ic_tree_arrow--opened'"
+                           :name="menu.hideMenu ? 'ic_caret-right' : 'ic_caret-down-filled-alt'"
                            size="sm"
                            :disabled="isDisabled"
                            @click="handleToggleMenuVisible"
@@ -13,7 +13,7 @@
                 {{ $t(translationId) }}
                 <p-i v-if="lIdx < menu.translationIds.length - 1"
                      :key="`label-${menu.translationIds.join('.')}-${lIdx}`"
-                     name="ic_breadcrumb_arrow"
+                     name="ic_chevron-left-thin"
                      width="1rem"
                      height="1rem"
                 />
@@ -39,7 +39,7 @@
                        :contents="tooltipText"
                        :position="'bottom'"
             >
-                <p-i name="ic_help"
+                <p-i name="ic_question-mark-circle"
                      width="0.875rem"
                      height="0.875rem"
                      color="inherit"

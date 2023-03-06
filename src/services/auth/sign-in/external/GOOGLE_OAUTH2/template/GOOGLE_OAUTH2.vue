@@ -3,7 +3,7 @@
         <button class="google-signin-button"
                 @click="handleLogin"
         >
-            <p-i name="logo_googleg_48dp"
+            <p-i name="logo_google"
                  width="18px"
                  height="18px"
                  class="mr-2"

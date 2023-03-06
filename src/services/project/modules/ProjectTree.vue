@@ -43,7 +43,7 @@
                         @change-select="onAllProjectChangeSelect"
                 >
                     <template #left-extra>
-                        <p-i name="ic_tree_all-projects"
+                        <p-i name="ic_dots-4-square"
                              width="1rem"
                              height="1rem"
                              class="all-project-button"
@@ -69,7 +69,7 @@
                         {{ node.data.name }}
                     </template>
                     <template #icon="{node}">
-                        <p-i :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' : 'ic_tree_project-group'"
+                        <p-i :name="node.data.item_type === 'PROJECT' ? 'ic_document-filled' : 'ic_folder-filled'"
                              class="project-group-icon"
                              color="inherit"
                              width="1rem"
@@ -85,7 +85,7 @@
                     </template>
                     <template #right-extra="{node, path}">
                         <p-icon-button v-if="treeEditMode && node.data.item_type !== 'PROJECT' && permissionInfo[node.data.id]"
-                                       name="ic_delete"
+                                       name="ic_close"
                                        class="group-delete-btn"
                                        size="sm"
                                        color="inherit"

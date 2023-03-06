@@ -20,7 +20,7 @@
                                  class="anchor-button"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
-                        <p-i name="ic_arrow_right"
+                        <p-i name="ic_chevron-right"
                              width="1rem"
                              height="1rem"
                              color="inherit transparent"

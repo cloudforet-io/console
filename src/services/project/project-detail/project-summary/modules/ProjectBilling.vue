@@ -52,7 +52,7 @@
                             <span class="in-process-text">({{ $t('COMMON.WIDGETS.BILLING.IN_PROCESS') }})</span>
                             <div class="help">
                                 <p-i v-tooltip.top="$t('COMMON.WIDGETS.BILLING.TOOLTIP_TEXT')"
-                                     name="ic_tooltip"
+                                     name="ic_question-mark-circle-filled"
                                      width="1rem"
                                      height="1rem"
                                      color="inherit transparent"
@@ -68,12 +68,12 @@
             <div class="col-span-12 detail-wrapper">
                 <div class="table-button-wrapper">
                     <p-icon-button class="text"
-                                   name="ic_arrow_left"
+                                   name="ic_chevron-left"
                                    color="inherit transparent"
                                    @click="handleClickDateButton('prev')"
                     />
                     <p-icon-button class="text"
-                                   name="ic_arrow_right"
+                                   name="ic_chevron-right"
                                    color="inherit transparent"
                                    :disabled="tableState.nextButtonDisabled"
                                    @click="handleClickDateButton('next')"

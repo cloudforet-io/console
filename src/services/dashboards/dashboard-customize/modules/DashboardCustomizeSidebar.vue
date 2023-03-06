@@ -38,7 +38,7 @@
                          class="draggable-item"
                     >
                         <span>
-                            <p-i name="ic_drag-handle--slim"
+                            <p-i name="ic_drag-handle"
                                  width="1rem"
                                  height="1rem"
                             /></span>
@@ -46,7 +46,7 @@
                         <span v-if="dashboardDetailValidationState.widgetValidMap[widget.widget_key] === false"
                               class="error-icon-wrapper"
                         >
-                            <p-i name="ic_alert"
+                            <p-i name="ic_error-filled"
                                  height="1rem"
                                  width="1rem"
                                  color="inherit"

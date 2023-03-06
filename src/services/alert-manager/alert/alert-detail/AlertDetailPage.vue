@@ -9,7 +9,7 @@
             <template #title-right-extra>
                 <span class="alert-number">#{{ alertInfo.alert_number }}</span>
                 <span class="title-btn">
-                    <p-icon-button name="ic_trashcan"
+                    <p-icon-button name="ic_delete"
                                    class="w-full delete-btn"
                                    :disabled="!hasManagePermission"
                                    @click="openAlertDeleteForm"

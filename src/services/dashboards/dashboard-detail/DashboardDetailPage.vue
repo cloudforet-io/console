@@ -8,7 +8,7 @@
             <template v-if="dashboardDetailState.name && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
-                <p-i name="ic_public"
+                <p-i name="ic_globe-filled"
                      width="1rem"
                      height="1rem"
                      :color="PUBLIC_ICON_COLOR"
@@ -30,7 +30,7 @@
                                    :disabled="!state.hasManagePermission && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    @click="handleVisibleNameEditModal"
                     />
-                    <p-icon-button name="ic_trashcan"
+                    <p-icon-button name="ic_delete"
                                    width="1.5rem"
                                    height="1.5rem"
                                    :disabled="!state.hasManagePermission && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"

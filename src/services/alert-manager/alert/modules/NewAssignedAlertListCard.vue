@@ -9,17 +9,17 @@
         @click="onClickListItem"
     >
         <template #header>
-            <p-i name="ic_notification"
+            <p-i name="ic_megaphone-filled"
                  width="1.25rem"
                  height="1.25rem"
                  class="ic_notification"
                  color="white"
             />
             {{ $t('MONITORING.ALERT.ALERT_LIST.ASSIGNED_TO_ME_TITLE') }}
-            <p-i name="ic_delete"
+            <p-i name="ic_close"
                  width="1.25rem"
                  height="1.25rem"
-                 class="ic_delete cursor-pointer"
+                 class="delete-button"
                  color="inherit"
                  @click="onHideAlerts"
             />
@@ -156,8 +156,9 @@ export default {
             @apply inline-block;
             margin-right: 0.25rem;
         }
-        .ic_delete {
+        .delete-button {
             @apply ml-auto;
+            cursor: pointer;
         }
     }
     .body {

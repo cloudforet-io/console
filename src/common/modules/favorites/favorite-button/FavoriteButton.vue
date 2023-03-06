@@ -1,7 +1,7 @@
 <template>
     <p-i
         v-show="(visibleActiveCaseOnly || readOnly) ? active : true"
-        :name="active ? 'ic_favorite--added': 'ic_favorite'"
+        :name="active ? 'ic_favorite-filled': 'ic_favorite'"
         width="1rem"
         height="1rem"
         :scale="scale"

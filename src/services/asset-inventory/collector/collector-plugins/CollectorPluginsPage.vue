@@ -29,7 +29,7 @@
                      class="filter-tag"
             >
                 <span>{{ tag }}</span>
-                <p-i name="ic_delete"
+                <p-i name="ic_close"
                      width="1rem"
                      height="1rem"
                      color="inherit"

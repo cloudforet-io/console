@@ -11,7 +11,7 @@
                 >
                     <div class="more">
                         <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE.SEE_MORE') }}</span>
-                        <p-i name="ic_arrow_right"
+                        <p-i name="ic_chevron-right"
                              width="1rem"
                              height="1rem"
                              color="inherit transparent"
@@ -47,7 +47,7 @@
                     <br><span class="time">{{ timeFormatter(item.created_at) }}</span>
                 </div>
                 <div class="right-part col-span-2">
-                    <p-i name="ic_setting"
+                    <p-i name="ic_settings-filled"
                          animation="spin"
                          width="1.5rem"
                          height="1.5rem"

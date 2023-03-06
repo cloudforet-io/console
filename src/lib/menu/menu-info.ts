@@ -4,31 +4,31 @@ import { MENU_ID } from '@/lib/menu/config';
 export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     [MENU_ID.HOME_DASHBOARD]: {
         translationId: 'MENU.HOME_DASHBOARD',
-        icon: 'ic_home-menu',
+        icon: 'ic_service_home',
     },
     [MENU_ID.DASHBOARDS]: {
         translationId: 'MENU.DASHBOARDS',
-        icon: 'ic_dashboard',
+        icon: 'ic_service_dashboard',
         needPermissionByRole: true,
     },
     [MENU_ID.DASHBOARDS_PROJECT]: {
         translationId: 'MENU.DASHBOARDS_PROJECT',
-        icon: 'ic_dashboard',
+        icon: 'ic_service_dashboard',
         needPermissionByRole: true,
     },
     [MENU_ID.DASHBOARDS_WORKSPACE]: {
         translationId: 'MENU.DASHBOARDS_WORKSPACE',
-        icon: 'ic_dashboard',
+        icon: 'ic_service_dashboard',
         needPermissionByRole: true,
     },
     [MENU_ID.PROJECT]: {
         translationId: 'MENU.PROJECT',
-        icon: 'ic_project',
+        icon: 'ic_service_project',
         needPermissionByRole: true,
     },
     [MENU_ID.ASSET_INVENTORY]: {
         translationId: 'MENU.ASSET_INVENTORY',
-        icon: 'ic_inventory',
+        icon: 'ic_service_asset-inventory',
         needPermissionByRole: true,
     },
     [MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE]: {
@@ -49,7 +49,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.COST_EXPLORER]: {
         translationId: 'MENU.COST_EXPLORER',
-        icon: 'ic_analytics',
+        icon: 'ic_service_cost-explorer',
         needPermissionByRole: true,
     },
     [MENU_ID.COST_EXPLORER_DASHBOARD]: {
@@ -66,7 +66,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.ALERT_MANAGER]: {
         translationId: 'MENU.ALERT_MANAGER',
-        icon: 'ic_monitoring',
+        icon: 'ic_service_alert-manager',
         needPermissionByRole: true,
     },
     [MENU_ID.ALERT_MANAGER_DASHBOARD]: {
@@ -83,7 +83,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.ADMINISTRATION]: {
         translationId: 'MENU.ADMINISTRATION',
-        icon: 'ic_management',
+        icon: 'ic_service_administration',
         needPermissionByRole: true,
     },
     [MENU_ID.ADMINISTRATION_IAM]: {
@@ -112,7 +112,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     // },
     [MENU_ID.MY_PAGE]: {
         translationId: 'MENU.MY_PAGE',
-        icon: 'ic_identity',
+        icon: 'ic_service_my-page',
     },
     [MENU_ID.MY_PAGE_ACCOUNT]: {
         translationId: 'MENU.MY_PAGE_ACCOUNT',
@@ -129,7 +129,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     [MENU_ID.INFO]: {
         translationId: 'MENU.INFO',
         isNew: true,
-        icon: 'ic_info-menu',
+        icon: 'ic_service_info',
     },
     [MENU_ID.INFO_NOTICE]: {
         translationId: 'MENU.INFO_NOTICE',

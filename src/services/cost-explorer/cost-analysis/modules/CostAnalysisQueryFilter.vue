@@ -49,7 +49,7 @@
                 />
                 <span class="v-divider" />
                 <p-icon-button class="filter-item"
-                               name="ic_setting"
+                               name="ic_settings-filled"
                                @click="handleClickSetFilter"
                 />
             </div>

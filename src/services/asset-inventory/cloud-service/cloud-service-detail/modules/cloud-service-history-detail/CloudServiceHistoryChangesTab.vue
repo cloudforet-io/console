@@ -38,7 +38,7 @@
                                 >
                                     <span class="text-gray-500">
                                         <p-i v-if="selectedKeyMenu && index !== 0"
-                                             name="ic_arrow_right"
+                                             name="ic_chevron-right"
                                              color="inherit"
                                              scale="0.7"
                                         />
@@ -48,7 +48,7 @@
                             </div>
                             <p-i width="1rem"
                                  height="1rem"
-                                 :name="folding ? 'ic_code-expand' : 'ic_code-collapse'"
+                                 :name="folding ? 'ic_arrows-expand-vertical' : 'ic_arrows-collapse-vertical'"
                                  class="cursor-pointer"
                                  @click="handleCodeDisplayType"
                             />

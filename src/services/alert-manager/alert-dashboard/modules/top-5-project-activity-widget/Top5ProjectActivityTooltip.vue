@@ -10,9 +10,10 @@
                    :key="`${projectId}-${date}-${idx}`"
                    class="alert-item"
                 >
-                    <p-i :name="alert.urgency === 'HIGH' ? 'ic_alert' : 'ic_urgency_low'"
+                    <p-i :name="alert.urgency === 'HIGH' ? 'ic_error-filled' : 'ic_warning-filled'"
                          width="0.75rem"
                          height="0.75rem"
+                         :color="alert.urgency === 'HIGH' ? red[400] : red[300]"
                     />
                     <span class="title"
                           :class="{'urgency-high': alert.urgency === 'HIGH'}"
@@ -27,7 +28,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     onMounted, reactive, toRefs, computed,
 } from 'vue';
@@ -44,6 +44,9 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { red } from '@/styles/colors';
+
 
 export default {
     name: 'Top5ProjectActivityTooltip',
@@ -135,6 +138,7 @@ export default {
 
         return {
             ...toRefs(state),
+            red,
             dateFormatter,
         };
     },

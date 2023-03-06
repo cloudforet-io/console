@@ -16,7 +16,7 @@
                 <span v-if="type === POLICY_TYPES.CUSTOM"
                       class="policy-edit-buttons"
                 >
-                    <p-icon-button name="ic_trashcan"
+                    <p-icon-button name="ic_delete"
                                    :disabled="!hasManagePermission"
                                    class="w-full delete-btn"
                                    @click="handleVisibleDeleteModal"

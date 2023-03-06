@@ -107,10 +107,10 @@ const statusTextColorFormatter = (status) => {
     return undefined;
 };
 const statusIconFormatter = (status) => {
-    if (status === JOB_TASK_STATUS.success) return 'ic_state_active';
-    if (status === JOB_TASK_STATUS.pending) return 'ic_clock-history';
-    if (status === JOB_TASK_STATUS.progress) return 'ic_in-progress';
-    return 'ic_alert';
+    if (status === JOB_TASK_STATUS.success) return 'ic_check';
+    if (status === JOB_TASK_STATUS.pending) return 'ic_clock';
+    if (status === JOB_TASK_STATUS.progress) return 'ic_gear-filled';
+    return 'ic_error-filled';
 };
 const statusIconColorFormatter = (status) => {
     if (status === JOB_TASK_STATUS.success) return COMPLETED_ICON_COLOR;

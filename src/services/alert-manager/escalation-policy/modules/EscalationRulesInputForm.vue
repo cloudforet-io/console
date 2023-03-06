@@ -113,7 +113,7 @@
             <p-icon-button
                 v-if="rules.length > 1"
                 class="delete-button"
-                name="ic_trashcan"
+                name="ic_delete"
                 @click="handleDeleteRule(idx)"
             />
         </div>

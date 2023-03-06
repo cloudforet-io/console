@@ -18,7 +18,7 @@
                              :class="{ 'is-exist-extra-mark': $slots['extra-mark'] }"
                         >
                             <p-i v-if="isDraggable"
-                                 name="ic_drag-handle--slim"
+                                 name="ic_drag-handle"
                                  width="1rem"
                                  height="1rem"
                                  class="drag-icon"
