@@ -45,7 +45,7 @@ describe('Query Tags Composable', () => {
                         { name: 'service_code', label: 'Product' },
                         { name: 'project_group_id', label: 'Project Group' },
                         { name: 'project_id', label: 'Project', reference: 'Project' },
-                        { name: 'collection_info.service_accounts', label: 'Service Account' },
+                        { name: 'collection_info.service_account_id', label: 'Service Account' },
                         { name: 'account', label: 'Account ID' },
                     ],
                 }]),

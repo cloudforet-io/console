@@ -149,7 +149,7 @@ export default {
                     { name: 'service_code', label: 'Product' },
                     { name: 'project_group_id', label: 'Project Group', valueSet: storeState.projectGroups },
                     { name: 'project_id', label: 'Project', valueSet: storeState.projects },
-                    { name: 'collection_info.service_accounts', label: 'Service Account', valueSet: storeState.serviceAccounts },
+                    { name: 'collection_info.service_account_id', label: 'Service Account', valueSet: storeState.serviceAccounts },
                     { name: 'account', label: 'Account ID' },
                 ],
             }]),
@@ -159,7 +159,7 @@ export default {
                 service_code: makeDistinctValueHandler('inventory.CloudServiceType', 'service_code'),
                 project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
                 project_id: makeReferenceValueHandler('identity.Project'),
-                'collection_info.service_accounts': makeReferenceValueHandler('identity.ServiceAccount'),
+                'collection_info.service_account_id': makeReferenceValueHandler('identity.ServiceAccount'),
                 account: makeDistinctValueHandler('inventory.CloudService', 'account'),
             } as ValueHandlerMap,
         });
