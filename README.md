@@ -35,6 +35,8 @@
 ```shell
 npm install
 
+npm run build:packages
+
 npm run serve
 ```
 
@@ -57,6 +59,19 @@ follow the instructions below.
  }
 }
 ```
+
+
+## E2E Test Settings
+
+### Set Variables
+
+#### Add `playwright.env` file into project root.
+```
+  USERNAME=testuser
+  PASSWORD=password
+  BASEURL=https://example.com/ 
+```
+- `BASEURL` is an optional variable. Default is `http://localhost:8080`
 
 
 ## 🧩 Mirinae - Cloudforet Design System  
