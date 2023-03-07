@@ -92,7 +92,7 @@ export default defineConfig({
 
     /* Run your local dev server before starting the tests */
     webServer: process.env.BASEURL ? undefined : {
-        command: 'npm run build --workspace=@cloudforet/core-lib && npm run serve',
+        command: 'npm run build:packages && npm run serve',
         port: 8080,
     },
 });
