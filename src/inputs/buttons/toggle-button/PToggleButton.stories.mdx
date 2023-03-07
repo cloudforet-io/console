@@ -18,21 +18,17 @@ export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PToggleButton },
     template: `
-<div style="display:flex; align-items:center; justify-content:center;">
-    <p-toggle-button
-        :value="value"
-        :style-type="styleType"
-        :disabled="disabled"
-        @change="onToggleChange"
-    />
-</div>`,
+        <div class="flex items-center justify-center">
+            <p-toggle-button
+                :value="value"
+                :label="label"
+                :style-type="styleType"
+                :disabled="disabled"
+            />
+        </div>
+    `,
     setup() {
-        const onToggleChange = () => {
-            console.log('toggle changed!');
-        }
-        return {
-            onToggleChange,
-        };
+        return {};
     }
 });
 
@@ -48,17 +44,36 @@ export const Template = (args, { argTypes }) => ({
     {{
         components: { PToggleButton },
         template: `
-<div style="display:flex; align-items:center; justify-content:center;">
-    <p-toggle-button
-        :value="true"
-        class="mr-8"
-    />
-    <p-toggle-button
-        :value="true"
-        theme="peacock500"
-    />
-</div>`
+            <div class="flex items-center justify-center">
+                <p-toggle-button
+                    :value="true"
+                    class="mr-8"
+                />
+                <p-toggle-button
+                    :value="true"
+                    style-type="peacock500"
+                />
+            </div>
+        `
     }}
+    </Story>
+</Canvas>
+
+## Label
+<Canvas>
+    <Story name="toggle button label">
+        {{
+            components: { PToggleButton },
+            template: `
+                <div class="flex items-center justify-center">
+                    <p-toggle-button
+                        :value="true"
+                        label="label"
+                        class="mr-8"
+                    />
+                </div>
+            `
+        }}
     </Story>
 </Canvas>
 
@@ -68,13 +83,47 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: { PToggleButton },
             template: `
-<div style="display:flex; align-items:center; justify-content:center;">
-    <p-toggle-button
-        :value="true"
-        :disabled="true"
-        class="mr-8"
-    />
-</div>`
+                <div class="flex flex-col items-center gap-6">
+                    <div class="flex">
+                        <p-toggle-button
+                            class="mr-8"
+                            :value="false"
+                            :disabled="true"
+                        />
+                        <p-toggle-button
+                            label="label"
+                            :value="false"
+                            :disabled="true"
+                        />
+                    </div>
+                    <div class="flex">
+                        <p-toggle-button
+                            class="mr-8"
+                            :value="true"
+                            :disabled="true"
+                        />
+                        <p-toggle-button
+                            label="label"
+                            :value="true"
+                            :disabled="true"
+                        />
+                    </div>
+                    <div class="flex">
+                        <p-toggle-button
+                            class="mr-8"
+                            style-type="peacock500"
+                            :value="true"
+                            :disabled="true"
+                        />
+                        <p-toggle-button
+                            style-type="peacock500"
+                            label="label"
+                            :value="true"
+                            :disabled="true"
+                        />
+                    </div>
+                </div>
+            `
         }}
     </Story>
 </Canvas>

@@ -4,10 +4,10 @@ import { TOGGLE_BUTTON_THEME } from '@/inputs/buttons/toggle-button/config';
 
 
 export const getToggleButtonArgTypes = (): ArgTypes => ({
-    sync: {
-        name: 'sync',
+    value: {
+        name: 'value',
         type: { name: 'boolean' },
-        description: 'If set to true, will be watching changes in value property and overwrite the current state of the button whenever value prop changes',
+        description: 'Determine whether the toggle button is checked.',
         defaultValue: false,
         table: {
             type: {
@@ -22,22 +22,22 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    value: {
-        name: 'value',
-        type: { name: 'boolean' },
-        description: 'Initial State of the toggle button.',
-        defaultValue: true,
+    label: {
+        name: 'label',
+        type: { name: 'string' },
+        description: 'Toggle Label',
+        defaultValue: '',
         table: {
             type: {
-                summary: 'boolean',
+                summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: 'false',
+                summary: undefined,
             },
         },
         control: {
-            type: 'boolean',
+            type: 'text',
         },
     },
     styleType: {
@@ -75,6 +75,33 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
         },
         control: {
             type: 'boolean',
+        },
+    },
+    // event
+    onChange: {
+        name: 'change-toggle',
+        description: 'Event emitted when the toggle is changed',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onUpdateValue: {
+        name: 'update:value',
+        description: 'Works with `v-model` and `value` props sync.',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
         },
     },
 });
