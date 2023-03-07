@@ -126,7 +126,7 @@ export default {
         /* Util */
         const getLocation = (type, provider, serviceAccountId) => {
             queryHelper.setFilters([
-                { k: 'collection_info.service_accounts', v: serviceAccountId, o: '=' },
+                { k: 'collection_info.service_account_id', v: serviceAccountId, o: '=' },
                 { k: 'project_id', o: '=', v: props.projectId },
             ]);
 

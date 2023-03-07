@@ -228,34 +228,34 @@ export default {
             }
 
             const filters: ConsoleFilter[] = [];
-            if (item.project_id) {
+            if (typeof item.project_id === 'string') {
                 filters.push({ k: 'project_id', v: item.project_id, o: '=' });
             } else if (state.filters.project_id?.length) {
-                filters.push({ k: 'project_id', v: state.filters.project_id, o: '=' });
+                filters.push({ k: 'project_id', v: state.filters.project_id.map(({ v }) => v), o: '=' });
             }
 
-            if (item.project_group_id) {
+            if (typeof item.project_group_id === 'string') {
                 filters.push({ k: 'project_group_id', v: item.project_group_id, o: '=' });
             } else if (state.filters.project_group_id?.length) {
-                filters.push({ k: 'project_group_id', v: state.filters.project_group_id, o: '=' });
+                filters.push({ k: 'project_group_id', v: state.filters.project_group_id.map(({ v }) => v), o: '=' });
             }
 
-            if (item.service_account_id) {
-                filters.push({ k: 'collection_info.service_accounts', v: item.service_account_id, o: '=' });
+            if (typeof item.service_account_id === 'string') {
+                filters.push({ k: 'collection_info.service_account_id', v: item.service_account_id, o: '=' });
             } else if (state.filters.service_account_id?.length) {
-                filters.push({ k: 'collection_info.service_accounts', v: state.filters.service_account_id, o: '=' });
+                filters.push({ k: 'collection_info.service_account_id', v: state.filters.service_account_id.map(({ v }) => v), o: '=' });
             }
 
-            if (item.account) {
+            if (typeof item.account === 'string') {
                 filters.push({ k: 'account', v: item.account, o: '=' });
             } else if (state.filters.account?.length) {
-                filters.push({ k: 'account', v: state.filters.account, o: '=' });
+                filters.push({ k: 'account', v: state.filters.account.map(({ v }) => v), o: '=' });
             }
 
-            if (item.product) {
+            if (typeof item.product === 'string') {
                 filters.push({ k: 'service_code', v: item.product, o: '=' });
             } else if (state.filters.product?.length) {
-                filters.push({ k: 'service_code', v: state.filters.product, o: '=' });
+                filters.push({ k: 'service_code', v: state.filters.product.map(({ v }) => v), o: '=' });
             }
 
             return {
