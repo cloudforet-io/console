@@ -1,12 +1,11 @@
 import Vue from 'vue';
 
-import type { LocaleMessageObject } from 'vue-i18n';
 import VueI18n from 'vue-i18n';
+import type { LocaleMessageObject } from 'vue-i18n';
 
-
-import en from '@/translations/language-pack/en.json';
-import ja from '@/translations/language-pack/ja.json';
-import ko from '@/translations/language-pack/ko.json';
+import en from '@cloudforet/language-pack/en.json';
+import ja from '@cloudforet/language-pack/ja.json';
+import ko from '@cloudforet/language-pack/ko.json';
 
 Vue.use(VueI18n);
 
