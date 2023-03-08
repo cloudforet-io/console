@@ -28,8 +28,7 @@
             <template #col-use-format="{ value, item }">
                 <p-toggle-button :value="value"
                                  :disabled="item.disabled"
-                                 sync
-                                 @change="handleToggleUse(item.propertyName, value)"
+                                 @change-toggle="handleToggleUse(item.propertyName, value)"
                 />
             </template>
             <template #col-options-format="{ value }">

@@ -25,9 +25,8 @@
                     <p class="input-title">
                         {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}
                     </p>
-                    <p-toggle-button sync
-                                     :value="stack"
-                                     @change="handleToggleStack"
+                    <p-toggle-button :value="stack"
+                                     @change-toggle="handleToggleStack"
                     />
                 </div>
                 <div class="input-wrapper">
@@ -141,7 +140,7 @@ export default {
         const handleSelectCurrency = (currency: Currency) => {
             state.currency = currency;
         };
-        const handleToggleStack = ({ value }) => {
+        const handleToggleStack = (value) => {
             state.stack = value;
         };
 

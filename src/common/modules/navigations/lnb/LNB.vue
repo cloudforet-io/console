@@ -51,8 +51,7 @@
                 >
                     <span>{{ $t('DASHBOARDS.LNB.ONLY_FAVORITE') }}</span>
                     <p-toggle-button :value="proxyShowFavoriteOnly"
-                                     sync
-                                     @change="handleFavoriteToggle"
+                                     @change-toggle="handleFavoriteToggle"
                     />
                 </div>
                 <l-n-b-menu-item v-else

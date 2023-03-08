@@ -46,7 +46,7 @@
                                        :required="true"
                         >
                             <p-toggle-button :value="isAutoUpgrade"
-                                             @change="onChangeAutoUpgrade"
+                                             @change-toggle="onChangeAutoUpgrade"
                             />
                         </p-field-group>
                     </div>

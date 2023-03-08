@@ -45,8 +45,7 @@
                                    :required="true"
                     >
                         <p-toggle-button :value="inputModel.isAutoUpgrade"
-                                         sync
-                                         @change="onChangeAutoUpgrade"
+                                         @change-toggle="onChangeAutoUpgrade"
                         />
                     </p-field-group>
                 </div>
