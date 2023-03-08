@@ -176,7 +176,7 @@ module.exports = {
         ],
         'import/namespace': [0, { allowComputed: true }],
     },
-    ignorePatterns: ['**/node_modules/**', 'dist/**', '.out/**'],
+    ignorePatterns: ['**/node_modules/**', 'dist/**', '.out/**', 'packages/cloudforet/language-pack/**'],
     parser: 'vue-eslint-parser',
     parserOptions: {
         parser: '@typescript-eslint/parser',

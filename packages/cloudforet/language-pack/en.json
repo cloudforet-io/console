@@ -1,0 +1,108 @@
+{
+	"BUTTON_MODAL": {
+		"CANCEL": "Cancel",
+		"CLOSE": "Close",
+		"CONFIRM": "Confirm"
+	},
+	"COLLAPSIBLE_PANEL": {
+		"HIDE": "Hide",
+		"SEE_MORE": "See more"
+	},
+	"COLLAPSIBLE_TOGGLE": {
+		"HIDE": "hide",
+		"SHOW_MORE": "show more"
+	},
+	"CONTEXT_MENU": {
+		"CLEAR_SELECTION": "Clear Selection",
+		"DONE": "Done",
+		"NO_ITEM": "No Item",
+		"SELECTED_LIST": "Selected List",
+		"SHOW_MORE": "Show more"
+	},
+	"COPY_BUTTON": {
+		"COPIED": "Copied"
+	},
+	"DATA_LOADER": {
+		"NO_DATA": "No Data"
+	},
+	"DATA_TABLE": {
+		"NO_DATA": "No Data"
+	},
+	"DATETIME_PICKER": {
+		"SELECT_DATE": "Select Date",
+		"SELECT_TIME": "Select Time"
+	},
+	"DATE_PAGINATION": {
+		"MONTH": "Month",
+		"YEAR": "Year"
+	},
+	"DEFINITION_TABLE": {
+		"NO_DATA": "No Data"
+	},
+	"DOUBLE_CHECK_MODAL": {
+		"INPUT_DESC": "Type {text} to Confirm.",
+		"INVALID_TEXT": "text is not {text}"
+	},
+	"EMPTY": {
+		"NO_DATA": "No Data"
+	},
+	"FIELD_GROUP": {
+		"OPTIONAL": "optional"
+	},
+	"FILTERABLE_DROPDOWN": {
+		"ITEMS_SELECTED": "item selected | items selected",
+		"PLACEHOLDER": "Select",
+		"QUERY_PLACEHOLDER": "Select property: value"
+	},
+	"JSON_SCHEMA_FORM": {
+		"GENERATE": "Generate"
+	},
+	"PAGE_TITLE": {
+		"SELECTED_OF": "{selectedCount} / {totalCount}"
+	},
+	"PANEL_CONTENT": {
+		"ID": "ID",
+		"NAME": "Name",
+		"STATE": "State"
+	},
+	"PROGRESS_WIZARD": {
+		"CANCEL": "Cancel",
+		"CONFIRM": "Confirm",
+		"NEXT": "Next",
+		"OPTIONAL": "optional",
+		"PREV": "Prev",
+		"STEP": "Step {step}"
+	},
+	"QUERY_INPUT": {
+		"PLACEHOLDER": "Enter property: value"
+	},
+	"QUERY_SEARCH": {
+		"HELP": "help"
+	},
+	"QUERY_SEARCH_GUIDE": {
+		"CONTACT": "contact us",
+		"FILTER": "filters",
+		"HELP": "Need more help? {contact}",
+		"OPERATOR": "operators",
+		"QUERY_KEY": "Query Key",
+		"STEP_1": "Select a refined filter {queryKey} and use specific words.",
+		"STEP_2_1": "Add and Delete {filter} to narrow your results.",
+		"STEP_2_2": "OR Search for the same filters, And Search for different filters.",
+		"STEP_3": "We support below {operator}.",
+		"TITLE": "Search Guide"
+	},
+	"QUERY_SEARCH_TAGS": {
+		"CLEAR_ALL": "Clear",
+		"FILTER": "Filter"
+	},
+	"SEARCH": {
+		"PLACEHOLDER": "Search"
+	},
+	"SELECT_DROPDOWN": {
+		"SELECT": "Select"
+	},
+	"TEXT_INPUT": {
+		"HIDE": "Hide",
+		"SHOW": "Show"
+	}
+}

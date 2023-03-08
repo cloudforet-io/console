@@ -58,6 +58,7 @@ export default defineConfig(({ mode }) => ({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
+            '@cloudforet/language-pack': path.resolve(__dirname, './packages/cloudforet/language-pack/'),
         },
     },
 }));
