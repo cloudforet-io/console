@@ -8,6 +8,7 @@ import en from '@cloudforet/language-pack/en.json';
 import ja from '@cloudforet/language-pack/ja.json';
 import ko from '@cloudforet/language-pack/ko.json';
 
+
 import { loadDayjsLocale } from '@/translations/vendors/dayjs';
 
 import { loadFonts } from '@/styles/fonts';
