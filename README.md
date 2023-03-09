@@ -65,7 +65,7 @@ follow the instructions below.
 
 ### Set Variables
 
-#### Add `playwright.env` file into project root.
+#### Add `playwright/local.env` file into project root.
 ```
   USERNAME=testuser
   PASSWORD=password

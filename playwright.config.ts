@@ -5,7 +5,8 @@ import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
-dotenv.config({ path: path.resolve(path.dirname(__filename), 'playwright.env') });
+const env = process.env.CI ? 'ci' : 'local';
+dotenv.config({ path: path.resolve(path.dirname(__filename), `playwright/${env}.env`) });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
