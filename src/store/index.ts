@@ -10,7 +10,6 @@ import favorite from './modules/favorite';
 import file from './modules/file';
 import recent from './modules/recent';
 import reference from './modules/reference';
-import service from './modules/service';
 import settings from './modules/settings';
 import user from './modules/user';
 import plugins from './plugins';
@@ -28,7 +27,6 @@ const store = new Vuex.Store<any>({
         reference,
         display,
         file,
-        service,
         error,
     },
     plugins,
