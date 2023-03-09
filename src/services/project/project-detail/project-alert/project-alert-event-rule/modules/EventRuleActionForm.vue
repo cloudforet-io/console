@@ -252,10 +252,10 @@ export default {
         });
 
         /* event */
-        const onToggleChange = () => {
+        const onToggleChange = (value) => {
             state.proxyActions = {
                 ...state.proxyActions,
-                no_notification: !state.proxyActions.no_notification,
+                no_notification: value,
             };
         };
         const handleUpdateAdditionalInformation = (tags: Tag) => {
