@@ -54,9 +54,15 @@ class GoogleAuth extends Authenticator {
         const tokenClient = await google.accounts.oauth2.initTokenClient({
             client_id: store.state.domain.authOptions.client_id,
             scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid',
+            include_granted_scopes: false,
             callback: async (res) => {
-                await GoogleAuth.onSuccess(res.access_token);
-                if (onSignInCallback) onSignInCallback();
+                if (google.accounts.oauth2.hasGrantedAllScopes(res, 'https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email')) {
+                    await GoogleAuth.onSuccess(res.access_token);
+                    if (onSignInCallback) onSignInCallback();
+                } else {
+                    ErrorHandler.handleError(new Error('GoogleAuth.signIn: has not granted all scopes'));
+                    await store.dispatch('display/showSignInErrorMessage');
+                }
             },
         });
         tokenClient.requestAccessToken();
