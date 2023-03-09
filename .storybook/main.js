@@ -33,7 +33,6 @@ module.exports = {
     config.resolve.alias = {
       'vue': 'vue/dist/vue.common.js',
       '@': path.resolve(__dirname, '../src'),
-      '@cloudforet/language-pack': path.resolve(__dirname, '../packages/cloudforet/language-pack/'),
       'fs': path.resolve(__dirname, 'fsMock.js'),
     };
 

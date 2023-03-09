@@ -17,8 +17,7 @@
     "baseUrl": ".",
     "types": ["webpack-env", "vitest/globals"],
     "paths": {
-      "@/*": ["src/*"],
-      "@cloudforet/language-pack/*": ["packages/cloudforet/language-pack/*"]
+      "@/*": ["src/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
