@@ -22,7 +22,7 @@
                         <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}</b>
                         <p-toggle-button class="ml-2"
                                          :value="stack"
-                                         @change="handleToggleStack"
+                                         @change-toggle="handleToggleStack"
                         />
                     </template>
                     <template v-else-if="stack">
@@ -130,7 +130,7 @@ export default {
             }
             costExplorerStore.commit('costAnalysis/setGranularity', granularity);
         };
-        const handleToggleStack = async ({ value }) => {
+        const handleToggleStack = async (value) => {
             costExplorerStore.commit('costAnalysis/setStack', value);
         };
         const handleSelectedDates = (period) => {

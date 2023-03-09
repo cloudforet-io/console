@@ -45,8 +45,7 @@
                                    :required="true"
                     >
                         <p-toggle-button :value="inputModel.isAutoUpgrade"
-                                         sync
-                                         @change="onChangeAutoUpgrade"
+                                         @change-toggle="onChangeAutoUpgrade"
                         />
                     </p-field-group>
                 </div>
@@ -195,8 +194,8 @@ export default {
         };
 
         /* event */
-        const onChangeAutoUpgrade = () => {
-            formState.inputModel.isAutoUpgrade = !formState.inputModel.isAutoUpgrade;
+        const onChangeAutoUpgrade = (value) => {
+            formState.inputModel.isAutoUpgrade = value;
         };
         const onClickReset = (): void => {
             if (state.loading) return;

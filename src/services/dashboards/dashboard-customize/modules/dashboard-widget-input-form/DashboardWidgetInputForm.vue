@@ -38,7 +38,7 @@
                         >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                         <p-toggle-button :value="inheritableProperties.includes(propertyName)"
                                          :disabled="widgetOptionsJsonSchema.properties?.[propertyName]?.disabled"
-                                         @change="handleChangeInheritToggle(propertyName, $event)"
+                                         @change-toggle="handleChangeInheritToggle(propertyName, $event)"
                         />
                     </div>
                 </template>
@@ -231,7 +231,7 @@ export default defineComponent<Props>({
 
 
         /* inherit */
-        const handleChangeInheritToggle = (propertyName: string, { value }) => {
+        const handleChangeInheritToggle = (propertyName: string, value) => {
             widgetFormState.inheritOptions = { ...widgetFormState.inheritOptions, [propertyName]: { enabled: value } };
 
             // update widget option schema
@@ -443,12 +443,10 @@ export default defineComponent<Props>({
         padding-left: 0.25rem;
     }
     .inherit-toggle-button {
-        @apply bg-gray-100 rounded;
+        @apply flex bg-gray-100 rounded;
         line-height: 1.25;
         padding: 0.25rem 0.5rem;
-        .toggle-button {
-            pointer-events: auto;
-        }
+        pointer-events: initial;
         .text {
             @apply text-gray-300;
             font-weight: 400;

@@ -12,14 +12,13 @@
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') }}
                 </p>
-                <div>
+                <div class="toggle-wrapper">
                     <span v-if="proxyActions.no_notification"
                           class="toggle-text"
                     >ON</span>
                     <p-toggle-button
-                        sync
                         :value="proxyActions.no_notification"
-                        @change="onToggleChange"
+                        @change-toggle="onToggleChange"
                     />
                 </div>
             </div>
@@ -253,7 +252,7 @@ export default {
         });
 
         /* event */
-        const onToggleChange = ({ value }) => {
+        const onToggleChange = (value) => {
             state.proxyActions = {
                 ...state.proxyActions,
                 no_notification: value,
@@ -314,9 +313,12 @@ export default {
             }
         }
 
-        .toggle-text {
-            @apply text-secondary;
-            padding-right: 0.5rem;
+        .toggle-wrapper {
+            @apply flex;
+            .toggle-text {
+                @apply text-secondary;
+                padding-right: 0.5rem;
+            }
         }
         .project-select-dropdown, .user-search-dropdown {
             width: 60%;

@@ -4,7 +4,7 @@
             <div class="left-section">
                 <p-toggle-button :value="isActivated"
                                  :disabled="manageDisabled"
-                                 @change="onToggleChange"
+                                 @change-toggle="onToggleChange"
                 />
                 <span class="card-title"
                       :class="{ inactivated: !isActivated }"

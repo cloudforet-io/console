@@ -7,15 +7,13 @@
             <div class="sidebar-contents">
                 <div class="selector-wrapper">
                     <p-toggle-button :value="state.enableDateRange"
-                                     sync
-                                     @change="handleChangeDateRangeToggle"
+                                     @change-toggle="handleChangeDateRangeToggle"
                     />
                     <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_DATE') }}</span>
                 </div>
                 <div class="selector-wrapper">
                     <p-toggle-button :value="state.enableCurrency"
-                                     sync
-                                     @change="handleChangeCurrencyToggle"
+                                     @change-toggle="handleChangeCurrencyToggle"
                     />
                     <span>{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY') }}</span>
                 </div>
