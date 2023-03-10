@@ -53,10 +53,18 @@ class GoogleAuth extends Authenticator {
         await GoogleAuth.loadGapi();
         const tokenClient = await google.accounts.oauth2.initTokenClient({
             client_id: store.state.domain.authOptions.client_id,
-            scope: 'https://www.googleapis.com/auth/userinfo.profile',
+            scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid',
+            include_granted_scopes: false,
             callback: async (res) => {
-                await GoogleAuth.onSuccess(res.access_token);
-                if (onSignInCallback) onSignInCallback();
+                if (google.accounts.oauth2.hasGrantedAllScopes(res, 'https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email')) {
+                    await GoogleAuth.onSuccess(res.access_token);
+                    if (onSignInCallback) onSignInCallback();
+                } else {
+                    ErrorHandler.handleError(new Error('GoogleAuth.signIn: has not granted all scopes'), {
+                        title: 'Google SSO Error',
+                        description: "Sorry, but we're having trouble with signing you in. Please contact system administrator.",
+                    });
+                }
             },
         });
         tokenClient.requestAccessToken();
