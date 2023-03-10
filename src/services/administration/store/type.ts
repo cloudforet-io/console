@@ -1,6 +1,5 @@
 import type { Store } from 'vuex';
 
-import type { PolicyState } from '@/services/administration/store/policy/type';
 import type { RoleStoreState } from '@/services/administration/store/role/type';
 import type { UserStoreState } from '@/services/administration/store/user/type';
 
@@ -12,3 +11,18 @@ export type AdministrationStore = Store<AdministrationState & {
     role: RoleStoreState;
     policy: PolicyState;
 }>;
+
+
+/* policy */
+export const POLICY_TYPE = {
+    MANAGED: 'MANAGED',
+    CUSTOM: 'CUSTOM',
+    ALL: 'ALL',
+} as const;
+export type PolicyType = typeof POLICY_TYPE[keyof typeof POLICY_TYPE];
+
+export const POLICY_STATE = {
+    ENABLED: 'ENABLED',
+    DISABLED: 'DISABLED',
+} as const;
+export type PolicyState = typeof POLICY_STATE[keyof typeof POLICY_STATE];

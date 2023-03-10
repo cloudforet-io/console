@@ -5,7 +5,6 @@ import type { AdministrationState, AdministrationStore } from '@/services/admini
 import * as actions from './actions';
 import * as getters from './getters';
 import * as mutations from './mutations';
-import policy from './policy';
 import role from './role';
 import user from './user';
 
@@ -17,7 +16,6 @@ export const administrationStoreModule: Module<AdministrationState, any> = {
     modules: {
         user,
         role,
-        policy,
     },
     getters,
     actions,
