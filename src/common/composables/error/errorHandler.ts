@@ -59,4 +59,9 @@ export default class ErrorHandler {
         }
         this.handleError(error);
     }
+
+    static handleToastUIError(error: unknown, errorTitle: TranslateResult|string, errorDescription?: TranslateResult|string) {
+        if (errorTitle) showErrorMessage(errorTitle, errorDescription);
+        this.handleError(error);
+    }
 }
