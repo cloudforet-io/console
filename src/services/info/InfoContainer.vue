@@ -26,13 +26,11 @@ import {
 import { store } from '@/store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
-import { registerServiceStore } from '@/common/composables/register-service-store';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import InfoLNB from '@/services/info/InfoLNB.vue';
-import { infoStore, infoStoreModule } from '@/services/info/store';
-import type { InfoState } from '@/services/info/store/type';
+
 
 export default defineComponent({
     name: 'InfoContainer',
@@ -42,7 +40,6 @@ export default defineComponent({
         VerticalPageLayout,
     },
     setup() {
-        registerServiceStore<InfoState>('info', infoStoreModule, infoStore);
         const { breadcrumbs } = useBreadcrumbs();
 
         /* Init */
