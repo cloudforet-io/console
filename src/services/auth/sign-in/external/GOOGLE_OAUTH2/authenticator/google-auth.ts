@@ -60,8 +60,10 @@ class GoogleAuth extends Authenticator {
                     await GoogleAuth.onSuccess(res.access_token);
                     if (onSignInCallback) onSignInCallback();
                 } else {
-                    const errorDescription = "Sorry, but we're having trouble with signing you in. Please contact system administrator.";
-                    ErrorHandler.handleToastUIError(new Error('GoogleAuth.signIn: has not granted all scopes'), 'Google SSO Error', errorDescription);
+                    ErrorHandler.handleError(new Error('GoogleAuth.signIn: has not granted all scopes'), {
+                        title: 'Google SSO Error',
+                        description: "Sorry, but we're having trouble with signing you in. Please contact system administrator.",
+                    });
                 }
             },
         });

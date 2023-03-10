@@ -19,6 +19,11 @@ interface GlobalErrorHandlers {
     authorizationErrorHandler: () => void;
 }
 
+interface ErrorInfo {
+    title: TranslateResult;
+    description?: TranslateResult;
+}
+
 export default class ErrorHandler {
     private static authenticationErrorHandler;
 
@@ -29,7 +34,7 @@ export default class ErrorHandler {
         ErrorHandler.authorizationErrorHandler = authorizationErrorHandler;
     }
 
-    static handleError(error) {
+    static handleError(error: unknown, errorInfo?: ErrorInfo) {
         if (isInstanceOfAuthenticationError(error)) {
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
@@ -48,6 +53,7 @@ export default class ErrorHandler {
         } else if (isInstanceOfAPIError(error)) {
             console.error('API Error', error);
         } else {
+            if (errorInfo?.title) showErrorMessage(errorInfo.title, errorInfo?.description);
             console.error(error);
         }
     }
@@ -57,11 +63,6 @@ export default class ErrorHandler {
             if (isInstanceOfBadRequestError(error) && errorMessage) showErrorMessage(errorMessage, error);
             else if (isInstanceOfAPIError(error)) showErrorMessage('Something is Wrong! Please contact the administrator.', error);
         }
-        this.handleError(error);
-    }
-
-    static handleToastUIError(error: unknown, errorTitle: TranslateResult|string, errorDescription?: TranslateResult|string) {
-        if (errorTitle) showErrorMessage(errorTitle, errorDescription);
         this.handleError(error);
     }
 }
