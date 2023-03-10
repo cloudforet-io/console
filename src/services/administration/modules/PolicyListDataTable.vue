@@ -6,7 +6,7 @@
             :searchable="!selectable"
             :refreshable="!selectable"
             search-type="query"
-            :loading="loading"
+            :loading="policyState.loading"
             :fields="fields"
             :items="items"
             :query-tags="queryTags"
@@ -39,13 +39,13 @@
                 <p-badge badge-type="solid-outline"
                          :style-type="policyTypeBadgeColorFormatter(value)"
                 >
-                    {{ capitalize(value ? value : POLICY_TYPES.MANAGED) }}
+                    {{ capitalize(value ? value : POLICY_TYPE.MANAGED) }}
                 </p-badge>
             </template>
             <template #col-policy_id-format="{ value, item }">
                 <template v-if="value">
                     <p-anchor
-                        :hide-icon="!anchorIconVisible"
+                        :hide-icon="!!hideAnchorIcon"
                         highlight
                         :to="{
                             name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
@@ -68,7 +68,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -91,7 +90,6 @@ import { store } from '@/store';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import type { PolicyTypes } from '@/services/administration/iam/policy/lib/config';
-import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
 import {
     makeCustomValueHandler,
     policyCreatedAtFormatter,
@@ -100,11 +98,12 @@ import {
 import type { PolicyDataModel } from '@/services/administration/iam/policy/lib/type';
 import type { Policy } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { administrationStore } from '@/services/administration/store';
+import { usePolicyStore } from '@/services/administration/store/policy-page-store';
+import { POLICY_TYPE } from '@/services/administration/store/type';
 
 const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyDataModel[], selectedType: PolicyTypes): PolicyDataModel[] => {
     // 1. filter by type
-    const _typeFilteredItems = filter(policyList, selectedType === POLICY_TYPES.ALL ? {} : { policy_type: selectedType });
+    const _typeFilteredItems = filter(policyList, selectedType === POLICY_TYPE.ALL ? {} : { policy_type: selectedType });
 
     // 2. filter by query tags
     let results = [..._typeFilteredItems];
@@ -128,9 +127,9 @@ export default {
             type: Boolean,
             default: false,
         },
-        anchorIconVisible: {
+        hideAnchorIcon: {
             type: Boolean,
-            default: true,
+            default: false,
         },
         initialPolicyList: {
             type: Array as PropType<Policy[]>,
@@ -138,6 +137,9 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const policyStore = usePolicyStore();
+        const policyState = policyStore.state;
+
         const currentRoute = SpaceRouter.router.currentRoute;
         const policyListApiQueryHelper = new ApiQueryHelper().setFiltersAsRawQueryString(currentRoute.query?.filters);
         const keyItemSets: KeyItemSet[] = [{
@@ -148,14 +150,12 @@ export default {
             ],
         }];
         const state = reactive({
-            loading: computed(() => administrationStore.state.policy.policyListLoading),
-            policyList: computed(() => administrationStore.state.policy.policyList),
             policyTypeList: [
-                { name: POLICY_TYPES.MANAGED, label: 'Managed' },
-                { name: POLICY_TYPES.CUSTOM, label: 'Custom' },
-                { name: POLICY_TYPES.ALL, label: 'All' },
+                { name: POLICY_TYPE.MANAGED, label: 'Managed' },
+                { name: POLICY_TYPE.CUSTOM, label: 'Custom' },
+                { name: POLICY_TYPE.ALL, label: 'All' },
             ],
-            selectedType: currentRoute?.query?.policy_type ?? POLICY_TYPES.MANAGED as PolicyTypes,
+            selectedType: currentRoute?.query?.policy_type ?? POLICY_TYPE.MANAGED as PolicyTypes,
             fields: [
                 { name: 'name', label: 'Name' },
                 { name: 'policy_type', label: 'Type' },
@@ -164,11 +164,11 @@ export default {
                 { name: 'created_at', label: 'Created' },
             ],
             items: computed<PolicyDataModel[]>(() => {
-                if (!state.policyList) return [];
-                return getFilteredItems(state.queryTags, state.policyList, state.selectedType);
+                if (!policyState.policyList.length) return [];
+                return getFilteredItems(state.queryTags, policyState.policyList, state.selectedType);
             }),
             timezone: computed(() => store.state.user.timezone),
-            totalCount: computed(() => administrationStore.state.policy.totalCount),
+            totalCount: computed(() => policyState.totalCount),
             queryTags: policyListApiQueryHelper.setKeyItemSets(keyItemSets).queryTags as QueryTag[],
             selectedIdMap: {} as Record<string, PolicyTypes>,
             selectedIndices: computed(() => state.items.reduce((results, d, i) => {
@@ -185,7 +185,7 @@ export default {
 
         /* Api */
         const listPolicies = async () => {
-            await administrationStore.dispatch('policy/fetchPolicyList', policyListApiQueryHelper.data);
+            policyStore.listPolicyData(policyListApiQueryHelper.data);
         };
 
         /* Event */
@@ -229,7 +229,7 @@ export default {
 
         const handleUpdateSelectIndex = (selectedIndices: number[]) => {
             const selectedIdMap: Record<string, PolicyTypes> = {};
-            if (state.selectedType !== POLICY_TYPES.ALL) {
+            if (state.selectedType !== POLICY_TYPE.ALL) {
                 const currentPolicyType = state.selectedType;
                 Object.entries(state.selectedIdMap).forEach(([id, policyType]) => {
                     if (policyType !== currentPolicyType) {
@@ -251,9 +251,6 @@ export default {
         };
 
         /* Watcher */
-        watch(() => state.totalCount as number, (value: number) => {
-            emit('update-total-count', value);
-        });
         watch(() => props.initialPolicyList, (initialPolicyList: Policy[]) => {
             if (initialPolicyList.length) {
                 emit('update-selected-policy-list', initialPolicyList);
@@ -272,9 +269,10 @@ export default {
 
         return {
             ...toRefs(state),
+            policyState,
             policySearchHandler,
             ADMINISTRATION_ROUTE,
-            POLICY_TYPES,
+            POLICY_TYPE,
             policyTypeBadgeColorFormatter,
             policyCreatedAtFormatter,
             handleChange,

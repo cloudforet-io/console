@@ -3,25 +3,25 @@
         <p-heading
             :title="$t('IAM.POLICY.POLICY')"
             use-total-count
-            :total-count="totalCount"
+            :total-count="state.totalCount"
         >
             <template #extra>
                 <p-button style-type="primary"
                           icon-left="ic_plus_bold"
-                          :disabled="!hasManagePermission"
+                          :disabled="!state.hasManagePermission"
                           @click="$router.push({ name: ADMINISTRATION_ROUTE.IAM.POLICY.CREATE._NAME })"
                 >
                     {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
                 </p-button>
             </template>
         </p-heading>
-        <policy-list-data-table :anchor-icon-visible="false" />
+        <policy-list-data-table hide-anchor-icon />
     </section>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
 import { PHeading, PButton } from '@spaceone/design-system';
@@ -30,25 +30,12 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import PolicyListDataTable from '@/services/administration/modules/PolicyListDataTable.vue';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { administrationStore } from '@/services/administration/store';
+import { usePolicyStore } from '@/services/administration/store/policy-page-store';
 
-export default {
-    name: 'PolicyPage',
-    components: {
-        PHeading,
-        PButton,
-        PolicyListDataTable,
-    },
-    setup() {
-        const state = reactive({
-            totalCount: computed(() => administrationStore.state.policy.totalCount),
-            hasManagePermission: useManagePermissionState(),
-        });
+const policyStore = usePolicyStore();
 
-        return {
-            ...toRefs(state),
-            ADMINISTRATION_ROUTE,
-        };
-    },
-};
+const state = reactive({
+    totalCount: computed(() => policyStore.state.totalCount),
+    hasManagePermission: useManagePermissionState(),
+});
 </script>
