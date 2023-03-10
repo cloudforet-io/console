@@ -10,9 +10,9 @@ type Path = string[]|string;
 
 const getPathList = (path: Path): string[] => {
     if (typeof path === 'string') {
-        return ['service', ...path.split('/')];
+        return path.split('/');
     }
-    return ['service', ...path];
+    return path;
 };
 
 const undefineServiceStore = (serviceStore) => {
