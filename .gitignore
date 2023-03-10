@@ -35,3 +35,10 @@ src/assets
 
 # Skaffold
 skaffold.yaml
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/playwright/local.env
+/playwright/local-storage.json
