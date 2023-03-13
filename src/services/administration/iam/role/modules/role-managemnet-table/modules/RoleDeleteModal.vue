@@ -91,8 +91,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
-import type { RoleBindingType } from '@/services/administration/iam/role/modules/role-managemnet-table/modules/type';
 import type { RoleData } from '@/services/administration/iam/role/type';
+import type { RoleBindingType } from '@/services/administration/type';
 import type { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
 
 interface UnDeletableRole {

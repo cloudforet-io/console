@@ -6,13 +6,13 @@
             selectable
             sortable
             exportable
-            :loading="loading"
-            :items="users"
-            :select-index.sync="selectedIndex"
+            :loading="userPageState.loading"
+            :items="userPageState.users"
+            :select-index="userPageState.selectedIndices"
             :fields="fields"
             :sort-by.sync="sortBy"
             :sort-desc="true"
-            :total-count="totalCount"
+            :total-count="userPageState.totalCount"
             :key-item-sets="keyItemSets"
             :value-handler-map="valueHandlerMap"
             :query-tags="tags"
@@ -22,7 +22,7 @@
             @refresh="handleChange()"
             @export="handleExport"
         >
-            <template slot="toolbox-left">
+            <template #toolbox-left>
                 <p-button style-type="primary"
                           icon-left="ic_plus_bold"
                           :disabled="manageDisabled"
@@ -74,41 +74,33 @@
             </template>
         </p-toolbox-table>
         <user-management-modal v-if="modalState.visible"
-                               :visible="modalState.visible"
                                :header-title="modalState.title"
                                :sub-title="modalState.subTitle"
                                :theme-color="modalState.themeColor"
                                :mode="modalState.mode"
-                               @confirm="listUsers()"
+                               @confirm="handleUserManagementModalConfirm()"
         />
-        <user-create-modal v-if="userFormState.visible && !userFormState.updateMode"
+        <user-create-modal v-if="userPageState.visibleCreateModal"
                            :header-title="userFormState.headerTitle"
                            :item="userFormState.item"
-                           :visible.sync="userFormState.visible"
                            @confirm="handleUserFormConfirm"
         />
-        <user-update-modal v-if="userFormState.visible && userFormState.updateMode"
+        <user-update-modal v-if="userPageState.visibleUpdateModal"
                            :header-title="userFormState.headerTitle"
-                           :update-mode="userFormState.updateMode"
                            :item="userFormState.item"
-                           :visible.sync="userFormState.visible"
                            @confirm="handleUserFormConfirm"
         />
     </section>
 </template>
 
 <script lang="ts">
-
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PBadge,
-    PButton,
-    PSelectDropdown,
-    PStatus, PToolboxTable,
+    PBadge, PButton, PSelectDropdown, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
@@ -127,15 +119,14 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userSearchHandlers } from '@/services/administration/iam/user/lib/config';
-import { calculateTime, userStateFormatter } from '@/services/administration/iam/user/lib/helper';
+import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import UserCreateModal from '@/services/administration/iam/user/modules/user-management-modal/UserCreateModal.vue';
 import UserManagementModal
     from '@/services/administration/iam/user/modules/user-management-modal/UserManagementModal.vue';
 import UserUpdateModal from '@/services/administration/iam/user/modules/user-management-modal/UserUpdateModal.vue';
-import type { User, UserType } from '@/services/administration/iam/user/type';
-import { USER_TYPE } from '@/services/administration/iam/user/type';
-import { administrationStore } from '@/services/administration/store';
-import { MODAL_TYPE } from '@/services/administration/store/user/type';
+import type { User } from '@/services/administration/iam/user/type';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
+
 
 export default {
     name: 'UserManagementTable',
@@ -159,7 +150,10 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup() {
+        const userPageStore = useUserPageStore();
+        const userPageState = userPageStore.state;
+
         const vm = getCurrentInstance()?.proxy as Vue;
         const userListApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(15)
@@ -167,9 +161,6 @@ export default {
             .setFiltersAsRawQueryString(vm.$route.query.filters);
 
         const state = reactive({
-            loading: false,
-            users: [] as User[],
-            timezone: computed(() => store.state.user.timezone || 'UTC'),
             fields: computed(() => ([
                 { name: 'user_id', label: 'User ID' },
                 { name: 'name', label: 'Name' },
@@ -194,31 +185,24 @@ export default {
                 { key: 'timezone', name: 'Timezone' },
             ],
             sortBy: 'name',
-            totalCount: 0,
             // selected
-            selectedIndex: [],
-            selectedUsers: computed(() => {
-                const users = [] as User[];
-                state.selectedIndex.map((d) => users.push(state.users[d]));
-                return users;
-            }) || [],
-            isSelected: computed(() => state.selectedIndex.length > 0),
+            isSelected: computed(() => userPageState.selectedIndices.length > 0),
             dropdownMenu: computed(() => ([
                 {
                     type: 'item',
                     name: 'update',
-                    label: vm.$t('IDENTITY.USER.MAIN.UPDATE'),
-                    disabled: state.selectedIndex.length > 1 || !state.isSelected,
+                    label: i18n.t('IDENTITY.USER.MAIN.UPDATE'),
+                    disabled: userPageState.selectedIndices.length > 1 || !state.isSelected,
                 },
                 {
-                    type: 'item', name: 'delete', label: vm.$t('IDENTITY.USER.MAIN.DELETE'), disabled: !state.isSelected,
+                    type: 'item', name: 'delete', label: i18n.t('IDENTITY.USER.MAIN.DELETE'), disabled: !state.isSelected,
                 },
                 { type: 'divider' },
                 {
-                    type: 'item', name: 'enable', label: vm.$t('IDENTITY.USER.MAIN.ENABLE'), disabled: !state.isSelected,
+                    type: 'item', name: 'enable', label: i18n.t('IDENTITY.USER.MAIN.ENABLE'), disabled: !state.isSelected,
                 },
                 {
-                    type: 'item', name: 'disable', label: vm.$t('IDENTITY.USER.MAIN.DISABLE'), disabled: !state.isSelected,
+                    type: 'item', name: 'disable', label: i18n.t('IDENTITY.USER.MAIN.DISABLE'), disabled: !state.isSelected,
                 },
             ] as MenuItem[])),
             keyItemSets: userSearchHandlers.keyItemSets as KeyItemSet[],
@@ -231,63 +215,27 @@ export default {
             title: '',
             subTitle: '',
             themeColor: undefined as string | undefined,
-            isManagementModalVisible: computed(() => administrationStore.getters['user/isManagementModalVisible']),
-            visible: computed(() => modalState.isManagementModalVisible),
+            visible: computed(() => userPageState.visibleManagementModal),
         });
         const userFormState = reactive({
-            visible: computed(() => userFormState.isCreateModalVisible || userFormState.isUpdateModalVisible),
+            visible: computed(() => userPageState.visibleCreateModal || userPageState.visibleUpdateModal),
             updateMode: false,
             headerTitle: '',
-            item: undefined,
+            item: undefined as undefined | User,
             roleOfSelectedUser: '',
-            isCreateModalVisible: computed(() => administrationStore.getters['user/isCreateModalVisible']),
-            isUpdateModalVisible: computed(() => administrationStore.getters['user/isUpdateModalVisible']),
         });
 
-        const getArrayWithNotDuplicatedItem = (array) => [...new Set(array)];
-        const getUserType = (userType: UserType) => {
-            let formattedUserType;
-            if (userType === USER_TYPE.API_USER) formattedUserType = 'API Only';
-            else formattedUserType = 'Console, API';
-            return formattedUserType;
-        };
-
         let userListApiQuery = userListApiQueryHelper.data;
-        const listUsers = async () => {
-            state.loading = true;
-            try {
-                const res = await SpaceConnector.client.identity.user.list({
-                    query: userListApiQuery,
-                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at', 'api_key_count', 'tags'],
-                    include_role_binding: true,
-                });
-                state.users = res.results.map((d) => ({
-                    ...d,
-                    api_key_count: d.api_key_count || 0,
-                    user_type: getUserType(d.user_type),
-                    role_name: (getArrayWithNotDuplicatedItem(d.role_bindings.map((data) => data.role_info.name))).join(', '),
-                    last_accessed_at: calculateTime(d.last_accessed_at, state.timezone),
-                }));
-                state.totalCount = res.total_count;
-                state.selectedIndex = [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.users = [];
-                state.totalCount = 0;
-            } finally {
-                state.loading = false;
-            }
-        };
 
         const saveRoleOfSelectedUser = (index) => {
-            const selectedUser = state.users[index];
-            const roleBindingsData = selectedUser.role_bindings?.find((data) => data.role_info?.role_type === 'DOMAIN');
+            const selectedUser = userPageState.users[index];
+            const roleBindingsData = selectedUser?.role_bindings?.find((data) => data.role_info?.role_type === 'DOMAIN');
             if (roleBindingsData) userFormState.roleOfSelectedUser = roleBindingsData.role_info?.role_id;
             else userFormState.roleOfSelectedUser = '';
         };
 
         const handleSelect = async (index) => {
-            state.selectedIndex = index;
+            userPageState.selectedIndices = index;
             if (index.length === 1) saveRoleOfSelectedUser(index);
         };
 
@@ -296,7 +244,7 @@ export default {
             if (options.queryTags !== undefined) {
                 await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
             }
-            await listUsers();
+            await userPageStore.listUsers(userListApiQuery);
         };
 
         const handleExport = async () => {
@@ -314,36 +262,36 @@ export default {
         /* Modal */
         const clickAdd = () => {
             userFormState.updateMode = false;
-            userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.ADD_TITLE') as string;
+            userFormState.headerTitle = i18n.t('IDENTITY.USER.FORM.ADD_TITLE') as string;
             userFormState.item = undefined;
-            administrationStore.dispatch('user/showModal', MODAL_TYPE.CREATE);
+            userPageState.visibleCreateModal = true;
         };
         const clickUpdate = () => {
             userFormState.updateMode = true;
-            userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.UPDATE_TITLE') as string;
-            userFormState.item = state.users[state.selectedIndex[0]];
-            administrationStore.dispatch('user/showModal', MODAL_TYPE.UPDATE);
+            userFormState.headerTitle = i18n.t('IDENTITY.USER.FORM.UPDATE_TITLE') as string;
+            userFormState.item = userPageState.users[userPageState.selectedIndices[0]];
+            userPageState.visibleUpdateModal = true;
         };
         const clickDelete = () => {
             modalState.mode = 'delete';
-            modalState.title = vm.$t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', state.selectedIndex.length);
+            modalState.title = i18n.t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
+            modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'alert';
-            administrationStore.dispatch('user/showModal', MODAL_TYPE.MANAGEMENT);
+            userPageState.visibleManagementModal = true;
         };
         const clickEnable = () => {
             modalState.mode = 'enable';
-            modalState.title = vm.$t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', state.selectedIndex.length);
+            modalState.title = i18n.t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
+            modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'safe';
-            administrationStore.dispatch('user/showModal', MODAL_TYPE.MANAGEMENT);
+            userPageState.visibleManagementModal = true;
         };
         const clickDisable = () => {
             modalState.mode = 'disable';
-            modalState.title = vm.$t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', state.selectedIndex.length);
+            modalState.title = i18n.t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
+            modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'alert';
-            administrationStore.dispatch('user/showModal', MODAL_TYPE.MANAGEMENT);
+            userPageState.visibleManagementModal = true;
         };
 
         const handleSelectDropdown = (name) => {
@@ -387,9 +335,9 @@ export default {
                 }
                 showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
             } finally {
-                state.selectedIndex = [];
+                userPageState.selectedIndices = [];
             }
         };
         const updateUser = async (item, roleId) => {
@@ -407,10 +355,10 @@ export default {
                 }
                 showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
+                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
             } finally {
-                await listUsers();
-                state.selectedIndex = [];
+                await userPageStore.listUsers(userListApiQuery);
+                userPageState.selectedIndices = [];
             }
         };
 
@@ -420,33 +368,24 @@ export default {
             } else {
                 await addUser(item, roleId);
             }
-            await listUsers();
+            await userPageStore.listUsers(userListApiQuery);
+        };
+        const handleUserManagementModalConfirm = () => {
+            userPageStore.listUsers(userListApiQuery);
         };
 
         (async () => {
-            await listUsers();
+            await userPageStore.listUsers(userListApiQuery);
         })();
-
-        const saveSelectedValueToStore = (selectedIndex: number[]) => {
-            administrationStore.dispatch('user/selectIndex', selectedIndex);
-            administrationStore.dispatch('user/selectUsers', state.selectedUsers);
-        };
-
-        watch(() => state.selectedIndex, (after) => {
-            saveSelectedValueToStore(after);
-        });
-
-        watch(() => state.totalCount, (value: number) => {
-            emit('update-total-count', value);
-        });
 
         return {
             ...toRefs(state),
+            userPageState,
             userFormState,
             userStateFormatter,
             modalState,
-            listUsers,
             clickAdd,
+            handleUserManagementModalConfirm,
             handleSelectDropdown,
             handleUserFormConfirm,
             handleSelect,

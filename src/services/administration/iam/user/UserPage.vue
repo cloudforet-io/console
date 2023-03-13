@@ -3,14 +3,13 @@
         <p-heading :title="$t('IDENTITY.USER.MAIN.TITLE')"
                    use-selected-count
                    use-total-count
-                   :total-count="totalCount"
-                   :selected-count="selectedIndex.length"
+                   :total-count="userPageState.totalCount"
+                   :selected-count="userPageState.selectedIndices.length"
         />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
                 <user-management-table :table-height="height"
                                        :manage-disabled="!hasManagePermission"
-                                       @update-total-count="handleUpdateTotalCount"
                 />
             </template>
         </p-horizontal-layout>
@@ -20,7 +19,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    reactive, toRefs,
 } from 'vue';
 
 import {
@@ -32,7 +31,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import UserManagementTab from '@/services/administration/iam/user/modules/user-management-tab/UserManagementTab.vue';
 import UserManagementTable from '@/services/administration/iam/user/modules/UserManagementTable.vue';
-import { administrationStore } from '@/services/administration/store';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 export default {
     name: 'UserPage',
@@ -43,18 +42,17 @@ export default {
         PHeading,
     },
     setup() {
+        const userPageStore = useUserPageStore();
+        const userPageState = userPageStore.state;
+
         const state = reactive({
-            selectedIndex: computed<number[]>(() => administrationStore.state.user.selectedIndex),
-            totalCount: 0,
             hasManagePermission: useManagePermissionState(),
         });
 
-        const handleUpdateTotalCount = (value) => { state.totalCount = value; };
-
         return {
             ...toRefs(state),
+            userPageState,
             userStateFormatter,
-            handleUpdateTotalCount,
         };
     },
 

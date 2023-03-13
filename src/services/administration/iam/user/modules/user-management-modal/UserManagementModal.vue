@@ -1,12 +1,12 @@
 <template>
     <p-table-check-modal
         v-if="!!mode"
-        :visible.sync="visible"
+        :visible="userPageState.visibleManagementModal"
         :header-title="headerTitle"
         :sub-title="subTitle"
         :theme-color="themeColor"
         :fields="fields"
-        :items="selectedUsers"
+        :items="userPageGetters.selectedUsers"
         modal-size="md"
         @confirm="checkModalConfirm"
         @cancel="handleClose"
@@ -34,7 +34,6 @@
 </template>
 
 <script lang="ts">
-
 import type { SetupContext } from 'vue';
 import {
     computed, getCurrentInstance, reactive, toRefs,
@@ -55,8 +54,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import type { User } from '@/services/administration/iam/user/type';
 import { administrationStore } from '@/services/administration/store';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
+
 
 export default {
     name: 'UserManagementModal',
@@ -83,6 +83,10 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
+        const userPageStore = useUserPageStore();
+        const userPageState = userPageStore.state;
+        const userPageGetters = userPageStore.getters;
+
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             fields: computed(() => ([
@@ -96,12 +100,6 @@ export default {
                 { name: 'last_accessed_at', label: 'Last Activity' },
                 { name: 'timezone', label: 'Timezone' },
             ])),
-            visible: computed({
-                get() { return administrationStore.getters['user/isManagementModalVisible']; },
-                set(val) { administrationStore.commit('user/setVisibleManagementModal', val); },
-            }),
-            selectedIndex: computed<number[]>(() => administrationStore.state.user.selectedIndex),
-            selectedUsers: computed<User[]>(() => administrationStore.state.user.selectedUsers),
         });
 
         const getUsersParam = (items) => ({ users: map(items, 'user_id') });
@@ -110,34 +108,34 @@ export default {
             try {
                 await SpaceConnector.client.identity.user.delete(getUsersParam(items));
                 await administrationStore.dispatch('user/selectIndex', []);
-                showSuccessMessage(i18n.tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', state.selectedIndex.length), '');
+                showSuccessMessage(i18n.tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', userPageState.selectedIndices.length), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length));
+                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', userPageState.selectedIndices.length));
             } finally {
                 emit('confirm');
-                state.visible = false;
+                userPageState.visibleManagementModal = false;
             }
         };
         const enableUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.enable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_ENABLE', state.selectedIndex.length), '');
+                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_ENABLE', userPageState.selectedIndices.length), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', state.selectedIndex.length));
+                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', userPageState.selectedIndices.length));
             } finally {
                 emit('confirm');
-                state.visible = false;
+                userPageState.visibleManagementModal = false;
             }
         };
         const disableUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.disable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DISABLE', state.selectedIndex.length), '');
+                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DISABLE', userPageState.selectedIndices.length), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', state.selectedIndex.length));
+                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', userPageState.selectedIndices.length));
             } finally {
                 emit('confirm');
-                state.visible = false;
+                userPageState.visibleManagementModal = false;
             }
         };
         const checkModalConfirm = async (item) => {
@@ -147,12 +145,14 @@ export default {
         };
 
         const handleClose = () => {
-            state.visible = false;
+            userPageState.visibleManagementModal = false;
         };
 
         return {
             userStateFormatter,
             ...toRefs(state),
+            userPageState,
+            userPageGetters,
             checkModalConfirm,
             handleClose,
         };

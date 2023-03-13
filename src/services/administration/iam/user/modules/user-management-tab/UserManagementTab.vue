@@ -1,17 +1,17 @@
 <template>
     <section>
-        <p-tab v-if="selectedIndex.length === 1"
+        <p-tab v-if="userPageState.selectedIndices.length === 1"
                :tabs="singleItemTabState.tabs"
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
                 <user-detail ref="userDetail"
-                             :user-id="selectedUsers[0].user_id"
+                             :user-id="userPageGetters.selectedUsers[0].user_id"
                              :timezone="timezone"
                 />
             </template>
             <template #tag>
-                <p-tags-panel :resource-id="selectedUsers[0].user_id"
+                <p-tags-panel :resource-id="userPageGetters.selectedUsers[0].user_id"
                               resource-type="identity.User"
                               resource-key="user_id"
                               :disabled="manageDisabled"
@@ -19,7 +19,7 @@
             </template>
             <template #assigned_role>
                 <user-assigned-role
-                    :user-id="selectedUsers[0].user_id"
+                    :user-id="userPageGetters.selectedUsers[0].user_id"
                 />
             </template>
             <template #api_key>
@@ -28,7 +28,7 @@
                                :title="$t('IDENTITY.USER.MAIN.API_KEY')"
                     />
                     <user-a-p-i-key-table class="api-key-table"
-                                          :user-id="selectedUsers[0].user_id"
+                                          :user-id="userPageGetters.selectedUsers[0].user_id"
                                           :disabled="manageDisabled"
                     />
                 </section>
@@ -37,7 +37,7 @@
             <!--                <user-notifications :user-id="selectedUsers[0].user_id" />-->
             <!--            </template>-->
         </p-tab>
-        <p-tab v-else-if="selectedIndex.length > 1"
+        <p-tab v-else-if="userPageState.selectedIndices.length > 1"
                :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
         >
@@ -45,7 +45,7 @@
                 <p-data-table :fields="fields"
                               :sortable="false"
                               :selectable="false"
-                              :items="selectedUsers"
+                              :items="userPageGetters.selectedUsers"
                               :col-copy="true"
                               class="selected-data-tab"
                 >
@@ -81,9 +81,8 @@
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PEmpty, PStatus, PTab, PDataTable, PHeading,
@@ -98,9 +97,7 @@ import PTagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import UserAssignedRole from '@/services/administration/iam/user/modules/user-management-tab/UserAssignedRole.vue';
 import UserDetail from '@/services/administration/iam/user/modules/user-management-tab/UserDetail.vue';
-// import UserNotifications from '@/services/administration/iam/user/modules/user-management-tab/UserNotifications.vue';
-import type { User } from '@/services/administration/iam/user/type';
-import { administrationStore } from '@/services/administration/store';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
 
 export default {
@@ -124,7 +121,9 @@ export default {
         },
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const userPageStore = useUserPageStore();
+        const userPageState = userPageStore.state;
+        const userPageGetters = userPageStore.getters;
 
         const state = reactive({
             loading: true,
@@ -140,9 +139,6 @@ export default {
                 { name: 'last_accessed_at', label: 'Last Activity' },
                 { name: 'timezone', label: 'Timezone' },
             ])),
-            selectedIndex: computed<number[]>(() => administrationStore.state.user.selectedIndex),
-            selectedUsers: computed<User[]>(() => administrationStore.state.user.selectedUsers),
-            isSelected: computed<boolean>(() => administrationStore.getters['user/isUserSelected']),
         });
 
         const singleItemTabState = reactive({
@@ -158,13 +154,15 @@ export default {
 
         const multiItemTabState = reactive({
             tabs: computed(() => ([
-                { name: 'data', label: vm.$t('IDENTITY.USER.MAIN.TAB_SELECTED_DATA'), keepAlive: true },
+                { name: 'data', label: i18n.t('IDENTITY.USER.MAIN.TAB_SELECTED_DATA'), keepAlive: true },
             ] as TabItem[])),
             activeTab: 'data',
         });
 
         return {
             ...toRefs(state),
+            userPageState,
+            userPageGetters,
             userStateFormatter,
             singleItemTabState,
             multiItemTabState,
