@@ -12,7 +12,6 @@
         <policy-list-data-table class="policy-list-data-table"
                                 :initial-policy-list="initialSelectedPolicyList"
                                 :selectable="true"
-                                :anchor-icon-visible="true"
                                 @update-selected-policy-list="handleUpdatePolicy"
         >
             <template #panel-top>

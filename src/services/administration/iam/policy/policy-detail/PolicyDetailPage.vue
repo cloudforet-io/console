@@ -2,41 +2,41 @@
     <section>
         <p-heading
             show-back-button
-            :title="policyName"
+            :title="state.policyName"
             @click-back-button="$router.go(-1)"
         >
             <template #title-right-extra>
-                <span v-if="type === POLICY_TYPES.MANAGED"
+                <span v-if="state.policyType === POLICY_TYPE.MANAGED"
                       class="policy-managed-badge"
                 >
                     <p-badge badge-type="subtle"
                              style-type="gray200"
                     >{{ $t('IAM.POLICY.FORM.VIEW_ONLY') }}</p-badge>
                 </span>
-                <span v-if="type === POLICY_TYPES.CUSTOM"
+                <span v-if="state.policyType === POLICY_TYPE.CUSTOM"
                       class="policy-edit-buttons"
                 >
                     <p-icon-button name="ic_delete"
-                                   :disabled="!hasManagePermission"
+                                   :disabled="!state.hasManagePermission"
                                    class="w-full delete-btn"
                                    @click="handleVisibleDeleteModal"
                     />
                     <p-icon-button name="ic_edit-text"
-                                   :disabled="!hasManagePermission"
+                                   :disabled="!state.hasManagePermission"
                                    class="edit-btn"
                                    @click="handleVisibleTitleEditModal"
                     />
                 </span>
-                <div v-if="type === POLICY_TYPES.CUSTOM"
+                <div v-if="state.policyType === POLICY_TYPE.CUSTOM"
                      class="policy-modify-buttons"
                 >
-                    <p-button :disabled="!isCodeModified && !isDescriptionModified"
+                    <p-button :disabled="!state.isCodeModified && !state.isDescriptionModified"
                               style-type="tertiary"
                               @click="$router.back()"
                     >
                         {{ $t('IAM.POLICY.FORM.CANCEL') }}
                     </p-button>
-                    <p-button :disabled="!isCodeModified && !isDescriptionModified"
+                    <p-button :disabled="!state.isCodeModified && !state.isDescriptionModified"
                               style-type="primary"
                               @click="handleSaveChanges"
                     >
@@ -50,7 +50,7 @@
                 <p-field-title>{{ $t('IAM.POLICY.FORM.TYPE') }}</p-field-title>
                 <br>
                 <div class="policy-detail-type-badge">
-                    <p-badge v-if="type === POLICY_TYPES.MANAGED"
+                    <p-badge v-if="state.policyType === POLICY_TYPE.MANAGED"
                              badge-type="solid-outline"
                              style-type="gray500"
                     >
@@ -66,23 +66,23 @@
             </div>
             <div class="policy-detail-contents">
                 <p-field-title>{{ $t('IAM.POLICY.FORM.ID') }}</p-field-title>
-                <p>{{ policyInfo ? policyInfo.policy_id : '' }}</p>
+                <p>{{ policyState.policyData ? policyState.policyData?.policy_id : '' }}</p>
             </div>
             <div class="policy-detail-contents">
-                <div v-if="type === POLICY_TYPES.MANAGED">
+                <div v-if="state.policyType === POLICY_TYPE.MANAGED">
                     <p-field-title>
                         {{ $t('IAM.POLICY.FORM.DESCRIPTION') }}
                     </p-field-title>
                     <br>
-                    <p>{{ policyInfo ? policyInfo.tags.description : '' }}</p>
+                    <p>{{ policyState.policyData ? policyState.policyData?.tags?.description : '' }}</p>
                 </div>
                 <p-field-group
                     v-else
                     :label="$t('IAM.POLICY.FORM.DESCRIPTION')"
                 >
                     <p-text-input
-                        v-model="description"
-                        :disabled="!hasManagePermission"
+                        v-model="state.description"
+                        :disabled="!state.hasManagePermission"
                         @update:value="handleDescriptionUpdate"
                     />
                 </p-field-group>
@@ -90,25 +90,25 @@
             <div class="policy-detail-contents">
                 <p-field-title>{{ $t('IAM.POLICY.FORM.PERMISSION') }}</p-field-title>
                 <p-text-editor
-                    :read-only="(type === POLICY_TYPES.MANAGED || !hasManagePermission)"
-                    :code="code"
+                    :read-only="(state.policyType === POLICY_TYPE.MANAGED || !state.hasManagePermission)"
+                    :code="state.code"
                     @update:code="handleCodeUpdate"
                 />
             </div>
         </p-pane-layout>
-        <policy-delete-modal :visible.sync="visibleDeleteModal"
+        <policy-delete-modal :visible.sync="state.visibleDeleteModal"
                              :policy-id="id"
         />
-        <policy-name-edit-modal :visible.sync="visibleTitleEditModal"
+        <policy-name-edit-modal :visible.sync="state.visibleTitleEditModal"
                                 :policy-id="id"
-                                :policy-name="policyName"
+                                :policy-name="state.policyName"
         />
     </section>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed, reactive, toRefs, defineComponent, onUnmounted,
+    computed, reactive, defineProps,
 } from 'vue';
 
 import {
@@ -125,109 +125,74 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import { POLICY_TYPES } from '@/services/administration/iam/policy/lib/config';
 import type { PolicyDetailPageProps } from '@/services/administration/iam/policy/lib/type';
 import PolicyDeleteModal from '@/services/administration/iam/policy/modules/PolicyDeleteModal.vue';
 import PolicyNameEditModal from '@/services/administration/iam/policy/modules/PolicyNameEditModal.vue';
-import { administrationStore } from '@/services/administration/store';
+import { usePolicyStore } from '@/services/administration/store/policy-page-store';
+import { POLICY_TYPE } from '@/services/administration/store/type';
 
-export default defineComponent<PolicyDetailPageProps>({
-    name: 'PolicyDetailPage',
-    components: {
-        PHeading,
-        PIconButton,
-        PBadge,
-        PPaneLayout,
-        PFieldTitle,
-        PTextEditor,
-        PButton,
-        PTextInput,
-        PolicyDeleteModal,
-        PolicyNameEditModal,
-        PFieldGroup,
-    },
-    props: {
-        id: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props) {
-        const stringifyPermission = (permissions: Array<string>|undefined) => permissions?.toString().replace(/,/gi, '\n') ?? '';
-        const arrayifyPermission = (permissionsCode: string) => permissionsCode.split('\n');
 
-        const state = reactive({
-            hasManagePermission: useManagePermissionState(),
-            policyInfo: computed(() => administrationStore.state.policy.policyData),
-            policyName: computed(() => state.policyInfo?.name || ''),
-            type: SpaceRouter.router.currentRoute.query.type,
-            code: '',
-            isCodeModified: false,
-            description: '',
-            isDescriptionModified: false,
-            visibleDeleteModal: false,
-            visibleTitleEditModal: false,
-        });
+const policyStore = usePolicyStore();
+const policyState = policyStore.state;
 
-        const handleCodeUpdate = (modifiedCode: string) => {
-            state.isCodeModified = modifiedCode !== stringifyPermission(state.policyInfo?.permissions);
-            state.code = modifiedCode;
-        };
+const stringifyPermission = (permissions: Array<string>|undefined) => permissions?.toString().replace(/,/gi, '\n') ?? '';
+const arrayifyPermission = (permissionsCode: string) => permissionsCode.split('\n');
 
-        const handleDescriptionUpdate = (modifiedDescription: string) => {
-            state.isDescriptionModified = modifiedDescription !== state.policyInfo?.tags?.description ?? '';
-            state.description = modifiedDescription;
-        };
-
-        const handleVisibleDeleteModal = () => { state.visibleDeleteModal = true; };
-        const handleVisibleTitleEditModal = () => { state.visibleTitleEditModal = true; };
-
-        const handleSaveChanges = () => {
-            try {
-                SpaceConnector.client.identity.policy.update({
-                    policy_id: props.id,
-                    permissions: arrayifyPermission(state.code),
-                    tags: {
-                        description: state.description,
-                    },
-                });
-                showSuccessMessage(i18n.t('IAM.POLICY.MODAL.ALT_S_CHANGE_POLICY'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IAM.POLICY.MODAL.ALT_E_CHANGE_POLICY'));
-            }
-        };
-
-        const getPolicyStoreData = () => {
-            state.code = stringifyPermission(administrationStore.state.policy.policyData?.permissions) ?? '';
-            state.description = administrationStore.state.policy.policyData?.tags?.description ?? '';
-        };
-
-        onUnmounted(() => {
-            administrationStore.commit('policy/setPolicyData', null);
-        });
-
-        (async () => {
-            const policyType = SpaceRouter.router.currentRoute.query.type;
-
-            try {
-                await administrationStore.dispatch('policy/getPolicyData', { policyId: props.id, policyType });
-                await getPolicyStoreData();
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        })();
-
-        return {
-            ...toRefs(state),
-            POLICY_TYPES,
-            handleCodeUpdate,
-            handleDescriptionUpdate,
-            handleVisibleDeleteModal,
-            handleVisibleTitleEditModal,
-            handleSaveChanges,
-        };
-    },
+interface PolicyDetailPageProps {
+    id: string;
+}
+const props = withDefaults(defineProps<PolicyDetailPageProps>(), {
+    id: '',
 });
+const state = reactive({
+    hasManagePermission: useManagePermissionState(),
+    policyName: computed(() => policyState.policyData?.name || ''),
+    policyType: computed(() => SpaceRouter.router.currentRoute.query.type),
+    code: '',
+    isCodeModified: false,
+    description: '',
+    isDescriptionModified: false,
+    visibleDeleteModal: false,
+    visibleTitleEditModal: false,
+});
+
+const handleCodeUpdate = (modifiedCode: string) => {
+    state.isCodeModified = modifiedCode !== stringifyPermission(policyState.policyData?.permissions);
+    state.code = modifiedCode;
+};
+
+const handleDescriptionUpdate = (modifiedDescription: string) => {
+    state.isDescriptionModified = modifiedDescription !== policyState.policyData?.tags?.description ?? '';
+    state.description = modifiedDescription;
+};
+
+const handleVisibleDeleteModal = () => { state.visibleDeleteModal = true; };
+const handleVisibleTitleEditModal = () => { state.visibleTitleEditModal = true; };
+
+const handleSaveChanges = () => {
+    try {
+        SpaceConnector.client.identity.policy.update({
+            policy_id: props.id,
+            permissions: arrayifyPermission(state.code),
+            tags: {
+                description: state.description,
+            },
+        });
+        showSuccessMessage(i18n.t('IAM.POLICY.MODAL.ALT_S_CHANGE_POLICY'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IAM.POLICY.MODAL.ALT_E_CHANGE_POLICY'));
+    }
+};
+
+const getPolicyData = async () => {
+    await policyStore.getPolicyData(props.id, state.policyType);
+    state.code = stringifyPermission(policyState.policyData?.permissions) ?? '';
+    state.description = policyState.policyData?.tags?.description ?? '';
+};
+
+(async () => {
+    await getPolicyData();
+})();
 </script>
 
 <style lang="postcss" scoped>

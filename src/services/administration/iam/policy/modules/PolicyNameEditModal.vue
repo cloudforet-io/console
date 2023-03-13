@@ -31,7 +31,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { administrationStore } from '@/services/administration/store';
+import { usePolicyStore } from '@/services/administration/store/policy-page-store';
 
 export default {
     name: 'PolicyNameEditModal',
@@ -55,6 +55,8 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const policyStore = usePolicyStore();
+
         const state = reactive({
             loading: true,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -66,12 +68,7 @@ export default {
         const updatePolicyName = async () => {
             try {
                 state.loading = true;
-                await administrationStore.dispatch('policy/updatePolicyData', {
-                    updateParams: {
-                        name: state.policyNameInput,
-                    },
-                    policyId: props.policyId,
-                });
+                await policyStore.updatePolicyData(props.policyId, { name: state.policyNameInput });
                 showSuccessMessage(i18n.t('IAM.POLICY.MODAL.ALT_S_UPDATE_POLICY'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IAM.POLICY.MODAL.ALT_E_UPDATE_POLICY'));
