@@ -3,7 +3,7 @@
         <p-heading
             :title="$t('IAM.POLICY.POLICY')"
             use-total-count
-            :total-count="state.totalCount"
+            :total-count="policyStore.state.totalCount"
         >
             <template #extra>
                 <p-button style-type="primary"
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import {
-    computed, reactive,
+    reactive,
 } from 'vue';
 
 import { PHeading, PButton } from '@spaceone/design-system';
@@ -35,7 +35,6 @@ import { usePolicyStore } from '@/services/administration/store/policy-page-stor
 const policyStore = usePolicyStore();
 
 const state = reactive({
-    totalCount: computed(() => policyStore.state.totalCount),
     hasManagePermission: useManagePermissionState(),
 });
 </script>
