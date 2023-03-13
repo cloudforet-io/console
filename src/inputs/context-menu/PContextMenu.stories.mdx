@@ -545,7 +545,7 @@ It works only in multi select case.
     <div class="mb-4 flex gap-4 items-center">
         <p-button style-type="secondary" @click="handleClickReset" >Reset</p-button>
         <div>
-            Next items exist: <p-toggle-button :value="hasMore" @change="hasMore = !hasMore"/>
+            Next items exist: <p-toggle-button :value="hasMore" @change-toggle="hasMore = !hasMore"/>
         </div>
     </div>
     <p-context-menu :menu="menu" show-clear-selection multi-selectable show-select-marker

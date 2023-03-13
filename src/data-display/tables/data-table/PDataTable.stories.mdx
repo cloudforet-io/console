@@ -349,7 +349,7 @@ To enable multi selection on row click, give `true` to `rowClickMultiSelectionMo
 <div>
     <div>
         <p class="mb-4 font-xl font-bold">Default</p>
-        <p class="mb-4 text-gray-700">Use Cursor Loading: <p-toggle-button :value="userCursorLoading" @change="onToggleChange"/></p>
+        <p class="mb-4 text-gray-700">Use Cursor Loading: <p-toggle-button :value="userCursorLoading" @change-toggle="onToggleChange"/></p>
         <p-data-table :fields="fields" :items="items" :loading="loading" :use-cursor-loading="userCursorLoading" />
     </div>
     <div class="mt-6">

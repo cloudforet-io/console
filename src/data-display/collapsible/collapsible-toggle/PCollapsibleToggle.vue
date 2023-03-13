@@ -18,7 +18,7 @@
             v-else-if="toggleType === COLLAPSIBLE_TOGGLE_TYPE.switch"
             :value="!proxyIsCollapsed"
             :sync="true"
-            @change="handleToggle"
+            @change-toggle="handleToggle"
         />
     </span>
 </template>

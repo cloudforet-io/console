@@ -404,7 +404,7 @@ If you don't want to use this feature, give true to the disableHandler prop.
         <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 90%;">
             <div style="height: 500px;">
                 <p class="text-lg mb-5 leading-7" :class="useFixedMenuStyle ? 'text-gray-800' : 'text-gray-400'">
-                    Use Fixed Menu Style: <strong> {{useFixedMenuStyle ? 'On' : 'Off' }}</strong> <p-toggle-button :value="useFixedMenuStyle" @change="onChange" /> <br/>
+                    Use Fixed Menu Style: <strong> {{useFixedMenuStyle ? 'On' : 'Off' }}</strong> <p-toggle-button :value="useFixedMenuStyle" @change-toggle="onChange" /> <br/>
                     The menu's style position will be set 'fixed'.<br/>
                     Therefore, the menu is placed on front, except for all other fixed elements with high z-index.<br/>
                     When you scroll parent elements, the menu will be automatically hidden.
