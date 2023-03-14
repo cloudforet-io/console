@@ -1,5 +1,7 @@
+import type { ComputedRef, UnwrapNestedRefs } from 'vue';
 import { computed, reactive } from 'vue';
 
+import type { TreeNode } from '@spaceone/design-system/types/data-display/tree/type';
 import { reverse } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -15,12 +17,37 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { ProjectPageState } from '@/services/project/store/type';
 import type { ProjectGroup, ProjectItemResp, ProjectGroupTreeItem } from '@/services/project/type';
 
+interface ProjectGroupInfo {parent_project_group_id?: string; name: string}
+interface ProjectInfo {
+    project_group_id: string;
+    name: string;
+}
+interface ProjectPageStore {
+    state: UnwrapNestedRefs<ProjectPageState>;
+    getters: UnwrapNestedRefs<{
+        selectedNodeData: ComputedRef<ProjectItemResp|undefined>;
+        selectedNodePath: ComputedRef<number[]|undefined>;
+        groupId: ComputedRef<string|undefined>;
+        groupName: ComputedRef<string|undefined>;
+        actionTargetNodeData: ComputedRef<ProjectItemResp|undefined>;
+        actionTargetNodePath: ComputedRef<number[]|undefined>;
+        parentGroups: ComputedRef<ProjectGroup[]>;
+    }>;
+    initRoot: (root: ProjectGroupTreeItem) => void;
+    selectNode: (groupId?: string) => Promise<TreeNode<ProjectItemResp>|null>;
+    openProjectGroupCreateForm: (target?: ProjectGroupTreeItem) => void;
+    openProjectGroupUpdateForm: (target?: ProjectGroupTreeItem) => void;
+    openProjectGroupDeleteCheckModal: (target?: ProjectGroupTreeItem) => void;
+    createProjectGroup: (projectGroupInfo: ProjectGroupInfo) => Promise<void>;
+    updateProjectGroup: (projectGroupInfo: ProjectGroupInfo) => Promise<void>;
+    deleteProjectGroup: (projectGroupId: string) => Promise<void>;
+    createProject: (projectInfo: ProjectInfo) => Promise<void>;
+    refreshPermissionInfo: () => Promise<void>;
+    addPermissionInfo: (permissionInfo: any) => void;
+    openProjectCreateForm: (target?: ProjectGroupTreeItem) => void;
+}
 
-
-
-
-
-export const useProjectPageStore = defineStore('project-page', () => {
+export const useProjectPageStore = defineStore('project-page', ():ProjectPageStore => {
     const state = reactive<ProjectPageState>({
         isInitiated: false,
         searchText: undefined,
@@ -115,7 +142,6 @@ export const useProjectPageStore = defineStore('project-page', () => {
         state.projectGroupDeleteCheckModalVisible = true;
     };
 
-    interface ProjectGroupInfo {parent_project_group_id?: string; name: string}
 
     const pushPermissionInfo = (permissionInfo) => {
         state.permissionInfo = { ...state.permissionInfo, ...permissionInfo };
@@ -226,10 +252,6 @@ export const useProjectPageStore = defineStore('project-page', () => {
         return permissionInfo;
     };
 
-    interface ProjectInfo {
-        project_group_id: string;
-        name: string;
-    }
     const createProject = async (
         projectInfo: ProjectInfo,
     ) => {
