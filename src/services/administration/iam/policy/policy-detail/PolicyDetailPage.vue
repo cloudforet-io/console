@@ -126,8 +126,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import type { PolicyDetailPageProps } from '@/services/administration/iam/policy/lib/type';
-import PolicyDeleteModal from '@/services/administration/iam/policy/modules/PolicyDeleteModal.vue';
-import PolicyNameEditModal from '@/services/administration/iam/policy/modules/PolicyNameEditModal.vue';
+import PolicyDeleteModal from '@/services/administration/iam/policy/policy-detail/modules/PolicyDeleteModal.vue';
+import PolicyNameEditModal from '@/services/administration/iam/policy/policy-detail/modules/PolicyNameEditModal.vue';
 import { usePolicyStore } from '@/services/administration/store/policy-page-store';
 import { POLICY_TYPE } from '@/services/administration/store/type';
 

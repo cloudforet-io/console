@@ -42,11 +42,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { FORM_TYPE } from '@/services/administration/iam/role/config';
+import RoleUpdateForm from '@/services/administration/iam/role/role-update/modules/RoleUpdateForm.vue';
 import type { RoleData } from '@/services/administration/iam/role/type';
-import RoleUpdateForm from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
+
 
 export default {
-    name: 'RoleEditPage',
+    name: 'RoleUpdatePage',
     components: {
         PHeading,
         PButton,

@@ -52,9 +52,9 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { RoleType } from '@/services/administration/iam/role/config';
 import { FORM_TYPE } from '@/services/administration/iam/role/config';
+import RoleUpdatePageAccessForm from '@/services/administration/iam/role/role-update/modules/RoleUpdatePageAccessForm.vue';
+import RoleUpdatePageBaseInformation from '@/services/administration/iam/role/role-update/modules/RoleUpdatePageBaseInformation.vue';
 import type { Policy, RoleData } from '@/services/administration/iam/role/type';
-import RoleUpdatePageAccessForm from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessForm.vue';
-import RoleUpdatePageBaseInformation from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageBaseInformation.vue';
 import PolicyListDataTable from '@/services/administration/modules/PolicyListDataTable.vue';
 
 export interface BaseInfoFormData {

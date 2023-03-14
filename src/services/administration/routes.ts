@@ -12,8 +12,8 @@ const AdministrationContainer = () => import('@/services/administration/Administ
 
 const UserPage = () => import('@/services/administration/iam/user/UserPage.vue');
 const RolePage = () => import('@/services/administration/iam/role/RolePage.vue');
-const RoleCreatePage = () => import('@/services/administration/iam/role/update-role/RoleCreatePage.vue');
-const RoleEditPage = () => import('@/services/administration/iam/role/update-role/RoleEditPage.vue');
+const RoleCreatePage = () => import('@/services/administration/iam/role/role-create/RoleCreatePage.vue');
+const RoleUpdatePage = () => import('@/services/administration/iam/role/role-update/RoleUpdatePage.vue');
 const PolicyPage = () => import('@/services/administration/iam/policy/PolicyPage.vue');
 const PolicyCreatePage = () => import('@/services/administration/iam/policy/policy-create/PolicyCreatePage.vue');
 const PolicyDetailPage = () => import('@/services/administration/iam/policy/policy-detail/PolicyDetailPage.vue');
@@ -64,7 +64,7 @@ const administrationRoutes: RouteConfig = {
                             name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME,
                             meta: { translationId: 'IAM.ROLE.FORM.EDIT_TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
                             props: true,
-                            component: RoleEditPage,
+                            component: RoleUpdatePage,
                         },
                     ],
                 },

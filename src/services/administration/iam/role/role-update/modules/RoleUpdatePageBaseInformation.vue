@@ -72,7 +72,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { RoleType } from '@/services/administration/iam/role/config';
 import { ROLE_TYPE, ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
-import type { BaseInfoFormData } from '@/services/administration/iam/role/update-role/modules/RoleUpdateForm.vue';
+import type { BaseInfoFormData } from '@/services/administration/iam/role/role-update/modules/RoleUpdateForm.vue';
 
 interface RoleTypeForm {label: string; key: string; description: TranslateResult}
 
