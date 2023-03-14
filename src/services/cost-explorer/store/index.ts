@@ -4,7 +4,6 @@ import type { PublicDashboardInfo, UserDashboardInfo } from '@/services/cost-exp
 
 import * as actions from './actions';
 import budget from './budget';
-import costAnalysis from './cost-analysis';
 import dashboard from './dashboard';
 import * as getters from './getters';
 import * as mutations from './mutations';
@@ -21,7 +20,6 @@ export const costExplorerStoreModule: Module<CostExplorerState, any> = {
     state: () => ({ ...state }),
     modules: {
         dashboard,
-        costAnalysis,
         budget,
     },
     getters,
