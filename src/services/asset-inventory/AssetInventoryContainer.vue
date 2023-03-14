@@ -48,6 +48,8 @@ export default defineComponent({
         onUnmounted(() => {
             cloudServicePageStore.$dispose();
             cloudServiceDetailPageStore.$dispose();
+            cloudServicePageStore.$reset();
+            cloudServiceDetailPageStore.$reset();
         });
         return {
             breadcrumbs,
