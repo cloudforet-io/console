@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="updateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
+    <p-button-modal :header-title="projectPageState.projectGroupFormUpdateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
                     centered
                     size="sm"
                     fade
@@ -46,6 +46,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useProjectPageStore } from '@/services/project/store/project-store';
+
 import TranslateResult = VueI18n.TranslateResult;
 
 export default {
@@ -63,13 +65,15 @@ export default {
         },
     },
     setup() {
+        const projectPageStore = useProjectPageStore();
+        const projectPageState = projectPageStore.state;
+        const projectPageGetters = projectPageStore.getters;
         const state = reactive({
             proxyVisible: computed({
-                get() { return store.state.service.project.projectGroupFormVisible; },
-                set(val) { store.commit('service/project/setProjectGroupFormVisible', val); },
+                get() { return projectPageState.projectGroupFormVisible; },
+                set(val) { projectPageState.projectGroupFormVisible = val; },
             }),
-            updateMode: computed(() => store.state.service.project.projectGroupFormUpdateMode),
-            currentGroupId: computed(() => store.getters['service/project/actionTargetNodeData']?.id),
+            currentGroupId: computed(() => projectPageGetters.actionTargetNodeData?.id),
             projectGroupNames: [] as string[],
             projectGroupName: undefined as undefined | string,
             projectGroupNameInvalidText: computed(() => {
@@ -114,9 +118,9 @@ export default {
 
         const createProjectGroup = async (item) => {
             try {
-                await store.dispatch('service/project/createProjectGroup', item);
+                await projectPageStore.createProjectGroup(item);
                 await store.dispatch('reference/projectGroup/load');
-                await store.commit('service/project/setShouldUpdateProjectList', true);
+                projectPageState.shouldUpdateProjectList = true;
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
@@ -125,7 +129,7 @@ export default {
 
         const updateProjectGroup = async (item) => {
             try {
-                await store.dispatch('service/project/updateProjectGroup', item);
+                await projectPageStore.updateProjectGroup(item);
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
@@ -144,15 +148,15 @@ export default {
 
             state.showValidation = false;
 
-            if (!state.updateMode) await createProjectGroup(item);
+            if (!projectPageState.projectGroupFormUpdateMode) await createProjectGroup(item);
             else await updateProjectGroup(item);
 
             state.loading = false;
-            store.commit('service/project/setProjectGroupFormVisible', false);
+            projectPageState.projectGroupFormVisible = false;
         };
 
         watch(() => state.currentGroupId, async (after) => {
-            if (after && state.updateMode) await getProjectGroup();
+            if (after && projectPageState.projectGroupFormUpdateMode) await getProjectGroup();
             else state.projectGroupName = undefined; // init form
         }, { immediate: true });
 
@@ -163,6 +167,7 @@ export default {
 
         return {
             ...toRefs(state),
+            projectPageState,
             confirm,
         };
     },
