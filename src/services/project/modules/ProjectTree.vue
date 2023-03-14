@@ -416,9 +416,7 @@ export default {
         };
 
         watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([rootNode, allProjectRoot]) => {
-            console.log('watch', rootNode, allProjectRoot);
             if (rootNode && allProjectRoot) {
-                console.log('run', projectPageState.isInitiated);
                 if (projectPageState.isInitiated) return;
 
                 state.loading = true;
