@@ -5,7 +5,7 @@
         <section ref="chartRef"
                  class="chart-section"
         >
-            <cost-analysis-pie-chart v-if="granularity === GRANULARITY.ACCUMULATED"
+            <cost-analysis-pie-chart v-if="costAnalysisPageState.granularity === GRANULARITY.ACCUMULATED"
                                      :loading="loading"
                                      :chart.sync="chart"
                                      :chart-data="chartData"
@@ -20,9 +20,9 @@
                                                 :chart.sync="chart"
                                                 :chart-data="chartData"
                                                 :legends="legends"
-                                                :granularity="granularity"
-                                                :stack="stack"
-                                                :period="period"
+                                                :granularity="costAnalysisPageState.granularity"
+                                                :stack="costAnalysisPageState.stack"
+                                                :period="costAnalysisPageState.period"
                                                 :currency="currency"
                                                 :currency-rates="currencyRates"
                                                 :print-mode="printMode"
@@ -41,7 +41,6 @@
 </template>
 
 <script lang="ts">
-
 import type Vue from 'vue';
 import {
     computed, reactive, toRefs, watch,
@@ -76,7 +75,7 @@ import {
 import {
     getConvertedFilter,
 } from '@/services/cost-explorer/lib/helper';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type {
     Period, Granularity, GroupBy,
 } from '@/services/cost-explorer/type';
@@ -86,6 +85,7 @@ import {
 import type {
     Legend, PieChartData, XYChartData,
 } from '@/services/cost-explorer/widgets/type';
+
 
 export default {
     name: 'CostAnalysisChart',
@@ -101,15 +101,10 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+        const costAnalysisPageState = costAnalysisPageStore.state;
+
         const state = reactive({
-            granularity: computed(() => costExplorerStore.state.costAnalysis.granularity),
-            stack: computed(() => costExplorerStore.state.costAnalysis.stack),
-            period: computed(() => costExplorerStore.state.costAnalysis.period),
-            filters: computed(() => costExplorerStore.state.costAnalysis.filters),
-            selectedQueryId: computed(() => costExplorerStore.state.costAnalysis.selectedQueryId),
-            groupBy: computed(() => costExplorerStore.state.costAnalysis.groupBy),
-            primaryGroupBy: computed(() => costExplorerStore.state.costAnalysis.primaryGroupBy),
-            //
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             //
@@ -131,14 +126,14 @@ export default {
             }
             listCostAnalysisRequest = axios.CancelToken.source();
             try {
-                costQueryHelper.setFilters(getConvertedFilter(state.filters));
-                const dateFormat = state.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+                costQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
+                const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    include_others: !!state.primaryGroupBy,
-                    granularity: state.granularity,
-                    group_by: state.primaryGroupBy ? [state.primaryGroupBy] : [],
-                    start: dayjs.utc(state.period.start).format(dateFormat),
-                    end: dayjs.utc(state.period.end).format(dateFormat),
+                    include_others: !!costAnalysisPageState.primaryGroupBy,
+                    granularity: costAnalysisPageState.granularity,
+                    group_by: costAnalysisPageState.primaryGroupBy ? [costAnalysisPageState.primaryGroupBy] : [],
+                    start: dayjs.utc(costAnalysisPageState.period.start).format(dateFormat),
+                    end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
                     limit: 15,
                     ...costQueryHelper.apiQuery,
                 });
@@ -183,12 +178,18 @@ export default {
             }
         };
 
-        watch([() => state.granularity, () => state.period, () => state.primaryGroupBy, () => state.filters], ([granularity, period, groupBy]) => {
+        watch([
+            () => costAnalysisPageState.granularity,
+            () => costAnalysisPageState.period,
+            () => costAnalysisPageState.primaryGroupBy,
+            () => costAnalysisPageState.filters,
+        ], ([granularity, period, groupBy]) => {
             setChartData(granularity, period, groupBy);
         }, { immediate: true, deep: true });
 
         return {
             ...toRefs(state),
+            costAnalysisPageState,
             GRANULARITY,
             handleChartRendered,
             handleToggleSeries,

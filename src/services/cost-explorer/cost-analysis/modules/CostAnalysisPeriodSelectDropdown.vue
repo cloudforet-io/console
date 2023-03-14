@@ -17,14 +17,13 @@
         />
         <cost-management-custom-range-modal v-if="customRangeModalVisible"
                                             :visible.sync="customRangeModalVisible"
-                                            :granularity="granularity"
+                                            :granularity="costAnalysisPageState.granularity"
                                             @confirm="handleCustomRangeModalConfirm"
         />
     </div>
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -42,8 +41,9 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { getInitialDates } from '@/services/cost-explorer/lib/helper';
 import CostManagementCustomRangeModal from '@/services/cost-explorer/modules/CostManagementCustomRangeModal.vue';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Period, Granularity } from '@/services/cost-explorer/type';
+
 
 const today = dayjs.utc();
 interface PeriodItem {
@@ -72,14 +72,16 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+        const costAnalysisPageState = costAnalysisPageStore.state;
+
         const { i18nDayjs } = useI18nDayjs();
         const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
         const state = reactive({
             period: computed<Period>({
                 get() { return props.fixedPeriod; },
-                set(period) { costExplorerStore.commit('costAnalysis/setPeriod', period); },
+                set(period) { costAnalysisPageState.period = period; },
             }),
-            granularity: computed(() => costExplorerStore.state.costAnalysis.granularity),
             periodItems: computed<PeriodItem[]>(() => ([
                 {
                     name: 'last7days',
@@ -125,7 +127,7 @@ export default {
                 },
             ])),
             periodMenuItems: computed<MenuItem[]>(() => {
-                const menuItems = state.periodItems.filter((d) => d.enabled.includes(state.granularity));
+                const menuItems = state.periodItems.filter((d) => d.enabled.includes(costAnalysisPageState.granularity));
                 return [
                     ...menuItems,
                     {
@@ -147,7 +149,7 @@ export default {
                 if (isSameMonth) {
                     return `${dateFormatter(start, 'MMMM D')} ~ ${dateFormatter(end, 'D')}, ${dateFormatter(end, 'YYYY')}`;
                 }
-                if (state.granularity === GRANULARITY.MONTHLY) {
+                if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
                     return `${dateFormatter(start, 'MMMM')}, ${dateFormatter(start, 'YYYY')} ~ ${dateFormatter(end, 'MMMM')}, ${dateFormatter(end, 'YYYY')}`;
                 }
                 return `${dateFormatter(start, 'MMMM D')}, ${dateFormatter(start, 'YYYY')} ~ ${dateFormatter(end, 'MMMM D')}, ${dateFormatter(end, 'YYYY')}`;
@@ -198,6 +200,7 @@ export default {
 
         return {
             ...toRefs(state),
+            costAnalysisPageState,
             handleSelectPeriod,
             handleCustomRangeModalConfirm,
         };

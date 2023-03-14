@@ -3,10 +3,10 @@
          :class="{'interactive-mode': !printMode}"
     >
         <section class="title-section">
-            <p-heading :title="selectedQueryId ? title : defaultTitle">
+            <p-heading :title="costAnalysisPageState.selectedQueryId ? title : defaultTitle">
                 <template #title-left-extra>
                     <p-select-dropdown v-if="!printMode"
-                                       :items="queryItemList"
+                                       :items="costQueryMenuItems"
                                        style-type="icon-button"
                                        button-icon="ic_list-bulleted-3"
                                        class="list-button"
@@ -38,19 +38,19 @@
                 <template v-if="!printMode"
                           #title-right-extra
                 >
-                    <div v-if="!printMode && selectedQueryId"
+                    <div v-if="!printMode && costAnalysisPageState.selectedQueryId"
                          class="button-wrapper"
                     >
                         <p-icon-button name="ic_delete"
-                                       @click.stop="handleClickDeleteQuery(selectedQueryId)"
+                                       @click.stop="handleClickDeleteQuery(costAnalysisPageState.selectedQueryId)"
                         />
                         <p-icon-button name="ic_edit-text"
-                                       @click.stop="handleClickEditQuery(selectedQueryId)"
+                                       @click.stop="handleClickEditQuery(costAnalysisPageState.selectedQueryId)"
                         />
                     </div>
                     <div class="button-wrapper extra">
                         <pdf-download-button @click="handleClickPdf" />
-                        <p-button v-if="selectedQueryId"
+                        <p-button v-if="costAnalysisPageState.selectedQueryId"
                                   style-type="tertiary"
                                   @click="handleSaveQueryOption"
                         >
@@ -65,12 +65,12 @@
                 </template>
             </p-heading>
         </section>
-        <save-query-form-modal v-if="!printMode"
-                               :header-title="saveQueryFormState.title"
-                               :visible.sync="saveQueryFormState.visible"
-                               :selected-query="saveQueryFormState.selectedQuery"
-                               :request-type="saveQueryFormState.requestType"
-                               @confirm="handleSaveQueryConfirm"
+        <cost-analysis-save-query-form-modal v-if="!printMode"
+                                             :header-title="saveQueryFormState.title"
+                                             :visible.sync="saveQueryFormState.visible"
+                                             :selected-query="saveQueryFormState.selectedQuery"
+                                             :request-type="saveQueryFormState.requestType"
+                                             @confirm="handleSaveQueryConfirm"
         />
         <delete-modal v-if="!printMode"
                       :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')"
@@ -118,14 +118,15 @@ import type { SaveQueryEmitParam } from '@/services/cost-explorer/cost-analysis/
 import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { CostQuerySetModel, CostQuerySetOption } from '@/services/cost-explorer/type';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
+import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
-const SaveQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue');
+const CostAnalysisSaveQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue');
 const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
 const PdfDownloadOverlay = () => import('@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue');
 const CostAnalysisPreview = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisPreview.vue');
 const PdfDownloadButton = () => import('@/common/components/buttons/PdfDownloadButton.vue');
+
 
 export default {
     name: 'CostAnalysisHeader',
@@ -133,7 +134,7 @@ export default {
         CostAnalysisPreview,
         PdfDownloadOverlay,
         DeleteModal,
-        SaveQueryFormModal,
+        CostAnalysisSaveQueryFormModal,
         PdfDownloadButton,
         PHeading,
         PIconButton,
@@ -147,24 +148,25 @@ export default {
         },
     },
     setup() {
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+        const costAnalysisPageState = costAnalysisPageStore.state;
+        const costAnalysisPageGetters = costAnalysisPageStore.getters;
+
         const state = reactive({
             defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
-            costQueryList: computed<CostQuerySetModel[]>(() => costExplorerStore.state.costAnalysis.costQueryList),
-            queryItemList: computed<MenuItem[]>(() => ([
+            costQueryMenuItems: computed<MenuItem[]>(() => ([
                 { name: 'header', label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVED_QUERY'), type: 'header' },
                 { name: undefined, label: 'Cost Analysis', type: 'item' },
-                ...state.costQueryList.map((item: CostQuerySetModel): MenuItem => ({
+                ...costAnalysisPageState.costQueryList.map((item: CostQuerySetModel): MenuItem => ({
                     name: item.cost_query_set_id,
                     label: item.name,
                     type: 'item',
                 })),
             ])),
-            selectedQueryId: computed<string|undefined>(() => costExplorerStore.state.costAnalysis.selectedQueryId),
-            selectedQuerySet: computed<CostQuerySetModel|undefined>(() => costExplorerStore.getters['costAnalysis/selectedQuerySet']),
-            title: computed<string>(() => state.selectedQuerySet?.name ?? 'Cost Analysis'),
+            title: computed<string>(() => costAnalysisPageGetters.selectedQuerySet?.name ?? 'Cost Analysis'),
             itemIdForDeleteQuery: '',
             visiblePdfOverlay: false,
-            pdfFileName: computed<string>(() => `${state.selectedQuerySet?.name ?? 'Cost_Analysis'}_${dayjs().format('YYYYMMDD')}`),
+            pdfFileName: computed<string>(() => `${costAnalysisPageGetters.selectedQuerySet?.name ?? 'Cost_Analysis'}_${dayjs().format('YYYYMMDD')}`),
             previewItems: [] as Item[],
             currency: computed(() => store.state.display.currency),
             pdfFontLanguage: computed<string>(() => {
@@ -187,37 +189,28 @@ export default {
         });
 
         /* Utils */
-        const setSelectedQueryId = (queryId?: string) => {
-            costExplorerStore.commit('costAnalysis/setSelectedQueryId', queryId);
-        };
-
-        const setQueryOptions = (options?: CostQuerySetOption) => {
-            if (options) costExplorerStore.dispatch('costAnalysis/setQueryOptions', options);
-            else costExplorerStore.dispatch('costAnalysis/initCostAnalysisStoreState');
-        };
-
-        const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (state.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
+        const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (costAnalysisPageState.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
 
         /* Event Handlers */
         const handleClickQueryItem = async (queryId: string) => {
-            if (queryId === state.selectedQueryId) return;
+            if (queryId === costAnalysisPageState.selectedQueryId) return;
 
             if (queryId) {
                 const { options } = getQueryWithKey(queryId);
-                setQueryOptions(options);
-                setSelectedQueryId(queryId);
+                costAnalysisPageStore.setQueryOptions(options);
+                costAnalysisPageState.selectedQueryId = queryId;
             } else {
-                setQueryOptions();
-                setSelectedQueryId();
+                costAnalysisPageStore.setQueryOptions();
+                costAnalysisPageState.selectedQueryId = undefined;
             }
         };
 
-        const handleClickDeleteQuery = (id) => {
+        const handleClickDeleteQuery = (id: string) => {
             state.itemIdForDeleteQuery = id;
             checkDeleteState.visible = true;
         };
 
-        const handleClickEditQuery = (queryItemId) => {
+        const handleClickEditQuery = (queryItemId: string) => {
             const queryItem = getQueryWithKey(queryItemId);
             saveQueryFormState.title = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_QUERY');
             saveQueryFormState.requestType = REQUEST_TYPE.EDIT;
@@ -233,36 +226,32 @@ export default {
         const handleSaveQueryConfirm = ({ updatedQuery, requestType }: SaveQueryEmitParam) => {
             if (!updatedQuery) return;
 
-            costExplorerStore.dispatch('costAnalysis/listCostQueryList');
+            costAnalysisPageStore.listCostQueryList();
 
-            if (requestType === REQUEST_TYPE.EDIT && updatedQuery.cost_query_set_id !== state.selectedQueryId) {
+            if (requestType === REQUEST_TYPE.EDIT && updatedQuery.cost_query_set_id !== costAnalysisPageState.selectedQueryId) {
                 return;
             }
 
             if (requestType === REQUEST_TYPE.SAVE) {
-                setSelectedQueryId(updatedQuery.cost_query_set_id);
+                costAnalysisPageState.selectedQueryId = updatedQuery.cost_query_set_id;
             }
         };
 
         const handleSaveQueryOption = async () => {
             try {
-                const {
-                    granularity, stack, period,
-                    groupBy, filters, primaryGroupBy, moreGroupBy,
-                } = costExplorerStore.state.costAnalysis;
                 await SpaceConnector.client.costAnalysis.costQuerySet.update({
-                    cost_query_set_id: state.selectedQueryId,
+                    cost_query_set_id: costAnalysisPageState.selectedQueryId,
                     options: {
-                        granularity,
-                        stack,
-                        period,
-                        group_by: groupBy,
-                        primary_group_by: primaryGroupBy, // will be deprecated(< v1.10.5)
-                        more_group_by: moreGroupBy, // will be deprecated(< v1.10.5)
-                        filters,
+                        granularity: costAnalysisPageState.granularity,
+                        stack: costAnalysisPageState.stack,
+                        period: costAnalysisPageState.period,
+                        group_by: costAnalysisPageState.groupBy,
+                        primary_group_by: costAnalysisPageState.primaryGroupBy, // will be deprecated(< v1.10.5)
+                        more_group_by: costAnalysisPageState.moreGroupBy, // will be deprecated(< v1.10.5)
+                        filters: costAnalysisPageState.filters,
                     },
                 });
-                await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
+                await costAnalysisPageStore.listCostQueryList();
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
@@ -273,12 +262,12 @@ export default {
             checkDeleteState.visible = false;
             try {
                 await SpaceConnector.client.costAnalysis.costQuerySet.delete({ cost_query_set_id: state.itemIdForDeleteQuery });
-                await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
+                await costAnalysisPageStore.listCostQueryList();
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '');
-                if (state.selectedQueryId === state.itemIdForDeleteQuery) {
+                if (costAnalysisPageState.selectedQueryId === state.itemIdForDeleteQuery) {
                     await SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });
-                    setQueryOptions();
-                    setSelectedQueryId();
+                    costAnalysisPageStore.setQueryOptions();
+                    costAnalysisPageState.selectedQueryId = undefined;
                 }
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
@@ -300,6 +289,7 @@ export default {
 
         return {
             ...toRefs(state),
+            costAnalysisPageState,
             saveQueryFormState,
             checkDeleteState,
             handleClickQueryItem,

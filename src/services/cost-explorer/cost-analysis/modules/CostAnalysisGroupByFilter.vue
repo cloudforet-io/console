@@ -22,14 +22,14 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 
-import {
-    PSelectButton, PDivider,
-} from '@spaceone/design-system';
+import { PDivider, PSelectButton } from '@spaceone/design-system';
 
-import CostAnalysisGroupByFilterMore from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilterMore.vue';
+import CostAnalysisGroupByFilterMore
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilterMore.vue';
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { GroupByItem } from '@/services/cost-explorer/store/cost-analysis/type';
+
 
 export default {
     name: 'CostAnalysisGroupByFilter',
@@ -45,8 +45,11 @@ export default {
         },
     },
     setup() {
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+        const costAnalysisPageState = costAnalysisPageStore.state;
+
         const state = reactive({
-            selectedGroupByItems: computed<GroupByItem[]>(() => costExplorerStore.getters['costAnalysis/groupByItems']),
+            selectedGroupByItems: computed<GroupByItem[]>(() => costAnalysisPageState.groupBy.map((d) => GROUP_BY_ITEM_MAP[d])),
             allGroupByItems: Object.values(GROUP_BY_ITEM_MAP) as GroupByItem[],
         });
 
@@ -55,8 +58,7 @@ export default {
 
         /* event */
         const handleSelectGroupByItems = async (items: GroupByItem[]) => {
-            const groupBy = items.map((d) => d.name);
-            costExplorerStore.commit('costAnalysis/setGroupBy', groupBy);
+            costAnalysisPageState.groupBy = items.map((d) => d.name);
         };
 
         return {
