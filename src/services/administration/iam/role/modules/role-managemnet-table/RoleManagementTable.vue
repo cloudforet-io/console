@@ -4,13 +4,13 @@
                          sortable
                          selectable
                          exportable
-                         :loading="loading"
-                         :items="roles"
-                         :select-index.sync="selectedIndices"
+                         :loading="rolePageState.loading"
+                         :items="rolePageState.roles"
+                         :select-index.sync="rolePageState.selectedIndices"
                          :fields="fields"
                          :sort-desc="true"
                          :sort-by="sortBy"
-                         :total-count="totalCount"
+                         :total-count="rolePageState.totalCount"
                          :style="{height: `${tableHeight}px`}"
                          :key-item-sets="roleSearchHandler.keyItemSets"
                          :value-handler-map="roleSearchHandler.valueHandlerMap"
@@ -61,7 +61,6 @@
             </template>
         </p-toolbox-table>
         <role-delete-modal :visible.sync="deleteModalVisible"
-                           :roles="selectedRoles"
                            @refresh="handleChange"
         />
     </section>
@@ -82,7 +81,6 @@ import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core
 import type { KeyItem } from '@cloudforet/core-lib/component-util/query-search/type';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
@@ -97,9 +95,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { ROLE_TYPE_BADGE_OPTION, ROLE_TYPE_LABEL } from '@/services/administration/iam/role/config';
 import RoleDeleteModal
     from '@/services/administration/iam/role/modules/role-managemnet-table/modules/RoleDeleteModal.vue';
-import type { RoleData } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { administrationStore } from '@/services/administration/store';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
 
 const DEFAULT_PAGE_LIMIT = 15;
 
@@ -122,7 +119,11 @@ export default defineComponent({
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup() {
+        const rolePageStore = useRolePageStore();
+        const rolePageState = rolePageStore.state;
+        const rolePageGetters = rolePageStore.getters;
+
         const currentRoute = SpaceRouter.router.currentRoute;
         const roleListApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
@@ -147,20 +148,17 @@ export default defineComponent({
             },
         });
         const state = reactive({
-            loading: false,
-            totalCount: 0,
             dropdownMenu: computed(() => ([
                 {
                     type: 'item',
                     name: 'edit',
                     label: i18n.t('IAM.ROLE.EDIT'),
-                    disabled: state.selectedIndices.length > 1 || !state.isSelected,
+                    disabled: rolePageState.selectedIndices.length > 1 || !state.isSelected,
                 },
                 {
                     type: 'item', name: 'delete', label: i18n.t('IAM.ROLE.DELETE'), disabled: !state.isSelected,
                 },
             ] as MenuItem[])),
-            roles: [] as RoleData[],
             fields: [
                 { name: 'name', label: 'Name' },
                 { name: 'tags.description', label: 'Description', sortable: false },
@@ -176,31 +174,11 @@ export default defineComponent({
             ],
             deleteModalVisible: false,
             // selected
-            selectedIndices: [] as number[],
-            selectedRoles: computed<RoleData[]>(() => state.selectedIndices.map((d) => state.roles[d]) || []),
-            isSelected: computed(() => state.selectedIndices.length > 0),
+            isSelected: computed(() => rolePageState.selectedIndices.length > 0),
             tags: roleListApiQueryHelper.setKeyItemSets(roleSearchHandler.keyItemSets).queryTags,
             sortBy: 'name',
         });
         let roleListApiQuery = roleListApiQueryHelper.data;
-
-        const listRoles = async () => {
-            state.loading = true;
-            try {
-                const res = await SpaceConnector.client.identity.role.list({
-                    query: roleListApiQuery,
-                });
-                state.roles = res.results;
-                state.totalCount = res.total_count;
-                state.selectedIndices = [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.roles = [];
-                state.totalCount = 0;
-            } finally {
-                state.loading = false;
-            }
-        };
 
         const openDeleteModal = () => {
             state.deleteModalVisible = true;
@@ -213,20 +191,20 @@ export default defineComponent({
             case 'edit':
                 SpaceRouter.router.push({
                     name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME,
-                    params: { id: state.selectedRoles[0].role_id },
+                    params: { id: rolePageGetters.selectedRoles[0].role_id },
                 });
                 break;
             case 'delete': openDeleteModal(); break;
             default: break;
             }
         };
-        const handleSelect = (index) => { state.selectedIndices = index; };
+        const handleSelect = (index) => { rolePageState.selectedIndices = index; };
         const handleChange = async (options: ToolboxOptions = {}) => {
             roleListApiQuery = getApiQueryWithToolboxOptions(roleListApiQueryHelper, options) ?? roleListApiQuery;
             if (options.queryTags !== undefined) {
                 await replaceUrlQuery('filters', roleListApiQueryHelper.rawQueryStrings);
             }
-            await listRoles();
+            await rolePageStore.listRoles(roleListApiQuery);
         };
         const handleExport = async () => {
             try {
@@ -242,27 +220,22 @@ export default defineComponent({
                 ErrorHandler.handleError(e);
             }
         };
-        watch(() => state.selectedIndices, (indices: number[]) => {
-            emit('update-selected-indices', indices);
-        });
-        watch(() => state.totalCount, (totalCount: number) => {
-            emit('update-total-count', totalCount);
-        });
         (async () => {
-            await listRoles();
+            await rolePageStore.listRoles(roleListApiQuery);
         })();
 
         const saveSelectedValueToStore = (selectedIndices: number[]) => {
-            administrationStore.dispatch('role/selectIndices', selectedIndices);
-            administrationStore.dispatch('role/selectRoles', state.selectedRoles);
+            rolePageState.selectedIndices = selectedIndices;
         };
 
-        watch(() => state.selectedIndices, (after) => {
+        watch(() => rolePageState.selectedIndices, (after) => {
             saveSelectedValueToStore(after);
         });
 
         return {
             ...toRefs(state),
+            rolePageState,
+            rolePageGetters,
             roleSearchHandler,
             ROLE_TYPE_BADGE_OPTION,
             handleCreateRole,

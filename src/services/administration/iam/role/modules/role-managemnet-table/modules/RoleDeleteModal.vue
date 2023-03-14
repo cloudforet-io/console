@@ -15,7 +15,7 @@
             </div>
             <p-data-table v-if="isDeletable"
                           class="role-data-table"
-                          :items="roles"
+                          :items="rolePageGetters.selectedRoles"
                           :fields="fields"
                           :loading="loading"
                           :table-custom-style="{ maxHeight: 'calc(100vh - 17.5rem)' }"
@@ -69,7 +69,6 @@
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
-import type { PropType } from 'vue';
 
 import { PDataTable, PBadge, PAnchor } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
@@ -91,9 +90,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
-import type { RoleData } from '@/services/administration/iam/role/type';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
 import type { RoleBindingType } from '@/services/administration/type';
 import type { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
+
 
 interface UnDeletableRole {
     roleName: string;
@@ -119,12 +119,11 @@ export default {
             type: Boolean,
             default: false,
         },
-        roles: {
-            type: Array as PropType<RoleData[]>,
-            default: () => [],
-        },
     },
     setup(props, { emit }) {
+        const rolePageStore = useRolePageStore();
+        const rolePageGetters = rolePageStore.getters;
+
         const state = reactive({
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             projects: computed(() => store.getters['reference/projectItems']),
@@ -151,7 +150,7 @@ export default {
 
         const handleDelete = async () => {
             let isAllSucceed = true;
-            await Promise.all(props.roles.map(async (role) => {
+            await Promise.all(rolePageGetters.selectedRoles.map(async (role) => {
                 try {
                     await SpaceConnector.client.identity.role.delete({
                         role_id: role.role_id,
@@ -195,7 +194,7 @@ export default {
             }
             return link.href;
         };
-        const getRoleBindingList = () => Promise.all(props.roles.map(async (role) => {
+        const getRoleBindingList = () => Promise.all(rolePageGetters.selectedRoles.map(async (role) => {
             try {
                 const { results }: Record<'results', RoleBindingType[]> = await SpaceConnector.client.identity.roleBinding.list({ role_id: role.role_id });
                 const roleBindingList: UnDeletableRole[] = results.map((roleBinding) => {
@@ -238,6 +237,7 @@ export default {
 
         return {
             ...toRefs(state),
+            rolePageGetters,
             handleDelete,
             projectFieldHandler,
             getProjectLink,

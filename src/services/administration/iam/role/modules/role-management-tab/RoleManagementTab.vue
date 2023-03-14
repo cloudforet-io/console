@@ -1,6 +1,6 @@
 <template>
     <section>
-        <p-tab v-if="selectedIndex.length === 1"
+        <p-tab v-if="rolePageState.selectedIndices.length === 1"
                :tabs="singleItemTabState.tabs"
                :active-tab.sync="singleItemTabState.activeTab"
         >
@@ -8,7 +8,7 @@
                 <role-detail :role-id="selectedRoleId" />
             </template>
         </p-tab>
-        <p-tab v-else-if="selectedIndex.length > 1"
+        <p-tab v-else-if="rolePageState.selectedIndices.length > 1"
                :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
         >
@@ -16,7 +16,7 @@
                 <p-data-table :fields="fields"
                               :sortable="false"
                               :selectable="false"
-                              :items="selectedRoles"
+                              :items="rolePageGetters.selectedRoles"
                               :col-copy="true"
                               class="selected-data-tab"
                 >
@@ -70,9 +70,9 @@ import { i18n } from '@/translations';
 
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
 import RoleDetail from '@/services/administration/iam/role/modules/role-management-tab/RoleDetail.vue';
-import type { RoleData } from '@/services/administration/iam/role/type';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { administrationStore } from '@/services/administration/store';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
+
 
 export default {
     name: 'RoleManagementTab',
@@ -85,8 +85,11 @@ export default {
         RoleDetail,
     },
     setup() {
+        const rolePageStore = useRolePageStore();
+        const rolePageState = rolePageStore.state;
+        const rolePageGetters = rolePageStore.getters;
+
         const state = reactive({
-            loading: true,
             fields: computed<DataTableField[]>(() => ([
                 { name: 'name', label: 'Name' },
                 { name: 'tags.description', label: 'Description', sortable: false },
@@ -94,10 +97,7 @@ export default {
                 { name: 'created_at', label: 'Created', sortable: false },
                 { name: 'edit_button', label: ' ', sortable: false },
             ])),
-            selectedIndex: computed<number[]>(() => administrationStore.state.role.selectedIndices),
-            selectedRoles: computed<RoleData[]>(() => administrationStore.state.role.selectedRoles),
-            isSelected: computed<boolean>(() => administrationStore.getters['role/isRoleSelected']),
-            selectedRoleId: computed(() => state.selectedRoles[0]?.role_id),
+            selectedRoleId: computed(() => rolePageGetters.selectedRoles[0]?.role_id),
         });
 
         const singleItemTabState = reactive({
@@ -120,6 +120,8 @@ export default {
             ...toRefs(state),
             singleItemTabState,
             multiItemTabState,
+            rolePageState,
+            rolePageGetters,
             handleEditRole,
             ROLE_TYPE_BADGE_OPTION,
         };

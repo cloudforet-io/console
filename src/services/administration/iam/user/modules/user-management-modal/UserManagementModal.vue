@@ -54,7 +54,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import { administrationStore } from '@/services/administration/store';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 
@@ -107,7 +106,7 @@ export default {
         const deleteUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.delete(getUsersParam(items));
-                await administrationStore.dispatch('user/selectIndex', []);
+                userPageState.selectedIndices = [];
                 showSuccessMessage(i18n.tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', userPageState.selectedIndices.length), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', userPageState.selectedIndices.length));

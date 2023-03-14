@@ -3,15 +3,13 @@
         <p-heading :title="$t('IAM.ROLE.ROLE')"
                    use-selected-count
                    use-total-count
-                   :total-count="totalCount"
-                   :selected-count="selectedIndices.length"
+                   :total-count="rolePageState.totalCount"
+                   :selected-count="rolePageState.selectedIndices.length"
         />
         <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
                 <role-management-table :table-height="height"
                                        :manage-disabled="!hasManagePermission"
-                                       @update-selected-indices="handleUpdate"
-                                       @update-total-count="handleUpdate"
                 />
             </template>
         </p-horizontal-layout>
@@ -32,6 +30,8 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import RoleManagementTab from '@/services/administration/iam/role/modules/role-management-tab/RoleManagementTab.vue';
 import RoleManagementTable from '@/services/administration/iam/role/modules/role-managemnet-table/RoleManagementTable.vue';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
+
 
 export default defineComponent({
     name: 'RolePage',
@@ -42,22 +42,16 @@ export default defineComponent({
         RoleManagementTable,
     },
     setup() {
+        const rolePageStore = useRolePageStore();
+        const rolePageState = rolePageStore.state;
+
         const state = reactive({
-            totalCount: 0,
-            selectedIndices: [] as number[],
             hasManagePermission: useManagePermissionState(),
         });
-        const handleUpdate = (value: number[] | number) => {
-            if (Array.isArray(value)) {
-                state.selectedIndices = value;
-            } else {
-                state.totalCount = value;
-            }
-        };
 
         return {
             ...toRefs(state),
-            handleUpdate,
+            rolePageState,
         };
     },
 
