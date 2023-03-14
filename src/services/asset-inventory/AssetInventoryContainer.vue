@@ -20,17 +20,17 @@
 
 <script lang="ts">
 import {
-    defineComponent,
+    defineComponent, onUnmounted,
 } from 'vue';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
-import { registerServiceStore } from '@/common/composables/register-service-store';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import AssetInventoryLNB from '@/services/asset-inventory/AssetInventoryLNB.vue';
-import { assetInventoryStoreModule, assetInventoryStore } from '@/services/asset-inventory/store';
-import type { AssetInventoryState } from '@/services/asset-inventory/store/type';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store/cloud-service-detail-page-store';
+import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
+
 
 export default defineComponent({
     name: 'AssetInventoryContainer',
@@ -40,8 +40,15 @@ export default defineComponent({
         VerticalPageLayout,
     },
     setup() {
-        registerServiceStore<AssetInventoryState>('assetInventory', assetInventoryStoreModule, assetInventoryStore);
+        const cloudServicePageStore = useCloudServicePageStore();
+        const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+
         const { breadcrumbs } = useBreadcrumbs();
+
+        onUnmounted(() => {
+            cloudServicePageStore.$dispose();
+            cloudServiceDetailPageStore.$dispose();
+        });
         return {
             breadcrumbs,
         };

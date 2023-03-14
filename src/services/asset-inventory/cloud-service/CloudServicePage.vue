@@ -283,7 +283,7 @@ export default {
         })();
 
         onUnmounted(() => {
-            // urlQueryString watcher is referencing assetInventoryStore which is destroyed on unmounted. so urlQueryString watcher must be destroyed on unmounted too.
+            // urlQueryString watcher is referencing cloudServicePageStore which is destroyed on unmounted. so urlQueryString watcher must be destroyed on unmounted too.
             if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
         });
 

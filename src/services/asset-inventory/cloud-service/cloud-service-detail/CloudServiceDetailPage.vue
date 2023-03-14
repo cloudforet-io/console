@@ -64,7 +64,7 @@
                         <template v-if="!isServerPage"
                                   #toolbox-bottom
                         >
-                            <cloud-service-usage-overview :cloud-service-type-info="sidebarState.selectedItem"
+                            <cloud-service-usage-overview :cloud-service-type-info="cloudServiceDetailPageState.selectedCloudServiceType"
                                                           :filters="tableState.searchFilters"
                                                           :period="overviewState.period"
                             />
@@ -210,8 +210,9 @@ import CloudServiceTagsPanel
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceTagsPanel.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { assetInventoryStore } from '@/services/asset-inventory/store';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store/cloud-service-detail-page-store';
 import type { Period } from '@/services/cost-explorer/type';
+
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -258,12 +259,11 @@ export default {
         },
     },
     setup(props) {
+        const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+        const cloudServiceDetailPageState = cloudServiceDetailPageStore.state;
+
         const vm = getCurrentInstance()?.proxy as Vue;
         const queryHelper = new QueryHelper();
-        /* Sidebar */
-        const sidebarState = reactive({
-            selectedItem: computed(() => assetInventoryStore.state.cloudServiceDetail.selectedItem),
-        });
 
         /* Main Table */
         const fetchOptionState = reactive({
@@ -576,7 +576,7 @@ export default {
 
         return {
             /* Sidebar */
-            sidebarState,
+            cloudServiceDetailPageState,
             /* Main Table */
             tableState,
             fetchOptionState,
