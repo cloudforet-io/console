@@ -4,7 +4,7 @@
                     size="md"
                     :fade="true"
                     :backdrop="true"
-                    :visible.sync="visible"
+                    :visible="userPageState.visibleUpdateModal"
                     @confirm="confirm"
                     @cancel="handleClose"
                     @close="handleClose"
@@ -110,13 +110,13 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, computed, getCurrentInstance,
+    computed, getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
 
 import {
-    PButtonModal, PSelectDropdown, PFieldGroup, PTextInput, PDivider,
+    PButtonModal, PDivider, PFieldGroup, PSelectDropdown, PTextInput,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -131,8 +131,8 @@ import type { Validation } from '@/services/administration/iam/user/lib/user-for
 import {
     checkEmailFormat, checkEmptyValue, checkMinLength, checkOneLowerCase, checkOneNumber, checkOneUpperCase, checkSamePassword,
 } from '@/services/administration/iam/user/lib/user-form-validations';
-import type { User } from '@/services/administration/iam/user/type';
-import { administrationStore } from '@/services/administration/store';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
+
 
 interface AuthType {
     label: string | null;
@@ -167,21 +167,15 @@ export default {
             type: Object,
             default: undefined,
         },
-        updateMode: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const userPageStore = useUserPageStore();
+        const userPageState = userPageStore.state;
+        const userPageGetters = userPageStore.getters;
 
+        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
-            visible: computed({
-                get() { return administrationStore.getters['user/isUpdateModalVisible']; },
-                set(val) { administrationStore.commit('user/setVisibleUpdateModal', val); },
-            }),
             isSameId: false,
-            selectedUsers: computed<User[]>(() => administrationStore.state.user.selectedUsers),
             //
             authTypeList: [
                 {
@@ -281,11 +275,11 @@ export default {
             } else {
                 emit('confirm', data, null);
             }
-            state.visible = false;
+            userPageState.visibleUpdateModal = false;
         };
 
         const handleClose = () => {
-            state.visible = false;
+            userPageState.visibleUpdateModal = false;
         };
         const handleUpdateTags = (tags: Tag) => {
             state.tags = tags;
@@ -309,9 +303,8 @@ export default {
         };
 
         const setCurrentDomainId = async () => {
-            if (state.domainRoleList[0] && state.selectedUsers[0]) {
-                const roleName = state.selectedUsers[0].role_bindings?.find((data) => data.role_info.role_type === 'DOMAIN')?.role_info.role_id;
-                state.domainRole = roleName;
+            if (state.domainRoleList[0] && userPageGetters.selectedUsers[0]) {
+                state.domainRole = userPageGetters.selectedUsers[0].role_bindings?.find((data) => data.role_info.role_type === 'DOMAIN')?.role_info.role_id;
             } else state.domainRole = '';
         };
 
@@ -336,6 +329,7 @@ export default {
 
         return {
             ...toRefs(state),
+            userPageState,
             validationState,
             confirm,
             handleClose,

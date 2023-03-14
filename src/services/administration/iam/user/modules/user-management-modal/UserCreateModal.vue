@@ -4,7 +4,7 @@
                     size="md"
                     :fade="true"
                     :backdrop="true"
-                    :visible.sync="visible"
+                    :visible="userPageState.visibleCreateModal"
                     @confirm="confirm"
                     @cancel="handleClose"
                     @close="handleClose"
@@ -188,7 +188,7 @@ import {
     checkOauth, checkOneLowerCase, checkOneNumber, checkOneUpperCase,
     checkRequiredField, checkSamePassword,
 } from '@/services/administration/iam/user/lib/user-form-validations';
-import { administrationStore } from '@/services/administration/store';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface AuthType {
     user_type: string;
@@ -241,11 +241,10 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const userPageStore = useUserPageStore();
+        const userPageState = userPageStore.state;
+
         const state = reactive({
-            visible: computed({
-                get() { return administrationStore.getters['user/isCreateModalVisible']; },
-                set(val) { administrationStore.commit('user/setVisibleCreateModal', val); },
-            }),
             isSameId: false,
             // external user
             loading: false,
@@ -423,11 +422,11 @@ export default {
             } else {
                 emit('confirm', data, null);
             }
-            state.visible = false;
+            userPageState.visibleCreateModal = false;
         };
 
         const handleClose = () => {
-            state.visible = false;
+            userPageState.visibleCreateModal = false;
         };
         const handleUpdateTags = (tags?: Tag) => {
             formState.tags = tags;
@@ -532,6 +531,7 @@ export default {
 
         return {
             ...toRefs(state),
+            userPageState,
             formState,
             validationState,
             confirm,

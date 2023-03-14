@@ -3,6 +3,8 @@ import type { Location } from 'vue-router';
 
 import type { Tags, TimeStamp } from '@/models';
 
+import type { RoleBindingType } from '@/services/administration/type';
+
 import TranslateResult = VueI18n.TranslateResult;
 
 export const USER_TYPE = Object.freeze({
@@ -23,6 +25,7 @@ interface UserData {
 	timezone: string;
 	user_id: string;
 	backend: string;
+	role_bindings?: RoleBindingType[];
 }
 
 export interface User extends UserData {
