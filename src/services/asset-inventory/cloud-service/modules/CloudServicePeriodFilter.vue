@@ -10,7 +10,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, defineComponent,
     reactive, toRefs,
@@ -19,7 +18,9 @@ import {
 import { PTag } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
+import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
 import type { Period } from '@/services/cost-explorer/type';
+
 
 interface Props {
     period?: Period;
@@ -32,23 +33,21 @@ export default defineComponent<Props>({
         PTag,
     },
     props: {
-        /* sync */
-        period: {
-            type: Object as () => Period|undefined,
-            default: undefined,
-        },
         readOnly: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup() {
+        const cloudServicePageStore = useCloudServicePageStore();
+        const cloudServicePageState = cloudServicePageStore.state;
+
         const state = reactive({
             periodText: computed<string>(() => {
-                if (props.period?.start) {
-                    const start = dayjs.utc(props.period.start);
-                    const end = dayjs.utc(props.period.end);
-                    if (start.isSame(end)) return dayjs.utc(props.period.start).format('MMM D, YYYY');
+                if (cloudServicePageState.period?.start) {
+                    const start = dayjs.utc(cloudServicePageState.period.start);
+                    const end = dayjs.utc(cloudServicePageState.period.end);
+                    if (start.isSame(end)) return dayjs.utc(cloudServicePageState.period.start).format('MMM D, YYYY');
                     return `${start.format('MMM D, YYYY')} ~ ${end.format('MMM D, YYYY')}`;
                 }
                 return '';
@@ -56,8 +55,7 @@ export default defineComponent<Props>({
         });
 
         const handleDeletePeriod = () => {
-            emit('update:period', undefined);
-            emit('delete-period');
+            cloudServicePageState.period = undefined;
         };
 
         return {

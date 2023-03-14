@@ -2,12 +2,10 @@
     <div>
         <div class="toolbox-top-wrapper">
             <span class="title">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FILTER') }}</span>
-            <div v-if="period"
+            <div v-if="cloudServicePageState.period"
                  class="period-wrapper"
             >
-                <cloud-service-period-filter :period="period"
-                                             @update:period="handleUpdatePeriod"
-                />
+                <cloud-service-period-filter />
                 <p-divider vertical />
             </div>
             <div class="filter-wrapper">
@@ -72,10 +70,10 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-// service
 import CloudServiceFilterModal from '@/services/asset-inventory/cloud-service/modules/CloudServiceFilterModal.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
-import { assetInventoryStore } from '@/services/asset-inventory/store';
+import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
+
 
 interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerMap }
 
@@ -116,27 +114,26 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
+        const cloudServicePageStore = useCloudServicePageStore();
+        const cloudServicePageState = cloudServicePageStore.state;
+        const cloudServicePageGetters = cloudServicePageStore.getters;
+
         const searchQueryHelper = new QueryHelper().setKeyItemSets(props.handlers.keyItemSets ?? []);
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
-            period: computed(() => assetInventoryStore.state.cloudService.period),
-            selectedCategories: computed(() => assetInventoryStore.getters['cloudService/selectedCategories']),
-            selectedRegions: computed(() => assetInventoryStore.getters['cloudService/selectedRegions']),
-            allFilters: computed<ConsoleFilter[]>(() => assetInventoryStore.getters['cloudService/allFilters']),
-            queryTags: computed(() => searchQueryHelper.setFilters(assetInventoryStore.state.cloudService.searchFilters).queryTags),
-            cloudServiceFilters: computed(() => state.allFilters.filter((f: any) => f.k && ![
+            queryTags: computed(() => searchQueryHelper.setFilters(cloudServicePageState.searchFilters).queryTags),
+            cloudServiceFilters: computed(() => cloudServicePageGetters.allFilters.filter((f: any) => f.k && ![
                 'labels',
                 'service_code',
             ].includes(f.k))),
             visibleSetFilterModal: false,
             selectedFiltersCount: computed<string>(() => {
                 const countLabels: string[] = [];
-                if (state.selectedCategories.length) {
-                    countLabels.push(`${state.selectedCategories.length} Service Categories`);
+                if (cloudServicePageGetters.selectedCategories.length) {
+                    countLabels.push(`${cloudServicePageGetters.selectedCategories.length} Service Categories`);
                 }
-                if (state.selectedRegions.length) {
-                    countLabels.push(`${state.selectedRegions.length} Regions`);
+                if (cloudServicePageGetters.selectedRegions.length) {
+                    countLabels.push(`${cloudServicePageGetters.selectedRegions.length} Regions`);
                 }
                 return countLabels.join(', ');
             }),
@@ -152,7 +149,7 @@ export default defineComponent<Props>({
                 cloudServiceResourcesApiQueryHelper.setFilters(state.cloudServiceFilters);
                 const { results } = await SpaceConnector.client.statistics.topic.cloudServiceResources(
                     {
-                        labels: state.selectedCategories,
+                        labels: cloudServicePageGetters.selectedCategories,
                         query: cloudServiceResourcesApiQueryHelper.data,
                     },
                 );
@@ -217,7 +214,7 @@ export default defineComponent<Props>({
                 url: '/statistics/topic/cloud-service-resources',
                 param: {
                     query: excelApiQueryHelper.data,
-                    labels: state.selectedCategories,
+                    labels: cloudServicePageGetters.selectedCategories,
                 },
                 fields: CLOUD_SERVICE_RESOURCES_EXCEL_FIELDS,
                 sheet_name: 'Summary',
@@ -264,13 +261,10 @@ export default defineComponent<Props>({
         const handleChange = (options: ToolboxOptions = {}) => {
             if (options.queryTags !== undefined) {
                 searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
-                assetInventoryStore.dispatch('cloudService/setSearchFilters', searchQueryHelper.filters);
+                cloudServicePageState.searchFilters = searchQueryHelper.filters;
             } else {
                 emit('update-pagination', options);
             }
-        };
-        const handleUpdatePeriod = (period) => {
-            assetInventoryStore.dispatch('cloudService/setPeriod', period);
         };
         const handleClickSet = () => {
             state.visibleSetFilterModal = true;
@@ -300,7 +294,7 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
-            handleUpdatePeriod,
+            cloudServicePageState,
             handleClickSet,
             handleChange,
             handleExport,

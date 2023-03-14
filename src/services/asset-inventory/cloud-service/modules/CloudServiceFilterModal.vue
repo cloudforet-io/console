@@ -85,8 +85,8 @@ import type { RegionMenuItem } from '@/services/asset-inventory/cloud-service/mo
 import {
     getRegionFilterMenuItem,
 } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
-import type { CloudServiceFilterKey, CloudServiceFilterMap } from '@/services/asset-inventory/cloud-service/type';
-import { assetInventoryStore } from '@/services/asset-inventory/store';
+import type { CloudServiceFilterKey } from '@/services/asset-inventory/cloud-service/type';
+import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
 
 interface FilterItem {
     name: string;
@@ -118,6 +118,13 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
+        const cloudServicePageStore = useCloudServicePageStore();
+        const cloudServicePageState = cloudServicePageStore.state;
+
+        const storeState = reactive({
+            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+        });
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             filterLabels: computed<Record<CloudServiceFilterKey, TranslateResult>>(() => ({
@@ -128,14 +135,10 @@ export default defineComponent<Props>({
                 { name: CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY, title: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.SERVICE_CATEGORY') },
                 { name: CLOUD_SERVICE_FILTER_KEY.REGION, title: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.MODAL.REGION') },
             ]),
-            // references
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             // asset inventory store data
-            provider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
             categoryFilters: computed<CategoryMenuItem[]>(() => state.filters[CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]?.map((d) => ({ name: d, label: d }))),
-            regionFilters: computed<RegionMenuItem[]>(() => state.filters[CLOUD_SERVICE_FILTER_KEY.REGION]?.map((d) => getRegionFilterMenuItem(d, state.regions, state.providers))),
-            filters: assetInventoryStore.state.cloudService.additionalFilters as CloudServiceFilterMap,
+            regionFilters: computed<RegionMenuItem[]>(() => state.filters[CLOUD_SERVICE_FILTER_KEY.REGION]?.map((d) => getRegionFilterMenuItem(d, storeState.regions, storeState.providers))),
+            filters: cloudServicePageState.additionalFilters,
             selectedItemsMap: computed<CloudServiceFilterItemsMap>(() => ({
                 [CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY]: state.categoryFilters,
                 [CLOUD_SERVICE_FILTER_KEY.REGION]: state.regionFilters,
@@ -151,7 +154,7 @@ export default defineComponent<Props>({
         /* util */
         const init = () => {
             const _unfoldedIndices: number[] = [];
-            const originFilters = assetInventoryStore.state.cloudService.additionalFilters;
+            const originFilters = cloudServicePageState.additionalFilters;
             state.filterItems.forEach((item, idx) => {
                 if (originFilters[item.name]?.length) {
                     _unfoldedIndices.push(idx);
@@ -174,7 +177,7 @@ export default defineComponent<Props>({
             state.filters = filters;
         };
         const handleFormConfirm = () => {
-            assetInventoryStore.dispatch('cloudService/setAdditionalFilters', state.filters);
+            cloudServicePageState.additionalFilters = state.filters;
             emit('confirm');
             state.proxyVisible = false;
         };
@@ -199,11 +202,11 @@ export default defineComponent<Props>({
         watch(() => props.visible, (visible) => {
             if (visible) init();
         });
-        watch(() => state.provider, (provider) => {
+        watch(() => cloudServicePageState.selectedProvider, (provider) => {
             if (!props.visible) return;
             if (provider === 'all') return;
             const regionFilters = state.filters[CLOUD_SERVICE_FILTER_KEY.REGION] ?? [];
-            assetInventoryStore.dispatch('cloudService/setSelectedRegions', regionFilters.filter((r) => {
+            cloudServicePageStore.setSelectedRegionsToFilters(regionFilters.filter((r) => {
                 const region = state.regions[r];
                 if (!region) return false;
                 return region.data.provider === provider;

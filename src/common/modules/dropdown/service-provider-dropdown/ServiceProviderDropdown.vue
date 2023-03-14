@@ -1,17 +1,17 @@
 <template>
     <p-select-dropdown class="service-provider-dropdown"
-                       :selected="proxySelected"
+                       :selected="cloudServicePageState.selectedProvider"
                        :items="contextMenuItems"
                        @select="handleSelect"
     >
-        <span v-if="providers[proxySelected]"
+        <span v-if="selectedProviderItem"
               class="text"
         >
             <p-lazy-img width="1rem"
                         height="1rem"
-                        :src="providers[proxySelected].icon"
+                        :src="selectedProviderItem.icon"
                         class="mr-1"
-            /><span>{{ providers[proxySelected].name }}</span>
+            /><span>{{ selectedProviderItem.name }}</span>
         </span>
         <span v-else-if="hasAll"
               class="text"
@@ -36,7 +36,6 @@
 </template>
 
 <script lang="ts">
-import type { SetupContext } from 'vue';
 import { computed, reactive, toRefs } from 'vue';
 
 import { PSelectDropdown, PLazyImg } from '@spaceone/design-system';
@@ -46,7 +45,8 @@ import { i18n } from '@/translations';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
+import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
+
 
 export default {
     name: 'ServiceProviderDropdown',
@@ -59,19 +59,18 @@ export default {
         event: 'update:selectedProvider',
     },
     props: {
-        selectedProvider: {
-            type: String,
-            default: 'aws',
-        },
         hasAll: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props, { emit }: SetupContext) {
+    setup(props) {
+        const cloudServicePageStore = useCloudServicePageStore();
+        const cloudServicePageState = cloudServicePageStore.state;
+
         const state = reactive({
-            proxySelected: useProxyValue('selectedProvider', props, emit),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            selectedProviderItem: computed(() => state.providers[cloudServicePageState.selectedProvider]),
             contextMenuItems: computed(() => [
                 { type: 'header', name: 'serviceProvider', label: i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') },
                 ...(props.hasAll ? [{ name: 'all', label: 'All', icon: undefined }] : []),
@@ -82,11 +81,12 @@ export default {
                 })),
             ]),
         });
-        const handleSelect = (provider) => {
-            state.proxySelected = provider;
+        const handleSelect = (provider: string) => {
+            cloudServicePageStore.setSelectedProvider(provider);
         };
         return {
             ...toRefs(state),
+            cloudServicePageState,
             handleSelect,
         };
     },
