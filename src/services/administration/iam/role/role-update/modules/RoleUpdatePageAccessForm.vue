@@ -58,9 +58,8 @@ import { MENU_ID } from '@/lib/menu/config';
 import type { RoleType } from '@/services/administration/iam/role/config';
 import { ROLE_TYPE } from '@/services/administration/iam/role/config';
 import { getPageAccessMenuList } from '@/services/administration/iam/role/lib/page-access-menu-list';
+import RoleUpdatePageAccessMenuItem from '@/services/administration/iam/role/role-update/modules/RoleUpdatePageAccessMenuItem.vue';
 import type { PageAccessMenuItem } from '@/services/administration/iam/role/type';
-import RoleUpdatePageAccessMenuItem
-    from '@/services/administration/iam/role/update-role/modules/RoleUpdatePageAccessMenuItem.vue';
 
 
 const getIndividualPagePermissions = (menuItem: PageAccessMenuItem): RawPagePermission[] => {
