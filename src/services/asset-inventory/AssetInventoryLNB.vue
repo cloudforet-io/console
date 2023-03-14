@@ -34,15 +34,18 @@ import type {
 
 import type {
     CloudServiceDetailPageParams,
-    CloudServiceTypeInfo,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { assetInventoryStore } from '@/services/asset-inventory/store';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store/cloud-service-detail-page-store';
+
 
 export default defineComponent({
     name: 'AssetInventoryLNB',
     components: { LNB },
     setup() {
+        const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+        const cloudServiceDetailPageState = cloudServiceDetailPageStore.state;
+
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             isCloudServiceDetailPage: computed(() => vm.$route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME),
@@ -57,19 +60,22 @@ export default defineComponent({
             }),
             topTitle: computed<TopTitle|undefined>(() => {
                 if (!state.detailPageParams) return undefined;
-                return { label: state.detailPageParams.group, icon: get(state.cloudServiceTypeList[0], ['tags', 'spaceone:icon'], '') };
+                return { label: state.detailPageParams.group, icon: get(cloudServiceDetailPageState.cloudServiceTypeList[0], ['tags', 'spaceone:icon'], '') };
             }),
-            cloudServiceTypeList: computed<CloudServiceTypeInfo[]>(() => assetInventoryStore.state.cloudServiceDetail.cloudServiceTypeList),
-            selectedItem: computed(() => assetInventoryStore.state.cloudServiceDetail.selectedItem),
-            cloudServiceDetailMenuSet: computed<LNBItem[]>(() => [...state.cloudServiceTypeList.map((d) => (
-                {
-                    type: 'item',
-                    label: d.name,
-                    id: d.cloud_service_type_key,
-                    to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
-                    favoriteType: FAVORITE_TYPE.CLOUD_SERVICE,
-                }
-            )), { type: 'divider' }]),
+            cloudServiceDetailMenuSet: computed<LNBItem[]>(() => {
+                const results: LNBItem[] = [];
+                cloudServiceDetailPageState.cloudServiceTypeList.forEach((d) => {
+                    results.push({
+                        type: 'item',
+                        label: d.name,
+                        id: d.cloud_service_type_key,
+                        to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
+                        favoriteType: FAVORITE_TYPE.CLOUD_SERVICE,
+                    });
+                });
+                results.push({ type: 'divider' });
+                return results;
+            }),
             menuSet: computed<LNBMenu[]>(() => {
                 const menu: LNBMenu[] = (state.isCloudServiceDetailPage ? [] : [{
                     type: 'item',
@@ -104,8 +110,8 @@ export default defineComponent({
         });
 
         const initCloudServiceDetailLNB = async (params: CloudServiceDetailPageParams) => {
-            assetInventoryStore.dispatch('cloudServiceDetail/setProviderGroupName', params);
-            await assetInventoryStore.dispatch('cloudServiceDetail/listCloudServiceTypeData');
+            cloudServiceDetailPageStore.setProviderGroupName(params);
+            cloudServiceDetailPageStore.listCloudServiceTypeData();
         };
 
         const routeToFirstCloudServiceType = async (params: CloudServiceDetailPageParams) => {
@@ -114,11 +120,11 @@ export default defineComponent({
                 params: {
                     provider: params.provider,
                     group: params.group,
-                    name: state.cloudServiceTypeList[0].name,
+                    name: cloudServiceDetailPageState.cloudServiceTypeList[0].name,
                 },
                 query: vm.$route.query,
             });
-            assetInventoryStore.dispatch('cloudServiceDetail/setSelectedItem');
+            cloudServiceDetailPageStore.setSelectedCloudServiceType();
         };
 
         /* Watchers */
