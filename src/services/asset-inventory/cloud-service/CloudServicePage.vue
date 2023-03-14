@@ -1,13 +1,11 @@
 <template>
     <div class="page-wrapper">
-        <p-heading :title="storeState.providers[selectedProvider] ? storeState.providers[selectedProvider].name : selectedProvider"
+        <p-heading :title="title"
                    class="page-title"
         >
             <template #title-right-extra>
                 <service-provider-dropdown class="provider-dropdown"
-                                           :selected-provider="selectedProvider"
                                            :has-all="true"
-                                           @update:selectedProvider="handleProviderSelect"
                 />
             </template>
         </p-heading>
@@ -26,9 +24,6 @@
                 <cloud-service-list-card v-for="(item, idx) in items"
                                          :key="`${item.provider}-${item.cloud_service_group}-${idx}`"
                                          :item="item"
-                                         :search-filters="searchFilters"
-                                         :selected-regions="selectedRegions"
-                                         :period="period"
                 />
             </div>
             <template #no-data>
@@ -49,7 +44,7 @@
                     </template>
                     <template #button>
                         <router-link
-                            :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: selectedProvider}}"
+                            :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: cloudServicePageState.selectedProvider}}"
                         >
                             <p-button style-type="substitutive"
                                       icon-left="ic_plus_bold"
@@ -80,6 +75,7 @@ import {
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import { isEmpty } from 'lodash';
 
 import {
     makeDistinctValueHandler,
@@ -89,7 +85,6 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -125,7 +120,8 @@ import type {
     Period,
 } from '@/services/asset-inventory/cloud-service/type';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { assetInventoryStore } from '@/services/asset-inventory/store';
+import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
+
 
 export default {
     name: 'CloudServicePage',
@@ -140,6 +136,10 @@ export default {
         PEmpty,
     },
     setup() {
+        const cloudServicePageStore = useCloudServicePageStore();
+        const cloudServicePageState = cloudServicePageStore.state;
+        const cloudServicePageGetters = cloudServicePageStore.getters;
+
         const storeState = reactive({
             projects: computed(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
@@ -173,24 +173,23 @@ export default {
         const searchQueryHelper = new QueryHelper();
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
-            // asset inventory store
-            selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
-            period: computed(() => assetInventoryStore.state.cloudService.period),
-            searchFilters: computed<ConsoleFilter[]>(() => assetInventoryStore.state.cloudService.searchFilters),
-            selectedCategories: computed<CloudServiceCategory[]>(() => assetInventoryStore.getters['cloudService/selectedCategories']),
-            selectedRegions: computed<string[]>(() => assetInventoryStore.getters['cloudService/selectedRegions']),
-            allFilters: computed<ConsoleFilter[]>(() => assetInventoryStore.getters['cloudService/allFilters']),
+            title: computed<string>(() => {
+                if (!isEmpty(storeState.providers[cloudServicePageState.selectedProvider])) {
+                    return storeState.providers[cloudServicePageState.selectedProvider].name;
+                }
+                return cloudServicePageState.selectedProvider;
+            }),
             // list
             loading: true,
             items: undefined as any,
             totalCount: 0,
             // url query
             urlQueryString: computed<CloudServicePageUrlQuery>(() => ({
-                provider: state.selectedProvider === 'all' ? null : primitiveToQueryString(state.selectedProvider),
-                service: arrayToQueryString(state.selectedCategories),
-                region: arrayToQueryString(state.selectedRegions),
-                period: objectToQueryString(state.period),
-                filters: searchQueryHelper.setFilters(state.searchFilters).rawQueryStrings,
+                provider: cloudServicePageState.selectedProvider === 'all' ? null : primitiveToQueryString(cloudServicePageState.selectedProvider),
+                service: arrayToQueryString(cloudServicePageGetters.selectedCategories),
+                region: arrayToQueryString(cloudServicePageGetters.selectedRegions),
+                period: objectToQueryString(cloudServicePageState.period),
+                filters: searchQueryHelper.setFilters(cloudServicePageState.searchFilters).rawQueryStrings,
             })),
         });
 
@@ -207,15 +206,15 @@ export default {
             listCloudServiceRequest = axios.CancelToken.source();
             try {
                 state.loading = true;
-                cloudServiceApiQueryHelper.setFilters(state.allFilters)
+                cloudServiceApiQueryHelper.setFilters(cloudServicePageGetters.allFilters)
                     .setMultiSort([{ key: 'is_primary', desc: true }, { key: 'name', desc: false }]);
                 const res = await SpaceConnector.client.inventory.cloudServiceType.analyze({
-                    labels: state.selectedCategories,
+                    labels: cloudServicePageGetters.selectedCategories,
                     ...cloudServiceApiQueryHelper.data,
-                    ...(state.period && {
+                    ...(cloudServicePageState.period && {
                         date_range: {
-                            start: dayjs.utc(state.period.start).format('YYYY-MM-DD'),
-                            end: dayjs.utc(state.period.end).add(1, 'day').format('YYYY-MM-DD'),
+                            start: dayjs.utc(cloudServicePageState.period.start).format('YYYY-MM-DD'),
+                            end: dayjs.utc(cloudServicePageState.period.end).add(1, 'day').format('YYYY-MM-DD'),
                         },
                     }),
                 });
@@ -235,10 +234,6 @@ export default {
         };
 
         /* event */
-        // service provider dropdown events
-        const handleProviderSelect = (selectedProvider: string) => {
-            assetInventoryStore.dispatch('cloudService/setSelectedProvider', selectedProvider);
-        };
         // cloud service toolbox events
         const handlePaginationUpdate = (options: ToolboxOptions) => {
             setApiQueryWithToolboxOptions(cloudServiceApiQueryHelper, options, { queryTags: true });
@@ -260,11 +255,11 @@ export default {
                 period: queryStringToObject<Period>(currentQuery.period),
                 filters: searchQueryHelper.setKeyItemSets(handlerState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
             };
-            assetInventoryStore.dispatch('cloudService/setSelectedProvider', urlQueryValue.provider);
-            assetInventoryStore.dispatch('cloudService/setSelectedRegions', urlQueryValue.region);
-            assetInventoryStore.dispatch('cloudService/setSelectedCategories', urlQueryValue.service);
-            assetInventoryStore.dispatch('cloudService/setPeriod', urlQueryValue.period);
-            assetInventoryStore.dispatch('cloudService/setSearchFilters', searchQueryHelper.filters);
+            cloudServicePageStore.setSelectedProvider(urlQueryValue.provider);
+            cloudServicePageStore.setSelectedRegionsToFilters(urlQueryValue.region);
+            cloudServicePageStore.setSelectedCategoriesToFilters(urlQueryValue.service);
+            cloudServicePageState.period = urlQueryValue.period;
+            cloudServicePageState.searchFilters = searchQueryHelper.filters;
 
             // LOAD REFERENCE STORE
             await Promise.allSettled([
@@ -296,8 +291,8 @@ export default {
             ...toRefs(state),
             storeState,
             handlerState,
+            cloudServicePageState,
             assetUrlConverter,
-            handleProviderSelect,
             handlePaginationUpdate,
             ASSET_INVENTORY_ROUTE,
             BACKGROUND_COLOR,

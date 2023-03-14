@@ -56,9 +56,6 @@ export default {
     setup(props: Props, { emit }) {
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            selectedProvider: computed(() => store.state.service.assetInventory.cloudService.selectedProvider),
-            selectedCategories: computed(() => store.state.service.assetInventory.cloudService.selectedCategories),
-            selectedRegions: computed(() => store.state.service.assetInventory.cloudService.selectedRegions),
             keyItemSets: props.handlers.keyItemSets,
             valueHandlerMap: props.handlers.valueHandlerMap,
             cloudServiceFilters: computed(() => props.filters.filter((f: ConsoleFilter) => f.k && ![

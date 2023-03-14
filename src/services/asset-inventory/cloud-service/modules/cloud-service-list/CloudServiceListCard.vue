@@ -61,6 +61,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { objectToQueryString } from '@/lib/router-query-string';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
 import type { Period } from '@/services/cost-explorer/type';
 
 interface Props {
@@ -81,34 +82,26 @@ export default {
             type: Object,
             default: () => {},
         },
-        searchFilters: {
-            type: Array,
-            default: () => [],
-        },
-        selectedRegions: {
-            type: Array,
-            default: () => [],
-        },
-        period: {
-            type: Object,
-            default: undefined,
-        },
     },
     setup(props: Props) {
+        const cloudServicePageStore = useCloudServicePageStore();
+        const cloudServicePageState = cloudServicePageStore.state;
+        const cloudServicePageGetters = cloudServicePageStore.getters;
+
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             slicedResources: computed(() => props.item?.resources.slice(0, 2)),
         });
         const cloudServiceDetailQueryHelper = new QueryHelper();
         const getCloudServiceDetailLink = (item) => {
-            cloudServiceDetailQueryHelper.setFilters(props.searchFilters.filter((f: any) => f.k && ![
+            cloudServiceDetailQueryHelper.setFilters(cloudServicePageState.searchFilters.filter((f: any) => f.k && ![
                 'cloud_service_type',
                 'cloud_service_group',
                 'service_code',
             ].includes(f.k)));
 
-            if (props.selectedRegions.length) {
-                cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: props.selectedRegions });
+            if (cloudServicePageGetters.selectedRegions.length) {
+                cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: cloudServicePageGetters.selectedRegions });
             }
 
             const res: Location = {
@@ -120,7 +113,7 @@ export default {
                 },
                 query: {
                     filters: cloudServiceDetailQueryHelper.rawQueryStrings,
-                    period: objectToQueryString(props.period),
+                    period: objectToQueryString(cloudServicePageState.period),
                 },
             };
             return res;

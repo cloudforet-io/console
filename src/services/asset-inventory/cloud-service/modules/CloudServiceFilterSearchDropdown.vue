@@ -59,7 +59,8 @@ import TextHighlighting from '@/common/components/text/text-highlighting/TextHig
 import { CLOUD_SERVICE_CATEGORY, CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/cloud-service/lib/config';
 import type { RegionMenuItem } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
 import { getRegionFilterMenuItem } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
-import { assetInventoryStore } from '@/services/asset-inventory/store';
+import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
+
 
 const categoryItems = [
     { name: CLOUD_SERVICE_CATEGORY.SERVER, label: CLOUD_SERVICE_CATEGORY.SERVER },
@@ -96,6 +97,9 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
+        const cloudServicePageStore = useCloudServicePageStore();
+        const cloudServicePageState = cloudServicePageStore.state;
+
         const state = reactive({
             searchTerm: '',
             selectedItems: computed<FilterableDropdownMenuItem[]>(() => props.selected.map((selectedName) => ({
@@ -103,11 +107,10 @@ export default defineComponent<Props>({
                 label: state.menuItems.find((d) => d.name === selectedName)?.label || selectedName,
             }))),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            selectedProvider: computed(() => assetInventoryStore.state.cloudService.selectedProvider),
             sortedRegions: computed<SortedRegionReferenceItem[]>(() => {
                 const regions: SortedRegionReferenceItem[] = store.getters['reference/region/regionsSortedByProvider'];
-                if (state.selectedProvider === 'all') return regions;
-                return regions.filter((r) => r.data.provider === state.selectedProvider);
+                if (cloudServicePageState.selectedProvider === 'all') return regions;
+                return regions.filter((r) => r.data.provider === cloudServicePageState.selectedProvider);
             }),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => getRegionFilterMenuItem(d.key, state.regions, state.providers))),
