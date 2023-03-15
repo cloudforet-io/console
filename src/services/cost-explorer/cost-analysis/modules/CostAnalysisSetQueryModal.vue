@@ -73,8 +73,9 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { getInitialDates } from '@/services/cost-explorer/lib/helper';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
+
 
 export default {
     name: 'CostAnalysisSetQueryModal',
@@ -90,6 +91,9 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+        const costAnalysisPageState = costAnalysisPageStore.state;
+
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             granularity: '' as Granularity,
@@ -125,11 +129,11 @@ export default {
         });
 
         const handleFormConfirm = async () => {
-            if (costExplorerStore.state.costAnalysis.granularity !== state.granularity) {
-                await costExplorerStore.commit('costAnalysis/setPeriod', getInitialDates());
+            if (costAnalysisPageState.granularity !== state.granularity) {
+                costAnalysisPageState.period = getInitialDates();
             }
-            costExplorerStore.commit('costAnalysis/setGranularity', state.granularity);
-            costExplorerStore.commit('costAnalysis/setStack', state.stack);
+            costAnalysisPageState.granularity = state.granularity;
+            costAnalysisPageState.stack = state.stack;
             store.commit('display/setCurrency', state.currency);
 
             state.proxyVisible = false;
@@ -146,8 +150,8 @@ export default {
 
         watch(() => state.proxyVisible, (after) => {
             if (after) {
-                state.granularity = costExplorerStore.state.costAnalysis.granularity;
-                state.stack = costExplorerStore.state.costAnalysis.stack;
+                state.granularity = costAnalysisPageState.granularity;
+                state.stack = costAnalysisPageState.stack;
                 state.currency = store.state.display.currency;
             }
         });

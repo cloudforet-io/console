@@ -61,8 +61,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { FILTER, MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { MoreGroupByItem } from '@/services/cost-explorer/type';
+
 
 interface Props {
     visible: boolean;
@@ -92,6 +93,9 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+        const costAnalysisPageGetters = costAnalysisPageStore.getters;
+
         const state = reactive({
             loading: false,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -145,7 +149,7 @@ export default defineComponent<Props>({
 
         /* Event */
         const handleConfirm = () => {
-            const preMoreGroupBy = costExplorerStore.getters['costAnalysis/orderedMoreGroupByItems'];
+            const preMoreGroupBy = costAnalysisPageGetters.orderedMoreGroupByItems;
             const tagsGroupBy: MoreGroupByItem[] = state.selectedTags.map((d) => ({
                 category: MORE_GROUP_BY.TAGS,
                 key: d.name as string,
@@ -164,7 +168,7 @@ export default defineComponent<Props>({
                 else mergedMoreGroupBy.push(item);
             });
             state.proxyVisible = false;
-            costExplorerStore.dispatch('costAnalysis/setMoreGroupBy', mergedMoreGroupBy);
+            costAnalysisPageStore.setMoreGroupByWithSettings(mergedMoreGroupBy);
         };
 
         /* Watcher */

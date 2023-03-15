@@ -1,10 +1,10 @@
 <template>
     <div class="cost-analysis-group-by-filter-more">
-        <template v-for="(moreGroupByItem, idx) in moreGroupByItems">
+        <template v-for="(moreGroupByItem, idx) in costAnalysisPageGetters.orderedMoreGroupByItems">
             <p-select-button v-if="!moreGroupByItem.disabled"
                              :key="`more-group-by-${moreGroupByItem.key}-${idx}`"
                              :value="moreGroupByItem"
-                             :selected="printMode ? '' : moreGroupByItems.filter(d => d.selected)"
+                             :selected="printMode ? '' : costAnalysisPageGetters.orderedMoreGroupByItems.filter(d => d.selected)"
                              multi-selectable
                              size="sm"
                              :predicate="predicate"
@@ -56,7 +56,7 @@
             </template>
         </p-popover>
         <cost-analysis-group-by-filter-more-modal :visible.sync="addMoreModalVisible"
-                                                  :prev-more-group-by-items="moreGroupByItems"
+                                                  :prev-more-group-by-items="costAnalysisPageGetters.orderedMoreGroupByItems"
         />
     </div>
 </template>
@@ -75,8 +75,9 @@ import { i18n } from '@/translations';
 
 import CostAnalysisGroupByFilterMoreModal from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGroupByFilterMoreModal.vue';
 import { MORE_GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { MoreGroupByItem } from '@/services/cost-explorer/type';
+
 
 export default defineComponent({
     name: 'CostAnalysisGroupByFilterMore',
@@ -95,8 +96,10 @@ export default defineComponent({
         },
     },
     setup() {
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+        const costAnalysisPageGetters = costAnalysisPageStore.getters;
+
         const state = reactive({
-            moreGroupByItems: computed<MoreGroupByItem[]>(() => costExplorerStore.getters['costAnalysis/orderedMoreGroupByItems']),
             addMoreModalVisible: false,
             // popover
             popoverVisible: false,
@@ -112,8 +115,8 @@ export default defineComponent({
                     items: state.additionalInfoGroupByItems,
                 },
             ])),
-            tagsGroupByItems: computed(() => state.moreGroupByItems.filter((d) => d.category === MORE_GROUP_BY.TAGS)),
-            additionalInfoGroupByItems: computed(() => state.moreGroupByItems.filter((d) => d.category === MORE_GROUP_BY.ADDITIONAL_INFO)),
+            tagsGroupByItems: computed(() => costAnalysisPageGetters.orderedMoreGroupByItems.filter((d) => d.category === MORE_GROUP_BY.TAGS)),
+            additionalInfoGroupByItems: computed(() => costAnalysisPageGetters.orderedMoreGroupByItems.filter((d) => d.category === MORE_GROUP_BY.ADDITIONAL_INFO)),
         });
 
         /* Util */
@@ -130,31 +133,32 @@ export default defineComponent({
             state.addMoreModalVisible = true;
         };
         const handleSelectMoreGroupByItem = (item: MoreGroupByItem, _, val) => {
-            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(state.moreGroupByItems);
+            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(costAnalysisPageGetters.orderedMoreGroupByItems);
             const target = _moreGroupBy.find((d) => d.category === item.category && d.key === item.key);
             if (target) {
                 target.selected = val;
-                costExplorerStore.dispatch('costAnalysis/setMoreGroupBy', _moreGroupBy);
+                costAnalysisPageStore.setMoreGroupByWithSettings(_moreGroupBy);
             }
         };
         const handleChangeCheckBox = (item: MoreGroupByItem, val) => {
-            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(state.moreGroupByItems);
+            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(costAnalysisPageGetters.orderedMoreGroupByItems);
             const target = _moreGroupBy.find((d) => d.category === item.category && d.key === item.key);
             if (target) {
                 target.disabled = !val;
                 if (!val) target.selected = false;
-                costExplorerStore.dispatch('costAnalysis/setMoreGroupBy', _moreGroupBy);
+                costAnalysisPageStore.setMoreGroupByWithSettings(_moreGroupBy);
             }
         };
         const handleDeleteItem = (item: MoreGroupByItem) => {
-            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(state.moreGroupByItems);
+            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(costAnalysisPageGetters.orderedMoreGroupByItems);
             const targetIdx = _moreGroupBy.findIndex((d) => d.category === item.category && d.key === item.key);
             _moreGroupBy.splice(targetIdx, 1);
-            costExplorerStore.dispatch('costAnalysis/setMoreGroupBy', _moreGroupBy);
+            costAnalysisPageStore.setMoreGroupByWithSettings(_moreGroupBy);
         };
 
         return {
             ...toRefs(state),
+            costAnalysisPageGetters,
             predicate,
             handleClickSettingButton,
             handleClose,

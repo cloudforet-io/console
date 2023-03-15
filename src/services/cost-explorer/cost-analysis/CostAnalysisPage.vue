@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import {
-    computed, onUnmounted, reactive, toRefs, watch,
+    onUnmounted, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
 
@@ -36,10 +36,11 @@ import CostAnalysisGroupByFilter from '@/services/cost-explorer/cost-analysis/mo
 import CostAnalysisHeader from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisHeader.vue';
 import CostAnalysisQueryFilter from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFilter.vue';
 import type { CostAnalysisPageUrlQuery } from '@/services/cost-explorer/cost-analysis/type';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type {
     CostQuerySetModel, CostQuerySetOption, Granularity,
 } from '@/services/cost-explorer/type';
+
 
 export interface SaveQueryEmitParam {
     updatedQuery: CostQuerySetModel;
@@ -62,19 +63,14 @@ export default {
         },
     },
     setup(props) {
-        const state = reactive({
-            costQueryList: computed<CostQuerySetModel[]>(() => costExplorerStore.state.costAnalysis.costQueryList),
-            selectedQueryId: computed<string|undefined>(() => costExplorerStore.state.costAnalysis.selectedQueryId),
-        });
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+        const costAnalysisPageState = costAnalysisPageStore.state;
+        const costAnalysisPageGetters = costAnalysisPageStore.getters;
 
         /* util */
-        const setSelectedQueryId = (queryId?: string) => {
-            costExplorerStore.commit('costAnalysis/setSelectedQueryId', queryId);
-        };
-
         const setQueryOptions = (options?: CostQuerySetOption) => {
-            if (options) costExplorerStore.dispatch('costAnalysis/setQueryOptions', options);
-            else costExplorerStore.dispatch('costAnalysis/initCostAnalysisStoreState');
+            if (options) costAnalysisPageStore.setQueryOptions(options);
+            else costAnalysisPageStore.initState();
         };
 
         const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetOption => ({
@@ -85,10 +81,10 @@ export default {
             filters: queryStringToObject(urlQuery.filters),
         });
 
-        const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (state.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
+        const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (costAnalysisPageState.costQueryList.find((item) => item.cost_query_set_id === queryItemKey)) || {};
 
         /* Watchers */
-        watch(() => state.selectedQueryId, (selectedQueryId) => {
+        watch(() => costAnalysisPageState.selectedQueryId, (selectedQueryId) => {
             if (props.querySetId !== selectedQueryId) {
                 const location: Location = {
                     params: { querySetId: selectedQueryId as string },
@@ -101,7 +97,7 @@ export default {
 
         let unregisterStoreWatch;
         const registerStoreWatch = (currentQuery) => {
-            unregisterStoreWatch = watch(() => costExplorerStore.getters['costAnalysis/currentQuerySetOptions'], (options: CostQuerySetOption) => {
+            unregisterStoreWatch = watch(() => costAnalysisPageGetters.currentQuerySetOptions, (options: Partial<CostQuerySetOption>) => {
                 if (props.querySetId) return;
 
                 const newQuery: CostAnalysisPageUrlQuery = {
@@ -125,37 +121,35 @@ export default {
             if (unregisterStoreWatch) {
                 unregisterStoreWatch();
             }
+            costAnalysisPageStore.$dispose();
+            costAnalysisPageStore.$reset();
         });
 
         /* Page Init */
         (async () => {
             const currentQuery = SpaceRouter.router.currentRoute.query;
             // list cost query sets
-            await costExplorerStore.dispatch('costAnalysis/listCostQueryList');
+            costAnalysisPageStore.listCostQueryList();
 
             // init states
             if (props.querySetId) {
                 const { name, options } = getQueryWithKey(props.querySetId);
                 if (name) {
                     setQueryOptions(options);
-                    setSelectedQueryId(props.querySetId);
+                    costAnalysisPageState.selectedQueryId = props.querySetId;
                 } else {
-                    setSelectedQueryId();
+                    costAnalysisPageState.selectedQueryId = undefined;
                 }
             } else if (Object.keys(currentQuery).length) {
                 const options = getQueryOptionsFromUrlQuery(currentQuery);
                 setQueryOptions(options);
             } else {
-                await costExplorerStore.dispatch('costAnalysis/initCostAnalysisStoreState');
+                costAnalysisPageStore.initState();
             }
 
             // register store watch
             registerStoreWatch(currentQuery);
         })();
-
-        return {
-            ...toRefs(state),
-        };
     },
 };
 </script>

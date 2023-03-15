@@ -49,7 +49,7 @@ import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/con
 import {
     REQUEST_TYPE,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 
 export default {
     name: 'CostAnalysisSaveQueryFormModal',
@@ -80,6 +80,8 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+
         const formState = reactive({
             queryName: undefined as undefined | string,
         });
@@ -102,7 +104,7 @@ export default {
 
         const saveQuery = async () => {
             try {
-                const updatedQuery = await costExplorerStore.dispatch('costAnalysis/saveQuery', formState.queryName);
+                const updatedQuery = await costAnalysisPageStore.saveQuery(formState.queryName);
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
                 emit('confirm', { updatedQuery, requestType: REQUEST_TYPE.SAVE });
             } catch (e) {
@@ -112,7 +114,7 @@ export default {
 
         const editQuery = async () => {
             try {
-                const updatedQuery = await costExplorerStore.dispatch('costAnalysis/editQuery', {
+                const updatedQuery = await costAnalysisPageStore.editQuery({
                     selectedQuery: props.selectedQuery, formState,
                 });
                 if (!updatedQuery) return;

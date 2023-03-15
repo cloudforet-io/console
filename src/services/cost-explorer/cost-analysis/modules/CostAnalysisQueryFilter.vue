@@ -7,25 +7,25 @@
                 <div class="filter-item">
                     <b class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
                     <p-select-dropdown :items="granularityItems"
-                                       :selected="granularity"
+                                       :selected="costAnalysisPageState.granularity"
                                        style-type="transparent"
                                        :read-only="printMode"
                                        class="granularity-select"
                                        @select="handleSelectGranularity"
                     />
                 </div>
-                <div v-if="granularity !== GRANULARITY.ACCUMULATED"
+                <div v-if="costAnalysisPageState.granularity !== GRANULARITY.ACCUMULATED"
                      class="filter-item"
                 >
                     <template v-if="!printMode">
                         <span class="v-divider" />
                         <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK') }}</b>
                         <p-toggle-button class="ml-2"
-                                         :value="stack"
+                                         :value="costAnalysisPageState.stack"
                                          @change-toggle="handleToggleStack"
                         />
                     </template>
-                    <template v-else-if="stack">
+                    <template v-else-if="costAnalysisPageState.stack">
                         <span class="v-divider" />
                         <span>Stacked</span>
                     </template>
@@ -33,7 +33,7 @@
             </div>
             <div class="right-part">
                 <span class="timezone-text">UTC</span>
-                <cost-analysis-period-select-dropdown :fixed-period="period"
+                <cost-analysis-period-select-dropdown :fixed-period="costAnalysisPageState.period"
                                                       :print-mode="printMode"
                                                       @update="handleSelectedDates"
                 />
@@ -43,7 +43,7 @@
         </div>
         <div class="filter-wrapper tablet-on">
             <div class="right-part">
-                <cost-analysis-period-select-dropdown :fixed-period="period"
+                <cost-analysis-period-select-dropdown :fixed-period="costAnalysisPageState.period"
                                                       :print-mode="printMode"
                                                       @update="handleSelectedDates"
                 />
@@ -59,7 +59,6 @@
 </template>
 
 <script lang="ts">
-
 import { computed, reactive, toRefs } from 'vue';
 
 import {
@@ -76,8 +75,8 @@ import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { getInitialDates } from '@/services/cost-explorer/lib/helper';
-import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { Period } from '@/services/cost-explorer/type';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
+import type { Granularity } from '@/services/cost-explorer/type';
 
 const CostAnalysisSetQueryModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue');
 
@@ -98,11 +97,10 @@ export default {
         },
     },
     setup() {
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+        const costAnalysisPageState = costAnalysisPageStore.state;
+
         const state = reactive({
-            granularity: computed(() => costExplorerStore.state.costAnalysis.granularity),
-            stack: computed(() => costExplorerStore.state.costAnalysis.stack),
-            period: computed<Period>(() => costExplorerStore.state.costAnalysis.period),
-            //
             granularityItems: computed<MenuItem[]>(() => ([
                 {
                     type: 'item',
@@ -124,17 +122,17 @@ export default {
         });
 
         /* event */
-        const handleSelectGranularity = async (granularity: string) => {
-            if (granularity !== state.granularity) {
-                await costExplorerStore.commit('costAnalysis/setPeriod', getInitialDates());
+        const handleSelectGranularity = async (granularity: Granularity) => {
+            if (granularity !== costAnalysisPageState.granularity) {
+                costAnalysisPageState.period = getInitialDates();
             }
-            costExplorerStore.commit('costAnalysis/setGranularity', granularity);
+            costAnalysisPageState.granularity = granularity;
         };
         const handleToggleStack = async (value) => {
-            costExplorerStore.commit('costAnalysis/setStack', value);
+            costAnalysisPageState.stack = value;
         };
         const handleSelectedDates = (period) => {
-            costExplorerStore.commit('costAnalysis/setPeriod', period);
+            costAnalysisPageState.period = period;
         };
         const handleClickSetFilter = () => {
             state.setQueryModalVisible = true;
@@ -144,6 +142,7 @@ export default {
 
         return {
             ...toRefs(state),
+            costAnalysisPageState,
             GRANULARITY,
             handleSelectGranularity,
             handleToggleStack,

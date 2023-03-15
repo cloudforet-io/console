@@ -11,7 +11,7 @@
                 <p-button style-type="tertiary"
                           size="sm"
                           :disabled="!filtersLength"
-                          @click="handleClearAllFilters"
+                          @click="handleUpdateFilters({})"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CLEAR_ALL') }}
                 </p-button>
@@ -25,9 +25,9 @@
         </div>
         <div class="filter-wrapper">
             <cost-explorer-filter-tags :print-mode="printMode"
-                                       :filters="filters"
+                                       :filters="costAnalysisPageState.filters"
                                        deletable
-                                       @update-filter-tags="handleUpdateFilterTags"
+                                       @update-filter-tags="handleUpdateFilters"
             />
         </div>
 
@@ -35,7 +35,7 @@
         <div class="title-wrapper">
             <p-select-dropdown v-if="groupByMenuItems.length"
                                :items="groupByMenuItems"
-                               :selected="primaryGroupBy"
+                               :selected="costAnalysisPageState.primaryGroupBy"
                                style-type="transparent"
                                :read-only="printMode"
                                @select="handlePrimaryGroupByItem"
@@ -80,9 +80,9 @@
         </p-data-loader>
         <cost-explorer-set-filter-modal v-if="!printMode"
                                         :visible.sync="filterModalVisible"
-                                        :prev-selected-filters="filters"
+                                        :prev-selected-filters="costAnalysisPageState.filters"
                                         :categories="CATEGORIES"
-                                        @confirm="handleConfirmFilterModal"
+                                        @confirm="handleUpdateFilters"
         />
     </div>
 </template>
@@ -106,9 +106,10 @@ import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets'
 import { FILTER, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import CostExplorerFilterTags from '@/services/cost-explorer/modules/CostExplorerFilterTags.vue';
 import CostExplorerSetFilterModal from '@/services/cost-explorer/modules/CostExplorerSetFilterModal.vue';
-import { costExplorerStore } from '@/services/cost-explorer/store';
-import type { CostFiltersMap, MoreGroupByItem } from '@/services/cost-explorer/type';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
+import type { CostFiltersMap } from '@/services/cost-explorer/type';
 import type { Legend } from '@/services/cost-explorer/widgets/type';
+
 
 interface Props {
     printMode: boolean;
@@ -144,22 +145,21 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+        const costAnalysisPageState = costAnalysisPageStore.state;
+        const costAnalysisPageGetters = costAnalysisPageStore.getters;
+
         const state = reactive({
-            filters: computed(() => costExplorerStore.state.costAnalysis.filters),
-            groupBy: computed(() => costExplorerStore.state.costAnalysis.groupBy),
-            primaryGroupBy: computed(() => costExplorerStore.state.costAnalysis.primaryGroupBy),
-            moreGroupBy: computed<MoreGroupByItem[]>(() => costExplorerStore.getters['costAnalysis/orderedMoreGroupByItems']),
-            //
             filtersLength: computed<number>(() => {
-                const selectedValues = Object.values(state.filters);
+                const selectedValues = Object.values(costAnalysisPageState.filters);
                 return sum(selectedValues.map((v) => v?.length || 0));
             }),
             filterModalVisible: false,
             //
             proxyLegends: useProxyValue('legends', props, emit),
             groupByMenuItems: computed<SelectDropdownMenu[]>(() => {
-                const groupByItems = state.groupBy.map((d) => GROUP_BY_ITEM_MAP[d]);
-                const moreGroupByItems = state.moreGroupBy.filter((d) => d.selected).map((d) => ({
+                const groupByItems = costAnalysisPageState.groupBy.map((d) => GROUP_BY_ITEM_MAP[d]);
+                const moreGroupByItems = costAnalysisPageGetters.orderedMoreGroupByItems.filter((d) => d.selected).map((d) => ({
                     name: `${d.category}.${d.key}`,
                     label: d.key,
                 }));
@@ -182,14 +182,11 @@ export default defineComponent<Props>({
         };
 
         /* Event */
-        const handleClearAllFilters = () => {
-            costExplorerStore.commit('costAnalysis/setFilters', {});
-        };
         const handleClickAddFilterButton = () => {
             state.filterModalVisible = true;
         };
-        const handleUpdateFilterTags = (filters: CostFiltersMap) => {
-            costExplorerStore.commit('costAnalysis/setFilters', filters);
+        const handleUpdateFilters = (filters: CostFiltersMap) => {
+            costAnalysisPageState.filters = filters;
         };
         const handleToggleSeries = (index) => {
             const _legends = cloneDeep(props.legends);
@@ -213,33 +210,29 @@ export default defineComponent<Props>({
             state.proxyLegends = _legends;
         };
         const handlePrimaryGroupByItem = (groupBy?: string) => {
-            costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', groupBy);
-        };
-        const handleConfirmFilterModal = (filters) => {
-            costExplorerStore.commit('costAnalysis/setFilters', filters);
+            costAnalysisPageState.primaryGroupBy = groupBy;
         };
 
         /* Watcher */
         watch(() => state.groupByMenuItems, (after) => {
             if (!after.length) {
-                costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', undefined);
-            } else if (!after.filter((d) => d.name === state.primaryGroupBy).length) {
-                costExplorerStore.commit('costAnalysis/setPrimaryGroupBy', after[0].name);
+                costAnalysisPageState.primaryGroupBy = undefined;
+            } else if (!after.filter((d) => d.name === costAnalysisPageState.primaryGroupBy).length) {
+                costAnalysisPageState.primaryGroupBy = after[0].name;
             }
         });
 
         return {
             ...toRefs(state),
+            costAnalysisPageState,
             CATEGORIES,
             getLegendIconColor,
             getLegendTextColor,
-            handleClearAllFilters,
             handleClickAddFilterButton,
-            handleUpdateFilterTags,
+            handleUpdateFilters,
             handlePrimaryGroupByItem,
             handleToggleSeries,
             handleToggleAllLegends,
-            handleConfirmFilterModal,
         };
     },
 });
