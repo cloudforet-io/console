@@ -40,7 +40,8 @@ import CostDashboardDuplicateModal
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardDuplicateModal.vue';
 import type { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostExplorerDashboardStore } from '@/services/cost-explorer/store/cost-explorer-dashboard-store';
+
 
 const MENU = Object.freeze({
     DUPLICATE: 'duplicate',
@@ -70,6 +71,9 @@ export default {
         },
     },
     setup(props) {
+        const costExplorerDashboardStore = useCostExplorerDashboardStore();
+        const costExplorerDashboardGetters = costExplorerDashboardStore.getters;
+
         const defaultMenuItems = computed(() => [
             { name: MENU.DUPLICATE, label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.DUPLICATE'), disabled: false },
             { name: MENU.DELETE, label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.DELETE'), disabled: false },
@@ -79,14 +83,14 @@ export default {
         const state = reactive({
             moreMenuItems: computed(() => {
                 const menuItems = cloneDeep(defaultMenuItems.value);
-                if (state.homeDashboardId === props.dashboardId) {
+                if (costExplorerDashboardGetters.homeDashboardId === props.dashboardId) {
                     // below find() never be undefined
                     menuItems.find((d) => d.name === MENU.DELETE)!.disabled = true;
                     menuItems.find((d) => d.name === MENU.SET_HOME)!.disabled = true;
                     return menuItems;
                 }
                 if (state.dashboardType === DASHBOARD_TYPE.PUBLIC && props.manageDisabled) {
-                    if (state.homeDashboardId === props.dashboardId) {
+                    if (costExplorerDashboardGetters.homeDashboardId === props.dashboardId) {
                         // below find() never be undefined
                         menuItems.find((d) => d.name === MENU.DELETE)!.disabled = true;
                         menuItems.find((d) => d.name === MENU.SET_HOME)!.disabled = true;
@@ -96,7 +100,6 @@ export default {
                 }
                 return defaultMenuItems.value;
             }),
-            homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
             duplicateModalVisible: false,
             dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(props.dashboard, 'public_dashboard_id') ? DASHBOARD_TYPE.PUBLIC : DASHBOARD_TYPE.USER)),
         });
@@ -122,7 +125,7 @@ export default {
                         public_dashboard_id: props.dashboardId,
                     });
                 }
-                await costExplorerStore.dispatch('setDashboardList');
+                await costExplorerDashboardStore.setDashboardList();
                 await SpaceRouter.router.replace({ name: COST_EXPLORER_ROUTE._NAME });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
@@ -134,7 +137,7 @@ export default {
 
         const handleSelectMoreMenu = (item) => {
             if (item === MENU.SET_HOME && props.dashboardId) {
-                costExplorerStore.dispatch('setHomeDashboard', props.dashboardId);
+                costExplorerDashboardStore.setHomeDashboard(props.dashboardId);
             } else if (item === MENU.DUPLICATE) {
                 state.duplicateModalVisible = true;
             } else if (item === MENU.DELETE) {

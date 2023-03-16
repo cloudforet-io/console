@@ -49,8 +49,9 @@ import {
     PERIOD_TYPE,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 import type { CostFiltersMap, Period } from '@/services/cost-explorer/type';
+
 
 export default {
     name: 'CostDashboardCreatePage',
@@ -61,11 +62,14 @@ export default {
     },
 
     setup() {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const state = reactive({
-            selectedTemplate: computed(() => costExplorerStore.state.dashboard.selectedTemplate),
-            defaultFilter: computed<CostFiltersMap>(() => costExplorerStore.state.dashboard.defaultFilter),
-            includesFilter: computed<boolean>(() => costExplorerStore.state.dashboard.includesFilter),
-            selectedPrivacy: computed<DashboardPrivacyType>(() => costExplorerStore.state.dashboard.selectedDashboardPrivacy),
+            selectedTemplate: computed(() => costDashboardPageState.selectedTemplate),
+            defaultFilter: computed<CostFiltersMap>(() => costDashboardPageState.defaultFilter),
+            includesFilter: computed<boolean>(() => costDashboardPageState.includesFilter),
+            selectedPrivacy: computed<DashboardPrivacyType>(() => costDashboardPageState.selectedDashboardPrivacy),
             hasManagePermission: useManagePermissionState(),
         });
 
@@ -117,7 +121,7 @@ export default {
         const handleClickCreate = async () => {
             const createdDashboardId = state.selectedPrivacy === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
             if (createdDashboardId) goToCustomizePage(createdDashboardId);
-            costExplorerStore.commit('dashboard/setDashboardPrivacy', DASHBOARD_PRIVACY_TYPE.USER);
+            costDashboardPageState.selectedDashboardPrivacy = DASHBOARD_PRIVACY_TYPE.USER;
         };
 
         return {

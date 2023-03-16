@@ -54,7 +54,7 @@ import CostDashboardPeriodSelectDropdown
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
 import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
 import type { CustomLayout, DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+
 
 const HEADER_ELEMENT = 1;
 const DASHBOARD_LAYOUT = 1;
@@ -89,7 +89,6 @@ export default {
             periodType: '',
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
             isPageMounted: false,
             // dashboard layout widget
             widgetList: undefined as HTMLElement[]|undefined,

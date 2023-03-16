@@ -69,7 +69,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { EDITABLE_WIDGET_OPTIONS } from '@/services/cost-explorer/cost-dashboard/type';
 import { GRANULARITY_ITEM_MAP, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
 
 import TranslateResult = VueI18n.TranslateResult;
@@ -86,10 +86,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        selectedWidget: {
-            type: Object,
-            default: () => ({}),
-        },
         editableWidgetOptionList: {
             type: Array,
             default: () => [],
@@ -97,6 +93,9 @@ export default {
     },
 
     setup(props) {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const {
             forms: {
                 name,
@@ -126,9 +125,9 @@ export default {
         });
 
         const state = reactive({
-            _selectedWidget: computed<WidgetInfo>(() => props.selectedWidget),
-            editedSelectedWidget: computed<WidgetInfo>(() => cloneDeep(state._selectedWidget)),
-            selectedWidgetDesc: computed<TranslateResult|undefined>(() => i18n.t(state._selectedWidget?.options?.chart_desc_translation_id)),
+            selectedWidget: computed(() => costDashboardPageState.originSelectedWidget ?? {}),
+            editedSelectedWidget: computed<WidgetInfo>(() => cloneDeep(state.selectedWidget)),
+            selectedWidgetDesc: computed<TranslateResult|undefined>(() => i18n.t(state.selectedWidget?.options?.chart_desc_translation_id)),
             groupByItems: computed<MenuItem[]>(() => Object.values(GROUP_BY_ITEM_MAP)),
             granularityItems: computed<MenuItem[]>(() => Object.values(GRANULARITY_ITEM_MAP)),
             selectedGroupByItem: computed<string>({
@@ -152,36 +151,36 @@ export default {
         const handleName = (value) => {
             setForm('name', value);
             state.editedSelectedWidget.name = value;
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
+            costDashboardPageState.editedSelectedWidget = state.editedSelectedWidget;
         };
 
         const handleSelectGroupBy = (value) => {
             setForm('groupBy', value);
             state.editedSelectedWidget.options.group_by = value;
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
+            costDashboardPageState.editedSelectedWidget = state.editedSelectedWidget;
         };
 
         const handleSelectGranularity = (value) => {
             setForm('granularity', value);
             state.editedSelectedWidget.options.granularity = value;
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', state.editedSelectedWidget);
+            costDashboardPageState.editedSelectedWidget = state.editedSelectedWidget;
         };
 
         const init = () => {
             if (props.isCustom) {
-                initForm('name', state._selectedWidget?.name);
+                initForm('name', state.selectedWidget?.name);
             } else {
-                initForm('name', defaultWidgetMap[state._selectedWidget?.widget_id].widget_name);
+                initForm('name', defaultWidgetMap[state.selectedWidget?.widget_id].widget_name);
             }
 
-            if (props.editableWidgetOptionList.includes(EDITABLE_WIDGET_OPTIONS.GROUP_BY)) initForm('groupBy', state._selectedWidget?.options.group_by);
+            if (props.editableWidgetOptionList.includes(EDITABLE_WIDGET_OPTIONS.GROUP_BY)) initForm('groupBy', state.selectedWidget?.options.group_by);
             else state.selectedGroupByItem = '';
 
-            if (props.editableWidgetOptionList?.includes(EDITABLE_WIDGET_OPTIONS.GRANULARITY)) initForm('granularity', state._selectedWidget?.options.granularity);
+            if (props.editableWidgetOptionList?.includes(EDITABLE_WIDGET_OPTIONS.GRANULARITY)) initForm('granularity', state.selectedWidget?.options.granularity);
             else state.selectedGranularityItem = '';
         };
 
-        watch(() => state._selectedWidget, (after) => {
+        watch(() => state.selectedWidget, (after) => {
             if (after && Object.keys(after).length) {
                 init();
             }

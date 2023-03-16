@@ -22,7 +22,8 @@ import { i18n } from '@/translations';
 
 import type { DashboardPrivacyType } from '@/services/cost-explorer/cost-dashboard/type';
 import { DASHBOARD_PRIVACY_TYPE } from '@/services/cost-explorer/cost-dashboard/type';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
+
 
 const privacyList = [
     {
@@ -47,13 +48,16 @@ export default {
         },
     },
     setup(props) {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const state = reactive({
             selectedPrivacy: DASHBOARD_PRIVACY_TYPE.USER as DashboardPrivacyType,
             filteredPrivacyList: computed(() => (props.manageDisabled ? privacyList.filter((item) => item.name !== DASHBOARD_PRIVACY_TYPE.PUBLIC) : privacyList)),
         });
 
         const handleRadio = (value: DashboardPrivacyType) => {
-            costExplorerStore.commit('dashboard/setDashboardPrivacy', value);
+            costDashboardPageState.selectedDashboardPrivacy = value;
         };
 
         return {

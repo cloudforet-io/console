@@ -105,8 +105,9 @@ import CostDashboardUpdateWidgetModal
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardUpdateWidgetModal.vue';
 import DynamicWidget from '@/services/cost-explorer/cost-dashboard/modules/DynamicWidget.vue';
 import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
+
 
 export default {
     name: 'DashboardLayouts',
@@ -154,6 +155,9 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             widgetCount: computed<number>(() => props.layout.flat().length),
@@ -188,15 +192,15 @@ export default {
         };
 
         const handleClickUpdate = (rowIdx, colIdx, widget: WidgetInfo) => {
-            costExplorerStore.commit('dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', widget);
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', widget);
+            costDashboardPageState.widgetPosition = { row: rowIdx, col: colIdx };
+            costDashboardPageState.originSelectedWidget = widget;
+            costDashboardPageState.editedSelectedWidget = widget;
             state.updateModalVisible = true;
         };
 
         const handleClickDelete = (rowIdx, colIdx, widget: WidgetInfo) => {
-            costExplorerStore.commit('dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', widget);
+            costDashboardPageState.widgetPosition = { row: rowIdx, col: colIdx };
+            costDashboardPageState.editedSelectedWidget = widget;
             checkDeleteState.visible = true;
         };
 
@@ -210,8 +214,8 @@ export default {
         };
 
         const handleClickAdd = (rowIdx, colIdx, layout) => {
-            costExplorerStore.commit('dashboard/setWidgetPosition', { row: rowIdx, col: colIdx });
-            costExplorerStore.commit('dashboard/setLayoutOfSpace', layout);
+            costDashboardPageState.widgetPosition = { row: rowIdx, col: colIdx };
+            costDashboardPageState.layoutOfSpace = layout;
             state.customizeModalVisible = true;
         };
 

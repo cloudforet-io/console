@@ -14,7 +14,7 @@
                         @click="handleSelectWidget(widget)"
                     >
                         <div class="card-header">
-                            <p-radio :selected="selectedWidget.name"
+                            <p-radio :selected="costDashboardPageState.originSelectedWidget?.name"
                                      :value="widget.name"
                                      @click="handleSelectWidget(widget)"
                             >
@@ -51,14 +51,13 @@
             />
         </div>
         <div class="right-area">
-            <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length"
-                                                    :selected-widget="selectedWidget"
+            <cost-dashboard-customize-widget-config v-if="Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length"
                                                     :is-custom="true"
             />
             <custom-widget-preview v-if="showPreview"
                                    :selected-item="selectedItem"
             />
-            <p-button v-if="Object.keys(selectedWidget).length"
+            <p-button v-if="Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length"
                       style-type="negative-outlined"
                       class="btn-remove"
                       @click="handleClickRemoveWidget"
@@ -70,7 +69,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -96,8 +94,9 @@ import CustomWidgetPreview
 import { chartTypeItemMap } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import type { WidgetInfo, ChartType } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
+
 
 const PAGE_SIZE = 6;
 
@@ -114,12 +113,14 @@ export default {
         PDataLoader,
     },
     setup() {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const state = reactive({
             loading: true,
             totalCount: 0,
             widgetList: [] as WidgetInfo[],
             selectedItem: {} as WidgetInfo | CostQuerySetModel,
-            selectedWidget: computed<WidgetInfo>(() => costExplorerStore.state.dashboard.originSelectedWidget),
             selectedQuery: {} as CostQuerySetModel,
             showPreview: computed<boolean>(() => !!Object.keys(state.selectedItem).length),
             allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
@@ -156,7 +157,7 @@ export default {
         const deleteCustomWidget = async () => {
             try {
                 await SpaceConnector.client.costAnalysis.customWidget.delete({
-                    widget_id: state.selectedWidget.widget_id,
+                    widget_id: costDashboardPageState.originSelectedWidget?.widget_id,
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -165,23 +166,23 @@ export default {
 
         /* Event */
         const handleSelectWidget = async (value: WidgetInfo) => {
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', value);
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', value);
+            costDashboardPageState.originSelectedWidget = value;
+            costDashboardPageState.editedSelectedWidget = value;
             state.selectedQuery = {};
             state.selectedItem = value;
         };
         const handleClickRemoveWidget = async () => {
             await deleteCustomWidget();
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', {});
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
+            costDashboardPageState.originSelectedWidget = undefined;
+            costDashboardPageState.editedSelectedWidget = undefined;
             state.selectedItem = {};
             state.thisPage = 1;
             await listCustomWidget();
         };
         const handleCreateCustomWidget = async (createdCustomWidget: WidgetInfo) => {
             await listCustomWidget();
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', createdCustomWidget);
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', createdCustomWidget);
+            costDashboardPageState.originSelectedWidget = createdCustomWidget;
+            costDashboardPageState.editedSelectedWidget = createdCustomWidget;
             state.selectedQuery = {};
             state.selectedItem = createdCustomWidget;
             state.thisPage = 1;
@@ -202,13 +203,14 @@ export default {
         watch(() => state.selectedQuery, (selectedQuery) => {
             if (Object.keys(selectedQuery).length) {
                 state.selectedItem = selectedQuery;
-                costExplorerStore.commit('dashboard/setOriginSelectedWidget', {});
-                costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
+                costDashboardPageState.originSelectedWidget = undefined;
+                costDashboardPageState.editedSelectedWidget = undefined;
             }
         }, { immediate: false });
 
         return {
             ...toRefs(state),
+            costDashboardPageState,
             COST_EXPLORER_ROUTE,
             listCustomWidget,
             handleSelectWidget,

@@ -36,7 +36,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, onBeforeUnmount, onMounted, reactive, toRefs,
 } from 'vue';
@@ -62,8 +61,9 @@ import type {
     DefaultLayout, PublicDashboardInfo, WidgetInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 import type { CostFiltersMap, Period } from '@/services/cost-explorer/type';
+
 
 export default {
     name: 'CostDashboardCustomizePage',
@@ -81,26 +81,29 @@ export default {
         },
     },
     setup(props) {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const state = reactive({
             loading: true,
             layout: [] as CustomLayout[],
             editingCustomLayout: computed<CustomLayout[]|undefined>({
-                get() { return costExplorerStore.state.dashboard.editedCustomLayout; },
+                get() { return costDashboardPageState.editedCustomLayout; },
                 set(val) {
-                    costExplorerStore.commit('dashboard/setEditedCustomLayout', [...(val ?? [])]);
+                    costDashboardPageState.editedCustomLayout = [...(val ?? [])];
                 },
             }),
             dashboardIdFromRoute: computed(() => props.dashboardId || SpaceRouter.router.currentRoute.params.dashboardId),
             dashboardData: {} as DashboardInfo,
             dashboardTitle: '',
-            selectedWidget: computed<WidgetInfo|undefined>(() => costExplorerStore.state.dashboard.editedSelectedWidget),
-            selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => costExplorerStore.state.dashboard.selectedTemplate),
-            defaultFilter: computed<CostFiltersMap>(() => costExplorerStore.state.dashboard.defaultFilter),
+            selectedWidget: computed<WidgetInfo|undefined>(() => costDashboardPageState.editedSelectedWidget),
+            selectedTemplate: computed<Record<string, DefaultLayout> | PublicDashboardInfo>(() => costDashboardPageState.selectedTemplate),
+            defaultFilter: computed<CostFiltersMap>(() => costDashboardPageState.defaultFilter),
             period: {} as Period,
             periodType: '',
             filters: {} as CostFiltersMap,
-            widgetPosition: computed(() => costExplorerStore.state.dashboard.widgetPosition),
-            layoutOfSpace: computed(() => costExplorerStore.state.dashboard.layoutOfSpace),
+            widgetPosition: computed(() => costDashboardPageState.widgetPosition),
+            layoutOfSpace: computed(() => costDashboardPageState.layoutOfSpace),
         });
 
         const goToMainDashboardPage = () => {
@@ -139,13 +142,13 @@ export default {
                     state.editingCustomLayout[state.widgetPosition.row ?? ''].splice((state.widgetPosition.col ?? 0) + 1, 0, state.selectedWidget as WidgetInfo);
                 } else {
                     state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget as WidgetInfo];
-                    costExplorerStore.commit('dashboard/setEditedCustomLayout', [...(state.editingCustomLayout ?? [])]);
+                    costDashboardPageState.editedCustomLayout = [...(state.editingCustomLayout ?? [])];
                 }
             } else if (state.editingCustomLayout.length === 0) {
                 state.editingCustomLayout = [[state.selectedWidget as WidgetInfo]];
             } else {
                 state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget as WidgetInfo];
-                costExplorerStore.commit('dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
+                costDashboardPageState.editedCustomLayout = [...state.editingCustomLayout];
             }
         };
 
@@ -154,18 +157,18 @@ export default {
             if (!state.editingCustomLayout) return;
             state.editingCustomLayout[state.widgetPosition.row ?? ''].splice(state.widgetPosition.col, 1);
             state.editingCustomLayout = state.editingCustomLayout.filter((row) => row.length > 0);
-            costExplorerStore.commit('dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
-            costExplorerStore.commit('dashboard/setWidgetPosition', undefined);
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
+            costDashboardPageState.editedCustomLayout = [...state.editingCustomLayout];
+            costDashboardPageState.widgetPosition = undefined;
+            costDashboardPageState.editedSelectedWidget = undefined;
         };
 
         const handleUpdateWidget = () => {
             if (!state.widgetPosition) return;
             if (!state.editingCustomLayout) return;
             state.editingCustomLayout[state.widgetPosition.row ?? ''][state.widgetPosition.col ?? ''] = state.selectedWidget;
-            costExplorerStore.commit('dashboard/setEditedCustomLayout', [...state.editingCustomLayout]);
-            costExplorerStore.commit('dashboard/setWidgetPosition', undefined);
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
+            costDashboardPageState.editedCustomLayout = [...state.editingCustomLayout];
+            costDashboardPageState.widgetPosition = undefined;
+            costDashboardPageState.editedSelectedWidget = undefined;
         };
 
         const getDashboardData = async () => {
@@ -181,7 +184,9 @@ export default {
                     });
                 }
                 state.dashboardTitle = state.dashboardData?.name || '';
-                state.layout = await getDashboardLayout(state.dashboardData);
+                const layout = await getDashboardLayout(state.dashboardData);
+                state.layout = layout;
+                costDashboardPageState.editedCustomLayout = layout;
                 state.filters = state.dashboardData.default_filter ?? {};
                 state.period = state.dashboardData.period ?? {};
                 state.periodType = state.dashboardData.period_type ?? 'AUTO';

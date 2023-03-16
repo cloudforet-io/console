@@ -8,7 +8,7 @@
             >
                 <!--                TODO:: apply keyboard event below this SelectCard-->
                 <p-select-card
-                    :selected="selectedTemplate"
+                    :selected="costDashboardPageState.selectedTemplate"
                     :value="layoutData"
                     block
                     @change="handleLayoutChange"
@@ -54,7 +54,7 @@
 
 <script lang="ts">
 
-import { computed, reactive, toRefs } from 'vue';
+import { reactive, toRefs } from 'vue';
 
 import {
     PCollapsibleToggle, PSelectCard,
@@ -63,8 +63,9 @@ import { flattenDeep, startCase } from 'lodash';
 
 import { defaultLayoutData } from '@/services/cost-explorer/cost-dashboard/lib/config';
 import type { DefaultLayout, WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
+
 
 const getNamesOfWidgetList = (widgetList) => {
     const flattenWidgetList: WidgetInfo[] = flattenDeep(widgetList);
@@ -80,9 +81,11 @@ export default {
     },
 
     setup() {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const state = reactive({
             selectedLayout: {} as Record<string, DefaultLayout>,
-            selectedTemplate: computed(() => costExplorerStore.state.dashboard.selectedTemplate),
             unfoldedIndices: [] as number[],
         });
 
@@ -98,12 +101,13 @@ export default {
         };
 
         const handleLayoutChange = (value: Record<string, DefaultLayout>) => {
-            costExplorerStore.commit('dashboard/setDashboardTemplate', value);
-            costExplorerStore.commit('dashboard/setDefaultFilter', {});
+            costDashboardPageState.selectedTemplate = value;
+            costDashboardPageState.defaultFilter = {};
         };
 
         return {
             ...toRefs(state),
+            costDashboardPageState,
             defaultLayoutData,
             handleUpdateCollapsed,
             handleLayoutChange,

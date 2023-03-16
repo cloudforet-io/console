@@ -15,7 +15,7 @@
             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.CREATE.TEMPLATE.VIEW_FILTER') }}
         </p-button>
         <view-filter-modal :visible.sync="defaultFilterModalVisible"
-                           :selected-filters="defaultFilter"
+                           :selected-filters="costDashboardPageState.defaultFilter"
         />
     </fragment>
 </template>
@@ -30,7 +30,7 @@ import {
 import { has } from 'lodash';
 
 import ViewFilterModal from '@/services/cost-explorer/cost-dashboard/modules/ViewFilterModal.vue';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 
 export default {
     name: 'CostDashboardCreateDefaultFilter',
@@ -41,19 +41,21 @@ export default {
     },
 
     setup() {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const state = reactive({
             includesFilter: computed({
                 get() {
-                    return costExplorerStore.state.dashboard.includesFilter ?? false;
+                    return costDashboardPageState.includesFilter ?? false;
                 },
                 set(value) {
-                    costExplorerStore.commit('dashboard/setIncludesFilter', value);
+                    costDashboardPageState.includesFilter = value;
                 },
             }),
             defaultFilterModalVisible: false,
-            defaultFilter: computed(() => costExplorerStore.state.dashboard.defaultFilter ?? {}),
-            isDashboardTemplate: computed(() => has(costExplorerStore.state.dashboard.selectedTemplate, 'public_dashboard_id')
-                || has(costExplorerStore.state.dashboard.selectedTemplate, 'user_dashboard_id')),
+            isDashboardTemplate: computed(() => has(costDashboardPageState.selectedTemplate, 'public_dashboard_id')
+                || has(costDashboardPageState.selectedTemplate, 'user_dashboard_id')),
         });
 
         const handleClickFilterButton = () => {
@@ -62,6 +64,7 @@ export default {
 
         return {
             ...toRefs(state),
+            costDashboardPageState,
             handleClickFilterButton,
         };
     },
