@@ -128,7 +128,7 @@ import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
-import { useProjectPageStore } from '@/services/project/store/project-store';
+import { useProjectPageStore } from '@/services/project/store/project-page-store';
 import type {
     ProjectItemResp,
 } from '@/services/project/type';

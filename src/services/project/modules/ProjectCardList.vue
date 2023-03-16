@@ -188,7 +188,7 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { useProjectPageStore } from '@/services/project/store/project-store';
+import { useProjectPageStore } from '@/services/project/store/project-page-store';
 import type { SummaryType } from '@/services/project/type';
 import { SUMMARY_TYPE } from '@/services/project/type';
 

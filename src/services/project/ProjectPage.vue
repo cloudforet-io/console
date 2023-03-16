@@ -163,7 +163,7 @@ import ProjectGroupFormModal from '@/services/project/modules/ProjectGroupFormMo
 import ProjectSearch from '@/services/project/modules/ProjectSearch.vue';
 import ProjectTree from '@/services/project/modules/ProjectTree.vue';
 import ProjectGroupMember from '@/services/project/project-detail/project-member/modules/ProjectGroupMember.vue';
-import { useProjectPageStore } from '@/services/project/store/project-store';
+import { useProjectPageStore } from '@/services/project/store/project-page-store';
 import type {
     ProjectGroup, ProjectGroupTreeItem,
 } from '@/services/project/type';

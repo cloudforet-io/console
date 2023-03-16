@@ -29,7 +29,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useProjectPageStore } from '@/services/project/store/project-store';
+import { useProjectPageStore } from '@/services/project/store/project-page-store';
 
 export default {
     name: 'ProjectGroupDeleteCheckModal',

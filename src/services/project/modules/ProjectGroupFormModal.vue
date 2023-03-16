@@ -46,7 +46,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useProjectPageStore } from '@/services/project/store/project-store';
+import { useProjectPageStore } from '@/services/project/store/project-page-store';
 
 import TranslateResult = VueI18n.TranslateResult;
 
