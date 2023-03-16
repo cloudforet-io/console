@@ -3,7 +3,7 @@
         <sidebar-title :title="$t('PROJECT.LANDING.PROJECT_GROUPS')">
             <template #extra>
                 <div class="action-btn-wrapper">
-                    <p-button v-if="treeEditMode"
+                    <p-button v-if="projectPageState.treeEditMode"
                               size="sm"
                               style-type="highlight"
                               @click="finishTreeEdit"
@@ -84,7 +84,7 @@
                         />
                     </template>
                     <template #right-extra="{node, path}">
-                        <p-icon-button v-if="treeEditMode && node.data.item_type !== 'PROJECT' && permissionInfo[node.data.id]"
+                        <p-icon-button v-if="projectPageState.treeEditMode && node.data.item_type !== 'PROJECT' && projectPageState.permissionInfo[node.data.id]"
                                        name="ic_close"
                                        class="group-delete-btn"
                                        size="sm"
@@ -92,11 +92,11 @@
                                        :disabled="manageDisabled"
                                        @click.stop="openProjectGroupDeleteCheckModal({node, path})"
                         />
-                        <p-icon-button v-if="!treeEditMode && node.data.item_type !== 'PROJECT'"
+                        <p-icon-button v-if="!projectPageState.treeEditMode && node.data.item_type !== 'PROJECT'"
                                        name="ic_plus"
                                        class="group-add-btn"
                                        size="sm"
-                                       :disabled="manageDisabled || !permissionInfo[node.data.id]"
+                                       :disabled="manageDisabled || !projectPageState.permissionInfo[node.data.id]"
                                        @click.stop="openProjectGroupCreateForm({node, path})"
                         />
                     </template>
@@ -128,6 +128,7 @@ import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
+import { useProjectPageStore } from '@/services/project/store/project-page-store';
 import type {
     ProjectItemResp,
 } from '@/services/project/type';
@@ -154,24 +155,24 @@ export default {
         },
     },
     setup(props) {
+        const projectPageStore = useProjectPageStore();
+        const projectPageState = projectPageStore.state;
+        const projectPageGetters = projectPageStore.getters;
         const state = reactive({
             hasRootProjectGroupManagePermission: computed(() => !props.manageDisabled && store.getters['user/hasDomainRole']),
-            hasCurrentProjectGroupManagePermission: computed(() => !props.manageDisabled && state.permissionInfo[store.getters['service/project/groupId']]),
+            hasCurrentProjectGroupManagePermission: computed(() => !props.manageDisabled && projectPageState.permissionInfo[(projectPageGetters.groupId) ?? '']),
             loading: false,
-            rootNode: computed(() => store.state.service.project.rootNode),
-            permissionInfo: computed(() => store.state.service.project.permissionInfo),
-            treeEditMode: computed(() => store.state.service.project.treeEditMode),
             editOptions: computed(() => ({
-                disabled: !state.treeEditMode,
-                editStartValidator: (item) => (state.permissionInfo[item.data.id] || item.data.has_permission) && (item.data.item_type !== 'PROJECT'),
+                disabled: !projectPageState.treeEditMode,
+                editStartValidator: (item) => (projectPageState.permissionInfo[item.data.id] || item.data.has_permission) && (item.data.item_type !== 'PROJECT'),
                 validator: (text) => (text && text.length > 2 && text.length < 40),
                 setDataAfterEdit: false,
             })),
             dragOptions: computed(() => ({
-                disabled: !state.treeEditMode,
+                disabled: !projectPageState.treeEditMode,
                 dragValidator(node, dragNodeParent) {
                     if (!dragNodeParent) return !props.manageDisabled;
-                    return !!(state.permissionInfo[node.data.id] || node.data.has_permission);
+                    return !!(projectPageState.permissionInfo[node.data.id] || node.data.has_permission);
                 },
                 dropValidator(node, oldParent, parent) {
                     if (oldParent?.data.id === parent?.data.id) return true;
@@ -182,7 +183,7 @@ export default {
                     }
                     if (parent.data.item_type === 'PROJECT') return false;
                     if (parent.children?.some((child) => child.data.name === node.data.name)) return false;
-                    return !!(state.permissionInfo[parent.data.id] || parent.data.has_permission);
+                    return !!(projectPageState.permissionInfo[parent.data.id] || parent.data.has_permission);
                 },
             })),
             allProjectRoot: null as any,
@@ -206,28 +207,28 @@ export default {
         const dataGetter = (node) => node.data.name;
 
         const getClassNames = ({ data }) => ({
-            'no-permission': state.treeEditMode ? !state.permissionInfo[data.id] && !data.has_permission : false,
+            'no-permission': projectPageState.treeEditMode ? !projectPageState.permissionInfo[data.id] && !data.has_permission : false,
         });
 
         const openProjectGroupDeleteCheckModal = (item) => {
-            store.dispatch('service/project/openProjectGroupDeleteCheckModal', item);
+            projectPageStore.openProjectGroupDeleteCheckModal(item);
         };
 
         const openProjectGroupCreateForm = (item = {}) => {
-            store.dispatch('service/project/openProjectGroupCreateForm', item);
+            projectPageStore.openProjectGroupCreateForm(item);
         };
 
         const startTreeEdit = () => {
-            store.commit('service/project/setTreeEditMode', true);
+            projectPageState.treeEditMode = true;
         };
 
         const finishTreeEdit = () => {
-            store.commit('service/project/setTreeEditMode', false);
+            projectPageState.treeEditMode = false;
         };
 
         const getAllCurrentItems = (): {path: number[]; node: any}[] => {
-            if (!state.rootNode) return [];
-            return state.rootNode.getAllItems();
+            if (!projectPageState.rootNode) return [];
+            return projectPageState.rootNode.getAllItems();
         };
 
         const dataFetcher = async (node: any = {}, projectOnly = false): Promise<ProjectItemResp[]> => {
@@ -243,7 +244,7 @@ export default {
                     params.item_type = node.data.item_type;
                 }
 
-                if (state.treeEditMode) {
+                if (projectPageState.treeEditMode) {
                     params.include_permission = true;
                     if (projectOnly) params.exclude_type = 'PROJECT_GROUP';
                 } else {
@@ -253,14 +254,11 @@ export default {
                 const { items } = await SpaceConnector.client.identity.project.tree(params);
 
                 if (!node.data) {
-                    store.commit('service/project/setHasProjectGroup', Array.isArray(items) ? !!items.length : false);
+                    projectPageState.hasProjectGroup = Array.isArray(items) ? !!items.length : false;
                 }
 
-                store.dispatch(
-                    'service/project/addPermissionInfo',
-                    items.filter((d) => d.item_type === 'PROJECT_GROUP')
-                        .map((d) => d.id),
-                );
+                projectPageStore.addPermissionInfo(items.filter((d) => d.item_type === 'PROJECT_GROUP')
+                    .map((d) => d.id));
                 return items;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -269,25 +267,25 @@ export default {
         };
 
         const addProjectNodes = async (items) => {
-            if (!state.rootNode) return;
+            if (!projectPageState.rootNode) return;
 
-            const permittedItems = items.filter(({ node }) => state.permissionInfo[node.data.id]);
+            const permittedItems = items.filter(({ node }) => projectPageState.permissionInfo[node.data.id]);
 
             const newChildren: ProjectItemResp[][] = await Promise.all(permittedItems.map(({ node }) => dataFetcher(node, true)));
 
             permittedItems.forEach(({ node, path }, i) => {
-                state.rootNode.updateNodeByPath(path, { ...node.data, has_child: node.data.has_child || newChildren[i].length > 0 });
-                if (!node.$folded) state.rootNode.addChildNodeByPath(path, newChildren[i], false);
+                projectPageState.rootNode?.updateNodeByPath(path, { ...node.data, has_child: node.data.has_child || newChildren[i].length > 0 });
+                if (!node.$folded) projectPageState.rootNode?.addChildNodeByPath(path, newChildren[i], false);
             });
         };
 
         const removeProjectNodes = async (items) => {
-            if (!state.rootNode) return;
+            if (!projectPageState.rootNode) return;
 
             const projectItems = items.filter(({ node }) => node.data.item_type === 'PROJECT');
 
             projectItems.forEach(({ node }) => {
-                state.rootNode.deleteNode((d) => d.id === node.data.id);
+                projectPageState.rootNode?.deleteNode((d) => d.id === node.data.id);
             });
 
             const projectGroupItems = items.filter(({ node }) => node.data.item_type === 'PROJECT_GROUP' && node.data.has_child);
@@ -295,11 +293,11 @@ export default {
             const newChildren: ProjectItemResp[][] = await Promise.all(projectGroupItems.map(({ node }) => dataFetcher(node)));
 
             projectGroupItems.forEach(({ node, path }, i) => {
-                state.rootNode.updateNodeByPath(path, { ...node.data, has_child: newChildren[i].length > 0 });
+                projectPageState.rootNode?.updateNodeByPath(path, { ...node.data, has_child: newChildren[i].length > 0 });
             });
         };
 
-        watch(() => state.treeEditMode, async (treeEditMode) => {
+        watch(() => projectPageState.treeEditMode, async (treeEditMode) => {
             const items = getAllCurrentItems();
             state.loading = true;
             if (treeEditMode) {
@@ -357,8 +355,8 @@ export default {
                 await SpaceConnector.client.identity.project.update(params);
 
                 // this is for refresh project list cards
-                if (store.getters['service/project/groupId'] === oldParent?.data.id || store.getters['service/project/groupId'] === parent.data.id) {
-                    store.commit('service/project/setSelectedItem', { ...store.state.service.project.selectedItem });
+                if (projectPageGetters.groupId === oldParent?.data.id || projectPageGetters.groupId === parent.data.id) {
+                    projectPageState.selectedItem = { ...projectPageState.selectedItem };
                 }
 
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '');
@@ -369,10 +367,10 @@ export default {
         };
 
         const onDrop = async (node, oldParent, parent, rollback) => {
-            if (!state.rootNode) return;
+            if (!projectPageState.rootNode) return;
             if (oldParent?.data.id === parent?.data.id) return;
             if (oldParent?.data.has_child && oldParent?.children.length === 1) {
-                state.rootNode.updateNode((d) => d.id === oldParent.data.id, {
+                projectPageState.rootNode.updateNode((d) => d.id === oldParent.data.id, {
                     ...oldParent.data,
                     has_child: false,
                 });
@@ -390,16 +388,16 @@ export default {
         };
 
         const onChangeSelect = (selected) => {
-            store.commit('service/project/setSelectedItem', selected[0] || {});
+            projectPageState.selectedItem = selected[0] || {};
         };
 
         const onAllProjectChangeSelect = (selected) => {
-            if (selected.length > 0 && store.getters['service/project/groupId'] && state.rootNode) {
-                state.rootNode.resetSelect();
+            if (selected.length > 0 && projectPageGetters.groupId && projectPageState.rootNode) {
+                projectPageState.rootNode.resetSelect();
             }
         };
 
-        watch(() => store.getters['service/project/groupId'], (data) => {
+        watch(() => projectPageGetters.groupId, (data) => {
             if (!state.allProjectRoot) return;
             if (data) {
                 state.allProjectRoot.resetSelect();
@@ -410,20 +408,21 @@ export default {
 
         /* Init */
         const onTreeInit = (root) => {
-            store.dispatch('service/project/initRoot', root);
+            projectPageStore.initRoot(root);
         };
 
         const onAllProjectTreeInit = (root) => {
             state.allProjectRoot = root;
         };
 
-        watch([() => state.rootNode, () => state.allProjectRoot], async ([rootNode, allProjectRoot]) => {
+        watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([rootNode, allProjectRoot]) => {
             if (rootNode && allProjectRoot) {
-                if (store.state.service.project.isInitiated) return;
+                if (projectPageState.isInitiated) return;
 
                 state.loading = true;
                 if (props.initGroupId) {
-                    const res = await store.dispatch('service/project/selectNode', props.initGroupId);
+                    const res = await projectPageStore.selectNode(props.initGroupId);
+
                     if (!res) {
                         allProjectRoot.changeSelectState(state.allProjectNode, [0]);
                         await rootNode.fetchData();
@@ -432,13 +431,14 @@ export default {
                     allProjectRoot.changeSelectState(state.allProjectNode, [0]);
                     await rootNode.fetchData();
                 }
-                store.commit('service/project/setIsInitiated', true);
+                projectPageState.isInitiated = true;
                 state.loading = false;
             }
         }, { immediate: true });
 
         return {
             ...toRefs(state),
+            projectPageState,
             toggleOptions,
             selectOptions,
             FAVORITE_TYPE,

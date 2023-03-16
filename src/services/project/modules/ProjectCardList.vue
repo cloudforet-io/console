@@ -188,6 +188,7 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { useProjectPageStore } from '@/services/project/store/project-page-store';
 import type { SummaryType } from '@/services/project/type';
 import { SUMMARY_TYPE } from '@/services/project/type';
 
@@ -223,6 +224,9 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
+        const projectPageStore = useProjectPageStore();
+        const projectPageState = projectPageStore.state;
+        const projectPageGetters = projectPageStore.getters;
         const state = reactive({
             items: undefined,
             totalCount: 0,
@@ -237,19 +241,19 @@ export default {
             hoveredProjectId: '',
             hoveredGroupId: '',
             isAll: computed(() => !state.groupId),
-            groupId: computed(() => store.getters['service/project/groupId']),
-            searchText: computed(() => store.state.service.project.searchText),
-            noProjectGroup: computed(() => !store.state.service.project.hasProjectGroup),
+            groupId: computed(() => projectPageGetters.groupId),
+            searchText: computed(() => projectPageState.searchText),
+            noProjectGroup: computed(() => !projectPageState.hasProjectGroup),
             projectFormVisible: computed({
-                get() { return store.state.service.project.projectFormVisible; },
-                set(val) { store.commit('service/project/setProjectFormVisible', val); },
+                get() { return projectPageState.projectFormVisible; },
+                set(val) { projectPageState.projectFormVisible = val; },
             }),
             projectSummaryList: computed(() => [
                 { title: i18n.t('PROJECT.LANDING.SERVER'), summaryType: SUMMARY_TYPE.SERVER },
                 { title: i18n.t('PROJECT.LANDING.DATABASE'), summaryType: SUMMARY_TYPE.DATABASE },
                 { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
             ]),
-            shouldUpdateProjectList: computed<boolean>(() => store.state.service.project.shouldUpdateProjectList),
+            shouldUpdateProjectList: computed<boolean>(() => projectPageState.shouldUpdateProjectList),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
         });
 
@@ -355,7 +359,7 @@ export default {
                 else res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
                 state.items = res.results;
                 state.totalCount = res.total_count;
-                store.commit('service/project/setProjectCount', state.totalCount);
+                projectPageState.projectCount = state.totalCount;
                 state.loading = false;
                 listProjectToken = undefined;
                 await getCardSummary(res.results);
@@ -364,7 +368,7 @@ export default {
                     state.items = [];
                     state.totalCount = 0;
                     state.loading = false;
-                    store.commit('service/project/setProjectCount', 0);
+                    projectPageState.projectCount = 0;
                     ErrorHandler.handleError(e);
                 }
             }
@@ -405,12 +409,12 @@ export default {
         watch(() => state.shouldUpdateProjectList, async () => {
             if (state.shouldUpdateProjectList) {
                 await getData();
-                await store.commit('service/project/setShouldUpdateProjectList', false);
+                projectPageState.shouldUpdateProjectList = false;
             }
         });
 
         /* Init */
-        watch([() => store.state.service.project.isInitiated, () => state.groupId, () => state.searchText], async ([isInitiated, groupId, searchText]) => {
+        watch([() => projectPageState.isInitiated, () => state.groupId, () => state.searchText], async ([isInitiated, groupId, searchText]) => {
             if (isInitiated) await listProjects(groupId, searchText);
         }, { immediate: true });
 

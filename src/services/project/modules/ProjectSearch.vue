@@ -70,10 +70,9 @@ import { debounce } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { store } from '@/store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useProjectPageStore } from '@/services/project/store/project-page-store';
 import type { ItemType } from '@/services/project/type';
 
 const LIMIT = 5;
@@ -137,11 +136,13 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
-
+        const projectPageStore = useProjectPageStore();
+        const projectPageState = projectPageStore.state;
+        const projectPageGetters = projectPageStore.getters;
         const state = reactive({
             menuRef: null as null|Vue,
-            groupId: computed(() => store.getters['service/project/groupId']),
-            groupName: computed(() => store.getters['service/project/groupName']),
+            groupId: computed(() => projectPageGetters.groupId),
+            groupName: computed(() => projectPageGetters.groupName),
             searchText: '' as string,
             trimmedValue: computed<string>(() => (typeof state.searchText === 'string' ? state.searchText.trim() : '')),
             regex: computed(() => {
@@ -270,11 +271,11 @@ export default {
             if (!val) val = '';
 
             if (state.groupId !== groupId) {
-                store.dispatch('service/project/selectNode', groupId);
+                projectPageStore.selectNode(groupId);
             }
 
-            if (store.state['service/project/searchText'] !== val) {
-                store.commit('service/project/setSearchText', val);
+            if (projectPageState.searchText !== val) {
+                projectPageState.searchText = val;
             }
         };
 
@@ -319,7 +320,7 @@ export default {
 
         if (vm.$route.query.search) {
             state.searchText = vm.$route.query.search as string;
-            store.commit('service/project/setSearchText', vm.$route.query.search as string);
+            projectPageState.searchText = vm.$route.query.search as string;
         }
 
         const focusMenu = () => {

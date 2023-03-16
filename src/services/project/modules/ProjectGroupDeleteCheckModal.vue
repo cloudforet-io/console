@@ -22,7 +22,6 @@ import {
     computed, reactive, toRefs,
 } from 'vue';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -30,29 +29,34 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useProjectPageStore } from '@/services/project/store/project-page-store';
+
 export default {
     name: 'ProjectGroupDeleteCheckModal',
     components: {
         DeleteModal,
     },
     setup() {
+        const projectPageStore = useProjectPageStore();
+        const projectPageState = projectPageStore.state;
+        const projectPageGetters = projectPageStore.getters;
         const state = reactive({
             proxyVisible: computed({
-                get() { return store.state.service.project.projectGroupDeleteCheckModalVisible; },
-                set(val) { store.commit('service/project/setProjectGroupDeleteCheckModalVisible', val); },
+                get() { return projectPageState.projectGroupDeleteCheckModalVisible; },
+                set(val) { projectPageState.projectGroupDeleteCheckModalVisible = val; },
             }),
-            groupId: computed((() => store.getters['service/project/actionTargetNodeData']?.id)),
+            groupId: computed((() => projectPageGetters.actionTargetNodeData?.id)),
         });
 
         const deleteProjectGroup = async () => {
             try {
-                await store.dispatch('service/project/deleteProjectGroup');
+                await projectPageStore.deleteProjectGroup();
                 // await store.dispatch('favorite/projectGroup/removeItem', { id: state.groupId });
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
             } finally {
-                store.commit('service/project/setProjectGroupDeleteCheckModalVisible', false);
+                projectPageState.projectGroupDeleteCheckModalVisible = false;
             }
         };
         return {
