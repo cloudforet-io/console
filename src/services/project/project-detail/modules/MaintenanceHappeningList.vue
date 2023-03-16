@@ -72,7 +72,6 @@ export default {
         /* Init */
         (async () => {
             state.loading = true;
-            console.log(projectDetailPageStore);
             projectDetailPageStore.loadMaintenanceHappenings();
             state.loading = false;
         })();
