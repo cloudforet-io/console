@@ -119,7 +119,7 @@ import BudgetNotificationsChannel
 import BudgetNotificationsModal
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-notifications/BudgetNotificationsModal.vue';
 import { BUDGET_NOTIFICATIONS_TYPE, BUDGET_NOTIFICATIONS_UNIT } from '@/services/cost-explorer/budget/type';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 export default {
@@ -142,19 +142,22 @@ export default {
         },
     },
     setup() {
+        const budgetPageStore = useBudgetPageStore();
+        const budgetPageState = budgetPageStore.state;
+
         const state = reactive({
             hasBudgetAlert: computed(() => {
-                const notifications = costExplorerStore.state.budget.budgetData?.notifications;
+                const notifications = budgetPageState.budgetData?.notifications;
                 return notifications ? notifications.length > 0 : false;
             }),
             notifications: computed(() => {
-                const notifications = costExplorerStore.state.budget.budgetData?.notifications;
+                const notifications = budgetPageState.budgetData?.notifications;
                 return notifications ? notifications.map((d) => ({ ...d, id: getUUID() })) : [];
             }),
             budgetNotificationsModalVisible: false,
-            budgetId: computed(() => costExplorerStore.state.budget.budgetData?.budget_id),
-            budgetTargetId: computed(() => costExplorerStore.state.budget.budgetData?.project_id || undefined),
-            isBudgetLoading: computed(() => costExplorerStore.getters['budget/isBudgetLoading']),
+            budgetId: computed(() => budgetPageState.budgetData?.budget_id ?? ''),
+            budgetTargetId: computed(() => budgetPageState.budgetData?.project_id || undefined),
+            isBudgetLoading: computed(() => budgetPageState.loading),
         });
 
         const checkDeleteState = reactive({
@@ -168,7 +171,7 @@ export default {
         const handleDeleteForm = async () => {
             try {
                 checkDeleteState.loading = true;
-                await costExplorerStore.dispatch('budget/updateBudgetNotifications', {
+                await budgetPageStore.updateBudgetNotifications({
                     budgetId: state.budgetId,
                     notifications: [],
                 });

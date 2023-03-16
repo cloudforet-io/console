@@ -92,14 +92,13 @@ import {
 import {
     PButtonModal, PTextInput, PAnchor, PButton, PSelectDropdown, PIconButton,
 } from '@spaceone/design-system';
-import cloneDeep from 'lodash/cloneDeep';
 
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 const NOTIFICATION_UNIT = Object.freeze({
@@ -141,10 +140,13 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const budgetPageStore = useBudgetPageStore();
+        const budgetPageState = budgetPageStore.state;
+
         const state = reactive({
             loading: true,
             proxyVisible: useProxyValue('visible', props, emit),
-            conditions: cloneDeep(costExplorerStore.state.budget.budgetData?.notifications) as Condition[],
+            conditions: budgetPageState.budgetData?.notifications as Condition[],
             units: computed(() => ([
                 {
                     name: NOTIFICATION_UNIT.ACTUAL_COST,
@@ -165,8 +167,8 @@ export default {
                     label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.CRITICAL'),
                 },
             ])),
-            budgetId: computed(() => costExplorerStore.state.budget.budgetData?.budget_id),
-            thresholdValidations: costExplorerStore.state.budget.budgetData?.notifications?.map((d) => !!d) ?? [] as Array<boolean|undefined>,
+            budgetId: computed(() => budgetPageState.budgetData?.budget_id),
+            thresholdValidations: budgetPageState.budgetData?.notifications?.map((d) => !!d) ?? [] as Array<boolean|undefined>,
             isAllValid: computed(() => state.thresholdValidations.every((d) => !!d)),
         });
 
@@ -198,7 +200,7 @@ export default {
 
         const setBudgetAlert = async () => {
             try {
-                await costExplorerStore.dispatch('budget/updateBudgetNotifications', {
+                budgetPageStore.updateBudgetNotifications({
                     budgetId: state.budgetId,
                     notifications: state.conditions,
                 });

@@ -58,7 +58,6 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import type {
-    BudgetData,
     BudgetTimeUnit,
     BudgetUsageData,
     CostType,
@@ -68,7 +67,7 @@ import {
 } from '@/services/cost-explorer/budget/type';
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 import type { Period } from '@/services/cost-explorer/type';
 import { getStackedChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
 
@@ -120,6 +119,9 @@ export default {
         },
     },
     setup() {
+        const budgetPageStore = useBudgetPageStore();
+        const budgetPageState = budgetPageStore.state;
+
         const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageData[], period: Period) => getStackedChartData(budgetUsageData, period, 'month');
 
         const getBudgetRatio = (budgetTimeUnit, usdCost, totalBudgetLimit, monthlyLimit) => {
@@ -179,8 +181,8 @@ export default {
         };
 
         const state = reactive({
-            budgetData: computed<Partial<BudgetData>|null>(() => costExplorerStore.state.budget.budgetData),
-            budgetUsageData: computed<Partial<BudgetUsageData>|null>(() => costExplorerStore.state.budget.budgetUsageData),
+            budgetUsageData: computed(() => budgetPageState.budgetUsageData),
+            budgetData: computed(() => budgetPageState.budgetData),
             budgetTimeUnit: computed<BudgetTimeUnit>(() => state.budgetData?.time_unit),
             budgetPeriod: computed<Period>(() => ({
                 start: state.budgetData?.start,
