@@ -23,13 +23,12 @@ import type { Vue } from 'vue/types/vue';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import { store } from '@/store';
-
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import AlertDataTable from '@/services/alert-manager/alert/modules/AlertDataTable.vue';
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
 import type { AlertListPageUrlQuery, AlertListTableFilters } from '@/services/alert-manager/type';
+import { useProjectDetailPageStore } from '@/services/project/project-detail/store/project-detail-page-store';
 
 export default {
     name: 'ProjectAlertListPage',
@@ -44,6 +43,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
+        const projectDetailPageStore = useProjectDetailPageStore();
         const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             alertState: vm.$route.query.state ?? ALERT_STATE_FILTER.OPEN,
@@ -84,7 +84,7 @@ export default {
         };
 
         const onChangeList = () => {
-            store.dispatch('service/projectDetail/getAlertCounts');
+            projectDetailPageStore.getAlertCounts();
         };
 
         onActivated(() => {

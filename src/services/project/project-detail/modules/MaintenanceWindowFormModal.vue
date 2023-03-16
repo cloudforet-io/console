@@ -134,6 +134,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useProjectDetailPageStore } from '@/services/project/project-detail/store/project-detail-page-store';
+
 const SCHEDULE_TYPE = Object.freeze({
     startNow: 'startNow',
     startAtTime: 'startAtTime',
@@ -186,6 +188,7 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
+        const projectDetailPageStore = useProjectDetailPageStore();
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             loading: false,
@@ -342,7 +345,7 @@ export default {
 
                 state.proxyVisible = false;
                 emit('confirm', maintenanceWindowId);
-                await store.dispatch('service/projectDetail/loadMaintenanceHappenings');
+                await projectDetailPageStore.loadMaintenanceHappenings();
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
