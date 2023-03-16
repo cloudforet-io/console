@@ -1,26 +1,26 @@
 <template>
     <section class="budget-detail-summary">
         <p-pane-layout class="summary-card">
-            <span v-if="!loading"
+            <span v-if="!budgetPageState.loading"
                   class="summary-title"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.AMOUNT_PLANNING_TYPE') }} <span class="font-normal">({{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.PERIOD') }})</span>
             </span>
-            <div v-if="!loading"
+            <div v-if="!budgetPageState.loading"
                  class="flex justify-between"
             >
-                <p v-if="budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL"
+                <p v-if="budgetPageState.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL"
                    class="summary-content"
                 >
-                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ budgetPageState.budgetData.start }} ~ {{ budgetPageState.budgetData.end }})
                 </p>
                 <p v-else
                    class="summary-content"
                 >
-                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ budgetPageState.budgetData.start }} ~ {{ budgetPageState.budgetData.end }})
                 </p>
                 <amount-planning-type-popover class="summary-content"
-                                              :budget-data="budgetData"
+                                              :budget-data="budgetPageState.budgetData"
                 >
                     <span class="view-all">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DETAILS') }}</span>
                 </amount-planning-type-popover>
@@ -28,13 +28,13 @@
         </p-pane-layout>
         <p-pane-layout class="summary-card">
             <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TARGET') }}</span>
-            <p v-if="!loading"
+            <p v-if="!budgetPageState.loading"
                class="summary-content"
             >
-                <p-anchor v-if="budgetData.project_group_id || budgetData.project_id"
+                <p-anchor v-if="budgetPageState.budgetData.project_group_id || budgetPageState.budgetData.project_id"
                           :to="referenceRouter(
-                              (budgetData.project_id || budgetData.project_group_id),
-                              { resource_type: budgetData.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
+                              (budgetPageState.budgetData.project_id || budgetPageState.budgetData.project_group_id),
+                              { resource_type: budgetPageState.budgetData.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
                     {{ getTargetLabel(projects) }}
                 </p-anchor>
@@ -42,11 +42,11 @@
         </p-pane-layout>
         <p-pane-layout class="summary-card">
             <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }}
-                <span v-if="!loading"
+                <span v-if="!budgetPageState.loading"
                       class="text-gray-900 font-normal"
                 >{{ costTypeMap[costTypeKey] }}</span>
             </span>
-            <p v-if="!loading"
+            <p v-if="!budgetPageState.loading"
                class="summary-content cost-type"
             >
                 <span class="cost-type-content">{{ processedCostTypeValue }}</span>
@@ -79,11 +79,12 @@ import AmountPlanningTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
 import BudgetCostTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypePopover.vue';
-import type { BudgetData, CostType } from '@/services/cost-explorer/budget/type';
+import type { CostType } from '@/services/cost-explorer/budget/type';
 import {
     BUDGET_TIME_UNIT,
 } from '@/services/cost-explorer/budget/type';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
+
 
 const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
 const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
@@ -114,16 +115,23 @@ export default {
         },
     },
     setup() {
+        const budgetPageStore = useBudgetPageStore();
+        const budgetPageState = budgetPageStore.state;
+
         const state = reactive({
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-            budgetData: computed<Partial<BudgetData>|null>(() => costExplorerStore.state.budget.budgetData),
-            costTypeKey: computed(() => (state.budgetData ? getKeyOfCostType(state.budgetData.cost_types ?? {}) : '')),
-            costTypeValue: computed(() => (state.budgetData ? getValueOfCostType(state.budgetData.cost_types ?? {}, state.costTypeKey) : [])),
+            costTypeKey: computed(() => {
+                if (!budgetPageState.budgetData || !budgetPageState.budgetData?.cost_types) return '';
+                return getKeyOfCostType(budgetPageState.budgetData.cost_types);
+            }),
+            costTypeValue: computed(() => {
+                if (!budgetPageState.budgetData || !budgetPageState.budgetData?.cost_types) return [];
+                return getValueOfCostType(budgetPageState.budgetData.cost_types, state.costTypeKey);
+            }),
             processedCostTypeValue: computed(() => state.costTypeValue?.join(', ') || 'All'),
             buttonRef: null as HTMLElement | null,
             balloonVisible: false,
-            loading: computed(() => costExplorerStore.getters['budget/isBudgetLoading']),
         });
 
         const handleClickViewAll = () => {
@@ -131,8 +139,8 @@ export default {
         };
 
         const getTargetLabel = (projects: ProjectReferenceMap) => {
-            if (state.budgetData?.project_id) return projects[state.budgetData.project_id]?.label ?? '';
-            if (state.budgetData?.project_group_id) return state.projectGroups[state.budgetData.project_group_id]?.label ?? '';
+            if (budgetPageState.budgetData?.project_id) return projects[budgetPageState.budgetData.project_id]?.label ?? '';
+            if (budgetPageState.budgetData?.project_group_id) return state.projectGroups[budgetPageState.budgetData.project_group_id]?.label ?? '';
             return 'No Item';
         };
 
@@ -146,6 +154,7 @@ export default {
 
         return {
             ...toRefs(state),
+            budgetPageState,
             referenceRouter,
             handleClickViewAll,
             currencyMoneyFormatter,

@@ -2,7 +2,7 @@
     <div>
         <section class="page-title-wrapper">
             <p-heading :show-back-button="!loading"
-                       :title="loading ? '' : budgetData.name"
+                       :title="loading ? '' : budgetPageState.budgetData.name"
                        @click-back-button="$router.go(-1)"
             >
                 <template v-if="!loading"
@@ -34,8 +34,8 @@
         </section>
         <budget-delete-modal v-if="!loading"
                              :visible="checkDeleteState.visible"
-                             :budget-id="budgetData.budget_id"
-                             :budget-name="budgetData.name"
+                             :budget-id="budgetPageState.budgetData.budget_id"
+                             :budget-name="budgetPageState.budgetData.name"
                              @update="handleUpdateDelete"
                              @confirm="handleConfirmDelete"
         />
@@ -60,9 +60,9 @@ import BudgetNotifications
 import BudgetSummary
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-summary/BudgetSummary.vue';
 import BudgetDeleteModal from '@/services/cost-explorer/budget/budget-detail/modules/BudgetDeleteModal.vue';
-import type { BudgetData } from '@/services/cost-explorer/budget/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
+
 
 export default {
     name: 'BudgetDetailPage',
@@ -81,9 +81,11 @@ export default {
         },
     },
     setup(props) {
+        const budgetPageStore = useBudgetPageStore();
+        const budgetPageState = budgetPageStore.state;
+
         const state = reactive({
             loading: true,
-            budgetData: computed<Partial<BudgetData>|null>(() => costExplorerStore.state.budget.budgetData),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             hasManagePermission: useManagePermissionState(),
@@ -109,8 +111,8 @@ export default {
             state.loading = true;
             try {
                 await Promise.allSettled([
-                    costExplorerStore.dispatch('budget/getBudgetData', props.budgetId),
-                    costExplorerStore.dispatch('budget/getBudgetUsageData', props.budgetId),
+                    budgetPageStore.getBudgetData(props.budgetId),
+                    budgetPageStore.getBudgetUsageData(props.budgetId),
                 ]);
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -121,6 +123,7 @@ export default {
 
         return {
             ...toRefs(state),
+            budgetPageState,
             checkDeleteState,
             handleClickDelete,
             handleUpdateDelete,

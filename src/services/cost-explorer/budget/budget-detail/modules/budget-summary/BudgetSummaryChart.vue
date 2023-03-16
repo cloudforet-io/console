@@ -32,8 +32,9 @@ import {
 } from '@/styles/colors';
 
 import { BUDGET_TIME_UNIT } from '@/services/cost-explorer/budget/type';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 import { getStackedChartData } from '@/services/cost-explorer/widgets/lib/widget-data-helper';
+
 
 const categoryKey = 'date';
 const columnChartValueName = 'usd_cost';
@@ -45,15 +46,19 @@ export default {
         PSkeleton,
     },
     setup() {
+        const budgetPageStore = useBudgetPageStore();
+        const budgetPageState = budgetPageStore.state;
+
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as XYChart | null,
             chartRegistry: {},
-            budgetUsageData: computed(() => costExplorerStore.state.budget.budgetUsageData),
-            budgetData: computed(() => costExplorerStore.state.budget.budgetData),
             limitProperty: computed(() => ((state.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL) ? 'total_limit' : 'limit')),
             chartData: [] as any,
             loading: true,
+            //
+            budgetUsageData: computed(() => budgetPageState.budgetUsageData),
+            budgetData: computed(() => budgetPageState.budgetData),
         });
 
         const getChartData = () => {
