@@ -3,7 +3,6 @@ import type { Module } from 'vuex';
 import type { PublicDashboardInfo, UserDashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 
 import * as actions from './actions';
-import budget from './budget';
 import dashboard from './dashboard';
 import * as getters from './getters';
 import * as mutations from './mutations';
@@ -20,7 +19,6 @@ export const costExplorerStoreModule: Module<CostExplorerState, any> = {
     state: () => ({ ...state }),
     modules: {
         dashboard,
-        budget,
     },
     getters,
     actions,
