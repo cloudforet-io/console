@@ -48,6 +48,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useProjectPageStore } from '@/services/project/store/project-store';
+
 import TranslateResult = VueI18n.TranslateResult;
 
 export default {
@@ -82,6 +84,7 @@ export default {
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance()?.proxy as Vue;
+        const projectPageStore = useProjectPageStore();
         const state = reactive({
             updateMode: computed(() => !!props.project),
             proxyVisible: useProxyValue('visible', props, emit),
@@ -122,7 +125,7 @@ export default {
         };
 
         const createProject = async (params) => {
-            store.dispatch('service/project/createProject', params);
+            projectPageStore.createProject(params);
             await store.dispatch('reference/project/load');
         };
 

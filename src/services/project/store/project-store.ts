@@ -40,7 +40,7 @@ interface ProjectPageStore {
     openProjectGroupDeleteCheckModal: (target?: ProjectGroupTreeItem) => void;
     createProjectGroup: (projectGroupInfo: ProjectGroupInfo) => Promise<void>;
     updateProjectGroup: (projectGroupInfo: ProjectGroupInfo) => Promise<void>;
-    deleteProjectGroup: (projectGroupId: string) => Promise<void>;
+    deleteProjectGroup: () => Promise<void>;
     createProject: (projectInfo: ProjectInfo) => Promise<void>;
     refreshPermissionInfo: () => Promise<void>;
     addPermissionInfo: (permissionInfo: any) => void;
