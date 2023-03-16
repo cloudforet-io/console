@@ -278,7 +278,6 @@ export default {
             chart.geodata = am4geodataWorldLow;
             chart.projection = new am4maps.projections.Miller();
             chart.responsive.enabled = true;
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.chartContainer.wheelable = true;
 
             const polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());

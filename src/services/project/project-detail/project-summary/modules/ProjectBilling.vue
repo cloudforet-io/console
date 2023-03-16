@@ -286,7 +286,6 @@ export default {
                 return chartState.registry[state.chartRef];
             };
             const chart = createChart();
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
             chart.paddingTop = 10;

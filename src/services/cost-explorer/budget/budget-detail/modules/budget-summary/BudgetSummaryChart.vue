@@ -123,7 +123,6 @@ export default {
             };
             const chart = createChart();
             state.chart = chart;
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
             /* Create axes */
             const categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());

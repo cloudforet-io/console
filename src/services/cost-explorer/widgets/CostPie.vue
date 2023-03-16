@@ -186,7 +186,6 @@ export default defineComponent<WidgetProps>({
             chart.paddingTop = 5;
             chart.paddingBottom = 5;
             chart.radius = am4core.percent(100);
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
             const series = chart.series.push(new am4charts.PieSeries());
             if (props.printMode) series.showOnInit = false;

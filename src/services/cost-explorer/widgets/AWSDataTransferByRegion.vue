@@ -251,7 +251,6 @@ export default {
                 emit('rendered');
             });
 
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.chartContainer.wheelable = true;
             chart.zoomControl = new am4maps.ZoomControl();
 

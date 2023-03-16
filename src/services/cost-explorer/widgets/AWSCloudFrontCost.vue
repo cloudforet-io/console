@@ -249,7 +249,6 @@ export default {
         };
         const drawChart = (chartContext, chartData, legends) => {
             const chart: any = am4core.create(chartContext, am4charts.XYChart);
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.events.on('ready', () => {
                 emit('rendered');
             });

@@ -172,7 +172,6 @@ export default defineComponent<WidgetProps>({
             }
 
             chart.innerRadius = am4core.percent(65);
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.events.on('ready', () => {
                 emit('rendered');
             });

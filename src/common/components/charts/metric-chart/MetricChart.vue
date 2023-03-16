@@ -176,7 +176,6 @@ export default defineComponent<MetricChartProps>({
 
         const drawChart = (ctx) => {
             const chart: any = am4core.create(ctx, am4charts.XYChart);
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
             chart.paddingTop = 10;

@@ -188,7 +188,6 @@ export default {
         /* Util */
         const drawChart = (chartContext) => {
             const chart = am4core.create(chartContext, am4charts.XYChart);
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingRight = 10;
             chart.paddingLeft = -5;
             chart.paddingTop = 5;

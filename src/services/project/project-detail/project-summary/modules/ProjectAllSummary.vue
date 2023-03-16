@@ -252,7 +252,6 @@ export default {
             const chart = createChart();
             state.chart = chart;
 
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = 0;
             chart.paddingTop = 10;

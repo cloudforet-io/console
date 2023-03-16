@@ -200,7 +200,6 @@ export default {
             state.USDChartData = USDChartData;
 
             const chart = am4core.create(chartContainer, am4charts.XYChart);
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.events.on('ready', () => {
                 state.isChartDrawn = true;
             });

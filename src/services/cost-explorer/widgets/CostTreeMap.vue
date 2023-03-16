@@ -188,7 +188,6 @@ export default defineComponent<WidgetProps>({
                 return state.chartRegistry[chartContext];
             };
             const chart = createChart();
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.events.on('ready', () => {
                 emit('rendered');
             });

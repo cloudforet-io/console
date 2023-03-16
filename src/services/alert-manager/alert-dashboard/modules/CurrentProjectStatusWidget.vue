@@ -121,7 +121,6 @@ export default {
 
             const chart = createChart();
             state.chart = chart;
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.responsive.enabled = true;
             chart.innerRadius = am4core.percent(62);
 
