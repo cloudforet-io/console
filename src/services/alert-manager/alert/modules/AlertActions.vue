@@ -107,6 +107,7 @@ import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-
 import type { AlertAction } from '@/services/alert-manager/lib/config';
 import { ALERT_ACTION, ALERT_STATE, ALERT_URGENCY } from '@/services/alert-manager/lib/config';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
+import { useProjectDetailPageStore } from '@/services/project/store/project-detail-page-store';
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
 
@@ -146,6 +147,7 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
+        const projectDetailPageStore = useProjectDetailPageStore();
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
@@ -194,7 +196,7 @@ export default {
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_DELETE'), '');
                 state.visibleDeleteModal = false;
                 emit('refresh');
-                await store.dispatch('service/projectDetail/getAlertCounts');
+                await projectDetailPageStore.getAlertCounts();
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_DELETE'));
             } finally {
@@ -214,7 +216,7 @@ export default {
 
         const onConfirmResolve = () => {
             emit('refresh');
-            store.dispatch('service/projectDetail/getAlertCounts');
+            projectDetailPageStore.getAlertCounts();
         };
 
         // LOAD REFERENCE STORE

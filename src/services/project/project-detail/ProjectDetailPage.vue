@@ -108,7 +108,7 @@
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
@@ -138,7 +138,6 @@ import BetaMark from '@/common/components/marks/BetaMark.vue';
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-import { registerServiceStore } from '@/common/composables/register-service-store';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
@@ -148,9 +147,8 @@ import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import MaintenanceHappeningList from '@/services/project/project-detail/modules/MaintenanceHappeningList.vue';
 import MaintenanceWindowFormModal from '@/services/project/project-detail/modules/MaintenanceWindowFormModal.vue';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
-import ProjectDetailStoreModule from '@/services/project/project-detail/store';
-import type { ProjectDetailState } from '@/services/project/project-detail/store/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { useProjectDetailPageStore } from '@/services/project/store/project-detail-page-store';
 import type { ProjectModel } from '@/services/project/type';
 
 export default {
@@ -180,15 +178,14 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
-
-        registerServiceStore<ProjectDetailState>('projectDetail', ProjectDetailStoreModule);
-
+        const projectDetailPageStore = useProjectDetailPageStore();
+        const projectDetailPageState = projectDetailPageStore.state;
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
             hasAlertPermission: computed<boolean>(() => isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList'])),
             loading: true,
             item: null as null|ProjectModel,
-            projectId: computed(() => store.state.service.projectDetail.projectId),
+            projectId: computed(() => projectDetailPageState.projectId),
             projectName: computed(() => state.item?.name || ''),
             projectGroupId: computed(() => state.item?.project_group_info?.project_group_id || ''),
             projectGroupName: computed(() => state.item?.project_group_info?.name || ''),
@@ -205,7 +202,7 @@ export default {
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             maintenanceWindowFormVisible: false,
             counts: computed(() => ({
-                TRIGGERED: find(store.state.service.projectDetail.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
+                TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
             })),
         });
 
@@ -315,7 +312,7 @@ export default {
             if (projectId) {
                 await Promise.allSettled([
                     getProject(projectId),
-                    store.dispatch('service/projectDetail/getAlertCounts'),
+                    projectDetailPageStore.getAlertCounts(),
                 ]);
             }
         }, { immediate: true });
@@ -327,9 +324,14 @@ export default {
 
         watch(() => props.id, (after, before) => {
             if (after !== before) {
-                store.commit('service/projectDetail/setProjectId', after);
+                projectDetailPageState.projectId = after;
             }
         }, { immediate: true });
+
+        onUnmounted(() => {
+            projectDetailPageStore.$reset();
+            projectDetailPageStore.$dispose();
+        });
 
         return {
             ...toRefs(state),

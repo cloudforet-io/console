@@ -45,7 +45,8 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 
 import { store } from '@/store';
 
-import type { MaintenanceHappening } from '@/services/project/project-detail/store/type';
+import { useProjectDetailPageStore } from '@/services/project/store/project-detail-page-store';
+import type { MaintenanceHappening } from '@/services/project/store/project-detail-page-store';
 
 const TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 export default {
@@ -55,9 +56,11 @@ export default {
         PI,
     },
     setup() {
+        const projectDetailPageStore = useProjectDetailPageStore();
+        const projectDetailPageState = projectDetailPageStore.state;
         const state = reactive({
             loading: false,
-            maintenanceHappenings: computed<MaintenanceHappening[]>(() => store.state.service.projectDetail.maintenanceHappenings),
+            maintenanceHappenings: computed<MaintenanceHappening[]>(() => projectDetailPageState.maintenanceHappenings),
             timezone: computed(() => store.state.user.timezone),
             visible: true,
         });
@@ -69,7 +72,7 @@ export default {
         /* Init */
         (async () => {
             state.loading = true;
-            await store.dispatch('service/projectDetail/loadMaintenanceHappenings');
+            projectDetailPageStore.loadMaintenanceHappenings();
             state.loading = false;
         })();
 
