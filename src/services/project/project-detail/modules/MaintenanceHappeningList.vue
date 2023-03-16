@@ -45,8 +45,8 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 
 import { store } from '@/store';
 
-import { useProjectDetailPageStore } from '@/services/project/project-detail/store/project-detail-page-store';
-import type { MaintenanceHappening } from '@/services/project/project-detail/store/type';
+import { useProjectDetailPageStore } from '@/services/project/store/project-detail-page-store';
+import type { MaintenanceHappening } from '@/services/project/store/project-detail-page-store';
 
 const TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 export default {

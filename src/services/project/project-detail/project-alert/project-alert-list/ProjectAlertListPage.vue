@@ -28,7 +28,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import AlertDataTable from '@/services/alert-manager/alert/modules/AlertDataTable.vue';
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
 import type { AlertListPageUrlQuery, AlertListTableFilters } from '@/services/alert-manager/type';
-import { useProjectDetailPageStore } from '@/services/project/project-detail/store/project-detail-page-store';
+import { useProjectDetailPageStore } from '@/services/project/store/project-detail-page-store';
 
 export default {
     name: 'ProjectAlertListPage',

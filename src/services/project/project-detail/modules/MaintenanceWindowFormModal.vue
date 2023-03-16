@@ -134,7 +134,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useProjectDetailPageStore } from '@/services/project/project-detail/store/project-detail-page-store';
+import { useProjectDetailPageStore } from '@/services/project/store/project-detail-page-store';
 
 const SCHEDULE_TYPE = Object.freeze({
     startNow: 'startNow',

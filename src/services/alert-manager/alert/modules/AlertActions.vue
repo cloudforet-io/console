@@ -107,7 +107,7 @@ import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-
 import type { AlertAction } from '@/services/alert-manager/lib/config';
 import { ALERT_ACTION, ALERT_STATE, ALERT_URGENCY } from '@/services/alert-manager/lib/config';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
-import { useProjectDetailPageStore } from '@/services/project/project-detail/store/project-detail-page-store';
+import { useProjectDetailPageStore } from '@/services/project/store/project-detail-page-store';
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
 

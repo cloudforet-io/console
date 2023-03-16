@@ -5,7 +5,24 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { MaintenanceHappening, ProjectDetailState } from '@/services/project/project-detail/store/type';
+import type { AlertState } from '@/services/alert-manager/lib/config';
+
+export interface AlertCount {
+    state: AlertState;
+    total: number;
+}
+
+export interface MaintenanceHappening {
+    title: string;
+    startTime: string;
+    endTime: string;
+}
+
+export interface ProjectDetailState {
+    projectId: string;
+    alertCounts: AlertCount[];
+    maintenanceHappenings: MaintenanceHappening[];
+}
 
 export const useProjectDetailPageStore = defineStore('project-detail-page', () => {
     const state = reactive<ProjectDetailState>({
