@@ -215,13 +215,6 @@ export default defineComponent<Props>({
             totalCount: computed(() => state.data.length),
             // dataSources and computed data by dataSources(schema, tabs)
             dataSourceList: [] as DataSourceInfo[],
-            // dataSourcesMap: computed(() => {
-            //     const map = new Map<string, DataSourceInfo>();
-            //     state.dataSourceList.forEach((dataSource) => {
-            //         map.set(dataSource.data_source_id, dataSource);
-            //     });
-            //     return map;
-            // }),
             layouts: computed<DynamicLayout[]>(() => state.dataSourceList.map((dataSource) => {
                 const layout = dataSource.plugin_info?.metadata?.view?.table?.layout ?? {};
                 return {
