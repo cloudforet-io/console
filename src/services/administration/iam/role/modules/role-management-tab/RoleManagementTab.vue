@@ -16,7 +16,7 @@
                 <p-data-table :fields="fields"
                               :sortable="false"
                               :selectable="false"
-                              :items="rolePageGetters.selectedRoles"
+                              :items="rolePageStore.selectedRoles"
                               :col-copy="true"
                               class="selected-data-tab"
                 >
@@ -86,8 +86,7 @@ export default {
     },
     setup() {
         const rolePageStore = useRolePageStore();
-        const rolePageState = rolePageStore.state;
-        const rolePageGetters = rolePageStore.getters;
+        const rolePageState = rolePageStore.$state;
 
         const state = reactive({
             fields: computed<DataTableField[]>(() => ([
@@ -97,7 +96,7 @@ export default {
                 { name: 'created_at', label: 'Created', sortable: false },
                 { name: 'edit_button', label: ' ', sortable: false },
             ])),
-            selectedRoleId: computed(() => rolePageGetters.selectedRoles[0]?.role_id),
+            selectedRoleId: computed(() => rolePageStore.selectedRoles[0]?.role_id),
         });
 
         const singleItemTabState = reactive({
@@ -120,8 +119,8 @@ export default {
             ...toRefs(state),
             singleItemTabState,
             multiItemTabState,
+            rolePageStore,
             rolePageState,
-            rolePageGetters,
             handleEditRole,
             ROLE_TYPE_BADGE_OPTION,
         };

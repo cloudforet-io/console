@@ -152,7 +152,7 @@ export default {
     },
     setup() {
         const userPageStore = useUserPageStore();
-        const userPageState = userPageStore.state;
+        const userPageState = userPageStore.$state;
 
         const vm = getCurrentInstance()?.proxy as Vue;
         const userListApiQueryHelper = new ApiQueryHelper()
@@ -235,7 +235,7 @@ export default {
         };
 
         const handleSelect = async (index) => {
-            userPageState.selectedIndices = index;
+            userPageStore.$patch({ selectedIndices: index });
             if (index.length === 1) saveRoleOfSelectedUser(index);
         };
 
@@ -264,34 +264,34 @@ export default {
             userFormState.updateMode = false;
             userFormState.headerTitle = i18n.t('IDENTITY.USER.FORM.ADD_TITLE') as string;
             userFormState.item = undefined;
-            userPageState.visibleCreateModal = true;
+            userPageStore.$patch({ visibleCreateModal: true });
         };
         const clickUpdate = () => {
             userFormState.updateMode = true;
             userFormState.headerTitle = i18n.t('IDENTITY.USER.FORM.UPDATE_TITLE') as string;
             userFormState.item = userPageState.users[userPageState.selectedIndices[0]];
-            userPageState.visibleUpdateModal = true;
+            userPageStore.$patch({ visibleUpdateModal: true });
         };
         const clickDelete = () => {
             modalState.mode = 'delete';
             modalState.title = i18n.t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
             modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'alert';
-            userPageState.visibleManagementModal = true;
+            userPageStore.$patch({ visibleManagementModal: true });
         };
         const clickEnable = () => {
             modalState.mode = 'enable';
             modalState.title = i18n.t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
             modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'safe';
-            userPageState.visibleManagementModal = true;
+            userPageStore.$patch({ visibleManagementModal: true });
         };
         const clickDisable = () => {
             modalState.mode = 'disable';
             modalState.title = i18n.t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
             modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'alert';
-            userPageState.visibleManagementModal = true;
+            userPageStore.$patch({ visibleManagementModal: true });
         };
 
         const handleSelectDropdown = (name) => {
@@ -337,7 +337,7 @@ export default {
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
             } finally {
-                userPageState.selectedIndices = [];
+                userPageStore.$patch({ selectedIndices: [] });
             }
         };
         const updateUser = async (item, roleId) => {
@@ -358,7 +358,7 @@ export default {
                 ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
             } finally {
                 await userPageStore.listUsers(userListApiQuery);
-                userPageState.selectedIndices = [];
+                userPageStore.$patch({ selectedIndices: [] });
             }
         };
 

@@ -133,7 +133,7 @@ import { POLICY_TYPE } from '@/services/administration/store/type';
 
 
 const policyStore = usePolicyStore();
-const policyState = policyStore.state;
+const policyState = policyStore.$state;
 
 const stringifyPermission = (permissions: Array<string>|undefined) => permissions?.toString().replace(/,/gi, '\n') ?? '';
 const arrayifyPermission = (permissionsCode: string) => permissionsCode.split('\n');

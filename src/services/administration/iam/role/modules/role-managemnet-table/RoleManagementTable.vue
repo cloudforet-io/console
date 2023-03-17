@@ -121,8 +121,7 @@ export default defineComponent({
     },
     setup() {
         const rolePageStore = useRolePageStore();
-        const rolePageState = rolePageStore.state;
-        const rolePageGetters = rolePageStore.getters;
+        const rolePageState = rolePageStore.$state;
 
         const currentRoute = SpaceRouter.router.currentRoute;
         const roleListApiQueryHelper = new ApiQueryHelper()
@@ -191,14 +190,16 @@ export default defineComponent({
             case 'edit':
                 SpaceRouter.router.push({
                     name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME,
-                    params: { id: rolePageGetters.selectedRoles[0].role_id },
+                    params: { id: rolePageStore.selectedRoles[0].role_id },
                 });
                 break;
             case 'delete': openDeleteModal(); break;
             default: break;
             }
         };
-        const handleSelect = (index) => { rolePageState.selectedIndices = index; };
+        const handleSelect = (index) => {
+            rolePageStore.$patch({ selectedIndices: index });
+        };
         const handleChange = async (options: ToolboxOptions = {}) => {
             roleListApiQuery = getApiQueryWithToolboxOptions(roleListApiQueryHelper, options) ?? roleListApiQuery;
             if (options.queryTags !== undefined) {
@@ -225,7 +226,7 @@ export default defineComponent({
         })();
 
         const saveSelectedValueToStore = (selectedIndices: number[]) => {
-            rolePageState.selectedIndices = selectedIndices;
+            rolePageStore.$patch({ selectedIndices });
         };
 
         watch(() => rolePageState.selectedIndices, (after) => {
@@ -235,7 +236,6 @@ export default defineComponent({
         return {
             ...toRefs(state),
             rolePageState,
-            rolePageGetters,
             roleSearchHandler,
             ROLE_TYPE_BADGE_OPTION,
             handleCreateRole,

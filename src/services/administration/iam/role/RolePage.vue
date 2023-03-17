@@ -43,7 +43,7 @@ export default defineComponent({
     },
     setup() {
         const rolePageStore = useRolePageStore();
-        const rolePageState = rolePageStore.state;
+        const rolePageState = rolePageStore.$state;
 
         const state = reactive({
             hasManagePermission: useManagePermissionState(),

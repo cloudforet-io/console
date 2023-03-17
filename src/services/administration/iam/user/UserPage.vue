@@ -43,7 +43,7 @@ export default {
     },
     setup() {
         const userPageStore = useUserPageStore();
-        const userPageState = userPageStore.state;
+        const userPageState = userPageStore.$state;
 
         const state = reactive({
             hasManagePermission: useManagePermissionState(),

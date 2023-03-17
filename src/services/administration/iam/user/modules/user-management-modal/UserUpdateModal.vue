@@ -170,8 +170,7 @@ export default {
     },
     setup(props, { emit }) {
         const userPageStore = useUserPageStore();
-        const userPageState = userPageStore.state;
-        const userPageGetters = userPageStore.getters;
+        const userPageState = userPageStore.$state;
 
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
@@ -275,11 +274,11 @@ export default {
             } else {
                 emit('confirm', data, null);
             }
-            userPageState.visibleUpdateModal = false;
+            userPageStore.$patch({ visibleUpdateModal: false });
         };
 
         const handleClose = () => {
-            userPageState.visibleUpdateModal = false;
+            userPageStore.$patch({ visibleUpdateModal: false });
         };
         const handleUpdateTags = (tags: Tag) => {
             state.tags = tags;
@@ -303,8 +302,8 @@ export default {
         };
 
         const setCurrentDomainId = async () => {
-            if (state.domainRoleList[0] && userPageGetters.selectedUsers[0]) {
-                state.domainRole = userPageGetters.selectedUsers[0].role_bindings?.find((data) => data.role_info.role_type === 'DOMAIN')?.role_info.role_id;
+            if (state.domainRoleList[0] && userPageStore.selectedUsers[0]) {
+                state.domainRole = userPageStore.selectedUsers[0].role_bindings?.find((data) => data.role_info.role_type === 'DOMAIN')?.role_info.role_id;
             } else state.domainRole = '';
         };
 

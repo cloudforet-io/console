@@ -3,7 +3,7 @@
         <p-heading
             :title="$t('IAM.POLICY.POLICY')"
             use-total-count
-            :total-count="policyStore.state.totalCount"
+            :total-count="policyState.totalCount"
         >
             <template #extra>
                 <p-button style-type="primary"
@@ -33,6 +33,7 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { usePolicyStore } from '@/services/administration/store/policy-page-store';
 
 const policyStore = usePolicyStore();
+const policyState = policyStore.$state;
 
 const state = reactive({
     hasManagePermission: useManagePermissionState(),

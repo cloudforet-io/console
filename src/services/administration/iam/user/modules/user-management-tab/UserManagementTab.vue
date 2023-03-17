@@ -6,12 +6,12 @@
         >
             <template #detail>
                 <user-detail ref="userDetail"
-                             :user-id="userPageGetters.selectedUsers[0].user_id"
+                             :user-id="userPageStore.selectedUsers[0].user_id"
                              :timezone="timezone"
                 />
             </template>
             <template #tag>
-                <p-tags-panel :resource-id="userPageGetters.selectedUsers[0].user_id"
+                <p-tags-panel :resource-id="userPageStore.selectedUsers[0].user_id"
                               resource-type="identity.User"
                               resource-key="user_id"
                               :disabled="manageDisabled"
@@ -19,7 +19,7 @@
             </template>
             <template #assigned_role>
                 <user-assigned-role
-                    :user-id="userPageGetters.selectedUsers[0].user_id"
+                    :user-id="userPageStore.selectedUsers[0].user_id"
                 />
             </template>
             <template #api_key>
@@ -28,7 +28,7 @@
                                :title="$t('IDENTITY.USER.MAIN.API_KEY')"
                     />
                     <user-a-p-i-key-table class="api-key-table"
-                                          :user-id="userPageGetters.selectedUsers[0].user_id"
+                                          :user-id="userPageStore.selectedUsers[0].user_id"
                                           :disabled="manageDisabled"
                     />
                 </section>
@@ -45,7 +45,7 @@
                 <p-data-table :fields="fields"
                               :sortable="false"
                               :selectable="false"
-                              :items="userPageGetters.selectedUsers"
+                              :items="userPageStore.selectedUsers"
                               :col-copy="true"
                               class="selected-data-tab"
                 >
@@ -122,8 +122,7 @@ export default {
     },
     setup() {
         const userPageStore = useUserPageStore();
-        const userPageState = userPageStore.state;
-        const userPageGetters = userPageStore.getters;
+        const userPageState = userPageStore.$state;
 
         const state = reactive({
             loading: true,
@@ -161,8 +160,8 @@ export default {
 
         return {
             ...toRefs(state),
+            userPageStore,
             userPageState,
-            userPageGetters,
             userStateFormatter,
             singleItemTabState,
             multiItemTabState,

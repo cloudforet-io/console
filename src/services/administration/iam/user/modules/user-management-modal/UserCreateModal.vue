@@ -242,7 +242,7 @@ export default {
     },
     setup(props, { emit }) {
         const userPageStore = useUserPageStore();
-        const userPageState = userPageStore.state;
+        const userPageState = userPageStore.$state;
 
         const state = reactive({
             isSameId: false,
@@ -422,11 +422,11 @@ export default {
             } else {
                 emit('confirm', data, null);
             }
-            userPageState.visibleCreateModal = false;
+            userPageStore.$patch({ visibleCreateModal: false });
         };
 
         const handleClose = () => {
-            userPageState.visibleCreateModal = false;
+            userPageStore.$patch({ visibleCreateModal: false });
         };
         const handleUpdateTags = (tags?: Tag) => {
             formState.tags = tags;

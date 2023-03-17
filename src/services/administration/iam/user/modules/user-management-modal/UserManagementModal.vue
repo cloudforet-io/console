@@ -6,7 +6,7 @@
         :sub-title="subTitle"
         :theme-color="themeColor"
         :fields="fields"
-        :items="userPageGetters.selectedUsers"
+        :items="userPageStore.selectedUsers"
         modal-size="md"
         @confirm="checkModalConfirm"
         @cancel="handleClose"
@@ -83,8 +83,7 @@ export default {
     },
     setup(props, { emit }: SetupContext) {
         const userPageStore = useUserPageStore();
-        const userPageState = userPageStore.state;
-        const userPageGetters = userPageStore.getters;
+        const userPageState = userPageStore.$state;
 
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
@@ -106,13 +105,13 @@ export default {
         const deleteUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.delete(getUsersParam(items));
-                userPageState.selectedIndices = [];
+                userPageStore.$patch({ selectedIndices: [] });
                 showSuccessMessage(i18n.tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', userPageState.selectedIndices.length), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', userPageState.selectedIndices.length));
             } finally {
                 emit('confirm');
-                userPageState.visibleManagementModal = false;
+                userPageStore.$patch({ visibleManagementModal: false });
             }
         };
         const enableUser = async (items) => {
@@ -123,7 +122,7 @@ export default {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', userPageState.selectedIndices.length));
             } finally {
                 emit('confirm');
-                userPageState.visibleManagementModal = false;
+                userPageStore.$patch({ visibleManagementModal: false });
             }
         };
         const disableUser = async (items) => {
@@ -134,7 +133,7 @@ export default {
                 ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', userPageState.selectedIndices.length));
             } finally {
                 emit('confirm');
-                userPageState.visibleManagementModal = false;
+                userPageStore.$patch({ visibleManagementModal: false });
             }
         };
         const checkModalConfirm = async (item) => {
@@ -144,14 +143,14 @@ export default {
         };
 
         const handleClose = () => {
-            userPageState.visibleManagementModal = false;
+            userPageStore.$patch({ visibleManagementModal: false });
         };
 
         return {
             userStateFormatter,
             ...toRefs(state),
+            userPageStore,
             userPageState,
-            userPageGetters,
             checkModalConfirm,
             handleClose,
         };

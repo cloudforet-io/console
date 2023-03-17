@@ -1,5 +1,3 @@
-import { computed, reactive } from 'vue';
-
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -10,39 +8,40 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { RoleData } from '@/services/administration/iam/role/type';
 
 
-export const useRolePageStore = defineStore('role-page', () => {
-    const state = reactive({
+interface RolePageState {
+    loading: boolean;
+    roles: RoleData[];
+    totalCount: number;
+    selectedIndices: number[];
+}
+
+export const useRolePageStore = defineStore('role-page', {
+    state: (): RolePageState => ({
         loading: false,
-        roles: [] as RoleData[],
+        roles: [],
         totalCount: 0,
-        selectedIndices: [] as number[],
-    });
-    const getters = reactive({
-        selectedRoles: computed<RoleData[]>(() => state.selectedIndices.map((d) => state.roles[d]) || []),
-    });
-
-    /* Actions */
-    const listRoles = async (apiQuery: Query) => {
-        state.loading = true;
-        try {
-            const res = await SpaceConnector.client.identity.role.list({
-                query: apiQuery,
-            });
-            state.roles = res.results;
-            state.totalCount = res.total_count;
-            state.selectedIndices = [];
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            state.roles = [];
-            state.totalCount = 0;
-        } finally {
-            state.loading = false;
-        }
-    };
-
-    return {
-        state,
-        getters,
-        listRoles,
-    };
+        selectedIndices: [],
+    }),
+    getters: {
+        selectedRoles: (state) => state.selectedIndices.map((d) => state.roles[d]) || [],
+    },
+    actions: {
+        async listRoles(apiQuery: Query) {
+            this.loading = true;
+            try {
+                const res = await SpaceConnector.client.identity.role.list({
+                    query: apiQuery,
+                });
+                this.roles = res.results;
+                this.totalCount = res.total_count;
+                this.selectedIndices = [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                this.roles = [];
+                this.totalCount = 0;
+            } finally {
+                this.loading = false;
+            }
+        },
+    },
 });
