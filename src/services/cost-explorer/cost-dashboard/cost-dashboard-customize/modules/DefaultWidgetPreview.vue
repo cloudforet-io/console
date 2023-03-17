@@ -44,7 +44,7 @@ export default {
     },
     setup() {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const state = reactive({
             chartThumbnail: computed(() => `${CONSOLE_ASSETS_S3_PATH}/tn--${costDashboardPageState.originSelectedWidget?.options?.chart_img}.png`),

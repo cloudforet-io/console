@@ -104,7 +104,7 @@ export default {
 
     setup() {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const state = reactive({
             widgetList: [] as WidgetInfo[],
@@ -137,8 +137,10 @@ export default {
         const getChartTypeImageFileName = (chartType: ChartType) => chartTypeItemMap[chartType].imageFileName;
 
         const selectWidget = (value: WidgetInfo) => {
-            costDashboardPageState.originSelectedWidget = value;
-            costDashboardPageState.editedSelectedWidget = value;
+            costDashboardPageStore.$patch({
+                originSelectedWidget: value,
+                editedSelectedWidget: value,
+            });
         };
 
         const getWidgetCardImageList = async (): Promise<void> => {

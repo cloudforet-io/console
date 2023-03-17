@@ -82,7 +82,7 @@ export default {
 
     setup() {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const state = reactive({
             selectedLayout: {} as Record<string, DefaultLayout>,
@@ -101,8 +101,10 @@ export default {
         };
 
         const handleLayoutChange = (value: Record<string, DefaultLayout>) => {
-            costDashboardPageState.selectedTemplate = value;
-            costDashboardPageState.defaultFilter = {};
+            costDashboardPageStore.$patch({
+                selectedTemplate: value,
+                defaultFilter: {},
+            });
         };
 
         return {

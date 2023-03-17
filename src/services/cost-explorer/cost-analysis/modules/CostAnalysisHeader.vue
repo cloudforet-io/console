@@ -149,8 +149,7 @@ export default {
     },
     setup() {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.state;
-        const costAnalysisPageGetters = costAnalysisPageStore.getters;
+        const costAnalysisPageState = costAnalysisPageStore.$state;
 
         const state = reactive({
             defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
@@ -163,10 +162,10 @@ export default {
                     type: 'item',
                 })),
             ])),
-            title: computed<string>(() => costAnalysisPageGetters.selectedQuerySet?.name ?? 'Cost Analysis'),
+            title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost Analysis'),
             itemIdForDeleteQuery: '',
             visiblePdfOverlay: false,
-            pdfFileName: computed<string>(() => `${costAnalysisPageGetters.selectedQuerySet?.name ?? 'Cost_Analysis'}_${dayjs().format('YYYYMMDD')}`),
+            pdfFileName: computed<string>(() => `${costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost_Analysis'}_${dayjs().format('YYYYMMDD')}`),
             previewItems: [] as Item[],
             currency: computed(() => store.state.display.currency),
             pdfFontLanguage: computed<string>(() => {
@@ -197,11 +196,11 @@ export default {
 
             if (queryId) {
                 const { options } = getQueryWithKey(queryId);
-                costAnalysisPageStore.setQueryOptions(options);
-                costAnalysisPageState.selectedQueryId = queryId;
+                await costAnalysisPageStore.setQueryOptions(options);
+                costAnalysisPageStore.$patch({ selectedQueryId: queryId });
             } else {
-                costAnalysisPageStore.setQueryOptions();
-                costAnalysisPageState.selectedQueryId = undefined;
+                await costAnalysisPageStore.setQueryOptions();
+                costAnalysisPageStore.$patch({ selectedQueryId: undefined });
             }
         };
 
@@ -233,7 +232,7 @@ export default {
             }
 
             if (requestType === REQUEST_TYPE.SAVE) {
-                costAnalysisPageState.selectedQueryId = updatedQuery.cost_query_set_id;
+                costAnalysisPageStore.$patch({ selectedQueryId: updatedQuery.cost_query_set_id });
             }
         };
 
@@ -266,8 +265,8 @@ export default {
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '');
                 if (costAnalysisPageState.selectedQueryId === state.itemIdForDeleteQuery) {
                     await SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });
-                    costAnalysisPageStore.setQueryOptions();
-                    costAnalysisPageState.selectedQueryId = undefined;
+                    await costAnalysisPageStore.setQueryOptions();
+                    costAnalysisPageStore.$patch({ selectedQueryId: undefined });
                 }
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));

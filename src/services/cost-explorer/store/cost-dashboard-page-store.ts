@@ -1,5 +1,3 @@
-import { reactive } from 'vue';
-
 import { defineStore } from 'pinia';
 
 import type {
@@ -23,8 +21,8 @@ interface CostDashboardState {
     layoutOfSpace?: number;
 }
 
-export const useCostDashboardPageStore = defineStore('cost-dashboard-page', () => {
-    const state = reactive<CostDashboardState>({
+export const useCostDashboardPageStore = defineStore('cost-dashboard-page', {
+    state: (): CostDashboardState => ({
         // for creating dashboard
         selectedTemplate: {},
         defaultFilter: {},
@@ -39,9 +37,5 @@ export const useCostDashboardPageStore = defineStore('cost-dashboard-page', () =
         editedCustomLayout: [] as CustomLayout[],
         widgetPosition: undefined,
         layoutOfSpace: undefined,
-    });
-
-    return {
-        state,
-    };
+    }),
 });

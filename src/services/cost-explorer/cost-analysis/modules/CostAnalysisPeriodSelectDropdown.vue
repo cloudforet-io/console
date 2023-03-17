@@ -73,14 +73,14 @@ export default {
     },
     setup(props, { emit }) {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.state;
+        const costAnalysisPageState = costAnalysisPageStore.$state;
 
         const { i18nDayjs } = useI18nDayjs();
         const dateFormatter = (date: string, format: string) => i18nDayjs.value.utc(date).format(format);
         const state = reactive({
             period: computed<Period>({
                 get() { return props.fixedPeriod; },
-                set(period) { costAnalysisPageState.period = period; },
+                set(period) { costAnalysisPageStore.$patch({ period }); },
             }),
             periodItems: computed<PeriodItem[]>(() => ([
                 {

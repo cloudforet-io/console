@@ -49,7 +49,6 @@ export default {
     },
     setup(props) {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
 
         const state = reactive({
             selectedPrivacy: DASHBOARD_PRIVACY_TYPE.USER as DashboardPrivacyType,
@@ -57,7 +56,7 @@ export default {
         });
 
         const handleRadio = (value: DashboardPrivacyType) => {
-            costDashboardPageState.selectedDashboardPrivacy = value;
+            costDashboardPageStore.$patch({ selectedDashboardPrivacy: value });
         };
 
         return {

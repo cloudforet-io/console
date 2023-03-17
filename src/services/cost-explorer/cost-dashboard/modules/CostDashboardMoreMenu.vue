@@ -72,7 +72,6 @@ export default {
     },
     setup(props) {
         const costExplorerDashboardStore = useCostExplorerDashboardStore();
-        const costExplorerDashboardGetters = costExplorerDashboardStore.getters;
 
         const defaultMenuItems = computed(() => [
             { name: MENU.DUPLICATE, label: i18n.t('BILLING.COST_MANAGEMENT.DASHBOARD.DUPLICATE'), disabled: false },
@@ -83,14 +82,14 @@ export default {
         const state = reactive({
             moreMenuItems: computed(() => {
                 const menuItems = cloneDeep(defaultMenuItems.value);
-                if (costExplorerDashboardGetters.homeDashboardId === props.dashboardId) {
+                if (costExplorerDashboardStore.homeDashboardId === props.dashboardId) {
                     // below find() never be undefined
                     menuItems.find((d) => d.name === MENU.DELETE)!.disabled = true;
                     menuItems.find((d) => d.name === MENU.SET_HOME)!.disabled = true;
                     return menuItems;
                 }
                 if (state.dashboardType === DASHBOARD_TYPE.PUBLIC && props.manageDisabled) {
-                    if (costExplorerDashboardGetters.homeDashboardId === props.dashboardId) {
+                    if (costExplorerDashboardStore.homeDashboardId === props.dashboardId) {
                         // below find() never be undefined
                         menuItems.find((d) => d.name === MENU.DELETE)!.disabled = true;
                         menuItems.find((d) => d.name === MENU.SET_HOME)!.disabled = true;

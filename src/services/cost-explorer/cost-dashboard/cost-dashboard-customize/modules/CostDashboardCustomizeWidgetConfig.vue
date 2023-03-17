@@ -94,7 +94,7 @@ export default {
 
     setup(props) {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const {
             forms: {
@@ -151,19 +151,19 @@ export default {
         const handleName = (value) => {
             setForm('name', value);
             state.editedSelectedWidget.name = value;
-            costDashboardPageState.editedSelectedWidget = state.editedSelectedWidget;
+            costDashboardPageStore.$patch({ editedSelectedWidget: state.editedSelectedWidget });
         };
 
         const handleSelectGroupBy = (value) => {
             setForm('groupBy', value);
             state.editedSelectedWidget.options.group_by = value;
-            costDashboardPageState.editedSelectedWidget = state.editedSelectedWidget;
+            costDashboardPageStore.$patch({ editedSelectedWidget: state.editedSelectedWidget });
         };
 
         const handleSelectGranularity = (value) => {
             setForm('granularity', value);
             state.editedSelectedWidget.options.granularity = value;
-            costDashboardPageState.editedSelectedWidget = state.editedSelectedWidget;
+            costDashboardPageStore.$patch({ editedSelectedWidget: state.editedSelectedWidget });
         };
 
         const init = () => {

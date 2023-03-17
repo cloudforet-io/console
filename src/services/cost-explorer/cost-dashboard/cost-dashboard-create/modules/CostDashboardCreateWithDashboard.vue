@@ -72,7 +72,7 @@ export default {
 
     setup() {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const state = reactive({
             existingDashboardData: [] as Partial<DashboardInfo>[],
@@ -89,8 +89,10 @@ export default {
         });
 
         const handleDashboardChange = (value: Partial<DashboardInfo>) => {
-            costDashboardPageState.selectedTemplate = value;
-            costDashboardPageState.defaultFilter = convertFiltersInToNewType(value.default_filter ?? {});
+            costDashboardPageStore.$patch({
+                selectedTemplate: value,
+                defaultFilter: convertFiltersInToNewType(value.default_filter ?? {}),
+            });
         };
 
         const listDashboard = async () => {

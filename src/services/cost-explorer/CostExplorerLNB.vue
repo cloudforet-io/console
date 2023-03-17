@@ -1,13 +1,13 @@
 <template>
     <aside class="sidebar-menu">
         <l-n-b
-            v-if="!costExplorerDashboardState.dashboardListLoading"
+            v-if="!costExplorerDashboardState.loading"
             :header="header"
             :top-title="topTitle"
             :menu-set="menuSet"
         >
             <template #after-text="{item}">
-                <p-i v-if="item.id === costExplorerDashboardGetters.homeDashboardId"
+                <p-i v-if="item.id === costExplorerDashboardStore.homeDashboardId"
                      name="ic_home-filled"
                      width="1rem"
                      height="1rem"
@@ -52,8 +52,7 @@ export default {
     },
     setup() {
         const costExplorerDashboardStore = useCostExplorerDashboardStore();
-        const costExplorerDashboardState = costExplorerDashboardStore.state;
-        const costExplorerDashboardGetters = costExplorerDashboardStore.getters;
+        const costExplorerDashboardState = costExplorerDashboardStore.$state;
 
         const state = reactive({
             loading: true,
@@ -145,13 +144,13 @@ export default {
         /* Init */
         (async () => {
             await listDashboard();
-            if (!costExplorerDashboardGetters.homeDashboardId) setInitialHomeDashboard();
+            if (!costExplorerDashboardStore.homeDashboardId) setInitialHomeDashboard();
         })();
 
         return {
             ...toRefs(state),
+            costExplorerDashboardStore,
             costExplorerDashboardState,
-            costExplorerDashboardGetters,
             handleClickCreate,
             COST_EXPLORER_ROUTE,
         };

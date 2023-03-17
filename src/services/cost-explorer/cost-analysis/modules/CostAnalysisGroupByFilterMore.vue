@@ -1,10 +1,10 @@
 <template>
     <div class="cost-analysis-group-by-filter-more">
-        <template v-for="(moreGroupByItem, idx) in costAnalysisPageGetters.orderedMoreGroupByItems">
+        <template v-for="(moreGroupByItem, idx) in costAnalysisPageStore.orderedMoreGroupByItems">
             <p-select-button v-if="!moreGroupByItem.disabled"
                              :key="`more-group-by-${moreGroupByItem.key}-${idx}`"
                              :value="moreGroupByItem"
-                             :selected="printMode ? '' : costAnalysisPageGetters.orderedMoreGroupByItems.filter(d => d.selected)"
+                             :selected="printMode ? '' : costAnalysisPageStore.orderedMoreGroupByItems.filter(d => d.selected)"
                              multi-selectable
                              size="sm"
                              :predicate="predicate"
@@ -56,7 +56,7 @@
             </template>
         </p-popover>
         <cost-analysis-group-by-filter-more-modal :visible.sync="addMoreModalVisible"
-                                                  :prev-more-group-by-items="costAnalysisPageGetters.orderedMoreGroupByItems"
+                                                  :prev-more-group-by-items="costAnalysisPageStore.orderedMoreGroupByItems"
         />
     </div>
 </template>
@@ -97,7 +97,6 @@ export default defineComponent({
     },
     setup() {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageGetters = costAnalysisPageStore.getters;
 
         const state = reactive({
             addMoreModalVisible: false,
@@ -115,8 +114,8 @@ export default defineComponent({
                     items: state.additionalInfoGroupByItems,
                 },
             ])),
-            tagsGroupByItems: computed(() => costAnalysisPageGetters.orderedMoreGroupByItems.filter((d) => d.category === MORE_GROUP_BY.TAGS)),
-            additionalInfoGroupByItems: computed(() => costAnalysisPageGetters.orderedMoreGroupByItems.filter((d) => d.category === MORE_GROUP_BY.ADDITIONAL_INFO)),
+            tagsGroupByItems: computed(() => costAnalysisPageStore.orderedMoreGroupByItems.filter((d) => d.category === MORE_GROUP_BY.TAGS)),
+            additionalInfoGroupByItems: computed(() => costAnalysisPageStore.orderedMoreGroupByItems.filter((d) => d.category === MORE_GROUP_BY.ADDITIONAL_INFO)),
         });
 
         /* Util */
@@ -133,7 +132,7 @@ export default defineComponent({
             state.addMoreModalVisible = true;
         };
         const handleSelectMoreGroupByItem = (item: MoreGroupByItem, _, val) => {
-            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(costAnalysisPageGetters.orderedMoreGroupByItems);
+            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(costAnalysisPageStore.orderedMoreGroupByItems);
             const target = _moreGroupBy.find((d) => d.category === item.category && d.key === item.key);
             if (target) {
                 target.selected = val;
@@ -141,7 +140,7 @@ export default defineComponent({
             }
         };
         const handleChangeCheckBox = (item: MoreGroupByItem, val) => {
-            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(costAnalysisPageGetters.orderedMoreGroupByItems);
+            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(costAnalysisPageStore.orderedMoreGroupByItems);
             const target = _moreGroupBy.find((d) => d.category === item.category && d.key === item.key);
             if (target) {
                 target.disabled = !val;
@@ -150,7 +149,7 @@ export default defineComponent({
             }
         };
         const handleDeleteItem = (item: MoreGroupByItem) => {
-            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(costAnalysisPageGetters.orderedMoreGroupByItems);
+            const _moreGroupBy: MoreGroupByItem[] = cloneDeep(costAnalysisPageStore.orderedMoreGroupByItems);
             const targetIdx = _moreGroupBy.findIndex((d) => d.category === item.category && d.key === item.key);
             _moreGroupBy.splice(targetIdx, 1);
             costAnalysisPageStore.setMoreGroupByWithSettings(_moreGroupBy);
@@ -158,7 +157,7 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
-            costAnalysisPageGetters,
+            costAnalysisPageStore,
             predicate,
             handleClickSettingButton,
             handleClose,

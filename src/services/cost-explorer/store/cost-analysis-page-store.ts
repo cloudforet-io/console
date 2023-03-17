@@ -1,5 +1,3 @@
-import { computed, reactive } from 'vue';
-
 import { orderBy, union } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -74,8 +72,8 @@ const getMergedMoreGroupByItems = (selectedGroupBy: string[], storedMoreGroupByI
 };
 
 
-export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => {
-    const state = reactive<CostAnalysisPageState>({
+export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
+    state: (): CostAnalysisPageState => ({
         granularity: GRANULARITY.ACCUMULATED,
         stack: false,
         groupBy: [],
@@ -85,13 +83,13 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         filters: {},
         selectedQueryId: undefined,
         costQueryList: [],
-    });
-    const getters = reactive({
-        selectedQuerySet: computed<CostQuerySetModel|undefined>(() => {
+    }),
+    getters: {
+        selectedQuerySet: (state): CostQuerySetModel|undefined => {
             if (!state.selectedQueryId) return undefined;
             return state.costQueryList.find((item) => item.cost_query_set_id === state.selectedQueryId);
-        }),
-        currentQuerySetOptions: computed<Partial<CostQuerySetOption>>(() => getRefinedCostQueryOptions({
+        },
+        currentQuerySetOptions: (state): Partial<CostQuerySetOption> => getRefinedCostQueryOptions({
             stack: state.stack,
             granularity: state.granularity,
             group_by: state.groupBy,
@@ -99,129 +97,118 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
             more_group_by: state.moreGroupBy,
             period: state.period,
             filters: state.filters,
-        })),
-        orderedMoreGroupByItems: computed(() => {
+        }),
+        orderedMoreGroupByItems: (state) => {
             if (!state.moreGroupBy?.length) return [];
             const tags = state.moreGroupBy.filter((d) => d.category === MORE_GROUP_BY.TAGS);
             const additionalInfo = state.moreGroupBy.filter((d) => d.category === MORE_GROUP_BY.ADDITIONAL_INFO);
             const orderedTags = orderBy(tags, [(d) => d.key]);
             const orderedAdditionalInfo = orderBy(additionalInfo, [(d) => d.key]);
             return [...orderedTags, ...orderedAdditionalInfo];
-        }),
-    });
-
-    /* Actions */
-    const initState = (): void => {
-        state.granularity = GRANULARITY.ACCUMULATED;
-        state.stack = false;
-        state.groupBy = [];
-        state.primaryGroupBy = undefined;
-        state.period = getInitialDates();
-        state.filters = {};
-        // set more group by items
-        const storedMoreGroupByItems: MoreGroupByItem[] = store.getters['settings/getItem']('more_group_by', COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME);
-        state.moreGroupBy = getMergedMoreGroupByItems([], storedMoreGroupByItems);
-    };
-    const setQueryOptions = (options?: CostQuerySetOption): void => {
-        if (!options) {
-            initState();
-            return;
-        }
-
-        const refinedOptions = getRefinedCostQueryOptions(options);
-
-        if (refinedOptions.granularity) state.granularity = refinedOptions.granularity;
-        if (typeof refinedOptions.stack === 'boolean') state.stack = refinedOptions.stack;
-
-        const refinedDefaultGroupBy: string[] = [];
-        const refinedGroupBy = refinedOptions.group_by?.filter((d) => {
-            // Get only what belongs to the default groupBy
-            if (defaultGroupBySet.has(d)) {
-                refinedDefaultGroupBy.push(d);
-                return true;
+        },
+    },
+    actions: {
+        async initState() {
+            this.granularity = GRANULARITY.ACCUMULATED;
+            this.stack = false;
+            this.groupBy = [];
+            this.primaryGroupBy = undefined;
+            this.period = getInitialDates();
+            this.filters = {};
+            // set more group by items
+            const storedMoreGroupByItems: MoreGroupByItem[] = store.getters['settings/getItem']('more_group_by', COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME);
+            this.moreGroupBy = getMergedMoreGroupByItems([], storedMoreGroupByItems);
+        },
+        async setQueryOptions(options?: CostQuerySetOption) {
+            if (!options) {
+                await this.initState();
+                return;
             }
-            // Get only what is convertable to moreGroupByItem
-            return !!convertGroupByStringToMoreGroupByItem(d);
-        });
-        state.groupBy = refinedDefaultGroupBy;
-        state.primaryGroupBy = refinedGroupBy?.[0];
 
-        // set moreGroupByItems
-        const storedMoreGroupByItems: MoreGroupByItem[] = store.getters['settings/getItem']('more_group_by', COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME);
-        state.moreGroupBy = getMergedMoreGroupByItems(refinedGroupBy ?? [], storedMoreGroupByItems);
+            const refinedOptions = getRefinedCostQueryOptions(options);
 
-        if (options.period) state.period = { start: options.period.start, end: options.period.end };
-        if (options.filters) {
-            state.filters = convertFiltersInToNewType(options.filters);
-        }
-    };
-    const listCostQueryList = async (): Promise<void|Error> => {
-        try {
-            const { results } = await SpaceConnector.client.costAnalysis.costQuerySet.list({
-                query: {
-                    filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
-                },
+            if (refinedOptions.granularity) this.granularity = refinedOptions.granularity;
+            if (typeof refinedOptions.stack === 'boolean') this.stack = refinedOptions.stack;
+
+            const refinedDefaultGroupBy: string[] = [];
+            const refinedGroupBy = refinedOptions.group_by?.filter((d) => {
+                // Get only what belongs to the default groupBy
+                if (defaultGroupBySet.has(d)) {
+                    refinedDefaultGroupBy.push(d);
+                    return true;
+                }
+                // Get only what is convertable to moreGroupByItem
+                return !!convertGroupByStringToMoreGroupByItem(d);
             });
-            state.costQueryList = results;
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            state.costQueryList = [];
-        }
-    };
-    const saveQuery = async (name): Promise<CostQuerySetModel|undefined> => {
-        const options = getRefinedCostQueryOptions({
-            granularity: state.granularity,
-            stack: state.stack,
-            period: state.period,
-            group_by: state.groupBy,
-            primary_group_by: state.primaryGroupBy, // will be deprecated(< v1.10.5)
-            more_group_by: state.moreGroupBy, // will be deprecated(< v1.10.5)
-            filters: state.filters,
-        });
-        let createdData;
-        try {
-            createdData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
-                name,
-                options,
-            });
-            state.selectedQueryId = createdData.cost_query_set_id;
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-        return createdData;
-    };
-    const editQuery = async ({ selectedQuery, formState }): Promise<CostQuerySetModel|Error> => {
-        const { queryName } = formState;
-        let updatedQueryData;
-        if (selectedQuery.name !== queryName) {
+            this.groupBy = refinedDefaultGroupBy;
+            this.primaryGroupBy = refinedGroupBy?.[0];
+
+            // set moreGroupByItems
+            const storedMoreGroupByItems: MoreGroupByItem[] = store.getters['settings/getItem']('more_group_by', COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME);
+            this.moreGroupBy = getMergedMoreGroupByItems(refinedGroupBy ?? [], storedMoreGroupByItems);
+
+            if (options.period) this.period = { start: options.period.start, end: options.period.end };
+            if (options.filters) {
+                this.filters = convertFiltersInToNewType(options.filters);
+            }
+        },
+        async listCostQueryList(): Promise<void> {
             try {
-                updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
-                    cost_query_set_id: selectedQuery.cost_query_set_id,
-                    name: queryName,
+                const { results } = await SpaceConnector.client.costAnalysis.costQuerySet.list({
+                    query: {
+                        filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
+                    },
                 });
+                this.costQueryList = results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                this.costQueryList = [];
+            }
+        },
+        async saveQuery(name: string): Promise<CostQuerySetModel|undefined> {
+            const options = getRefinedCostQueryOptions({
+                granularity: this.granularity,
+                stack: this.stack,
+                period: this.period,
+                group_by: this.groupBy,
+                primary_group_by: this.primaryGroupBy, // will be deprecated(< v1.10.5)
+                more_group_by: this.moreGroupBy, // will be deprecated(< v1.10.5)
+                filters: this.filters,
+            });
+            let createdData;
+            try {
+                createdData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
+                    name,
+                    options,
+                });
+                this.selectedQueryId = createdData.cost_query_set_id;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
-        }
-        return updatedQueryData;
-    };
-    const setMoreGroupByWithSettings = (moreGroupByItems: MoreGroupByItem[]) => {
-        state.moreGroupBy = moreGroupByItems;
-        store.dispatch('settings/setItem', {
-            key: 'more_group_by',
-            value: moreGroupByItems,
-            path: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        }, { root: true });
-    };
-
-    return {
-        state,
-        getters,
-        setQueryOptions,
-        initState,
-        listCostQueryList,
-        saveQuery,
-        editQuery,
-        setMoreGroupByWithSettings,
-    };
+            return createdData;
+        },
+        async editQuery({ selectedQuery, formState }): Promise<CostQuerySetModel> {
+            const { queryName } = formState;
+            let updatedQueryData;
+            if (selectedQuery.name !== queryName) {
+                try {
+                    updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
+                        cost_query_set_id: selectedQuery.cost_query_set_id,
+                        name: queryName,
+                    });
+                } catch (e) {
+                    ErrorHandler.handleError(e);
+                }
+            }
+            return updatedQueryData;
+        },
+        setMoreGroupByWithSettings(moreGroupByItems: MoreGroupByItem[]) {
+            this.moreGroupBy = moreGroupByItems;
+            store.dispatch('settings/setItem', {
+                key: 'more_group_by',
+                value: moreGroupByItems,
+                path: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+            }, { root: true });
+        },
+    },
 });

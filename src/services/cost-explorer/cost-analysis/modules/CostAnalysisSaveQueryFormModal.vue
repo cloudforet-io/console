@@ -103,6 +103,7 @@ export default {
         });
 
         const saveQuery = async () => {
+            if (!formState.queryName) return;
             try {
                 const updatedQuery = await costAnalysisPageStore.saveQuery(formState.queryName);
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');

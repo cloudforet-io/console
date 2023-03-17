@@ -133,8 +133,7 @@ export default {
     },
     setup(props, { emit }) {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.state;
-        const costAnalysisPageGetters = costAnalysisPageStore.getters;
+        const costAnalysisPageState = costAnalysisPageStore.$state;
 
         const state = reactive({
             component: computed(() => (props.printMode ? PDataTable : PToolboxTable)),
@@ -184,7 +183,7 @@ export default {
                     ...GROUP_BY_ITEM_MAP[d],
                     sortable: false,
                 }));
-                const moreGroupByItems = costAnalysisPageGetters.orderedMoreGroupByItems.filter((d) => d.selected).map((d) => ({
+                const moreGroupByItems = costAnalysisPageStore.orderedMoreGroupByItems.filter((d) => d.selected).map((d) => ({
                     name: `${d.category}_${d.key}`,
                     label: d.key,
                     sortable: false,
@@ -359,7 +358,7 @@ export default {
             await listCostAnalysisTableData(
                 costAnalysisPageState.granularity,
                 costAnalysisPageState.groupBy,
-                costAnalysisPageGetters.orderedMoreGroupByItems,
+                costAnalysisPageStore.orderedMoreGroupByItems,
                 costAnalysisPageState.period,
                 costAnalysisPageState.filters,
                 costAnalysisPageState.stack,
@@ -369,7 +368,7 @@ export default {
             await listCostAnalysisTableData(
                 costAnalysisPageState.granularity,
                 costAnalysisPageState.groupBy,
-                costAnalysisPageGetters.orderedMoreGroupByItems,
+                costAnalysisPageStore.orderedMoreGroupByItems,
                 costAnalysisPageState.period,
                 costAnalysisPageState.filters,
                 costAnalysisPageState.stack,
@@ -459,7 +458,7 @@ export default {
             [
                 () => costAnalysisPageState.granularity,
                 () => costAnalysisPageState.groupBy,
-                () => costAnalysisPageGetters.orderedMoreGroupByItems,
+                () => costAnalysisPageStore.orderedMoreGroupByItems,
                 () => costAnalysisPageState.period,
                 () => costAnalysisPageState.filters,
                 () => costAnalysisPageState.stack,

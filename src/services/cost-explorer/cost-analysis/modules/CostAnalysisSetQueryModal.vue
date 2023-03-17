@@ -92,7 +92,7 @@ export default {
     },
     setup(props, { emit }: SetupContext) {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.state;
+        const costAnalysisPageState = costAnalysisPageStore.$state;
 
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
@@ -130,10 +130,12 @@ export default {
 
         const handleFormConfirm = async () => {
             if (costAnalysisPageState.granularity !== state.granularity) {
-                costAnalysisPageState.period = getInitialDates();
+                costAnalysisPageStore.$patch({ period: getInitialDates() });
             }
-            costAnalysisPageState.granularity = state.granularity;
-            costAnalysisPageState.stack = state.stack;
+            costAnalysisPageStore.$patch({
+                granularity: state.granularity,
+                stack: state.stack,
+            });
             store.commit('display/setCurrency', state.currency);
 
             state.proxyVisible = false;
