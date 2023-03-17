@@ -1,5 +1,3 @@
-import { reactive } from 'vue';
-
 import { find } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -23,41 +21,34 @@ const _getCloudServiceTypeQuery = (provider: string, group: string): Query => {
     return _cloudServiceTypeQuery.data;
 };
 
-export const useCloudServiceDetailPageStore = defineStore('cloud-service-detail-page', () => {
-    const state = reactive({
+export const useCloudServiceDetailPageStore = defineStore('cloud-service-detail-page', {
+    state: () => ({
         provider: '' as string,
         group: '' as string,
         name: undefined as undefined | string,
         cloudServiceTypeList: [] as CloudServiceTypeInfo[],
         selectedCloudServiceType: undefined as undefined | CloudServiceTypeInfo,
-    });
-
-    /* Actions */
-    const listCloudServiceTypeData = async () => {
-        try {
-            const { results } = await SpaceConnector.client.inventory.cloudServiceType.list({
-                query: _getCloudServiceTypeQuery(state.provider, state.group),
-            });
-            state.cloudServiceTypeList = results;
-            setSelectedCloudServiceType(state.name);
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-    };
-    const setSelectedCloudServiceType = (name?: string) => {
-        if (name) state.selectedCloudServiceType = find(state.cloudServiceTypeList, { name });
-        else state.selectedCloudServiceType = state.cloudServiceTypeList[0];
-    };
-    const setProviderGroupName = ({ provider, group, name }: CloudServiceDetailPageParams) => {
-        state.provider = provider;
-        state.group = group;
-        state.name = name;
-    };
-
-    return {
-        state,
-        listCloudServiceTypeData,
-        setSelectedCloudServiceType,
-        setProviderGroupName,
-    };
+    }),
+    actions: {
+        async listCloudServiceTypeData() {
+            try {
+                const { results } = await SpaceConnector.client.inventory.cloudServiceType.list({
+                    query: _getCloudServiceTypeQuery(this.provider, this.group),
+                });
+                this.cloudServiceTypeList = results;
+                await this.setSelectedCloudServiceType(this.name);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
+        async setSelectedCloudServiceType(name?: string) {
+            if (name) this.selectedCloudServiceType = find(this.cloudServiceTypeList, { name });
+            else this.selectedCloudServiceType = this.cloudServiceTypeList[0];
+        },
+        setProviderGroupName({ provider, group, name }: CloudServiceDetailPageParams) {
+            this.provider = provider;
+            this.group = group;
+            this.name = name;
+        },
+    },
 });
