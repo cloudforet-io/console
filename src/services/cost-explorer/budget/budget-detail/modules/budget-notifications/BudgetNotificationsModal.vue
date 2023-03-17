@@ -141,7 +141,7 @@ export default {
     },
     setup(props, { emit }) {
         const budgetPageStore = useBudgetPageStore();
-        const budgetPageState = budgetPageStore.state;
+        const budgetPageState = budgetPageStore.$state;
 
         const state = reactive({
             loading: true,

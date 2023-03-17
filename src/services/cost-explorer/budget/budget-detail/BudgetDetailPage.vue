@@ -2,7 +2,7 @@
     <div>
         <section class="page-title-wrapper">
             <p-heading :show-back-button="!loading"
-                       :title="loading ? '' : budgetPageState.budgetData.name"
+                       :title="loading ? '' : budgetPageState.budgetData?.name"
                        @click-back-button="$router.go(-1)"
             >
                 <template v-if="!loading"
@@ -34,8 +34,6 @@
         </section>
         <budget-delete-modal v-if="!loading"
                              :visible="checkDeleteState.visible"
-                             :budget-id="budgetPageState.budgetData.budget_id"
-                             :budget-name="budgetPageState.budgetData.name"
                              @update="handleUpdateDelete"
                              @confirm="handleConfirmDelete"
         />
@@ -82,7 +80,7 @@ export default {
     },
     setup(props) {
         const budgetPageStore = useBudgetPageStore();
-        const budgetPageState = budgetPageStore.state;
+        const budgetPageState = budgetPageStore.$state;
 
         const state = reactive({
             loading: true,

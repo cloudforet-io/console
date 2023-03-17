@@ -143,7 +143,7 @@ export default {
     },
     setup() {
         const budgetPageStore = useBudgetPageStore();
-        const budgetPageState = budgetPageStore.state;
+        const budgetPageState = budgetPageStore.$state;
 
         const state = reactive({
             hasBudgetAlert: computed(() => {
