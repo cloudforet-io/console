@@ -30,8 +30,10 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import CostDashboardCustomizeWidgetPreview
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetPreview.vue';
-import type { WidgetInfo } from '@/services/cost-explorer/cost-dashboard/type';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 
+
+const CONSOLE_ASSETS_S3_PATH = 'https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/widget';
 export default {
     name: 'DefaultWidgetPreview',
     components: {
@@ -40,19 +42,15 @@ export default {
         PLazyImg,
         PAnchor,
     },
-    props: {
-        selectedWidget: {
-            type: Object as () => WidgetInfo,
-            default: () => ({}),
-        },
-    },
+    setup() {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
 
-    setup(props) {
         const state = reactive({
-            chartThumbnail: computed(() => `https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/widget/tn--${props.selectedWidget?.options?.chart_img}.png`),
-            thumbnailLink: computed(() => `https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/widget/${props.selectedWidget?.options?.chart_img}.png`),
-            chartType: computed(() => props.selectedWidget?.options?.chart_type ?? ''),
-            layout: computed(() => props.selectedWidget?.options?.layout),
+            chartThumbnail: computed(() => `${CONSOLE_ASSETS_S3_PATH}/tn--${costDashboardPageState.originSelectedWidget?.options?.chart_img}.png`),
+            thumbnailLink: computed(() => `${CONSOLE_ASSETS_S3_PATH}/${costDashboardPageState.originSelectedWidget?.options?.chart_img}.png`),
+            chartType: computed(() => costDashboardPageState.originSelectedWidget?.options?.chart_type ?? ''),
+            layout: computed(() => costDashboardPageState.originSelectedWidget?.options?.layout),
         });
         return {
             ...toRefs(state),

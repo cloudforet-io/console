@@ -1,13 +1,13 @@
 <template>
     <aside class="sidebar-menu">
         <l-n-b
-            v-if="!dashboardListLoading"
+            v-if="!costExplorerDashboardState.dashboardListLoading"
             :header="header"
             :top-title="topTitle"
             :menu-set="menuSet"
         >
             <template #after-text="{item}">
-                <p-i v-if="item.id === homeDashboardId"
+                <p-i v-if="item.id === costExplorerDashboardGetters.homeDashboardId"
                      name="ic_home-filled"
                      width="1rem"
                      height="1rem"
@@ -42,7 +42,7 @@ import type {
     PublicDashboardInfo, UserDashboardInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostExplorerDashboardStore } from '@/services/cost-explorer/store/cost-explorer-dashboard-store';
 
 export default {
     name: 'CostExplorerLNB',
@@ -51,11 +51,12 @@ export default {
         PI,
     },
     setup() {
+        const costExplorerDashboardStore = useCostExplorerDashboardStore();
+        const costExplorerDashboardState = costExplorerDashboardStore.state;
+        const costExplorerDashboardGetters = costExplorerDashboardStore.getters;
+
         const state = reactive({
-            publicDashboardList: computed<PublicDashboardInfo[]>(() => costExplorerStore.state?.publicDashboardList ?? []),
-            userDashboardList: computed<UserDashboardInfo[]>(() => costExplorerStore.state.userDashboardList ?? []),
             loading: true,
-            dashboardListLoading: computed<boolean>(() => costExplorerStore.state?.dashboardListLoading ?? true),
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId)),
             topTitle: computed(() => {
                 if (isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_DASHBOARD, store.getters['user/pagePermissionList'])) {
@@ -75,25 +76,25 @@ export default {
                             {
                                 type: 'title', label: 'Public', id: 'public', foldable: false,
                             },
-                            ...state.publicDashboardList.map((list: PublicDashboardInfo) => ({
+                            ...costExplorerDashboardState.publicDashboardList.map((list: PublicDashboardInfo) => ({
                                 type: 'item',
                                 label: list.name,
                                 id: list.public_dashboard_id,
                                 to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.public_dashboard_id } },
                                 hideFavorite: true,
-                            })),
+                            })) as LNBItem[],
                         ],
                         [
                             {
                                 type: 'title', label: 'My Dashboard', id: 'my', foldable: true,
                             },
-                            ...state.userDashboardList.map((list: UserDashboardInfo) => ({
+                            ...costExplorerDashboardState.userDashboardList.map((list: UserDashboardInfo) => ({
                                 type: 'item',
                                 label: list.name,
                                 id: list.user_dashboard_id,
                                 to: { name: COST_EXPLORER_ROUTE.DASHBOARD._NAME, params: { dashboardId: list.user_dashboard_id } },
                                 hideFavorite: true,
-                            })),
+                            })) as LNBItem[],
                         ],
                         { type: 'divider' },
                     );
@@ -118,13 +119,12 @@ export default {
                 ], store.getters['user/pagePermissionList']),
             ]),
             selectedMenu: {} as LNBItem,
-            homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters?.homeDashboardId),
         });
 
         const listDashboard = async () => {
             try {
                 state.loading = true;
-                await costExplorerStore.dispatch('setDashboardList');
+                costExplorerDashboardStore.setDashboardList();
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
@@ -139,17 +139,19 @@ export default {
         };
 
         const setInitialHomeDashboard = () => {
-            costExplorerStore.dispatch('setHomeDashboard', state.publicDashboardList[0]?.public_dashboard_id);
+            costExplorerDashboardStore.setHomeDashboard(costExplorerDashboardState.publicDashboardList[0]?.public_dashboard_id);
         };
 
         /* Init */
         (async () => {
             await listDashboard();
-            if (!state.homeDashboardId) setInitialHomeDashboard();
+            if (!costExplorerDashboardGetters.homeDashboardId) setInitialHomeDashboard();
         })();
 
         return {
             ...toRefs(state),
+            costExplorerDashboardState,
+            costExplorerDashboardGetters,
             handleClickCreate,
             COST_EXPLORER_ROUTE,
         };

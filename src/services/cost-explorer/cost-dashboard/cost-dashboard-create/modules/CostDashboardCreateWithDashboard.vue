@@ -9,7 +9,7 @@
             >
                 <!--                TODO:: apply keyboard event below this SelectCard-->
                 <p-select-card
-                    :selected="selectedTemplate"
+                    :selected="costDashboardPageState.selectedTemplate"
                     :value="dashboardData"
                     block
                     @change="handleDashboardChange"
@@ -56,7 +56,8 @@ import type {
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { convertFiltersInToNewType } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
+
 
 const PAGE_SIZE = 8;
 
@@ -70,6 +71,9 @@ export default {
     },
 
     setup() {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const state = reactive({
             existingDashboardData: [] as Partial<DashboardInfo>[],
             slicedDashboardData: computed<Partial<DashboardInfo>[]>(() => {
@@ -77,7 +81,6 @@ export default {
                 const endIndex = state.thisPage * PAGE_SIZE;
                 return state.existingDashboardData.slice(startIndex, endIndex);
             }),
-            selectedTemplate: computed(() => costExplorerStore.state.dashboard.selectedTemplate),
             // pagination
             totalCount: 0,
             allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
@@ -86,8 +89,8 @@ export default {
         });
 
         const handleDashboardChange = (value: Partial<DashboardInfo>) => {
-            costExplorerStore.commit('dashboard/setDashboardTemplate', value);
-            costExplorerStore.commit('dashboard/setDefaultFilter', convertFiltersInToNewType(value.default_filter ?? {}));
+            costDashboardPageState.selectedTemplate = value;
+            costDashboardPageState.defaultFilter = convertFiltersInToNewType(value.default_filter ?? {});
         };
 
         const listDashboard = async () => {
@@ -115,6 +118,7 @@ export default {
         return {
             COST_EXPLORER_ROUTE,
             ...toRefs(state),
+            costDashboardPageState,
             defaultLayoutData,
             handleDashboardChange,
             getUUID,

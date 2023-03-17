@@ -22,13 +22,10 @@
 import { store } from '@/store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
-import { registerServiceStore } from '@/common/composables/register-service-store';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import CostExplorerLNB from '@/services/cost-explorer/CostExplorerLNB.vue';
-import { costExplorerStore, costExplorerStoreModule } from '@/services/cost-explorer/store';
-import type { CostExplorerState } from '@/services/cost-explorer/store/type';
 
 export default {
     name: 'CostExplorerContainer',
@@ -38,7 +35,6 @@ export default {
         VerticalPageLayout,
     },
     setup() {
-        registerServiceStore<CostExplorerState>('costExplorer', costExplorerStoreModule, costExplorerStore);
         const { breadcrumbs } = useBreadcrumbs();
 
         /* Init */

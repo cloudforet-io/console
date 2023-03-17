@@ -71,7 +71,8 @@ import {
     DASHBOARD_PRIVACY_TYPE, PERIOD_TYPE,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostExplorerDashboardStore } from '@/services/cost-explorer/store/cost-explorer-dashboard-store';
+
 
 interface Props {
     visible: boolean;
@@ -117,6 +118,8 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
+        const costExplorerDashboardStore = useCostExplorerDashboardStore();
+
         const {
             forms: {
                 name,
@@ -185,7 +188,7 @@ export default defineComponent<Props>({
         const handleConfirm = async () => {
             if (!isAllValid) return;
             const duplicatedDashboardId = visibility.value === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
-            await costExplorerStore.dispatch('setDashboardList');
+            await costExplorerDashboardStore.setDashboardList();
             if (duplicatedDashboardId) {
                 await SpaceRouter.router.push({
                     name: COST_EXPLORER_ROUTE.DASHBOARD._NAME,

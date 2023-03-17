@@ -9,13 +9,13 @@
                     <li v-for="(widget, index) in recommendedWidgetList"
                         :key="widget.widget_id"
                         class="widget-card"
-                        :class="{'selected' : selectedWidget.widget_id === widget.widget_id}"
+                        :class="{'selected' : costDashboardPageState.originSelectedWidget?.widget_id === widget.widget_id}"
                         @click="selectWidget(widget)"
                     >
                         <div class="card-header">
                             <p-radio
                                 :selected="widget"
-                                :value="selectedWidget"
+                                :value="costDashboardPageState.originSelectedWidget"
                                 @click="selectWidget(widget)"
                             >
                                 <span @click="selectWidget(widget)">{{ widgetLabel(widget.widget_id) }}</span>
@@ -23,7 +23,7 @@
                         </div>
                         <div class="card-content">
                             <img class="card-image"
-                                 :src="widgetCardImageList[index].value.default"
+                                 :src="widgetCardImageList[index]?.value.default"
                             >
                         </div>
                     </li>
@@ -35,13 +35,13 @@
                     <li v-for="(widget, index) in widgetList"
                         :key="widget.widget_id"
                         class="widget-card"
-                        :class="{'selected' : selectedWidget.widget_id === widget.widget_id}"
+                        :class="{'selected' : costDashboardPageState.originSelectedWidget?.widget_id === widget.widget_id}"
                         @click="selectWidget(widget)"
                     >
                         <div class="card-header">
                             <p-radio
                                 :selected="widget"
-                                :value="selectedWidget"
+                                :value="costDashboardPageState.originSelectedWidget"
                                 @click="selectWidget(widget)"
                             >
                                 <span @click="selectWidget(widget)">{{ widgetLabel(widget.widget_id) }}</span>
@@ -49,7 +49,7 @@
                         </div>
                         <div class="card-content">
                             <img class="card-image"
-                                 :src="widgetCardImageList[index].value.default"
+                                 :src="widgetCardImageList[index]?.value.default"
                             >
                         </div>
                     </li>
@@ -61,13 +61,10 @@
             </div>
         </div>
         <div class="right-area">
-            <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length"
-                                                    :selected-widget="selectedWidget"
+            <cost-dashboard-customize-widget-config v-if="Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length"
                                                     :editable-widget-option-list="editableWidgetOptionList"
             />
-            <default-widget-preview v-if="Object.keys(selectedWidget).length"
-                                    :selected-widget="selectedWidget"
-            />
+            <default-widget-preview v-if="Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length" />
         </div>
     </div>
 </template>
@@ -89,8 +86,9 @@ import type {
 import {
     EDITABLE_WIDGET_OPTIONS,
 } from '@/services/cost-explorer/cost-dashboard/type';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 import { defaultWidgetMap } from '@/services/cost-explorer/widgets/lib/config';
+
 
 const PAGE_SIZE = 6;
 
@@ -105,17 +103,19 @@ export default {
     },
 
     setup() {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const state = reactive({
             widgetList: [] as WidgetInfo[],
             recommendedWidgetList: computed<WidgetInfo[]>(() => {
-                if (state.layoutOfSpace) return state.widgetList.filter((widget) => widget.options.layout === state.layoutOfSpace);
+                if (costDashboardPageState.layoutOfSpace) return state.widgetList.filter((widget) => widget.options.layout === costDashboardPageState.layoutOfSpace);
                 return [];
             }),
-            selectedWidget: computed<WidgetInfo>(() => costExplorerStore.state.dashboard.originSelectedWidget),
             editableWidgetOptionList: computed<EDITABLE_WIDGET_OPTIONS_TYPE[]>(() => {
                 const optionList: EDITABLE_WIDGET_OPTIONS_TYPE[] = [];
-                if (state.selectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);
-                if (state.selectedWidget?.options?.granularity) optionList.push(EDITABLE_WIDGET_OPTIONS.GRANULARITY);
+                if (costDashboardPageState.originSelectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);
+                if (costDashboardPageState.originSelectedWidget?.options?.granularity) optionList.push(EDITABLE_WIDGET_OPTIONS.GRANULARITY);
                 return optionList;
             }),
             widgetLabel: computed(() => (widgetId) => defaultWidgetMap[widgetId]?.widget_name ?? ''),
@@ -123,7 +123,6 @@ export default {
             totalCount: 0,
             thisPage: 1,
             allPage: computed(() => Math.ceil(state.totalCount / PAGE_SIZE) || 1),
-            layoutOfSpace: computed(() => costExplorerStore.state.dashboard.layoutOfSpace),
             widgetCardImageList: [],
         });
         const getWidgets = async () => {
@@ -138,8 +137,8 @@ export default {
         const getChartTypeImageFileName = (chartType: ChartType) => chartTypeItemMap[chartType].imageFileName;
 
         const selectWidget = (value: WidgetInfo) => {
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', value);
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', value);
+            costDashboardPageState.originSelectedWidget = value;
+            costDashboardPageState.editedSelectedWidget = value;
         };
 
         const getWidgetCardImageList = async (): Promise<void> => {
@@ -155,6 +154,7 @@ export default {
 
         return {
             ...toRefs(state),
+            costDashboardPageState,
             defaultWidgetMap,
             selectWidget,
             getWidgets,

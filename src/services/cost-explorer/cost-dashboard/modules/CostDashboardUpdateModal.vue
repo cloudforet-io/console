@@ -38,7 +38,8 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostExplorerDashboardStore } from '@/services/cost-explorer/store/cost-explorer-dashboard-store';
+
 
 interface Props {
     visible: boolean;
@@ -71,6 +72,8 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
+        const costExplorerDashboardStore = useCostExplorerDashboardStore();
+
         const {
             forms: {
                 name,
@@ -110,7 +113,7 @@ export default defineComponent<Props>({
 
         const handleConfirm = async () => {
             await updateDashboard();
-            await costExplorerStore.dispatch('setDashboardList');
+            await costExplorerDashboardStore.setDashboardList();
             emit('update:visible', false);
             emit('confirm', name.value);
         };

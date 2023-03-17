@@ -7,9 +7,8 @@
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <cost-dashboard-customize-widget-config v-if="Object.keys(selectedWidget).length"
+            <cost-dashboard-customize-widget-config v-if="Object.keys(costDashboardPageState.editedSelectedWidget).length"
                                                     is-custom
-                                                    :selected-widget="selectedWidget"
                                                     :editable-widget-option-list="editableWidgetOptionList"
             />
         </template>
@@ -29,12 +28,11 @@ import CostDashboardCustomizeWidgetConfig
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeWidgetConfig.vue';
 import type {
     EDITABLE_WIDGET_OPTIONS_TYPE,
-    WidgetInfo,
 } from '@/services/cost-explorer/cost-dashboard/type';
 import {
     EDITABLE_WIDGET_OPTIONS,
 } from '@/services/cost-explorer/cost-dashboard/type';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 
 interface Props {
     visible: boolean;
@@ -61,13 +59,15 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const state = reactive({
             proxyVisible: props.visible,
-            selectedWidget: computed<WidgetInfo|undefined>(() => costExplorerStore.state.dashboard.editedSelectedWidget),
             editableWidgetOptionList: computed(() => {
                 const optionList: EDITABLE_WIDGET_OPTIONS_TYPE[] = [];
-                if (state.selectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);
-                if (state.selectedWidget?.options?.granularity) optionList.push(EDITABLE_WIDGET_OPTIONS.GRANULARITY);
+                if (costDashboardPageState.editedSelectedWidget?.options?.group_by) optionList.push(EDITABLE_WIDGET_OPTIONS.GROUP_BY);
+                if (costDashboardPageState.editedSelectedWidget?.options?.granularity) optionList.push(EDITABLE_WIDGET_OPTIONS.GRANULARITY);
                 return optionList;
             }),
         });
@@ -84,6 +84,7 @@ export default defineComponent<Props>({
         });
         return {
             ...toRefs(state),
+            costDashboardPageState,
             handleConfirm,
             handleUpdateVisible,
         };

@@ -1,6 +1,6 @@
 <template>
     <div class="cost-dashboard-page">
-        <div v-if="dashboardList.length"
+        <div v-if="costExplorerDashboardGetters.dashboardList.length"
              class="top-wrapper"
         >
             <p-heading :title="dashboard.name || $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
@@ -55,9 +55,9 @@
                                    :manage-disabled="!hasManagePermission"
             />
         </div>
-        <div v-if="!loading && !dashboardListLoading">
+        <div v-if="!loading && !costExplorerDashboardState.loading">
             <dashboard-layouts
-                v-if="dashboardList.length > 0"
+                v-if="costExplorerDashboardGetters.dashboardList.length > 0"
                 :loading="loading"
                 :layout="layout"
                 :period="period"
@@ -136,14 +136,20 @@ import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/Da
 import type { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { convertFiltersInToNewType } from '@/services/cost-explorer/lib/helper';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
+import { useCostExplorerDashboardStore } from '@/services/cost-explorer/store/cost-explorer-dashboard-store';
 import type { CostFiltersMap, Period } from '@/services/cost-explorer/type';
+
 
 const PUBLIC_ICON_COLOR = gray[500];
 
+const costExplorerDashboardStore = useCostExplorerDashboardStore();
+const costExplorerDashboardState = costExplorerDashboardStore.state;
+const costExplorerDashboardGetters = costExplorerDashboardStore.getters;
+
 const validateDashboardId = async (dashboardId): Promise<boolean> => {
-    await costExplorerStore.dispatch('setDashboardList');
-    const dashboardList = costExplorerStore.getters.dashboardList;
+    await costExplorerDashboardStore.setDashboardList();
+    const dashboardList = costExplorerDashboardGetters.dashboardList;
     const targetDashboard = dashboardList.find((item) => item.dashboard_id === dashboardId);
     return !!targetDashboard;
 };
@@ -183,6 +189,9 @@ export default {
         },
     },
     setup(props) {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
             dashboard: {} as DashboardInfo,
@@ -193,14 +202,11 @@ export default {
             filters: {} as CostFiltersMap,
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            homeDashboardId: computed<string|undefined>(() => costExplorerStore.getters.homeDashboardId),
             visiblePdfDownload: false,
             previewItems: [] as Item[],
             pdfFileName: computed<string>(() => `${state.dashboard.name ?? 'Cost_Dashboard'}_${dayjs().format('YYYYMMDD')}`),
             dashboardType: computed(() => (Object.prototype.hasOwnProperty.call(state.dashboard, 'public_dashboard_id') ? 'public' : 'user')),
             updateModalVisible: false,
-            dashboardList: computed(() => costExplorerStore.getters.dashboardList ?? []),
-            dashboardListLoading: computed(() => costExplorerStore.state.dashboardListLoading),
         });
 
         /* event */
@@ -251,7 +257,9 @@ export default {
 
             const dashboard = await fetchDashboard(dashboardId);
             state.dashboard = dashboard;
-            state.layout = await getDashboardLayout(dashboard);
+            const layout = await getDashboardLayout(dashboard);
+            state.layout = layout;
+            costDashboardPageState.editedCustomLayout = layout;
             state.filters = convertFiltersInToNewType(dashboard.default_filter);
             state.period = dashboard.period ?? {};
             state.periodType = dashboard.period_type;
@@ -259,7 +267,7 @@ export default {
             state.loading = false;
         };
 
-        watch([() => props.dashboardId, () => state.homeDashboardId], async ([dashboardId, homeDashboardId], before) => {
+        watch([() => props.dashboardId, () => costExplorerDashboardGetters.homeDashboardId], async ([dashboardId, homeDashboardId], before) => {
             if (!dashboardId) {
                 if (homeDashboardId) {
                     SpaceRouter.router.replace({
@@ -288,6 +296,8 @@ export default {
 
         return {
             ...toRefs(state),
+            costExplorerDashboardState,
+            costExplorerDashboardGetters,
             handleClickEditDashboard,
             handleUpdateConfirm,
             handleClickPdfDownload,

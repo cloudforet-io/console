@@ -40,7 +40,7 @@ import CostDashboardCustomizeCustomWidgetTab
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeCustomWidgetTab.vue';
 import CostDashboardCustomizeDefaultWidgetTab
     from '@/services/cost-explorer/cost-dashboard/cost-dashboard-customize/modules/CostDashboardCustomizeDefaultWidgetTab.vue';
-import { costExplorerStore } from '@/services/cost-explorer/store';
+import { useCostDashboardPageStore } from '@/services/cost-explorer/store/cost-dashboard-page-store';
 
 interface Props {
     visible: boolean;
@@ -67,10 +67,12 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
+        const costDashboardPageStore = useCostDashboardPageStore();
+        const costDashboardPageState = costDashboardPageStore.state;
+
         const state = reactive({
             proxyVisible: props.visible,
-            widgetPosition: computed(() => costExplorerStore.state.dashboard.widgetPosition),
-            isSelectedWidgetExist: computed(() => Object.keys(costExplorerStore.state.dashboard.originSelectedWidget).length),
+            isSelectedWidgetExist: computed(() => Object.keys(costDashboardPageState.originSelectedWidget ?? {}).length),
         });
         const tabState = reactive({
             tabs: computed(() => ([
@@ -88,15 +90,15 @@ export default {
             emit('update:visible', visible);
         };
         const handleCancel = () => {
-            costExplorerStore.commit('dashboard/setWidgetPosition', undefined);
-            costExplorerStore.commit('dashboard/setLayoutOfSpace', undefined);
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', {});
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
+            costDashboardPageState.widgetPosition = undefined;
+            costDashboardPageState.layoutOfSpace = undefined;
+            costDashboardPageState.originSelectedWidget = undefined;
+            costDashboardPageState.editedSelectedWidget = undefined;
         };
 
         const handleChangeTab = () => {
-            costExplorerStore.commit('dashboard/setOriginSelectedWidget', {});
-            costExplorerStore.commit('dashboard/setEditedSelectedWidget', {});
+            costDashboardPageState.originSelectedWidget = undefined;
+            costDashboardPageState.editedSelectedWidget = undefined;
         };
 
         watch(() => props.visible, (visible) => {
