@@ -59,12 +59,12 @@ import DashboardCustomizePageName
     from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizePageName.vue';
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
 import DashboardWidgetContainer from '@/services/dashboards/dashboard-detail/modules/dashboard-widget-container/DashboardWidgetContainer.vue';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import DashboardLabels from '@/services/dashboards/modules/dashboard-label/DashboardLabels.vue';
 import DashboardToolset from '@/services/dashboards/modules/dashboard-toolset/DashboardToolset.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/modules/DashboardRefreshDropdown.vue';
 import DashboardVariablesSelector from '@/services/dashboards/modules/DashboardVariablesSelector.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 interface Props {
     dashboardId?: string;

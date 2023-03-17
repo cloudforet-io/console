@@ -37,7 +37,7 @@ import DashboardManageVariableOverlay
 import VariableMoreButtonDropdown
     from '@/services/dashboards/dashboard-customize/modules/VariableMoreButtonDropdown.vue';
 import VariableSelectorDropdown from '@/services/dashboards/dashboard-customize/modules/VariableSelectorDropdown.vue';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 interface Props {
     isManageable: boolean;

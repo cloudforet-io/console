@@ -23,8 +23,8 @@ import {
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardWidgetInputForm from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
-import { useWidgetFormStore } from '@/services/dashboards/dashboard-customize/stores/widget-form';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 
