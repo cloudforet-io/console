@@ -1,5 +1,3 @@
-import { reactive } from 'vue';
-
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -14,37 +12,31 @@ export interface UpdateAlertParams {
     updateParams: any;
 }
 
-export const useAlertPageStore = defineStore('alert-page', () => {
-    const state = reactive({
+export const useAlertPageStore = defineStore('alert-page', {
+    state: () => ({
         alertData: null as Partial<AlertDataModel>|null,
-    });
-
-    /* Actions */
-    const getAlertData = async (alertId: string): Promise<void|Error> => {
-        try {
-            state.alertData = await SpaceConnector.client.monitoring.alert.get({
-                alert_id: alertId,
-            });
-        } catch (e: any) {
-            ErrorHandler.handleError(e);
-            throw e;
-        }
-    };
-    const updateAlertData = async ({ alertId, updateParams }: UpdateAlertParams): Promise<void|Error> => {
-        try {
-            state.alertData = await SpaceConnector.client.monitoring.alert.update({
-                ...updateParams,
-                alert_id: alertId,
-            });
-        } catch (e: any) {
-            ErrorHandler.handleError(e);
-            throw e;
-        }
-    };
-
-    return {
-        state,
-        getAlertData,
-        updateAlertData,
-    };
+    }),
+    actions: {
+        async getAlertData(alertId: string): Promise<void|Error> {
+            try {
+                this.alertData = await SpaceConnector.client.monitoring.alert.get({
+                    alert_id: alertId,
+                });
+            } catch (e: any) {
+                ErrorHandler.handleError(e);
+                throw e;
+            }
+        },
+        async updateAlertData({ alertId, updateParams }: UpdateAlertParams): Promise<void|Error> {
+            try {
+                this.alertData = await SpaceConnector.client.monitoring.alert.update({
+                    ...updateParams,
+                    alert_id: alertId,
+                });
+            } catch (e: any) {
+                ErrorHandler.handleError(e);
+                throw e;
+            }
+        },
+    },
 });

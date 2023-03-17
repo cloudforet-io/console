@@ -55,7 +55,7 @@ export default {
     },
     setup() {
         const alertPageStore = useAlertPageStore();
-        const alertPageState = alertPageStore.state;
+        const alertPageState = alertPageStore.$state;
 
         const state = reactive({
             projectList: computed(() => alertPageState.alertData?.project_dependencies ?? []),

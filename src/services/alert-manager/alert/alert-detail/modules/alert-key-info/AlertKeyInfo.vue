@@ -134,7 +134,7 @@ export default {
     },
     setup() {
         const alertPageStore = useAlertPageStore();
-        const alertPageState = alertPageStore.state;
+        const alertPageState = alertPageStore.$state;
 
         const state = reactive({
             fields: computed(() => [

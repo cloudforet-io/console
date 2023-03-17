@@ -70,7 +70,7 @@ export default {
     },
     setup(props, { emit }: SetupContext) {
         const alertPageStore = useAlertPageStore();
-        const alertPageState = alertPageStore.state;
+        const alertPageState = alertPageStore.$state;
 
         const state = reactive({
             loading: true,
