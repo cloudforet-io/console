@@ -10,7 +10,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { EditMode } from '@/services/alert-manager/lib/config';
 import { EDIT_MODE } from '@/services/alert-manager/lib/config';
-import { alertManagerStore } from '@/services/alert-manager/store';
+import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
 
 interface AlertDetailItemState {
 	isEditMode: boolean;
@@ -28,6 +28,7 @@ interface ParamType {
 }
 
 export const useAlertInfoItem = (obj: AlertDetailItemState) => {
+    const alertPageStore = useAlertPageStore();
     const state = reactive<AlertDetailItemState>(obj);
     const cancelEdit = (initialData) => {
         state.isEditMode = false;
@@ -66,7 +67,7 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
     };
     const updateAlert = async (editMode: EditMode) => {
         try {
-            await alertManagerStore.dispatch('alert/updateAlertData', {
+            await alertPageStore.updateAlertData({
                 updateParams: getParams(editMode),
                 alertId: state.alertId,
             });
@@ -85,7 +86,6 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
         state,
         cancelEdit,
         startEdit,
-        updateAlert,
         onClickSave,
     };
 };

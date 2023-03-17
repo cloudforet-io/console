@@ -84,7 +84,6 @@
 import {
     computed, reactive, toRefs,
 } from 'vue';
-import type { PropType } from 'vue';
 
 import {
     PPaneLayout, PDefinitionTable, PAnchor, PBadge,
@@ -109,8 +108,8 @@ import AlertInfoProject from '@/services/alert-manager/alert/alert-detail/module
 import AlertTriggeredBy from '@/services/alert-manager/alert/modules/AlertTriggeredBy.vue';
 import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/alert-manager/lib/config';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import { alertManagerStore } from '@/services/alert-manager/store';
-import type { AlertDataModel } from '@/services/alert-manager/type';
+import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
+
 
 export default {
     name: 'AlertKeyInfo',
@@ -128,16 +127,15 @@ export default {
             type: String,
             default: undefined,
         },
-        alertData: {
-            type: Object,
-            default: () => ({}) as PropType<AlertDataModel>,
-        },
         manageDisabled: {
             type: Boolean,
             default: false,
         },
     },
     setup() {
+        const alertPageStore = useAlertPageStore();
+        const alertPageState = alertPageStore.state;
+
         const state = reactive({
             fields: computed(() => [
                 { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },
@@ -159,7 +157,7 @@ export default {
             ]),
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
             webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
-            data: computed(() => alertManagerStore.state.alert.alertData) || {},
+            data: computed(() => alertPageState.alertData ?? {}),
             escalationPolicyName: '',
             loading: true,
             timezone: computed(() => store.state.user.timezone),
@@ -168,7 +166,6 @@ export default {
         const getEscalationPolicy = async () => {
             try {
                 const res = await SpaceConnector.client.monitoring.escalationPolicy.get({
-                    // eslint-disable-next-line camelcase
                     escalation_policy_id: state.data.escalation_policy_id,
                 });
                 state.escalationPolicyName = res.name;

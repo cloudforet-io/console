@@ -20,12 +20,10 @@
 
 <script lang="ts">
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
-import { registerServiceStore } from '@/common/composables/register-service-store';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import AlertManagerLNB from '@/services/alert-manager/AlertManagerLNB.vue';
-import { alertManagerStoreModule, alertManagerStore } from '@/services/alert-manager/store';
 
 export default {
     name: 'AlertManagerContainer',
@@ -35,7 +33,6 @@ export default {
         GeneralPageLayout,
     },
     setup() {
-        registerServiceStore<any>('alertManager', alertManagerStoreModule, alertManagerStore);
         const { breadcrumbs } = useBreadcrumbs();
         return {
             breadcrumbs,

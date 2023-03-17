@@ -49,7 +49,7 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { alertManagerStore } from '@/services/alert-manager/store';
+import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
 
 export default {
     name: 'AlertDetails',
@@ -64,6 +64,9 @@ export default {
         },
     },
     setup() {
+        const alertPageStore = useAlertPageStore();
+        const alertPageState = alertPageStore.state;
+
         const state = reactive({
             fields: computed(() => [
                 { name: 'alert_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ALERT_ID') },
@@ -74,7 +77,7 @@ export default {
                 { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
                 { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
             ]),
-            data: computed(() => alertManagerStore.state.alert.alertData ?? {}),
+            data: computed(() => alertPageState.alertData ?? {}),
             escalationPolicyName: '',
             loading: true,
             timezone: computed(() => store.state.user.timezone),
@@ -84,7 +87,7 @@ export default {
         const additionalState = reactive({
             fields: computed(() => map(additionalState.data, (d, k) => ({ name: k, label: k }))),
             // eslint-disable-next-line camelcase
-            data: computed(() => alertManagerStore.state.alert.alertData?.additional_info) || {},
+            data: computed(() => alertPageState.alertData?.additional_info) || {},
             loading: true,
             isEmptyValue: computed(() => checkEmptyValue(additionalState.data)),
         });

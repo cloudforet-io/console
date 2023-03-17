@@ -2,12 +2,12 @@
     <div v-if="!loading"
          class="alert-detail-page"
     >
-        <p-heading :title="alertInfo.title"
+        <p-heading :title="alertPageState.alertData?.title"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         >
             <template #title-right-extra>
-                <span class="alert-number">#{{ alertInfo.alert_number }}</span>
+                <span class="alert-number">#{{ alertPageState.alertData?.alert_number }}</span>
                 <span class="title-btn">
                     <p-icon-button name="ic_delete"
                                    class="w-full delete-btn"
@@ -26,29 +26,25 @@
             <div class="left-wrapper">
                 <alert-summary :id="id"
                                class="header"
-                               :alert-data="alertInfo"
                                :manage-disabled="!hasManagePermission"
                 />
 
                 <alert-key-info :id="id"
                                 class="info"
-                                :alert-data="alertInfo"
                                 :manage-disabled="!hasManagePermission"
                 />
                 <alert-status-update :id="id"
-                                     :alert-data="alertInfo"
                                      :manage-disabled="!hasManagePermission"
                                      class="status-update"
                 />
                 <alert-timeline-and-event :id="id"
-                                          :alert-data="alertInfo"
                                           class="timeline-and-event"
                 />
             </div>
             <div class="right-wrapper">
                 <alert-responder :id="id"
                                  class="responder"
-                                 :alert-data="alertInfo"
+                                 :alert-data="alertPageState.alertData"
                                  :manage-disabled="!hasManagePermission"
                 />
                 <alert-note :id="id"
@@ -56,7 +52,6 @@
                             class="note"
                 />
                 <alert-project-dependency :id="id"
-                                          :alert-data="alertInfo"
                                           class="project-dependency"
                 />
             </div>
@@ -69,7 +64,6 @@
         <alert-title-edit-modal v-if="alertTitleEditFormVisible"
                                 :visible.sync="alertTitleEditFormVisible"
                                 :alert-id="id"
-                                :alert-title="alertInfo.title"
                                 @confirm="alertTitleEditConfirm"
         />
         <delete-modal :header-title="checkDeleteState.headerTitle"
@@ -82,7 +76,7 @@
 
 <script lang="ts">
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    getCurrentInstance, reactive, toRefs,
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
@@ -110,7 +104,7 @@ import AlertStatusUpdate
 import AlertTimelineAndEvent from '@/services/alert-manager/alert/alert-detail/modules/AlertTimelineAndEvent.vue';
 import AlertTitleEditModal from '@/services/alert-manager/alert/alert-detail/modules/AlertTitleEditModal.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import { alertManagerStore } from '@/services/alert-manager/store';
+import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
 
 export default {
     name: 'AlertDetailPage',
@@ -134,13 +128,14 @@ export default {
         },
     },
     setup(props) {
+        const alertPageStore = useAlertPageStore();
+        const alertPageState = alertPageStore.state;
+
         const vm = getCurrentInstance()?.proxy as Vue;
 
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
-            alertInfo: computed(() => alertManagerStore.state.alert.alertData),
             loading: true,
-            //
             alertTitleEditFormVisible: false,
         });
 
@@ -179,7 +174,7 @@ export default {
         (async () => {
             state.loading = true;
             try {
-                await alertManagerStore.dispatch('alert/getAlertData', props.id);
+                await alertPageStore.getAlertData(props.id);
             } catch (e) {
                 ErrorHandler.handleError(new NoResourceError({ name: ALERT_MANAGER_ROUTE.ALERT._NAME }));
             } finally {
@@ -190,6 +185,7 @@ export default {
         return {
             ...toRefs(state),
             checkDeleteState,
+            alertPageState,
             openAlertDeleteForm,
             alertDeleteConfirm,
             openAlertEditForm,

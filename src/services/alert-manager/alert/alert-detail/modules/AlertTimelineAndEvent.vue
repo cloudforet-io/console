@@ -10,9 +10,7 @@
             <alert-pushed-event :id="id" />
         </template>
         <template #details>
-            <alert-details :id="id"
-                           :alert-data="alertData"
-            />
+            <alert-details :id="id" />
         </template>
     </p-tab>
 </template>
@@ -42,10 +40,6 @@ export default {
         id: {
             type: String,
             default: '',
-        },
-        alertData: {
-            type: Object,
-            default: () => ({}),
         },
     },
     setup() {

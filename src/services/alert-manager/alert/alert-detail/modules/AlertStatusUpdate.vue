@@ -2,9 +2,9 @@
     <p-pane-layout class="alert-detail-status-update">
         <span class="content-title">{{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.STATUS_UPDATE') }}</span>
         <p class="content-wrapper">
-            <span v-if="status"
+            <span v-if="alertPageState.alertData?.status_message"
                   class="description"
-            >{{ status }}</span>
+            >{{ alertPageState.alertData?.status_message }}</span>
             <p-empty v-else>
                 {{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NO_UPDATE') }}
             </p-empty>
@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    reactive, toRefs,
 } from 'vue';
 
 import {
@@ -51,7 +51,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { alertManagerStore } from '@/services/alert-manager/store';
+import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
+
 
 export default {
     name: 'AlertStatusUpdate',
@@ -67,19 +68,17 @@ export default {
             type: String,
             default: undefined,
         },
-        alertData: {
-            type: Object,
-            default: () => ({}),
-        },
         manageDisabled: {
             type: Boolean,
             default: false,
         },
     },
     setup(props) {
+        const alertPageStore = useAlertPageStore();
+        const alertPageState = alertPageStore.state;
+
         const state = reactive({
             modalVisible: false,
-            status: computed(() => alertManagerStore.state.alert.alertData?.status_message),
             statusInput: '',
             loading: true,
         });
@@ -90,7 +89,7 @@ export default {
             const isEmptyInput = state.statusInput.trim().length === 0;
             try {
                 state.loading = true;
-                await alertManagerStore.dispatch('alert/updateAlertData', {
+                await alertPageStore.updateAlertData({
                     updateParams: {
                         status_message: state.statusInput,
                         reset_status_message: isEmptyInput,
@@ -111,11 +110,12 @@ export default {
         };
 
         (() => {
-            state.statusInput = alertManagerStore.state.alert.alertData?.status_message ?? '';
+            state.statusInput = alertPageState.alertData?.status_message ?? '';
         })();
 
         return {
             ...toRefs(state),
+            alertPageState,
             openStatusUpdateModal,
             onClickConfirm,
         };
