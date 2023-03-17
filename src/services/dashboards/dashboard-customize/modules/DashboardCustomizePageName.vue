@@ -65,7 +65,7 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 const props = defineProps<{
     name: string;

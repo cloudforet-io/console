@@ -64,10 +64,10 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { DashboardViewer, DashboardConfig, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import type { DashboardDetailInfoStoreState } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import type { DashboardDetailInfoStoreState } from '@/services/dashboards/store/dashboard-detail-info';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {

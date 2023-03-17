@@ -78,8 +78,8 @@ import DashboardManageVariableTable
 import type {
     OverlayStatus,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 interface Props {
     visible: boolean;

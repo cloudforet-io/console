@@ -53,7 +53,7 @@ import {
 import {
     useWidgetValidator,
 } from '@/services/dashboards/dashboard-detail/modules/dashboard-widget-container/composables/use-widget-validator';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
