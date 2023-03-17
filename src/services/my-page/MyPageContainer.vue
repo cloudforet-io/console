@@ -42,14 +42,12 @@ import type { Vue } from 'vue/types/vue';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
-import { registerServiceStore } from '@/common/composables/register-service-store';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 
 import UserAPIKeyHandbook from '@/services/my-page/my-account/user-api-key/modules/APIKeyHandbook.vue';
 import MyPageLNB from '@/services/my-page/MyPageLNB.vue';
-import myPageStore from '@/services/my-page/store';
 
 export default defineComponent({
     name: 'MyPageContainer',
@@ -61,7 +59,6 @@ export default defineComponent({
         UserAPIKeyHandbook,
     },
     setup() {
-        registerServiceStore('myPage', myPageStore);
         const vm = getCurrentInstance()?.proxy as Vue;
         const { breadcrumbs } = useBreadcrumbs();
         const handbookState = reactive({
