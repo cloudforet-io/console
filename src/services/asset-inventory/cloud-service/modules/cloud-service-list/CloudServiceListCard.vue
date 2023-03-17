@@ -85,8 +85,7 @@ export default {
     },
     setup(props: Props) {
         const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.state;
-        const cloudServicePageGetters = cloudServicePageStore.getters;
+        const cloudServicePageState = cloudServicePageStore.$state;
 
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -100,8 +99,8 @@ export default {
                 'service_code',
             ].includes(f.k)));
 
-            if (cloudServicePageGetters.selectedRegions.length) {
-                cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: cloudServicePageGetters.selectedRegions });
+            if (cloudServicePageStore.selectedRegions.length) {
+                cloudServiceDetailQueryHelper.addFilter({ k: 'region_code', o: '=', v: cloudServicePageStore.selectedRegions });
             }
 
             const res: Location = {

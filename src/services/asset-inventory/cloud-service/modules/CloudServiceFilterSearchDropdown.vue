@@ -98,7 +98,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }) {
         const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.state;
+        const cloudServicePageState = cloudServicePageStore.$state;
 
         const state = reactive({
             searchTerm: '',

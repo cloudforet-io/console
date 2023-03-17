@@ -47,8 +47,8 @@ export default defineComponent({
 
         onUnmounted(() => {
             cloudServicePageStore.$dispose();
-            cloudServiceDetailPageStore.$dispose();
             cloudServicePageStore.$reset();
+            cloudServiceDetailPageStore.$dispose();
             cloudServiceDetailPageStore.$reset();
         });
         return {

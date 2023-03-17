@@ -88,6 +88,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ConsoleFilter } from '@/query/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
@@ -137,8 +138,7 @@ export default {
     },
     setup() {
         const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.state;
-        const cloudServicePageGetters = cloudServicePageStore.getters;
+        const cloudServicePageState = cloudServicePageStore.$state;
 
         const storeState = reactive({
             projects: computed(() => store.getters['reference/projectItems']),
@@ -186,8 +186,8 @@ export default {
             // url query
             urlQueryString: computed<CloudServicePageUrlQuery>(() => ({
                 provider: cloudServicePageState.selectedProvider === 'all' ? null : primitiveToQueryString(cloudServicePageState.selectedProvider),
-                service: arrayToQueryString(cloudServicePageGetters.selectedCategories),
-                region: arrayToQueryString(cloudServicePageGetters.selectedRegions),
+                service: arrayToQueryString(cloudServicePageStore.selectedCategories),
+                region: arrayToQueryString(cloudServicePageStore.selectedRegions),
                 period: objectToQueryString(cloudServicePageState.period),
                 filters: searchQueryHelper.setFilters(cloudServicePageState.searchFilters).rawQueryStrings,
             })),
@@ -206,10 +206,10 @@ export default {
             listCloudServiceRequest = axios.CancelToken.source();
             try {
                 state.loading = true;
-                cloudServiceApiQueryHelper.setFilters(cloudServicePageGetters.allFilters)
+                cloudServiceApiQueryHelper.setFilters(cloudServicePageStore.allFilters)
                     .setMultiSort([{ key: 'is_primary', desc: true }, { key: 'name', desc: false }]);
                 const res = await SpaceConnector.client.inventory.cloudServiceType.analyze({
-                    labels: cloudServicePageGetters.selectedCategories,
+                    labels: cloudServicePageStore.selectedCategories,
                     ...cloudServiceApiQueryHelper.data,
                     ...(cloudServicePageState.period && {
                         date_range: {
@@ -258,8 +258,10 @@ export default {
             cloudServicePageStore.setSelectedProvider(urlQueryValue.provider);
             cloudServicePageStore.setSelectedRegionsToFilters(urlQueryValue.region);
             cloudServicePageStore.setSelectedCategoriesToFilters(urlQueryValue.service);
-            cloudServicePageState.period = urlQueryValue.period;
-            cloudServicePageState.searchFilters = searchQueryHelper.filters;
+            cloudServicePageStore.$patch({
+                period: urlQueryValue.period,
+                searchFilters: searchQueryHelper.filters as ConsoleFilter[],
+            });
 
             // LOAD REFERENCE STORE
             await Promise.allSettled([

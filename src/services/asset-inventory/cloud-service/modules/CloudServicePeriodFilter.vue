@@ -40,7 +40,7 @@ export default defineComponent<Props>({
     },
     setup() {
         const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.state;
+        const cloudServicePageState = cloudServicePageStore.$state;
 
         const state = reactive({
             periodText: computed<string>(() => {
@@ -55,7 +55,7 @@ export default defineComponent<Props>({
         });
 
         const handleDeletePeriod = () => {
-            cloudServicePageState.period = undefined;
+            cloudServicePageStore.$patch({ period: undefined });
         };
 
         return {
