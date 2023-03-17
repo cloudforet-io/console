@@ -58,9 +58,9 @@
                     {{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGN') }}
                 </p-button>
             </span>
-            <span v-if="alertData.assignee"
+            <span v-if="alertPageState.alertData?.assignee"
                   class="email"
-            >{{ alertData.assignee }}</span>
+            >{{ alertPageState.alertData?.assignee }}</span>
             <span v-else>--</span>
         </p>
         <p class="content-wrapper">
@@ -69,7 +69,7 @@
         </p>
         <alert-assign-modal
             :visible.sync="reassignModalVisible"
-            :project-id="alertData.project_id"
+            :project-id="alertPageState.alertData?.project_id"
             :alert-id="id"
         />
     </p-pane-layout>
@@ -99,16 +99,8 @@ import type { AlertState, AlertUrgency } from '@/services/alert-manager/lib/conf
 import {
     ALERT_STATE, ALERT_URGENCY,
 } from '@/services/alert-manager/lib/config';
-import { alertManagerStore } from '@/services/alert-manager/store';
+import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
 
-// interface HeaderState {
-//     alertState: ALERT_STATE;
-//     alertUrgency: ALERT_URGENCY;
-//     reassignModalVisible: boolean;
-//     duration: string;
-//     alertStateList: MenuItem[];
-//     alertUrgencyList: MenuItem[];
-// }
 
 const calculateTime = (time) => {
     const today = dayjs().toISOString();
@@ -136,22 +128,20 @@ export default {
             type: String,
             default: undefined,
         },
-        alertData: {
-            type: Object,
-            default: () => ({}),
-        },
         manageDisabled: {
             type: Boolean,
             default: false,
         },
     },
     setup(props) {
+        const alertPageStore = useAlertPageStore();
+        const alertPageState = alertPageStore.state;
+
         const state = reactive({
-            alertInfo: computed(() => alertManagerStore.state.alert.alertData),
-            alertState: computed(() => state.alertInfo?.state),
-            alertUrgency: computed(() => state.alertInfo?.urgency),
+            alertState: computed(() => alertPageState.alertData?.state),
+            alertUrgency: computed(() => alertPageState.alertData?.urgency),
             reassignModalVisible: false,
-            duration: computed(() => calculateTime(state.alertInfo?.created_at)),
+            duration: computed(() => calculateTime(alertPageState.alertData?.created_at)),
             alertStateList: computed(() => ([
                 { name: ALERT_STATE.TRIGGERED, label: i18n.t('MONITORING.ALERT.DETAIL.HEADER.TRIGGERED') },
                 { name: ALERT_STATE.ACKNOWLEDGED, label: i18n.t('MONITORING.ALERT.DETAIL.HEADER.ACKNOWLEDGED') },
@@ -169,7 +159,7 @@ export default {
 
         const changeAlertState = async (alertState: AlertState) => {
             try {
-                await alertManagerStore.dispatch('alert/updateAlertData', {
+                await alertPageStore.updateAlertData({
                     updateParams: {
                         state: alertState,
                     },
@@ -183,7 +173,7 @@ export default {
 
         const changeAlertUrgency = async (alertUrgency: AlertUrgency) => {
             try {
-                await alertManagerStore.dispatch('alert/updateAlertData', {
+                await alertPageStore.updateAlertData({
                     updateParams: {
                         urgency: alertUrgency,
                     },
@@ -197,6 +187,7 @@ export default {
 
         return {
             ...toRefs(state),
+            alertPageState,
             ALERT_STATE,
             ALERT_URGENCY,
             onClickReassign,

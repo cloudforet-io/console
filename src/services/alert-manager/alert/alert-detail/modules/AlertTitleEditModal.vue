@@ -19,7 +19,7 @@
                     <p-text-input v-model="alertTitleInput"
                                   class="block w-full"
                                   :invalid="isNameInvalid"
-                                  :placeholder="alertTitle"
+                                  :placeholder="alertPageState.alertData?.title"
                     />
                 </template>
             </p-field-group>
@@ -30,7 +30,7 @@
 <script lang="ts">
 import type { SetupContext } from 'vue';
 import {
-    computed, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from 'vue';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
@@ -42,7 +42,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { alertManagerStore } from '@/services/alert-manager/store';
+import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
 
 export default {
     name: 'AlertTitleEditModal',
@@ -67,23 +67,19 @@ export default {
             type: String,
             default: null,
         },
-        alertTitle: {
-            type: String,
-            default: null,
-        },
     },
     setup(props, { emit }: SetupContext) {
+        const alertPageStore = useAlertPageStore();
+        const alertPageState = alertPageStore.state;
+
         const state = reactive({
             loading: true,
             proxyVisible: useProxyValue('visible', props, emit),
-            alertTitleInput: props.alertTitle,
+            alertTitleInput: '',
             nameInvalidText: computed(() => {
                 if (state.alertTitleInput.length === 0) {
                     return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
                 }
-                // if (state.alertTitleInput.length > 40) {
-                //     return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
-                // }
                 return undefined;
             }),
             isNameInvalid: computed(() => !!state.nameInvalidText),
@@ -92,11 +88,11 @@ export default {
         const updateAlertTitle = async () => {
             try {
                 state.loading = true;
-                await alertManagerStore.dispatch('alert/updateAlertData', {
+                await alertPageStore.updateAlertData({
+                    alertId: props.alertId,
                     updateParams: {
                         title: state.alertTitleInput,
                     },
-                    alertId: props.alertId,
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_TITLE'), '');
             } catch (e) {
@@ -110,8 +106,13 @@ export default {
             state.proxyVisible = false;
             emit('confirm');
         };
+
+        watch(() => alertPageState.alertData?.title, (alertTitle) => {
+            if (alertTitle) state.alertTitleInput = alertTitle;
+        });
         return {
             ...toRefs(state),
+            alertPageState,
             onClickConfirm,
         };
     },

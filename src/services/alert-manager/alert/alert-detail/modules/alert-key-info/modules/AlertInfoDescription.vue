@@ -72,7 +72,6 @@ export default {
             state: alertDetailItemState,
             cancelEdit,
             startEdit,
-            updateAlert,
             onClickSave,
         } = useAlertInfoItem({
             alertId: props.id,
@@ -84,7 +83,6 @@ export default {
             ...toRefs(alertDetailItemState),
             cancelEdit,
             startEdit,
-            updateAlert,
             onClickSave,
         };
     },

@@ -110,7 +110,6 @@ export default {
             state: alertDetailItemState,
             cancelEdit,
             startEdit,
-            updateAlert,
             onClickSave,
         } = useAlertInfoItem({
             alertId: props.id,
@@ -144,7 +143,6 @@ export default {
             referenceRouter,
             cancelEdit,
             startEdit,
-            updateAlert,
             onClickSave,
             onSelectProject,
             openModal,

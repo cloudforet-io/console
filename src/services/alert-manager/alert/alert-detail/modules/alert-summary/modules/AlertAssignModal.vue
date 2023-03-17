@@ -52,8 +52,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { alertManagerStore } from '@/services/alert-manager/store';
+import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
 import type { ProjectMember } from '@/services/alert-manager/type';
+
 
 export default {
     name: 'AlertAssignModal',
@@ -76,6 +77,8 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
+        const alertPageStore = useAlertPageStore();
+
         const state = reactive({
             modalLoading: false,
             proxyVisible: useProxyValue('visible', props, emit),
@@ -94,7 +97,7 @@ export default {
 
         const reassignMember = async () => {
             try {
-                await alertManagerStore.dispatch('alert/updateAlertData', {
+                await alertPageStore.updateAlertData({
                     updateParams: {
                         assignee: state.selectedUserID,
                     },

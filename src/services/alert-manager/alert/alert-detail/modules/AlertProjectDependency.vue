@@ -25,7 +25,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs,
 } from 'vue';
@@ -38,7 +37,7 @@ import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import type { AlertDataModel } from '@/services/alert-manager/type';
+import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
 
 export default {
     name: 'AlertProjectDependency',
@@ -53,14 +52,13 @@ export default {
             type: String,
             default: undefined,
         },
-        alertData: {
-            type: Object,
-            default: () => ({}) as PropType<AlertDataModel>,
-        },
     },
-    setup(props) {
+    setup() {
+        const alertPageStore = useAlertPageStore();
+        const alertPageState = alertPageStore.state;
+
         const state = reactive({
-            projectList: props.alertData?.project_dependencies,
+            projectList: computed(() => alertPageState.alertData?.project_dependencies ?? []),
             projects: computed(() => store.getters['reference/projectItems']),
         });
 
