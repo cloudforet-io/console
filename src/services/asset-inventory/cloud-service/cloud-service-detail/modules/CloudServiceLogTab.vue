@@ -1,5 +1,6 @@
 <template>
     <p-data-loader :loading="schemaLoading"
+                   :data="dataSourceList"
                    :class="{ 'data-loader': schemaLoading }"
                    class="cloud-service-history-log-tab"
     >
