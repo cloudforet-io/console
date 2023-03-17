@@ -55,8 +55,8 @@ import { SpaceRouter } from '@/router';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 interface Props {
     isManageable: boolean;

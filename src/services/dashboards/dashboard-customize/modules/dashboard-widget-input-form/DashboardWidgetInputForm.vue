@@ -85,7 +85,7 @@ import {
     getRefinedWidgetInheritOptions,
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-input-form/schema-helpers';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type {
     DashboardLayoutWidgetInfo, WidgetConfig,

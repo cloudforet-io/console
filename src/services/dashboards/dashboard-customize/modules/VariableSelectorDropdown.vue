@@ -76,7 +76,7 @@ import { cloneDeep, debounce } from 'lodash';
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/dashboard-detail/store/dashboard-detail-info';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 interface Props {
     propertyName: string;

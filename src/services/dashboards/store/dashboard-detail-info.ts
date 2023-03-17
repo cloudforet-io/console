@@ -12,7 +12,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
 import { store } from '@/store';
 
 import { CURRENCY } from '@/store/modules/display/config';
