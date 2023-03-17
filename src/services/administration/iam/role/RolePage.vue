@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import {
-    defineComponent, reactive, toRefs,
+    defineComponent, onUnmounted, reactive, toRefs,
 } from 'vue';
 
 import {
@@ -47,6 +47,11 @@ export default defineComponent({
 
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
+        });
+
+        onUnmounted(() => {
+            rolePageStore.$dispose();
+            rolePageStore.$reset();
         });
 
         return {

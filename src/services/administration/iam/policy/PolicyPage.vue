@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import {
-    reactive,
+    onUnmounted, reactive,
 } from 'vue';
 
 import { PHeading, PButton } from '@spaceone/design-system';
@@ -37,5 +37,10 @@ const policyState = policyStore.$state;
 
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
+});
+
+onUnmounted(() => {
+    policyStore.$dispose();
+    policyStore.$reset();
 });
 </script>
