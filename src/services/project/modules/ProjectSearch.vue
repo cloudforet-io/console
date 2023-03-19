@@ -137,12 +137,10 @@ export default {
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
         const projectPageStore = useProjectPageStore();
-        const projectPageState = projectPageStore.state;
-        const projectPageGetters = projectPageStore.getters;
         const state = reactive({
             menuRef: null as null|Vue,
-            groupId: computed(() => projectPageGetters.groupId),
-            groupName: computed(() => projectPageGetters.groupName),
+            groupId: computed(() => projectPageStore.groupId),
+            groupName: computed(() => projectPageStore.groupName),
             searchText: '' as string,
             trimmedValue: computed<string>(() => (typeof state.searchText === 'string' ? state.searchText.trim() : '')),
             regex: computed(() => {
@@ -269,13 +267,11 @@ export default {
             let val = searchText;
             if (typeof searchText === 'string') val = searchText.trim();
             if (!val) val = '';
-
             if (state.groupId !== groupId) {
                 projectPageStore.selectNode(groupId);
             }
-
-            if (projectPageState.searchText !== val) {
-                projectPageState.searchText = val;
+            if (projectPageStore.searchText !== val) {
+                projectPageStore.searchText = val;
             }
         };
 
@@ -320,7 +316,7 @@ export default {
 
         if (vm.$route.query.search) {
             state.searchText = vm.$route.query.search as string;
-            projectPageState.searchText = vm.$route.query.search as string;
+            projectPageStore.searchText = vm.$route.query.search as string;
         }
 
         const focusMenu = () => {
