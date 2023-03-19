@@ -254,13 +254,13 @@ export default defineComponent<Props>({
                 });
                 getLogDataToken = undefined;
                 state.data = results;
+                state.loading = false;
             } catch (e: any) {
                 if (!axios.isCancel(e.axiosError)) {
                     ErrorHandler.handleError(e);
+                    state.data = [];
+                    state.loading = false;
                 }
-                state.data = [];
-            } finally {
-                state.loading = false;
             }
         }, 300);
         const schemaApiQueryHelper = new ApiQueryHelper();
