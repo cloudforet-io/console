@@ -31,34 +31,27 @@
                                  @change-toggle="handleToggleUse(item.propertyName, value)"
                 />
             </template>
-            <template #col-options-format="{ value }">
+            <template #col-description-format="{ value }">
                 <p-collapsible-panel class="options-area"
                                      is-collapsed
                                      :line-clamp="1"
                 >
-                    {{ value.join(', ') }}
+                    {{ value }}
                 </p-collapsible-panel>
             </template>
             <template #col-managable-format="{ value }">
                 <div v-if="value"
                      class="button-wrapper"
                 >
-                    <p-button class="manage-button"
-                              style-type="tertiary"
-                              icon-left="ic_edit"
-                              size="sm"
-                              @click="handleEditVariable(value)"
-                    >
-                        {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.EDIT') }}
-                    </p-button>
-                    <p-button class="manage-button"
-                              style-type="negative-secondary"
-                              icon-left="ic_delete"
-                              size="sm"
-                              @click="handleDeleteVariable(value)"
-                    >
-                        {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE') }}
-                    </p-button>
+                    <p-icon-button name="ic_duplicate"
+                                   @click="handleClonrVariable(value)"
+                    />
+                    <p-icon-button name="ic_edit"
+                                   @click="handleEditVariable(value)"
+                    />
+                    <p-icon-button name="ic_delete"
+                                   @click="handleDeleteVariable(value)"
+                    />
                 </div>
             </template>
         </p-data-table>
@@ -71,7 +64,7 @@ import {
 } from 'vue';
 
 import {
-    PBadge, PDataTable, PSelectStatus, PToggleButton, PButton, PCollapsiblePanel,
+    PBadge, PDataTable, PSelectStatus, PToggleButton, PCollapsiblePanel, PIconButton,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -88,6 +81,7 @@ interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
 interface EmitFn {
     (e: 'delete', value: string): void;
     (e: 'edit', name: string): void;
+    (e: 'clone', name: string): void;
 }
 
 const emit = defineEmits<EmitFn>();
@@ -108,8 +102,8 @@ const state = reactive({
         { name: 'selection_type', label: 'Selection Type' },
         { name: 'variable_type', label: 'Variable Type' },
         { name: 'use', label: 'Use', width: '90px' },
-        { name: 'options', label: 'Options', width: '448px' },
-        { name: 'managable', label: ' ', width: '164px' },
+        { name: 'description', label: 'Description', width: '448px' },
+        { name: 'managable', label: ' ', width: '144px' },
     ],
     selectionType: computed(() => ({
         SINGLE: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT'),
@@ -125,6 +119,9 @@ const state = reactive({
 /* EVENT */
 const handleSelectType = (selected) => {
     state.selectedVariableType = selected;
+};
+const handleClonrVariable = (propertyName: string) => {
+    emit('clone', propertyName);
 };
 const handleEditVariable = (propertyName: string) => {
     emit('edit', propertyName);
@@ -204,10 +201,7 @@ const {
             padding: 0;
         }
         .button-wrapper {
-            @apply flex items-center justify-center;
-            .manage-button {
-                margin-right: 0.375rem;
-            }
+            @apply w-full flex items-center justify-between;
         }
     }
 }
