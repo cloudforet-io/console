@@ -22,6 +22,12 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             use: true,
             selection_type: 'MULTI',
         },
+        [REFERENCE_TYPE_INFO.region.type]: {
+            name: REFERENCE_TYPE_INFO.region.name,
+            variable_type: 'MANAGED',
+            use: true,
+            selection_type: 'MULTI',
+        },
         // [REFERENCE_TYPE_INFO.user.type]: {
         //     name: REFERENCE_TYPE_INFO.user.name,
         //     variable_type: 'MANAGED',
@@ -34,12 +40,6 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
         //     use: false,
         //     selection_type: 'MULTI',
         // },
-        [REFERENCE_TYPE_INFO.region.type]: {
-            name: REFERENCE_TYPE_INFO.region.name,
-            variable_type: 'MANAGED',
-            use: true,
-            selection_type: 'MULTI',
-        },
     },
     order: [
         REFERENCE_TYPE_INFO.project.type,

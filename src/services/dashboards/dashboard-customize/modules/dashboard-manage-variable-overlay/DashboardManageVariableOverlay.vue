@@ -33,6 +33,7 @@
             <dashboard-manage-variable-table v-if="contentType === 'LIST'"
                                              @delete="handleOpenDeleteModal"
                                              @edit="handleChangeEditContent"
+                                             @clone="handleChangeCloneContent"
             />
             <dashboard-manage-variable-form v-else
                                             :content-type.sync="contentType"
@@ -155,6 +156,10 @@ const handleConfirmModalAction = () => {
 const handleChangeEditContent = (propertyName: string) => {
     state.selectedVariable = propertyName;
     state.contentType = 'EDIT';
+};
+const handleChangeCloneContent = (propertyName: string) => {
+    state.selectedVariable = propertyName;
+    state.contentType = 'ADD';
 };
 const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
     const properties = cloneDeep(state.variableSchema.properties) as DashboardVariablesSchema['properties'];

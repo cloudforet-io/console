@@ -218,6 +218,12 @@ onMounted(() => {
         state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
         state.options = (props.selectedVariable?.options ?? []).map((d) => ({ key: getUUID(), value: d })) ?? [{ key: getUUID(), value: '' }];
     }
+    // For clone-custom-variable CASE
+    if (props.contentType === 'ADD' && props.selectedVariable) {
+        setForm('name', `Copy - ${props.selectedVariable?.name}` ?? '');
+        state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
+        state.options = (props.selectedVariable?.options ?? []).map((d) => ({ key: getUUID(), value: d })) ?? [{ key: getUUID(), value: '' }];
+    }
 });
 
 const {
