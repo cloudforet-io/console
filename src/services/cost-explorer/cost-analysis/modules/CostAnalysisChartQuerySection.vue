@@ -146,8 +146,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.state;
-        const costAnalysisPageGetters = costAnalysisPageStore.getters;
+        const costAnalysisPageState = costAnalysisPageStore.$state;
 
         const state = reactive({
             filtersLength: computed<number>(() => {
@@ -159,7 +158,7 @@ export default defineComponent<Props>({
             proxyLegends: useProxyValue('legends', props, emit),
             groupByMenuItems: computed<SelectDropdownMenu[]>(() => {
                 const groupByItems = costAnalysisPageState.groupBy.map((d) => GROUP_BY_ITEM_MAP[d]);
-                const moreGroupByItems = costAnalysisPageGetters.orderedMoreGroupByItems.filter((d) => d.selected).map((d) => ({
+                const moreGroupByItems = costAnalysisPageStore.orderedMoreGroupByItems.filter((d) => d.selected).map((d) => ({
                     name: `${d.category}.${d.key}`,
                     label: d.key,
                 }));
@@ -186,7 +185,7 @@ export default defineComponent<Props>({
             state.filterModalVisible = true;
         };
         const handleUpdateFilters = (filters: CostFiltersMap) => {
-            costAnalysisPageState.filters = filters;
+            costAnalysisPageStore.$patch({ filters });
         };
         const handleToggleSeries = (index) => {
             const _legends = cloneDeep(props.legends);
@@ -210,15 +209,15 @@ export default defineComponent<Props>({
             state.proxyLegends = _legends;
         };
         const handlePrimaryGroupByItem = (groupBy?: string) => {
-            costAnalysisPageState.primaryGroupBy = groupBy;
+            costAnalysisPageStore.$patch({ primaryGroupBy: groupBy });
         };
 
         /* Watcher */
         watch(() => state.groupByMenuItems, (after) => {
             if (!after.length) {
-                costAnalysisPageState.primaryGroupBy = undefined;
+                costAnalysisPageStore.$patch({ primaryGroupBy: undefined });
             } else if (!after.filter((d) => d.name === costAnalysisPageState.primaryGroupBy).length) {
-                costAnalysisPageState.primaryGroupBy = after[0].name;
+                costAnalysisPageStore.$patch({ primaryGroupBy: after[0].name });
             }
         });
 

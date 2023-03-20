@@ -82,7 +82,7 @@ export default {
     },
     setup(props) {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const state = reactive({
             loading: true,
@@ -90,7 +90,7 @@ export default {
             editingCustomLayout: computed<CustomLayout[]|undefined>({
                 get() { return costDashboardPageState.editedCustomLayout; },
                 set(val) {
-                    costDashboardPageState.editedCustomLayout = [...(val ?? [])];
+                    costDashboardPageStore.$patch({ editedCustomLayout: [...(val ?? [])] });
                 },
             }),
             dashboardIdFromRoute: computed(() => props.dashboardId || SpaceRouter.router.currentRoute.params.dashboardId),
@@ -142,13 +142,13 @@ export default {
                     state.editingCustomLayout[state.widgetPosition.row ?? ''].splice((state.widgetPosition.col ?? 0) + 1, 0, state.selectedWidget as WidgetInfo);
                 } else {
                     state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget as WidgetInfo];
-                    costDashboardPageState.editedCustomLayout = [...(state.editingCustomLayout ?? [])];
+                    costDashboardPageStore.$patch({ editedCustomLayout: [...(state.editingCustomLayout ?? [])] });
                 }
             } else if (state.editingCustomLayout.length === 0) {
                 state.editingCustomLayout = [[state.selectedWidget as WidgetInfo]];
             } else {
                 state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget as WidgetInfo];
-                costDashboardPageState.editedCustomLayout = [...state.editingCustomLayout];
+                costDashboardPageStore.$patch({ editedCustomLayout: [...state.editingCustomLayout] });
             }
         };
 
@@ -157,18 +157,22 @@ export default {
             if (!state.editingCustomLayout) return;
             state.editingCustomLayout[state.widgetPosition.row ?? ''].splice(state.widgetPosition.col, 1);
             state.editingCustomLayout = state.editingCustomLayout.filter((row) => row.length > 0);
-            costDashboardPageState.editedCustomLayout = [...state.editingCustomLayout];
-            costDashboardPageState.widgetPosition = undefined;
-            costDashboardPageState.editedSelectedWidget = undefined;
+            costDashboardPageStore.$patch({
+                editedCustomLayout: [...state.editingCustomLayout],
+                widgetPosition: undefined,
+                editedSelectedWidget: undefined,
+            });
         };
 
         const handleUpdateWidget = () => {
             if (!state.widgetPosition) return;
             if (!state.editingCustomLayout) return;
             state.editingCustomLayout[state.widgetPosition.row ?? ''][state.widgetPosition.col ?? ''] = state.selectedWidget;
-            costDashboardPageState.editedCustomLayout = [...state.editingCustomLayout];
-            costDashboardPageState.widgetPosition = undefined;
-            costDashboardPageState.editedSelectedWidget = undefined;
+            costDashboardPageStore.$patch({
+                editedCustomLayout: [...state.editingCustomLayout],
+                widgetPosition: undefined,
+                editedSelectedWidget: undefined,
+            });
         };
 
         const getDashboardData = async () => {
@@ -186,7 +190,7 @@ export default {
                 state.dashboardTitle = state.dashboardData?.name || '';
                 const layout = await getDashboardLayout(state.dashboardData);
                 state.layout = layout;
-                costDashboardPageState.editedCustomLayout = layout;
+                costDashboardPageStore.$patch({ editedCustomLayout: layout });
                 state.filters = state.dashboardData.default_filter ?? {};
                 state.period = state.dashboardData.period ?? {};
                 state.periodType = state.dashboardData.period_type ?? 'AUTO';

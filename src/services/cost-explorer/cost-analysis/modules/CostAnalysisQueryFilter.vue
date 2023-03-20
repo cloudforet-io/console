@@ -98,7 +98,7 @@ export default {
     },
     setup() {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.state;
+        const costAnalysisPageState = costAnalysisPageStore.$state;
 
         const state = reactive({
             granularityItems: computed<MenuItem[]>(() => ([
@@ -124,15 +124,15 @@ export default {
         /* event */
         const handleSelectGranularity = async (granularity: Granularity) => {
             if (granularity !== costAnalysisPageState.granularity) {
-                costAnalysisPageState.period = getInitialDates();
+                costAnalysisPageStore.$patch({ period: getInitialDates() });
             }
-            costAnalysisPageState.granularity = granularity;
+            costAnalysisPageStore.$patch({ granularity });
         };
         const handleToggleStack = async (value) => {
-            costAnalysisPageState.stack = value;
+            costAnalysisPageStore.$patch({ stack: value });
         };
         const handleSelectedDates = (period) => {
-            costAnalysisPageState.period = period;
+            costAnalysisPageStore.$patch({ period });
         };
         const handleClickSetFilter = () => {
             state.setQueryModalVisible = true;

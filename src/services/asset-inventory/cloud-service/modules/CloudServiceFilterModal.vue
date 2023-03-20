@@ -119,7 +119,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }) {
         const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.state;
+        const cloudServicePageState = cloudServicePageStore.$state;
 
         const storeState = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -177,7 +177,7 @@ export default defineComponent<Props>({
             state.filters = filters;
         };
         const handleFormConfirm = () => {
-            cloudServicePageState.additionalFilters = state.filters;
+            cloudServicePageStore.$patch({ additionalFilters: state.filters });
             emit('confirm');
             state.proxyVisible = false;
         };

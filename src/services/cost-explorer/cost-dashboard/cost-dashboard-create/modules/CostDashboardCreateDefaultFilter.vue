@@ -42,7 +42,7 @@ export default {
 
     setup() {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const state = reactive({
             includesFilter: computed({
@@ -50,7 +50,7 @@ export default {
                     return costDashboardPageState.includesFilter ?? false;
                 },
                 set(value) {
-                    costDashboardPageState.includesFilter = value;
+                    costDashboardPageStore.$patch({ includesFilter: value });
                 },
             }),
             defaultFilterModalVisible: false,

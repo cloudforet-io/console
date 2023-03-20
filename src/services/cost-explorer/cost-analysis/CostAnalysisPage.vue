@@ -64,8 +64,7 @@ export default {
     },
     setup(props) {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.state;
-        const costAnalysisPageGetters = costAnalysisPageStore.getters;
+        const costAnalysisPageState = costAnalysisPageStore.$state;
 
         /* util */
         const setQueryOptions = (options?: CostQuerySetOption) => {
@@ -97,7 +96,7 @@ export default {
 
         let unregisterStoreWatch;
         const registerStoreWatch = (currentQuery) => {
-            unregisterStoreWatch = watch(() => costAnalysisPageGetters.currentQuerySetOptions, (options: Partial<CostQuerySetOption>) => {
+            unregisterStoreWatch = watch(() => costAnalysisPageStore.currentQuerySetOptions, (options: Partial<CostQuerySetOption>) => {
                 if (props.querySetId) return;
 
                 const newQuery: CostAnalysisPageUrlQuery = {
@@ -129,22 +128,22 @@ export default {
         (async () => {
             const currentQuery = SpaceRouter.router.currentRoute.query;
             // list cost query sets
-            costAnalysisPageStore.listCostQueryList();
+            await costAnalysisPageStore.listCostQueryList();
 
             // init states
             if (props.querySetId) {
                 const { name, options } = getQueryWithKey(props.querySetId);
                 if (name) {
                     setQueryOptions(options);
-                    costAnalysisPageState.selectedQueryId = props.querySetId;
+                    costAnalysisPageStore.$patch({ selectedQueryId: props.querySetId });
                 } else {
-                    costAnalysisPageState.selectedQueryId = undefined;
+                    costAnalysisPageStore.$patch({ selectedQueryId: undefined });
                 }
             } else if (Object.keys(currentQuery).length) {
                 const options = getQueryOptionsFromUrlQuery(currentQuery);
                 setQueryOptions(options);
             } else {
-                costAnalysisPageStore.initState();
+                await costAnalysisPageStore.initState();
             }
 
             // register store watch

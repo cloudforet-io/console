@@ -46,7 +46,7 @@ export default {
     },
     setup() {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.state;
+        const costAnalysisPageState = costAnalysisPageStore.$state;
 
         const state = reactive({
             selectedGroupByItems: computed<GroupByItem[]>(() => costAnalysisPageState.groupBy.map((d) => GROUP_BY_ITEM_MAP[d])),
@@ -58,7 +58,7 @@ export default {
 
         /* event */
         const handleSelectGroupByItems = async (items: GroupByItem[]) => {
-            costAnalysisPageState.groupBy = items.map((d) => d.name);
+            costAnalysisPageStore.$patch({ groupBy: items.map((d) => d.name) });
         };
 
         return {

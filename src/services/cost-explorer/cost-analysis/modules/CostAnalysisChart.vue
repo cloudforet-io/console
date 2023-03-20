@@ -102,7 +102,7 @@ export default {
     },
     setup(props, { emit }) {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.state;
+        const costAnalysisPageState = costAnalysisPageStore.$state;
 
         const state = reactive({
             currency: computed(() => store.state.display.currency),

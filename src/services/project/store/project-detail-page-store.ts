@@ -1,5 +1,3 @@
-import { reactive } from 'vue';
-
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -23,50 +21,47 @@ export interface ProjectDetailState {
     alertCounts: AlertCount[];
     maintenanceHappenings: MaintenanceHappening[];
 }
+interface ProjectDetailPageActions {
+    getAlertCounts: () => Promise<void>;
+    loadMaintenanceHappenings: () => Promise<void>;
+}
 
-export const useProjectDetailPageStore = defineStore('project-detail-page', () => {
-    const state = reactive<ProjectDetailState>({
+export const useProjectDetailPageStore = defineStore<string, ProjectDetailState, any, ProjectDetailPageActions>('project-detail-page', {
+    state: () => ({
         projectId: '',
         alertCounts: [],
         maintenanceHappenings: [],
-    });
-
-    const getAlertCounts = async (): Promise<void> => {
-        try {
-            const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState({
-                project_id: state.projectId,
-            });
-            state.alertCounts = results;
-        } catch (e) {
-            state.alertCounts = [];
-            console.error(e);
-        }
-    };
-
-    const loadMaintenanceHappenings = async (): Promise<void> => {
-        const queryHelper = new ApiQueryHelper().setFilters([{
-            k: 'state', v: 'OPEN', o: '=',
-        }]);
-        try {
-            const { results } = await SpaceConnector.client.monitoring.maintenanceWindow.list({
-                project_id: state.projectId,
-                query: queryHelper.data,
-            });
-            const convertedResults: MaintenanceHappening[] = results.map((d) => ({
-                title: d.title,
-                startTime: d.start_time,
-                endTime: d.end_time,
-            }));
-            state.maintenanceHappenings = convertedResults;
-        } catch (e) {
-            state.maintenanceHappenings = [];
-            console.error(e);
-        }
-    };
-
-    return {
-        state,
-        getAlertCounts,
-        loadMaintenanceHappenings,
-    };
+    }),
+    actions: {
+        async getAlertCounts() {
+            try {
+                const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState({
+                    project_id: this.projectId,
+                });
+                this.alertCounts = results;
+            } catch (e) {
+                this.alertCounts = [];
+                console.error(e);
+            }
+        },
+        async loadMaintenanceHappenings() {
+            const queryHelper = new ApiQueryHelper().setFilters([{
+                k: 'state', v: 'OPEN', o: '=',
+            }]);
+            try {
+                const { results } = await SpaceConnector.client.monitoring.maintenanceWindow.list({
+                    project_id: this.projectId,
+                    query: queryHelper.data,
+                });
+                this.maintenanceHappenings = results.map((d) => ({
+                    title: d.title,
+                    startTime: d.start_time,
+                    endTime: d.end_time,
+                }));
+            } catch (e) {
+                this.maintenanceHappenings = [];
+                console.error(e);
+            }
+        },
+    },
 });

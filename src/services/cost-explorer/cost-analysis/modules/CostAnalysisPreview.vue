@@ -43,11 +43,10 @@ export default {
     },
     setup(props, { emit }) {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageGetters = costAnalysisPageStore.getters;
 
         const state = reactive({
             defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
-            title: computed<string>(() => costAnalysisPageGetters.selectedQuerySet?.name ?? 'Cost Analysis'),
+            title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost Analysis'),
             topContainerRef: null as null|HTMLElement,
             chartElements: [] as HTMLElement[],
             tableItems: [] as Item[],

@@ -115,25 +115,24 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }) {
         const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.state;
-        const cloudServicePageGetters = cloudServicePageStore.getters;
+        const cloudServicePageState = cloudServicePageStore.$state;
 
         const searchQueryHelper = new QueryHelper().setKeyItemSets(props.handlers.keyItemSets ?? []);
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             queryTags: computed(() => searchQueryHelper.setFilters(cloudServicePageState.searchFilters).queryTags),
-            cloudServiceFilters: computed(() => cloudServicePageGetters.allFilters.filter((f: any) => f.k && ![
+            cloudServiceFilters: computed(() => cloudServicePageStore.allFilters.filter((f: any) => f.k && ![
                 'labels',
                 'service_code',
             ].includes(f.k))),
             visibleSetFilterModal: false,
             selectedFiltersCount: computed<string>(() => {
                 const countLabels: string[] = [];
-                if (cloudServicePageGetters.selectedCategories.length) {
-                    countLabels.push(`${cloudServicePageGetters.selectedCategories.length} Service Categories`);
+                if (cloudServicePageStore.selectedCategories.length) {
+                    countLabels.push(`${cloudServicePageStore.selectedCategories.length} Service Categories`);
                 }
-                if (cloudServicePageGetters.selectedRegions.length) {
-                    countLabels.push(`${cloudServicePageGetters.selectedRegions.length} Regions`);
+                if (cloudServicePageStore.selectedRegions.length) {
+                    countLabels.push(`${cloudServicePageStore.selectedRegions.length} Regions`);
                 }
                 return countLabels.join(', ');
             }),
@@ -149,7 +148,7 @@ export default defineComponent<Props>({
                 cloudServiceResourcesApiQueryHelper.setFilters(state.cloudServiceFilters);
                 const { results } = await SpaceConnector.client.statistics.topic.cloudServiceResources(
                     {
-                        labels: cloudServicePageGetters.selectedCategories,
+                        labels: cloudServicePageStore.selectedCategories,
                         query: cloudServiceResourcesApiQueryHelper.data,
                     },
                 );
@@ -214,7 +213,7 @@ export default defineComponent<Props>({
                 url: '/statistics/topic/cloud-service-resources',
                 param: {
                     query: excelApiQueryHelper.data,
-                    labels: cloudServicePageGetters.selectedCategories,
+                    labels: cloudServicePageStore.selectedCategories,
                 },
                 fields: CLOUD_SERVICE_RESOURCES_EXCEL_FIELDS,
                 sheet_name: 'Summary',
@@ -261,7 +260,7 @@ export default defineComponent<Props>({
         const handleChange = (options: ToolboxOptions = {}) => {
             if (options.queryTags !== undefined) {
                 searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
-                cloudServicePageState.searchFilters = searchQueryHelper.filters;
+                cloudServicePageStore.$patch({ searchFilters: searchQueryHelper.filters as ConsoleFilter[] });
             } else {
                 emit('update-pagination', options);
             }

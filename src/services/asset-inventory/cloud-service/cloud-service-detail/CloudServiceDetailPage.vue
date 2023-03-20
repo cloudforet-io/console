@@ -260,7 +260,7 @@ export default {
     },
     setup(props) {
         const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-        const cloudServiceDetailPageState = cloudServiceDetailPageStore.state;
+        const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 
         const vm = getCurrentInstance()?.proxy as Vue;
         const queryHelper = new QueryHelper();

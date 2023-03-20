@@ -114,7 +114,7 @@ export default {
     },
     setup() {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const state = reactive({
             loading: true,
@@ -166,23 +166,29 @@ export default {
 
         /* Event */
         const handleSelectWidget = async (value: WidgetInfo) => {
-            costDashboardPageState.originSelectedWidget = value;
-            costDashboardPageState.editedSelectedWidget = value;
+            costDashboardPageStore.$patch({
+                originSelectedWidget: value,
+                editedSelectedWidget: value,
+            });
             state.selectedQuery = {};
             state.selectedItem = value;
         };
         const handleClickRemoveWidget = async () => {
             await deleteCustomWidget();
-            costDashboardPageState.originSelectedWidget = undefined;
-            costDashboardPageState.editedSelectedWidget = undefined;
+            costDashboardPageStore.$patch({
+                originSelectedWidget: undefined,
+                editedSelectedWidget: undefined,
+            });
             state.selectedItem = {};
             state.thisPage = 1;
             await listCustomWidget();
         };
         const handleCreateCustomWidget = async (createdCustomWidget: WidgetInfo) => {
             await listCustomWidget();
-            costDashboardPageState.originSelectedWidget = createdCustomWidget;
-            costDashboardPageState.editedSelectedWidget = createdCustomWidget;
+            costDashboardPageStore.$patch({
+                originSelectedWidget: createdCustomWidget,
+                editedSelectedWidget: createdCustomWidget,
+            });
             state.selectedQuery = {};
             state.selectedItem = createdCustomWidget;
             state.thisPage = 1;
@@ -203,8 +209,10 @@ export default {
         watch(() => state.selectedQuery, (selectedQuery) => {
             if (Object.keys(selectedQuery).length) {
                 state.selectedItem = selectedQuery;
-                costDashboardPageState.originSelectedWidget = undefined;
-                costDashboardPageState.editedSelectedWidget = undefined;
+                costDashboardPageStore.$patch({
+                    originSelectedWidget: undefined,
+                    editedSelectedWidget: undefined,
+                });
             }
         }, { immediate: false });
 

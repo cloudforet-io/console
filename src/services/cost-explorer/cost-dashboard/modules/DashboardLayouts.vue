@@ -156,7 +156,6 @@ export default {
     },
     setup(props, { emit }) {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
 
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
@@ -192,15 +191,19 @@ export default {
         };
 
         const handleClickUpdate = (rowIdx, colIdx, widget: WidgetInfo) => {
-            costDashboardPageState.widgetPosition = { row: rowIdx, col: colIdx };
-            costDashboardPageState.originSelectedWidget = widget;
-            costDashboardPageState.editedSelectedWidget = widget;
+            costDashboardPageStore.$patch({
+                widgetPosition: { row: rowIdx, col: colIdx },
+                originSelectedWidget: widget,
+                editedSelectedWidget: widget,
+            });
             state.updateModalVisible = true;
         };
 
         const handleClickDelete = (rowIdx, colIdx, widget: WidgetInfo) => {
-            costDashboardPageState.widgetPosition = { row: rowIdx, col: colIdx };
-            costDashboardPageState.editedSelectedWidget = widget;
+            costDashboardPageStore.$patch({
+                widgetPosition: { row: rowIdx, col: colIdx },
+                editedSelectedWidget: widget,
+            });
             checkDeleteState.visible = true;
         };
 
@@ -214,8 +217,10 @@ export default {
         };
 
         const handleClickAdd = (rowIdx, colIdx, layout) => {
-            costDashboardPageState.widgetPosition = { row: rowIdx, col: colIdx };
-            costDashboardPageState.layoutOfSpace = layout;
+            costDashboardPageStore.$patch({
+                widgetPosition: { row: rowIdx, col: colIdx },
+                layoutOfSpace: layout,
+            });
             state.customizeModalVisible = true;
         };
 

@@ -66,7 +66,7 @@ export default {
     },
     setup(props) {
         const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.state;
+        const cloudServicePageState = cloudServicePageStore.$state;
 
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),

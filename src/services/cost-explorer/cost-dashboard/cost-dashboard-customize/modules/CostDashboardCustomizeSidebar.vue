@@ -82,22 +82,24 @@ export default {
 
     setup() {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const state = reactive({
             customizeModalVisible: false,
             editingCustomLayout: computed<CustomLayout[]|undefined>({
                 get() { return costDashboardPageState.editedCustomLayout; },
                 set(val) {
-                    costDashboardPageState.editedCustomLayout = [...(val || [])];
+                    costDashboardPageStore.$patch({ editedCustomLayout: [...(val || [])] });
                 },
             }),
         });
 
         const handleClickAddWidget = () => {
             state.customizeModalVisible = true;
-            costDashboardPageState.widgetPosition = undefined;
-            costDashboardPageState.layoutOfSpace = undefined;
+            costDashboardPageStore.$patch({
+                widgetPosition: undefined,
+                layoutOfSpace: undefined,
+            });
         };
 
         onUnmounted(() => {

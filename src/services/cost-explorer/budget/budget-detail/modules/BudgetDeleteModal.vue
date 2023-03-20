@@ -9,7 +9,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
@@ -23,6 +22,8 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
+
 import TranslateResult = VueI18n.TranslateResult;
 
 export default {
@@ -35,26 +36,21 @@ export default {
             type: Boolean,
             default: false,
         },
-        budgetId: {
-            type: String,
-            default: '',
-        },
-        budgetName: {
-            type: String,
-            default: '',
-        },
     },
     setup(props, { emit }) {
+        const budgetPageStore = useBudgetPageStore();
+        const budgetPageState = budgetPageStore.$state;
+
         const state = reactive({
             proxyVisible: false,
             title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.DELETE_BUDGET') as TranslateResult,
-            verificationText: computed(() => props.budgetName),
+            verificationText: computed(() => budgetPageState.budgetData?.name),
         });
 
         const handleConfirm = async () => {
             try {
                 await SpaceConnector.client.costAnalysis.budget.delete({
-                    budget_id: props.budgetId,
+                    budget_id: budgetPageState.budgetData?.budget_id,
                 });
                 state.proxyVisible = false;
                 emit('confirm');

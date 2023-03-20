@@ -138,7 +138,7 @@ export default {
     },
     setup(props, { emit }) {
         const policyStore = usePolicyStore();
-        const policyState = policyStore.state;
+        const policyState = policyStore.$state;
 
         const currentRoute = SpaceRouter.router.currentRoute;
         const policyListApiQueryHelper = new ApiQueryHelper().setFiltersAsRawQueryString(currentRoute.query?.filters);

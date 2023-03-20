@@ -94,7 +94,6 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageGetters = costAnalysisPageStore.getters;
 
         const state = reactive({
             loading: false,
@@ -149,7 +148,7 @@ export default defineComponent<Props>({
 
         /* Event */
         const handleConfirm = () => {
-            const preMoreGroupBy = costAnalysisPageGetters.orderedMoreGroupByItems;
+            const preMoreGroupBy = costAnalysisPageStore.orderedMoreGroupByItems;
             const tagsGroupBy: MoreGroupByItem[] = state.selectedTags.map((d) => ({
                 category: MORE_GROUP_BY.TAGS,
                 key: d.name as string,

@@ -60,7 +60,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }) {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const state = reactive({
             proxyVisible: props.visible,

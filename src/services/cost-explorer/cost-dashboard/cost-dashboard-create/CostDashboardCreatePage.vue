@@ -63,7 +63,7 @@ export default {
 
     setup() {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const state = reactive({
             selectedTemplate: computed(() => costDashboardPageState.selectedTemplate),
@@ -121,7 +121,7 @@ export default {
         const handleClickCreate = async () => {
             const createdDashboardId = state.selectedPrivacy === DASHBOARD_PRIVACY_TYPE.PUBLIC ? await createPublicDashboard() : await createUserDashboard();
             if (createdDashboardId) goToCustomizePage(createdDashboardId);
-            costDashboardPageState.selectedDashboardPrivacy = DASHBOARD_PRIVACY_TYPE.USER;
+            costDashboardPageStore.$patch({ selectedDashboardPrivacy: DASHBOARD_PRIVACY_TYPE.USER });
         };
 
         return {

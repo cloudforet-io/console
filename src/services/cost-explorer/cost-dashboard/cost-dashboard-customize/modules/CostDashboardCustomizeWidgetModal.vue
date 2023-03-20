@@ -68,7 +68,7 @@ export default {
     },
     setup(props: Props, { emit }) {
         const costDashboardPageStore = useCostDashboardPageStore();
-        const costDashboardPageState = costDashboardPageStore.state;
+        const costDashboardPageState = costDashboardPageStore.$state;
 
         const state = reactive({
             proxyVisible: props.visible,
@@ -90,15 +90,19 @@ export default {
             emit('update:visible', visible);
         };
         const handleCancel = () => {
-            costDashboardPageState.widgetPosition = undefined;
-            costDashboardPageState.layoutOfSpace = undefined;
-            costDashboardPageState.originSelectedWidget = undefined;
-            costDashboardPageState.editedSelectedWidget = undefined;
+            costDashboardPageStore.$patch({
+                widgetPosition: undefined,
+                layoutOfSpace: undefined,
+                originSelectedWidget: undefined,
+                editedSelectedWidget: undefined,
+            });
         };
 
         const handleChangeTab = () => {
-            costDashboardPageState.originSelectedWidget = undefined;
-            costDashboardPageState.editedSelectedWidget = undefined;
+            costDashboardPageStore.$patch({
+                originSelectedWidget: undefined,
+                editedSelectedWidget: undefined,
+            });
         };
 
         watch(() => props.visible, (visible) => {

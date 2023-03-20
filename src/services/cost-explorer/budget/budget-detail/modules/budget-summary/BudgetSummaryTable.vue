@@ -120,7 +120,7 @@ export default {
     },
     setup() {
         const budgetPageStore = useBudgetPageStore();
-        const budgetPageState = budgetPageStore.state;
+        const budgetPageState = budgetPageStore.$state;
 
         const getAccumulatedBudgetUsageData = (budgetUsageData: BudgetUsageData[], period: Period) => getStackedChartData(budgetUsageData, period, 'month');
 

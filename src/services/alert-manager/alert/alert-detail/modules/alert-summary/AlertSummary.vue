@@ -135,7 +135,7 @@ export default {
     },
     setup(props) {
         const alertPageStore = useAlertPageStore();
-        const alertPageState = alertPageStore.state;
+        const alertPageState = alertPageStore.$state;
 
         const state = reactive({
             alertState: computed(() => alertPageState.alertData?.state),

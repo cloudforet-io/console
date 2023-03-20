@@ -9,15 +9,15 @@
             <div v-if="!budgetPageState.loading"
                  class="flex justify-between"
             >
-                <p v-if="budgetPageState.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL"
+                <p v-if="budgetPageState.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL"
                    class="summary-content"
                 >
-                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ budgetPageState.budgetData.start }} ~ {{ budgetPageState.budgetData.end }})
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ budgetPageState.budgetData?.start }} ~ {{ budgetPageState.budgetData?.end }})
                 </p>
                 <p v-else
                    class="summary-content"
                 >
-                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ budgetPageState.budgetData.start }} ~ {{ budgetPageState.budgetData.end }})
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ budgetPageState.budgetData?.start }} ~ {{ budgetPageState.budgetData?.end }})
                 </p>
                 <amount-planning-type-popover class="summary-content"
                                               :budget-data="budgetPageState.budgetData"
@@ -31,10 +31,10 @@
             <p v-if="!budgetPageState.loading"
                class="summary-content"
             >
-                <p-anchor v-if="budgetPageState.budgetData.project_group_id || budgetPageState.budgetData.project_id"
+                <p-anchor v-if="budgetPageState.budgetData?.project_group_id || budgetPageState.budgetData?.project_id"
                           :to="referenceRouter(
-                              (budgetPageState.budgetData.project_id || budgetPageState.budgetData.project_group_id),
-                              { resource_type: budgetPageState.budgetData.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
+                              (budgetPageState.budgetData?.project_id || budgetPageState.budgetData?.project_group_id),
+                              { resource_type: budgetPageState.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
                     {{ getTargetLabel(projects) }}
                 </p-anchor>
@@ -86,7 +86,7 @@ import {
 import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
 
 
-const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
+const getKeyOfCostType = (costType: Record<CostType, string[]|null>): string => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
 const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
 
 const costTypeMap = {
@@ -116,7 +116,7 @@ export default {
     },
     setup() {
         const budgetPageStore = useBudgetPageStore();
-        const budgetPageState = budgetPageStore.state;
+        const budgetPageState = budgetPageStore.$state;
 
         const state = reactive({
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),

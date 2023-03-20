@@ -179,7 +179,7 @@ export default {
     setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
         const projectDetailPageStore = useProjectDetailPageStore();
-        const projectDetailPageState = projectDetailPageStore.state;
+        const projectDetailPageState = projectDetailPageStore.$state;
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
             hasAlertPermission: computed<boolean>(() => isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList'])),
@@ -324,7 +324,7 @@ export default {
 
         watch(() => props.id, (after, before) => {
             if (after !== before) {
-                projectDetailPageState.projectId = after;
+                projectDetailPageStore.$patch({ projectId: after });
             }
         }, { immediate: true });
 

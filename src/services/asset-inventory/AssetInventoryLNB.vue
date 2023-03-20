@@ -44,7 +44,7 @@ export default defineComponent({
     components: { LNB },
     setup() {
         const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-        const cloudServiceDetailPageState = cloudServiceDetailPageStore.state;
+        const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
@@ -124,7 +124,7 @@ export default defineComponent({
                 },
                 query: vm.$route.query,
             });
-            cloudServiceDetailPageStore.setSelectedCloudServiceType();
+            await cloudServiceDetailPageStore.setSelectedCloudServiceType();
         };
 
         /* Watchers */

@@ -57,7 +57,7 @@ export default {
     },
     setup() {
         const projectDetailPageStore = useProjectDetailPageStore();
-        const projectDetailPageState = projectDetailPageStore.state;
+        const projectDetailPageState = projectDetailPageStore.$state;
         const state = reactive({
             loading: false,
             maintenanceHappenings: computed<MaintenanceHappening[]>(() => projectDetailPageState.maintenanceHappenings),
@@ -72,7 +72,7 @@ export default {
         /* Init */
         (async () => {
             state.loading = true;
-            projectDetailPageStore.loadMaintenanceHappenings();
+            await projectDetailPageStore.loadMaintenanceHappenings();
             state.loading = false;
         })();
 

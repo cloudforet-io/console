@@ -129,7 +129,7 @@ export default {
     },
     setup(props) {
         const alertPageStore = useAlertPageStore();
-        const alertPageState = alertPageStore.state;
+        const alertPageState = alertPageStore.$state;
 
         const vm = getCurrentInstance()?.proxy as Vue;
 

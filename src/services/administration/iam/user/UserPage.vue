@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs,
+    onUnmounted, reactive, toRefs,
 } from 'vue';
 
 import {
@@ -43,10 +43,15 @@ export default {
     },
     setup() {
         const userPageStore = useUserPageStore();
-        const userPageState = userPageStore.state;
+        const userPageState = userPageStore.$state;
 
         const state = reactive({
             hasManagePermission: useManagePermissionState(),
+        });
+
+        onUnmounted(() => {
+            userPageStore.$dispose();
+            userPageStore.$reset();
         });
 
         return {
