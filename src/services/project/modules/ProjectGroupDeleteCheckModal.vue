@@ -38,14 +38,12 @@ export default {
     },
     setup() {
         const projectPageStore = useProjectPageStore();
-        const projectPageState = projectPageStore.state;
-        const projectPageGetters = projectPageStore.getters;
         const state = reactive({
             proxyVisible: computed({
-                get() { return projectPageState.projectGroupDeleteCheckModalVisible; },
-                set(val) { projectPageState.projectGroupDeleteCheckModalVisible = val; },
+                get() { return projectPageStore.projectGroupDeleteCheckModalVisible; },
+                set(val) { projectPageStore.$patch({ projectGroupDeleteCheckModalVisible: val }); },
             }),
-            groupId: computed((() => projectPageGetters.actionTargetNodeData?.id)),
+            groupId: computed((() => projectPageStore.actionTargetNodeData?.id)),
         });
 
         const deleteProjectGroup = async () => {
@@ -56,7 +54,7 @@ export default {
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
             } finally {
-                projectPageState.projectGroupDeleteCheckModalVisible = false;
+                projectPageStore.$patch({ projectGroupDeleteCheckModalVisible: false });
             }
         };
         return {

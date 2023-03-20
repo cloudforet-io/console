@@ -225,8 +225,6 @@ export default {
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
         const projectPageStore = useProjectPageStore();
-        const projectPageState = projectPageStore.state;
-        const projectPageGetters = projectPageStore.getters;
         const state = reactive({
             items: undefined,
             totalCount: 0,
@@ -241,19 +239,19 @@ export default {
             hoveredProjectId: '',
             hoveredGroupId: '',
             isAll: computed(() => !state.groupId),
-            groupId: computed(() => projectPageGetters.groupId),
-            searchText: computed(() => projectPageState.searchText),
-            noProjectGroup: computed(() => !projectPageState.hasProjectGroup),
+            groupId: computed(() => projectPageStore.groupId),
+            searchText: computed(() => projectPageStore.searchText),
+            noProjectGroup: computed(() => !projectPageStore.hasProjectGroup),
             projectFormVisible: computed({
-                get() { return projectPageState.projectFormVisible; },
-                set(val) { projectPageState.projectFormVisible = val; },
+                get() { return projectPageStore.projectFormVisible; },
+                set(val) { projectPageStore.$patch({ projectFormVisible: val }); },
             }),
             projectSummaryList: computed(() => [
                 { title: i18n.t('PROJECT.LANDING.SERVER'), summaryType: SUMMARY_TYPE.SERVER },
                 { title: i18n.t('PROJECT.LANDING.DATABASE'), summaryType: SUMMARY_TYPE.DATABASE },
                 { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
             ]),
-            shouldUpdateProjectList: computed<boolean>(() => projectPageState.shouldUpdateProjectList),
+            shouldUpdateProjectList: computed<boolean>(() => projectPageStore.shouldUpdateProjectList),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
         });
 
@@ -359,7 +357,7 @@ export default {
                 else res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
                 state.items = res.results;
                 state.totalCount = res.total_count;
-                projectPageState.projectCount = state.totalCount;
+                projectPageStore.$patch({ projectCount: state.totalCount });
                 state.loading = false;
                 listProjectToken = undefined;
                 await getCardSummary(res.results);
@@ -368,7 +366,7 @@ export default {
                     state.items = [];
                     state.totalCount = 0;
                     state.loading = false;
-                    projectPageState.projectCount = 0;
+                    projectPageStore.$patch({ projectCount: 0 });
                     ErrorHandler.handleError(e);
                 }
             }
@@ -409,12 +407,12 @@ export default {
         watch(() => state.shouldUpdateProjectList, async () => {
             if (state.shouldUpdateProjectList) {
                 await getData();
-                projectPageState.shouldUpdateProjectList = false;
+                projectPageStore.$patch({ shouldUpdateProjectList: false });
             }
         });
 
         /* Init */
-        watch([() => projectPageState.isInitiated, () => state.groupId, () => state.searchText], async ([isInitiated, groupId, searchText]) => {
+        watch([() => projectPageStore.isInitiated, () => state.groupId, () => state.searchText], async ([isInitiated, groupId, searchText]) => {
             if (isInitiated) await listProjects(groupId, searchText);
         }, { immediate: true });
 

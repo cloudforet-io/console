@@ -171,10 +171,8 @@ import type {
 
 const vm = getCurrentInstance()?.proxy as Vue;
 const projectPageStore = useProjectPageStore();
-const projectPageState = projectPageStore.state;
-const projectPageGetters = projectPageStore.getters;
 /* Query String */
-watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
+watch(() => projectPageStore.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
     vm.$router.replace({
         query: {
             // eslint-disable-next-line camelcase
@@ -184,19 +182,19 @@ watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) 
 });
 
 const storeState = reactive({
-    groupId: computed(() => projectPageGetters.groupId),
-    groupName: computed(() => projectPageGetters.groupName),
-    searchText: computed(() => projectPageState.searchText),
-    selectedItem: computed(() => projectPageState.selectedItem),
-    selectedNodeData: computed(() => projectPageGetters.selectedNodeData),
-    parentGroups: computed(() => projectPageGetters.parentGroups),
-    hasProjectGroup: computed(() => projectPageState.hasProjectGroup),
-    projectCount: computed(() => projectPageState.projectCount),
+    groupId: computed(() => projectPageStore.groupId),
+    groupName: computed(() => projectPageStore.groupName),
+    searchText: computed(() => projectPageStore.searchText),
+    selectedItem: computed(() => projectPageStore.selectedItem),
+    selectedNodeData: computed(() => projectPageStore.selectedNodeData),
+    parentGroups: computed(() => projectPageStore.parentGroups),
+    hasProjectGroup: computed(() => projectPageStore.hasProjectGroup),
+    projectCount: computed(() => projectPageStore.projectCount),
     projects: computed(() => store.getters['reference/projectItems']),
     favoriteProjects: computed(() => store.state.favorite.projectItems),
     projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-    projectGroupFormVisible: computed(() => projectPageState.projectGroupFormVisible),
-    projectGroupDeleteCheckModalVisible: computed(() => projectPageState.projectGroupDeleteCheckModalVisible),
+    projectGroupFormVisible: computed(() => projectPageStore.projectGroupFormVisible),
+    projectGroupDeleteCheckModalVisible: computed(() => projectPageStore.projectGroupDeleteCheckModalVisible),
     favoriteProjectGroups: computed(() => store.state.favorite.projectGroupItems),
 });
 

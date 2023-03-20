@@ -1,5 +1,5 @@
 <template>
-    <p-button-modal :header-title="projectPageState.projectGroupFormUpdateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
+    <p-button-modal :header-title="projectPageStore.projectGroupFormUpdateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
                     centered
                     size="sm"
                     fade
@@ -66,14 +66,12 @@ export default {
     },
     setup() {
         const projectPageStore = useProjectPageStore();
-        const projectPageState = projectPageStore.state;
-        const projectPageGetters = projectPageStore.getters;
         const state = reactive({
             proxyVisible: computed({
-                get() { return projectPageState.projectGroupFormVisible; },
-                set(val) { projectPageState.projectGroupFormVisible = val; },
+                get() { return projectPageStore.projectGroupFormVisible; },
+                set(val) { projectPageStore.$patch({ projectGroupFormVisible: val }); },
             }),
-            currentGroupId: computed(() => projectPageGetters.actionTargetNodeData?.id),
+            currentGroupId: computed(() => projectPageStore.actionTargetNodeData?.id),
             projectGroupNames: [] as string[],
             projectGroupName: undefined as undefined | string,
             projectGroupNameInvalidText: computed(() => {
@@ -120,7 +118,7 @@ export default {
             try {
                 await projectPageStore.createProjectGroup(item);
                 await store.dispatch('reference/projectGroup/load');
-                projectPageState.shouldUpdateProjectList = true;
+                projectPageStore.$patch({ shouldUpdateProjectList: true });
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
@@ -148,15 +146,15 @@ export default {
 
             state.showValidation = false;
 
-            if (!projectPageState.projectGroupFormUpdateMode) await createProjectGroup(item);
+            if (!projectPageStore.projectGroupFormUpdateMode) await createProjectGroup(item);
             else await updateProjectGroup(item);
 
             state.loading = false;
-            projectPageState.projectGroupFormVisible = false;
+            projectPageStore.$patch({ projectGroupFormVisible: false });
         };
 
         watch(() => state.currentGroupId, async (after) => {
-            if (after && projectPageState.projectGroupFormUpdateMode) await getProjectGroup();
+            if (after && projectPageStore.projectGroupFormUpdateMode) await getProjectGroup();
             else state.projectGroupName = undefined; // init form
         }, { immediate: true });
 
@@ -167,7 +165,7 @@ export default {
 
         return {
             ...toRefs(state),
-            projectPageState,
+            projectPageStore,
             confirm,
         };
     },
