@@ -86,12 +86,13 @@ export type VariableType = typeof VARIABLE_TYPES[number];
 
 // variables schema
 export interface DashboardVariableSchemaProperty {
+    name: string;
     variable_type: VariableType;
     use: boolean;
     selection_type: VariableSelectionType;
-    options?: string[];
-    name: string;
+    description?: string;
     disabled?: boolean;
+    options?: string[];
 }
 export interface DashboardVariablesSchema {
     properties: {
