@@ -69,7 +69,7 @@ export default {
         const state = reactive({
             proxyVisible: computed({
                 get() { return projectPageStore.projectGroupFormVisible; },
-                set(val) { projectPageStore.projectGroupFormVisible = val; },
+                set(val) { projectPageStore.$patch({ projectGroupFormVisible: val }); },
             }),
             currentGroupId: computed(() => projectPageStore.actionTargetNodeData?.id),
             projectGroupNames: [] as string[],
@@ -118,7 +118,7 @@ export default {
             try {
                 await projectPageStore.createProjectGroup(item);
                 await store.dispatch('reference/projectGroup/load');
-                projectPageStore.shouldUpdateProjectList = true;
+                projectPageStore.$patch({ shouldUpdateProjectList: true });
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
@@ -150,7 +150,7 @@ export default {
             else await updateProjectGroup(item);
 
             state.loading = false;
-            projectPageStore.projectGroupFormVisible = false;
+            projectPageStore.$patch({ projectGroupFormVisible: false });
         };
 
         watch(() => state.currentGroupId, async (after) => {

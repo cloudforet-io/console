@@ -244,7 +244,7 @@ export default {
             noProjectGroup: computed(() => !projectPageStore.hasProjectGroup),
             projectFormVisible: computed({
                 get() { return projectPageStore.projectFormVisible; },
-                set(val) { projectPageStore.projectFormVisible = val; },
+                set(val) { projectPageStore.$patch({ projectFormVisible: val }); },
             }),
             projectSummaryList: computed(() => [
                 { title: i18n.t('PROJECT.LANDING.SERVER'), summaryType: SUMMARY_TYPE.SERVER },
@@ -357,7 +357,7 @@ export default {
                 else res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
                 state.items = res.results;
                 state.totalCount = res.total_count;
-                projectPageStore.projectCount = state.totalCount;
+                projectPageStore.$patch({ projectCount: state.totalCount });
                 state.loading = false;
                 listProjectToken = undefined;
                 await getCardSummary(res.results);
@@ -366,7 +366,7 @@ export default {
                     state.items = [];
                     state.totalCount = 0;
                     state.loading = false;
-                    projectPageStore.projectCount = 0;
+                    projectPageStore.$patch({ projectCount: 0 });
                     ErrorHandler.handleError(e);
                 }
             }
@@ -407,7 +407,7 @@ export default {
         watch(() => state.shouldUpdateProjectList, async () => {
             if (state.shouldUpdateProjectList) {
                 await getData();
-                projectPageStore.shouldUpdateProjectList = false;
+                projectPageStore.$patch({ shouldUpdateProjectList: false });
             }
         });
 

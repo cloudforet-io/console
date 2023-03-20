@@ -271,7 +271,7 @@ export default {
                 projectPageStore.selectNode(groupId);
             }
             if (projectPageStore.searchText !== val) {
-                projectPageStore.searchText = val;
+                projectPageStore.$patch({ searchText: val });
             }
         };
 
@@ -316,7 +316,7 @@ export default {
 
         if (vm.$route.query.search) {
             state.searchText = vm.$route.query.search as string;
-            projectPageStore.searchText = vm.$route.query.search as string;
+            projectPageStore.$patch({ searchText: vm.$route.query.search as string });
         }
 
         const focusMenu = () => {
