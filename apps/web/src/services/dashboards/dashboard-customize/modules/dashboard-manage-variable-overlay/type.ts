@@ -1,1 +1,1 @@
-export type OverlayStatus = 'LIST' | 'ADD' | 'EDIT';
+export type OverlayStatus = 'LIST' | 'ADD' | 'CLONE' | 'EDIT';
