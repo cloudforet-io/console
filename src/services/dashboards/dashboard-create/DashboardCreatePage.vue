@@ -65,7 +65,6 @@ export default {
     },
     setup() {
         const dashboardDetailStore = useDashboardDetailInfoStore();
-        const dashboardDetailState = dashboardDetailStore.state;
         const {
             forms: {
                 dashboardTemplate,
@@ -111,8 +110,10 @@ export default {
             }
 
             dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
-            dashboardDetailState.dashboardId = undefined;
-            dashboardDetailState.placeholder = dashboardTemplate.value.name;
+            dashboardDetailStore.$patch({
+                dashboardId: undefined,
+                placeholder: dashboardTemplate.value.name,
+            });
             const routeName = state.dashboardScope === DASHBOARD_SCOPE.PROJECT ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME;
             SpaceRouter.router.push({ name: routeName });
         };

@@ -77,7 +77,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const dashboardDetailStore = useDashboardDetailInfoStore();
-        const dashboardDetailState = dashboardDetailStore.state;
+        const dashboardDetailState = dashboardDetailStore.$state;
         const {
             forms: {
                 _name,

@@ -21,6 +21,7 @@ interface State {
 
 export const useWidgetFormStore = defineStore('widget-form', () => {
     const dashboardDetailInfoStore = useDashboardDetailInfoStore();
+    const dashboardDetailInfoState = dashboardDetailInfoStore.$state;
 
     const state = reactive<State>({
         widgetConfigId: undefined,
@@ -64,7 +65,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     };
 
     const initWidgetForm = (widgetKey: string): DashboardLayoutWidgetInfo|undefined => {
-        state.widgetInfo = dashboardDetailInfoStore.dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
+        state.widgetInfo = dashboardDetailInfoState.dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
         if (state.widgetInfo) {
             state.widgetConfigId = state.widgetInfo.widget_name;
             state.widgetTitle = state.widgetInfo.title;

@@ -65,8 +65,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDeatilOriginState = dashboardDetailStore.originState;
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     targetRef: null as HTMLElement | null,
@@ -121,7 +120,7 @@ const updateVariablesUse = () => {
     state.variableSchema.order.forEach((property) => {
         _varialbesSchema.properties[property].use = state.selectedForUpdate.some((menu) => menu.name === property);
     });
-    dashboardDetailState.variablesSchema = _varialbesSchema;
+    dashboardDetailStore.$patch({ variablesSchema: _varialbesSchema });
 };
 
 // event
@@ -129,7 +128,7 @@ const handleOpenOverlay = () => {
     hideContextMenu();
     updateVariablesUse();
     SpaceRouter.router.push({
-        name: dashboardDeatilOriginState.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+        name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
         params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
         hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
     });

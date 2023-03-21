@@ -106,6 +106,9 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const dashboardDetailStore = useDashboardDetailInfoStore();
+        const dashboardDetailState = dashboardDetailStore.$state;
+
         const {
             forms: {
                 name,
@@ -130,8 +133,6 @@ export default defineComponent<Props>({
             viewers(value: DashboardViewer) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
         });
         const currentRouteName = SpaceRouter.router.currentRoute.name;
-        const dashboardDetailStore = useDashboardDetailInfoStore();
-        const dashboardOriginState = dashboardDetailStore.originState;
         const state = reactive({
             proxyVisible: props.visible,
             filteredVisibilityList: computed(() => [
@@ -173,10 +174,10 @@ export default defineComponent<Props>({
                 name: name.value,
                 viewers: viewers.value,
                 layouts: state.layouts,
-                labels: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.labels : dashboardOriginState.dashboardInfo?.labels,
-                settings: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.settings : dashboardOriginState.dashboardInfo?.settings,
-                variables: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.variables : dashboardOriginState.dashboardInfo?.variables,
-                variables_schema: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? state.variablesSchema : dashboardOriginState.dashboardInfo?.variablesSchema,
+                labels: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.labels : dashboardDetailState.dashboardInfo?.labels,
+                settings: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.settings : dashboardDetailState.dashboardInfo?.settings,
+                variables: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.variables : dashboardDetailState.dashboardInfo?.variables,
+                variables_schema: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? state.variablesSchema : dashboardDetailState.dashboardInfo?.variables_schema,
             })),
         });
 

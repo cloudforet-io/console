@@ -5,7 +5,7 @@
                         width="20rem"
                         height="1.5rem"
             />
-            <template v-if="dashboardDetailState.name && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+            <template v-if="dashboardDetailState.name && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
                 <p-i name="ic_globe-filled"
@@ -27,13 +27,13 @@
                     <p-icon-button name="ic_edit-text"
                                    width="1.5rem"
                                    height="1.5rem"
-                                   :disabled="!state.hasManagePermission && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    @click="handleVisibleNameEditModal"
                     />
                     <p-icon-button name="ic_delete"
                                    width="1.5rem"
                                    height="1.5rem"
-                                   :disabled="!state.hasManagePermission && dashboardDetailOriginState.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    @click="handleVisibleDeleteModal"
                     />
                 </span>
@@ -130,8 +130,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailOriginState = dashboardDetailStore.originState;
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
@@ -179,7 +178,7 @@ const handleVisibleNameEditModal = () => {
     state.nameEditModalVisible = true;
 };
 const handleNameUpdate = (name: string) => {
-    dashboardDetailState.name = name;
+    dashboardDetailStore.$patch({ name });
     dashboardDetailStore.setOriginDashboardName(name);
 };
 
@@ -199,16 +198,14 @@ const handleRefresh = () => {
 };
 
 const handleUpdateCurrency = (currency) => {
-    dashboardDetailState.settings = {
-        ...dashboardDetailState.settings,
-        currency,
-    };
+    dashboardDetailStore.$patch((_state) => {
+        _state.settings = { ..._state.settings, currency };
+    });
 };
 const handleUpdateDateRange = (dateRange) => {
-    dashboardDetailState.settings = {
-        ...dashboardDetailState.settings,
-        date_range: dateRange,
-    };
+    dashboardDetailStore.$patch((_state) => {
+        _state.settings = { ..._state.settings, date_range: dateRange };
+    });
 };
 
 /* init */
@@ -222,30 +219,38 @@ const init = async () => {
         refresh_interval_option: queryStringToString(currentQuery.refresh_interval_option) as RefreshIntervalOption,
     };
 
-    if (useQueryValue.variables) dashboardDetailState.variables = useQueryValue.variables;
+    if (useQueryValue.variables) {
+        dashboardDetailStore.$patch({ variables: useQueryValue.variables });
+    }
     if (useQueryValue.dateRange) {
-        dashboardDetailState.settings = {
-            ...dashboardDetailState.settings,
-            date_range: {
-                enabled: true,
-                ...useQueryValue.dateRange,
-            },
-        };
+        dashboardDetailStore.$patch((_state) => {
+            _state.settings = {
+                ..._state.settings,
+                date_range: {
+                    enabled: true,
+                    ...useQueryValue.dateRange,
+                },
+            };
+        });
     }
     if (useQueryValue.currency) {
-        dashboardDetailState.settings = {
-            ...dashboardDetailState.settings,
-            currency: {
-                enabled: true,
-                ...useQueryValue.currency,
-            },
-        };
+        dashboardDetailStore.$patch((_state) => {
+            _state.settings = {
+                ..._state.settings,
+                currency: {
+                    enabled: true,
+                    ...useQueryValue.currency,
+                },
+            };
+        });
     }
     if (useQueryValue.refresh_interval_option) {
-        dashboardDetailState.settings = {
-            ...dashboardDetailState.settings,
-            refresh_interval_option: useQueryValue.refresh_interval_option,
-        };
+        dashboardDetailStore.$patch((_state) => {
+            _state.settings = {
+                ..._state.settings,
+                refresh_interval_option: useQueryValue.refresh_interval_option,
+            };
+        });
     }
 
     urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
@@ -274,7 +279,7 @@ onMounted(() => {
     /*
     Empty widget data map which is used in DashboardWidgetContainer to reuse data and not to call api when going to customize page.
      */
-    dashboardDetailState.widgetDataMap = {};
+    dashboardDetailStore.$patch({ widgetDataMap: {} });
 });
 </script>
 

@@ -86,7 +86,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     targetRef: null as HTMLElement | null,
@@ -168,7 +168,7 @@ const changeVariables = (changedSelected: MenuItem[]) => {
     } else {
         variables[props.propertyName] = reconvertedSelected;
     }
-    dashboardDetailState.variables = variables;
+    dashboardDetailStore.$patch({ variables });
 };
 
 const handleUpdateSearchText = debounce((text: string) => {

@@ -129,7 +129,7 @@ export default defineComponent<Props>({
     },
     setup(props) {
         const dashboardDetailStore = useDashboardDetailInfoStore();
-        const dashboardDetailState = dashboardDetailStore.state;
+        const dashboardDetailState = dashboardDetailStore.$state;
         const widgetFormStore = useWidgetFormStore();
         const widgetFormState = widgetFormStore.state;
 
