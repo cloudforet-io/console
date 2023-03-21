@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+import { cloneDeep, flattenDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
@@ -67,7 +67,8 @@ export const useWidgetFormStore = defineStore<string, WidgetFormState, any, Widg
             this.inheritOptions = _inheritOptions;
         },
         initWidgetForm(widgetKey: string) {
-            this.widgetInfo = dashboardDetailInfoState.dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
+            const _dashboardWidgetInfoList = flattenDeep(dashboardDetailInfoState.dashboardWidgetInfoList ?? []);
+            this.widgetInfo = _dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
             if (this.widgetInfo) {
                 this.widgetConfigId = this.widgetInfo.widget_name;
                 this.widgetTitle = this.widgetInfo.title;
