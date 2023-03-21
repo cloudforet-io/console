@@ -232,7 +232,9 @@ export default defineComponent<Props>({
 
         /* inherit */
         const handleChangeInheritToggle = (propertyName: string, value) => {
-            widgetFormState.inheritOptions = { ...widgetFormState.inheritOptions, [propertyName]: { enabled: value } };
+            widgetFormStore.$patch((_state) => {
+                _state.inheritOptions = { ..._state.inheritOptions, [propertyName]: { enabled: value } };
+            });
 
             // update widget option schema
             const originPropertySchema = state.widgetConfig?.options_schema?.schema?.properties?.[propertyName] ?? {};
@@ -279,8 +281,10 @@ export default defineComponent<Props>({
         const resetStates = () => {
             // reset widget form store states
             widgetFormStore.$reset();
-            widgetFormState.defaultSchemaProperties = [];
-            widgetFormState.inheritOptions = {};
+            widgetFormStore.$patch({
+                defaultSchemaProperties: [],
+                inheritOptions: {},
+            });
             // reset states
             state.widgetOptionsJsonSchema = {
                 type: 'object',
@@ -295,15 +299,19 @@ export default defineComponent<Props>({
             state.schemaFormData = {};
             const widgetOptionsSchema: WidgetOptionsSchema = state.widgetConfig?.options_schema ?? {};
             // init widget form store states
-            widgetFormState.widgetConfigId = widgetConfigId;
-            widgetFormState.defaultSchemaProperties = getRefinedDefaultSchemaProperties(widgetOptionsSchema);
-            widgetFormState.inheritOptions = {};
+            widgetFormStore.$patch({
+                widgetConfigId,
+                defaultSchemaProperties: getRefinedDefaultSchemaProperties(widgetOptionsSchema),
+                inheritOptions: {},
+            });
             if (!props.widgetKey) {
-                widgetFormState.defaultSchemaProperties.filter((d) => !state.requiredProperties.includes(d)).forEach((propertyName) => {
-                    widgetFormState.inheritOptions = {
-                        ...widgetFormState.inheritOptions,
-                        [propertyName]: { enabled: true },
-                    };
+                widgetFormState.defaultSchemaProperties?.filter((d) => !state.requiredProperties.includes(d)).forEach((propertyName) => {
+                    widgetFormStore.$patch((_state) => {
+                        _state.inheritOptions = {
+                            ..._state.inheritOptions,
+                            [propertyName]: { enabled: true },
+                        };
+                    });
                     state.schemaFormData[propertyName] = propertyName.replace('filters.', '');
                 });
             }
@@ -312,8 +320,8 @@ export default defineComponent<Props>({
                 referenceStoreState,
                 widgetOptionsSchema,
                 dashboardDetailState.variablesSchema,
-                widgetFormState.inheritOptions,
-                widgetFormState.defaultSchemaProperties,
+                widgetFormState.inheritOptions ?? {},
+                widgetFormState.defaultSchemaProperties ?? [],
                 dashboardDetailState.projectId,
             );
         };
@@ -327,15 +335,17 @@ export default defineComponent<Props>({
             // init title
             updateTitle(widgetInfo.title);
             // init widget form store states
-            widgetFormState.inheritOptions = getRefinedWidgetInheritOptions(widgetInfo, dashboardDetailState.projectId);
-            widgetFormState.defaultSchemaProperties = getDefaultSchemaPropertiesFromWidgetInfo(widgetInfo);
+            widgetFormStore.$patch({
+                inheritOptions: getRefinedWidgetInheritOptions(widgetInfo, dashboardDetailState.projectId),
+                defaultSchemaProperties: getDefaultSchemaPropertiesFromWidgetInfo(widgetInfo),
+            });
             // init options schema
             state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
                 referenceStoreState,
                 widgetOptionsSchema,
                 dashboardDetailState.variablesSchema,
-                widgetFormState.inheritOptions,
-                widgetFormState.defaultSchemaProperties,
+                widgetFormState.inheritOptions ?? {},
+                widgetFormState.defaultSchemaProperties ?? [],
                 dashboardDetailState.projectId,
             );
             // init form data
@@ -373,7 +383,7 @@ export default defineComponent<Props>({
             widgetFormStore.setFormData(schemaFormData);
         }, { immediate: true });
         watch(() => state.isAllValid, (_isAllValid) => {
-            widgetFormState.isValid = _isAllValid;
+            widgetFormStore.$patch({ isValid: _isAllValid });
         }, { immediate: true });
 
         return {
