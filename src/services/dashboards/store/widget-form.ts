@@ -1,5 +1,3 @@
-import { reactive } from 'vue';
-
 import { cloneDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -9,7 +7,7 @@ import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/w
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 
-interface State {
+interface WidgetFormState {
     widgetConfigId?: string;
     widgetTitle?: string;
     isValid: boolean;
@@ -18,12 +16,16 @@ interface State {
     widgetInfo?: DashboardLayoutWidgetInfo;
     defaultSchemaProperties?: string[];
 }
+interface WidgetFormActions {
+    setFormData: (formData: any) => void;
+    initWidgetForm: (widgetKey: string) => DashboardLayoutWidgetInfo|undefined;
+}
 
-export const useWidgetFormStore = defineStore('widget-form', () => {
-    const dashboardDetailInfoStore = useDashboardDetailInfoStore();
-    const dashboardDetailInfoState = dashboardDetailInfoStore.$state;
+const dashboardDetailInfoStore = useDashboardDetailInfoStore();
+const dashboardDetailInfoState = dashboardDetailInfoStore.$state;
 
-    const state = reactive<State>({
+export const useWidgetFormStore = defineStore<string, WidgetFormState, any, WidgetFormActions>('widget-form', {
+    state: () => ({
         widgetConfigId: undefined,
         widgetTitle: undefined,
         isValid: false,
@@ -31,54 +33,49 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         widgetOptions: undefined,
         widgetInfo: undefined,
         defaultSchemaProperties: undefined,
-    });
-    const setFormData = (formData: any) => {
-        if (!state.widgetConfigId) return;
-        const widgetConfig = getWidgetConfig(state.widgetConfigId);
-        const _widgetOptions: WidgetOptions = {
-            ...widgetConfig.options,
-        };
-        const widgetFiltersMap: WidgetOptions['filters'] = {};
-        const _inheritOptions = cloneDeep(state.inheritOptions);
-        Object.entries(formData).forEach(([key, val]) => {
-            const _propertyName = key.replace('filters.', '');
-            if (_inheritOptions?.[key]?.enabled && val) {
-                _inheritOptions[key] = {
-                    enabled: true,
-                    variable_info: {
-                        key: val as string,
-                    },
-                };
-            } else if (key.startsWith('filters.')) {
-                if (val) {
-                    const filterDataKey = getWidgetFilterDataKey(_propertyName);
-                    widgetFiltersMap[_propertyName] = [{ k: filterDataKey, v: val, o: '=' }];
+    }),
+    actions: {
+        setFormData(formData: any) {
+            if (!this.widgetConfigId) return;
+            const widgetConfig = getWidgetConfig(this.widgetConfigId);
+            const _widgetOptions: WidgetOptions = {
+                ...widgetConfig.options,
+            };
+            const widgetFiltersMap: WidgetOptions['filters'] = {};
+            const _inheritOptions = cloneDeep(this.inheritOptions);
+            Object.entries(formData).forEach(([key, val]) => {
+                const _propertyName = key.replace('filters.', '');
+                if (_inheritOptions?.[key]?.enabled && val) {
+                    _inheritOptions[key] = {
+                        enabled: true,
+                        variable_info: {
+                            key: val as string,
+                        },
+                    };
+                } else if (key.startsWith('filters.')) {
+                    if (val) {
+                        const filterDataKey = getWidgetFilterDataKey(_propertyName);
+                        widgetFiltersMap[_propertyName] = [{ k: filterDataKey, v: val, o: '=' }];
+                    }
+                } else {
+                    _widgetOptions[key] = val;
                 }
-            } else {
-                _widgetOptions[key] = val;
+            });
+            _widgetOptions.filters = widgetFiltersMap;
+
+            this.widgetOptions = _widgetOptions;
+            this.inheritOptions = _inheritOptions;
+        },
+        initWidgetForm(widgetKey: string) {
+            this.widgetInfo = dashboardDetailInfoState.dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
+            if (this.widgetInfo) {
+                this.widgetConfigId = this.widgetInfo.widget_name;
+                this.widgetTitle = this.widgetInfo.title;
+                this.widgetOptions = this.widgetInfo.widget_options;
+                this.inheritOptions = this.widgetInfo.inherit_options;
+                this.defaultSchemaProperties = this.widgetInfo.default_schema_properties;
             }
-        });
-        _widgetOptions.filters = widgetFiltersMap;
-
-        state.widgetOptions = _widgetOptions;
-        state.inheritOptions = _inheritOptions;
-    };
-
-    const initWidgetForm = (widgetKey: string): DashboardLayoutWidgetInfo|undefined => {
-        state.widgetInfo = dashboardDetailInfoState.dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
-        if (state.widgetInfo) {
-            state.widgetConfigId = state.widgetInfo.widget_name;
-            state.widgetTitle = state.widgetInfo.title;
-            state.widgetOptions = state.widgetInfo.widget_options;
-            state.inheritOptions = state.widgetInfo.inherit_options;
-            state.defaultSchemaProperties = state.widgetInfo.default_schema_properties;
-        }
-        return state.widgetInfo;
-    };
-
-    return {
-        state,
-        setFormData,
-        initWidgetForm,
-    };
+            return this.widgetInfo;
+        },
+    },
 });

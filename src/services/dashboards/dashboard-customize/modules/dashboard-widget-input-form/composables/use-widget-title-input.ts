@@ -8,7 +8,6 @@ import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 
 export const useWidgetTitleInput = () => {
     const widgetFormStore = useWidgetFormStore();
-    const widgetFormState = widgetFormStore.state;
     const {
         forms: { title }, setForm, invalidState, invalidTexts, isAllValid: isTitleValid, resetAll: resetTitle,
     } = useFormValidator({
@@ -18,7 +17,7 @@ export const useWidgetTitleInput = () => {
     });
     const updateTitle = (val) => {
         setForm('title', val);
-        widgetFormState.widgetTitle = val;
+        widgetFormStore.$patch({ widgetTitle: val });
     };
     const isTitleInvalid = toRef(invalidState, 'title');
     const titleInvalidText = toRef(invalidTexts, 'title');
