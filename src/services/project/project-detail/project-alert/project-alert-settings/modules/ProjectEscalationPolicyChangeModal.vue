@@ -91,7 +91,7 @@ export default {
     },
     setup(props, { emit }: SetupContext) {
         const escalationPolicyFormStore = useEscalationPolicyFormStore();
-        const escalationPolicyFormState = escalationPolicyFormStore.state;
+        const escalationPolicyFormState = escalationPolicyFormStore.$state;
         const tableState = reactive({
             loading: true,
             items: [] as any,
@@ -114,7 +114,7 @@ export default {
             selectedEscalationPolicyId: undefined,
             isModalValid: computed(() => {
                 if (state.activeTab === FORM_MODE.select) return tableState.selectIndex.length;
-                return escalationPolicyFormState.isAllValid;
+                return escalationPolicyFormStore.isAllValid;
             }),
         });
 
@@ -189,7 +189,7 @@ export default {
         const handleClickConfirm = async () => {
             let newEscalationPolicyId;
             if (state.activeTab === FORM_MODE.create) {
-                if (!escalationPolicyFormState.isAllValid) return;
+                if (!escalationPolicyFormStore.isAllValid) return;
                 newEscalationPolicyId = await createEscalationPolicy();
             } else {
                 newEscalationPolicyId = tableState.items[tableState.selectIndex[0]].escalation_policy_id;

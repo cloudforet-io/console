@@ -217,8 +217,7 @@ export default {
     },
     setup() {
         const escalationPolicyFormStore = useEscalationPolicyFormStore();
-        const escalationPolicyFormState = escalationPolicyFormStore.state;
-        const escalationPolicyFormOriginState = escalationPolicyFormStore.originState;
+        const escalationPolicyFormState = escalationPolicyFormStore.$state;
         const state = reactive({
             projectChannels: [],
         });
@@ -300,20 +299,20 @@ export default {
         watch(() => escalationPolicyFormState.projectId, (projectId) => {
             if (projectId) listProjectChannel(projectId);
         });
-        watch(() => escalationPolicyFormOriginState.escalationPolicyData?.escalation_policy_id, (escalationPolicyId) => {
+        watch(() => escalationPolicyFormState.escalationPolicyData?.escalation_policy_id, (escalationPolicyId) => {
             if (escalationPolicyId) {
                 setForm('repeatCount', escalationPolicyFormState.repeatCount);
                 setForm('rules', escalationPolicyFormState.rules);
             }
         }, { immediate: true });
         watch(() => rules.value, (_rules) => {
-            escalationPolicyFormState.rules = _rules;
+            escalationPolicyFormStore.$patch({ rules: _rules });
         }, { deep: true, immediate: true });
         watch(() => repeatCount.value, (_repeatCount) => {
-            escalationPolicyFormState.repeatCount = _repeatCount;
+            escalationPolicyFormStore.$patch({ repeatCount: _repeatCount });
         }, { immediate: true });
         watch(() => isAllValid.value, (_isAllValid) => {
-            escalationPolicyFormState.isEscalationRulesFormValid = _isAllValid;
+            escalationPolicyFormStore.$patch({ isEscalationRulesFormValid: _isAllValid });
         }, { immediate: true });
 
         return {

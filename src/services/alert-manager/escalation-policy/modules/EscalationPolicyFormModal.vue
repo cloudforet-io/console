@@ -6,7 +6,7 @@
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
-        :disabled="!escalationPolicyFormState.isAllValid"
+        :disabled="!escalationPolicyFormStore.isAllValid"
         @confirm="handleConfirm"
     >
         <template #body>
@@ -65,8 +65,7 @@ export default {
     },
     setup(props, { emit }: SetupContext) {
         const escalationPolicyFormStore = useEscalationPolicyFormStore();
-        const escalationPolicyFormOriginState = escalationPolicyFormStore.originState;
-        const escalationPolicyFormState = escalationPolicyFormStore.state;
+        const escalationPolicyFormState = escalationPolicyFormStore.$state;
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
             inputModel: computed<Partial<EscalationPolicyDataModel>>(() => ({
@@ -100,7 +99,7 @@ export default {
         const updateEscalationPolicy = async () => {
             try {
                 await SpaceConnector.client.monitoring.escalationPolicy.update({
-                    escalation_policy_id: escalationPolicyFormOriginState?.escalationPolicyData?.escalation_policy_id,
+                    escalation_policy_id: escalationPolicyFormState?.escalationPolicyData?.escalation_policy_id,
                     name: escalationPolicyFormState.name,
                     rules: escalationPolicyFormState.rules,
                     repeat_count: escalationPolicyFormState.repeatCount,
@@ -116,7 +115,7 @@ export default {
 
         /* event */
         const handleConfirm = async () => {
-            if (!escalationPolicyFormState.isAllValid) return;
+            if (!escalationPolicyFormStore.isAllValid) return;
 
             if (props.mode === ACTION.create) await createEscalationPolicy();
             else if (props.mode === ACTION.update) await updateEscalationPolicy();
@@ -125,7 +124,7 @@ export default {
 
         return {
             ...toRefs(state),
-            escalationPolicyFormState,
+            escalationPolicyFormStore,
             ACTION,
             handleConfirm,
             createEscalationPolicy,

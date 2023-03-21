@@ -1,6 +1,4 @@
-import type { ComputedRef } from 'vue';
-import { computed, reactive } from 'vue';
-
+import type { _GettersTree } from 'pinia';
 import { defineStore } from 'pinia';
 
 import type { ScopeType } from '@/services/alert-manager/lib/config';
@@ -9,6 +7,7 @@ import type { Rule, EscalationPolicyDataModel } from '@/services/alert-manager/t
 
 
 interface EscalationPolicyFormState {
+    escalationPolicyData?: EscalationPolicyDataModel|undefined;
     name?: string;
     scope: ScopeType
     rules: Rule[];
@@ -16,18 +15,21 @@ interface EscalationPolicyFormState {
     repeatCount: number;
     projectId?: string;
     //
-    isAllValid: ComputedRef<boolean>;
     isNameProjectIdFormValid: boolean;
     isEscalationRulesFormValid: boolean;
+}
+type EscalationPolicyFormGetters = _GettersTree<{
+    isAllValid: boolean;
+}> & _GettersTree<EscalationPolicyFormState>;
+interface EscalationPolicyFormActions {
+    initEscalationPolicyFormData: (escalationPolicyData: EscalationPolicyDataModel) => void;
 }
 
 const DEFAULT_NOTIFICATION_LEVEL = 'LV1';
 
-export const useEscalationPolicyFormStore = defineStore('escalation-policy-form', () => {
-    const originState = reactive({
+export const useEscalationPolicyFormStore = defineStore<string, EscalationPolicyFormState, EscalationPolicyFormGetters, EscalationPolicyFormActions>('escalation-policy-form', {
+    state: () => ({
         escalationPolicyData: {} as EscalationPolicyDataModel|undefined,
-    });
-    const state = reactive<EscalationPolicyFormState>({
         name: undefined,
         scope: SCOPE.DOMAIN,
         rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }],
@@ -35,34 +37,21 @@ export const useEscalationPolicyFormStore = defineStore('escalation-policy-form'
         repeatCount: 0,
         projectId: undefined,
         //
-        isAllValid: computed(() => state.isNameProjectIdFormValid && state.isEscalationRulesFormValid),
         isNameProjectIdFormValid: false,
         isEscalationRulesFormValid: false,
-    });
-
-    const resetEscalationPolicyFormData = () => {
-        originState.escalationPolicyData = undefined;
-        state.name = undefined;
-        state.scope = SCOPE.DOMAIN;
-        state.rules = [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }];
-        state.finishCondition = FINISH_CONDITION.acknowledged;
-        state.repeatCount = 0;
-        state.projectId = undefined;
-    };
-    const initEscalationPolicyFormData = (escalationPolicyData: EscalationPolicyDataModel) => {
-        originState.escalationPolicyData = escalationPolicyData;
-        state.name = escalationPolicyData.name;
-        state.scope = escalationPolicyData.scope;
-        state.rules = escalationPolicyData.rules;
-        state.finishCondition = escalationPolicyData.finish_condition;
-        state.repeatCount = escalationPolicyData.repeat_count;
-        state.projectId = escalationPolicyData.project_id;
-    };
-
-    return {
-        originState,
-        state,
-        resetEscalationPolicyFormData,
-        initEscalationPolicyFormData,
-    };
+    }),
+    getters: {
+        isAllValid: (state) => state.isNameProjectIdFormValid && state.isEscalationRulesFormValid,
+    },
+    actions: {
+        initEscalationPolicyFormData(escalationPolicyData: EscalationPolicyDataModel) {
+            this.escalationPolicyData = escalationPolicyData;
+            this.name = escalationPolicyData.name;
+            this.scope = escalationPolicyData.scope;
+            this.rules = escalationPolicyData.rules;
+            this.finishCondition = escalationPolicyData.finish_condition;
+            this.repeatCount = escalationPolicyData.repeat_count;
+            this.projectId = escalationPolicyData.project_id;
+        },
+    },
 });
