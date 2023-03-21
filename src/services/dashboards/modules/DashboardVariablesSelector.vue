@@ -47,7 +47,7 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const { resetVariables } = dashboardDetailStore;
-const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const vm = getCurrentInstance()?.proxy as Vue;
 

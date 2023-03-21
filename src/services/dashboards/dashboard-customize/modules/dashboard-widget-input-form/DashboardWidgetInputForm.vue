@@ -129,9 +129,9 @@ export default defineComponent<Props>({
     },
     setup(props) {
         const dashboardDetailStore = useDashboardDetailInfoStore();
-        const dashboardDetailState = dashboardDetailStore.state;
+        const dashboardDetailState = dashboardDetailStore.$state;
         const widgetFormStore = useWidgetFormStore();
-        const widgetFormState = widgetFormStore.state;
+        const widgetFormState = widgetFormStore.$state;
 
         const state = reactive({
             widgetConfig: computed<WidgetConfig|undefined>(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
@@ -166,7 +166,7 @@ export default defineComponent<Props>({
 
         /* more options */
         const handleUpdateDefaultSchemaProperties = (properties: string[]) => {
-            widgetFormState.defaultSchemaProperties = properties;
+            widgetFormStore.$patch({ defaultSchemaProperties: properties });
 
             // update inherit options
             const inheritOptions = {};
@@ -175,14 +175,14 @@ export default defineComponent<Props>({
                 if (properties.includes(name)) inheritOptions[name] = origin[name];
                 else inheritOptions[name] = { enabled: false };
             });
-            widgetFormState.inheritOptions = inheritOptions;
+            widgetFormStore.$patch({ inheritOptions });
 
             // update schema
             state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
                 referenceStoreState,
                 state.widgetConfig?.options_schema ?? {},
                 dashboardDetailState.variablesSchema,
-                widgetFormState.inheritOptions,
+                widgetFormState.inheritOptions ?? {},
                 properties,
                 dashboardDetailState.projectId,
             );

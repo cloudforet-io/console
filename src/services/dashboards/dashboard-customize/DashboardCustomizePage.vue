@@ -72,8 +72,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailOriginState = dashboardDetailStore.originState;
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     name: dashboardDetailState.name,
@@ -100,7 +99,7 @@ const getDashboardData = async () => {
 };
 const updateDashboardData = async () => {
     try {
-        if (dashboardDetailOriginState.isProjectDashboard) {
+        if (dashboardDetailStore.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
                 ...state.apiParam,
                 name: state.name,
@@ -113,7 +112,7 @@ const updateDashboardData = async () => {
                 domain_dashboard_id: props.dashboardId,
             });
         }
-        const routeName = dashboardDetailOriginState.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
+        const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
         await SpaceRouter.router.push({
             name: routeName,
             params: {
@@ -126,23 +125,23 @@ const updateDashboardData = async () => {
 };
 const createDashboard = async () => {
     try {
-        if (dashboardDetailOriginState.isProjectDashboard) {
+        if (dashboardDetailStore.isProjectDashboard) {
             const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
                 ...state.apiParam,
                 name: state.name,
-                viewers: dashboardDetailOriginState.dashboardViewer,
+                viewers: dashboardDetailStore.dashboardViewer,
                 project_id: dashboardDetailState.projectId,
             });
-            dashboardDetailState.dashboardId = result.project_dashboard_id;
+            dashboardDetailStore.$patch({ dashboardId: result.project_dashboard_id });
         } else {
             const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create({
                 ...state.apiParam,
                 name: state.name,
-                viewers: dashboardDetailOriginState.dashboardViewer,
+                viewers: dashboardDetailStore.dashboardViewer,
             });
-            dashboardDetailState.dashboardId = result.domain_dashboard_id;
+            dashboardDetailStore.$patch({ dashboardId: result.domain_dashboard_id });
         }
-        const routeName = dashboardDetailOriginState.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
+        const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
         await SpaceRouter.router.push({
             name: routeName,
             params: {
@@ -159,7 +158,7 @@ const handleUpdateDashboardName = (name: string) => {
     state.name = name;
 };
 const handleUpdateLabelList = (labels: Array<string>) => {
-    dashboardDetailState.labels = [...labels];
+    dashboardDetailStore.$patch({ labels: [...labels] });
 };
 const handleSave = async () => {
     state.loading = true;

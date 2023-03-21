@@ -143,7 +143,7 @@ export default {
     },
     setup(props) {
         const escalationPolicyFormStore = useEscalationPolicyFormStore();
-        const escalationPolicyFormState = escalationPolicyFormStore.state;
+        const escalationPolicyFormState = escalationPolicyFormStore.$state;
         const state = reactive({
             projects: computed(() => store.getters['reference/projectItems']),
             //
@@ -188,24 +188,26 @@ export default {
 
         /* event */
         const handleChangeScope = (value) => {
-            escalationPolicyFormState.scope = value;
-            if (value === SCOPE.DOMAIN) escalationPolicyFormState.projectId = undefined;
+            escalationPolicyFormStore.$patch({ scope: value });
+            if (value === SCOPE.DOMAIN) {
+                escalationPolicyFormStore.$patch({ projectId: undefined });
+            }
         };
         const handleChangeFinishCondition = (value) => {
-            escalationPolicyFormState.finishCondition = value;
+            escalationPolicyFormStore.$patch({ finishCondition: value });
         };
         const handleUpdateName = (_name) => {
             setForm('name', _name);
-            escalationPolicyFormState.name = _name;
+            escalationPolicyFormStore.$patch({ name: _name });
         };
         const handleSelectProject = (selected) => {
             setForm('projectId', selected[0]?.id);
-            escalationPolicyFormState.projectId = selected[0]?.id;
+            escalationPolicyFormStore.$patch({ projectId: selected[0]?.id });
         };
 
         watch([() => props.mode, () => props.escalationPolicyData], ([mode, escalationPolicyData]) => {
             if (mode === ACTION.create) {
-                escalationPolicyFormStore.resetEscalationPolicyFormData();
+                escalationPolicyFormStore.$reset();
             } else if (props.escalationPolicyData?.escalation_policy_id) {
                 escalationPolicyFormStore.initEscalationPolicyFormData(escalationPolicyData);
                 setForm('name', escalationPolicyFormState.name);
@@ -213,7 +215,7 @@ export default {
             }
         }, { immediate: true });
         watch(() => isAllValid.value, (_isAllValid) => {
-            escalationPolicyFormState.isNameProjectIdFormValid = _isAllValid;
+            escalationPolicyFormStore.$patch({ isNameProjectIdFormValid: _isAllValid });
         }, { immediate: true });
 
         // LOAD REFERENCE STORE

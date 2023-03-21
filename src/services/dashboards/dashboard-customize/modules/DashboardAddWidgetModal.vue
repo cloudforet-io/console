@@ -55,7 +55,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const widgetFormStore = useWidgetFormStore();
-        const widgetFormState = widgetFormStore.state;
+        const widgetFormState = widgetFormStore.$state;
         const state = reactive({
             proxyVisible: useProxyValue('visible', props, emit),
         });

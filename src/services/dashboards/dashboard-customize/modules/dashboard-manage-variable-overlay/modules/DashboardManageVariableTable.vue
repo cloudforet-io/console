@@ -93,7 +93,7 @@ interface EmitFn {
 const emit = defineEmits<EmitFn>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     orderedVariables: [] as VariablesPropertiesForManage[],
@@ -139,7 +139,9 @@ const handleToggleUse = (propertyName: string, value: boolean) => {
     state.orderedVariables[selectedIndex].use = !value;
 
     // change use in store
-    dashboardDetailState.variablesSchema.properties[propertyName].use = !value;
+    dashboardDetailStore.$patch((_state) => {
+        _state.variablesSchema.properties[propertyName].use = !value;
+    });
 };
 
 /* Helper */

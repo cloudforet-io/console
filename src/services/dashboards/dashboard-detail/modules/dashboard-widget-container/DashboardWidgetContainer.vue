@@ -21,7 +21,7 @@
                        :dashboard-settings="dashboardDetailState.settings"
                        :currency-rates="currencyRates"
                        :edit-mode="editMode"
-                       :error-mode="editMode && dashboardDetailValidationState.widgetValidMap[widget.widget_key] === false"
+                       :error-mode="editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                        :all-reference-type-info="allReferenceTypeInfo"
                        :initiated="!!initiatedWidgetMap[widget.widget_key]"
             />
@@ -81,8 +81,7 @@ export default defineComponent<Props>({
     },
     setup(props, { expose }: SetupContext) {
         const dashboardDetailStore = useDashboardDetailInfoStore();
-        const dashboardDetailState = dashboardDetailStore.state;
-        const dashboardDetailValidationState = dashboardDetailStore.validationState;
+        const dashboardDetailState = dashboardDetailStore.$state;
 
         const state = reactive({
             widgetRef: [] as Array<WidgetComponent|null>,
@@ -108,7 +107,7 @@ export default defineComponent<Props>({
             widgetConfigMap,
             variablesSchema: toRef(dashboardDetailState, 'variablesSchema'),
             updateWidgetValidMap: (validMap) => {
-                dashboardDetailValidationState.widgetValidMap = validMap;
+                dashboardDetailStore.$patch({ widgetValidMap: validMap });
             },
         });
 
@@ -120,7 +119,9 @@ export default defineComponent<Props>({
                 if (typeof targetWidgetRef?.initWidget === 'function') {
                     const prevData = props.reusePreviousData ? dashboardDetailState.widgetDataMap[target.id] : undefined;
                     const data = await targetWidgetRef.initWidget(prevData);
-                    dashboardDetailState.widgetDataMap[target.id] = data;
+                    dashboardDetailStore.$patch((_state) => {
+                        _state.widgetDataMap[target.id] = data;
+                    });
                     state.initiatedWidgetMap[target.id] = data;
                 }
             }
@@ -153,7 +154,7 @@ export default defineComponent<Props>({
             }
         });
         const refreshAllWidget = debounce(async () => {
-            dashboardDetailState.loadingWidgets = true;
+            dashboardDetailStore.$patch({ loadingWidgets: true });
             const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
 
             const filteredRefs = state.widgetRef.filter((comp) => {
@@ -168,10 +169,14 @@ export default defineComponent<Props>({
             results.forEach((result, idx) => {
                 if (result.status === 'fulfilled') {
                     const widgetKey = filteredRefs[idx]?.$el?.id;
-                    if (widgetKey) dashboardDetailState.widgetDataMap[widgetKey] = result.value;
+                    if (widgetKey) {
+                        dashboardDetailStore.$patch((_state) => {
+                            _state.widgetDataMap[widgetKey] = result.value;
+                        });
+                    }
                 }
             });
-            dashboardDetailState.loadingWidgets = false;
+            dashboardDetailStore.$patch({ loadingWidgets: false });
         }, 150);
         expose({
             refreshAllWidget,
@@ -189,7 +194,6 @@ export default defineComponent<Props>({
 
         return {
             dashboardDetailState,
-            dashboardDetailValidationState,
             ...toRefs(state),
             containerRef,
             reformedWidgetInfoList,

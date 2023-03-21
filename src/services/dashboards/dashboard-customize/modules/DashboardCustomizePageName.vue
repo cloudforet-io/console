@@ -75,8 +75,7 @@ const emit = defineEmits<{(e: string, value: string): void}>();
 
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailValidationState = dashboardDetailStore.validationState;
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     placeHolder: dashboardDetailState.placeholder,
@@ -143,7 +142,7 @@ watch(() => props.name, (d) => {
 }, { immediate: true });
 
 watch(() => invalidState.nameInput, (invalid) => {
-    dashboardDetailValidationState.isNameValid = !invalid;
+    dashboardDetailStore.$patch({ isNameValid: !invalid });
 }, { immediate: true });
 
 (async () => {

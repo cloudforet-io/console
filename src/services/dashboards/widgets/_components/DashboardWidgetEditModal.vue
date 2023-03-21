@@ -44,7 +44,7 @@ const state = reactive({
 });
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.state;
+const widgetFormState = widgetFormStore.$state;
 
 const handleEditModalConfirm = () => {
     const widgetInfo: Partial<DashboardLayoutWidgetInfo> = {

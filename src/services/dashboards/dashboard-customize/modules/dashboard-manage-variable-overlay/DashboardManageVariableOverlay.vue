@@ -89,8 +89,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailOriginState = dashboardDetailStore.originState;
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     contentType: 'LIST' as OverlayStatus,
@@ -126,8 +125,10 @@ const deleteVariable = () => {
     const properties = cloneDeep(state.variableSchema.properties) as DashboardVariablesSchema['properties'];
     delete properties[state.selectedVariable];
     const order = state.variableSchema.order.filter((d) => d !== state.selectedVariable);
-    dashboardDetailState.variablesSchema = { properties, order };
-    delete dashboardDetailState.variables[state.selectedVariable];
+    dashboardDetailStore.$patch((_state) => {
+        _state.variablesSchema = { properties, order };
+        delete _state.variables[state.selectedVariable];
+    });
 };
 const resetDeleteModalState = () => {
     deleteModalState.visible = false;
@@ -161,12 +162,16 @@ const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
     if (state.contentType === 'ADD') {
         const variableKey = getUUID();
         properties[variableKey] = variable;
-        dashboardDetailState.variablesSchema = { properties, order: [...state.variableSchema.order, variableKey] };
+        dashboardDetailStore.$patch({
+            variablesSchema: { properties, order: [...state.variableSchema.order, variableKey] },
+        });
     } else {
         const selectedProperty = state.selectedVariable;
         properties[selectedProperty] = variable;
-        dashboardDetailState.variablesSchema = { ...dashboardDetailState.variablesSchema, properties };
-        delete dashboardDetailState.variables[selectedProperty];
+        dashboardDetailStore.$patch((_state) => {
+            _state.variablesSchema = { ...dashboardDetailState.variablesSchema, properties };
+            delete _state.variables[selectedProperty];
+        });
     }
     state.selectedVariable = '';
     state.contentType = 'LIST';
@@ -178,7 +183,7 @@ const handleClickGoBackButton = () => {
         return;
     }
     SpaceRouter.router.replace({
-        name: dashboardDetailOriginState.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+        name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
         params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
     });
 };

@@ -41,7 +41,7 @@
                                  height="1rem"
                             /></span>
                         <span class="text">{{ widget.title }}</span>
-                        <span v-if="dashboardDetailValidationState.widgetValidMap[widget.widget_key] === false"
+                        <span v-if="dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                               class="error-icon-wrapper"
                         >
                             <p-i name="ic_error-filled"
@@ -63,7 +63,7 @@
                     {{ $t('DASHBOARDS.CUSTOMIZE.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary"
-                          :disabled="!dashboardDetailValidationState.isWidgetLayoutValid || !dashboardDetailValidationState.isNameValid"
+                          :disabled="!dashboardDetailStore.isWidgetLayoutValid || !dashboardDetailState.isNameValid"
                           :loading="loading"
                           @click="handleClickSaveButton"
                 >
@@ -110,8 +110,7 @@ const emit = defineEmits<{(e: string, value: string): void,
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
-const dashboardDetailValidationState = dashboardDetailStore.validationState;
+const dashboardDetailState = dashboardDetailStore.$state;
 const state = reactive({
     enableDateRange: computed(() => dashboardDetailState.settings.date_range?.enabled ?? false),
     enableCurrency: computed(() => dashboardDetailState.settings.currency?.enabled ?? false),
@@ -121,10 +120,14 @@ const state = reactive({
 
 /* Event */
 const handleChangeDateRangeToggle = () => {
-    dashboardDetailState.settings.date_range.enabled = !dashboardDetailState.settings.date_range.enabled;
+    dashboardDetailStore.$patch((_state) => {
+        _state.settings.date_range.enabled = !_state.settings.date_range.enabled;
+    });
 };
 const handleChangeCurrencyToggle = () => {
-    dashboardDetailState.settings.currency.enabled = !dashboardDetailState.settings.currency.enabled;
+    dashboardDetailStore.$patch((_state) => {
+        _state.settings.currency.enabled = !_state.settings.currency.enabled;
+    });
 };
 const handleClickAddWidget = () => {
     state.addWidgetModalVisible = true;
