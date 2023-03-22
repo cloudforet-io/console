@@ -66,6 +66,7 @@ export default defineComponent({
             workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
         });
 
+
         const handleSelectScope = (scopeType: DashboardScope) => {
             updateScope(scopeType);
         };
