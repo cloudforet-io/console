@@ -1,10 +1,10 @@
 <template>
     <div class="dashboard-create-header">
         <p class="step">
-            Step {{ props.currentStep }}/{{ props.totalSteps }}
+            {{ $t('DASHBOARDS.CREATE.STEP') }} {{ props.currentStep }}/{{ props.totalSteps }}
         </p>
         <h2 class="heading">
-            Create New Dashboard
+            {{ $t('DASHBOARDS.CREATE.TITLE') }}
         </h2>
         <p class="description">
             {{ props.description }}
