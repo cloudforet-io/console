@@ -100,7 +100,7 @@ interface Props {
     cloudServiceId: string;
     date: string;
 }
-type PeriodType = 'last1day' | 'last3days' | 'last1week' | 'last2weeks' | 'last1month' | 'last3months';
+type PeriodType = 'last1day' | 'last3days' | 'last1week' | 'last2weeks' | 'last1month' | 'last3months' | 'last1year';
 interface PeriodItem {
     name: PeriodType;
     label: TranslateResult;
@@ -109,7 +109,7 @@ interface PeriodItem {
 }
 
 const HISTORY_LOG_PERIOD_LIST: PeriodType[] = ['last1day', 'last3days', 'last1week'];
-const CLOUD_SERVICE_LOG_PERIOD_LIST: PeriodType[] = ['last1week', 'last2weeks', 'last1month', 'last3months'];
+const CLOUD_SERVICE_LOG_PERIOD_LIST: PeriodType[] = ['last1week', 'last2weeks', 'last1month', 'last3months', 'last1year'];
 
 interface DataSourceInfo {
     data_source_id: string;
@@ -202,6 +202,12 @@ export default defineComponent<Props>({
                         name: 'last3months',
                         label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_3_MONTHS'),
                         start: _date.subtract(3, 'month'),
+                        end: _date,
+                    },
+                    {
+                        name: 'last1year',
+                        label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.LOG_TAB.LAST_1_YEAR'),
+                        start: _date.subtract(1, 'year'),
                         end: _date,
                     },
                 ];
