@@ -182,17 +182,11 @@ export default {
 
 <style lang="postcss" scoped>
 .button-area {
-    @apply flex justify-end;
-    margin-top: 2rem;
-    gap: 1rem;
-
-    @screen tablet {
-        @apply flex-col;
-    }
+    @apply flex justify-end mt-8 gap-4;
 }
 .dashboard-create-step1 {
     @apply w-full;
-    width: 30rem;
+    max-width: 30rem;
     padding: 2.5rem;
     margin: 0 auto;
 
@@ -203,10 +197,14 @@ export default {
 .dashboard-create-step2 {
     width: 62.5rem;
     margin: 0 auto;
-    padding: 0.25rem 1.5rem 4.0625rem;
+    padding: 2rem 1.5rem 4.0625rem;
 
     @screen tablet {
-        @apply w-full;
+        @apply w-full p-8;
+
+        .button-area {
+            @apply flex-col w-full mt-4;
+        }
     }
     .dashboard-create-header {
         @apply mb-8;
