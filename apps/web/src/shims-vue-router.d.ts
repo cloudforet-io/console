@@ -27,6 +27,7 @@ import {
   }
   interface RouteMeta {
     lnbVisible?: boolean;
+    centeredLayout?: boolean;
     menuId?: string;
     label?: string|RouteLabelFormatter;
     translationId?: string|RouteTranslationIdFormatter;
