@@ -1,204 +1,171 @@
 <template>
-    <div class="dashboard-template-wrapper">
-        <p-search
-            :value.sync="state.searchValue"
-            @update:value="handleInputSearch"
-        />
-        <div class="dashboard-template-container">
-            <div class="card-container default-dashboard-board">
-                <span class="card-wrapper-title">
-                    {{ $t('DASHBOARDS.CREATE.LABEL_DEFAULT_TEMPLATE') }}
-                </span>
-                <div class="card-wrapper">
-                    <p-board
-                        selectable
-                        style-type="cards"
-                        :style-options="{ column: 3 }"
-                        :board-sets="defaultTemplateState.boardSets"
-                        :selected-item="state.selectedTemplateName"
-                        @item-click="handleSelectTemplate"
-                    >
-                        <template #item-content="{board}">
-                            <div class="content-layout">
-                                <p-i :name="board.description.icon"
-                                     width="2.5rem"
-                                     height="2.5rem"
-                                />
-                                <strong class="dashboard-name">{{ board.name }}</strong>
-                                <div class="dashboard-label-wrapper">
-                                    <p-label v-for="(label, idx) in board.labels"
-                                             :key="`board-${board.name}-label-${idx}`"
-                                             :text="label"
-                                             :click-stop="false"
-                                    />
-                                </div>
-                                <span class="dashboard-description-text">{{ board.description.text }}</span>
-                            </div>
-                        </template>
-                        <template #item-overlay-content="{board}">
-                            <router-link
-                                v-if="board.description?.preview_image"
-                                :to="`/images/dashboard-previews/dashboard-img_${board.description?.preview_image}--thumbnail.png`"
-                                target="_blank"
+    <section>
+        <p-pane-layout>
+            <p-heading heading-type="sub"
+                       :title="$t('DASHBOARDS.CREATE.LABEL_START_FROM')"
+            />
+            <div class="dashboard-template-wrapper">
+                <div class="dashboard-template-container">
+                    <div class="card-container">
+                        <span class="card-wrapper-title">
+                            {{ $t('DASHBOARDS.CREATE.LABEL_DEFAULT_TEMPLATE') }}
+                        </span>
+                        <div class="card-wrapper">
+                            <p-board
+                                selectable
+                                style-type="cards"
+                                :style-options="{ column: 2 }"
+                                :board-sets="defaultTemplateState.boardSets"
+                                :selected-item="state.selectedTemplateName"
+                                @item-click="handleSelectTemplate"
                             >
-                                <div class="dashboard-template-overlay-content">
-                                    <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.PREVIEW') }}</span>
-                                    <p-i name="ic_external-link"
-                                         height="1em"
-                                         width="1em"
-                                    />
-                                </div>
-                            </router-link>
-                        </template>
-                    </p-board>
-                    <p-empty
-                        v-show="!defaultTemplateState.boardSets.length"
-                        show-image
-                    >
-                        {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
-                    </p-empty>
-                    <p-text-pagination
-                        v-show="defaultTemplateState.allPage >= 2"
-                        :this-page="defaultTemplateState.thisPage"
-                        :all-page="defaultTemplateState.allPage"
-                        @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
-                    />
-                </div>
-            </div>
-            <div class="card-container existing-dashboard-board">
-                <span class="card-wrapper-title">
-                    {{ $t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
-                </span>
-                <div class="card-wrapper">
-                    <p-board
-                        selectable
-                        style-type="cards"
-                        :board-sets="existingTemplateState.boardSets"
-                        :selected-item="state.selectedTemplateName"
-                        @item-click="handleSelectTemplate"
-                    >
-                        <template #item-content="{board}">
-                            <div class="content-layout">
-                                <strong class="dashboard-name">{{ board.name }}</strong>
-                                <div class="dashboard-info">
-                                    {{ board.groupLabel }}
-                                </div>
-                                <div v-if="board.labels.length > 0"
-                                     class="dashboard-label-wrapper"
+                                <template #item-content="{board}">
+                                    <strong class="dashboard-name">{{ board.name }}</strong>
+                                    <div class="dashboard-label-wrapper">
+                                        <p-label v-for="(label, idx) in board.labels"
+                                                 :key="`board-${board.name}-label-${idx}`"
+                                                 :text="label"
+                                                 :click-stop="false"
+                                        />
+                                    </div>
+                                    <span class="dashboard-description-text">{{ board.description.text }}</span>
+                                </template>
+                                <template #item-overlay-content="{board}">
+                                    <router-link
+                                        v-if="board.description?.preview_image"
+                                        :to="`/images/dashboard-previews/dashboard-img_${board.description?.preview_image}--thumbnail.png`"
+                                        target="_blank"
+                                    >
+                                        <div class="dashboard-template-overlay-content">
+                                            <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.PREVIEW') }}</span>
+                                            <p-i name="ic_external-link"
+                                                 height="1em"
+                                                 width="1em"
+                                            />
+                                        </div>
+                                    </router-link>
+                                </template>
+                            </p-board>
+                            <p-text-pagination
+                                v-show="defaultTemplateState.allPage >= 2"
+                                :this-page="defaultTemplateState.thisPage"
+                                :all-page="defaultTemplateState.allPage"
+                                @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
+                            />
+                        </div>
+                    </div>
+                    <p-divider />
+                    <div class="card-container">
+                        <span class="card-wrapper-title">
+                            {{ $t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
+                        </span>
+                        <div class="card-wrapper">
+                            <p-search
+                                :value.sync="existingTemplateState.searchValue"
+                                @update:value="handleInputSearch"
+                            />
+                            <div class="existing-dashboard-board">
+                                <p-board
+                                    selectable
+                                    style-type="cards"
+                                    :style-options="{ column: 2 }"
+                                    :board-sets="existingTemplateState.boardSets"
+                                    :selected-item="state.selectedTemplateName"
+                                    @item-click="handleSelectTemplate"
                                 >
-                                    <p-label v-for="(label, idx) in board.labels"
-                                             :key="`board-${board.name}-label-${idx}`"
-                                             :text="label"
-                                             :click-stop="false"
-                                    />
-                                </div>
+                                    <template #item-content="{board}">
+                                        <strong class="dashboard-name">{{ board.name }}</strong>
+                                        <div class="dashboard-label-wrapper">
+                                            <p-label v-for="(label, idx) in board.labels"
+                                                     :key="`board-${board.name}-label-${idx}`"
+                                                     :text="label"
+                                                     :click-stop="false"
+                                            />
+                                        </div>
+                                    </template>
+                                    <template #item-overlay-content="{board}">
+                                        <div class="dashboard-template-overlay-content"
+                                             @click="handleOpenDashboardNewTab(board)"
+                                        >
+                                            <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.PREVIEW') }}</span>
+                                            <p-i name="ic_external-link"
+                                                 height="1em"
+                                                 width="1em"
+                                            />
+                                        </div>
+                                    </template>
+                                </p-board>
+                                <p-empty
+                                    v-show="!existingTemplateState.boardSets.length"
+                                    show-image
+                                >
+                                    {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
+                                </p-empty>
                             </div>
-                        </template>
-                        <template #item-overlay-content="{board}">
-                            <div class="dashboard-template-overlay-content"
-                                 @click="handleOpenDashboardNewTab(board)"
-                            >
-                                <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.PREVIEW') }}</span>
-                                <p-i name="ic_external-link"
-                                     height="1em"
-                                     width="1em"
-                                />
-                            </div>
-                        </template>
-                    </p-board>
-                    <p-empty
-                        v-show="!existingTemplateState.boardSets.length"
-                        show-image
-                    >
-                        {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
-                    </p-empty>
-                    <p-text-pagination
-                        v-show="existingTemplateState.allPage >= 2"
-                        :this-page="existingTemplateState.thisPage"
-                        :all-page="existingTemplateState.allPage"
-                        @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
-                    />
+                            <p-text-pagination
+                                v-show="existingTemplateState.allPage >= 2"
+                                :this-page="existingTemplateState.thisPage"
+                                :all-page="existingTemplateState.allPage"
+                                @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </p-pane-layout>
+    </section>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
 import {
-    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI,
+    PPaneLayout, PHeading, PBoard, PLabel, PTextPagination, PSearch, PEmpty, PDivider, PI,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-
-
-import type { DashboardConfig, DashboardScope } from '@/services/dashboards/config';
-import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
+import type { DashboardConfig } from '@/services/dashboards/config';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/default-dashboard/template-list';
 import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
-const DOMAIN_SCOPE_NAME = 'Workspace';
+
 const emit = defineEmits(['set-template']);
 
-type DashboardTemplateBoardSet = DashboardConfig & { value: string };
+type DashboardTemplateBoardSet = DashboardConfig & { value: string, leftIcon: string };
 
 const TEMPLATE_TYPE = { DEFAULT: 'DEFAULT', EXISTING: 'EXISTING' };
 type TemplateType = typeof TEMPLATE_TYPE[keyof typeof TEMPLATE_TYPE];
-interface Props {
-    dashboardScope: DashboardScope;
-}
-
-const props = defineProps<Props>();
 
 const state = reactive({
     selectedTemplateName: '',
-    searchValue: '',
 });
 const defaultTemplateState = reactive({
     thisPage: 1,
     allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
-    boardSets: computed<DashboardTemplateBoardSet[]>(() => Object.values(DASHBOARD_TEMPLATES)
-        .map((d: DashboardConfig) => ({
-            ...d,
-            // below values are used only for render
-            value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
-        }))
-        .filter((d) => d.name.includes(state.searchValue))
-        .slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1)),
+    boardSets: computed<DashboardTemplateBoardSet[]>(() => Object.values(DASHBOARD_TEMPLATES).map((d: DashboardConfig) => ({
+        ...d,
+        // below values are used only for render
+        value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
+        leftIcon: d.description?.icon ?? '',
+    })).slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1)),
 });
 const existingTemplateState = reactive({
+    dashboards: computed<DashboardModel[]>(() => [...store.state.dashboard.domainItems, ...store.state.dashboard.projectItems].filter((d) => d.name.includes(existingTemplateState.searchValue))),
     thisPage: 1,
     allPage: computed<number>(() => Math.ceil(existingTemplateState.dashboards.length / 10) || 1),
-    boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards
-        .map((d: DomainDashboardModel & ProjectDashboardModel) => {
-            const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');
-            return {
-                ...d,
-                // below values are used only for render
-                value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id}`,
-                groupLabel: existingTemplateState.projectItems[d.project_id]?.label || existingTemplateState.groupLabel,
-            };
-        })
-        .slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
-    projectItems: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-    groupLabel: computed<string>(() => {
-        if (props.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return DOMAIN_SCOPE_NAME;
-        return '';
-    }),
-    dashboards: computed<DashboardModel[]>(() => {
-        let dashboardItems;
-        if (props.dashboardScope === DASHBOARD_SCOPE.DOMAIN) dashboardItems = store.state.dashboard.domainItems;
-        else dashboardItems = store.state.dashboard.projectItems;
-
-        return dashboardItems.filter((d) => d.name.includes(state.searchValue));
-    }),
-
+    boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards.map((d: DomainDashboardModel & ProjectDashboardModel) => {
+        const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');
+        return {
+            ...d,
+            // below values are used only for render
+            value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id}`,
+            leftIcon: d.description?.preview_image ?? '',
+        };
+    }).slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
+    searchValue: '',
 });
 
 const handleOpenDashboardNewTab = (board: DashboardModel) => {
@@ -218,6 +185,7 @@ const handleOpenDashboardNewTab = (board: DashboardModel) => {
 const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
     state.selectedTemplateName = selectedTemplate.value;
     const _selectedTemplate: Partial<DashboardTemplateBoardSet> = { ...selectedTemplate };
+    delete _selectedTemplate.leftIcon;
     emit('set-template', _selectedTemplate as DashboardModel);
 };
 
@@ -240,41 +208,43 @@ const handleInputSearch = () => {
 
 <style lang="postcss" scoped>
 .dashboard-template-wrapper {
-    @apply relative;
+    padding: 0.5rem 1rem 2.375rem 1rem;
     .dashboard-template-container {
-        @apply overflow-auto;
-        height: calc(100vh - $gnb-height - 2.5rem - 6.5rem - 2rem - 4.5rem - 4.1rem);
-        padding-bottom: 2.5rem;
-        &::after {
-            @apply w-full absolute;
-            height: 2.5rem;
-            content: '';
-            bottom: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 100%);
-        }
-        .card-container {
-            @apply mt-6;
-        }
+        @apply bg-gray-100 border-gray-200 grid gap-5;
+        padding: 1rem 1rem 1.25rem;
+        border-width: 1px;
+        border-radius: 0.5rem;
         .card-wrapper-title {
             @apply text-gray-500 !important text-xs block;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
         .dashboard-name {
-            @apply text-sm block;
-        }
-        .dashboard-info {
-            @apply text-label-sm text-gray-500;
+            @apply text-sm;
         }
         .dashboard-description-text {
             @apply text-gray-500 text-xs;
         }
         .dashboard-template-overlay-content {
-            @apply text-blue-700;
             height: 1.5rem;
         }
         .dashboard-template-overlay-preview {
-            @apply text-sm mr-1;
+            @apply text-gray-700 text-sm mr-1;
+            &:hover {
+                @apply underline;
+            }
+        }
+        .existing-dashboard-board {
+            @apply relative;
+            min-height: 5rem;
+
+            @screen tablet {
+                min-height: 54.5rem;
+            }
+
+            @screen mobile {
+                min-height: 54.5rem;
+            }
         }
         .p-empty {
             padding-top: 3.25rem;
@@ -286,41 +256,11 @@ const handleInputSearch = () => {
             @apply flex justify-center;
             margin: 0.75rem auto 0 auto;
         }
-
-        .default-dashboard-board {
-            .content-layout {
-                @apply flex flex-col items-center;
-            }
-            .dashboard-name {
-                margin: 0.375rem 0;
-            }
-
-            @screen tablet {
-                .content-layout {
-                    @apply relative items-start;
-                    padding-left: 3.25rem;
-                    min-height: 2.5rem;
-                    .p-i-icon {
-                        @apply absolute;
-                        left: 0;
-                    }
-                }
-                .dashboard-name {
-                    margin: 0;
-                }
-            }
-        }
-
-        .existing-dashboard-board {
-            @apply relative;
-
-            .content-layout {
-                @apply flex flex-col row-gap-1;
-            }
-            .p-board {
-                min-height: 4.125rem;
-            }
-        }
     }
+}
+
+/* custom design-system component - p-board-item */
+:deep(.p-board-item) {
+    min-height: 5rem;
 }
 </style>

@@ -1149,11 +1149,8 @@
 		"CREATE": {
 			"BLANK_DESC": "空のダッシュボードを利用して、最初から作成",
 			"CANCEL": "キャンセル",
-			"CONTINUE": "",
 			"CREATE": "作成",
-			"CREATE_NEW_DASHBOARD": "新規ダッシュボード作成",
 			"ENTIRE_WORKSPACES": "ワークスペース全体",
-			"GO_BACK": "",
 			"LABEL_DEFAULT_TEMPLATE": "デフォルトテンプレートから選択",
 			"LABEL_EXISTING_DASHBOARD": "既存のダッシュボードから選択",
 			"LABEL_SCOPE": "ダッシュボードの範囲",
@@ -1166,9 +1163,6 @@
 			"PUBLIC": "公開",
 			"PUBLIC_DESC": "該当するダッシュボード範囲に「view」アクセス権限を持つすべてのユーザー",
 			"SINGLE_PROJECT": "個別プロジェクト",
-			"STEP": "",
-			"STEP1_DESC": "",
-			"STEP2_DESC": "",
 			"TITLE": "新規ダッシュボード作成",
 			"VALIDATION_PROJECT": "プロジェクトを選択してください。",
 			"VALIDATION_TEMPLATE": "テンプレートを選択してください"
