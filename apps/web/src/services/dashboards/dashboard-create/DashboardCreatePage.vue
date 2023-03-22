@@ -18,7 +18,7 @@
                     size="lg"
                     @click="$router.go(-1)"
                 >
-                    Cancel
+                    {{ $t('DASHBOARDS.CREATE.CANCEL') }}
                 </p-button>
                 <p-button
                     style-type="primary"
@@ -27,7 +27,7 @@
                     :disabled="!valid"
                     @click="handleGoStep(2)"
                 >
-                    Continue
+                    {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
                 </p-button>
             </div>
         </div>
@@ -50,7 +50,7 @@
                     icon-left="ic_arrow-left"
                     @click="handleGoStep(1)"
                 >
-                    Go to Back
+                    {{ $t('DASHBOARDS.CREATE.GO_BACK') }}
                 </p-button>
                 <p-button
                     style-type="primary"
@@ -58,7 +58,7 @@
                     :disabled="!isAllValid"
                     @click="handleClickCreate"
                 >
-                    Create New Dashboard
+                    {{ $t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD') }}
                 </p-button>
             </div>
         </div>
@@ -124,8 +124,8 @@ export default {
             dashboardScope: DASHBOARD_SCOPE.DOMAIN as DashboardScope,
             dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
             steps: [
-                { step: 1, name: 'choose scope and viewer', description: 'Choose dashboard scope and viewer.' },
-                { step: 2, name: 'choose template', description: 'Choose a template or an existing dashboard to get started quickly.' },
+                { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') },
+                { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') },
             ],
             currentStep: 1,
             valid: computed(() => {
