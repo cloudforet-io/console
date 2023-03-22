@@ -1,30 +1,26 @@
 <template>
     <section class="dashboard-scope-form">
-        <p-pane-layout>
-            <p-heading heading-type="sub"
-                       :title="$t('DASHBOARDS.CREATE.LABEL_SCOPE')"
+        <p-field-title>{{ $t('DASHBOARDS.CREATE.LABEL_SCOPE') }}</p-field-title>
+        <div class="dashboard-scope-wrapper">
+            <p-radio-group direction="vertical">
+                <p-radio :selected="isDomainScope"
+                         :disabled="!workspaceManagePermission"
+                         @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
+                >
+                    {{ $t('DASHBOARDS.CREATE.ENTIRE_WORKSPACES') }}
+                </p-radio>
+                <p-radio :selected="!isDomainScope"
+                         :disabled="!projectManagePermission"
+                         @change="handleSelectScope(DASHBOARD_SCOPE.PROJECT)"
+                >
+                    {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}
+                </p-radio>
+            </p-radio-group>
+            <project-select-dropdown v-show="!isDomainScope"
+                                     project-selectable
+                                     @select="handleSelectProjects"
             />
-            <div class="dashboard-scope-wrapper">
-                <p-radio-group direction="vertical">
-                    <p-radio :selected="isDomainScope"
-                             :disabled="!workspaceManagePermission"
-                             @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
-                    >
-                        {{ $t('DASHBOARDS.CREATE.ENTIRE_WORKSPACES') }}
-                    </p-radio>
-                    <p-radio :selected="!isDomainScope"
-                             :disabled="!projectManagePermission"
-                             @change="handleSelectScope(DASHBOARD_SCOPE.PROJECT)"
-                    >
-                        {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}
-                    </p-radio>
-                </p-radio-group>
-                <project-select-dropdown v-show="!isDomainScope"
-                                         project-selectable
-                                         @select="handleSelectProjects"
-                />
-            </div>
-        </p-pane-layout>
+        </div>
     </section>
 </template>
 
@@ -35,7 +31,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PHeading, PRadio, PRadioGroup,
+    PRadio, PRadioGroup, PFieldTitle,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -52,11 +48,16 @@ import type { ProjectItemResp } from '@/services/project/type';
 export default defineComponent({
     name: 'DashboardScopeForm',
     components: {
+        PFieldTitle,
         ProjectSelectDropdown,
         PRadioGroup,
         PRadio,
-        PHeading,
-        PPaneLayout,
+    },
+    props: {
+        dashboardProject: {
+            type: String,
+            default: '',
+        },
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
@@ -64,6 +65,7 @@ export default defineComponent({
             projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
             workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
         });
+
 
         const handleSelectScope = (scopeType: DashboardScope) => {
             updateScope(scopeType);
@@ -102,15 +104,10 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .dashboard-scope-form {
+    @apply mt-8;
     .dashboard-scope-wrapper {
-        .p-radio-group {
-            display: grid;
-            grid-gap: 0.875rem;
-        }
         .project-select-dropdown {
-            max-width: 30rem;
-            width: 50%;
-            margin: 0.375rem 0 0 1.125rem;
+            @apply mt-1 ml-6;
         }
 
         @screen tablet {
@@ -118,7 +115,6 @@ export default defineComponent({
                 width: 100%;
             }
         }
-        margin: 0.5rem 1rem 2.25rem;
     }
 }
 </style>
