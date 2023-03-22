@@ -125,7 +125,7 @@ export default {
             dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
             steps: [
                 { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') },
-                { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') },
+                { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') },
             ],
             currentStep: 1,
             valid: computed(() => {
