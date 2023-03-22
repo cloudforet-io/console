@@ -14,12 +14,6 @@
         <div v-else-if="$route.meta.centeredLayout"
              class="centered-page-layout"
         >
-            <p-icon-button
-                class="go-back-button"
-                name="ic_close"
-                size="lg"
-                @click="$router.go(-1)"
-            />
             <div class="page-contents">
                 <router-view />
             </div>
@@ -34,7 +28,6 @@
 </template>
 
 <script lang="ts">
-import { PIconButton } from '@spaceone/design-system';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -45,7 +38,7 @@ import DashboardsLNB from '@/services/dashboards/DashboardsLNB.vue';
 export default {
     name: 'DashboardsContainer',
     components: {
-        DashboardsLNB, GeneralPageLayout, VerticalPageLayout, PIconButton,
+        DashboardsLNB, GeneralPageLayout, VerticalPageLayout,
     },
     setup() {
         const { breadcrumbs } = useBreadcrumbs();
@@ -59,11 +52,6 @@ export default {
 .centered-page-layout {
     @apply flex flex-col flex-grow;
     background: url('@/assets/images/img_blurred-background.png') no-repeat 50% -$gnb-height / 90rem auto;
-    .go-back-button {
-        @apply absolute;
-        top: 0;
-        right: 1.5rem;
-    }
     .page-contents {
         @apply relative flex flex-col;
         margin: auto 0;
