@@ -39,6 +39,7 @@ const dashboardsRoute: RouteConfig = {
                     path: 'create',
                     name: DASHBOARDS_ROUTE.CREATE._NAME,
                     meta: {
+                        centeredLayout: true,
                         translationId: 'DASHBOARDS.CREATE.TITLE',
                         accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
                         accessInfo: {
