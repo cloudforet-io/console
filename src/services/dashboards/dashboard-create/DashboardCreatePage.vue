@@ -4,7 +4,7 @@
              class="dashboard-create-step1"
         >
             <dashboard-create-header
-                :description="steps[0].description"
+                :description="steps[currentStep - 1].description"
                 :total-steps="steps.length"
                 :current-step="currentStep"
             />
@@ -23,8 +23,7 @@
                 <p-button
                     style-type="primary"
                     size="lg"
-                    :loading="false"
-                    :disabled="!valid"
+                    :disabled="!isValid"
                     @click="handleGoStep(2)"
                 >
                     {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
@@ -32,10 +31,10 @@
             </div>
         </div>
         <div v-if="currentStep === steps[1].step"
-             class="dashboard-create-step2 max-w-lg2"
+             class="dashboard-create-step2"
         >
             <dashboard-create-header
-                :description="steps[1].description"
+                :description="steps[currentStep - 1].description"
                 :total-steps="steps.length"
                 :current-step="currentStep"
             />
@@ -128,7 +127,7 @@ export default {
                 { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') },
             ],
             currentStep: 1,
-            valid: computed(() => {
+            isValid: computed(() => {
                 if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) return !!dashboardProject.value?.id;
                 if (state.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return true;
                 return false;
