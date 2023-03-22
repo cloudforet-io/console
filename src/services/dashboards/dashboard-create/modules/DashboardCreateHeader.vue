@@ -3,9 +3,9 @@
         <p class="step">
             {{ $t('DASHBOARDS.CREATE.STEP') }} {{ props.currentStep }}/{{ props.totalSteps }}
         </p>
-        <h2 class="heading">
+        <p-heading heading-type="main">
             {{ $t('DASHBOARDS.CREATE.TITLE') }}
-        </h2>
+        </p-heading>
         <p class="description">
             {{ props.description }}
         </p>
@@ -13,6 +13,10 @@
 </template>
 
 <script lang="ts" setup>
+import {
+    PHeading,
+} from '@spaceone/design-system';
+
 interface Props {
     description: string;
     totalSteps: number;
@@ -28,8 +32,8 @@ const props = defineProps<Props>();
     .step {
         @apply mb-1 text-label-sm text-gray-500;
     }
-    .heading {
-        @apply mb-1 text-display-md text-gray-900 font-black;
+    .p-heading {
+        @apply mb-0;
     }
     .description {
         @apply mt-1 text-label-md text-gray-700;

@@ -21,8 +21,8 @@
                         <template #item-content="{board}">
                             <div class="content-layout">
                                 <p-i :name="board.description.icon"
-                                     width="2rem"
-                                     height="2rem"
+                                     width="2.5rem"
+                                     height="2.5rem"
                                 />
                                 <strong class="dashboard-name">{{ board.name }}</strong>
                                 <div class="dashboard-label-wrapper">
@@ -243,11 +243,8 @@ const handleInputSearch = () => {
     @apply relative;
     .dashboard-template-container {
         @apply overflow-auto;
-        height: calc(100vh - $gnb-height - 1.5rem - 6.5rem - 2rem - 4.5rem - 4.1rem);
+        height: calc(100vh - $gnb-height - 2.5rem - 6.5rem - 2rem - 4.5rem - 4.1rem);
         padding-bottom: 2.5rem;
-        &::-webkit-scrollbar {
-            display: none;
-        }
         &::after {
             @apply w-full absolute;
             height: 2.5rem;
@@ -297,6 +294,21 @@ const handleInputSearch = () => {
             .dashboard-name {
                 margin: 0.375rem 0;
             }
+
+            @screen tablet {
+                .content-layout {
+                    @apply relative items-start;
+                    padding-left: 3.25rem;
+                    min-height: 2.5rem;
+                    .p-i-icon {
+                        @apply absolute;
+                        left: 0;
+                    }
+                }
+                .dashboard-name {
+                    margin: 0;
+                }
+            }
         }
 
         .existing-dashboard-board {
@@ -307,14 +319,6 @@ const handleInputSearch = () => {
             }
             .p-board {
                 min-height: 4.125rem;
-            }
-
-            @screen tablet {
-                min-height: 54.5rem;
-            }
-
-            @screen mobile {
-                min-height: 54.5rem;
             }
         }
     }
