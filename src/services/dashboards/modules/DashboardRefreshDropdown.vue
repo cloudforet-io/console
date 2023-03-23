@@ -10,7 +10,7 @@
         />
         <p-select-dropdown class="currency-select-dropdown"
                            :items="intervalOptionItems"
-                           :selected="intervalOptionProxy"
+                           :selected="dashboardDetailState.settings.refresh_interval_option"
                            :read-only="loading"
                            :class="{ loading }"
                            menu-position="right"
@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import type { PropType, SetupContext } from 'vue';
+import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
@@ -31,16 +31,14 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { i18n } from '@/translations';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-
 import type { RefreshIntervalOption } from '@/services/dashboards/config';
 import { refreshIntervalOptionList, REFRESH_INTERVAL_OPTIONS_MAP } from '@/services/dashboards/config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 interface Props {
     dashboardId: string;
     readOnly: boolean;
     refreshDisabled: boolean;
-    intervalOption: RefreshIntervalOption;
     loading: boolean;
 }
 
@@ -63,18 +61,16 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-        intervalOption: {
-            type: String as PropType<RefreshIntervalOption>,
-            default: refreshIntervalOptionList[0],
-        },
         loading: {
             type: Boolean,
             default: false,
         },
     },
     setup(props, { emit }: SetupContext) {
+        const dashboardDetailStore = useDashboardDetailInfoStore();
+        const dashboardDetailState = dashboardDetailStore.$state;
+
         const state = reactive({
-            intervalOptionProxy: useProxyValue('intervalOption', props, emit),
             intervalOptionList: computed<{label: TranslateResult; value: RefreshIntervalOption}[]>(() => [
                 { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_OFF'), value: 'off' },
                 { label: i18n.t('DASHBOARDS.CUSTOMIZE.REFRESH_INTERVAL_15S'), value: '15s' },
@@ -91,8 +87,8 @@ export default defineComponent<Props>({
                 label: interval.label,
             }))),
             intervalDuration: computed<number|undefined>(() => {
-                if (!refreshIntervalOptionList.includes(state.intervalOptionProxy)) return undefined;
-                return REFRESH_INTERVAL_OPTIONS_MAP[state.intervalOptionProxy];
+                if (!refreshIntervalOptionList.includes(dashboardDetailState.settings.refresh_interval_option)) return undefined;
+                return REFRESH_INTERVAL_OPTIONS_MAP[dashboardDetailState.settings.refresh_interval_option];
             }),
         });
 
@@ -120,7 +116,9 @@ export default defineComponent<Props>({
         };
 
         const handleSelectRefreshIntervalOption = (option) => {
-            state.intervalOptionProxy = option;
+            dashboardDetailStore.$patch((_state) => {
+                _state.settings.refresh_interval_option = option;
+            });
             if (props.refreshDisabled) return;
             clearRefreshInterval();
             executeRefreshInterval();
@@ -165,6 +163,7 @@ export default defineComponent<Props>({
 
         return {
             ...toRefs(state),
+            dashboardDetailState,
             handleSelectRefreshIntervalOption,
             handleRefresh,
         };

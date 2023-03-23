@@ -9,7 +9,7 @@
         </template>
         <variable-more-button-dropdown :is-manageable="props.isManageable" />
         <button class="reset-button"
-                @click="resetVariables"
+                @click="dashboardDetailStore.resetVariables"
         >
             <p-i name="ic_refresh"
                  width="1rem"
@@ -46,14 +46,12 @@ interface Props {
 const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const { resetVariables } = dashboardDetailStore;
 const dashboardDetailState = dashboardDetailStore.$state;
 
 const vm = getCurrentInstance()?.proxy as Vue;
 
 const variableState = reactive({
     showOverlay: computed(() => vm.$route.hash === `#${MANAGE_VARIABLES_HASH_NAME}`),
-    variableData: computed(() => dashboardDetailState.variables),
     variableProperties: computed(() => dashboardDetailState.variablesSchema.properties),
     order: computed(() => dashboardDetailState.variablesSchema.order),
     allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),

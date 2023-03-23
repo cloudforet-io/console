@@ -5,13 +5,8 @@
                                        @update:name="handleUpdateDashboardName"
         />
         <div class="filters-box">
-            <dashboard-labels editable
-                              :label-list="dashboardDetailState.labels"
-                              @update:labelList="handleUpdateLabelList"
-            />
-            <dashboard-toolset :date-range.sync="dashboardDetailState.settings.date_range"
-                               :currency.sync="dashboardDetailState.settings.currency"
-            />
+            <dashboard-labels editable />
+            <dashboard-toolset />
         </div>
         <p-divider />
         <div class="dashboard-selectors">
@@ -19,18 +14,13 @@
                                           is-manageable
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                        :interval-option.sync="dashboardDetailState.settings.refresh_interval_option"
                                         refresh-disabled
             />
         </div>
         <dashboard-widget-container edit-mode
                                     reuse-previous-data
         />
-        <dashboard-customize-sidebar :widget-info-list.sync="dashboardDetailState.dashboardWidgetInfoList"
-                                     :dashboard-id="props.dashboardId"
-                                     :enable-date-range.sync="dashboardDetailState.settings.date_range.enabled"
-                                     :enable-currency.sync="dashboardDetailState.settings.currency.enabled"
-                                     :loading="state.loading"
+        <dashboard-customize-sidebar :loading="state.loading"
                                      @save="handleSave"
         />
     </div>
@@ -156,9 +146,6 @@ const createDashboard = async () => {
 /* Event */
 const handleUpdateDashboardName = (name: string) => {
     state.name = name;
-};
-const handleUpdateLabelList = (labels: Array<string>) => {
-    dashboardDetailStore.$patch({ labels: [...labels] });
 };
 const handleSave = async () => {
     state.loading = true;
