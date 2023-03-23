@@ -151,19 +151,25 @@ export default {
         const handleName = (value) => {
             setForm('name', value);
             state.editedSelectedWidget.name = value;
-            costDashboardPageStore.$patch({ editedSelectedWidget: state.editedSelectedWidget });
+            costDashboardPageStore.$patch((_state) => {
+                _state.editedSelectedWidget = state.editedSelectedWidget;
+            });
         };
 
         const handleSelectGroupBy = (value) => {
             setForm('groupBy', value);
             state.editedSelectedWidget.options.group_by = value;
-            costDashboardPageStore.$patch({ editedSelectedWidget: state.editedSelectedWidget });
+            costDashboardPageStore.$patch((_state) => {
+                _state.editedSelectedWidget = state.editedSelectedWidget;
+            });
         };
 
         const handleSelectGranularity = (value) => {
             setForm('granularity', value);
             state.editedSelectedWidget.options.granularity = value;
-            costDashboardPageStore.$patch({ editedSelectedWidget: state.editedSelectedWidget });
+            costDashboardPageStore.$patch((_state) => {
+                _state.editedSelectedWidget = state.editedSelectedWidget;
+            });
         };
 
         const init = () => {

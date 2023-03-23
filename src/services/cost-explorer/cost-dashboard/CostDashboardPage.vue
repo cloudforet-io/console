@@ -257,7 +257,9 @@ export default {
             state.dashboard = dashboard;
             const layout = await getDashboardLayout(dashboard);
             state.layout = layout;
-            costDashboardPageStore.$patch({ editedCustomLayout: layout });
+            costDashboardPageStore.$patch((_state) => {
+                _state.editedCustomLayout = layout;
+            });
             state.filters = convertFiltersInToNewType(dashboard.default_filter);
             state.period = dashboard.period ?? {};
             state.periodType = dashboard.period_type;

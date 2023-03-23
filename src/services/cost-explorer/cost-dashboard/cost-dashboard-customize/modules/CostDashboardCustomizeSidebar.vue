@@ -89,7 +89,9 @@ export default {
             editingCustomLayout: computed<CustomLayout[]|undefined>({
                 get() { return costDashboardPageState.editedCustomLayout; },
                 set(val) {
-                    costDashboardPageStore.$patch({ editedCustomLayout: [...(val || [])] });
+                    costDashboardPageStore.$patch((_state) => {
+                        _state.editedCustomLayout = [...(val || [])];
+                    });
                 },
             }),
         });

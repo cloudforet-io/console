@@ -191,18 +191,18 @@ export default {
         };
 
         const handleClickUpdate = (rowIdx, colIdx, widget: WidgetInfo) => {
-            costDashboardPageStore.$patch({
-                widgetPosition: { row: rowIdx, col: colIdx },
-                originSelectedWidget: widget,
-                editedSelectedWidget: widget,
+            costDashboardPageStore.$patch((_state) => {
+                _state.widgetPosition = { row: rowIdx, col: colIdx };
+                _state.originSelectedWidget = widget;
+                _state.editedSelectedWidget = widget;
             });
             state.updateModalVisible = true;
         };
 
         const handleClickDelete = (rowIdx, colIdx, widget: WidgetInfo) => {
-            costDashboardPageStore.$patch({
-                widgetPosition: { row: rowIdx, col: colIdx },
-                editedSelectedWidget: widget,
+            costDashboardPageStore.$patch((_state) => {
+                _state.widgetPosition = { row: rowIdx, col: colIdx };
+                _state.editedSelectedWidget = widget;
             });
             checkDeleteState.visible = true;
         };
@@ -217,9 +217,9 @@ export default {
         };
 
         const handleClickAdd = (rowIdx, colIdx, layout) => {
-            costDashboardPageStore.$patch({
-                widgetPosition: { row: rowIdx, col: colIdx },
-                layoutOfSpace: layout,
+            costDashboardPageStore.$patch((_state) => {
+                _state.widgetPosition = { row: rowIdx, col: colIdx };
+                _state.layoutOfSpace = layout;
             });
             state.customizeModalVisible = true;
         };

@@ -137,9 +137,9 @@ export default {
         const getChartTypeImageFileName = (chartType: ChartType) => chartTypeItemMap[chartType].imageFileName;
 
         const selectWidget = (value: WidgetInfo) => {
-            costDashboardPageStore.$patch({
-                originSelectedWidget: value,
-                editedSelectedWidget: value,
+            costDashboardPageStore.$patch((_state) => {
+                _state.originSelectedWidget = value;
+                _state.editedSelectedWidget = value;
             });
         };
 

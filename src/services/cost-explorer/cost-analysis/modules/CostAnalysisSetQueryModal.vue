@@ -130,7 +130,9 @@ export default {
 
         const handleFormConfirm = async () => {
             if (costAnalysisPageState.granularity !== state.granularity) {
-                costAnalysisPageStore.$patch({ period: getInitialDates() });
+                costAnalysisPageStore.$patch((_state) => {
+                    _state.period = getInitialDates();
+                });
             }
             costAnalysisPageStore.$patch({
                 granularity: state.granularity,

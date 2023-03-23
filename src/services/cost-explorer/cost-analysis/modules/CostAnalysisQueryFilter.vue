@@ -124,7 +124,9 @@ export default {
         /* event */
         const handleSelectGranularity = async (granularity: Granularity) => {
             if (granularity !== costAnalysisPageState.granularity) {
-                costAnalysisPageStore.$patch({ period: getInitialDates() });
+                costAnalysisPageStore.$patch((_state) => {
+                    _state.period = getInitialDates();
+                });
             }
             costAnalysisPageStore.$patch({ granularity });
         };
@@ -132,7 +134,9 @@ export default {
             costAnalysisPageStore.$patch({ stack: value });
         };
         const handleSelectedDates = (period) => {
-            costAnalysisPageStore.$patch({ period });
+            costAnalysisPageStore.$patch((_state) => {
+                _state.period = period;
+            });
         };
         const handleClickSetFilter = () => {
             state.setQueryModalVisible = true;

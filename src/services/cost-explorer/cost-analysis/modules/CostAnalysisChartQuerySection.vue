@@ -185,7 +185,9 @@ export default defineComponent<Props>({
             state.filterModalVisible = true;
         };
         const handleUpdateFilters = (filters: CostFiltersMap) => {
-            costAnalysisPageStore.$patch({ filters });
+            costAnalysisPageStore.$patch((_state) => {
+                _state.filters = filters;
+            });
         };
         const handleToggleSeries = (index) => {
             const _legends = cloneDeep(props.legends);

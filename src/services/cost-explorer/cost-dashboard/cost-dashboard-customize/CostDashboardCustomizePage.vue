@@ -90,7 +90,9 @@ export default {
             editingCustomLayout: computed<CustomLayout[]|undefined>({
                 get() { return costDashboardPageState.editedCustomLayout; },
                 set(val) {
-                    costDashboardPageStore.$patch({ editedCustomLayout: [...(val ?? [])] });
+                    costDashboardPageStore.$patch((_state) => {
+                        _state.editedCustomLayout = [...(val ?? [])];
+                    });
                 },
             }),
             dashboardIdFromRoute: computed(() => props.dashboardId || SpaceRouter.router.currentRoute.params.dashboardId),
@@ -142,13 +144,17 @@ export default {
                     state.editingCustomLayout[state.widgetPosition.row ?? ''].splice((state.widgetPosition.col ?? 0) + 1, 0, state.selectedWidget as WidgetInfo);
                 } else {
                     state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget as WidgetInfo];
-                    costDashboardPageStore.$patch({ editedCustomLayout: [...(state.editingCustomLayout ?? [])] });
+                    costDashboardPageStore.$patch((_state) => {
+                        _state.editedCustomLayout = [...(state.editingCustomLayout ?? [])];
+                    });
                 }
             } else if (state.editingCustomLayout.length === 0) {
                 state.editingCustomLayout = [[state.selectedWidget as WidgetInfo]];
             } else {
                 state.editingCustomLayout[state.editingCustomLayout.length] = [state.selectedWidget as WidgetInfo];
-                costDashboardPageStore.$patch({ editedCustomLayout: [...state.editingCustomLayout] });
+                costDashboardPageStore.$patch((_state) => {
+                    _state.editedCustomLayout = [...state.editingCustomLayout];
+                });
             }
         };
 
@@ -157,10 +163,10 @@ export default {
             if (!state.editingCustomLayout) return;
             state.editingCustomLayout[state.widgetPosition.row ?? ''].splice(state.widgetPosition.col, 1);
             state.editingCustomLayout = state.editingCustomLayout.filter((row) => row.length > 0);
-            costDashboardPageStore.$patch({
-                editedCustomLayout: [...state.editingCustomLayout],
-                widgetPosition: undefined,
-                editedSelectedWidget: undefined,
+            costDashboardPageStore.$patch((_state) => {
+                _state.editedCustomLayout = [...state.editingCustomLayout];
+                _state.widgetPosition = undefined;
+                _state.editedSelectedWidget = undefined;
             });
         };
 
@@ -168,10 +174,10 @@ export default {
             if (!state.widgetPosition) return;
             if (!state.editingCustomLayout) return;
             state.editingCustomLayout[state.widgetPosition.row ?? ''][state.widgetPosition.col ?? ''] = state.selectedWidget;
-            costDashboardPageStore.$patch({
-                editedCustomLayout: [...state.editingCustomLayout],
-                widgetPosition: undefined,
-                editedSelectedWidget: undefined,
+            costDashboardPageStore.$patch((_state) => {
+                _state.editedCustomLayout = [...state.editingCustomLayout];
+                _state.widgetPosition = undefined;
+                _state.editedSelectedWidget = undefined;
             });
         };
 
@@ -190,7 +196,9 @@ export default {
                 state.dashboardTitle = state.dashboardData?.name || '';
                 const layout = await getDashboardLayout(state.dashboardData);
                 state.layout = layout;
-                costDashboardPageStore.$patch({ editedCustomLayout: layout });
+                costDashboardPageStore.$patch((_state) => {
+                    _state.editedCustomLayout = layout;
+                });
                 state.filters = state.dashboardData.default_filter ?? {};
                 state.period = state.dashboardData.period ?? {};
                 state.periodType = state.dashboardData.period_type ?? 'AUTO';

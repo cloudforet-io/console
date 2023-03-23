@@ -258,9 +258,9 @@ export default {
             cloudServicePageStore.setSelectedProvider(urlQueryValue.provider);
             cloudServicePageStore.setSelectedRegionsToFilters(urlQueryValue.region);
             cloudServicePageStore.setSelectedCategoriesToFilters(urlQueryValue.service);
-            cloudServicePageStore.$patch({
-                period: urlQueryValue.period,
-                searchFilters: searchQueryHelper.filters as ConsoleFilter[],
+            cloudServicePageStore.$patch((_state) => {
+                _state.period = urlQueryValue.period;
+                _state.searchFilters = searchQueryHelper.filters as ConsoleFilter[];
             });
 
             // LOAD REFERENCE STORE

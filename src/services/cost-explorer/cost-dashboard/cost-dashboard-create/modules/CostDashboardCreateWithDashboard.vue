@@ -88,10 +88,10 @@ export default {
             userId: computed(() => store.state.user.userId),
         });
 
-        const handleDashboardChange = (value: Partial<DashboardInfo>) => {
-            costDashboardPageStore.$patch({
-                selectedTemplate: value,
-                defaultFilter: convertFiltersInToNewType(value.default_filter ?? {}),
+        const handleDashboardChange = (value: PublicDashboardInfo) => {
+            costDashboardPageStore.$patch((_state) => {
+                _state.selectedTemplate = value;
+                _state.defaultFilter = convertFiltersInToNewType(value.default_filter ?? {});
             });
         };
 
