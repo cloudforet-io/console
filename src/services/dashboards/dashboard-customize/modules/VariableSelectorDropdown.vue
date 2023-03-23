@@ -168,7 +168,9 @@ const changeVariables = (changedSelected: MenuItem[]) => {
     } else {
         variables[props.propertyName] = reconvertedSelected;
     }
-    dashboardDetailStore.$patch({ variables });
+    dashboardDetailStore.$patch((_state) => {
+        _state.variables = variables;
+    });
 };
 
 const handleUpdateSearchText = debounce((text: string) => {

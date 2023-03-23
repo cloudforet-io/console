@@ -107,7 +107,9 @@ export default defineComponent<Props>({
             widgetConfigMap,
             variablesSchema: toRef(dashboardDetailState, 'variablesSchema'),
             updateWidgetValidMap: (validMap) => {
-                dashboardDetailStore.$patch({ widgetValidMap: validMap });
+                dashboardDetailStore.$patch((_state) => {
+                    _state.widgetValidMap = validMap;
+                });
             },
         });
 

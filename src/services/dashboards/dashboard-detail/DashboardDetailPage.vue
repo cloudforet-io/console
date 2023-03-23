@@ -220,7 +220,9 @@ const init = async () => {
     };
 
     if (useQueryValue.variables) {
-        dashboardDetailStore.$patch({ variables: useQueryValue.variables });
+        dashboardDetailStore.$patch((_state) => {
+            _state.variables = useQueryValue.variables;
+        });
     }
     if (useQueryValue.dateRange) {
         dashboardDetailStore.$patch((_state) => {
@@ -279,7 +281,9 @@ onMounted(() => {
     /*
     Empty widget data map which is used in DashboardWidgetContainer to reuse data and not to call api when going to customize page.
      */
-    dashboardDetailStore.$patch({ widgetDataMap: {} });
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap = {};
+    });
 });
 </script>
 

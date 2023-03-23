@@ -162,8 +162,8 @@ const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
     if (state.contentType === 'ADD') {
         const variableKey = getUUID();
         properties[variableKey] = variable;
-        dashboardDetailStore.$patch({
-            variablesSchema: { properties, order: [...state.variableSchema.order, variableKey] },
+        dashboardDetailStore.$patch((_state) => {
+            _state.variablesSchema = { properties, order: [...state.variableSchema.order, variableKey] };
         });
     } else {
         const selectedProperty = state.selectedVariable;
