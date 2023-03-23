@@ -123,7 +123,7 @@ export default {
         const listDashboard = async () => {
             try {
                 state.loading = true;
-                costExplorerDashboardStore.setDashboardList();
+                await costExplorerDashboardStore.setDashboardList();
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
