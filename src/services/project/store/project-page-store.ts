@@ -14,7 +14,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { ProjectPageState } from '@/services/project/store/type';
 import type {
-    ProjectGroup, ProjectItemResp, ProjectGroupTreeItem, ProjectTreeRoot,
+    ProjectGroup, ProjectItemResp, ProjectGroupTreeItem, ProjectTreeRoot, ProjectModel,
 } from '@/services/project/type';
 
 interface ProjectGroupInfo {parent_project_group_id?: string; name: string}
@@ -42,7 +42,7 @@ interface ProjectPageAction {
     createProjectGroup: (projectGroupInfo: ProjectGroupInfo) => Promise<void>;
     updateProjectGroup: (projectGroupInfo: ProjectGroupInfo) => Promise<void>;
     deleteProjectGroup: () => Promise<void>;
-    createProject: (projectInfo: ProjectInfo) => Promise<void>;
+    createProject: (projectInfo: ProjectInfo) => Promise<ProjectModel|undefined>;
     refreshPermissionInfo: () => Promise<void>;
     addPermissionInfo: (permissionInfo: any) => void;
     openProjectCreateForm: (target?: ProjectGroupTreeItem) => void;
@@ -246,7 +246,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
         },
         async createProject(
             projectInfo: ProjectInfo,
-        ) {
+        ):Promise<ProjectModel|undefined> {
             try {
                 const res = await SpaceConnector.client.identity.project.create({
                     ...projectInfo,
@@ -269,6 +269,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
 
                     this.pushPermissionInfo({ [res.project_id]: true });
                 }
+                return res;
             } catch (e: any) {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
                 throw new Error(e);
