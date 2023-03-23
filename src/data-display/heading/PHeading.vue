@@ -106,13 +106,15 @@ export default defineComponent<Props>({
         width: 100%;
         margin-bottom: 1.5rem;
         > .heading-wrapper {
-            font-weight: bold;
             > h2 {
+                font-weight: bold;
                 &.has-right {
                     margin-right: 0.5rem;
                 }
             }
             > .total-count {
+                font-weight: bold;
+
                 @apply text-gray-900;
             }
         }
