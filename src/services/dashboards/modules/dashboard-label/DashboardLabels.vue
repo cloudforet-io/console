@@ -56,13 +56,13 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+
 
 interface Props {
-    labelList: Array<string>;
     editable?: boolean;
 }
 const props = defineProps<Props>();
-const emit = defineEmits(['update:labelList']);
 
 const {
     forms: {
@@ -81,10 +81,15 @@ const {
     },
 });
 
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
+
 const state = reactive({
     labelList: computed<Array<string>>({
-        get: () => props.labelList,
-        set(val: Array<string>) { emit('update:labelList', val); },
+        get: () => dashboardDetailState.labels,
+        set(val: Array<string>) {
+            dashboardDetailStore.$patch({ labels: [...val] });
+        },
     }),
     inputMode: false,
     isInputFocused: false,
@@ -102,11 +107,11 @@ const handlePushLabel = (e: KeyboardEvent) => {
     if (e.isComposing || !inputText.value || invalidState.inputText) return;
     state.labelList.push(inputText.value);
     setForm('inputText', '');
-    emit('update:labelList', state.labelList);
+    dashboardDetailStore.$patch({ labels: state.labelList });
 };
 const handleDelete = (index: number) => {
     state.labelList.splice(index, 1);
-    emit('update:labelList', state.labelList);
+    dashboardDetailStore.$patch({ labels: state.labelList });
 };
 
 </script>

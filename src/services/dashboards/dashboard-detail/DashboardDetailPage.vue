@@ -47,13 +47,8 @@
             </template>
         </p-heading>
         <div class="filter-box">
-            <dashboard-labels :label-list="dashboardDetailState.labels" />
-            <dashboard-toolset
-                :currency="dashboardDetailState.settings.currency"
-                :date-range="dashboardDetailState.settings.date_range"
-                @update:currency="handleUpdateCurrency"
-                @update:date-range="handleUpdateDateRange"
-            />
+            <dashboard-labels />
+            <dashboard-toolset />
         </div>
         <p-divider class="divider" />
         <div class="dashboard-selectors">
@@ -61,7 +56,6 @@
                                           :is-manageable="state.hasManagePermission"
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                        :interval-option.sync="dashboardDetailState.settings.refresh_interval_option"
                                         :loading="dashboardDetailState.loadingWidgets"
                                         @refresh="handleRefresh"
             />
@@ -197,17 +191,6 @@ const handleRefresh = () => {
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
 };
 
-const handleUpdateCurrency = (currency) => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.settings = { ..._state.settings, currency };
-    });
-};
-const handleUpdateDateRange = (dateRange) => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.settings = { ..._state.settings, date_range: dateRange };
-    });
-};
-
 /* init */
 let urlQueryStringWatcherStop;
 const init = async () => {
@@ -220,7 +203,9 @@ const init = async () => {
     };
 
     if (useQueryValue.variables) {
-        dashboardDetailStore.$patch({ variables: useQueryValue.variables });
+        dashboardDetailStore.$patch((_state) => {
+            _state.variables = useQueryValue.variables;
+        });
     }
     if (useQueryValue.dateRange) {
         dashboardDetailStore.$patch((_state) => {
@@ -279,7 +264,9 @@ onMounted(() => {
     /*
     Empty widget data map which is used in DashboardWidgetContainer to reuse data and not to call api when going to customize page.
      */
-    dashboardDetailStore.$patch({ widgetDataMap: {} });
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap = {};
+    });
 });
 </script>
 

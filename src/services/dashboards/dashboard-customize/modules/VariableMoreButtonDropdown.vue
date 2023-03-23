@@ -120,7 +120,9 @@ const updateVariablesUse = () => {
     state.variableSchema.order.forEach((property) => {
         _varialbesSchema.properties[property].use = state.selectedForUpdate.some((menu) => menu.name === property);
     });
-    dashboardDetailStore.$patch({ variablesSchema: _varialbesSchema });
+    dashboardDetailStore.$patch((_state) => {
+        _state.variablesSchema = _varialbesSchema;
+    });
 };
 
 // event

@@ -29,9 +29,9 @@
                 </p-button>
                 <draggable class="draggable-wrapper"
                            ghost-class="ghost"
-                           :list="state.proxyWidgetInfoList"
+                           :list="state.widgetInfoList"
                 >
-                    <div v-for="(widget, idx) in state.proxyWidgetInfoList"
+                    <div v-for="(widget, idx) in state.widgetInfoList"
                          :key="`drag-item-${widget.widget_name}-${idx}`"
                          class="draggable-item"
                     >
@@ -57,14 +57,14 @@
         <portal to="widget-footer">
             <div class="footer-wrapper">
                 <p-button style-type="transparent"
-                          :disabled="loading"
+                          :disabled="props.loading"
                           @click="handleClickCancelButton"
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary"
                           :disabled="!dashboardDetailStore.isWidgetLayoutValid || !dashboardDetailState.isNameValid"
-                          :loading="loading"
+                          :loading="props.loading"
                           @click="handleClickSaveButton"
                 >
                     {{ $t('DASHBOARDS.CUSTOMIZE.SAVE') }}
@@ -92,15 +92,11 @@ import {
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-
 import DashboardAddWidgetModal from '@/services/dashboards/dashboard-customize/modules/DashboardAddWidgetModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {
-    widgetInfoList: DashboardLayoutWidgetInfo[];
-    dashboardId?: string;
     loading?: boolean;
 }
 
@@ -112,9 +108,9 @@ const emit = defineEmits<{(e: string, value: string): void,
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const state = reactive({
+    widgetInfoList: computed(() => dashboardDetailState.dashboardWidgetInfoList),
     enableDateRange: computed(() => dashboardDetailState.settings.date_range?.enabled ?? false),
     enableCurrency: computed(() => dashboardDetailState.settings.currency?.enabled ?? false),
-    proxyWidgetInfoList: useProxyValue('widgetInfoList', props, emit),
     addWidgetModalVisible: false,
 });
 
@@ -140,7 +136,9 @@ const handleClickSaveButton = () => {
     emit('save');
 };
 const handleAddWidget = (newWidget: DashboardLayoutWidgetInfo) => {
-    state.proxyWidgetInfoList = state.proxyWidgetInfoList.concat([newWidget]);
+    dashboardDetailStore.$patch((_state) => {
+        _state.dashboardWidgetInfoList = _state.dashboardWidgetInfoList.concat([newWidget]);
+    });
 };
 
 onMounted(() => {
