@@ -101,9 +101,9 @@ export default {
         };
 
         const handleLayoutChange = (value: Record<string, DefaultLayout>) => {
-            costDashboardPageStore.$patch({
-                selectedTemplate: value,
-                defaultFilter: {},
+            costDashboardPageStore.$patch((_state) => {
+                _state.selectedTemplate = value;
+                _state.defaultFilter = {};
             });
         };
 

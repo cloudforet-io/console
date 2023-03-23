@@ -80,7 +80,11 @@ export default {
         const state = reactive({
             period: computed<Period>({
                 get() { return props.fixedPeriod; },
-                set(period) { costAnalysisPageStore.$patch({ period }); },
+                set(period) {
+                    costAnalysisPageStore.$patch((_state) => {
+                        _state.period = period;
+                    });
+                },
             }),
             periodItems: computed<PeriodItem[]>(() => ([
                 {

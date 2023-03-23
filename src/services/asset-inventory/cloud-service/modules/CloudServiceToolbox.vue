@@ -260,7 +260,9 @@ export default defineComponent<Props>({
         const handleChange = (options: ToolboxOptions = {}) => {
             if (options.queryTags !== undefined) {
                 searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
-                cloudServicePageStore.$patch({ searchFilters: searchQueryHelper.filters as ConsoleFilter[] });
+                cloudServicePageStore.$patch((_state) => {
+                    _state.searchFilters = searchQueryHelper.filters;
+                });
             } else {
                 emit('update-pagination', options);
             }

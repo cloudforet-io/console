@@ -166,18 +166,18 @@ export default {
 
         /* Event */
         const handleSelectWidget = async (value: WidgetInfo) => {
-            costDashboardPageStore.$patch({
-                originSelectedWidget: value,
-                editedSelectedWidget: value,
+            costDashboardPageStore.$patch((_state) => {
+                _state.originSelectedWidget = value;
+                _state.editedSelectedWidget = value;
             });
             state.selectedQuery = {};
             state.selectedItem = value;
         };
         const handleClickRemoveWidget = async () => {
             await deleteCustomWidget();
-            costDashboardPageStore.$patch({
-                originSelectedWidget: undefined,
-                editedSelectedWidget: undefined,
+            costDashboardPageStore.$patch((_state) => {
+                _state.originSelectedWidget = undefined;
+                _state.editedSelectedWidget = undefined;
             });
             state.selectedItem = {};
             state.thisPage = 1;
@@ -185,9 +185,9 @@ export default {
         };
         const handleCreateCustomWidget = async (createdCustomWidget: WidgetInfo) => {
             await listCustomWidget();
-            costDashboardPageStore.$patch({
-                originSelectedWidget: createdCustomWidget,
-                editedSelectedWidget: createdCustomWidget,
+            costDashboardPageStore.$patch((_state) => {
+                _state.originSelectedWidget = createdCustomWidget;
+                _state.editedSelectedWidget = createdCustomWidget;
             });
             state.selectedQuery = {};
             state.selectedItem = createdCustomWidget;
@@ -209,9 +209,9 @@ export default {
         watch(() => state.selectedQuery, (selectedQuery) => {
             if (Object.keys(selectedQuery).length) {
                 state.selectedItem = selectedQuery;
-                costDashboardPageStore.$patch({
-                    originSelectedWidget: undefined,
-                    editedSelectedWidget: undefined,
+                costDashboardPageStore.$patch((_state) => {
+                    _state.originSelectedWidget = undefined;
+                    _state.editedSelectedWidget = undefined;
                 });
             }
         }, { immediate: false });

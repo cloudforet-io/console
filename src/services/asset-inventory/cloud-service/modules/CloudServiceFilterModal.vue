@@ -177,7 +177,9 @@ export default defineComponent<Props>({
             state.filters = filters;
         };
         const handleFormConfirm = () => {
-            cloudServicePageStore.$patch({ additionalFilters: state.filters });
+            cloudServicePageStore.$patch((_state) => {
+                _state.additionalFilters = state.filters;
+            });
             emit('confirm');
             state.proxyVisible = false;
         };
