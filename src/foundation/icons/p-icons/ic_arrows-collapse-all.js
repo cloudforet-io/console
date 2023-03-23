@@ -3,7 +3,7 @@
 // @ts-ignore
 import icon from 'vue-svgicon'
 icon.register({
-  'ic_arrows-collaps-all': {
+  'ic_arrows-collapse-all': {
     width: 32,
     height: 32,
     viewBox: '0 0 32 32',
