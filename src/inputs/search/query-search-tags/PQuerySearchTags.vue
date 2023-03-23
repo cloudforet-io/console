@@ -198,7 +198,7 @@ export default defineComponent<QuerySearchTagsProps>({
                         margin-right: 0.125rem;
                     }
                     .value-label {
-                        white-space: normal;
+                        white-space: pre-wrap;
                         word-break: break-all;
                     }
                 }

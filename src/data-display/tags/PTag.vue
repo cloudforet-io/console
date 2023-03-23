@@ -18,7 +18,9 @@
                 <span v-if="keyItem"
                       class="key"
                 ><slot name="key">{{ keyItem.label || keyItem.name }}:</slot></span>
-                <span v-if="valueItem"><slot name="value">{{ valueItem.label || valueItem.name }}</slot></span>
+                <span v-if="valueItem"
+                      class="value"
+                ><slot name="value">{{ valueItem.label || valueItem.name }}</slot></span>
             </slot>
         </span>
         <p-i v-if="deletable"
@@ -154,6 +156,10 @@ export default defineComponent<Props>({
     .key {
         font-weight: bold;
         margin-right: 0.25rem;
+    }
+    .value {
+        white-space: pre-wrap;
+        word-break: break-all;
     }
 }
 </style>
