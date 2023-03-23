@@ -354,7 +354,7 @@ export default {
 
                 // this is for refresh project list cards
                 if (projectPageStore.groupId === oldParent?.data.id || projectPageStore.groupId === parent.data.id) {
-                    projectPageStore.$patch({ selectedItem: { ...projectPageStore?.selectedItem } });
+                    projectPageStore.$patch((_state) => { _state.selectedItem = { ...projectPageStore?.selectedItem }; });
                 }
 
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '');
@@ -386,7 +386,7 @@ export default {
         };
 
         const onChangeSelect = (selected) => {
-            projectPageStore.$patch({ selectedItem: selected[0] || {} });
+            projectPageStore.$patch((_state) => { _state.selectedItem = selected[0] || {}; });
         };
 
         const onAllProjectChangeSelect = (selected) => {
