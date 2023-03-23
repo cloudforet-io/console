@@ -44,6 +44,7 @@ export const Template = (args, {argTypes}) => ({
 });
 
 # Board Item
+The style of `board-item` may be different depending on the `board` component Style Type. For example, border-radius, box-shadow, etc.
 <br/>
 <br/>
 
@@ -164,7 +165,7 @@ and when you want a custom ui, use the `left-content` slot to replace it.<br/>
                 </div>
             `,
             setup() {
-                const state = reactive({ selected: false });
+                const state = reactive({ selected: undefined });
                 const handleSelect = (e) => {
                     state.selected = !state.selected
                 };
@@ -235,19 +236,19 @@ Custom content injected into the `custom-right-overlay-content` slot is not repl
             i18n,
             components: { PBoardItem, PTextButton },
             template: `
-    <div class="h-full w-full overflow p-8">
-        <p-board-item>
-            <template #content>
-                <strong>Custom Right Overlay Content - Preview </strong>
-                <p>Hover your mouse over here</p>
-            </template>
-            <template #custom-right-content>
-                <p-text-button icon-right="ic_external-link">Preview</p-text-button>
-            </template>
-        </p-board-item>
-        </p-board-item>
-    </div>
-    `,
+                <div class="h-full w-full overflow p-8">
+                    <p-board-item>
+                        <template #content>
+                            <strong>Custom Right Overlay Content - Preview </strong>
+                            <p>Hover your mouse over here</p>
+                        </template>
+                        <template #custom-right-content>
+                            <p-text-button icon-right="ic_external-link">Preview</p-text-button>
+                        </template>
+                    </p-board-item>
+                    </p-board-item>
+                </div>
+                `,
             setup() {
                 return {}
             }

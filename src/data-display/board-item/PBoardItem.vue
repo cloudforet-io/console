@@ -148,14 +148,23 @@ export default defineComponent<BoardItemProps>({
     min-height: 4rem;
     box-sizing: border-box;
     &.rounded {
-        @apply rounded-md;
+        @apply rounded-lg;
     }
     &.selectable {
         cursor: pointer;
     }
     &.selected {
-        @apply border-blue-600 text-blue-600;
-        border-bottom-width: 1px !important;
+        @apply bg-blue-200 relative;
+
+        &::before {
+            @apply absolute border-blue-600;
+            width: calc(100% + 0.125rem);
+            height: calc(100% + 0.125rem);
+            left: -1px;
+            border-width: 0.125rem !important;
+            border-radius: inherit;
+            content: '';
+        }
     }
 
     &:hover {
@@ -169,12 +178,12 @@ export default defineComponent<BoardItemProps>({
             line-height: normal;
         }
         .right-overlay-wrapper {
-            @apply h-full flex items-center bg-blue-100 absolute;
+            @apply flex items-center bg-blue-100 absolute;
+            top: 1rem;
             right: 1rem;
 
             .overlay-contents {
                 @apply h-full w-full flex bg-blue-100;
-                padding: 1rem 0 1rem;
 
                 .overlay-icon-button {
                     height: 2rem;

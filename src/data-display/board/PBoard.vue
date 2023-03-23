@@ -122,10 +122,10 @@ export default defineComponent<BoardProps>({
         @apply border-b-0;
     }
     .first-list-item {
-        @apply rounded-t-md;
+        @apply rounded-t-lg;
     }
     .last-list-item {
-        @apply rounded-b-md border-b;
+        @apply rounded-b-lg border-b;
     }
 }
 .cards-style {
@@ -135,7 +135,8 @@ export default defineComponent<BoardProps>({
     gap: 0.5rem;
     grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
     .p-board-item {
-        @apply rounded-md;
+        @apply rounded-lg;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
     }
 
     @screen tablet {
