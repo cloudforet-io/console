@@ -1,8 +1,18 @@
 {
-  "name": "tsconfig",
-  "version": "1.11.0-rc1",
-  "private": true,
-  "files": [
-    "base.json"
+  "extends": "tsconfig/base.json",
+  "compilerOptions": {
+    "types": ["vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@cloudforet/core-lib/*": ["../../packages/core-lib/dist/*"]
+    }
+  },
+  "include": [ "./**/*.ts", "./**/*.tsx", "./**/*.vue" ],
+  "exclude": [
+    "node_modules",
+    "src/assets",
+    "**/*.stories.ts",
+    "dist"
   ]
 }

@@ -1,15 +1,18 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "tsconfig/base.json",
   "compilerOptions": {
     "types": ["vitest/globals"],
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*", "packages/cloudforet/core-lib/src/*"],
-      "@cloudforet/*": ["packages/cloudforet/*"],
-      "@cloudforet/core-lib": ["packages/cloudforet/core-lib/dist/index.d.ts"],
-      "@cloudforet/core-lib/*": ["packages/cloudforet/core-lib/dist/*"]
+      "@/*": ["./src/*"],
+      "@cloudforet/core-lib/*": ["../../packages/core-lib/dist/*"]
     }
   },
-  "include": [ "**/*.ts", "**/*.tsx", "**/*.vue" ],
-  "exclude": [ "node_modules", "src/assets", "**/*.stories.ts", "dist" ],
-  "references": [{"path": "packages/cloudforet/core-lib/tsconfig.ref.json"}]
+  "include": [ "./**/*.ts", "./**/*.tsx", "./**/*.vue" ],
+  "exclude": [
+    "node_modules",
+    "src/assets",
+    "**/*.stories.ts",
+    "dist"
+  ]
 }
