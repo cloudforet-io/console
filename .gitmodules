@@ -1,3 +1,0 @@
-[submodule "apps/web/src/assets"]
-	path = apps/web/src/assets
-	url = https://github.com/cloudforet-io/console-assets.git

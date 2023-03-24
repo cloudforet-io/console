@@ -11,7 +11,7 @@ import VueTypeImports from 'vite-plugin-vue-type-imports';
 const isPackageLinked = (packageName) => new Promise((resolve, reject) => {
     if (!packageName) reject(new Error('No argument'));
 
-    const packagePath = path.resolve(__dirname, `./node_modules/${packageName}`)
+    const packagePath = path.resolve(__dirname, `../../node_modules/${packageName}`)
     glob(packagePath, (err, foundPaths) => {
         if (err) reject(err)
 
@@ -69,9 +69,9 @@ export default defineConfig(async ({ command, mode }) => {
         resolve: {
             alias: {
                 '@': path.resolve(__dirname, './src'),
-                '@cloudforet/core-lib': path.resolve(__dirname, './packages/cloudforet/core-lib/dist/'),
-                '@cloudforet/language-pack': path.resolve(__dirname, './packages/cloudforet/language-pack/'),
-                vue: path.resolve(__dirname, './node_modules/vue/dist/vue.js'),
+                '@cloudforet/core-lib': path.resolve(__dirname, '../../packages/core-lib/dist/'),
+                '@cloudforet/language-pack': path.resolve(__dirname, '../../packages/language-pack/'),
+                vue: path.resolve(__dirname, '../../node_modules/vue/dist/vue.js'),
             },
         },
         define: {
