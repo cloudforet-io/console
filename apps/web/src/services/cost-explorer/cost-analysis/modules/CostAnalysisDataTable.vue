@@ -356,22 +356,22 @@ export default {
         const handleChange = async (options: any = {}) => {
             setApiQueryWithToolboxOptions(costApiQueryHelper, options, { queryTags: true });
             await listCostAnalysisTableData(
-                costAnalysisPageState.granularity,
-                costAnalysisPageState.groupBy,
+                costAnalysisPageStore.currentQuerySetOptions.granularity,
+                costAnalysisPageStore.currentQuerySetOptions.group_by,
                 costAnalysisPageStore.orderedMoreGroupByItems,
-                costAnalysisPageState.period,
-                costAnalysisPageState.filters,
-                costAnalysisPageState.stack,
+                costAnalysisPageStore.currentQuerySetOptions.period,
+                costAnalysisPageStore.currentQuerySetOptions.filters,
+                costAnalysisPageStore.currentQuerySetOptions.stack,
             );
         };
         const handleRefresh = async () => {
             await listCostAnalysisTableData(
-                costAnalysisPageState.granularity,
-                costAnalysisPageState.groupBy,
+                costAnalysisPageStore.currentQuerySetOptions.granularity,
+                costAnalysisPageStore.currentQuerySetOptions.group_by,
                 costAnalysisPageStore.orderedMoreGroupByItems,
-                costAnalysisPageState.period,
-                costAnalysisPageState.filters,
-                costAnalysisPageState.stack,
+                costAnalysisPageStore.currentQuerySetOptions.period,
+                costAnalysisPageStore.currentQuerySetOptions.filters,
+                costAnalysisPageStore.currentQuerySetOptions.stack,
             );
         };
         const handleExport = async () => {
@@ -383,8 +383,8 @@ export default {
                 await store.dispatch('file/downloadExcel', {
                     url: '/cost-analysis/cost/analyze',
                     param: {
-                        granularity: costAnalysisPageState.granularity,
-                        group_by: costAnalysisPageState.groupBy,
+                        granularity: costAnalysisPageStore.currentQuerySetOptions.granularity,
+                        group_by: costAnalysisPageStore.currentQuerySetOptions.group_by,
                         start: dayjs.utc(costAnalysisPageState.period.start).format(dateFormat),
                         end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
                         filter: costApiQueryHelper.data.filter,
