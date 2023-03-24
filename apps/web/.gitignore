@@ -1,0 +1,21 @@
+# Config
+public/config/*
+!public/config/default.json
+!public/config/development.json.sample
+
+# Transpiled code
+dist
+.out
+
+# Tests
+coverage/
+
+# Skaffold
+skaffold.yaml
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/playwright/local.env
+/playwright/local-storage.json

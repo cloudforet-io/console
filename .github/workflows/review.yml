@@ -3,6 +3,10 @@ name: SpaceONE Review
 
 on:
   pull_request:
+    path-ignores:
+      - '.github/**'
+      - '**/deploy/helm/**'
+      - '**/skaffold.template.yaml'
     branches:
       - master
 
@@ -10,16 +14,20 @@ on:
 jobs:
   review:
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
+          cache: 'npm'
 
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -33,24 +41,15 @@ jobs:
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm install
 
-      - name: Transpile Core-Lib
+      - name: Build
         run: |
-          npm run tsc --workspace=@cloudforet/core-lib
+          npm run build
 
-      - name: ESLint
+      - name: Lint
         run: |
-          npm run eslint
-
-      - name: StyleLint
-        run: |
-          npm run stylelint --workspaces --if-present
+          npm run lint
 
       - name: Unit Test
         run: |
-          npm run test:unit --workspaces
-
-
-      - name: Build
-        run: |
-          npm run build --workspaces
+          npm run test
 

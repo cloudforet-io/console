@@ -1,0 +1,35 @@
+{
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "web#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"],
+      "inputs": [
+        "public/**", "src/**", "package.json", "package-lock.json", "tsconfig.json",
+        "vite.config.ts", "postcss.config.js", "tailwind.config.js"
+      ]
+    },
+    "@cloudforet/core-lib#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"],
+      "inputs": [
+        "src/**", "package.json", "package-lock.json", "tsconfig.json"
+      ]
+    },
+    "dev": {
+      "cache": false
+    },
+    "lint": {
+      "outputs": []
+    },
+    "format": {
+      "outputs": []
+    },
+    "test": {
+      "outputs": []
+    }
+  }
+}

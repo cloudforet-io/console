@@ -1,9 +1,26 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# dependencies
+node_modules
+
+# outout
+out
+
+#misc
 *.swp
 *.bak
 .git
-.gitignore
+.DS_Store
+.husky
 .dockerignore
-.eslintrc.cjs
-node_modules
-test
-dist
+.eslintrc.js
+commitlint.config.cjs
+LICENSE
+AUTHORS
+VERSION
+deploy
+
+
