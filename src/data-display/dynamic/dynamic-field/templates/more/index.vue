@@ -1,6 +1,7 @@
 <template>
     <span class="p-dynamic-field-more">
         <p-dynamic-field type="text"
+                         class="display-data"
                          :data="displayData"
                          :options="nextOptions"
                          @click.native="handleClick"
@@ -94,7 +95,9 @@ export default defineComponent<MoreDynamicFieldProps>({
 
 <style lang="postcss">
 .p-dynamic-field-more {
-    @apply text-blue-700;
-    cursor: pointer;
+    > .display-data {
+        @apply text-blue-700;
+        cursor: pointer;
+    }
 }
 </style>
