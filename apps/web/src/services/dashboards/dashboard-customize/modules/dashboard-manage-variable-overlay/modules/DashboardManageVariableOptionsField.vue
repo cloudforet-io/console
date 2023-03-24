@@ -24,19 +24,27 @@
                        ghost-class="ghost"
             >
                 <div v-for="(option, index) in state.proxyOptions"
-                     :key="`drag-item-${option.key}`"
+                     :key="`drag-item-${option._key}`"
                      class="draggable-item"
                 >
-                    <p-i class="grab-area"
-                         name="ic_drag-handle"
-                         width="1rem"
-                         height="1rem"
-                    />
-                    <p-text-input :value="option.value"
+                    <div class="grab-area">
+                        <p-i name="ic_drag-handle"
+                             width="1rem"
+                             height="1rem"
+                        />
+                    </div>
+                    <p-text-input :value="option.key"
                                   class="option-input"
                                   :placeholder="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.PLACEHOLDER_OPTIONS')"
                                   :invalid="option.error"
                                   @update:value="handleChangeOptionValue(index, $event)"
+                    />
+                    <span class="option-colon">:</span>
+                    <p-text-input :value="option.label"
+                                  class="option-input"
+                                  :placeholder="$t('Enter option label')"
+                                  :invalid="option.error"
+                                  @update:value="handleChangeOptionLabel(index, $event)"
                     />
                     <div class="option-delete-area">
                         <p-icon-button v-if="options.length > 1"
@@ -77,26 +85,31 @@ const props = defineProps<Props>();
 const emit = defineEmits<EmitFn>();
 
 const state = reactive({
-    proxyOptions: useProxyValue('options', props, emit),
+    proxyOptions: useProxyValue<OptionItem[]>('options', props, emit),
     isManualOption: true,
 });
 
-// const handleChangeOptionType = () => {
-//
-// };
-
 const handleChangeOptionValue = (index: number, value: string) => {
-    state.proxyOptions[index].error = state.proxyOptions.some((option, _index) => {
-        if (index === _index || value === '') return false;
-        return option.value === value;
-    });
-    state.proxyOptions[index].value = value;
+    // TODO: reactor with planning
+    // state.proxyOptions[index].error = state.proxyOptions.some((option, _index) => {
+    //     if (index === _index || value === '') return false;
+    //     return option.key === value;
+    // });
+    state.proxyOptions[index].key = value;
+};
+const handleChangeOptionLabel = (index: number, value: string) => {
+    // TODO: reactor with planning
+    // state.proxyOptions[index].error = state.proxyOptions.some((option, _index) => {
+    //     if (index === _index || value === '') return false;
+    //     return option.label === value;
+    // });
+    state.proxyOptions[index].label = value;
 };
 const handleAddOption = () => {
-    state.proxyOptions = [...state.proxyOptions, { key: getUUID(), value: '' }];
+    state.proxyOptions = [...state.proxyOptions, { _key: getUUID(), key: '', label: '' }];
 };
-const handleDeleteOption = (key: string) => {
-    state.proxyOptions = state.proxyOptions.filter((d) => d.key !== key);
+const handleDeleteOption = (_key: string) => {
+    state.proxyOptions = state.proxyOptions.filter((d) => d._key !== _key);
 };
 
 </script>
@@ -119,6 +132,8 @@ const handleDeleteOption = (key: string) => {
             .draggable-item {
                 @apply flex items-center bg-white;
                 .grab-area {
+                    width: 1.25rem;
+                    height: 1.25rem;
                     cursor: grab;
                     &:active {
                         cursor: grabbing;
@@ -126,6 +141,10 @@ const handleDeleteOption = (key: string) => {
                 }
                 .option-input {
                     @apply w-full;
+                }
+                .option-colon {
+                    @apply text-label-md text-gray-300;
+                    margin: 0 0.125rem;
                 }
                 .option-delete-area {
                     width: 2rem;

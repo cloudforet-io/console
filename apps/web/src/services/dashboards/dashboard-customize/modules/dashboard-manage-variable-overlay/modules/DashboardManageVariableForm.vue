@@ -111,10 +111,14 @@ const {
 });
 
 // helper
-const checkOptionsChanged = (subject: string[] = [], target: {key: string, value: string}[]): boolean => {
-    const emptyExcludedTarget = target.filter((d) => d.value !== '');
-    if (subject.length !== emptyExcludedTarget.length) return false;
-    for (let idx = 0; idx < subject.length; idx++) if (subject[idx] !== emptyExcludedTarget[idx].value) return false;
+const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options'], target: OptionItem[]): boolean => {
+    let _subject;
+    if (Array.isArray(subject)) {
+        _subject = subject.map((d) => ({ key: d, label: d }));
+    } else _subject = subject?.value;
+    const targetExcludingEmpty = target.filter((d) => d.key !== '' && d.label !== '');
+    if (_subject.length !== targetExcludingEmpty.length) return false;
+    for (let idx = 0; idx < _subject.length; idx++) if (_subject[idx].key !== targetExcludingEmpty[idx].key || _subject[idx].key !== targetExcludingEmpty[idx].label) return false;
     return true;
 };
 
@@ -123,7 +127,7 @@ const state = reactive({
     selectionType: 'MULTI',
     isManualOptionsType: true,
     options: [
-        { key: getUUID(), value: '' },
+        { _key: getUUID(), key: '', label: '' },
     ] as OptionItem[],
     selectionMenu: computed(() => [
         { name: 'MULTI', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT') },
@@ -137,7 +141,7 @@ const formInvalidState = reactive({
         const isNameChanged = (props.selectedVariable?.name ?? '') === name.value;
         const isDescriptionChanged = (props.selectedVariable?.description ?? '') === description.value;
         const isSelectionTypeChanged = (props.selectedVariable?.selection_type ?? 'MULTI') === state.selectionType;
-        const isOptionChanged = checkOptionsChanged(props.selectedVariable?.options ?? [], state.options);
+        const isOptionChanged = checkOptionsChanged(props.selectedVariable?.options, state.options);
 
         return isNameChanged && isDescriptionChanged && isSelectionTypeChanged && isOptionChanged;
     }),
@@ -165,7 +169,10 @@ const handleSave = () => {
         use: false,
         selection_type: state.selectionType,
         description: description.value,
-        options: state.options.map((d) => d.value).filter((value) => value !== ''),
+        options: {
+            type: 'MANUAL',
+            value: state.options.map((d) => ({ key: d.key, label: d.label })).filter(({ key, label }) => key !== '' && label !== ''),
+        },
     } as DashboardVariableSchemaProperty;
     emit('save-click', variableToSave);
 };
@@ -175,13 +182,23 @@ onMounted(() => {
         setForm('name', props.selectedVariable?.name ?? '');
         setForm('description', props.selectedVariable?.description ?? '');
         state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
-        state.options = (props.selectedVariable?.options ?? []).map((d) => ({ key: getUUID(), value: d })) ?? [{ key: getUUID(), value: '' }];
+        // TODO: refactor & add DATA SOURCE case
+        if (Array.isArray(props.selectedVariable?.options)) {
+            state.options = (props.selectedVariable?.options ?? []).map((d) => ({ _key: getUUID(), key: d, label: d })) ?? [{ _key: getUUID(), key: '', label: '' }];
+        } else if (props.selectedVariable?.options?.type === 'MANUAL') {
+            state.options = (props.selectedVariable?.options.value ?? []).map((d) => ({ _key: getUUID(), key: d.key, label: d.label })) ?? [{ _key: getUUID(), key: '', label: '' }];
+        }
     }
     if (props.contentType === 'CLONE') {
         setForm('name', `Copy - ${props.selectedVariable?.name}` ?? '');
         setForm('description', props.selectedVariable?.description ?? '');
         state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
-        state.options = (props.selectedVariable?.options ?? []).map((d) => ({ key: getUUID(), value: d })) ?? [{ key: getUUID(), value: '' }];
+        // TODO: refactor & add DATA SOURCE case
+        if (Array.isArray(props.selectedVariable?.options)) {
+            state.options = (props.selectedVariable?.options ?? []).map((d) => ({ _key: getUUID(), key: d, label: d })) ?? [{ _key: getUUID(), key: '', label: '' }];
+        } else if (props.selectedVariable?.options?.type === 'MANUAL') {
+            state.options = (props.selectedVariable?.options.value ?? []).map((d) => ({ _key: getUUID(), key: d.key, label: d.label })) ?? [{ _key: getUUID(), key: '', label: '' }];
+        }
     }
 });
 

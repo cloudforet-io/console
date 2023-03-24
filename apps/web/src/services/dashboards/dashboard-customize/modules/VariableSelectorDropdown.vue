@@ -113,7 +113,11 @@ const state = reactive({
             result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
                 name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
             }));
-        } else result = state.variableProperty.options?.map((d) => ({ name: d, label: d }));
+        } else if (Array.isArray(state.variableProperty.options)) {
+            result = state.variableProperty.options?.map((d) => ({ name: d, label: d }));
+        } else {
+            result = state.variableProperty.options.value.map((d) => ({ name: d.key, label: d.label }));
+        }
         return result;
     }),
 });
