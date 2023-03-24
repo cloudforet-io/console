@@ -33,24 +33,17 @@ jobs:
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm install
 
-      - name: Transpile Core-Lib
+      - name: Lint
         run: |
-          npm run tsc --workspace=@cloudforet/core-lib
+          npm run lint
 
-      - name: ESLint
-        run: |
-          npm run eslint
-
-      - name: StyleLint
-        run: |
-          npm run stylelint --workspaces --if-present
 
       - name: Unit Test
         run: |
-          npm run test:unit --workspaces
+          npm run test
 
 
       - name: Build
         run: |
-          npm run build --workspaces
+          npm run build
 

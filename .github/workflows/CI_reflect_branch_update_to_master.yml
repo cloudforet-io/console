@@ -17,8 +17,8 @@ jobs:
           fi
       - name: get existing official version
         run: |
-          echo "current_major=$(cat src/VERSION | cut -c 2- | cut -d'.' -f1)" >> $GITHUB_ENV
-          echo "current_minor=$(cat src/VERSION | cut -c 2- | cut -d'.' -f2 | cut -d'-' -f1)" >> $GITHUB_ENV
+          echo "current_major=$(cat VERSION | cut -c 2- | cut -d'.' -f1)" >> $GITHUB_ENV
+          echo "current_minor=$(cat VERSION | cut -c 2- | cut -d'.' -f2 | cut -d'-' -f1)" >> $GITHUB_ENV
           echo "new_major=$(echo ${{ env.VERSION }} | cut -c 2- | cut -d'.' -f1)" >> $GITHUB_ENV
           echo "new_minor=$(echo ${{ env.VERSION }} | cut -c 2- | cut -d'.' -f2 | cut -d'-' -f1)" >> $GITHUB_ENV
       - name: Is new_ver is latest?
@@ -34,19 +34,19 @@ jobs:
               echo "LATEST_TAG=true" >> $GITHUB_ENV
             fi
           fi
-      - 
+      -
         if: ${{ env.LATEST_TAG }} == 'true'
         uses: actions/checkout@v2
         with:
           persist-credentials: false
-      - 
+      -
         name: Latest Update - update version file
         if: ${{ env.LATEST_TAG }} == 'true'
         run: |
-          echo ${{ env.VERSION }} > src/VERSION
-          if [[ $(cat src/VERSION) =~ v[0-9]\.[0-9]?[0-9]\.[0-9]?[0-9]\.([0-9]+) ]];
-            then npm --no-git-tag-version version $(echo $(cat src/VERSION | cut -d'v' -f2 | cut -d '.' -f 1-3)-$(cat src/VERSION | cut -d'.' -f4))
-            else npm --no-git-tag-version version $(cat src/VERSION | cut -d'v' -f2)
+          echo ${{ env.VERSION }} > VERSION
+          if [[ $(cat VERSION) =~ v[0-9]\.[0-9]?[0-9]\.[0-9]?[0-9]\.([0-9]+) ]];
+            then npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d'.' -f4)) --workspaces
+            else npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2) --workspaces
           fi
           git config user.name github-actions
           git config user.email github-actions@github.com
