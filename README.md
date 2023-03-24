@@ -28,16 +28,14 @@
 
 [![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/0)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/0)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/1)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/1)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/2)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/2)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/3)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/3)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/4)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/4)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/5)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/5)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/6)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/6)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/7)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/7)
 
-## How to Use
+## How to Use Console Web Application
 
 ### Run dev server
 
 ```shell
 npm install
 
-npm run build:packages
-
-npm run serve
+npm run dev
 ```
 
 ### Chart License
@@ -48,24 +46,29 @@ If you want to purchase the amCharts license that suits you and use it on your c
 follow the instructions below.
 
 
-#### Add your license key to ```public/config/default.json```
+#### Add your license key to config file.
+- for development environment: ```apps/web/public/config/development.json```
+- for production environment: ```apps/web/public/config/production.json```
 
 ```json
 {
  "AMCHARTS_LICENSE": {
+  "ENABLED": true,
   "CHARTS": "",
   "MAPS": "",
-  "TIMELINE": ""
+  "TIMELINE": "",
+  "AM5_CHARTS": "",
+  "AM5_MAPS": ""
  }
 }
 ```
 
 
-## E2E Test Settings
+### E2E Test Settings
 
-### Set Variables
+#### Set Variables
 
-#### Add `playwright/local.env` file into project root.
+Add `apps/web/playwright/local.env` file into project root.
 ```
   USERNAME=testuser
   PASSWORD=password
