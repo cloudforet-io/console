@@ -64,7 +64,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.PAT_TOKEN }}
-          event-type: update_master_version_old
+          event-type: update_master_version
           client-payload: '{"version": "${{ env.TAG }}"}'
 
   update_local_version_file:
