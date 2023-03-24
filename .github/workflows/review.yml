@@ -14,8 +14,17 @@ on:
 jobs:
   review:
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+      TURBO_REMOTE_ONLY: true
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - uses: actions/checkout@v3
         with:
           submodules: true
@@ -26,27 +35,15 @@ jobs:
           node-version: '16'
           cache: 'npm'
 
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
-
       - name: Install dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm install
 
       - name: Build
-        run: |
-          TURBO_TEAM=${{ secrets.TURBO_TEAM }} TURBO_TOKEN=${{ secrets.TURBO_TOKEN }} npm run build
+        run: npm run build
 
       - name: Lint
-        run: |
-          npm run lint
+        run: npm run lint
 
-      - name: Unit Test
-        run: |
-          npm run test
+      - name: Test
+        run: npm run test
 
