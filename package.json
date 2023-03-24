@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --team=$TURBO_TEAM --token=$TURBO_TOKEN",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "turbo run format",
