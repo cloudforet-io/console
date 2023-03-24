@@ -11,7 +11,7 @@ export default defineConfig(({ command, mode }) => {
         resolve: {
             alias: {
                 '@': path.resolve(__dirname, './src'),
-                vue: path.resolve(__dirname, './node_modules/vue/dist/vue.js'),
+                vue: path.resolve(__dirname, '../../node_modules/vue/dist/vue.js'),
             },
         },
     };

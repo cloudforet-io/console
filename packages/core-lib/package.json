@@ -1,16 +1,16 @@
 {
   "name": "@cloudforet/core-lib",
-  "version": "1.16.0",
+  "version": "1.11.0-rc1",
   "description": "Cloudforet Console Core Library",
   "scripts": {
     "build": "npm run tsc",
-    "build:watch": "rimraf dist && npm run tsc:watch",
+    "dev": "rimraf dist && npm run tsc:watch",
     "tsc": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "tsc:watch": "tsc-watch --project . --outDir ./dist --onSuccess \"tsc-alias -w\"",
-    "eslint": "eslint --ext .js,.ts src",
-    "eslint:fix": "eslint --fix --ext .js,.ts src",
-    "test:unit": "vitest run",
-    "test:unit:watch": "vitest watch --ui"
+    "lint": "eslint --ext .js,.ts src",
+    "format": "eslint --fix --ext .js,.ts src",
+    "test": "vitest run",
+    "test:watch": "vitest watch --ui"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,8 @@
     "luxon": "^1.28.1"
   },
   "devDependencies": {
+    "eslint-config-custom": "*",
+    "tsconfig": "*",
     "@types/bytes": "^3.1.1",
     "@types/luxon": "^1.27.0",
     "@types/node": "^16.11.6",
@@ -37,7 +39,8 @@
     "tsc-alias": "^1.3.7",
     "tsc-watch": "^5.0.3"
   },
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "typesVersions": {
     ">=3.1": {
       "*": [
