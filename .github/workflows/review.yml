@@ -14,6 +14,9 @@ on:
 jobs:
   review:
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
     steps:
       - uses: actions/checkout@v3
@@ -40,7 +43,7 @@ jobs:
 
       - name: Build
         run: |
-          TURBO_TEAM=${{ secrets.TURBO_TEAM }} TURBO_TOKEN=${{ secrets.TURBO_TOKEN }} npm run build
+          npm run build --team=$TURBO_TEAM --token=$TURBO_TOKEN
 
       - name: Lint
         run: |
