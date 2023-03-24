@@ -49,8 +49,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useProjectPageStore } from '@/services/project/store/project-page-store';
+import type { ProjectModel } from '@/services/project/type';
 
 import TranslateResult = VueI18n.TranslateResult;
+
 
 export default {
     name: 'ProjectFormModal',
@@ -124,14 +126,16 @@ export default {
             state.projectNames = res.results.map((d) => d.name);
         };
 
-        const createProject = async (params) => {
-            projectPageStore.createProject(params);
+        const createProject = async (params): Promise<ProjectModel|undefined> => {
+            const projectInfo = await projectPageStore.createProject(params);
             await store.dispatch('reference/project/load');
+            return projectInfo;
         };
 
-        const updateProject = async (params) => {
+        const updateProject = async (params): Promise<ProjectModel|undefined> => {
+            let projectInfo:ProjectModel|undefined;
             try {
-                await SpaceConnector.client.identity.project.update({
+                projectInfo = await SpaceConnector.client.identity.project.update({
                     ...params,
                     project_id: props.project?.project_id || vm.$router.currentRoute.params.id,
                 });
@@ -140,6 +144,7 @@ export default {
                 ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
                 throw new Error(e);
             }
+            return projectInfo;
         };
 
         const confirm = async () => {
@@ -154,12 +159,13 @@ export default {
             };
 
             try {
+                let projectInfo:ProjectModel|undefined;
                 if (state.updateMode) {
-                    await updateProject(params);
+                    projectInfo = await updateProject(params);
                 } else {
-                    await createProject(params);
+                    projectInfo = await createProject(params);
                 }
-                emit('complete', params);
+                emit('complete', projectInfo);
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
