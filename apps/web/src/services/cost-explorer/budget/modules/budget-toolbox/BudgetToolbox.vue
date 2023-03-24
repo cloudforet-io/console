@@ -172,7 +172,7 @@ export default {
 
                 if (state.selectedPeriod[0] === 'thisMonth') {
                     period.start = dayjs.utc().format('YYYY-MM');
-                    period.end = dayjs.utc().format('YYYY-MM');
+                    period.end = dayjs.utc().format('YYYY-MM-DD');
                 }
 
                 return period;
