@@ -126,7 +126,7 @@ export default {
             state.projectNames = res.results.map((d) => d.name);
         };
 
-        const createProject = async (params) => {
+        const createProject = async (params): Promise<ProjectModel|undefined> => {
             const projectInfo = await projectPageStore.createProject(params);
             await store.dispatch('reference/project/load');
             return projectInfo;
