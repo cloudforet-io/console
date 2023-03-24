@@ -5,7 +5,6 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@cloudforet/core-lib": ["../../packages/core-lib/dist/index.d.ts"],
       "@cloudforet/core-lib/*": ["../../packages/core-lib/dist/*"]
     }
   },
