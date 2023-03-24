@@ -3,6 +3,10 @@ name: SpaceONE Review
 
 on:
   pull_request:
+    path-ignores:
+      - '.github/**'
+      - '**/deploy/helm/**'
+      - '**/skaffold.template.yaml'
     branches:
       - master
 
