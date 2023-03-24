@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "NODE_OPTIONS=--max_old_space_size=8192 vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --host",
     "test": "vitest run",
     "test:watch": "vitest watch --ui",
     "test:coverage": "vitest run --coverage",
