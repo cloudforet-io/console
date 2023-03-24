@@ -13,7 +13,7 @@ interface IdParameter {
     [idField]: string;
 }
 
-export interface ProviderModel extends Tags, IdParameter{
+export interface ProviderModel extends Tags, IdParameter {
     name: string;
     template: {
         service_account: {

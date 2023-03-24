@@ -71,8 +71,10 @@ module.exports = {
         'no-tabs': ['off'],
         'no-shadow': ['off'],
         'no-use-before-define': ['off'],
+        'space-before-blocks': 'off',
 
         // typescript rules
+        '@typescript-eslint/space-before-blocks': 'error',
         '@typescript-eslint/explicit-member-accessibility': [
             'error',
             {
