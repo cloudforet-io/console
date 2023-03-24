@@ -67,7 +67,7 @@ const props = withDefaults(defineProps<AnchorProps>(), {
 
 const validateTarget = () => {
     if (props.disabled) return '_self';
-    if (props.iconName === 'ic_external-link' && props.hideIcon) return '_blank';
+    if (props.iconName === 'ic_external-link' && !props.hideIcon) return '_blank';
     return '_self';
 };
 const anchorRef = ref<HTMLElement|null>(null);
