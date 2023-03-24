@@ -1,6 +1,8 @@
-import type { ConsoleFilterOperator } from '@/query/type';
+import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
 import type { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
+
+
 
 export interface Period {
     start?: string;

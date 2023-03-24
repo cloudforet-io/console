@@ -85,10 +85,10 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ConsoleFilter } from '@/query/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 

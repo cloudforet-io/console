@@ -1,7 +1,8 @@
 import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
-import type { ConsoleFilter } from '@/query/type';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';

@@ -79,10 +79,10 @@ import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/to
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type {
     KeyItemSet, ValueHandler, KeyDataType, KeyItem, ValueMenuItem,
+    HandlerResponse,
 } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import type { HandlerResponse } from '@/component-util/query-search/type';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
