@@ -1,4 +1,4 @@
-name: "[CI]create branch for old version"
+name: "[CI]old create branch"
 on:
    workflow_dispatch:
      inputs:
@@ -7,7 +7,7 @@ on:
          required: true
          default: 1.2.3
    repository_dispatch:
-    types: [create_release_branch]
+    types: [old_create_release_branch]
 
 env:
   VERSION: v${{ github.event.client_payload.version }}-rc1
@@ -28,5 +28,5 @@ jobs:
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.PAT_TOKEN }}
-          event-type: branch_tagging_old
+          event-type: old_branch_tagging
           client-payload: '{"version": "${{ env.VERSION }}"}'

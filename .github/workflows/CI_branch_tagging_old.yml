@@ -1,4 +1,4 @@
-name: "[CI]branch tagging for old version"
+name: "[CI]old branch tagging"
 on:
   push:
     tags:
@@ -10,7 +10,7 @@ on:
         required: true
         default: v1.2.3-rc1
   repository_dispatch:
-    types: [branch_tagging_old]
+    types: [old_branch_tagging]
 
 jobs:
   
