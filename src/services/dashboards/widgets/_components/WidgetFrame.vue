@@ -53,7 +53,7 @@
                                   :href="props.widgetLink"
                                   :to="props.widgetLocation"
                                   class="anchor-button"
-                                  icon-name="ic_arrow_right"
+                                  icon-name="ic_chevron-right"
                         >
                             {{ $t('BILLING.COST_MANAGEMENT.DASHBOARD.FULL_DATA') }}
                         </p-anchor>
