@@ -85,8 +85,14 @@ jobs:
           git pull
           echo ${{ env.VERSION }} > VERSION
           if [[ $(cat VERSION) =~ v[0-9]\.[0-9]?[0-9]\.[0-9]?[0-9]\.([0-9]+) ]];
-            then npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4)) --workspaces
-            else npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2) --workspaces
+            then 
+              npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4)) --workspaces
+              \npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4))
+              \npm install
+            else 
+              npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2) --workspaces
+              \npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2)
+              \npm install
           fi
           git add .
           git commit -m "[CI/CD] release version ${{ env.VERSION }}"
@@ -100,8 +106,14 @@ jobs:
           git pull
           echo ${{ env.VERSION }} > VERSION
           if [[ $(cat VERSION) =~ v[0-9]\.[0-9]?[0-9]\.[0-9]?[0-9]\.([0-9]+) ]];
-            then npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4)) --workspaces
-            else npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2) --workspaces
+            then 
+              npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4)) --workspaces
+              \npm --no-git-tag-version version $(echo $(cat VERSION | cut -d'v' -f2 | cut -d '-' -f 1 | cut -d '.' -f 1-3)-$(cat VERSION | cut -d '.' -f 4))
+              \npm install
+            else 
+              npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2) --workspaces
+              \npm --no-git-tag-version version $(cat VERSION | cut -d'v' -f2)
+              \npm install
           fi
           git add .
           git commit -m "[CI/CD] release version ${{ env.VERSION }}"
