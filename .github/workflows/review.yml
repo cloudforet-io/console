@@ -15,14 +15,15 @@ jobs:
       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
+          cache: 'npm'
 
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -36,17 +37,15 @@ jobs:
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm install
 
+      - name: Build
+        run: |
+          npm run build
+
       - name: Lint
         run: |
           npm run lint
 
-
       - name: Unit Test
         run: |
           npm run test
-
-
-      - name: Build
-        run: |
-          npm run build
 
