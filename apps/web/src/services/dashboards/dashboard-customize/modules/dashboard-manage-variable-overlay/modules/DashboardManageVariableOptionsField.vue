@@ -24,7 +24,7 @@
                        ghost-class="ghost"
             >
                 <div v-for="(option, index) in state.proxyOptions"
-                     :key="`drag-item-${option._key}`"
+                     :key="`drag-item-${option.draggableItemId}`"
                      class="draggable-item"
                 >
                     <div class="grab-area">
@@ -106,10 +106,10 @@ const handleChangeOptionLabel = (index: number, value: string) => {
     state.proxyOptions[index].label = value;
 };
 const handleAddOption = () => {
-    state.proxyOptions = [...state.proxyOptions, { _key: getUUID(), key: '', label: '' }];
+    state.proxyOptions = [...state.proxyOptions, { draggableItemId: getUUID(), key: '', label: '' }];
 };
-const handleDeleteOption = (_key: string) => {
-    state.proxyOptions = state.proxyOptions.filter((d) => d._key !== _key);
+const handleDeleteOption = (draggableItemId: string) => {
+    state.proxyOptions = state.proxyOptions.filter((d) => d.draggableItemId !== draggableItemId);
 };
 
 </script>

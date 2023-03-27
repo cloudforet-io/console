@@ -109,15 +109,17 @@ const state = reactive({
     }),
     options: computed<MenuItem[]>(() => {
         let result;
+        // MANAGED variable CASE: options
         if (state.variableProperty.variable_type === 'MANAGED') {
             result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
                 name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
             }));
         } else if (Array.isArray(state.variableProperty.options)) {
             result = state.variableProperty.options?.map((d) => ({ name: d, label: d }));
-        } else {
+        } else if (state.variableProperty.options?.type === 'MANUAL') {
             result = state.variableProperty.options.value.map((d) => ({ name: d.key, label: d.label }));
         }
+        // TODO: need to handle DATA_SOURCE type CASE
         return result;
     }),
 });

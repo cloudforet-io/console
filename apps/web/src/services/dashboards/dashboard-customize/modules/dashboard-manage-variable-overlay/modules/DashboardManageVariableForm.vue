@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, toRefs, watch,
+    computed, onMounted, reactive, toRefs,
 } from 'vue';
 import draggable from 'vuedraggable';
 
@@ -67,13 +67,17 @@ import { getUUID } from '@/lib/component-util/getUUID';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import type {
+    DashboardVariableSchemaProperty, ManualOptions, SearchDataSourceOptions,
+} from '@/services/dashboards/config';
 import DashboardManageVariableOptionsField
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/modules/DashboardManageVariableOptionsField.vue';
 import type {
     OverlayStatus,
     OptionItem,
 } from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
+
+const CLONE_PREFIX = 'Copy - ';
 
 interface Props {
     contentType: OverlayStatus;
@@ -115,7 +119,10 @@ const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options']
     let _subject;
     if (Array.isArray(subject)) {
         _subject = subject.map((d) => ({ key: d, label: d }));
-    } else _subject = subject?.value;
+    } else if (subject?.type === 'MANUAL') {
+        _subject = subject?.values;
+    }
+    // TODO: refactor Search Data Source CASE
     const targetExcludingEmpty = target.filter((d) => d.key !== '' && d.label !== '');
     if (_subject.length !== targetExcludingEmpty.length) return false;
     for (let idx = 0; idx < _subject.length; idx++) if (_subject[idx].key !== targetExcludingEmpty[idx].key || _subject[idx].key !== targetExcludingEmpty[idx].label) return false;
@@ -126,8 +133,9 @@ const state = reactive({
     proxyContentType: useProxyValue('contentType', props, emit),
     selectionType: 'MULTI',
     isManualOptionsType: true,
+    optionsType: 'MANUAL',
     options: [
-        { _key: getUUID(), key: '', label: '' },
+        { draggableItemId: getUUID(), key: '', label: '' },
     ] as OptionItem[],
     selectionMenu: computed(() => [
         { name: 'MULTI', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT') },
@@ -136,7 +144,7 @@ const state = reactive({
 });
 
 const formInvalidState = reactive({
-    baseInvalid: computed<boolean>(() => (invalidState.name ?? true) || (state.options.filter((d) => d.value !== '').length === 0) || state.options.some((option) => option.error)),
+    baseInvalid: computed<boolean>(() => (invalidState.name ?? true) || (state.options.filter((d) => d.key !== '' && d.label !== '').length === 0) || state.options.some((option) => option.error)),
     isChanged: computed<boolean>(() => {
         const isNameChanged = (props.selectedVariable?.name ?? '') === name.value;
         const isDescriptionChanged = (props.selectedVariable?.description ?? '') === description.value;
@@ -163,48 +171,43 @@ const handleCancel = () => {
 };
 
 const handleSave = () => {
+    let options;
+    if (state.optionsType === 'MANUAL') {
+        options = {
+            type: 'MANUAL',
+            values: state.options.map((d) => ({ key: d.key, label: d.label })).filter(({ key, label }) => key !== '' && label !== ''),
+        } as ManualOptions;
+    } else {
+        options = {
+            type: 'DATA_SOURCE',
+            data_source: '',
+        } as SearchDataSourceOptions;
+    }
     const variableToSave = {
         variable_type: 'CUSTOM',
         name: name.value,
         use: false,
         selection_type: state.selectionType,
         description: description.value,
-        options: {
-            type: 'MANUAL',
-            value: state.options.map((d) => ({ key: d.key, label: d.label })).filter(({ key, label }) => key !== '' && label !== ''),
-        },
+        options,
     } as DashboardVariableSchemaProperty;
     emit('save-click', variableToSave);
 };
 
 onMounted(() => {
-    if (props.contentType === 'EDIT') {
-        setForm('name', props.selectedVariable?.name ?? '');
+    if (props.contentType === 'EDIT' || props.contentType === 'CLONE') {
+        const namePrefix = props.contentType === 'CLONE' ? CLONE_PREFIX : '';
+        setForm('name', `${namePrefix}${props.selectedVariable?.name}` ?? '');
         setForm('description', props.selectedVariable?.description ?? '');
         state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
         // TODO: refactor & add DATA SOURCE case
         if (Array.isArray(props.selectedVariable?.options)) {
-            state.options = (props.selectedVariable?.options ?? []).map((d) => ({ _key: getUUID(), key: d, label: d })) ?? [{ _key: getUUID(), key: '', label: '' }];
+            state.options = (props.selectedVariable?.options ?? []).map((d) => ({ draggableItemId: getUUID(), key: d, label: d })) ?? [{ draggableItemId: getUUID(), key: '', label: '' }];
         } else if (props.selectedVariable?.options?.type === 'MANUAL') {
-            state.options = (props.selectedVariable?.options.value ?? []).map((d) => ({ _key: getUUID(), key: d.key, label: d.label })) ?? [{ _key: getUUID(), key: '', label: '' }];
-        }
-    }
-    if (props.contentType === 'CLONE') {
-        setForm('name', `Copy - ${props.selectedVariable?.name}` ?? '');
-        setForm('description', props.selectedVariable?.description ?? '');
-        state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
-        // TODO: refactor & add DATA SOURCE case
-        if (Array.isArray(props.selectedVariable?.options)) {
-            state.options = (props.selectedVariable?.options ?? []).map((d) => ({ _key: getUUID(), key: d, label: d })) ?? [{ _key: getUUID(), key: '', label: '' }];
-        } else if (props.selectedVariable?.options?.type === 'MANUAL') {
-            state.options = (props.selectedVariable?.options.value ?? []).map((d) => ({ _key: getUUID(), key: d.key, label: d.label })) ?? [{ _key: getUUID(), key: '', label: '' }];
+            state.options = props.selectedVariable?.options.values.map((d) => ({ draggableItemId: getUUID(), key: d.key, label: d.label })) ?? [{ draggableItemId: getUUID(), key: '', label: '' }];
         }
     }
 });
-
-watch(() => state.options, (changed) => {
-    console.debug(changed);
-}, { immediate: true });
 
 const {
     selectionType, options, selectionMenu, isManualOptionsType,

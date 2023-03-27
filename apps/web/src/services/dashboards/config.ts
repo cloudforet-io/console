@@ -89,8 +89,12 @@ export const VARIABLE_TYPES = ['MANAGED', 'CUSTOM'] as const;
 export type VariableType = typeof VARIABLE_TYPES[number];
 
 
-interface DefaultOptions {
-    value: { key: string; label: string; }[];
+export interface ManualOptions {
+    type: 'MANUAL';
+    values: { key: string; label: string; }[];
+}
+export interface SearchDataSourceOptions {
+    type: 'DATA_SOURCE';
     data_source: any;
     // data_source: {
     //     resource_type: string;
@@ -98,13 +102,8 @@ interface DefaultOptions {
     //     cloud_service_group?: string;
     // }
 }
-export interface ManualOptions extends DefaultOptions{
-    type: 'MANUAL';
-}
-interface SearchDataSourceOptions extends DefaultOptions{
-    type: 'DATA_SOURCE';
-}
 type LegacyOptions = string[];
+export type VarialbeOptions = ManualOptions | SearchDataSourceOptions | LegacyOptions;
 
 // variables schema
 export interface DashboardVariableSchemaProperty {
@@ -114,8 +113,7 @@ export interface DashboardVariableSchemaProperty {
     selection_type: VariableSelectionType;
     description?: string;
     disabled?: boolean;
-    options?: ManualOptions | SearchDataSourceOptions | LegacyOptions;
-    version?: string;
+    options?: VarialbeOptions;
 }
 export interface DashboardVariablesSchema {
     properties: {
