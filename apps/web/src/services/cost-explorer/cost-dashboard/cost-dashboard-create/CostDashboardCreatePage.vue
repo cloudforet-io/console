@@ -24,7 +24,9 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+import {
+    computed, onUnmounted, reactive, toRefs,
+} from 'vue';
 
 import { PButton, PHeading } from '@spaceone/design-system';
 
@@ -123,6 +125,10 @@ export default {
             if (createdDashboardId) goToCustomizePage(createdDashboardId);
             costDashboardPageStore.$patch({ selectedDashboardPrivacy: DASHBOARD_PRIVACY_TYPE.USER });
         };
+
+        onUnmounted(() => {
+            costDashboardPageStore.$reset();
+        });
 
         return {
             ...toRefs(state),
