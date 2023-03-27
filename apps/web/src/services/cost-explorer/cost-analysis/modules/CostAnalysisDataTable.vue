@@ -95,6 +95,7 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { objectToQueryString, primitiveToQueryString, arrayToQueryString } from '@/lib/router-query-string';
 
 import type { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
@@ -380,6 +381,9 @@ export default {
                 costApiQueryHelper.setFilters(_convertedFilters);
 
                 const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
+                if (costAnalysisPageState.granularity !== GRANULARITY.ACCUMULATED && costAnalysisPageState.stack) {
+                    await showSuccessMessage('Notice', i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_EXCEL_DOWNLOAD_STACKED'));
+                }
                 await store.dispatch('file/downloadExcel', {
                     url: '/cost-analysis/cost/analyze',
                     param: {
