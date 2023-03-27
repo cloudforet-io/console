@@ -250,21 +250,25 @@ export default {
             emit('update-selected-policy-list', selectedPolicyList);
         };
 
+        const initForm = (initialPolicyList: Policy[]) => {
+            const selectedIdMap = {};
+            initialPolicyList.forEach((d) => {
+                selectedIdMap[d.policy_id] = d.policy_type;
+            });
+            state.selectedIdMap = selectedIdMap;
+        };
+
         /* Watcher */
         watch(() => props.initialPolicyList, (initialPolicyList: Policy[]) => {
             if (initialPolicyList.length) {
                 emit('update-selected-policy-list', initialPolicyList);
+                initForm(initialPolicyList);
             }
-        });
+        }, { immediate: true });
 
         /* Init */
         (async () => {
             await listPolicies();
-            const selectedIdMap = {};
-            props.initialPolicyList.forEach((d) => {
-                selectedIdMap[d.policy_id] = d.policy_type;
-            });
-            state.selectedIdMap = selectedIdMap;
         })();
 
         return {
