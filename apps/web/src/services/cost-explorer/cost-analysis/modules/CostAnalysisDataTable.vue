@@ -70,6 +70,9 @@
                     {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_EXCEL_DOWNLOAD_STACKED') }}
                 </p>
             </template>
+            <template #confirm-button>
+                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DOWNLOAD') }}
+            </template>
         </p-button-modal>
     </fragment>
 </template>
