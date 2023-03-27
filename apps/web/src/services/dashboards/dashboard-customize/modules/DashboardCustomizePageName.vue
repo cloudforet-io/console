@@ -143,7 +143,7 @@ watch(() => props.name, (d) => {
 
 watch(() => invalidState.nameInput, (invalid) => {
     dashboardDetailStore.$patch({ isNameValid: !invalid });
-}, { immediate: true });
+});
 
 (async () => {
     await store.dispatch('dashboard/loadProjectDashboard');
