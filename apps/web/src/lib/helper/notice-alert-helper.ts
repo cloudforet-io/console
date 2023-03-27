@@ -53,7 +53,7 @@ export const showSuccessMessage = (successTitle, successMessage) => {
 export const showLoadingMessage = (loadingTitle, loadingMessage) => {
     if (Vue) {
         (Vue as any).notify({
-            group: 'toastTopCenter-loading',
+            group: 'toastTopCenter',
             type: 'loading',
             title: loadingTitle,
             text: loadingMessage,
@@ -71,7 +71,7 @@ export const showLoadingMessage = (loadingTitle, loadingMessage) => {
 export const hideLoadingMessage = () => {
     if (Vue) {
         Vue.notify({
-            group: 'toastTopCenter-loading',
+            group: 'toastTopCenter',
             clean: true,
         });
     }

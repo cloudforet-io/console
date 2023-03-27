@@ -1,64 +1,77 @@
 <template>
-    <p-toolbox-table class="cost-analysis-data-table"
-                     :loading="tableState.loading"
-                     :fields="tableState.fields"
-                     :items="tableState.items"
-                     :total-count="tableState.totalCount"
-                     :searchable="false"
-                     :row-height-fixed="!printMode"
-                     exportable
-                     @change="handleChange"
-                     @refresh="handleChange()"
-                     @export="handleExport"
-    >
-        <template #th-format="{field}">
-            {{ field.label }}
-            <span class="field-description">{{ fieldDescriptionFormatter(field) }}</span>
-        </template>
-        <template #col-format="{field, value, item}">
-            <span v-if="tableState.loading" />
-            <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
-                Unknown
-            </span>
-            <span v-else-if="field.name === GROUP_BY.PROJECT_GROUP">
-                {{ projectGroups[value] ? projectGroups[value].label : value }}
-            </span>
-            <span v-else-if="field.name === GROUP_BY.PROJECT">
-                {{ projects[value] ? projects[value].label : value }}
-            </span>
-            <span v-else-if="field.name === GROUP_BY.PROVIDER">
-                {{ providers[value] ? providers[value].name : value }}
-            </span>
-            <span v-else-if="field.name === GROUP_BY.REGION">
-                {{ regions[value] ? regions[value].name : value }}
-            </span>
-            <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT">
-                {{ serviceAccounts[value] ? serviceAccounts[value].name : value }}
-            </span>
-            <span v-else-if="field.name === 'totalCost'">
-                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
-            </span>
-            <span v-else-if="typeof value !== 'string'"
-                  class="text-center"
-            >
-                <p-anchor :to="value ? getLink(item, field.name) : undefined"
-                          hide-icon
-                          class="!align-middle"
+    <fragment>
+        <p-toolbox-table class="cost-analysis-data-table"
+                         :loading="tableState.loading"
+                         :fields="tableState.fields"
+                         :items="tableState.items"
+                         :total-count="tableState.totalCount"
+                         :searchable="false"
+                         :row-height-fixed="!printMode"
+                         exportable
+                         @change="handleChange"
+                         @refresh="handleChange()"
+                         @export="handleExport"
+        >
+            <template #th-format="{field}">
+                {{ field.label }}
+                <span class="field-description">{{ fieldDescriptionFormatter(field) }}</span>
+            </template>
+            <template #col-format="{field, value, item}">
+                <span v-if="tableState.loading" />
+                <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
+                    Unknown
+                </span>
+                <span v-else-if="field.name === GROUP_BY.PROJECT_GROUP">
+                    {{ projectGroups[value] ? projectGroups[value].label : value }}
+                </span>
+                <span v-else-if="field.name === GROUP_BY.PROJECT">
+                    {{ projects[value] ? projects[value].label : value }}
+                </span>
+                <span v-else-if="field.name === GROUP_BY.PROVIDER">
+                    {{ providers[value] ? providers[value].name : value }}
+                </span>
+                <span v-else-if="field.name === GROUP_BY.REGION">
+                    {{ regions[value] ? regions[value].name : value }}
+                </span>
+                <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT">
+                    {{ serviceAccounts[value] ? serviceAccounts[value].name : value }}
+                </span>
+                <span v-else-if="field.name === 'totalCost'">
+                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
+                </span>
+                <span v-else-if="typeof value !== 'string'"
+                      class="text-center"
                 >
-                    <template v-if="getIsRaised(item, field.name)">
-                        <span class="cell-text raised">{{ currencyMoneyFormatter(value, currency, currencyRates, true) }}</span>
-                        <p-i name="ic_arrow-up-bold-alt"
-                             width="0.75rem"
-                             height="0.75rem"
-                        />
-                    </template>
-                    <template v-else>
-                        {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
-                    </template>
-                </p-anchor>
-            </span>
-        </template>
-    </p-toolbox-table>
+                    <p-anchor :to="value ? getLink(item, field.name) : undefined"
+                              hide-icon
+                              class="!align-middle"
+                    >
+                        <template v-if="getIsRaised(item, field.name)">
+                            <span class="cell-text raised">{{ currencyMoneyFormatter(value, currency, currencyRates, true) }}</span>
+                            <p-i name="ic_arrow-up-bold-alt"
+                                 width="0.75rem"
+                                 height="0.75rem"
+                            />
+                        </template>
+                        <template v-else>
+                            {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
+                        </template>
+                    </p-anchor>
+                </span>
+            </template>
+        </p-toolbox-table>
+        <p-button-modal :visible.sync="visibleExcelNotiModal"
+                        hide-header
+                        size="sm"
+                        @confirm="handleExcelDownload"
+        >
+            <template #body>
+                <p class="mt-4">
+                    {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_EXCEL_DOWNLOAD_STACKED') }}
+                </p>
+            </template>
+        </p-button-modal>
+    </fragment>
 </template>
 
 <script lang="ts">
@@ -68,7 +81,7 @@ import {
 import type { Location } from 'vue-router';
 
 import {
-    PAnchor, PI, PToolboxTable, PDataTable,
+    PAnchor, PI, PToolboxTable, PDataTable, PButtonModal,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { CancelTokenSource } from 'axios';
@@ -95,7 +108,6 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { objectToQueryString, primitiveToQueryString, arrayToQueryString } from '@/lib/router-query-string';
 
 import type { Item as PdfOverlayItem } from '@/common/components/layouts/PdfDownloadOverlay/PdfDownloadOverlay.vue';
@@ -122,6 +134,7 @@ const PRINT_MODE_MAX_COL = 10;
 export default {
     name: 'CostAnalysisDataTable',
     components: {
+        PButtonModal,
         PAnchor,
         PI,
         PToolboxTable,
@@ -160,6 +173,7 @@ export default {
                 [GROUP_BY.REGION]: state.regions,
                 [GROUP_BY.SERVICE_ACCOUNT]: state.serviceAccounts,
             })),
+            visibleExcelNotiModal: false,
         });
         const tableState = reactive({
             loading: true,
@@ -375,15 +389,14 @@ export default {
                 costAnalysisPageStore.currentQuerySetOptions.stack,
             );
         };
-        const handleExport = async () => {
+        const handleExcelDownload = async () => {
             try {
                 const _convertedFilters = getConvertedFilter(costAnalysisPageState.filters);
                 costApiQueryHelper.setFilters(_convertedFilters);
 
                 const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
-                if (costAnalysisPageState.granularity !== GRANULARITY.ACCUMULATED && costAnalysisPageState.stack) {
-                    await showSuccessMessage('Notice', i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_EXCEL_DOWNLOAD_STACKED'));
-                }
+
+
                 await store.dispatch('file/downloadExcel', {
                     url: '/cost-analysis/cost/analyze',
                     param: {
@@ -399,7 +412,15 @@ export default {
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
+            } finally {
+                state.visibleExcelNotiModal = false;
             }
+        };
+
+        const handleExport = async () => {
+            if (costAnalysisPageState.granularity !== GRANULARITY.ACCUMULATED && costAnalysisPageState.stack) {
+                state.visibleExcelNotiModal = true;
+            } else await handleExcelDownload();
         };
 
         // Link for setting table widths: https://pdfmake.github.io/docs/0.1/document-definition-object/tables/
@@ -494,6 +515,7 @@ export default {
             handleChange,
             handleRefresh,
             handleExport,
+            handleExcelDownload,
             getLink,
             getIsRaised,
             fieldDescriptionFormatter,
