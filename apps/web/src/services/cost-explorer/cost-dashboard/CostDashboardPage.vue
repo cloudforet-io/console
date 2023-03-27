@@ -130,8 +130,7 @@ import CostDashboardMoreMenu from '@/services/cost-explorer/cost-dashboard/modul
 import CostDashboardPeriodSelectDropdown
     from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
 import CostDashboardPreview from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardPreview.vue';
-import CostDashboardUpdateModal
-    from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardUpdateModal.vue';
+import CostDashboardUpdateModal from '@/services/cost-explorer/cost-dashboard/modules/CostDashboardUpdateModal.vue';
 import DashboardLayouts from '@/services/cost-explorer/cost-dashboard/modules/DashboardLayouts.vue';
 import type { DashboardInfo } from '@/services/cost-explorer/cost-dashboard/type';
 import { convertFiltersInToNewType } from '@/services/cost-explorer/lib/helper';
@@ -221,6 +220,9 @@ export default {
         };
 
         const handleClickCustomize = () => {
+            costDashboardPageStore.$patch((_state) => {
+                _state.editedCustomLayout = state.layout;
+            });
             SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.DASHBOARD.CUSTOMIZE._NAME, params: { dashboardId: props.dashboardId } });
         };
 
@@ -255,11 +257,7 @@ export default {
 
             const dashboard = await fetchDashboard(dashboardId);
             state.dashboard = dashboard;
-            const layout = await getDashboardLayout(dashboard);
-            state.layout = layout;
-            costDashboardPageStore.$patch((_state) => {
-                _state.editedCustomLayout = layout;
-            });
+            state.layout = await getDashboardLayout(dashboard);
             state.filters = convertFiltersInToNewType(dashboard.default_filter);
             state.period = dashboard.period ?? {};
             state.periodType = dashboard.period_type;
