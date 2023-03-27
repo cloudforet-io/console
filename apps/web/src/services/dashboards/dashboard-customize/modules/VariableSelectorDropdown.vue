@@ -105,7 +105,7 @@ const state = reactive({
 
         if (state.variableProperty.variable_type === 'MANAGED') {
             return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
-        } return arrayOfSelectedOptions.map((d) => ({ name: d, label: d }));
+        } return arrayOfSelectedOptions.map((d) => ({ name: d, label: state.options.find((optionItem) => optionItem.name === d).label }));
     }),
     options: computed<MenuItem[]>(() => {
         let result;
@@ -117,10 +117,10 @@ const state = reactive({
         } else if (Array.isArray(state.variableProperty.options)) {
             result = state.variableProperty.options?.map((d) => ({ name: d, label: d }));
         } else if (state.variableProperty.options?.type === 'MANUAL') {
-            result = state.variableProperty.options.value.map((d) => ({ name: d.key, label: d.label }));
+            result = state.variableProperty.options.values.map((d) => ({ name: d.key, label: d.label }));
         }
         // TODO: need to handle DATA_SOURCE type CASE
-        return result;
+        return result ?? [];
     }),
 });
 
