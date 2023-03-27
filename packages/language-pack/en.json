@@ -463,6 +463,7 @@
 				"ACCUMULATED": "Accumulated",
 				"ADDITIONAL_INFO": "Additional Info",
 				"ADD_MORE": "Add More",
+				"ALT_EXCEL_DOWNLOAD_STACKED": "The file will be downloaded as monthly data rather than accumulated data.",
 				"ALT_E_DELETE_QUERY": "Failed to Delete Query",
 				"ALT_E_EDITED_QUERY": "Failed to Edit Query",
 				"ALT_E_SAVED_QUERY": "Failed to Save Query",
