@@ -28,14 +28,13 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 
-import { map, sortBy } from 'lodash';
-
 import type { DynamicFieldHandler } from '@/data-display/dynamic/dynamic-field/type';
 import type { RawTableDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw-table/type';
 import PDynamicLayoutTable from '@/data-display/dynamic/dynamic-layout/templates/table/index.vue';
 import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
 import type { RawTableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
+import { getSortingData } from '@/utils';
 
 
 export default defineComponent<RawTableDynamicLayoutProps>({
@@ -72,15 +71,12 @@ export default defineComponent<RawTableDynamicLayoutProps>({
     setup(props) {
         const state = reactive({
             fields: computed(() => {
-                if (state.rootData[0]) {
-                    const firstItem = state.rootData[0];
+                const firstItem = state.rootData[0];
+                if (firstItem) {
                     if (Array.isArray(props.options?.headers) && props.options?.headers?.length) {
-                        return props.options.headers.map((header) => ({
-                            key: header,
-                            name: header,
-                        }));
+                        return props.options.headers.map((value) => ({ key: value, name: value }));
                     }
-                    return sortBy(map(firstItem, (value, key) => ({ key, name: key })), (item) => item.key);
+                    return getSortingData(Object.keys(firstItem)).map((value) => ({ key: value, name: value }));
                 }
                 return [];
             }),

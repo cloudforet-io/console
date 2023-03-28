@@ -2,7 +2,7 @@ import { createLocalVue, mount } from '@vue/test-utils';
 import type { ComponentPublicInstance } from 'vue';
 import { defineComponent, ref } from 'vue';
 
-import { expect } from 'vitest';
+import { describe, expect } from 'vitest';
 
 import type { UseContextMenuControllerOptions } from '@/hooks/context-menu-controller';
 import { useContextMenuController } from '@/hooks/context-menu-controller';

@@ -1,5 +1,5 @@
 import {
-    isEmpty, get, toString,
+    isEmpty, get, toString, sortBy,
 } from 'lodash';
 
 import colors from '@/styles/colors.cjs';
@@ -80,3 +80,35 @@ export const getTextHighlightRegex = (term?: string|number) => {
     }
     return new RegExp(regex, 'i');
 };
+
+export const getSortingData = (data: string[]) => {
+    const numRegex = /^\d+$/;
+    const includeNumRegex = /(\d+)/g;
+
+    const numArr = sortBy(data.filter((item) => item.match(numRegex)));
+    const strArr = sortBy(data.filter((item) => !item.match(includeNumRegex)));
+    const mixArr = data.filter((item) => item.match(includeNumRegex) && !numRegex.test(item));
+
+    const sortedMixArr = mixArr.sort((a, b) => {
+        const numA = parseInt(a);
+        const numB = parseInt(b);
+        const strA = a.replace(String(numA), '');
+        const strB = b.replace(String(numB), '');
+        if (strA < strB) {
+            return -1;
+        }
+        if (strA > strB) {
+            return 1;
+        }
+        if (numA < numB) {
+            return -1;
+        }
+        if (numA > numB) {
+            return 1;
+        }
+        return 0;
+    });
+
+    return [...numArr, ...sortedMixArr, ...strArr];
+};
+
