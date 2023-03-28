@@ -133,8 +133,8 @@ export default defineComponent({
                 name: AUTH_ROUTE.SIGN_OUT._NAME,
                 query: { nextPath: vm.$route.fullPath },
             };
-            vm.$router.push(res);
             store.commit('error/setVisibleSessionExpiredError', false);
+            vm.$router.push(res);
         };
         const showsBrowserRecommendation = () => !supportsBrowser() && !window.localStorage.getItem('showBrowserRecommendation');
 
