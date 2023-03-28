@@ -42,14 +42,14 @@
                     <p-text-input :value="option.key"
                                   class="option-input"
                                   :placeholder="$t('Key')"
-                                  :invalid="state.manualOptionValidations[index].invalid"
+                                  :invalid="state.manualOptionValidations[index]"
                                   @update:value="handleChangeOptionValue(index, $event)"
                     />
                     <span class="option-colon">:</span>
                     <p-text-input :value="option.label"
                                   class="option-input"
                                   :placeholder="$t('Label name')"
-                                  :invalid="state.manualOptionValidations[index].invalid"
+                                  :invalid="state.manualOptionValidations[index]"
                                   @update:value="handleChangeOptionLabel(index, $event)"
                     />
                     <div class="option-delete-area">
@@ -97,15 +97,15 @@ const emit = defineEmits<EmitFn>();
 const state = reactive({
     proxyOptions: useProxyValue<OptionItem[]>('options', props, emit),
     proxyOptionsType: useProxyValue('optionsType', props, emit),
-    manualOptionValidations: computed(() => {
+    manualOptionValidations: computed<boolean[]>(() => {
         const keys = state.proxyOptions.map((option) => option.key);
         const labels = state.proxyOptions.map((option) => option.label);
         return state.proxyOptions.map((option) => {
-            const validationResult = { invalid: false };
+            let validationResult = false;
             const isDuplicated = keys.filter((k) => k === option.key).length > 1 || labels.filter((l) => l === option.label).length > 1;
 
-            if (option.key === '' || option.label === '') validationResult.invalid = true;
-            else if (isDuplicated) validationResult.invalid = true;
+            if (option.key === '' || option.label === '') validationResult = true;
+            else if (isDuplicated) validationResult = true;
 
             return validationResult;
         });
@@ -131,7 +131,7 @@ const handleDeleteOption = (draggableItemId: string) => {
 };
 
 watch(() => state.manualOptionValidations, (updated) => {
-    emit('update-options-invalid', updated.some((item) => item.invalid));
+    emit('update-options-invalid', updated.some((invalid) => invalid));
 });
 
 </script>
