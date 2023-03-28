@@ -33,8 +33,9 @@
                           @update:value="setForm('description', $event)"
             />
         </p-field-group>
-        <dashboard-manage-variable-options-field :is-manual-options-type.sync="isManualOptionsType"
+        <dashboard-manage-variable-options-field :options-type.sync="optionsType"
                                                  :options.sync="options"
+                                                 @update-options-invalid="handleUpdateOptionsInvalid"
         />
         <div class="button-wrapper">
             <p-button style-type="tertiary"
@@ -121,7 +122,7 @@ const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options']
         _subject = subject.map((d) => ({ key: d, label: d }));
     } else if (subject?.type === 'MANUAL') {
         _subject = subject?.values;
-    }
+    } else _subject = [];
     // TODO: refactor Search Data Source CASE
     const targetExcludingEmpty = target.filter((d) => d.key !== '' && d.label !== '');
     if (_subject.length !== targetExcludingEmpty.length) return false;
@@ -132,11 +133,11 @@ const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options']
 const state = reactive({
     proxyContentType: useProxyValue('contentType', props, emit),
     selectionType: 'MULTI',
-    isManualOptionsType: true,
     optionsType: 'MANUAL',
     options: [
         { draggableItemId: getUUID(), key: '', label: '' },
     ] as OptionItem[],
+    dataSource: '', // TODO: need to refactor
     selectionMenu: computed(() => [
         { name: 'MULTI', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT') },
         { name: 'SINGLE', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT') },
@@ -144,7 +145,8 @@ const state = reactive({
 });
 
 const formInvalidState = reactive({
-    baseInvalid: computed<boolean>(() => (invalidState.name ?? true) || (state.options.filter((d) => d.key !== '' && d.label !== '').length === 0) || state.options.some((option) => option.error)),
+    optionsInvalid: false,
+    baseInvalid: computed<boolean>(() => (invalidState.name ?? true) || (state.options.filter((d) => d.key !== '' && d.label !== '').length === 0) || formInvalidState.optionsInvalid),
     isChanged: computed<boolean>(() => {
         const isNameChanged = (props.selectedVariable?.name ?? '') === name.value;
         const isDescriptionChanged = (props.selectedVariable?.description ?? '') === description.value;
@@ -162,6 +164,10 @@ const formInvalidState = reactive({
 });
 
 // Event
+const handleUpdateOptionsInvalid = (invalid: boolean) => {
+    formInvalidState.optionsInvalid = invalid;
+};
+
 const handleCancel = () => {
     if (!formInvalidState.isChanged) {
         emit('cancel-click');
@@ -210,7 +216,7 @@ onMounted(() => {
 });
 
 const {
-    selectionType, options, selectionMenu, isManualOptionsType,
+    selectionType, optionsType, options, selectionMenu,
 } = toRefs(state);
 
 </script>
