@@ -34,6 +34,7 @@
             />
         </p-field-group>
         <dashboard-manage-variable-options-field :is-manual-options-type.sync="isManualOptionsType"
+                                                 :options-type.sync="optionsType"
                                                  :options.sync="options"
         />
         <div class="button-wrapper">
@@ -121,7 +122,7 @@ const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options']
         _subject = subject.map((d) => ({ key: d, label: d }));
     } else if (subject?.type === 'MANUAL') {
         _subject = subject?.values;
-    }
+    } else _subject = [];
     // TODO: refactor Search Data Source CASE
     const targetExcludingEmpty = target.filter((d) => d.key !== '' && d.label !== '');
     if (_subject.length !== targetExcludingEmpty.length) return false;
@@ -137,6 +138,7 @@ const state = reactive({
     options: [
         { draggableItemId: getUUID(), key: '', label: '' },
     ] as OptionItem[],
+    dataSource: '', // TODO: need to refactor
     selectionMenu: computed(() => [
         { name: 'MULTI', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT') },
         { name: 'SINGLE', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT') },
@@ -210,7 +212,7 @@ onMounted(() => {
 });
 
 const {
-    selectionType, options, selectionMenu, isManualOptionsType,
+    selectionType, optionsType, options, selectionMenu, isManualOptionsType,
 } = toRefs(state);
 
 </script>

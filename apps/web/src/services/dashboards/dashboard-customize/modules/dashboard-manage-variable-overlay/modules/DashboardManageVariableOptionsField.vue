@@ -4,14 +4,20 @@
                    required
     >
         <p-radio-group>
-            <p-radio :selected="state.isManualOption">
+            <p-radio :selected="state.proxyOptionsType === 'MANUAL'"
+                     @change="handleSelectOptionsType('MANUAL')"
+            >
                 {{ $t('Manual Entry') }}
             </p-radio>
-            <p-radio :selected="!state.isManualOption">
+            <p-radio :selected="state.proxyOptionsType === 'DATA_SOURCE'"
+                     @change="handleSelectOptionsType('DATA_SOURCE')"
+            >
                 {{ $t('Search Data Source') }}
             </p-radio>
         </p-radio-group>
-        <div class="options-wrapper">
+        <div v-if="state.proxyOptionsType === 'MANUAL'"
+             class="maunal-entry-options-wrapper"
+        >
             <p-button class="option-add-button"
                       icon-left="ic_plus_bold"
                       style-type="secondary"
@@ -35,26 +41,27 @@
                     </div>
                     <p-text-input :value="option.key"
                                   class="option-input"
-                                  :placeholder="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.PLACEHOLDER_OPTIONS')"
+                                  :placeholder="$t('Key')"
                                   :invalid="option.error"
                                   @update:value="handleChangeOptionValue(index, $event)"
                     />
                     <span class="option-colon">:</span>
                     <p-text-input :value="option.label"
                                   class="option-input"
-                                  :placeholder="$t('Enter option label')"
+                                  :placeholder="$t('Label name')"
                                   :invalid="option.error"
                                   @update:value="handleChangeOptionLabel(index, $event)"
                     />
                     <div class="option-delete-area">
                         <p-icon-button v-if="options.length > 1"
                                        name="ic_delete"
-                                       @click="handleDeleteOption(option.key)"
+                                       @click="handleDeleteOption(option.draggableItemId)"
                         />
                     </div>
                 </div>
             </draggable>
         </div>
+        <!--        <dashboard-manage-variable-data-source-options-selector v-if="state.proxyOptionsType === 'DATA_SOURCE'" />-->
     </p-field-group>
 </template>
 
@@ -69,11 +76,14 @@ import {
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
+import DashboardManageVariableDataSourceOptionsSelector
+    from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/modules/DashboardManageVariableDataSourceOptionsSelector.vue';
 import type { OptionItem } from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
 
 
 interface Props {
     options: OptionItem[];
+    optionsType: 'MANUAL' | 'DATA_SOURCE';
     isManualOptionsType: boolean;
 }
 interface EmitFn {
@@ -86,27 +96,35 @@ const emit = defineEmits<EmitFn>();
 
 const state = reactive({
     proxyOptions: useProxyValue<OptionItem[]>('options', props, emit),
+    proxyOptionsType: useProxyValue('optionsType', props, emit),
     isManualOption: true,
 });
 
 const handleChangeOptionValue = (index: number, value: string) => {
-    // TODO: reactor with planning
-    // state.proxyOptions[index].error = state.proxyOptions.some((option, _index) => {
-    //     if (index === _index || value === '') return false;
-    //     return option.key === value;
-    // });
+    // current options validation check, need improvement
+    state.proxyOptions[index].error = state.proxyOptions.some((option, _index) => {
+        if (index === _index) return false;
+        return option.key === value || state.proxyOptions[index].label === option.label;
+    }) || value === '' || state.proxyOptions[index].label === '';
+
     state.proxyOptions[index].key = value;
 };
 const handleChangeOptionLabel = (index: number, value: string) => {
-    // TODO: reactor with planning
-    // state.proxyOptions[index].error = state.proxyOptions.some((option, _index) => {
-    //     if (index === _index || value === '') return false;
-    //     return option.label === value;
-    // });
+    // current options validation check, need improvement
+    state.proxyOptions[index].error = state.proxyOptions.some((option, _index) => {
+        if (index === _index) return false;
+        return option.label === value || state.proxyOptions[index].key === option.key;
+    }) || value === '' || state.proxyOptions[index].key === '';
+
     state.proxyOptions[index].label = value;
 };
+const handleSelectOptionsType = (type: string) => {
+    state.proxyOptionsType = type;
+};
 const handleAddOption = () => {
-    state.proxyOptions = [...state.proxyOptions, { draggableItemId: getUUID(), key: '', label: '' }];
+    state.proxyOptions = [...state.proxyOptions, {
+        draggableItemId: getUUID(), key: '', label: '', error: true,
+    }];
 };
 const handleDeleteOption = (draggableItemId: string) => {
     state.proxyOptions = state.proxyOptions.filter((d) => d.draggableItemId !== draggableItemId);
@@ -118,7 +136,7 @@ const handleDeleteOption = (draggableItemId: string) => {
 .dashboard-manage-variable-options-field {
     @apply w-1/2;
 
-    .options-wrapper {
+    .maunal-entry-options-wrapper {
         @apply w-full bg-gray-100 rounded-md;
         padding: 0.5rem;
 
