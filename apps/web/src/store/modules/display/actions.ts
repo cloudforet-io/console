@@ -80,7 +80,7 @@ const DEBUG_MODE = false;
 const debugCheckNotification = DEBUG_MODE ? console.debug : () => {};
 
 const fixedCheckNotificationFilter: ConsoleFilter = { k: 'is_read', v: false, o: '=' };
-const checkNotificationQueryHelper = new ApiQueryHelper().setCountOnly();
+const checkNotificationQueryHelper = new ApiQueryHelper().setCountOnly().setTimezone('UTC');
 const getNotificationListParam = (userId: string, currentTime: Dayjs, lastNotificationReadTime: string) => {
     checkNotificationQueryHelper.setFilters([
         fixedCheckNotificationFilter,
