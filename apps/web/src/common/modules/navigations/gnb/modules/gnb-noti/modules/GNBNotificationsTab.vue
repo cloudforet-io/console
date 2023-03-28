@@ -269,6 +269,13 @@ export default {
                 state.proxyCount = total_count;
                 state.items = state.items.concat(convertNotificationItem(results));
                 await setReadNotifications(results);
+
+                // update last read
+                await store.dispatch('settings/setItem', {
+                    key: 'lastNotificationReadTime',
+                    value: dayjs.utc().toISOString(),
+                    path: '/gnb',
+                }, { root: true });
             } catch (e: any) {
                 if (!axios.isCancel(e.axiosError)) {
                     ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));

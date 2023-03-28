@@ -81,22 +81,22 @@ const debugCheckNotification = DEBUG_MODE ? console.debug : () => {};
 
 const fixedCheckNotificationFilter: ConsoleFilter = { k: 'is_read', v: false, o: '=' };
 const checkNotificationQueryHelper = new ApiQueryHelper().setCountOnly();
-const getNotificationListParam = (userId: string, currentTime: Dayjs, lastCheckedTime: string) => {
+const getNotificationListParam = (userId: string, currentTime: Dayjs, lastNotificationReadTime: string) => {
     checkNotificationQueryHelper.setFilters([
         fixedCheckNotificationFilter,
-        { k: 'created_at', v: currentTime.format('YYYY-MM-DD HH:mm:ss'), o: '<=t' },
+        { k: 'created_at', v: currentTime.toISOString(), o: '<=t' },
         { k: 'user_id', v: userId, o: '=' },
     ]);
 
     const minimumCheckTime = currentTime.subtract(7, 'day');
 
-    if (lastCheckedTime && dayjs(lastCheckedTime).isAfter(minimumCheckTime)) {
+    if (lastNotificationReadTime && dayjs.utc(lastNotificationReadTime).isAfter(minimumCheckTime)) {
         checkNotificationQueryHelper.addFilter(
-            { k: 'created_at', v: lastCheckedTime, o: '>t' },
+            { k: 'created_at', v: lastNotificationReadTime, o: '>t' },
         );
     } else {
         checkNotificationQueryHelper.addFilter(
-            { k: 'created_at', v: minimumCheckTime.format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
+            { k: 'created_at', v: minimumCheckTime.toISOString(), o: '>=t' },
         );
     }
 
@@ -107,7 +107,7 @@ const getNotificationListParam = (userId: string, currentTime: Dayjs, lastChecke
 
 let notificationListApiToken: CancelTokenSource | undefined;
 export const checkNotification: Action<DisplayState, any> = async ({
-    commit, state, rootState, rootGetters, dispatch,
+    commit, state, rootState, rootGetters,
 }): Promise<void> => {
     if (notificationListApiToken) {
         debugCheckNotification('[CHECK NOTI]', ' pending...');
@@ -117,11 +117,11 @@ export const checkNotification: Action<DisplayState, any> = async ({
         debugCheckNotification('[CHECK NOTI]', ' start');
         notificationListApiToken = axios.CancelToken.source();
 
-        const currentTime = dayjs();
+        const currentTime = dayjs.utc();
         const param = getNotificationListParam(
             rootState.user.userId,
             currentTime,
-            rootGetters['settings/getItem']('last_checked_notification', '/gnb'),
+            rootGetters['settings/getItem']('lastNotificationReadTime', '/gnb'),
         );
         debugCheckNotification('[NOTI QUERY.FILTER]', param.query.filter);
         const { total_count } = await SpaceConnector.client.notification.notification.list(param, {
@@ -129,15 +129,6 @@ export const checkNotification: Action<DisplayState, any> = async ({
         });
 
         if (state.uncheckedNotificationCount !== total_count) commit('setUncheckedNotificationCount', total_count);
-
-        const lastCheckedTime = currentTime.format('YYYY-MM-DD HH:mm:ss');
-        dispatch('settings/setItem', {
-            key: 'last_checked_notification',
-            value: lastCheckedTime,
-            path: '/gnb',
-        }, { root: true });
-
-        commit('setUncheckedNotificationCount', 0);
     } catch (e: any) {
         if (!axios.isCancel(e.axiosError)) {
             ErrorHandler.handleError(e);
