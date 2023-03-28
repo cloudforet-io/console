@@ -42,14 +42,14 @@
                     <p-text-input :value="option.key"
                                   class="option-input"
                                   :placeholder="$t('Key')"
-                                  :invalid="option.error"
+                                  :invalid="state.manualOptionValidations[index].invalid"
                                   @update:value="handleChangeOptionValue(index, $event)"
                     />
                     <span class="option-colon">:</span>
                     <p-text-input :value="option.label"
                                   class="option-input"
                                   :placeholder="$t('Label name')"
-                                  :invalid="option.error"
+                                  :invalid="state.manualOptionValidations[index].invalid"
                                   @update:value="handleChangeOptionLabel(index, $event)"
                     />
                     <div class="option-delete-area">
@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 
-import { reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import draggable from 'vuedraggable';
 
 import {
@@ -84,12 +84,12 @@ import type { OptionItem } from '@/services/dashboards/dashboard-customize/modul
 interface Props {
     options: OptionItem[];
     optionsType: 'MANUAL' | 'DATA_SOURCE';
-    isManualOptionsType: boolean;
 }
 interface EmitFn {
     (e: string, value: string): void;
     (e: 'save-click', value: string): void;
     (e: 'cancel-click'): void;
+    (e: 'update-options-invalid', value: boolean): void;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<EmitFn>();
@@ -97,25 +97,25 @@ const emit = defineEmits<EmitFn>();
 const state = reactive({
     proxyOptions: useProxyValue<OptionItem[]>('options', props, emit),
     proxyOptionsType: useProxyValue('optionsType', props, emit),
-    isManualOption: true,
+    manualOptionValidations: computed(() => {
+        const keys = state.proxyOptions.map((option) => option.key);
+        const labels = state.proxyOptions.map((option) => option.label);
+        return state.proxyOptions.map((option) => {
+            const validationResult = { invalid: false };
+            const isDuplicated = keys.filter((k) => k === option.key).length > 1 || labels.filter((l) => l === option.label).length > 1;
+
+            if (option.key === '' || option.label === '') validationResult.invalid = true;
+            else if (isDuplicated) validationResult.invalid = true;
+
+            return validationResult;
+        });
+    }),
 });
 
 const handleChangeOptionValue = (index: number, value: string) => {
-    // current options validation check, need improvement
-    state.proxyOptions[index].error = state.proxyOptions.some((option, _index) => {
-        if (index === _index) return false;
-        return option.key === value || state.proxyOptions[index].label === option.label;
-    }) || value === '' || state.proxyOptions[index].label === '';
-
     state.proxyOptions[index].key = value;
 };
 const handleChangeOptionLabel = (index: number, value: string) => {
-    // current options validation check, need improvement
-    state.proxyOptions[index].error = state.proxyOptions.some((option, _index) => {
-        if (index === _index) return false;
-        return option.label === value || state.proxyOptions[index].key === option.key;
-    }) || value === '' || state.proxyOptions[index].key === '';
-
     state.proxyOptions[index].label = value;
 };
 const handleSelectOptionsType = (type: string) => {
@@ -129,6 +129,10 @@ const handleAddOption = () => {
 const handleDeleteOption = (draggableItemId: string) => {
     state.proxyOptions = state.proxyOptions.filter((d) => d.draggableItemId !== draggableItemId);
 };
+
+watch(() => state.manualOptionValidations, (updated) => {
+    emit('update-options-invalid', updated.some((item) => item.invalid));
+});
 
 </script>
 

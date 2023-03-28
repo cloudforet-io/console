@@ -33,9 +33,9 @@
                           @update:value="setForm('description', $event)"
             />
         </p-field-group>
-        <dashboard-manage-variable-options-field :is-manual-options-type.sync="isManualOptionsType"
-                                                 :options-type.sync="optionsType"
+        <dashboard-manage-variable-options-field :options-type.sync="optionsType"
                                                  :options.sync="options"
+                                                 @update-options-invalid="handleUpdateOptionsInvalid"
         />
         <div class="button-wrapper">
             <p-button style-type="tertiary"
@@ -133,7 +133,6 @@ const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options']
 const state = reactive({
     proxyContentType: useProxyValue('contentType', props, emit),
     selectionType: 'MULTI',
-    isManualOptionsType: true,
     optionsType: 'MANUAL',
     options: [
         { draggableItemId: getUUID(), key: '', label: '' },
@@ -146,7 +145,8 @@ const state = reactive({
 });
 
 const formInvalidState = reactive({
-    baseInvalid: computed<boolean>(() => (invalidState.name ?? true) || (state.options.filter((d) => d.key !== '' && d.label !== '').length === 0) || state.options.some((option) => option.error)),
+    optionsInvalid: false,
+    baseInvalid: computed<boolean>(() => (invalidState.name ?? true) || (state.options.filter((d) => d.key !== '' && d.label !== '').length === 0) || formInvalidState.optionsInvalid),
     isChanged: computed<boolean>(() => {
         const isNameChanged = (props.selectedVariable?.name ?? '') === name.value;
         const isDescriptionChanged = (props.selectedVariable?.description ?? '') === description.value;
@@ -164,6 +164,10 @@ const formInvalidState = reactive({
 });
 
 // Event
+const handleUpdateOptionsInvalid = (invalid: boolean) => {
+    formInvalidState.optionsInvalid = invalid;
+};
+
 const handleCancel = () => {
     if (!formInvalidState.isChanged) {
         emit('cancel-click');
@@ -212,7 +216,7 @@ onMounted(() => {
 });
 
 const {
-    selectionType, optionsType, options, selectionMenu, isManualOptionsType,
+    selectionType, optionsType, options, selectionMenu,
 } = toRefs(state);
 
 </script>
