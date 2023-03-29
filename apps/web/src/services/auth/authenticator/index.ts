@@ -18,6 +18,8 @@ abstract class Authenticator {
             store.dispatch('reference/loadAll', { force: true }),
             setI18nLocale(store.state.user.language),
         ]);
+        await store.dispatch('display/hideSignInErrorMessage');
+        await store.dispatch('error/resetErrorState');
     }
 
     static async signOut(): Promise<void> {
