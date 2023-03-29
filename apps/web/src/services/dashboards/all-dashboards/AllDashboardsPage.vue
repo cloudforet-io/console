@@ -35,9 +35,13 @@
                     show-image
                     show-button
                 >
+                    <template #image>
+                        <img alt="empty-default-image"
+                             src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
+                        >
+                    </template>
                     <template #button>
-                        <p-button style-type="substitutive"
-                                  icon-left="ic_plus_bold"
+                        <p-button icon-left="ic_plus_bold"
                                   :disabled="hasOnlyViewPermission"
                                   @click="handleCreateDashboard"
                         >
