@@ -1002,7 +1002,7 @@
 			},
 			"CLOUD_SERVICE": {
 				"HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",
-				"NO_DATA": "",
+				"NO_DATA": "클라우드 리소스가 없습니다.",
 				"SEE_MORE": "더보기 ",
 				"TITLE": "클라우드 서비스 "
 			},
@@ -1051,8 +1051,8 @@
 				"HOUR": "시간",
 				"LAST_UPDATE": "마지막 업데이트",
 				"MORE": "더보기",
-				"NO_DATA": "",
-				"NO_DATA_TITLE": "",
+				"NO_DATA": "관련된 클라우드 서비스 어카운트를 추가해주세요.",
+				"NO_DATA_TITLE": "Personal Health Dashboardのデータがありません",
 				"PAST_7_DAYS": "지난 7 일",
 				"PLACEHOLDER": "이벤트 검색",
 				"SUMMARY_ISSUE": "발생 이슈",
@@ -1096,7 +1096,7 @@
 				"CREATE_PROJECT": "프로젝트 생성",
 				"NO_PROJECT": "프로젝트 없음",
 				"NO_PROJECT_HELP_TEXT": "분산되어 있는 리소스와 계정을 프로젝트로 그룹화해보세요.",
-				"RESOURCE_MAP": ""
+				"RESOURCE_MAP": "분산된 리소스 및 클라우드 계정을 프로젝트 단위로 통합할 수 있습니다."
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "클라우드 서비스 ",
 			"TOP_PROJECT_CREATE_PROJECT": "프로젝트 생성",
