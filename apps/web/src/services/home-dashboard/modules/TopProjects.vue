@@ -30,7 +30,7 @@
                      class="chart"
                 />
             </p-data-loader>
-            <p-empty v-if="!loading && items.length === 0"
+            <p-empty v-if="!loading && items.length === 0 && projectItems.length === 0"
                      :title="$t('COMMON.WIDGETS.TOP_PROJECTS.NO_PROJECT')"
                      show-button
             >
@@ -44,6 +44,11 @@
                         </p-button>
                     </router-link>
                 </template>
+            </p-empty>
+            <p-empty v-else-if="!loading && items.length === 0 && projectItems.length !== 0"
+                     show-image
+            >
+                {{ $t('COMMON.COMPONENTS.METRIC_CHART.NO_DATA') }}
             </p-empty>
             <template v-else>
                 <p-data-table
@@ -114,6 +119,7 @@ import { range } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
@@ -166,6 +172,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
+            projectItems: computed(() => store.state.reference.project.items),
             loading: true,
             items: [] as TableItem[],
             chartData: [] as ChartData[],
