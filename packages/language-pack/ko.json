@@ -1136,7 +1136,7 @@
 			"FILTER_PRIVATE": "비공개",
 			"FILTER_PUBLIC": "공개",
 			"FILTER_SINGLE_PROJECT": "개별 프로젝트",
-			"HELP_TEXT_CREATE": "",
+			"HELP_TEXT_CREATE": "커스텀 대시보드를 생성하고, 클라우드 데이터 한눈에 파악하세요.",
 			"LABEL_PRIVATE": "비공개",
 			"LABEL_PUBLIC": "공개",
 			"LABEL_SCOPE": "범위",
