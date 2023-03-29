@@ -1158,7 +1158,7 @@
 			"LABEL_SCOPE": "ダッシュボードの範囲",
 			"LABEL_START_FROM": "基本生成フォーム",
 			"LABEL_VIEWERS": "公開可否",
-			"NO_DATA": "",
+			"NO_DATA": "データがありません",
 			"PREVIEW": "プレビュー",
 			"PRIVATE": "非公開",
 			"PRIVATE_DESC": "非公開",

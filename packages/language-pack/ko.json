@@ -1158,7 +1158,7 @@
 			"LABEL_SCOPE": "대시보드 범위",
 			"LABEL_START_FROM": "기본 생성 폼",
 			"LABEL_VIEWERS": "공개 여부",
-			"NO_DATA": "",
+			"NO_DATA": "데이터가 없습니다.",
 			"PREVIEW": "미리보기",
 			"PRIVATE": "비공개",
 			"PRIVATE_DESC": "나만보기",
