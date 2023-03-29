@@ -313,7 +313,6 @@ watch(() => state.isPermissionDenied, (isPermissionDenied) => {
 
 watch(() => vm.$route.query, async (after, before) => {
     if (after?.select_pg !== before?.select_pg && !Array.isArray(after.select_pg)) {
-        projectPageStore.selectNode(after.select_pg);
         await projectPageStore.selectNode(after.select_pg);
     }
 });

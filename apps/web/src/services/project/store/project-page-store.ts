@@ -114,7 +114,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
                 });
                 const paths = res.open_path || [];
 
-                if (this.rootNode) {
+                if (this.rootNode && paths.length) {
                     const { node } = await this.rootNode.fetchAndFindNode(paths.map((d) => ((data) => data.id === d)));
                     return node;
                 }
