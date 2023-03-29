@@ -1051,7 +1051,7 @@
 				"HOUR": "hr | hrs",
 				"LAST_UPDATE": "Last Update",
 				"MORE": "more",
-				"NO_DATA": "Add Service Account to create a dashboard.",
+				"NO_DATA": "Add the relevant cloud service accounts.",
 				"NO_DATA_TITLE": "No Personal Health Dashboard",
 				"PAST_7_DAYS": "Past 7 days",
 				"PLACEHOLDER": "Search Event",
@@ -1096,7 +1096,7 @@
 				"CREATE_PROJECT": "Create Project",
 				"NO_PROJECT": "No Project",
 				"NO_PROJECT_HELP_TEXT": "",
-				"RESOURCE_MAP": "Getting started with grouping your scattered resource and accounts with your own project."
+				"RESOURCE_MAP": "Integrate distributed resources and cloud accounts on project basis."
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "Cloud Service",
 			"TOP_PROJECT_CREATE_PROJECT": "Create Project",

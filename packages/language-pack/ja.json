@@ -1002,7 +1002,7 @@
 			},
 			"CLOUD_SERVICE": {
 				"HELP": "サービスしている主要なクラウドサービスリストを表示します",
-				"NO_DATA": "",
+				"NO_DATA": "クラウドリソースがありません。",
 				"SEE_MORE": "もっと見る",
 				"TITLE": "クラウドサービス"
 			},
@@ -1051,8 +1051,8 @@
 				"HOUR": "時間",
 				"LAST_UPDATE": "最終更新",
 				"MORE": "もっと見る",
-				"NO_DATA": "",
-				"NO_DATA_TITLE": "",
+				"NO_DATA": "関連するクラウドサービスアカウントを追加してください。",
+				"NO_DATA_TITLE": "Personal Health Dashboard 데이터가 없습니다.",
 				"PAST_7_DAYS": "過去7日間",
 				"PLACEHOLDER": "イベント検索",
 				"SUMMARY_ISSUE": "発生した問題",
@@ -1096,7 +1096,7 @@
 				"CREATE_PROJECT": "プロジェクト作成",
 				"NO_PROJECT": "プロジェクトなし",
 				"NO_PROJECT_HELP_TEXT": "分散されているリソースやアカウントを独自のプロジェクトでグループ化をしてみましょう",
-				"RESOURCE_MAP": ""
+				"RESOURCE_MAP": "分散されたリソースとクラウドアカウントをプロジェクト単位で統合することができます。"
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "クラウドサービス",
 			"TOP_PROJECT_CREATE_PROJECT": "プロジェクト作成",
