@@ -159,9 +159,6 @@ jobs:
         with:
           context: .
           file: ./apps/web/Dockerfile
-          build-args: |
-            TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
-            TURBO_TEAM=${{ secrets.TURBO_TEAM }}
           push: true
           tags: spaceone/${{ env.SERVICE }}:${{ env.VERSION }}
           cache-from: pyengine/${{ env.SERVICE }}:latest
@@ -181,6 +178,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
+          file: ./apps/web/Dockerfile
           push: true
           tags: ${{ secrets.ECR_REPO }}/${{ env.SERVICE }}:latest, ${{ secrets.ECR_REPO }}/${{ env.SERVICE }}:${{ env.VERSION }}
           cache-from: pyengine/${{ env.SERVICE }}:latest
