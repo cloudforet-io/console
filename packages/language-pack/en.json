@@ -1136,7 +1136,7 @@
 			"FILTER_PRIVATE": "Private",
 			"FILTER_PUBLIC": "Pubilc",
 			"FILTER_SINGLE_PROJECT": "Single Project",
-			"HELP_TEXT_CREATE": "Create a dashboard to get insights at a glace.",
+			"HELP_TEXT_CREATE": "Create your own custom dashboard and view your cloud usage status at a glance.",
 			"LABEL_PRIVATE": "Private",
 			"LABEL_PUBLIC": "Public",
 			"LABEL_SCOPE": "Scope",

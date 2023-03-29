@@ -1136,7 +1136,7 @@
 			"FILTER_PRIVATE": "非公開",
 			"FILTER_PUBLIC": "公開",
 			"FILTER_SINGLE_PROJECT": "個別プロジェクト",
-			"HELP_TEXT_CREATE": "",
+			"HELP_TEXT_CREATE": "カスタマダッシュボードを作成し、クラウドの利用状況を一目で確認できます。",
 			"LABEL_PRIVATE": "非公開",
 			"LABEL_PUBLIC": "公開",
 			"LABEL_SCOPE": "スコープ",
