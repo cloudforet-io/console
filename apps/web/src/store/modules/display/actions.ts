@@ -81,22 +81,24 @@ const debugCheckNotification = DEBUG_MODE ? console.debug : () => {};
 
 const fixedCheckNotificationFilter: ConsoleFilter = { k: 'is_read', v: false, o: '=' };
 const checkNotificationQueryHelper = new ApiQueryHelper().setCountOnly();
-const getNotificationListParam = (userId: string, currentTime: Dayjs, lastNotificationReadTime: string) => {
+const getNotificationListParam = (userId: string, currentTime: Dayjs, lastNotificationReadTime?: Dayjs) => {
+    /* caution
+     * Do not use iso string in api request here. */
     checkNotificationQueryHelper.setFilters([
         fixedCheckNotificationFilter,
-        { k: 'created_at', v: currentTime.toISOString(), o: '<=t' },
+        { k: 'created_at', v: currentTime.format('YYYY-MM-DD HH:mm:ss'), o: '<=t' },
         { k: 'user_id', v: userId, o: '=' },
     ]);
 
     const minimumCheckTime = currentTime.subtract(7, 'day');
 
-    if (lastNotificationReadTime && dayjs.utc(lastNotificationReadTime).isAfter(minimumCheckTime)) {
+    if (lastNotificationReadTime && lastNotificationReadTime.isAfter(minimumCheckTime)) {
         checkNotificationQueryHelper.addFilter(
-            { k: 'created_at', v: lastNotificationReadTime, o: '>t' },
+            { k: 'created_at', v: lastNotificationReadTime.format('YYYY-MM-DD HH:mm:ss'), o: '>t' },
         );
     } else {
         checkNotificationQueryHelper.addFilter(
-            { k: 'created_at', v: minimumCheckTime.toISOString(), o: '>=t' },
+            { k: 'created_at', v: minimumCheckTime.format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
         );
     }
 
@@ -117,11 +119,13 @@ export const checkNotification: Action<DisplayState, any> = async ({
         debugCheckNotification('[CHECK NOTI]', ' start');
         notificationListApiToken = axios.CancelToken.source();
 
-        const currentTime = dayjs.utc();
+        const currentTime = dayjs.tz(dayjs.utc(), rootState.user.timezone);
+        const lastNotificationReadTimeStr = rootGetters['settings/getItem']('lastNotificationReadTime', '/gnb');
+        const lastNotificationReadTime = lastNotificationReadTimeStr ? dayjs(lastNotificationReadTimeStr).tz(rootState.user.timezone) : undefined;
         const param = getNotificationListParam(
             rootState.user.userId,
             currentTime,
-            rootGetters['settings/getItem']('lastNotificationReadTime', '/gnb'),
+            lastNotificationReadTime,
         );
         debugCheckNotification('[NOTI QUERY.FILTER]', param.query.filter);
         const { total_count } = await SpaceConnector.client.notification.notification.list(param, {
