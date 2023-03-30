@@ -81,6 +81,7 @@ import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers
 import { getReferenceTypeOfGroupBy } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+// eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
@@ -244,6 +245,7 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
+    widgetConfig: toRef(state, 'widgetConfig'),
     settings: toRef(state, 'settings'),
     onCurrencyUpdate: async () => {
         if (!state.data) return;
