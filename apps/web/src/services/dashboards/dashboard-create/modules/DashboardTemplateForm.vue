@@ -4,7 +4,11 @@
             :value.sync="state.searchValue"
             @update:value="handleInputSearch"
         />
-        <div class="dashboard-template-container">
+        <div
+            ref="templateContainerRef"
+            class="dashboard-template-container"
+            :class="{ 'overflow-auto':state.hasScrollbar }"
+        >
             <div class="card-container default-dashboard-board">
                 <span class="card-wrapper-title">
                     {{ $t('DASHBOARDS.CREATE.LABEL_DEFAULT_TEMPLATE') }}
@@ -125,7 +129,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, nextTick, reactive, toRefs,
+} from 'vue';
 
 import {
     PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI,
@@ -159,7 +165,14 @@ const props = defineProps<Props>();
 const state = reactive({
     selectedTemplateName: '',
     searchValue: '',
+    templateContainerRef: null as HTMLElement | null,
+    hasScroll: true,
 });
+
+const {
+    templateContainerRef,
+} = toRefs(state);
+
 const defaultTemplateState = reactive({
     thisPage: 1,
     allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
@@ -230,11 +243,21 @@ const handleInputSearch = () => {
     existingTemplateState.thisPage = 1;
 };
 
+const handleCheckScroll = () => {
+    if (state.templateContainerRef) {
+        state.hasScroll = state.templateContainerRef.scrollHeight > state.templateContainerRef.clientHeight;
+    } else {
+        state.hasScroll = false;
+    }
+};
+
 (async () => {
     await Promise.allSettled([
         store.dispatch('dashboard/loadProjectDashboard'),
         store.dispatch('dashboard/loadDomainDashboard'),
     ]);
+    await nextTick();
+    handleCheckScroll();
 })();
 </script>
 
@@ -242,10 +265,9 @@ const handleInputSearch = () => {
 .dashboard-template-wrapper {
     @apply relative;
     .dashboard-template-container {
-        @apply overflow-auto;
         height: calc(100vh - $gnb-height - 2.5rem - 6.5rem - 2rem - 4.5rem - 4.1rem);
         padding-bottom: 2.5rem;
-        &::after {
+        &.overflow-auto::after {
             @apply w-full absolute;
             height: 2.5rem;
             content: '';
