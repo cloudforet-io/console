@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('Create Dashboard', () => {
+test.describe('Entire Workspace Dashboard', () => {
     test('Create entire Workspace dashboard', async ({ page }) => {
         page.goto('/');
         await test.step('1. Go to Create New Dashboard page', async () => {
@@ -40,6 +40,9 @@ test.describe('Create Dashboard', () => {
 
             await expect(locatorScope).toContainText(' Workspace ');
             await expect(locatorName).toContainText(dashboardName);
+
+            // Todo: to be added
+            // await expect(locatorName).toContainText('public');
         });
     });
 });
