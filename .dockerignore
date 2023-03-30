@@ -4,10 +4,22 @@ logs
 npm-debug.log*
 
 # dependencies
-node_modules
+**/node_modules
 
 # outout
 out
+**/dist
+
+# lint
+**/.eslintrc.js
+**/.eslintrc.cjs
+**/.eslintignore
+**/.lintstagedrc.cjs
+
+# tests
+**/tests
+**/playwright
+**/playwright.config.ts
 
 #misc
 *.swp
@@ -16,11 +28,11 @@ out
 .DS_Store
 .husky
 .dockerignore
-.eslintrc.js
 commitlint.config.cjs
-LICENSE
-AUTHORS
+**/LICENSE
+**/AUTHORS
 VERSION
+**/README.md
 deploy
-
-
+**/Dockerfile
+**/skaffold.template.yaml

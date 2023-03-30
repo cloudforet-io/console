@@ -3,7 +3,7 @@ RUN apk add --no-cache libc6-compat
 RUN apk update
 # Set working directory
 WORKDIR /app
-RUN npm i -g npm@8 turbo
+RUN npm i -g turbo
 COPY . .
 RUN turbo prune --scope=web --docker
 
@@ -17,7 +17,7 @@ WORKDIR /app
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/package-lock.json ./package-lock.lock
+COPY --from=builder /app/out/package-lock.json ./package-lock.json
 RUN npm install
 
 # Build the project
