@@ -463,7 +463,7 @@
 				"ACCUMULATED": "누적 데이터",
 				"ADDITIONAL_INFO": "추가 정보",
 				"ADD_MORE": "그룹 추가",
-				"ALT_EXCEL_DOWNLOAD_STACKED": "누적데이터가 아닌 월별 데이터로 파일이 다운로드 됩니다.",
+				"ALT_EXCEL_DOWNLOAD_STACKED": "누적 데이터가 아닌 월별 데이터로 파일이 다운로드 됩니다.",
 				"ALT_E_DELETE_QUERY": "쿼리 삭제 실패",
 				"ALT_E_EDITED_QUERY": "쿼리 편집 실패",
 				"ALT_E_SAVED_QUERY": "쿼리 저장 실패",
@@ -984,7 +984,7 @@
 				"STORAGE": "저장소",
 				"TITLE": "일반",
 				"TREND_TITLE": "트렌드",
-				"TYPE_TITLE": ""
+				"TYPE_TITLE": "데이터베이스 타입 "
 			},
 			"BILLING": {
 				"DAY": "일",
@@ -1077,7 +1077,7 @@
 			"SERVICE_ACCOUNTS": "서비스 어카운트 ",
 			"SERVICE_ACCOUNTS_ACCOUNT": "계정 ",
 			"SERVICE_ACCOUNTS_ADD": "추가",
-			"SERVICE_ACCOUNTS_NO_ACCOUNT": "",
+			"SERVICE_ACCOUNTS_NO_ACCOUNT": "서비스 어카운트가 없습니다.",
 			"SERVICE_ACCOUNTS_PROJECT": "프로젝트 ",
 			"SERVICE_ACCOUNTS_PROVIDER": "서비스 제공자 ",
 			"SERVICE_ACCOUNT_TABLE": {
@@ -1095,7 +1095,7 @@
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "프로젝트 생성",
 				"NO_PROJECT": "프로젝트 없음",
-				"NO_PROJECT_HELP_TEXT": "분산되어 있는 리소스와 계정을 프로젝트로 그룹화해보세요.",
+				"NO_PROJECT_HELP_TEXT": "분산된 리소스 및 클라우드 계정을 프로젝트 단위로 통합할 수 있습니다.",
 				"RESOURCE_MAP": "분산된 리소스 및 클라우드 계정을 프로젝트 단위로 통합할 수 있습니다."
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "클라우드 서비스 ",
@@ -1118,7 +1118,7 @@
 				"LABEL_SERVICE_LIMITS": "서비스 한도",
 				"LABEL_WARNING": "조사 권고",
 				"NO_DATA": "데이터가 없습니다.",
-				"NO_DATA_DESC": "",
+				"NO_DATA_DESC": "관련된 클라우드 서비스 어카운트를 추가해주세요.",
 				"SUB_TITLE_OVERALL": "전체요약",
 				"SUB_TITLE_PROJECT_SUMMARY": "요약 정보",
 				"TITLE": "Trusted Advisor"
@@ -1158,7 +1158,7 @@
 			"LABEL_SCOPE": "대시보드 범위",
 			"LABEL_START_FROM": "기본 생성 폼",
 			"LABEL_VIEWERS": "공개 여부",
-			"NO_DATA": "",
+			"NO_DATA": "데이터가 없습니다.",
 			"PREVIEW": "미리보기",
 			"PRIVATE": "비공개",
 			"PRIVATE_DESC": "나만보기",

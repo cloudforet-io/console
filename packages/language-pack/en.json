@@ -1095,7 +1095,7 @@
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "Create Project",
 				"NO_PROJECT": "No Project",
-				"NO_PROJECT_HELP_TEXT": "",
+				"NO_PROJECT_HELP_TEXT": "Integrate distributed resources and cloud accounts on project basis.",
 				"RESOURCE_MAP": "Integrate distributed resources and cloud accounts on project basis."
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "Cloud Service",
@@ -1118,7 +1118,7 @@
 				"LABEL_SERVICE_LIMITS": "Service Limits",
 				"LABEL_WARNING": "Investigation recommended",
 				"NO_DATA": "No AWS Trusted Advisor",
-				"NO_DATA_DESC": "Add Service Account to create a dashboard.",
+				"NO_DATA_DESC": "Add the relevant cloud service accounts.",
 				"SUB_TITLE_OVERALL": "Overall",
 				"SUB_TITLE_PROJECT_SUMMARY": "Project Summary",
 				"TITLE": "Trusted Advisor"
