@@ -53,7 +53,7 @@
 import { vOnClickOutside } from '@vueuse/components';
 import { useFocus } from '@vueuse/core';
 import {
-    computed, nextTick, reactive, ref, watch,
+    computed, nextTick, onMounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -143,6 +143,11 @@ watch(() => props.name, (d) => {
 
 watch(() => invalidState.nameInput, (invalid) => {
     dashboardDetailStore.$patch({ isNameValid: !invalid });
+});
+
+onMounted(() => {
+    if (nameInput.value?.length) dashboardDetailStore.$patch({ isNameValid: true });
+    else dashboardDetailStore.$patch({ isNameValid: false });
 });
 
 (async () => {
