@@ -5,8 +5,16 @@ on:
   pull_request:
     path-ignores:
       - '.github/**'
-      - '**/deploy/helm/**'
+      - '**/deploy/**'
       - '**/skaffold.template.yaml'
+      - '**/Dockerfile'
+      - '**/.distignore'
+      - '**/README.md'
+      - '**/LICENSE'
+      - '**/AUTHORS'
+      - '**/.husky/**'
+      - '**/commitlint.config.js'
+      - '**/.lintstagedrc.js'
     branches:
       - master
 
