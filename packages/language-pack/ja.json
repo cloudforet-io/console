@@ -463,7 +463,7 @@
 				"ACCUMULATED": "累積データ",
 				"ADDITIONAL_INFO": "追加情報",
 				"ADD_MORE": "グループ追加",
-				"ALT_EXCEL_DOWNLOAD_STACKED": "",
+				"ALT_EXCEL_DOWNLOAD_STACKED": "累積データではなく、月別データでファイルがダウンロードされます。",
 				"ALT_E_DELETE_QUERY": "クエリの削除に失敗しました",
 				"ALT_E_EDITED_QUERY": "クエリの編集に失敗しました",
 				"ALT_E_SAVED_QUERY": "クエリの保存に失敗しました",
@@ -984,7 +984,7 @@
 				"STORAGE": "ストレージ",
 				"TITLE": "一般",
 				"TREND_TITLE": "トレンド",
-				"TYPE_TITLE": ""
+				"TYPE_TITLE": "データベースタイプ"
 			},
 			"BILLING": {
 				"DAY": "日",
@@ -1077,7 +1077,7 @@
 			"SERVICE_ACCOUNTS": "サービスアカウント",
 			"SERVICE_ACCOUNTS_ACCOUNT": "アカウント",
 			"SERVICE_ACCOUNTS_ADD": "追加",
-			"SERVICE_ACCOUNTS_NO_ACCOUNT": "",
+			"SERVICE_ACCOUNTS_NO_ACCOUNT": "サービスアカウントがありません。",
 			"SERVICE_ACCOUNTS_PROJECT": "プロジェクト ",
 			"SERVICE_ACCOUNTS_PROVIDER": "プロバイダー ",
 			"SERVICE_ACCOUNT_TABLE": {
@@ -1095,7 +1095,7 @@
 			"TOP_PROJECTS": {
 				"CREATE_PROJECT": "プロジェクト作成",
 				"NO_PROJECT": "プロジェクトなし",
-				"NO_PROJECT_HELP_TEXT": "分散されているリソースやアカウントを独自のプロジェクトでグループ化をしてみましょう",
+				"NO_PROJECT_HELP_TEXT": "分散されたリソースとクラウドアカウントをプロジェクト単位で統合することができます。",
 				"RESOURCE_MAP": "分散されたリソースとクラウドアカウントをプロジェクト単位で統合することができます。"
 			},
 			"TOP_PROJECT_CLOUD_SERVICE": "クラウドサービス",
@@ -1118,7 +1118,7 @@
 				"LABEL_SERVICE_LIMITS": "サービス制限",
 				"LABEL_WARNING": "調査を推奨",
 				"NO_DATA": "データがありません。",
-				"NO_DATA_DESC": "",
+				"NO_DATA_DESC": "関連するクラウドサービスアカウントを追加してください。",
 				"SUB_TITLE_OVERALL": "サマリ",
 				"SUB_TITLE_PROJECT_SUMMARY": "サマリ情報",
 				"TITLE": "Trusted Advisor"
@@ -1158,7 +1158,7 @@
 			"LABEL_SCOPE": "ダッシュボードの範囲",
 			"LABEL_START_FROM": "基本生成フォーム",
 			"LABEL_VIEWERS": "公開可否",
-			"NO_DATA": "",
+			"NO_DATA": "データがありません",
 			"PREVIEW": "プレビュー",
 			"PRIVATE": "非公開",
 			"PRIVATE_DESC": "非公開",
@@ -1876,10 +1876,10 @@
 						"LAST_1_DAY": "過去1日",
 						"LAST_1_MONTH": "過去1ヶ月間",
 						"LAST_1_YEAR": "過去1年",
-						"LAST_2_WEEKS": "",
+						"LAST_2_WEEKS": "過去2週間",
 						"LAST_3_DAYS": "過去3日",
 						"LAST_3_MONTHS": "過去3ヶ月間",
-						"LAST_A_WEEK": "",
+						"LAST_A_WEEK": "過去1週間",
 						"NO_LOG_HELP_TEXT": "該当のクラウドプロバイダは、現在別途のログを提供していません。",
 						"TIME_WITHIN": "照会期間"
 					},
