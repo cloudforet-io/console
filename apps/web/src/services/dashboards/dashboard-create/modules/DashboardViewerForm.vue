@@ -3,17 +3,15 @@
         <p-field-title>{{ $t('DASHBOARDS.CREATE.LABEL_VIEWERS') }}</p-field-title>
         <div class="dashboard-viewers-wrapper">
             <p-radio-group direction="vertical">
-                <div>
-                    <p-radio
-                        :selected="isPublicViewer"
-                        @change="handleSelectViewer(DASHBOARD_VIEWER.PUBLIC)"
-                    >
-                        {{ $t('DASHBOARDS.CREATE.PUBLIC') }}
-                    </p-radio>
-                    <p class="viewer-description">
-                        {{ $t('DASHBOARDS.CREATE.PUBLIC_DESC') }}
-                    </p>
-                </div>
+                <p-radio
+                    :selected="isPublicViewer"
+                    @change="handleSelectViewer(DASHBOARD_VIEWER.PUBLIC)"
+                >
+                    {{ $t('DASHBOARDS.CREATE.PUBLIC') }}
+                </p-radio>
+                <p class="viewer-description">
+                    {{ $t('DASHBOARDS.CREATE.PUBLIC_DESC') }}
+                </p>
                 <div>
                     <p-radio
                         :selected="!isPublicViewer"
@@ -22,9 +20,9 @@
                         <p-i name="ic_lock-filled"
                              width="0.875rem"
                              height="0.875rem"
-                             class="mr-1 mb-1 ml-1"
+                             class="mr-1 mb-1 ml-1 gray-500"
                         />
-                        {{ $t('DASHBOARDS.CREATE.PRIVATE') }}
+                        <span>{{ $t('DASHBOARDS.CREATE.PRIVATE') }}</span>
                     </p-radio>
                     <p class="viewer-description">
                         {{ $t('DASHBOARDS.CREATE.PRIVATE_DESC') }}
@@ -84,5 +82,4 @@ export default {
         }
     }
 }
-
 </style>
