@@ -1153,7 +1153,7 @@
 			"CREATE": "Create",
 			"CREATE_NEW_DASHBOARD": "Create New Dashboard",
 			"ENTIRE_WORKSPACES": "Entire Workspace",
-			"GO_BACK": "Go to Back",
+			"GO_BACK": "Go back",
 			"LABEL_DEFAULT_TEMPLATE": "Default Template",
 			"LABEL_EXISTING_DASHBOARD": "Existing Dashboard",
 			"LABEL_SCOPE": "Dashboard Scope",
@@ -1168,7 +1168,7 @@
 			"SINGLE_PROJECT": "Single Project",
 			"STEP": "Step",
 			"STEP1_DESC": "Choose dashboard scope and viewer.",
-			"STEP2_DESC": "Choose a template or an existing dashboard to get started quickly.",
+			"STEP2_DESC": "Get started quickly with templates or existing dashboards",
 			"TITLE": "Create New Dashboard",
 			"VALIDATION_PROJECT": "Please Select Project",
 			"VALIDATION_TEMPLATE": "Please Select Template."
