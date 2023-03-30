@@ -159,10 +159,10 @@ interface Props {
 const props = defineProps<Props>();
 
 const state = reactive({
-    selectedTemplateName: '',
+    selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
     searchValue: '',
     templateContainerRef: null as HTMLElement | null,
-    hasScroll: true,
+    hasScroll: false,
 });
 
 const {
@@ -254,6 +254,7 @@ const handleCheckScroll = () => {
     ]);
     await nextTick();
     handleCheckScroll();
+    handleSelectTemplate(defaultTemplateState.boardSets[0]);
 })();
 </script>
 
