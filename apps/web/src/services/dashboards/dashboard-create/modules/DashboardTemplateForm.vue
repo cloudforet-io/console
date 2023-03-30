@@ -261,7 +261,8 @@ const handleCheckScroll = () => {
 .dashboard-template-wrapper {
     @apply relative;
     .dashboard-template-container {
-        height: calc(100vh - $gnb-height - 2.5rem - 6.5rem - 2rem - 4.5rem - 4.1rem);
+        max-height: calc(100vh - 22.85rem);
+        min-height: 40vh;
         &.overflow-auto {
             padding-bottom: 2.5rem;
             &::after {
