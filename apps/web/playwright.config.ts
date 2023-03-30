@@ -47,6 +47,7 @@ export default defineConfig({
 
     /* Configure projects for major browsers */
     projects: [
+        { name: 'setup', testMatch: /.*\.setup\.ts/ },
         {
             name: 'chromium',
             use: {
@@ -54,8 +55,10 @@ export default defineConfig({
                 launchOptions: {
                     args: ['--disable-site-isolation-trials', '--disable-web-security'],
                 },
+                storageState: 'playwright/.auth/user.json',
                 // ignoreHTTPSErrors: true,
             },
+            dependencies: ['setup'],
         },
         // {
         //     name: 'firefox',
