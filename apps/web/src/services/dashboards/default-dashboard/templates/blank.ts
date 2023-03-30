@@ -23,6 +23,7 @@ export const blankDashboard: DashboardConfig = {
         currency: {
             enabled: true,
         },
+        refresh_interval_option: '5m',
     },
     variables_schema: {
         properties: {},
