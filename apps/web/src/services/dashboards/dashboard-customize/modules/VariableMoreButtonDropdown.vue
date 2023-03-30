@@ -128,6 +128,7 @@ const updateVariablesUse = () => {
 // event
 const handleOpenOverlay = () => {
     hideContextMenu();
+    updateVariablesUse();
     SpaceRouter.router.push({
         name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
         params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
@@ -145,9 +146,6 @@ const handleClickButton = () => {
 
 const handleSelectVariable = (changedSelected: MenuItem[]) => {
     state.selectedForUpdate = changedSelected;
-    updateVariablesUse();
-    hideContextMenu();
-    state.searchText = '';
 };
 
 const handleUpdateSearchText = debounce((text: string) => {
@@ -156,7 +154,13 @@ const handleUpdateSearchText = debounce((text: string) => {
 }, 200);
 
 watch(visibleMenu, (_visibleMenu) => {
-    if (_visibleMenu) initiateMenu();
+    if (_visibleMenu) {
+        initiateMenu();
+    } else {
+        // Reflect selectedForUpdate changes after the dropdown is closed.
+        updateVariablesUse();
+        state.searchText = '';
+    }
 });
 
 const {
