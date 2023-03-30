@@ -28,6 +28,50 @@
 		}
 	},
 	"AUTH": {
+		"PASSWORD": {
+			"FIND": {
+				"BACK_TO_SIGN_IN": "",
+				"HELP_TEXT": "",
+				"SEND": "",
+				"TITLE": "",
+				"USER_ID": ""
+			},
+			"RESET": {
+				"CONFIRM_PASSWORD": "",
+				"DESC": "",
+				"DONE": "",
+				"EMAIL": {
+					"DONE": {
+						"CLICK_HERE": "",
+						"COLLAPSED": "",
+						"DESC_1": "",
+						"DESC_2": "",
+						"EXTENSION_CONTACT": "",
+						"EXTENSION_DESC_1": "",
+						"EXTENSION_REASON_1": "",
+						"EXTENSION_REASON_2": "",
+						"EXTENSION_REASON_3": "",
+						"EXTENSION_TITLE_1": "",
+						"EXTENSION_TITLE_2": "",
+						"GO_BACK_TO_CONSOLE": "",
+						"TITLE": ""
+					},
+					"FAIL": {
+						"DESC_1": "",
+						"DESC_2": "",
+						"DESC_3": "",
+						"DESC_4": "",
+						"GO_BACK": "",
+						"TITLE": ""
+					}
+				},
+				"GO_TO_SIGN_IN": "",
+				"HELP_TEXT": "アカウントの新しいパスワード入力:",
+				"NOT_MATCHING": "",
+				"RESET_PASSWORD": "パスワード再設定",
+				"TITLE": ""
+			}
+		},
 		"RESET_PASSWORD_PAGE": {
 			"ALREADY_RESET_TEXT": "パスワードが既に変更されました。変更されたパスワードでログインしください。",
 			"GO_TO_LOGIN_PAGE": "ログインページへ移動",

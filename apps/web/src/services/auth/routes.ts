@@ -1,16 +1,21 @@
 import type { RouteConfig } from 'vue-router';
 
+import { store } from '@/store';
+
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 const SignOutPage = () => import('@/services/auth/sign-out/SignOutPage.vue');
-const ResetPasswordPage = () => import('@/services/auth/reset-password/ResetPasswordPage.vue');
-
 const SignInPage = () => import('@/services/auth/sign-in/SignInPage.vue');
 const DomainAdminSignInPage = () => import('@/services/auth/sign-in/DomainAdminSignInPage.vue');
 const KeycloakPage = () => import('@/services/auth/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue');
 const KB_SSO = () => import('@/services/auth/sign-in/external/KB_SSO/pages/KB_SSOPage.vue');
+const PasswordContainer = () => import('@/services/auth/password/PasswordContainer.vue');
+const PasswordPage = () => import('@/services/auth/password/PasswordPage.vue');
+const ValidationEmailPage = () => import('@/services/auth/validationEmail/ValidationEmailPage.vue');
+// const SuccessPage = () => import('@/services/auth/password/successStatus/Success.vue');
+// const FailedPage = () => import('@/services/auth/password/successStatus/Failed.vue');
 
 export default [
     {
@@ -67,6 +72,40 @@ export default [
         ],
     },
     {
+        path: '/password',
+        name: AUTH_ROUTE.PASSWORD._NAME,
+        meta: {
+            isSignInPage: false,
+            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
+        },
+        redirect: () => {
+            if (store.getters['user/isUserNeedPasswordReset']) return { name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME };
+            return { name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME };
+        },
+        component: PasswordContainer,
+        children: [
+            {
+                path: 'find',
+                name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME,
+                component: PasswordPage,
+            },
+            {
+                path: 'reset',
+                name: AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME,
+                component: PasswordPage,
+            },
+        ],
+    },
+    {
+        path: '/email',
+        name: AUTH_ROUTE.EMAIL._NAME,
+        meta: {
+            isSignInPage: false,
+            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
+        },
+        component: ValidationEmailPage,
+    },
+    {
         path: '/kbsso/checkauth.jsp',
         name: AUTH_ROUTE.SIGN_IN.KB._NAME,
         meta: {
@@ -80,14 +119,5 @@ export default [
             nextPath: query.nextPath,
         }),
         component: KB_SSO,
-    },
-    {
-        path: '/reset-password',
-        name: AUTH_ROUTE.RESET_PASSWORD._NAME,
-        component: ResetPasswordPage,
-        meta: {
-            isSignInPage: false,
-            accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
-        },
     },
 ] as RouteConfig[];

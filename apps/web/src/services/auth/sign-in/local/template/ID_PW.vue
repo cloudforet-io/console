@@ -33,7 +33,7 @@
         </form>
         <div class="util-wrapper">
             <p class="reset-pw-button">
-                <router-link :to="{ name: 'home' }">
+                <router-link :to="{ name: AUTH_ROUTE.PASSWORD._NAME }">
                     Forgot Password?
                 </router-link>
             </p>
@@ -141,7 +141,7 @@ export default defineComponent({
                 await loadAuth().signIn(credentials, state.userId?.trim(), props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER');
                 await store.dispatch('display/hideSignInErrorMessage');
                 if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
-                    await vm.$router.push({ name: 'home' });
+                    await vm.$router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
                 } else {
                     context.emit('sign-in', state.userId);
                 }

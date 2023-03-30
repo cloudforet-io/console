@@ -28,16 +28,63 @@
 		}
 	},
 	"AUTH": {
+		"PASSWORD": {
+			"FIND": {
+				"BACK_TO_SIGN_IN": "Back to Sign-in",
+				"HELP_TEXT": "Enter your User ID, then we'll send you a link to reset password again.",
+				"SEND": "Send Password Reset Email",
+				"TITLE": "Forgot your password?",
+				"USER_ID": "User ID"
+			},
+			"RESET": {
+				"CONFIRM_PASSWORD": "Confirm Password",
+				"DESC": "At least 8 characters",
+				"DONE": "Your password has been \nreset successfully!",
+				"EMAIL": {
+					"DONE": {
+						"CLICK_HERE": "Click here",
+						"COLLAPSED": "Didn't receive an email?",
+						"DESC_1": "An email has been sent",
+						"DESC_2": "Follow the directions in the email to reset your password.",
+						"EXTENSION_CONTACT": "contact your domain administrators.",
+						"EXTENSION_DESC_1": "Your notification email may not be the same as your user ID. if you've forgotten the exact email address, please",
+						"EXTENSION_REASON_1": "Please wait a bit longer... It could take couple of minutes to show up in your inbox.",
+						"EXTENSION_REASON_2": "Check your spam.",
+						"EXTENSION_REASON_3": "to re-send the email.",
+						"EXTENSION_TITLE_1": "Didn't receive an email?",
+						"EXTENSION_TITLE_2": "Still having trouble?",
+						"GO_BACK_TO_CONSOLE": "Go back to Console",
+						"TITLE": "Password reset email sent"
+					},
+					"FAIL": {
+						"DESC_1": "No email address found",
+						"DESC_2": "on your account to send password \nreset link. Please",
+						"DESC_3": "contact your domain administrators",
+						"DESC_4": "and\nrequest to change password.",
+						"GO_BACK": "Go Back",
+						"TITLE": "Unable to reset password"
+					}
+				},
+				"GO_TO_SIGN_IN": "Go to Sign-in",
+				"HELP_TEXT": "Enter a new password for account:",
+				"NOT_MATCHING": "Not matching",
+				"RESET_PASSWORD": "Reset Password",
+				"TITLE": "Reset Password"
+			},
+			"MOBILE": {
+				"MOBILE_GUIDE_MODAL_DESC_1": "You must",
+				"MOBILE_GUIDE_MODAL_DESC_2": "reset password on Desktop or Laptop environment",
+				"MOBILE_GUIDE_MODAL_DESC_3": "before loggin on the first time.",
+				"MOBILE_GUIDE_MODAL_TITLE": "Not supported on Mobile"
+			}
+		},
 		"RESET_PASSWORD_PAGE": {
 			"ALREADY_RESET_TEXT": "Your password has already been reset.",
 			"GO_TO_LOGIN_PAGE": "Go to Login",
 			"GO_TO_LOGIN_WITHOUT_CHANGE": "Go to Login without Changing Password",
 			"HELP_TEXT": "Enter a new password for account: ",
 			"INVALID_LINK": "Invalid Link",
-			"MOBILE_GUIDE_MODAL_DESC_1": "You must",
-			"MOBILE_GUIDE_MODAL_DESC_2": "reset password on Desktop or Laptop environment",
-			"MOBILE_GUIDE_MODAL_DESC_3": "before loggin on the first time.",
-			"MOBILE_GUIDE_MODAL_TITLE": "Not supported on Mobile",
+
 			"RESET_PASSWORD": "Reset Password"
 		}
 	},
