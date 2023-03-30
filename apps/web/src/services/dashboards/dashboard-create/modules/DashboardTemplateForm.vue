@@ -7,7 +7,7 @@
         <div
             ref="templateContainerRef"
             class="dashboard-template-container"
-            :class="{ 'overflow-auto':state.hasScrollbar }"
+            :class="{ 'overflow-auto':state.hasScroll }"
         >
             <div class="card-container default-dashboard-board">
                 <span class="card-wrapper-title">
@@ -55,12 +55,6 @@
                             </router-link>
                         </template>
                     </p-board>
-                    <p-empty
-                        v-show="!defaultTemplateState.boardSets.length"
-                        show-image
-                    >
-                        {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
-                    </p-empty>
                     <p-text-pagination
                         v-show="defaultTemplateState.allPage >= 2"
                         :this-page="defaultTemplateState.thisPage"
@@ -69,7 +63,9 @@
                     />
                 </div>
             </div>
-            <div class="card-container existing-dashboard-board">
+            <div v-if="existingTemplateState.boardSets.length"
+                 class="card-container existing-dashboard-board"
+            >
                 <span class="card-wrapper-title">
                     {{ $t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
                 </span>
@@ -110,12 +106,6 @@
                             </div>
                         </template>
                     </p-board>
-                    <p-empty
-                        v-show="!existingTemplateState.boardSets.length"
-                        show-image
-                    >
-                        {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
-                    </p-empty>
                     <p-text-pagination
                         v-show="existingTemplateState.allPage >= 2"
                         :this-page="existingTemplateState.thisPage"
@@ -124,6 +114,12 @@
                     />
                 </div>
             </div>
+            <p-empty
+                v-show="!defaultTemplateState.boardSets.length && !existingTemplateState.boardSets.length"
+                show-image
+            >
+                {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
+            </p-empty>
         </div>
     </div>
 </template>
@@ -266,13 +262,15 @@ const handleCheckScroll = () => {
     @apply relative;
     .dashboard-template-container {
         height: calc(100vh - $gnb-height - 2.5rem - 6.5rem - 2rem - 4.5rem - 4.1rem);
-        padding-bottom: 2.5rem;
-        &.overflow-auto::after {
-            @apply w-full absolute;
-            height: 2.5rem;
-            content: '';
-            bottom: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 100%);
+        &.overflow-auto {
+            padding-bottom: 2.5rem;
+            &::after {
+                @apply w-full absolute;
+                height: 2.5rem;
+                content: '';
+                bottom: 0;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 100%);
+            }
         }
         .card-container {
             @apply mt-6;
