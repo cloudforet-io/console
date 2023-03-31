@@ -1,0 +1,21 @@
+apiVersion: skaffold/v4beta1
+kind: Config
+metadata:
+  name: console 
+build:
+  platforms: ["linux/amd64"]
+  artifacts:
+    - image: ${IMAGE_REPOSITORY}/console
+      docker:
+        dockerfile: apps/web/dev.dockerfile
+        buildArgs:
+          TURBO_TEAM: ${TURBO_TEAM}
+          TURBO_TOKEN: ${TURBO_TOKEN}
+deploy:
+  helm:
+    releases:
+    - name: console-hody
+      chartPath: deploy/helm
+      valuesFiles:
+      - ${VALUES_LOCATION}/console-hody.yaml
+
