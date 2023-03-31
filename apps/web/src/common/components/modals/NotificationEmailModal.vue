@@ -1,9 +1,10 @@
 <template>
     <p-button-modal
-        :visible="state.proxyVisible"
+        :visible="myAccountPageState.isModalVisible"
         header-title="Verify Notification Email"
         class="notification-email-modal-wrapper"
         @confirm="onClickConfirm"
+        @cancel="handleClickCancel"
     >
         <template #body>
             <div class="modal-content-wrapper">
@@ -14,6 +15,7 @@
                         <div class="notification-field-wrapper">
                             <p-text-input
                                 v-model="formState.newNotificationEmail"
+                                :invalid="validationState.isNewNotificationEmailValid"
                             />
                             <p-button style-type="secondary"
                                       :disabled="formState.newNotificationEmail === ''"
@@ -47,9 +49,13 @@
                     />
                 </div>
                 <p-field-group label="Verification Code"
+                               :invalid="validationState.isValidationCodeValid"
+                               :invalid-text="validationState.validationCodeInvalidText"
                                required
                 >
-                    <p-text-input :value="formState.verificationCode" />
+                    <p-text-input v-model="formState.verificationCode"
+                                  :invalid="validationState.isValidationCodeValid"
+                    />
                 </p-field-group>
                 <div class="collapsible-wrapper">
                     <p-collapsible-toggle v-if="state.isCollapsed"
@@ -62,7 +68,7 @@
                     >
                         Check your junk mail folder or wait a few minutes. if you're still having trouble.
                         <p-button class="send-code-button"
-                                  @click="handleClickNewCode"
+                                  @click.prevent="handleClickNewCode"
                         >
                             <span class="emphasis">Send new code</span>
                         </p-button>
@@ -75,6 +81,7 @@
 
 <script lang="ts" setup>
 import { reactive } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton,
@@ -86,45 +93,64 @@ import {
     PTextInput,
 } from '@spaceone/design-system';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-
 import { useMyAccountPageStore } from '@/services/my-page/store/my-account-page-store';
-
-
-interface Props {
-    visible: boolean
-}
-const props = withDefaults(defineProps<Props>(), {
-    visible: false,
-});
 
 const myAccountPageStore = useMyAccountPageStore();
 const myAccountPageState = myAccountPageStore.$state;
 
-const emit = defineEmits(['visible']);
-
 const state = reactive({
     isCollapsed: true,
     isEditMode: false,
-    proxyVisible: useProxyValue('visible', props, emit),
 });
 const formState = reactive({
-    newNotificationEmail: '' as string | undefined,
-    verificationCode: '' as string | undefined,
+    newNotificationEmail: '',
+    verificationCode: '',
 });
+const validationState = reactive({
+    showValidation: false,
+    isNewNotificationEmailValid: undefined as undefined | boolean,
+    isValidationCodeValid: undefined as undefined | boolean,
+    validationCodeInvalidText: '' as TranslateResult | string,
+});
+
+const checkNotificationEmail = async () => {
+    const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+    if (formState.newNotificationEmail) {
+        validationState.isNewNotificationEmailValid = regex.test(formState.newNotificationEmail);
+    } else validationState.isNewNotificationEmailValid = true;
+};
 const handleEditButton = () => {
     state.isEditMode = true;
 };
-const handleClickSendButton = () => {
-    console.log(formState.newNotificationEmail);
-};
-const onClickConfirm = () => {
-    console.log('confirm!!!!!!');
-    state.proxyVisible = false;
+const handleClickSendButton = async () => {
+    await checkNotificationEmail();
+    if (!validationState.isNewNotificationEmailValid) return;
+    await myAccountPageStore.postValidationEmail(myAccountPageState.userId, formState.newNotificationEmail);
 };
 const handleClickNewCode = () => {
-    console.log('???');
-    // myAccountPageStore.sendValidationEmail(userId, notificationEmail);
+    myAccountPageStore.postValidationEmail(myAccountPageState.userId, myAccountPageState.email);
+};
+const handleClickCancel = () => {
+    myAccountPageStore.closeModal();
+    handleReset();
+};
+const onClickConfirm = async () => {
+    try {
+        await myAccountPageStore.postValidationCode(formState.verificationCode);
+        handleReset();
+        // showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_ASSIGN_MEMBER'), '');
+    } catch (e) {
+        validationState.isValidationCodeValid = true;
+        validationState.validationCodeInvalidText = 'Invalid Code';
+        console.log(e);
+    }
+};
+const handleReset = () => {
+    formState.newNotificationEmail = '';
+    formState.verificationCode = '';
+    validationState.isNewNotificationEmailValid = false;
+    validationState.isValidationCodeValid = false;
+    validationState.validationCodeInvalidText = '';
 };
 </script>
 
@@ -140,6 +166,13 @@ const handleClickNewCode = () => {
         }
         .p-text-input {
             width: 100%;
+        }
+
+        /* custom design-system component - p-field-group */
+        :deep(.p-field-group) {
+            .invalid-feedback {
+                position: absolute;
+            }
         }
         .sent-email-wrapper {
             @apply flex justify-between items-center bg-gray-100 rounded text-label-md text-gray-700;

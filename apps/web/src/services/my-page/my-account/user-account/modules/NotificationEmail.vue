@@ -33,11 +33,16 @@
             {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.HELP_TEXT') }}
         </span>
         <form class="form">
-            <p-text-input v-model="formState.notificationEmail"
-                          :placeholder="state.userId"
-                          :invalid="validationState.isNotificationEmailValid === false"
-                          block
-            />
+            <p-field-group required
+                           :invalid="validationState.isNotificationEmailValid === false"
+                           :invalid-text="validationState.notificationEmailInvalidText"
+            >
+                <p-text-input v-model="formState.notificationEmail"
+                              :invalid="validationState.isNotificationEmailValid === false"
+                              :placeholder="state.userId"
+                              block
+                />
+            </p-field-group>
             <div>
                 <p-button v-if="state.verified"
                           :disabled="formState.notificationEmail === ''"
@@ -52,18 +57,19 @@
                 >
                     {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}
                 </p-button>
-                <notification-email-modal
-                    :visible="state.modalVisible"
-                />
             </div>
         </form>
+        <notification-email-modal />
     </user-account-module-container>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
-import { PButton, PI, PTextInput } from '@spaceone/design-system';
+import {
+    PButton, PI, PTextInput, PFieldGroup,
+} from '@spaceone/design-system';
 
 import { store } from '@/store';
 
@@ -78,28 +84,31 @@ const myAccountPageStore = useMyAccountPageStore();
 const state = reactive({
     userId: computed(() => store.state.user.userId),
     verified: false,
-    modalVisible: false,
 });
 const formState = reactive({
     notificationEmail: '',
-    verificationCode: '' as string | undefined,
 });
 const validationState = reactive({
     showValidation: false,
     isNotificationEmailValid: undefined as undefined | boolean,
+    notificationEmailInvalidText: '' as TranslateResult | string,
 });
 
 const checkNotificationEmail = async () => {
     const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-    if (formState.notificationEmail) {
-        validationState.isNotificationEmailValid = regex.test(formState.notificationEmail);
-    } else validationState.isNotificationEmailValid = true;
+    if (regex.test(formState.notificationEmail)) {
+        validationState.isNotificationEmailValid = true;
+    } else {
+        console.log('true');
+        validationState.isNotificationEmailValid = false;
+        validationState.notificationEmailInvalidText = 'check format';
+    }
 };
 const handleClickVerifiedEmail = async () => {
     await checkNotificationEmail();
     if (!validationState.isNotificationEmailValid) return;
-    await myAccountPageStore.sendValidationEmail(state.userId, formState.notificationEmail);
-    state.modalVisible = true;
+    await myAccountPageStore.postValidationEmail(state.userId, formState.notificationEmail);
+    formState.notificationEmail = '';
 };
 </script>
 
@@ -132,11 +141,19 @@ const handleClickVerifiedEmail = async () => {
         @apply flex items-center;
         margin-top: 1rem;
 
-        /* custom design-system component - p-text-input */
-        :deep(.p-text-input) {
-            max-width: 26.625rem;
-            &::placeholder {
-                @apply text-gray-300;
+        /* custom design-system component - p-field-group */
+        :deep(.p-field-group) {
+            width: 26.625rem;
+            margin-bottom: 0;
+
+            /* custom design-system component - p-text-input */
+            :deep(.p-text-input) {
+                &::placeholder {
+                    @apply text-gray-300;
+                }
+            }
+            .invalid-feedback {
+                position: absolute;
             }
         }
 
