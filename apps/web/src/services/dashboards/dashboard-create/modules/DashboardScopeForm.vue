@@ -16,7 +16,7 @@
                     {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}
                 </p-radio>
             </p-radio-group>
-            <project-select-dropdown :disabled="isDomainScope"
+            <project-select-dropdown v-show="!isDomainScope"
                                      project-selectable
                                      @select="handleSelectProjects"
             />

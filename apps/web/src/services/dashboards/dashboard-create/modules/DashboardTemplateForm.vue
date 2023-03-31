@@ -4,7 +4,11 @@
             :value.sync="state.searchValue"
             @update:value="handleInputSearch"
         />
-        <div class="dashboard-template-container">
+        <div
+            ref="templateContainerRef"
+            class="dashboard-template-container"
+            :class="{ 'overflow-auto':state.hasScroll }"
+        >
             <div class="card-container default-dashboard-board">
                 <span class="card-wrapper-title">
                     {{ $t('DASHBOARDS.CREATE.LABEL_DEFAULT_TEMPLATE') }}
@@ -51,12 +55,6 @@
                             </router-link>
                         </template>
                     </p-board>
-                    <p-empty
-                        v-show="!defaultTemplateState.boardSets.length"
-                        show-image
-                    >
-                        {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
-                    </p-empty>
                     <p-text-pagination
                         v-show="defaultTemplateState.allPage >= 2"
                         :this-page="defaultTemplateState.thisPage"
@@ -65,7 +63,9 @@
                     />
                 </div>
             </div>
-            <div class="card-container existing-dashboard-board">
+            <div v-if="existingTemplateState.boardSets.length"
+                 class="card-container existing-dashboard-board"
+            >
                 <span class="card-wrapper-title">
                     {{ $t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
                 </span>
@@ -106,12 +106,6 @@
                             </div>
                         </template>
                     </p-board>
-                    <p-empty
-                        v-show="!existingTemplateState.boardSets.length"
-                        show-image
-                    >
-                        {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
-                    </p-empty>
                     <p-text-pagination
                         v-show="existingTemplateState.allPage >= 2"
                         :this-page="existingTemplateState.thisPage"
@@ -120,12 +114,20 @@
                     />
                 </div>
             </div>
+            <p-empty
+                v-show="!defaultTemplateState.boardSets.length && !existingTemplateState.boardSets.length"
+                show-image
+            >
+                {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
+            </p-empty>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, nextTick, reactive, toRefs,
+} from 'vue';
 
 import {
     PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI,
@@ -157,9 +159,16 @@ interface Props {
 const props = defineProps<Props>();
 
 const state = reactive({
-    selectedTemplateName: '',
+    selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
     searchValue: '',
+    templateContainerRef: null as HTMLElement | null,
+    hasScroll: false,
 });
+
+const {
+    templateContainerRef,
+} = toRefs(state);
+
 const defaultTemplateState = reactive({
     thisPage: 1,
     allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
@@ -230,11 +239,22 @@ const handleInputSearch = () => {
     existingTemplateState.thisPage = 1;
 };
 
+const handleCheckScroll = () => {
+    if (state.templateContainerRef) {
+        state.hasScroll = state.templateContainerRef.scrollHeight > state.templateContainerRef.clientHeight;
+    } else {
+        state.hasScroll = false;
+    }
+};
+
 (async () => {
     await Promise.allSettled([
         store.dispatch('dashboard/loadProjectDashboard'),
         store.dispatch('dashboard/loadDomainDashboard'),
     ]);
+    await nextTick();
+    handleCheckScroll();
+    handleSelectTemplate(defaultTemplateState.boardSets[0]);
 })();
 </script>
 
@@ -243,14 +263,17 @@ const handleInputSearch = () => {
     @apply relative;
     .dashboard-template-container {
         @apply overflow-auto;
-        height: calc(100vh - $gnb-height - 2.5rem - 6.5rem - 2rem - 4.5rem - 4.1rem);
-        padding-bottom: 2.5rem;
-        &::after {
-            @apply w-full absolute;
-            height: 2.5rem;
-            content: '';
-            bottom: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 100%);
+        max-height: calc(100vh - 22.85rem);
+        min-height: 40vh;
+        &.overflow-auto {
+            padding-bottom: 2.5rem;
+            &::after {
+                @apply w-full absolute;
+                height: 2.5rem;
+                content: '';
+                bottom: 0;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 100%);
+            }
         }
         .card-container {
             @apply mt-6;

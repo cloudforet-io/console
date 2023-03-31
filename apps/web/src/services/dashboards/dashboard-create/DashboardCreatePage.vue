@@ -24,7 +24,7 @@
                     style-type="primary"
                     size="lg"
                     :disabled="!isValid"
-                    @click="handleGoStep(2)"
+                    @click="handleGoStep('next')"
                 >
                     {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
                 </p-button>
@@ -47,7 +47,7 @@
                     style-type="transparent"
                     size="lg"
                     icon-left="ic_arrow-left"
-                    @click="handleGoStep(1)"
+                    @click="handleGoStep('prev')"
                 >
                     {{ $t('DASHBOARDS.CREATE.GO_BACK') }}
                 </p-button>
@@ -90,7 +90,6 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { ProjectItemResp } from '@/services/project/type';
 
-
 export default {
     name: 'CreateDashboardPage',
     components: {
@@ -122,10 +121,10 @@ export default {
         const state = reactive({
             dashboardScope: DASHBOARD_SCOPE.DOMAIN as DashboardScope,
             dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
-            steps: [
+            steps: computed(() => [
                 { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') },
                 { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') },
-            ],
+            ]),
             currentStep: 1,
             isValid: computed(() => {
                 if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) return !!dashboardProject.value?.id;
@@ -134,10 +133,11 @@ export default {
             }),
         });
 
-
-        const handleGoStep = (step) => {
-            state.currentStep = step;
+        const handleGoStep = (direction: 'prev'|'next') => {
+            if (direction === 'prev') state.currentStep--;
+            else state.currentStep++;
         };
+
         const handleClickCreate = () => {
             let _dashboardTemplate;
             if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) {
@@ -189,10 +189,22 @@ export default {
     padding: 2.5rem;
     margin: 0 auto;
 
+    .p-button {
+        &.transparent {
+            &:focus {
+                @apply text-gray-900;
+            }
+            &:hover {
+                @apply text-blue-600;
+            }
+        }
+    }
+
     @screen tablet {
         @apply w-full;
     }
 }
+
 .dashboard-create-step2 {
     width: 62.5rem;
     margin: 0 auto;
