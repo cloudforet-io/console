@@ -36,6 +36,12 @@
 				"TITLE": "Forgot your password?",
 				"USER_ID": "User ID"
 			},
+			"MOBILE": {
+				"MOBILE_GUIDE_MODAL_DESC_1": "You must",
+				"MOBILE_GUIDE_MODAL_DESC_2": "reset password on Desktop or Laptop environment",
+				"MOBILE_GUIDE_MODAL_DESC_3": "before loggin on the first time.",
+				"MOBILE_GUIDE_MODAL_TITLE": "Not supported on Mobile"
+			},
 			"RESET": {
 				"CONFIRM_PASSWORD": "Confirm Password",
 				"DESC": "At least 8 characters",
@@ -70,22 +76,7 @@
 				"NOT_MATCHING": "Not matching",
 				"RESET_PASSWORD": "Reset Password",
 				"TITLE": "Reset Password"
-			},
-			"MOBILE": {
-				"MOBILE_GUIDE_MODAL_DESC_1": "You must",
-				"MOBILE_GUIDE_MODAL_DESC_2": "reset password on Desktop or Laptop environment",
-				"MOBILE_GUIDE_MODAL_DESC_3": "before loggin on the first time.",
-				"MOBILE_GUIDE_MODAL_TITLE": "Not supported on Mobile"
 			}
-		},
-		"RESET_PASSWORD_PAGE": {
-			"ALREADY_RESET_TEXT": "Your password has already been reset.",
-			"GO_TO_LOGIN_PAGE": "Go to Login",
-			"GO_TO_LOGIN_WITHOUT_CHANGE": "Go to Login without Changing Password",
-			"HELP_TEXT": "Enter a new password for account: ",
-			"INVALID_LINK": "Invalid Link",
-
-			"RESET_PASSWORD": "Reset Password"
 		}
 	},
 	"AUTOMATION": {
@@ -943,6 +934,7 @@
 		"PROFILE": {
 			"ALT_E_UPDATE": "Failed to Update Profile",
 			"ALT_S_UPDATE": "Successfully Updated Profile",
+			"CURRENT_PASSWORD": "Current Password",
 			"EMAIL": "E-mail",
 			"EMAIL_REQUIRED": "Please enter email",
 			"GROUP": "Group/Company",
@@ -953,6 +945,7 @@
 			"MOBILE": "Mobile",
 			"NAME": "Name",
 			"NAME_REQUIRED": "Please enter name.",
+			"NEW_PASSWORD": "New Password",
 			"PASSWORD": "Password",
 			"PASSWORD_CHECK": "Password Check",
 			"PASSWORD_CHECK_INVALID": "Please enter same value again",
@@ -1631,6 +1624,14 @@
 				"ACCOUNT_N_PROFILE": "Account & Profile",
 				"BASE_INFORMATION": "Base Information",
 				"CHANGE_PASSWORD": "Change Password",
+				"NOTIFICATION_EMAIL": {
+					"CHANGE": "Change",
+					"HELP_TEXT": "Enter email address to receive important account and system-related information.",
+					"NOT_VERIFIED": "Not Verified",
+					"TITLE": "Notification Email",
+					"VERIFIED": "Verified",
+					"VERIFY": "Verify"
+				},
 				"SAVE_CHANGES": "Save Changes"
 			},
 			"API_KEY": {

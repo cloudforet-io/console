@@ -27,8 +27,8 @@ export const usePasswordPageStore = defineStore('password-page', {
                 this.loading = false;
             }
         },
-        // userId: string, password: string
-        async resetPassword(): Promise<void|Error> {
+        async resetPassword(userId: string, password: string): Promise<void|Error> {
+            console.log(userId, password);
             this.loading = true;
             try {
                 // TODO: API 완성 후 연결
