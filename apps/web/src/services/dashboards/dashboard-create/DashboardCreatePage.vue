@@ -122,10 +122,10 @@ export default {
         const state = reactive({
             dashboardScope: DASHBOARD_SCOPE.DOMAIN as DashboardScope,
             dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
-            steps: [
+            steps: computed(() => [
                 { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') },
                 { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') },
-            ],
+            ]),
             currentStep: 1,
             isValid: computed(() => {
                 if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) return !!dashboardProject.value?.id;
