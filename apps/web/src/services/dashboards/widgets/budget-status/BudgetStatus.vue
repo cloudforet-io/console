@@ -198,6 +198,7 @@ useWidgetLifecycle({
     disposeWidget: undefined,
     refreshWidget,
     props,
+    state,
 });
 
 defineExpose<WidgetExpose<Data>>({

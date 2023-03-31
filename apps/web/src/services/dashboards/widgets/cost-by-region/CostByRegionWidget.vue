@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
@@ -314,7 +314,7 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
-    settings: toRef(state, 'settings'),
+    state,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
         state.legends = getXYChartLegends(state.data.results, GROUP_BY.PROVIDER, props.allReferenceTypeInfo);
