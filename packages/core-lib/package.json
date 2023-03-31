@@ -3,10 +3,8 @@
   "version": "1.11.0-18",
   "description": "Cloudforet Console Core Library",
   "scripts": {
-    "build": "npm run tsc",
-    "dev": "rimraf dist && npm run tsc:watch",
-    "tsc": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "tsc:watch": "tsc-watch --project . --outDir ./dist --onSuccess \"tsc-alias -w\"",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "dev": "rimraf dist && tsc-watch --project . --outDir ./dist --onSuccess \"tsc-alias -w\"",
     "lint": "eslint --ext .js,.ts src",
     "format": "eslint --fix --ext .js,.ts src",
     "test": "vitest run",

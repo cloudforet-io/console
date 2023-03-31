@@ -8,7 +8,7 @@ npm-debug.log*
 
 # outout
 out
-**/dist
+
 
 # lint
 **/.eslintrc.js
