@@ -53,8 +53,7 @@
                     {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}
                 </p-button>
                 <notification-email-modal
-                    :email="formState.notificationEmail"
-                    :modal-visible="myAccountPageState.modalVisible"
+                    :visible="state.modalVisible"
                 />
             </div>
         </form>
@@ -75,11 +74,11 @@ import UserAccountModuleContainer
 import { useMyAccountPageStore } from '@/services/my-page/store/my-account-page-store';
 
 const myAccountPageStore = useMyAccountPageStore();
-const myAccountPageState = myAccountPageStore.$state;
 
 const state = reactive({
     userId: computed(() => store.state.user.userId),
     verified: false,
+    modalVisible: false,
 });
 const formState = reactive({
     notificationEmail: '',
@@ -100,6 +99,7 @@ const handleClickVerifiedEmail = async () => {
     await checkNotificationEmail();
     if (!validationState.isNotificationEmailValid) return;
     await myAccountPageStore.sendValidationEmail(state.userId, formState.notificationEmail);
+    state.modalVisible = true;
 };
 </script>
 
@@ -139,6 +139,8 @@ const handleClickVerifiedEmail = async () => {
                 @apply text-gray-300;
             }
         }
+
+        /* custom design-system component - p-button */
         :deep(.p-button) {
             margin-left: 1rem;
         }

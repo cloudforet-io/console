@@ -1,8 +1,9 @@
 <template>
     <p-button-modal
-        :visible="props.modalVisible"
+        :visible="state.proxyVisible"
         header-title="Verify Notification Email"
         class="notification-email-modal-wrapper"
+        @confirm="onClickConfirm"
     >
         <template #body>
             <div class="modal-content-wrapper">
@@ -35,7 +36,7 @@
                                  color="inherit"
                             />
                             <p class="email-tex">
-                                {{ formState.notificationEmail }}
+                                {{ myAccountPageState.email }}
                             </p>
                         </div>
                     </div>
@@ -60,7 +61,11 @@
                        class="collapsed-contents"
                     >
                         Check your junk mail folder or wait a few minutes. if you're still having trouble.
-                        <span class="emphasis">Send new code</span>
+                        <p-button class="send-code-button"
+                                  @click="handleClickNewCode"
+                        >
+                            <span class="emphasis">Send new code</span>
+                        </p-button>
                     </p>
                 </div>
             </div>
@@ -81,20 +86,29 @@ import {
     PTextInput,
 } from '@spaceone/design-system';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useMyAccountPageStore } from '@/services/my-page/store/my-account-page-store';
+
+
 interface Props {
-    email: string
-    modalVisible: boolean
+    visible: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
-    email: '',
-    modalVisible: false,
+    visible: false,
 });
+
+const myAccountPageStore = useMyAccountPageStore();
+const myAccountPageState = myAccountPageStore.$state;
+
+const emit = defineEmits(['visible']);
+
 const state = reactive({
     isCollapsed: true,
     isEditMode: false,
+    proxyVisible: useProxyValue('visible', props, emit),
 });
 const formState = reactive({
-    notificationEmail: props.email as string | undefined,
     newNotificationEmail: '' as string | undefined,
     verificationCode: '' as string | undefined,
 });
@@ -103,6 +117,14 @@ const handleEditButton = () => {
 };
 const handleClickSendButton = () => {
     console.log(formState.newNotificationEmail);
+};
+const onClickConfirm = () => {
+    console.log('confirm!!!!!!');
+    state.proxyVisible = false;
+};
+const handleClickNewCode = () => {
+    console.log('???');
+    // myAccountPageStore.sendValidationEmail(userId, notificationEmail);
 };
 </script>
 
@@ -138,8 +160,11 @@ const handleClickSendButton = () => {
             margin-top: 1rem;
             .collapsed-contents {
                 @apply text-paragraph-sm text-gray-500;
-                .emphasis {
-                    @apply cursor-pointer text-blue-700;
+                .send-code-button {
+                    @apply text-label-xs font-normal text-blue-700;
+                    background: initial;
+                    padding: 0;
+                    margin: 0;
                 }
             }
         }
