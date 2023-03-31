@@ -25,6 +25,9 @@ export const loadDomainDashboard: Action<DashboardState, any> = async ({ commit 
         if (results) {
             commit('setDomainItems', results);
             commit('setDomainItemCount', total_count);
+        } else {
+            commit('setDomainItems', []);
+            commit('setDomainItemCount', 0);
         }
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -38,6 +41,9 @@ export const loadProjectDashboard: Action<DashboardState, any> = async ({ commit
         if (results) {
             commit('setProjectItems', results);
             commit('setProjectItemCount', total_count);
+        } else {
+            commit('setDomainItems', []);
+            commit('setDomainItemCount', 0);
         }
     } catch (e) {
         ErrorHandler.handleError(e);
