@@ -11,7 +11,8 @@ dist
 coverage/
 
 # Skaffold
-skaffold.yaml
+skaffold.*.yaml
+!skaffold.template.yaml
 
 # Playwright
 /test-results/

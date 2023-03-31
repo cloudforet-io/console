@@ -14,8 +14,8 @@ build:
 deploy:
   helm:
     releases:
-    - name: console-disky
+    - name: ${DOMAIN_NAME}
       chartPath: deploy/helm
       valuesFiles:
-      - ${VALUES_LOCATION}/console-disky.yaml
+      - ${VALUES_LOCATION}/${DOMAIN_NAME}.yaml
 
