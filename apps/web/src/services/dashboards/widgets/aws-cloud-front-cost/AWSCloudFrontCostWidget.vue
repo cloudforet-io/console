@@ -290,7 +290,7 @@ useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
     refreshWidget,
     props,
-    settings: toRef(state, 'settings'),
+    state,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
         state.legends = getXYChartLegends(state.data.results, state.groupBy, props.allReferenceTypeInfo);
