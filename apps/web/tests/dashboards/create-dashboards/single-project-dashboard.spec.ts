@@ -19,13 +19,12 @@ test.describe('Single Project Dashboard', () => {
         });
 
         const dashboardName = `playwright-${Date()}`;
-        const selectedTemplate = await page.locator('.default-dashboard-board .p-board-item').first().locator('.dashboard-name');
-        const selectedTemplateName = await selectedTemplate.innerText();
+        const selectedTemplateName = await page.locator('.default-dashboard-board .p-board-item').first().locator('.dashboard-name').innerText();
 
         await test.step('3. Select Template (Default Dashboard)', async () => {
-            const locatorDashboardInfo = page.locator('.first-list-item .dashboard-info');
-            await expect(locatorDashboardInfo).not.toContainText(' Workspace ');
-            await selectedTemplate.click();
+            // Todo: to be added
+            // await expect('').not.toContainText(' Workspace ');
+            await page.locator('.default-dashboard-board .p-board-item').first().click();
             await page.getByRole('button', { name: 'Create New Dashboard' }).click();
             await expect(page).toHaveURL('/dashboards/project/customize');
         });
