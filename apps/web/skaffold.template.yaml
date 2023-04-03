@@ -1,0 +1,27 @@
+apiVersion: skaffold/v4beta4
+kind: Config
+metadata:
+  name: console-${CONSOLE_NAME}
+build:
+  platforms: ["linux/amd64"]
+  artifacts:
+    - image: ${IMAGE_REPOSITORY}/console
+      docker:
+        dockerfile: apps/web/dev.dockerfile
+        buildArgs:
+          TURBO_TEAM: "${TURBO_TEAM}"
+          TURBO_TOKEN: "${TURBO_TOKEN}"
+deploy:
+  helm:
+    releases:
+    - name: console-${CONSOLE_NAME}
+      chartPath: deploy/helm
+      valuesFiles:
+      - ${VALUES_LOCATION}/console.yaml
+      setValueTemplates:
+        image.name: "{{.IMAGE_REPO_${IMAGE_REPOSITORY}_console}}"
+        image.version: "{{.IMAGE_TAG_${IMAGE_REPOSITORY}_console}}@{{.IMAGE_DIGEST_${IMAGE_REPOSITORY}_console}}"
+      setValues:
+        name: console-${CONSOLE_NAME}
+        production_json.DOMAIN_NAME: ${DOMAIN_REF}
+

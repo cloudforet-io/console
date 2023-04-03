@@ -9,6 +9,6 @@ RUN npm install
 
 ENV NODE_ENV development
 
-EXPOSE 8080
+EXPOSE 80
 
-ENTRYPOINT ["npm", "run", "dev", "--workspace=web"]
+ENTRYPOINT ["npm", "run", "dev", "--workspace=web", "--", "--port=80"]
