@@ -925,6 +925,18 @@
 			"STATISTICS": "統計",
 			"TIME_RANGE": "時間範囲"
 		},
+		"NOTIFICATION_MODAL": {
+			"COLLAPSE_DESC": "",
+			"COLLAPSE_TITLE": "",
+			"INVALID_CODE": "",
+			"NOTIFICATION_EMAIL": "",
+			"SEND_CODE": "",
+			"SEND_NEW_CODE": "",
+			"SENT_DESC": "",
+			"TITLE": "",
+			"VERIFICATION_CODE": "",
+			"VERIFY_NOW": ""
+		},
 		"POPUP": {
 			"NOTICE": {
 				"CLOSE": "閉じる",
@@ -1750,7 +1762,6 @@
 				"DISABLE_MODAL_DESC": "選択したユーザーを無効化にしますか？ |選択したユーザーを全部無効化にしますか？",
 				"DISABLE_MODAL_TITLE": "ユーザ無効化",
 				"DOMAIN_ID": "ドメイン名",
-				"EMAIL": "メールアドレス",
 				"ENABLE": "有効化",
 				"ENABLE_MODAL_DESC": "選択したユーザーを有効にしますか？ |選択したユーザーを全部有効にしますか？",
 				"ENABLE_MODAL_TITLE": "ユーザー有効化",
@@ -1762,6 +1773,7 @@
 				"MY_ACCOUNT": "マイアカウント",
 				"NAME": "名前",
 				"NOTIFICATION": "アラート",
+				"NOTIFICATION_EMAIL": "",
 				"NO_SELECTED": "ユーザーを選択すると、詳細な情報が表示されます。",
 				"ROOT_ACCOUNT": "Root account",
 				"SELECTED_DATA": "選択したデータ",

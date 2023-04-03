@@ -925,6 +925,18 @@
 			"STATISTICS": "통계",
 			"TIME_RANGE": "시간 범위"
 		},
+		"NOTIFICATION_MODAL": {
+			"COLLAPSE_DESC": "",
+			"COLLAPSE_TITLE": "",
+			"INVALID_CODE": "",
+			"NOTIFICATION_EMAIL": "",
+			"SEND_CODE": "",
+			"SEND_NEW_CODE": "",
+			"SENT_DESC": "",
+			"TITLE": "",
+			"VERIFICATION_CODE": "",
+			"VERIFY_NOW": ""
+		},
 		"POPUP": {
 			"NOTICE": {
 				"CLOSE": "닫기",
@@ -1750,7 +1762,6 @@
 				"DISABLE_MODAL_DESC": "선택한 사용자를 비활성화 하시겠습니까?",
 				"DISABLE_MODAL_TITLE": "사용자 비활성화",
 				"DOMAIN_ID": "도메인 아이디",
-				"EMAIL": "이메일",
 				"ENABLE": "활성화",
 				"ENABLE_MODAL_DESC": "선택한 사용자를 활성화 하시겠습니까?",
 				"ENABLE_MODAL_TITLE": "사용자 활성화",
@@ -1762,6 +1773,7 @@
 				"MY_ACCOUNT": "내 계정 ",
 				"NAME": "이름",
 				"NOTIFICATION": "알림",
+				"NOTIFICATION_EMAIL": "",
 				"NO_SELECTED": "사용자를 선택하면 자세한 정보를 볼 수 있습니다.",
 				"ROOT_ACCOUNT": "루트 어카운트 ",
 				"SELECTED_DATA": "선택한 데이터",

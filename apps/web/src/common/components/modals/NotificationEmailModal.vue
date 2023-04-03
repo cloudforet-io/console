@@ -1,15 +1,16 @@
 <template>
     <p-button-modal
         :visible="myAccountPageState.isModalVisible"
-        header-title="Verify Notification Email"
+        :header-title="$t('COMMON.NOTIFICATION_MODAL.TITLE')"
         class="notification-email-modal-wrapper"
         @confirm="onClickConfirm"
         @cancel="handleClickCancel"
+        @close="handleClickCancel"
     >
         <template #body>
             <div class="modal-content-wrapper">
                 <div v-if="state.isEditMode">
-                    <p-field-group label="Notification Email"
+                    <p-field-group :label="$t('COMMON.NOTIFICATION_MODAL.NOTIFICATION_EMAIL')"
                                    required
                     >
                         <div class="notification-field-wrapper">
@@ -21,7 +22,7 @@
                                       :disabled="formState.newNotificationEmail === ''"
                                       @click.prevent="handleClickSendButton"
                             >
-                                Send Code
+                                {{ $t('COMMON.NOTIFICATION_MODAL.SEND_CODE') }}
                             </p-button>
                         </div>
                     </p-field-group>
@@ -30,7 +31,7 @@
                      class="sent-email-wrapper"
                 >
                     <div class="contents-wrapper">
-                        <p>A verification code has been sent to</p>
+                        <p>{{ $t('COMMON.NOTIFICATION_MODAL.SENT_DESC') }}</p>
                         <div class="email-wrapper">
                             <p-i name="ic_envelope-filled"
                                  height="0.875rem"
@@ -48,7 +49,7 @@
                                    @click="handleEditButton"
                     />
                 </div>
-                <p-field-group label="Verification Code"
+                <p-field-group :label="$t('COMMON.NOTIFICATION_MODAL.VERIFICATION_CODE')"
                                :invalid="validationState.isValidationCodeValid"
                                :invalid-text="validationState.validationCodeInvalidText"
                                required
@@ -61,27 +62,31 @@
                     <p-collapsible-toggle v-if="state.isCollapsed"
                                           v-model="state.isCollapsed"
                     >
-                        Didn't get a verification code?
+                        {{ $t('COMMON.NOTIFICATION_MODAL.COLLAPSE_TITLE') }}
                     </p-collapsible-toggle>
                     <p v-if="!state.isCollapsed"
                        class="collapsed-contents"
                     >
-                        Check your junk mail folder or wait a few minutes. if you're still having trouble.
+                        {{ $t('COMMON.NOTIFICATION_MODAL.COLLAPSE_DESC') }}
                         <p-button class="send-code-button"
                                   @click.prevent="handleClickNewCode"
                         >
-                            <span class="emphasis">Send new code</span>
+                            <span class="emphasis">{{ $t('COMMON.NOTIFICATION_MODAL.SEND_NEW_CODE') }}</span>
                         </p-button>
                     </p>
                 </div>
             </div>
         </template>
+        <template #confirm-button>
+            {{ $t('COMMON.NOTIFICATION_MODAL.VERIFY_NOW') }}
+        </template>
     </p-button-modal>
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { getCurrentInstance, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import {
     PButton,
@@ -97,6 +102,7 @@ import { useMyAccountPageStore } from '@/services/my-page/store/my-account-page-
 
 const myAccountPageStore = useMyAccountPageStore();
 const myAccountPageState = myAccountPageStore.$state;
+const vm = getCurrentInstance()?.proxy as Vue;
 
 const state = reactive({
     isCollapsed: true,
@@ -141,7 +147,7 @@ const onClickConfirm = async () => {
         // showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_ASSIGN_MEMBER'), '');
     } catch (e) {
         validationState.isValidationCodeValid = true;
-        validationState.validationCodeInvalidText = 'Invalid Code';
+        validationState.validationCodeInvalidText = vm.$t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');
         console.log(e);
     }
 };
@@ -195,6 +201,7 @@ const handleReset = () => {
                 @apply text-paragraph-sm text-gray-500;
                 .send-code-button {
                     @apply text-label-xs font-normal text-blue-700;
+                    height: 1rem;
                     background: initial;
                     padding: 0;
                     margin: 0;

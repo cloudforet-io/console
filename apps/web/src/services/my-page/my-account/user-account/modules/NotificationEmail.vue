@@ -44,18 +44,15 @@
                 />
             </p-field-group>
             <div>
-                <p-button v-if="state.verified"
-                          :disabled="formState.notificationEmail === ''"
-                          style-type="tertiary"
+                <p-button :disabled="formState.notificationEmail === ''"
+                          :style-type="state.verified ? 'tertiary' : 'primary'"
                           @click.prevent="handleClickVerifiedEmail"
                 >
-                    {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}
-                </p-button>
-                <p-button v-else
-                          :disabled="formState.notificationEmail === ''"
-                          @click.prevent="handleClickVerifiedEmail"
-                >
-                    {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}
+                    {{
+                        state.verified
+                            ? $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE')
+                            : $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY')
+                    }}
                 </p-button>
             </div>
         </form>

@@ -925,6 +925,18 @@
 			"STATISTICS": "Statistics",
 			"TIME_RANGE": "Time Range"
 		},
+		"NOTIFICATION_MODAL": {
+			"COLLAPSE_DESC": "Check your junk mail folder or wait a few minutes. if you're still having\ntrouble.",
+			"COLLAPSE_TITLE": "Didn't get verification code?",
+			"INVALID_CODE": "Invalid code. Please check the email try again.",
+			"NOTIFICATION_EMAIL": "Notification Email",
+			"SEND_CODE": "Send Code",
+			"SEND_NEW_CODE": "Send new code",
+			"SENT_DESC": "A verification code has been sent to",
+			"TITLE": "Verify Notification Email",
+			"VERIFICATION_CODE": "Verification Code",
+			"VERIFY_NOW": "Verify Now"
+		},
 		"POPUP": {
 			"NOTICE": {
 				"CLOSE": "Close",
@@ -1750,7 +1762,6 @@
 				"DISABLE_MODAL_DESC": "Are you sure you want to disable selected user? ",
 				"DISABLE_MODAL_TITLE": "Disable User",
 				"DOMAIN_ID": "Domain ID",
-				"EMAIL": "E-mail",
 				"ENABLE": "Enable",
 				"ENABLE_MODAL_DESC": "Are you sure you want to enable selected user below?",
 				"ENABLE_MODAL_TITLE": "Enable User",
@@ -1762,6 +1773,7 @@
 				"MY_ACCOUNT": "My Account",
 				"NAME": "Name",
 				"NOTIFICATION": "Notifications",
+				"NOTIFICATION_EMAIL": "Notification E-mail",
 				"NO_SELECTED": "Select a user for more details.",
 				"ROOT_ACCOUNT": "Root Account",
 				"SELECTED_DATA": "Selected Data",

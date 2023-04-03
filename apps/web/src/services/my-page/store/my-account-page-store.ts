@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+// import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+// TODO: administration 이랑 API 겹침 > 글로벌로?
 export const useMyAccountPageStore = defineStore('my-account-page', {
     state: () => ({
         loading: false,
@@ -35,7 +36,7 @@ export const useMyAccountPageStore = defineStore('my-account-page', {
             this.loading = true;
             try {
                 // TODO: API 완성 후 연결
-                await SpaceConnector.clientV2.identity.user.confirmEmail({ userId: this.userId, code });
+                // await SpaceConnector.clientV2.identity.user.confirmEmail({ userId: this.userId, code });
                 this.closeModal();
             } catch (e: any) {
                 ErrorHandler.handleError(e);
