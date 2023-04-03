@@ -18,4 +18,6 @@ ENV TURBO_TOKEN=$TURBO_TOKEN
 
 RUN npx turbo build --filter=web...
 
-ENTRYPOINT ["npm", "run", "preview", "--workspace=web"]
+EXPOSE 80
+
+ENTRYPOINT ["npm", "run", "preview", "--workspace=web", "--", "--port=80"]
