@@ -15,123 +15,149 @@
                        style-type="gray"
                        class="auth-type-tab"
             >
-                <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
-                               :required="true"
-                               :invalid="validationState.isUserIdValid === false"
-                               :invalid-text="validationState.userIdInvalidText"
-                               :valid="validationState.isUserIdValid"
-                               :valid-text="validationState.userIdValidText"
-                >
-                    <template v-if="formState.activeTab === 'external' && supportFind && externalItems.length > 100"
-                              #help
-                    >
-                        <div class="external-items-help-text">
-                            <span>{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
-                        </div>
-                    </template>
-                    <template #default="{invalid}">
-                        <div v-if="formState.activeTab === 'external' && supportFind">
-                            <p-filterable-dropdown
-                                :search-text.sync="searchText"
-                                :class="{invalid}"
-                                show-select-marker
-                                :menu="externalItems"
-                                :selected.sync="selectedItems"
-                                :loading="loading"
-                                disable-handler
-                                :exact-mode="false"
-                                use-fixed-menu-style
-                                @select="onSelectExternalUser"
-                                @delete-tag="onDeleteSelectedExternalUser"
-                            />
-                        </div>
-                        <div v-else
-                             class="id-input-form"
+                <div class="input-form-wrapper">
+                    <div class="input-form-view">
+                        <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
+                                       :required="true"
+                                       :invalid="validationState.isUserIdValid === false"
+                                       :invalid-text="validationState.userIdInvalidText"
+                                       :valid="validationState.isUserIdValid"
+                                       :valid-text="validationState.userIdValidText"
                         >
-                            <p-text-input v-model="formState.user_id"
-                                          v-focus
-                                          :placeholder="$t('IDENTITY.USER.FORM.NAME_PLACEHOLDER')"
-                                          :invalid="invalid"
-                                          class="text-input"
-                            />
-                            <p-button style-type="secondary"
-                                      class="user-id-check-button"
-                                      @click="checkUserID"
+                            <template v-if="formState.activeTab === 'external' && supportFind && externalItems.length > 100"
+                                      #help
                             >
-                                {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
-                            </p-button>
-                        </div>
-                    </template>
-                </p-field-group>
-                <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')"
-                               class="input-form"
-                >
-                    <p-text-input v-model="formState.name"
-                                  class="text-input"
-                                  autocomplete="username"
-                    />
-                </p-field-group>
-                <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')"
-                               :invalid="validationState.isEmailValid === false"
-                               :invalid-text="validationState.emailInvalidText"
-                               class="input-form"
-                >
-                    <template #default="{invalid}">
-                        <p-text-input v-model="formState.email"
-                                      :invalid="invalid"
-                                      class="text-input"
+                                <div class="external-items-help-text">
+                                    <span>{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
+                                </div>
+                            </template>
+                            <template #default="{invalid}">
+                                <div v-if="formState.activeTab === 'external' && supportFind">
+                                    <p-filterable-dropdown
+                                        :search-text.sync="searchText"
+                                        :class="{invalid}"
+                                        show-select-marker
+                                        :menu="externalItems"
+                                        :selected.sync="selectedItems"
+                                        :loading="loading"
+                                        disable-handler
+                                        :exact-mode="false"
+                                        use-fixed-menu-style
+                                        @select="onSelectExternalUser"
+                                        @delete-tag="onDeleteSelectedExternalUser"
+                                    />
+                                </div>
+                                <div v-else
+                                     class="id-input-form"
+                                >
+                                    <p-text-input v-model="formState.user_id"
+                                                  v-focus
+                                                  :placeholder="$t('IDENTITY.USER.FORM.NAME_PLACEHOLDER')"
+                                                  :invalid="invalid"
+                                                  class="text-input"
+                                    />
+                                    <p-button style-type="secondary"
+                                              class="user-id-check-button"
+                                              @click="checkUserID"
+                                    >
+                                        {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
+                                    </p-button>
+                                </div>
+                            </template>
+                        </p-field-group>
+                        <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')"
+                                       class="input-form"
+                        >
+                            <p-text-input v-model="formState.name"
+                                          class="text-input"
+                                          autocomplete="username"
+                            />
+                        </p-field-group>
+                    </div>
+                    <div class="input-form-view">
+                        <p-field-group :label="$t('IDENTITY.USER.FORM.NOTIFICATION_EMAIL')"
+                                       :invalid="validationState.isEmailValid === false"
+                                       :invalid-text="validationState.emailInvalidText"
+                                       class="input-form"
+                        >
+                            <template #default="{invalid}">
+                                <p-text-input v-model="formState.email"
+                                              :invalid="invalid"
+                                              class="text-input"
+                                />
+                            </template>
+                            <template #label-extra>
+                                <p-tooltip
+                                    position="bottom"
+                                    :contents="$t('IDENTITY.USER.FORM.NOTIFICATION_TOOLTIP')"
+                                >
+                                    <p-i name="ic_question-mark-circle-filled"
+                                         height="0.875rem"
+                                         width="0.875rem"
+                                         color="inherit transparent"
+                                         class="tooltip-icon"
+                                    />
+                                </p-tooltip>
+                            </template>
+                        </p-field-group>
+                    </div>
+                    <div class="input-form-view admin-role">
+                        <p-toggle-button
+                            :value="isToggled"
+                            @change-toggle="handleUpdateToggle"
                         />
-                    </template>
-                </p-field-group>
-                <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')"
-                               class="input-form"
-                >
-                    <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
-                    <p-select-dropdown :key="formState.activeTab"
-                                       v-model="formState.domainRole"
-                                       :items="formState.domainRoleItem"
-                                       :disabled="formState.domainRoleItem.length < 2 || isSameId"
-                                       use-fixed-menu-style
-                                       class="dropdown"
-                    />
-                </p-field-group>
-                <form v-if="formState.activeTab === 'local'"
-                      class="form"
-                >
-                    <p-field-group
-                        :label="$t('COMMON.PROFILE.PASSWORD')"
-                        :required="true"
-                        :invalid="validationState.isPasswordValid === false"
-                        :invalid-text="validationState.passwordInvalidText"
-                        class="input-form"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input v-model="formState.password"
-                                          type="password"
-                                          autocomplete="current-password"
-                                          class="text-input"
-                                          :invalid="invalid"
+                        <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')"
+                                       class="input-form"
+                                       required
+                        >
+                            <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
+                            <p-select-dropdown v-if="isToggled"
+                                               :key="formState.activeTab"
+                                               v-model="formState.domainRole"
+                                               :items="formState.domainRoleItem"
+                                               :disabled="formState.domainRoleItem.length < 2 || isSameId"
+                                               use-fixed-menu-style
+                                               class="dropdown"
                             />
-                        </template>
-                    </p-field-group>
-                    <p-field-group
-                        :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                        :required="true"
-                        :invalid="validationState.isPasswordCheckValid === false"
-                        :invalid-text="validationState.passwordCheckInvalidText"
-                        class="input-form"
+                        </p-field-group>
+                    </div>
+                    <form v-if="formState.activeTab === 'local'"
+                          class="form"
                     >
-                        <template #default="{invalid}">
-                            <p-text-input v-model="formState.passwordCheck"
-                                          type="password"
-                                          class="text-input"
-                                          autocomplete="new-password"
-                                          :invalid="invalid"
-                            />
-                        </template>
-                    </p-field-group>
-                </form>
-                <p-divider class="divider" />
+                        <p-field-group
+                            :label="$t('COMMON.PROFILE.PASSWORD')"
+                            :required="true"
+                            :invalid="validationState.isPasswordValid === false"
+                            :invalid-text="validationState.passwordInvalidText"
+                            class="input-form"
+                        >
+                            <template #default="{invalid}">
+                                <p-text-input v-model="formState.password"
+                                              type="password"
+                                              autocomplete="current-password"
+                                              class="text-input"
+                                              :invalid="invalid"
+                                />
+                            </template>
+                        </p-field-group>
+                        <p-field-group
+                            :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
+                            :required="true"
+                            :invalid="validationState.isPasswordCheckValid === false"
+                            :invalid-text="validationState.passwordCheckInvalidText"
+                            class="input-form"
+                        >
+                            <template #default="{invalid}">
+                                <p-text-input v-model="formState.passwordCheck"
+                                              type="password"
+                                              class="text-input"
+                                              autocomplete="new-password"
+                                              :invalid="invalid"
+                                />
+                            </template>
+                        </p-field-group>
+                    </form>
+                </div>
                 <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')"
                                class="tags-title"
                 >
@@ -165,7 +191,9 @@ import {
     PTextInput,
     PBoxTab,
     PFilterableDropdown,
-    PDivider,
+    PTooltip,
+    PI,
+    PToggleButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { debounce } from 'lodash';
@@ -220,7 +248,9 @@ export default {
         PButton,
         PBoxTab,
         PFilterableDropdown,
-        PDivider,
+        PTooltip,
+        PI,
+        PToggleButton,
         TagsInputGroup,
     },
     directives: {
@@ -253,6 +283,7 @@ export default {
             searchText: '',
             externalItems: [] as MenuItem[],
             selectedItems: [] as MenuItem[],
+            isToggled: false,
         });
         const formState = reactive({
             tabs: [
@@ -431,6 +462,9 @@ export default {
         const handleUpdateTags = (tags?: Tag) => {
             formState.tags = tags;
         };
+        const handleUpdateToggle = () => {
+            state.isToggled = !state.isToggled;
+        };
 
         /* External Users */
         const setExternalMenuItems = (users) => {
@@ -540,6 +574,7 @@ export default {
             onSelectExternalUser,
             onDeleteSelectedExternalUser,
             handleUpdateTags,
+            handleUpdateToggle,
         };
     },
 };
@@ -550,6 +585,27 @@ export default {
     .auth-type-tab {
         margin-bottom: 1.5rem;
         overflow-y: hidden;
+        .input-form-wrapper {
+            @apply flex flex-col bg-gray-100 rounded-md;
+            padding: 1rem;
+            gap: 1rem;
+            .input-form-view {
+                @apply flex flex-col bg-white rounded-md;
+                padding: 0.75rem;
+                gap: 1rem;
+                .p-field-group {
+                    margin-bottom: 0;
+                }
+                &.admin-role {
+                    @apply flex-row;
+                    margin-bottom: 0.75rem;
+                    gap: 0.5rem;
+                    .form-label {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+        }
     }
     .external-items-help-text {
         @apply text-gray-400;
@@ -567,32 +623,37 @@ export default {
         }
     }
     .id-input-form {
-        max-width: 32rem;
-        display: flex;
+        @apply flex;
         .text-input {
-            width: 25rem;
+            flex: 1;
         }
     }
+    .text-input {
+        width: 100%;
+    }
     .input-form {
-        max-width: 25rem;
-        .text-input {
-            width: 25rem;
-        }
         .p-select-dropdown {
             max-width: 14rem;
+        }
+        .has-tooltip {
+            margin-left: 0.25rem;
+            .tooltip-icon {
+                @apply text-gray-300;
+            }
         }
     }
     .user-id-check-button {
         margin-left: 0.5rem;
         min-height: 2rem;
     }
-
-    .divider {
-        @apply my-6;
-    }
     .tag-help-msg {
         font-size: 0.875rem;
         line-height: 150%;
     }
+}
+
+.tooltip {
+    @apply text-paragraph-md;
+    width: 14rem;
 }
 </style>

@@ -31,7 +31,7 @@
                               autocomplete="username"
                 />
             </p-field-group>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')"
+            <p-field-group :label="$t('IDENTITY.USER.FORM.NOTIFICATION_EMAIL')"
                            :invalid="validationState.isEmailValid === false"
                            :invalid-text="validationState.emailInvalidText"
                            class="input-form"
