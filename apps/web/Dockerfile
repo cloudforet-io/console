@@ -32,6 +32,7 @@ ENV TURBO_TEAM=$TURBO_TEAM
 ARG TURBO_TOKEN
 ENV TURBO_TOKEN=$TURBO_TOKEN
 
+RUN npx turbo build --filter=@cloudforet/core-lib
 RUN npx turbo build --filter=web...
 
 FROM nginx AS runner
