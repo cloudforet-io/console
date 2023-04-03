@@ -8,6 +8,7 @@ import { isEqual } from 'lodash';
 import type { Currency } from '@/store/modules/display/config';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { InheritOptions, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
@@ -86,7 +87,7 @@ export const useWidgetLifecycle = ({
     }, { deep: true });
     watch(() => props.dashboardVariablesSchema, (after, before) => {
         if (!props.initiated || props.errorMode || !props.editMode || !props.inheritOptions) return;
-        const optionsSchemaProperty = Object.keys(widgetConfig.value.options_schema?.schema.properties ?? {});
+        const optionsSchemaProperty = Object.keys(state.widgetConfig.options_schema?.schema.properties ?? {});
         const _isRefreshable = checkRefreshableByDashboardVariableSchema(props.inheritOptions, optionsSchemaProperty, props.widgetKey, after, before);
         if (_isRefreshable) refreshWidget();
     }, { deep: true });
