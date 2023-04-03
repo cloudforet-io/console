@@ -1151,8 +1151,11 @@
 		"CREATE": {
 			"BLANK_DESC": "Build your own dashboard from scratch.",
 			"CANCEL": "Cancel",
+			"CONTINUE": "Continue",
 			"CREATE": "Create",
+			"CREATE_NEW_DASHBOARD": "Create New Dashboard",
 			"ENTIRE_WORKSPACES": "Entire Workspace",
+			"GO_BACK": "Go back",
 			"LABEL_DEFAULT_TEMPLATE": "Default Template",
 			"LABEL_EXISTING_DASHBOARD": "Existing Dashboard",
 			"LABEL_SCOPE": "Dashboard Scope",
@@ -1165,6 +1168,9 @@
 			"PUBLIC": "Public",
 			"PUBLIC_DESC": "Anyone who has 'View' access to selected dashboard scope",
 			"SINGLE_PROJECT": "Single Project",
+			"STEP": "Step",
+			"STEP1_DESC": "Choose dashboard scope and viewer.",
+			"STEP2_DESC": "Get started quickly with templates or existing dashboards.",
 			"TITLE": "Create New Dashboard",
 			"VALIDATION_PROJECT": "Please Select Project",
 			"VALIDATION_TEMPLATE": "Please Select Template."
