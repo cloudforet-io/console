@@ -19,3 +19,6 @@ out/
 
 # Playwright
 user.json
+
+# Skaffold
+skaffold

@@ -1,0 +1,35 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+
+# lint
+**/.eslintrc.js
+**/.eslintrc.cjs
+**/.eslintignore
+**/.lintstagedrc.cjs
+
+# tests
+**/tests
+**/playwright
+**/playwright.config.ts
+
+#misc
+*.swp
+*.bak
+**/.git
+**/.DS_Store
+**/.husky
+**/commitlint.config.cjs
+**/LICENSE
+**/AUTHORS
+**/VERSION
+**/README.md
+**/deploy
+**/Dockerfile
+**/*.dockerfile
+**/*.dockerignore
+
+#cache
+**/node_modules/.vite/deps_temp

@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: console-spa-conf
+  name: {{ .Values.name }}-spa-conf
   namespace: {{ .Values.global.namespace | default .Release.Namespace }}
 data:
   production.json: |-
