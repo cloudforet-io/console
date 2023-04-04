@@ -102,76 +102,82 @@
                         </p-field-group>
                     </div>
                     <div class="input-form-view admin-role">
-                        <p-toggle-button
-                            :value="isToggled"
-                            @change-toggle="handleUpdateToggle"
-                        />
-                        <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')"
-                                       class="input-form"
-                                       required
-                        >
-                            <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
-                            <p-select-dropdown v-if="isToggled"
-                                               :key="formState.activeTab"
-                                               v-model="formState.domainRole"
-                                               :items="formState.domainRoleItem"
-                                               :disabled="formState.domainRoleItem.length < 2 || isSameId"
-                                               use-fixed-menu-style
-                                               class="dropdown"
+                        <div class="admin-role-headline">
+                            <p-toggle-button
+                                :value="isToggled"
+                                @change-toggle="handleUpdateToggle"
                             />
-                        </p-field-group>
+                            <span class="title">{{ $t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE') }}</span>
+                        </div>
+                        <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
+                        <p-select-dropdown v-if="isToggled"
+                                           :key="formState.activeTab"
+                                           :items="formState.domainRoleItem"
+                                           :disabled="formState.domainRoleItem.length < 2 || isSameId"
+                                           use-fixed-menu-style
+                                           :selected="selectedMenuIndex"
+                                           index-mode
+                                           class="dropdown"
+                                           @select="handleSelectedMenuIndex"
+                        />
                     </div>
-                    <form v-if="formState.activeTab === 'local'"
-                          class="form"
+                    <div v-if="formState.activeTab === 'local'"
+                         class="input-form-view"
                     >
-                        <p-field-group
-                            :label="$t('COMMON.PROFILE.PASSWORD')"
-                            :required="true"
-                            :invalid="validationState.isPasswordValid === false"
-                            :invalid-text="validationState.passwordInvalidText"
-                            class="input-form"
-                        >
-                            <template #default="{invalid}">
-                                <p-text-input v-model="formState.password"
-                                              type="password"
-                                              autocomplete="current-password"
-                                              class="text-input"
-                                              :invalid="invalid"
-                                />
-                            </template>
-                        </p-field-group>
-                        <p-field-group
-                            :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                            :required="true"
-                            :invalid="validationState.isPasswordCheckValid === false"
-                            :invalid-text="validationState.passwordCheckInvalidText"
-                            class="input-form"
-                        >
-                            <template #default="{invalid}">
-                                <p-text-input v-model="formState.passwordCheck"
-                                              type="password"
-                                              class="text-input"
-                                              autocomplete="new-password"
-                                              :invalid="invalid"
-                                />
-                            </template>
-                        </p-field-group>
-                    </form>
-                </div>
-                <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')"
-                               class="tags-title"
-                >
-                    <div class="tag-help-msg">
-                        {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT1') }} <br>
-                        {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
+                        <form class="form">
+                            <p-field-group
+                                :label="$t('COMMON.PROFILE.PASSWORD')"
+                                :required="true"
+                                :invalid="validationState.isPasswordValid === false"
+                                :invalid-text="validationState.passwordInvalidText"
+                                class="input-form"
+                            >
+                                <template #default="{invalid}">
+                                    <p-text-input v-model="formState.password"
+                                                  type="password"
+                                                  autocomplete="current-password"
+                                                  class="text-input"
+                                                  :invalid="invalid"
+                                    />
+                                </template>
+                            </p-field-group>
+                            <p-field-group
+                                :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
+                                :required="true"
+                                :invalid="validationState.isPasswordCheckValid === false"
+                                :invalid-text="validationState.passwordCheckInvalidText"
+                                class="input-form"
+                            >
+                                <template #default="{invalid}">
+                                    <p-text-input v-model="formState.passwordCheck"
+                                                  type="password"
+                                                  class="text-input"
+                                                  autocomplete="new-password"
+                                                  :invalid="invalid"
+                                    />
+                                </template>
+                            </p-field-group>
+                        </form>
                     </div>
-                </p-field-group>
+                </div>
+                <div class="input-form-wrapper tags">
+                    <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')"
+                                   class="title"
+                    >
+                        <div class="tag-help-msg">
+                            {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT1') }} <br>
+                            {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
+                        </div>
+                    </p-field-group>
 
-                <tags-input-group :tags="formState.tags"
-                                  show-validation
-                                  :is-valid.sync="validationState.isTagsValid"
-                                  @update-tags="handleUpdateTags"
-                />
+                    <tags-input-group :tags="formState.tags"
+                                      show-validation
+                                      :is-valid.sync="validationState.isTagsValid"
+                                      is-administration
+                                      class="utils-wrapper"
+                                      @update-tags="handleUpdateTags"
+                    />
+                </div>
             </p-box-tab>
         </template>
     </p-button-modal>
@@ -284,6 +290,7 @@ export default {
             externalItems: [] as MenuItem[],
             selectedItems: [] as MenuItem[],
             isToggled: false,
+            selectedMenuIndex: 0,
         });
         const formState = reactive({
             tabs: [
@@ -402,6 +409,16 @@ export default {
             // password check
             await checkPasswordCheck(password);
         };
+        const handleUpdateTags = (tags?: Tag) => {
+            formState.tags = tags;
+        };
+        const handleUpdateToggle = () => {
+            state.isToggled = !state.isToggled;
+        };
+        const handleSelectedMenuIndex = (selectedIndex: number) => {
+            state.selectedMenuIndex = selectedIndex;
+            formState.domainRole = formState.domainRoleItem[selectedIndex].label;
+        };
 
         /* API */
         const initAuthTypeList = async () => {
@@ -458,12 +475,6 @@ export default {
 
         const handleClose = () => {
             userPageStore.$patch({ visibleCreateModal: false });
-        };
-        const handleUpdateTags = (tags?: Tag) => {
-            formState.tags = tags;
-        };
-        const handleUpdateToggle = () => {
-            state.isToggled = !state.isToggled;
         };
 
         /* External Users */
@@ -575,6 +586,7 @@ export default {
             onDeleteSelectedExternalUser,
             handleUpdateTags,
             handleUpdateToggle,
+            handleSelectedMenuIndex,
         };
     },
 };
@@ -586,22 +598,41 @@ export default {
         margin-bottom: 1.5rem;
         overflow-y: hidden;
         .input-form-wrapper {
-            @apply flex flex-col bg-gray-100 rounded-md;
+            @apply flex flex-col bg-gray-100 rounded-lg;
             padding: 1rem;
             gap: 1rem;
             .input-form-view {
-                @apply flex flex-col bg-white rounded-md;
+                @apply flex flex-col bg-white rounded-lg;
                 padding: 0.75rem;
                 gap: 1rem;
                 .p-field-group {
                     margin-bottom: 0;
                 }
                 &.admin-role {
-                    @apply flex-row;
-                    margin-bottom: 0.75rem;
-                    gap: 0.5rem;
-                    .form-label {
-                        margin-bottom: 0;
+                    gap: 0.875rem;
+                    .admin-role-headline {
+                        @apply flex items-center;
+                        gap: 0.5rem;
+                        .title {
+                            @apply text-label-md font-bold;
+                        }
+                    }
+                }
+            }
+            & + .input-form-wrapper {
+                margin-top: 1.5rem;
+            }
+            &.tags {
+                padding-top: 1.125rem;
+                padding-bottom: 0.25rem;
+                gap: 0.75rem;
+                .title {
+                    margin-bottom: 0;
+                }
+                .utils-wrapper {
+                    .p-button {
+                        margin-top: 0;
+                        margin-bottom: 0.75rem;
                     }
                 }
             }
