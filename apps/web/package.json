@@ -5,7 +5,7 @@
   "description": "Cloudforet Console Web Application",
   "author": "Cloudforet",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "NODE_OPTIONS=--max_old_space_size=8192 vite build",
     "preview": "vite preview --host",
     "test": "vitest run",
