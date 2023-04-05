@@ -135,6 +135,7 @@ export interface WidgetOptionsSchema {
     schema: {
         type: 'object',
         properties: WidgetOptionsSchemaProperties;
+        required?: WidgetOptionsSchemaProperty[];
         order?: WidgetOptionsSchemaProperty[];
     };
 }
