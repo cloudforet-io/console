@@ -52,8 +52,8 @@
         </p-data-loader>
         <dashboard-widget-more-options class="more-option-container"
                                        :widget-config-id="widgetConfigId"
-                                       :selected-properties="widgetFormState.defaultSchemaProperties"
-                                       @update:selected-properties="handleUpdateDefaultSchemaProperties"
+                                       :selected-properties="widgetFormState.schemaProperties"
+                                       @update:selected-properties="handleUpdateSchemaProperties"
         />
     </div>
 </template>
@@ -165,9 +165,9 @@ export default defineComponent<Props>({
         const { referenceStoreState } = useReferenceStore();
 
         /* more options */
-        const handleUpdateDefaultSchemaProperties = (properties: string[]) => {
+        const handleUpdateSchemaProperties = (properties: string[]) => {
             widgetFormStore.$patch((_state) => {
-                _state.defaultSchemaProperties = properties;
+                _state.schemaProperties = properties;
             });
 
             // update inherit options
@@ -221,16 +221,16 @@ export default defineComponent<Props>({
             });
             return formData;
         };
-        const getDefaultSchemaPropertiesFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
+        const getSchemaPropertiesFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
             /*
                 TODO: After 1.11.0 QA duration, if statement below must be deleted.
-                This is compatible code to guard the case when default_schema_properties is undefined.
+                This is compatible code to guard the case when schema_properties is undefined.
                 After release, this case doesn't needed to be considered.
             */
-            if (!widgetInfo.default_schema_properties) {
-                return getRefinedDefaultSchemaProperties(state.widgetConfig?.options_schema ?? {});
+            if (!widgetInfo.schema_properties) {
+                return getRefinedSchemaProperties(state.widgetConfig?.options_schema ?? {});
             }
-            return widgetInfo.default_schema_properties ?? [];
+            return widgetInfo.schema_properties ?? [];
         };
 
 
@@ -255,7 +255,7 @@ export default defineComponent<Props>({
         };
 
         /* schema refining helpers */
-        const getRefinedDefaultSchemaProperties = (widgetOptionsSchema: WidgetOptionsSchema): string[] => {
+        const getRefinedSchemaProperties = (widgetOptionsSchema: WidgetOptionsSchema): string[] => {
             const requiredProperties: string[] = widgetOptionsSchema.schema.required ?? [];
             const defaultProperties: string[] = widgetOptionsSchema.default_properties ?? [];
             const allProperties = union(requiredProperties, defaultProperties);
@@ -286,7 +286,7 @@ export default defineComponent<Props>({
             // reset widget form store states
             widgetFormStore.$reset();
             widgetFormStore.$patch((_state) => {
-                _state.defaultSchemaProperties = [];
+                _state.schemaProperties = [];
                 _state.inheritOption = {};
             });
             // reset states
@@ -305,11 +305,11 @@ export default defineComponent<Props>({
             // init widget form store states
             widgetFormStore.$patch((_state) => {
                 _state.widgetConfigId = widgetConfigId;
-                _state.defaultSchemaProperties = getRefinedDefaultSchemaProperties(widgetOptionsSchema);
+                _state.schemaProperties = getRefinedSchemaProperties(widgetOptionsSchema);
                 _state.inheritOptions = {};
             });
             if (!props.widgetKey) {
-                widgetFormState.defaultSchemaProperties?.filter((d) => !state.requiredProperties.includes(d)).forEach((propertyName) => {
+                widgetFormState.schemaProperties?.filter((d) => !state.requiredProperties.includes(d)).forEach((propertyName) => {
                     widgetFormStore.$patch((_state) => {
                         _state.inheritOptions = {
                             ..._state.inheritOptions,
@@ -325,7 +325,7 @@ export default defineComponent<Props>({
                 widgetOptionsSchema,
                 dashboardDetailState.variablesSchema,
                 widgetFormState.inheritOptions ?? {},
-                widgetFormState.defaultSchemaProperties ?? [],
+                widgetFormState.schemaProperties ?? [],
                 dashboardDetailState.projectId,
             );
         };
@@ -341,7 +341,7 @@ export default defineComponent<Props>({
             // init widget form store states
             widgetFormStore.$patch((_state) => {
                 _state.inheritOptions = getRefinedWidgetInheritOptions(widgetInfo, dashboardDetailState.projectId);
-                _state.defaultSchemaProperties = getDefaultSchemaPropertiesFromWidgetInfo(widgetInfo);
+                _state.schemaProperties = getSchemaPropertiesFromWidgetInfo(widgetInfo);
             });
             // init options schema
             state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
@@ -349,7 +349,7 @@ export default defineComponent<Props>({
                 widgetOptionsSchema,
                 dashboardDetailState.variablesSchema,
                 widgetFormState.inheritOptions ?? {},
-                widgetFormState.defaultSchemaProperties ?? [],
+                widgetFormState.schemaProperties ?? [],
                 dashboardDetailState.projectId,
             );
             // init form data
@@ -402,7 +402,7 @@ export default defineComponent<Props>({
             /* reference store */
             referenceStoreState,
             /* more options */
-            handleUpdateDefaultSchemaProperties,
+            handleUpdateSchemaProperties,
             /* inherit */
             handleChangeInheritToggle,
             //
