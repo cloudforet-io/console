@@ -62,6 +62,7 @@ const checkRefreshableByDashboardVariableSchema = (
         if (isInOptionsSchema && _before?.use === false && _after?.use === true) {
             const targetWidgetInfo = dashboardDetailStore.$state.dashboardWidgetInfoList.find((d) => d.widget_key === widgetKey);
             if (targetWidgetInfo) {
+                // TODO: check required option
                 targetWidgetInfo.inherit_options[optionName] = { enabled: true, variable_info: { key: _variableKey } };
                 dashboardDetailStore.updateWidgetInfo(widgetKey, targetWidgetInfo);
             }
