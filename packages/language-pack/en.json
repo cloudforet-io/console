@@ -1238,6 +1238,9 @@
 				"SUB_TITLE": "Variables",
 				"SUB_TITLE_EDIT": "Edit Variable",
 				"TITLE": "Manage Variables",
+				"UNCHECK_MODAL_HELP_TEXT_1": "This will affect the following widgets",
+				"UNCHECK_MODAL_HELP_TEXT_2": "which currently have options inherited by selected variable.",
+				"UNCHECK_MODAL_TITLE": "Not going to use this variable?",
 				"VALIDATION_NAME_REQUIRED": ""
 			}
 		},
