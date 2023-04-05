@@ -8,7 +8,7 @@
                            required
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="state.userId"
+                    <p-text-input v-model="formState.userId"
                                   :placeholder="!isMobile() ? 'E-mail Address' : 'User ID'"
                                   :invalid="invalid"
                                   block
@@ -26,7 +26,7 @@
                            required
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="state.password"
+                    <p-text-input v-model="formState.password"
                                   type="password"
                                   placeholder="Password"
                                   :invalid="invalid"
@@ -42,7 +42,7 @@
                            required
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="state.confirmPassword"
+                    <p-text-input v-model="formState.confirmPassword"
                                   type="password"
                                   placeholder="Confirm Password"
                                   :invalid="invalid"
@@ -75,8 +75,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     status: '',
 });
-const emit = defineEmits<{(e: 'change-input', state): void;}>();
-const state = reactive({
+const emit = defineEmits<{(e: 'change-input', formState): void;}>();
+const formState = reactive({
     userId: '',
     password: '',
     confirmPassword: '',
@@ -90,17 +90,17 @@ const validationState = reactive({
 const vm = getCurrentInstance()?.proxy as Vue;
 
 const checkUserId = () => {
-    emit('change-input', state);
-    validationState.isIdValid = !(!state.userId);
+    emit('change-input', formState);
+    validationState.isIdValid = !(!formState.userId);
 };
 const checkPassword = async () => {
-    emit('change-input', state);
-    validationState.isPasswordValid = !((state.password.replace(/ /g, '').length !== state.password.length)
-        || !state.password);
+    emit('change-input', formState);
+    validationState.isPasswordValid = !((formState.password.replace(/ /g, '').length !== formState.password.length)
+        || !formState.password);
 };
 const checkConfirmPassword = () => {
-    emit('change-input', state);
-    if (state.password !== state.confirmPassword) {
+    emit('change-input', formState);
+    if (formState.password !== formState.confirmPassword) {
         validationState.isConfirmPasswordValid = false;
         validationState.confirmPasswordInvalidText = vm.$t('AUTH.PASSWORD.RESET.NOT_MATCHING');
     } else {

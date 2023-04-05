@@ -951,6 +951,7 @@
 			"EMAIL_REQUIRED": "メールアドレスを入力してください",
 			"GROUP": "グループ/会社",
 			"ID": "ID",
+			"KEEP_PASSWORD": "",
 			"LANGUAGE": "言語",
 			"MAX_LENGTH_INVALID": "{max}文字以内で入力してください",
 			"MIN_LENGTH_INVALID": "{min}文字以上で入力してください",
@@ -962,6 +963,8 @@
 			"PASSWORD_CHECK": "パスワードの確認",
 			"PASSWORD_CHECK_INVALID": "同じパスワードを入力してください",
 			"ROLE": "権限",
+			"SEND_LINK": "",
+			"SET_MANUALLY": "",
 			"TIMEZONE": "タイムゾーン",
 			"TITLE": "個人情報"
 		},
@@ -996,6 +999,7 @@
 			"VERSION": "バージョン"
 		},
 		"TAGS": {
+			"ADD": "",
 			"ADD_TAG": "タグの追加",
 			"ADD_TAG_DESC": "タグを追加して、リソースを管理します",
 			"ALT_E_UPDATE": "タグの編集に失敗",
@@ -1695,7 +1699,7 @@
 				"PASSWORD_CHECK": "パスワード確認",
 				"PASSWORD_CHECK_INVALID": "同じパスワードを入力してください。",
 				"PASSWORD_HELP_TEXT": "パスワードは、5〜12文字で入力してください。",
-				"PASSWORD_INVALID": "パスワードは、5〜12文字で入力してください。",
+				"PASSWORD_INVALID": "",
 				"REQUIRED_FIELD": "該当する情報を入力してください。",
 				"TAGS": "タグ",
 				"TAGS_HELP_TEXT1": "タグを追加してリソースを管理してください",
@@ -1705,7 +1709,7 @@
 				"TOO_MANY_RESULTS": "検索結果が多すぎます。 別のキーワードを使用してください",
 				"UPDATE_TITLE": "ユーザー編集",
 				"USER_ID": "User ID",
-				"USER_ID_DUPLICATED": "同じIDが存在します。",
+				"USER_ID_DUPLICATED": "",
 				"USER_ID_INVALID": "同じIDが存在します。",
 				"USER_ID_NOT_EXIST": "IDがありません"
 			},

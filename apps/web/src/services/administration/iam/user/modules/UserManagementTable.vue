@@ -73,22 +73,23 @@
                 </template>
             </template>
         </p-toolbox-table>
-        <user-management-modal v-if="modalState.visible"
-                               :header-title="modalState.title"
-                               :sub-title="modalState.subTitle"
-                               :theme-color="modalState.themeColor"
-                               :mode="modalState.mode"
-                               @confirm="handleUserManagementModalConfirm()"
+        <user-status-modal v-if="modalState.visible"
+                           :header-title="modalState.title"
+                           :sub-title="modalState.subTitle"
+                           :theme-color="modalState.themeColor"
+                           :mode="modalState.mode"
+                           @confirm="handleUserStatusModalConfirm()"
         />
-        <user-create-modal v-if="userPageState.visibleCreateModal"
-                           :header-title="userFormState.headerTitle"
-                           :item="userFormState.item"
-                           @confirm="handleUserFormConfirm"
+        <user-management-modal v-if="userPageState.visibleCreateModal"
+                               :header-title="userFormState.headerTitle"
+                               :item="userFormState.item"
+                               @confirm="handleUserFormConfirm"
         />
-        <user-update-modal v-if="userPageState.visibleUpdateModal"
-                           :header-title="userFormState.headerTitle"
-                           :item="userFormState.item"
-                           @confirm="handleUserFormConfirm"
+        <user-management-modal v-if="userPageState.visibleUpdateModal"
+                               :header-title="userFormState.headerTitle"
+                               :item="userFormState.item"
+                               is-update
+                               @confirm="handleUserFormConfirm"
         />
     </section>
 </template>
@@ -120,10 +121,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userSearchHandlers } from '@/services/administration/iam/user/lib/config';
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import UserCreateModal from '@/services/administration/iam/user/modules/user-management-modal/UserCreateModal.vue';
-import UserManagementModal
-    from '@/services/administration/iam/user/modules/user-management-modal/UserManagementModal.vue';
-import UserUpdateModal from '@/services/administration/iam/user/modules/user-management-modal/UserUpdateModal.vue';
+import UserManagementModal from '@/services/administration/iam/user/modules/user-management-modal/UserManagementModal.vue';
+import UserStatusModal
+    from '@/services/administration/iam/user/modules/user-management-modal/UserStatusModal.vue';
 import type { User } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
@@ -131,11 +131,10 @@ import { useUserPageStore } from '@/services/administration/store/user-page-stor
 export default {
     name: 'UserManagementTable',
     components: {
-        UserManagementModal,
+        UserStatusModal,
         PToolboxTable,
         PButton,
-        UserCreateModal,
-        UserUpdateModal,
+        UserManagementModal,
         PStatus,
         PSelectDropdown,
         PBadge,
@@ -215,7 +214,7 @@ export default {
             title: '',
             subTitle: '',
             themeColor: undefined as string | undefined,
-            visible: computed(() => userPageState.visibleManagementModal),
+            visible: computed(() => userPageState.visibleStatusModal),
         });
         const userFormState = reactive({
             visible: computed(() => userPageState.visibleCreateModal || userPageState.visibleUpdateModal),
@@ -277,21 +276,21 @@ export default {
             modalState.title = i18n.t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
             modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'alert';
-            userPageStore.$patch({ visibleManagementModal: true });
+            userPageStore.$patch({ visibleStatusModal: true });
         };
         const clickEnable = () => {
             modalState.mode = 'enable';
             modalState.title = i18n.t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
             modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'safe';
-            userPageStore.$patch({ visibleManagementModal: true });
+            userPageStore.$patch({ visibleStatusModal: true });
         };
         const clickDisable = () => {
             modalState.mode = 'disable';
             modalState.title = i18n.t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
             modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', userPageState.selectedIndices.length);
             modalState.themeColor = 'alert';
-            userPageStore.$patch({ visibleManagementModal: true });
+            userPageStore.$patch({ visibleStatusModal: true });
         };
 
         const handleSelectDropdown = (name) => {
@@ -370,7 +369,7 @@ export default {
             }
             await userPageStore.listUsers(userListApiQuery);
         };
-        const handleUserManagementModalConfirm = () => {
+        const handleUserStatusModalConfirm = () => {
             userPageStore.listUsers(userListApiQuery);
         };
 
@@ -385,7 +384,7 @@ export default {
             userStateFormatter,
             modalState,
             clickAdd,
-            handleUserManagementModalConfirm,
+            handleUserStatusModalConfirm,
             handleSelectDropdown,
             handleUserFormConfirm,
             handleSelect,

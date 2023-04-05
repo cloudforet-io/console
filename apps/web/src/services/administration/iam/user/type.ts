@@ -112,3 +112,9 @@ export interface ChannelItem {
 	notification_level?: string;
 	protocol_name: string;
 }
+
+export const PasswordType = Object.freeze({
+    KEEP: 'KEEP',
+    RESET: 'RESET',
+    MANUALLY: 'MANUALLY',
+}as const);

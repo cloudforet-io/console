@@ -16,167 +16,13 @@
                        class="auth-type-tab"
             >
                 <div class="input-form-wrapper">
-                    <div class="input-form-view">
-                        <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
-                                       :required="true"
-                                       :invalid="validationState.isUserIdValid === false"
-                                       :invalid-text="validationState.userIdInvalidText"
-                                       :valid="validationState.isUserIdValid"
-                                       :valid-text="validationState.userIdValidText"
-                        >
-                            <template v-if="formState.activeTab === 'external' && supportFind && externalItems.length > 100"
-                                      #help
-                            >
-                                <div class="external-items-help-text">
-                                    <span>{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
-                                </div>
-                            </template>
-                            <template #default="{invalid}">
-                                <div v-if="formState.activeTab === 'external' && supportFind">
-                                    <p-filterable-dropdown
-                                        :search-text.sync="searchText"
-                                        :class="{invalid}"
-                                        show-select-marker
-                                        :menu="externalItems"
-                                        :selected.sync="selectedItems"
-                                        :loading="loading"
-                                        disable-handler
-                                        :exact-mode="false"
-                                        use-fixed-menu-style
-                                        @select="onSelectExternalUser"
-                                        @delete-tag="onDeleteSelectedExternalUser"
-                                    />
-                                </div>
-                                <div v-else
-                                     class="id-input-form"
-                                >
-                                    <p-text-input v-model="formState.user_id"
-                                                  v-focus
-                                                  :placeholder="$t('IDENTITY.USER.FORM.NAME_PLACEHOLDER')"
-                                                  :invalid="invalid"
-                                                  class="text-input"
-                                    />
-                                    <p-button style-type="secondary"
-                                              class="user-id-check-button"
-                                              @click="checkUserID"
-                                    >
-                                        {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
-                                    </p-button>
-                                </div>
-                            </template>
-                        </p-field-group>
-                        <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')"
-                                       class="input-form"
-                        >
-                            <p-text-input v-model="formState.name"
-                                          class="text-input"
-                                          autocomplete="username"
-                            />
-                        </p-field-group>
-                    </div>
-                    <div class="input-form-view">
-                        <p-field-group :label="$t('IDENTITY.USER.FORM.NOTIFICATION_EMAIL')"
-                                       :invalid="validationState.isEmailValid === false"
-                                       :invalid-text="validationState.emailInvalidText"
-                                       class="input-form"
-                        >
-                            <template #default="{invalid}">
-                                <p-text-input v-model="formState.email"
-                                              :invalid="invalid"
-                                              class="text-input"
-                                />
-                            </template>
-                            <template #label-extra>
-                                <p-tooltip
-                                    position="bottom"
-                                    :contents="$t('IDENTITY.USER.FORM.NOTIFICATION_TOOLTIP')"
-                                >
-                                    <p-i name="ic_question-mark-circle-filled"
-                                         height="0.875rem"
-                                         width="0.875rem"
-                                         color="inherit transparent"
-                                         class="tooltip-icon"
-                                    />
-                                </p-tooltip>
-                            </template>
-                        </p-field-group>
-                    </div>
-                    <div class="input-form-view admin-role">
-                        <div class="admin-role-headline">
-                            <p-toggle-button
-                                :value="isToggled"
-                                @change-toggle="handleUpdateToggle"
-                            />
-                            <span class="title">{{ $t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE') }}</span>
-                        </div>
-                        <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
-                        <p-select-dropdown v-if="isToggled"
-                                           :key="formState.activeTab"
-                                           :items="formState.domainRoleItem"
-                                           :disabled="formState.domainRoleItem.length < 2 || isSameId"
-                                           use-fixed-menu-style
-                                           :selected="selectedMenuIndex"
-                                           index-mode
-                                           class="dropdown"
-                                           @select="handleSelectedMenuIndex"
-                        />
-                    </div>
-                    <div v-if="formState.activeTab === 'local'"
-                         class="input-form-view"
-                    >
-                        <form class="form">
-                            <p-field-group
-                                :label="$t('COMMON.PROFILE.PASSWORD')"
-                                :required="true"
-                                :invalid="validationState.isPasswordValid === false"
-                                :invalid-text="validationState.passwordInvalidText"
-                                class="input-form"
-                            >
-                                <template #default="{invalid}">
-                                    <p-text-input v-model="formState.password"
-                                                  type="password"
-                                                  autocomplete="current-password"
-                                                  class="text-input"
-                                                  :invalid="invalid"
-                                    />
-                                </template>
-                            </p-field-group>
-                            <p-field-group
-                                :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                                :required="true"
-                                :invalid="validationState.isPasswordCheckValid === false"
-                                :invalid-text="validationState.passwordCheckInvalidText"
-                                class="input-form"
-                            >
-                                <template #default="{invalid}">
-                                    <p-text-input v-model="formState.passwordCheck"
-                                                  type="password"
-                                                  class="text-input"
-                                                  autocomplete="new-password"
-                                                  :invalid="invalid"
-                                    />
-                                </template>
-                            </p-field-group>
-                        </form>
-                    </div>
+                    <user-info-form :active-tab="formState.activeTab" />
+                    <notification-email-form />
+                    <password-form v-if="formState.activeTab === 'local'" />
+                    <admin-role :active-tab="formState.activeTab" />
                 </div>
                 <div class="input-form-wrapper tags">
-                    <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')"
-                                   class="title"
-                    >
-                        <div class="tag-help-msg">
-                            {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT1') }} <br>
-                            {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
-                        </div>
-                    </p-field-group>
-
-                    <tags-input-group :tags="formState.tags"
-                                      show-validation
-                                      :is-valid.sync="validationState.isTagsValid"
-                                      is-administration
-                                      class="utils-wrapper"
-                                      @update-tags="handleUpdateTags"
-                    />
+                    <tags />
                 </div>
             </p-box-tab>
         </template>
@@ -191,37 +37,28 @@ import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButtonModal,
-    PSelectDropdown,
-    PFieldGroup,
-    PButton,
-    PTextInput,
     PBoxTab,
-    PFilterableDropdown,
-    PTooltip,
-    PI,
-    PToggleButton,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
-
-import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { Validation } from '@/services/administration/iam/user/lib/user-form-validations';
 import {
-    checkDuplicateID,
-    checkEmailFormat, checkEmptyValue, checkMinLength,
-    checkOauth, checkOneLowerCase, checkOneNumber, checkOneUpperCase,
+    checkEmptyValue, checkMinLength,
+    checkOneLowerCase, checkOneNumber, checkOneUpperCase,
     checkRequiredField, checkSamePassword,
 } from '@/services/administration/iam/user/lib/user-form-validations';
+import AdminRole from '@/services/administration/iam/user/modules/user-management-modal/modules/AdminRole.vue';
+import NotificationEmailForm
+    from '@/services/administration/iam/user/modules/user-management-modal/modules/NotificationEmailForm.vue';
+import PasswordForm from '@/services/administration/iam/user/modules/user-management-modal/modules/PasswordForm.vue';
+import Tags from '@/services/administration/iam/user/modules/user-management-modal/modules/Tags.vue';
+import UserInfoForm from '@/services/administration/iam/user/modules/user-management-modal/modules/UserInfoForm.vue';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface AuthType {
@@ -247,17 +84,13 @@ const authTypeMap: Record<string, AuthType> = {
 export default {
     name: 'UserCreateModal',
     components: {
+        Tags,
+        AdminRole,
+        PasswordForm,
+        NotificationEmailForm,
+        UserInfoForm,
         PButtonModal,
-        PFieldGroup,
-        PTextInput,
-        PSelectDropdown,
-        PButton,
         PBoxTab,
-        PFilterableDropdown,
-        PTooltip,
-        PI,
-        PToggleButton,
-        TagsInputGroup,
     },
     directives: {
         focus: {
@@ -282,13 +115,7 @@ export default {
 
         const state = reactive({
             isSameId: false,
-            // external user
-            loading: false,
             supportFind: computed(() => !!store.state.domain.authOptions?.support_find),
-            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-            searchText: '',
-            externalItems: [] as MenuItem[],
-            selectedItems: [] as MenuItem[],
             isToggled: false,
             selectedMenuIndex: 0,
         });
@@ -298,7 +125,7 @@ export default {
                 { name: 'apiOnly', label: 'API Only' },
             ],
             activeTab: '',
-            user_id: '',
+            userId: '',
             name: '',
             email: '',
             domainRole: '',
@@ -307,69 +134,20 @@ export default {
                 ...formState.domainRoleList,
             ]),
             domainRoleList: [] as any[],
-            password: '',
-            passwordCheck: '',
             tags: {},
         });
         const validationState = reactive({
             isUserIdValid: undefined as undefined | boolean,
             userIdInvalidText: '' as TranslateResult | string,
             userIdValidText: computed(() => i18n.t('IDENTITY.USER.FORM.NAME_VALID')),
-            //
             isEmailValid: undefined as undefined | boolean,
             emailInvalidText: '' as TranslateResult | string,
-            //
             isPasswordValid: undefined as undefined | boolean,
             passwordInvalidText: '' as TranslateResult | string,
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
-            //
             isTagsValid: undefined as undefined | boolean,
         });
-
-        /* Validation */
-        const setFormState = () => {
-            formState.user_id = '';
-            formState.name = '';
-            formState.email = '';
-            formState.domainRole = '';
-            formState.password = '';
-            formState.passwordCheck = '';
-            formState.tags = {};
-        };
-        const setValidationState = () => {
-            validationState.isUserIdValid = undefined;
-            validationState.userIdInvalidText = '';
-            validationState.isEmailValid = undefined;
-            validationState.emailInvalidText = '';
-            validationState.isPasswordValid = undefined;
-            validationState.passwordInvalidText = '';
-            validationState.isPasswordCheckValid = undefined;
-            validationState.passwordCheckInvalidText = '';
-        };
-
-        const executeSpecificIDValidation = async () => {
-            let res: Validation = { isValid: true, invalidText: '' };
-            if (formState.activeTab === 'local') res = checkEmailFormat(formState.user_id);
-            else if (formState.activeTab === 'external') res = await checkOauth(formState.user_id);
-            return res;
-        };
-
-        const checkUserID = async () => {
-            const validation: Validation[] = await Promise.all([
-                checkRequiredField(formState.user_id),
-                checkDuplicateID(formState.user_id),
-                checkEmptyValue(formState.user_id),
-                executeSpecificIDValidation()]);
-            const invalidObj = validation.find((item) => item.invalidText.length > 0);
-            if (!invalidObj) {
-                validationState.isUserIdValid = true;
-                validationState.userIdInvalidText = '';
-            } else {
-                validationState.isUserIdValid = invalidObj.isValid;
-                validationState.userIdInvalidText = invalidObj.invalidText;
-            }
-        };
 
         const checkPasswordCheck = async (password) => {
             const passwordCheckValidation: Validation[] = await Promise.all([
@@ -409,16 +187,7 @@ export default {
             // password check
             await checkPasswordCheck(password);
         };
-        const handleUpdateTags = (tags?: Tag) => {
-            formState.tags = tags;
-        };
-        const handleUpdateToggle = () => {
-            state.isToggled = !state.isToggled;
-        };
-        const handleSelectedMenuIndex = (selectedIndex: number) => {
-            state.selectedMenuIndex = selectedIndex;
-            formState.domainRole = formState.domainRoleItem[selectedIndex].label;
-        };
+
 
         /* API */
         const initAuthTypeList = async () => {
@@ -450,14 +219,13 @@ export default {
         };
 
         const confirm = async () => {
-            await checkUserID();
             if (!validationState.isUserIdValid || !validationState.isTagsValid) return;
             if (formState.activeTab === 'local') {
                 await checkPasswordValidation(formState.password);
                 if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
             }
             const data = {
-                user_id: formState.user_id,
+                user_id: formState.userId,
                 name: formState.name,
                 email: formState.email,
                 backend: authTypeMap[formState.activeTab]?.backend,
@@ -477,73 +245,6 @@ export default {
             userPageStore.$patch({ visibleCreateModal: false });
         };
 
-        /* External Users */
-        const setExternalMenuItems = (users) => {
-            state.externalItems = [];
-            users.forEach((user) => {
-                const singleItem = {
-                    name: user.user_id,
-                    label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
-                    disabled: false,
-                };
-                if (state.users[user.user_id]) {
-                    singleItem.label = `(${i18n.t('IDENTITY.USER.FORM.ALREADY_EXISTS')}) ${singleItem.label}`;
-                    singleItem.disabled = true;
-                }
-                state.externalItems.push(singleItem);
-            });
-        };
-        const listExternalUser = debounce(async () => {
-            try {
-                state.loading = true;
-                const { results } = await SpaceConnector.client.identity.user.find({
-                    search: {
-                        keyword: state.searchText,
-                    },
-                });
-                await setExternalMenuItems(results);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.externalItems = [];
-            } finally {
-                state.loading = false;
-            }
-        }, 300);
-        const getExternalUser = async (userId: string) => {
-            try {
-                const { results } = await SpaceConnector.client.identity.user.find({
-                    search: {
-                        user_id: userId,
-                    },
-                });
-                if (results.length) {
-                    const selectedExternalUser = results[0];
-                    formState.user_id = selectedExternalUser.user_id;
-
-                    if (state.users[userId]) {
-                        formState.name = '';
-                        formState.email = '';
-                    } else {
-                        formState.name = selectedExternalUser.name;
-                        formState.email = selectedExternalUser.email;
-                    }
-                }
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                formState.user_id = userId;
-                formState.name = '';
-                formState.email = '';
-            }
-        };
-        const onSelectExternalUser = async (userItem) => {
-            await getExternalUser(userItem.name);
-            await checkUserID();
-        };
-        const onDeleteSelectedExternalUser = () => {
-            setFormState();
-            setValidationState();
-        };
-
         /* init */
         (async () => {
             await Promise.allSettled([
@@ -553,20 +254,8 @@ export default {
             ]);
         })();
 
-        watch(() => formState.activeTab, (after) => {
-            if (after) {
-                setFormState();
-                setValidationState();
-                state.selectedItems = [];
-            }
-        }, { immediate: true });
-        watch(() => state.searchText, (searchText) => {
-            if (!searchText.trim().length) {
-                state.externalItems = [];
-            } else {
-                listExternalUser();
-            }
-        });
+
+
         watch(() => formState.password, (after) => {
             checkPassword(after);
         });
@@ -581,13 +270,12 @@ export default {
             validationState,
             confirm,
             handleClose,
-            checkUserID,
-            onSelectExternalUser,
-            onDeleteSelectedExternalUser,
-            handleUpdateTags,
-            handleUpdateToggle,
-            handleSelectedMenuIndex,
         };
+    },
+    computed: {
+        store() {
+            return store;
+        },
     },
 };
 </script>
@@ -601,24 +289,6 @@ export default {
             @apply flex flex-col bg-gray-100 rounded-lg;
             padding: 1rem;
             gap: 1rem;
-            .input-form-view {
-                @apply flex flex-col bg-white rounded-lg;
-                padding: 0.75rem;
-                gap: 1rem;
-                .p-field-group {
-                    margin-bottom: 0;
-                }
-                &.admin-role {
-                    gap: 0.875rem;
-                    .admin-role-headline {
-                        @apply flex items-center;
-                        gap: 0.5rem;
-                        .title {
-                            @apply text-label-md font-bold;
-                        }
-                    }
-                }
-            }
             & + .input-form-wrapper {
                 margin-top: 1.5rem;
             }
@@ -626,63 +296,10 @@ export default {
                 padding-top: 1.125rem;
                 padding-bottom: 0.25rem;
                 gap: 0.75rem;
-                .title {
-                    margin-bottom: 0;
-                }
-                .utils-wrapper {
-                    .p-button {
-                        margin-top: 0;
-                        margin-bottom: 0.75rem;
-                    }
-                }
             }
         }
-    }
-    .external-items-help-text {
-        @apply text-gray-400;
-        font-size: 0.75rem;
-        line-height: 1.3;
-        padding: 0.25rem 0;
-    }
-    .p-filterable-dropdown {
-        width: 25rem;
-
-        &.invalid {
-            .p-search {
-                @apply border-alert;
-            }
-        }
-    }
-    .id-input-form {
-        @apply flex;
-        .text-input {
-            flex: 1;
-        }
-    }
-    .text-input {
-        width: 100%;
-    }
-    .input-form {
-        .p-select-dropdown {
-            max-width: 14rem;
-        }
-        .has-tooltip {
-            margin-left: 0.25rem;
-            .tooltip-icon {
-                @apply text-gray-300;
-            }
-        }
-    }
-    .user-id-check-button {
-        margin-left: 0.5rem;
-        min-height: 2rem;
-    }
-    .tag-help-msg {
-        font-size: 0.875rem;
-        line-height: 150%;
     }
 }
-
 .tooltip {
     @apply text-paragraph-md;
     width: 14rem;

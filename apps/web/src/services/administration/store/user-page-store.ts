@@ -25,7 +25,7 @@ export const useUserPageStore = defineStore('user-page', {
         users: [] as User[],
         totalCount: 0,
         selectedIndices: [],
-        visibleManagementModal: false,
+        visibleStatusModal: false,
         visibleCreateModal: false,
         visibleUpdateModal: false,
     }),

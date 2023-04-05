@@ -951,6 +951,7 @@
 			"EMAIL_REQUIRED": "Please enter email",
 			"GROUP": "Group/Company",
 			"ID": "ID",
+			"KEEP_PASSWORD": "Keep current password",
 			"LANGUAGE": "Language",
 			"MAX_LENGTH_INVALID": "{max} characters in max",
 			"MIN_LENGTH_INVALID": "must longer than {min} characters.",
@@ -962,6 +963,8 @@
 			"PASSWORD_CHECK": "Password Check",
 			"PASSWORD_CHECK_INVALID": "Please enter same value again",
 			"ROLE": "Role",
+			"SEND_LINK": "Send user a password reset link",
+			"SET_MANUALLY": "Set password manually",
 			"TIMEZONE": "Time Zone",
 			"TITLE": "Profile"
 		},
@@ -996,6 +999,7 @@
 			"VERSION": "Version"
 		},
 		"TAGS": {
+			"ADD": "Add",
 			"ADD_TAG": "Add Tags",
 			"ADD_TAG_DESC": "Add associated tags.",
 			"ALT_E_UPDATE": "Failed to Update Tags",
@@ -1695,7 +1699,7 @@
 				"PASSWORD_CHECK": "Password Check",
 				"PASSWORD_CHECK_INVALID": "Please enter same value again.",
 				"PASSWORD_HELP_TEXT": "your Password must be 5 ~ 12 characters long",
-				"PASSWORD_INVALID": "Password must be 5 ~ 12 characters long.",
+				"PASSWORD_INVALID": "Password needs to at least 8 characters.",
 				"REQUIRED_FIELD": "Required field",
 				"TAGS": "Tags",
 				"TAGS_HELP_TEXT1": "Add associated tags.",
@@ -1705,7 +1709,7 @@
 				"TOO_MANY_RESULTS": "Too many search results. Try a different keyword.",
 				"UPDATE_TITLE": "Update User",
 				"USER_ID": "User ID",
-				"USER_ID_DUPLICATED": "same ID exists",
+				"USER_ID_DUPLICATED": "Already being used.",
 				"USER_ID_INVALID": "Same ID exists.",
 				"USER_ID_NOT_EXIST": "ID does not exists."
 			},
