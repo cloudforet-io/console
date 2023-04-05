@@ -1238,6 +1238,9 @@
 				"SUB_TITLE": "変数",
 				"SUB_TITLE_EDIT": "変数の編集",
 				"TITLE": "変数の管理",
+				"UNCHECK_MODAL_HELP_TEXT_1": "",
+				"UNCHECK_MODAL_HELP_TEXT_2": "",
+				"UNCHECK_MODAL_TITLE": "",
 				"VALIDATION_NAME_REQUIRED": ""
 			}
 		},
