@@ -1238,6 +1238,9 @@
 				"SUB_TITLE": "변수",
 				"SUB_TITLE_EDIT": "변수 편집",
 				"TITLE": "변수 관리",
+				"UNCHECK_MODAL_HELP_TEXT_1": "",
+				"UNCHECK_MODAL_HELP_TEXT_2": "",
+				"UNCHECK_MODAL_TITLE": "",
 				"VALIDATION_NAME_REQUIRED": ""
 			}
 		},

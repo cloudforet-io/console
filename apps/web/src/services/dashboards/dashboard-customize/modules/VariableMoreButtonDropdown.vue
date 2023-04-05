@@ -37,6 +37,22 @@
                 </p-button>
             </template>
         </p-context-menu>
+        <delete-modal :header-title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_TITLE')"
+                      :visible.sync="state.uncheckConfirmModalVisible"
+                      @confirm="handleConfirmUncheckModal"
+                      @cancel="handleCancelUncheckModal"
+                      @close="handleCancelUncheckModal"
+        >
+            <p>
+                <b>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_1') }} </b>
+                <span>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_2') }}</span>
+            </p>
+            <div>
+                <ul>
+                    <!--                    <li v-for=""></li>-->
+                </ul>
+            </div>
+        </delete-modal>
     </div>
 </template>
 
@@ -53,10 +69,13 @@ import { cloneDeep, debounce } from 'lodash';
 
 import { SpaceRouter } from '@/router';
 
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+
 
 interface Props {
     isManageable: boolean;
@@ -87,8 +106,10 @@ const state = reactive({
         });
         return result;
     }),
-    // Since variable's use changes after the dropdown is closed, create state to store the previous state and use it.
-    selectedForUpdate: [] as MenuItem[],
+    // uncheck custom variable
+    uncheckConfirmModalVisible: false,
+    selectedCustomVariable: undefined,
+    widgetsAffectedByCustomVariable: [],
 });
 
 const {
@@ -115,13 +136,33 @@ const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideContextMenu);
 
 // helper
-const updateVariablesUse = () => {
-    const _varialbesSchema = cloneDeep(state.variableSchema);
-    state.variableSchema.order.forEach((property) => {
-        _varialbesSchema.properties[property].use = state.selectedForUpdate.some((menu) => menu.name === property);
-    });
+const updateVariablesUse = (property: string, isChecked: boolean) => {
+    const _variablesSchema = cloneDeep(state.variableSchema);
+    _variablesSchema.properties[property].use = isChecked;
     dashboardDetailStore.$patch((_state) => {
-        _state.variablesSchema = _varialbesSchema;
+        _state.variablesSchema = _variablesSchema;
+    });
+};
+const toggleDashboardVariableUse = () => {
+    /*
+     * when variable is unchecked,
+     * managed variable: delete variable from each widget & set default value if it's required option
+     * custom variable: show warning modal
+     */
+    const _beforeProperties: DashboardVariablesSchema['properties'] = state.variableSchema.properties;
+    const _afterPropertyNames: string[] = state.selected.map((d) => d.name);
+    Object.entries(_beforeProperties).forEach(([k, v]) => {
+        if (v?.use && !_afterPropertyNames.includes(k)) { /* uncheck case */
+            if (dashboardDetailState.variablesSchema.properties[k]?.variable_type === 'CUSTOM') {
+                // TODO: check widgets which use custom variables
+                state.selectedCustomVariable = k;
+                state.uncheckConfirmModalVisible = true;
+            } else {
+                updateVariablesUse(k, false);
+            }
+        } else if (!v?.use && _afterPropertyNames.includes(k)) { /* check case */
+            updateVariablesUse(k, true);
+        }
     });
 };
 
@@ -138,14 +179,12 @@ const handleClickButton = () => {
     if (visibleMenu.value) {
         hideContextMenu();
     } else {
-        state.selectedForUpdate = state.selected;
         focusOnContextMenu();
     }
 };
 
-const handleSelectVariable = (changedSelected: MenuItem[]) => {
-    state.selectedForUpdate = changedSelected;
-    updateVariablesUse();
+const handleSelectVariable = () => {
+    toggleDashboardVariableUse();
     hideContextMenu();
     state.searchText = '';
 };
@@ -154,6 +193,17 @@ const handleUpdateSearchText = debounce((text: string) => {
     state.searchText = text;
     reloadMenu();
 }, 200);
+const handleConfirmUncheckModal = () => {
+    updateVariablesUse(state.selectedCustomVariable, false);
+    state.uncheckConfirmModalVisible = false;
+};
+const handleCancelUncheckModal = () => {
+    /* This $patch() is for initiating context menu items (state.selected) */
+    dashboardDetailStore.$patch((_state) => {
+        _state.variablesSchema = { ..._state.variablesSchema };
+    });
+    state.uncheckConfirmModalVisible = false;
+};
 
 watch(visibleMenu, (_visibleMenu) => {
     if (_visibleMenu) initiateMenu();

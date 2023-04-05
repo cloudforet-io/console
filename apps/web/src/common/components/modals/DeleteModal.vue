@@ -10,6 +10,8 @@
                     theme-color="alert"
                     :loading="loading"
                     @confirm="handleConfirm"
+                    @close="$emit('close')"
+                    @cancel="$emit('cancel')"
     >
         <template #body>
             <p
