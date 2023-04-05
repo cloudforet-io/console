@@ -169,7 +169,7 @@ export interface DashboardLayoutWidgetInfo {
     size: WidgetSize;
     version: string; // widget config version
     inherit_options: InheritOptions; // inherit information for the widget option
-    default_schema_properties: string[]; // schema properties that are shown on widget form. updated when use add more options.
+    schema_properties: string[]; // schema properties that are shown on widget form. updated when use add more options.
 }
 export type InheritOptions = Record<string, {
     enabled?: boolean;

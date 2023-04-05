@@ -14,7 +14,7 @@ interface WidgetFormState {
     inheritOptions?: InheritOptions;
     widgetOptions?: WidgetOptions;
     widgetInfo?: DashboardLayoutWidgetInfo;
-    defaultSchemaProperties?: string[];
+    schemaProperties?: string[];
 }
 interface WidgetFormActions {
     setFormData: (formData: any) => void;
@@ -32,7 +32,7 @@ export const useWidgetFormStore = defineStore<string, WidgetFormState, any, Widg
         inheritOptions: undefined,
         widgetOptions: undefined,
         widgetInfo: undefined,
-        defaultSchemaProperties: undefined,
+        schemaProperties: undefined,
     }),
     actions: {
         setFormData(formData: any) {
@@ -74,7 +74,7 @@ export const useWidgetFormStore = defineStore<string, WidgetFormState, any, Widg
                 this.widgetTitle = this.widgetInfo.title;
                 this.widgetOptions = this.widgetInfo.widget_options;
                 this.inheritOptions = this.widgetInfo.inherit_options;
-                this.defaultSchemaProperties = this.widgetInfo.default_schema_properties;
+                this.schemaProperties = this.widgetInfo.schema_properties;
             }
             return this.widgetInfo;
         },
