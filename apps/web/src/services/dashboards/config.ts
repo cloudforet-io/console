@@ -103,7 +103,7 @@ export interface SearchDataSourceOptions {
     // }
 }
 type LegacyOptions = string[];
-export type VarialbeOptions = ManualOptions | SearchDataSourceOptions | LegacyOptions;
+type VariableOptions = ManualOptions | SearchDataSourceOptions | LegacyOptions;
 
 // variables schema
 export interface DashboardVariableSchemaProperty {
@@ -113,7 +113,7 @@ export interface DashboardVariableSchemaProperty {
     selection_type: VariableSelectionType;
     description?: string;
     disabled?: boolean;
-    options?: VarialbeOptions;
+    options?: VariableOptions;
 }
 export interface DashboardVariablesSchema {
     properties: {

@@ -131,6 +131,7 @@ export type WidgetOptionsSchemaProperty = 'group_by'|WidgetFiltersSchemaProperty
 export type WidgetOptionsSchemaProperties = Partial<Record<WidgetOptionsSchemaProperty, JsonSchema['properties']>>;
 export interface WidgetOptionsSchema {
     default_properties?: WidgetOptionsSchemaProperty[];
+    fixed_properties?: WidgetOptionsSchemaProperty[];
     schema: {
         type: 'object',
         properties: WidgetOptionsSchemaProperties;
