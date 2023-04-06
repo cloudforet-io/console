@@ -26,6 +26,7 @@ const costTrendStackedWidgetConfig: Partial<WidgetConfig> = {
     },
     options_schema: {
         default_properties: ['group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'region')],
+        fixed_properties: ['group_by'],
         schema: {
             type: 'object',
             properties: {
@@ -43,7 +44,6 @@ const costTrendStackedWidgetConfig: Partial<WidgetConfig> = {
                     'account',
                 ),
             },
-            required: ['group_by'],
             order: ['group_by', ...getWidgetFilterSchemaPropertyNames(
                 'provider',
                 'project',
