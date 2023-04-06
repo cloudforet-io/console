@@ -6,10 +6,10 @@
         <div class="contents-wrapper">
             <div class="headline-wrapper">
                 <h1 class="title">
-                    {{ markUpTitle }}
+                    {{ state.pageTitle }}
                 </h1>
                 <div class="help-text-wrapper">
-                    <p v-if="currentPageName === AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME"
+                    <p v-if="passwordPageState.status === AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME"
                        class="help-text"
                     >
                         {{ $t('AUTH.PASSWORD.RESET.HELP_TEXT') }}
@@ -24,30 +24,34 @@
                     </p>
                 </div>
             </div>
-            <password-form :status="currentPageName"
-                           @change-input="handleChangeInput"
+            <password-form
+                ref="passwordFormEl"
+                v-model="formState"
+                @change-input="handleChangeInput"
+                @click-input="handleClickButton"
             />
             <div class="button-wrapper">
                 <p-button
-                    v-if="currentPageName === AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME"
+                    v-if="passwordPageState.status === AUTH_ROUTE.PASSWORD.STATUS.RESET._NAME"
                     :disabled="
-                        state.password === ''
-                            || state.confirmPassword === ''
-                            || state.password !== state.confirmPassword
+                        formState.password === ''
+                            || formState.confirmPassword === ''
+                            || formState.password !== formState.confirmPassword
+                            || formState.password.length< 8
                     "
-                    @click="handleClickResetButton"
+                    @click="handleClickButton"
                 >
                     {{ $t('AUTH.PASSWORD.RESET.RESET_PASSWORD') }}
                 </p-button>
                 <p-button
                     v-else
-                    :disabled="state.userId === ''"
+                    :disabled="formState.userId === ''"
                     @click="handleClickButton"
                 >
                     {{ $t('AUTH.PASSWORD.FIND.SEND') }}
                 </p-button>
             </div>
-            <div v-if="currentPageName === AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME"
+            <div v-if="passwordPageState.status === AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME"
                  class="util-wrapper"
             >
                 <p-icon-button name="ic_arrow-left"
@@ -65,54 +69,99 @@
 </template>
 
 <script setup lang="ts">
+import type { ComponentPublicInstance } from 'vue';
 import {
-    computed, getCurrentInstance, reactive,
+    computed,
+    getCurrentInstance, reactive, ref,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
 
 import { PButton, PDataLoader, PIconButton } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+
+import type { UserState } from '@/store/modules/user/type';
+
+import { emailValidator } from '@/lib/helper/user-validation-helper';
 
 import PasswordForm from '@/services/auth/password/moduels/PasswordForm.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { usePasswordPageStore } from '@/services/auth/store/password-page-store';
+import type { PasswordFormExpose } from '@/services/auth/type';
 
-const vm = getCurrentInstance()?.proxy as Vue;
 const passwordPageStore = usePasswordPageStore();
 const passwordPageState = passwordPageStore.$state;
 
+const vm = getCurrentInstance()?.proxy as Vue;
+
+const passwordFormEl = ref<ComponentPublicInstance<PasswordFormExpose>>();
 const state = reactive({
-    loading: false,
-    // TODO: email에 있는걸로 변경 확인해야함
-    email: 'nayeongkim@megazone.com',
+    pageTitle: '' as TranslateResult | string,
+    domainId: computed<string>(() => store.state.domain.domainId),
+    userInfo: computed<UserState>(() => store.state.user),
+    // TODO: tags?
+    tags: {},
+});
+const formState = reactive({
     userId: '',
     password: '',
     confirmPassword: '',
 });
-const currentPageName = SpaceRouter.router.currentRoute.name;
-const markUpTitle = computed(() => {
-    if (currentPageName === AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME) {
-        return vm.$t('AUTH.PASSWORD.FIND.TITLE');
-    } if (currentPageName === AUTH_ROUTE.EMAIL.INVALID._NAME) {
-        return 'The link is invalid';
-    }
-    return vm.$t('AUTH.PASSWORD.RESET.TITLE');
-});
+
+/* Components */
 const handleChangeInput = (value) => {
-    state.userId = value.userId;
-    state.password = value.password;
-    state.confirmPassword = value.confirmPassword;
+    formState.userId = value.userId;
+    formState.password = value.password;
+    formState.confirmPassword = value.confirmPassword;
 };
-const handleClickButton = () => {
-    passwordPageStore.sendResetEmail(state.userId);
-    state.userId = '';
-};
-const handleClickResetButton = () => {
-    console.log(state.email, state.password);
-    passwordPageStore.resetPassword(state.email, state.password);
+const resetInputs = () => {
+    formState.userId = '';
+    formState.password = '';
+    formState.confirmPassword = '';
 };
 
+/* API */
+const handleClickButton = () => {
+    if (formState.userId !== '') {
+        if (!emailValidator(formState.userId)) {
+            if (passwordFormEl.value) {
+                passwordFormEl.value.validationState.isIdValid = false;
+                // TODO: babel edit;
+                passwordFormEl.value.validationState.idInvalidText = 'Invalid email';
+            }
+            return;
+        }
+        passwordPageStore.postSendResetEmail(formState.userId, state.domainId);
+    } else {
+        const {
+            userId, name, email, language, timezone,
+        } = state.userInfo;
+        const request = {
+            user_id: userId,
+            password: formState.password,
+            name,
+            email,
+            language,
+            timezone,
+            tags: state.tags,
+            domain_id: state.domainId,
+        };
+        passwordPageStore.postResetPassword(request);
+    }
+    resetInputs();
+};
+
+/* Init */
+(async () => {
+    if (passwordPageState.status === AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME) {
+        state.pageTitle = vm.$t('AUTH.PASSWORD.FIND.TITLE');
+    } else if (passwordPageState.status === AUTH_ROUTE.EMAIL.INVALID._NAME) {
+        state.pageTitle = 'The link is invalid';
+    } else {
+        state.pageTitle = vm.$t('AUTH.PASSWORD.RESET.TITLE');
+    }
+})();
 </script>
 
 <style lang="postcss" scoped>
