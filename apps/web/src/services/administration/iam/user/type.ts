@@ -28,6 +28,25 @@ interface UserData {
 	role_bindings?: RoleBindingType[];
 }
 
+export interface UserDetailData {
+	roles?: unknown;
+	tags?: Tags;
+	user_id: string;
+	name: string;
+	state: string;
+	email?: string;
+	// eslint-disable-next-line camelcase
+	user_type: string;
+	backend: string;
+	language: string;
+	timezone: string;
+	// eslint-disable-next-line camelcase
+	last_accessed_at: number;
+	created_at?: TimeStamp;
+	domain_id: string;
+	email_verified?: boolean;
+}
+
 export interface User extends UserData {
 	api_key_count?: number;
 	roles?: string[];

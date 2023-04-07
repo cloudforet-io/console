@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        :visible="myAccountPageState.isModalVisible"
+        :visible="state.proxyVisible"
         :header-title="$t('COMMON.NOTIFICATION_MODAL.TITLE')"
         class="notification-email-modal-wrapper"
         @confirm="onClickConfirm"
@@ -9,7 +9,7 @@
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <div v-if="myAccountPageState.isEditMode">
+                <div v-if="state.isEditMode">
                     <p-field-group :label="$t('COMMON.NOTIFICATION_MODAL.NOTIFICATION_EMAIL')"
                                    required
                     >
@@ -20,7 +20,7 @@
                             />
                             <p-button style-type="secondary"
                                       :disabled="formState.newNotificationEmail === '' || !emailValidator(formState.newNotificationEmail)"
-                                      :loading="myAccountPageState.loading"
+                                      :loading="state.loading"
                                       @click.prevent="handleClickSendEmailButton"
                             >
                                 {{ $t('COMMON.NOTIFICATION_MODAL.SEND_CODE') }}
@@ -40,7 +40,7 @@
                                  color="inherit"
                             />
                             <p class="email-tex">
-                                {{ myAccountPageState.email }}
+                                {{ state.email }}
                             </p>
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                     >
                         {{ $t('COMMON.NOTIFICATION_MODAL.COLLAPSE_DESC') }}
                         <p-button class="send-code-button"
-                                  @click.prevent="handleClickResendEmailButton"
+                                  @click.prevent="handleClickSendEmailButton(true)"
                         >
                             <span class="emphasis">{{ $t('COMMON.NOTIFICATION_MODAL.SEND_NEW_CODE') }}</span>
                         </p-button>
@@ -86,7 +86,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getCurrentInstance, reactive } from 'vue';
+import { computed, getCurrentInstance, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
 
@@ -102,29 +102,34 @@ import {
 
 import { store } from '@/store';
 
-import type { UpdateUserRequest } from '@/store/modules/user/type';
-
 import { emailValidator } from '@/lib/helper/user-validation-helper';
+import { postValidationCode, postValidationEmail } from '@/lib/helper/verify-email-helper';
 
-import { useMyAccountPageStore } from '@/services/my-page/store/my-account-page-store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     domainId: string
     userId: string
+    visible: boolean
 }
 
 const vm = getCurrentInstance()?.proxy as Vue;
 
-const myAccountPageStore = useMyAccountPageStore();
-const myAccountPageState = myAccountPageStore.$state;
+const emit = defineEmits<{(e: 'visible'): void}>();
 
 const props = withDefaults(defineProps<Props>(), {
     domainId: '',
     userId: '',
+    visible: false,
 });
 
 const state = reactive({
+    loading: false,
     isCollapsed: true,
+    isEditMode: false,
+    email: computed(() => store.state.user.email),
+    proxyVisible: useProxyValue('visible', props, emit),
 });
 const formState = reactive({
     newNotificationEmail: '',
@@ -137,10 +142,10 @@ const validationState = reactive({
 
 /* Components */
 const handleEditButton = () => {
-    myAccountPageStore.handleSetEdit();
+    state.isEditMode = true;
 };
 const handleClickCancel = () => {
-    myAccountPageStore.handleCloseModal();
+    state.proxyVisible = false;
     handleReset();
 };
 const handleReset = () => {
@@ -151,39 +156,42 @@ const handleReset = () => {
 };
 
 /* API */
-const handleClickSendEmailButton = async () => {
-    await myAccountPageStore.postValidationEmail(
-        props.userId,
-        props.domainId,
-        formState.newNotificationEmail,
-    );
-    formState.newNotificationEmail = '';
-};
-const handleClickResendEmailButton = async () => {
-    await myAccountPageStore.postValidationEmail(
-        props.userId,
-        props.domainId,
-        myAccountPageState.email,
-    );
+const handleClickSendEmailButton = async (resend?: boolean) => {
+    state.loading = true;
+    try {
+        await postValidationEmail({
+            userId: props.userId,
+            domainId: props.domainId,
+            email: formState.newNotificationEmail,
+        });
+        if (!resend) {
+            formState.newNotificationEmail = '';
+        }
+        state.isEditMode = false;
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+        throw e;
+    } finally {
+        state.loading = false;
+    }
 };
 const onClickConfirm = async () => {
+    state.loading = true;
     try {
-        await myAccountPageStore.postValidationCode(
-            props.userId,
-            props.domainId,
-            formState.verificationCode,
-        );
-        const userParam: UpdateUserRequest = {
-            email: myAccountPageState.email,
-        };
-        await store.dispatch('user/setUser', userParam);
+        await postValidationCode({
+            userId: props.userId,
+            domainId: props.domainId,
+            code: formState.verificationCode,
+        });
+        state.proxyVisible = false;
         handleReset();
     } catch (e) {
         validationState.isValidationCodeValid = true;
         validationState.validationCodeInvalidText = vm.$t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');
+    } finally {
+        state.loading = false;
     }
 };
-
 </script>
 
 <style lang="postcss" scoped>
@@ -192,11 +200,10 @@ const onClickConfirm = async () => {
         @apply flex flex-col;
         .notification-field-wrapper {
             @apply flex;
-            .p-button {
-                margin-left: 1rem;
-            }
+            gap: 1rem;
         }
         .p-text-input {
+            flex: 1;
             width: 100%;
         }
 

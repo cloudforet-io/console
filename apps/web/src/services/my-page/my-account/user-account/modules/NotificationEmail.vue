@@ -39,43 +39,22 @@
                 :invalid="validationState.isNotificationEmailValid"
                 :invalid-text="validationState.notificationEmailInvalidText"
                 required
+                class="field-group"
             >
                 <p-text-input v-model="formState.notificationEmail"
                               :placeholder="state.userId"
-                              :disabled="myAccountPageState.loading || state.verified"
+                              :disabled="state.verified"
                               :invalid="validationState.isNotificationEmailValid"
                               block
                               @update:value="handleChangeInput"
                 />
             </p-field-group>
-            <div>
-                <p-button v-if="state.verified"
-                          style-type="tertiary"
-                          :loading="myAccountPageState.loading"
-                          @click.prevent="handleClickVerifiedEmail"
-                >
-                    <p-i name="ic_edit"
-                         height="1rem"
-                         width="1rem"
-                         color="inherit"
-                         class="icon-edit"
-                    />
-                    {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}
-                </p-button>
-                <p-button v-else
-                          :disabled="formState.notificationEmail === '' || !emailValidator(formState.notificationEmail)"
-                          style-type="primary"
-                          :loading="myAccountPageState.loading"
-                          @click.prevent="handleClickVerifiedEmail"
-                >
-                    {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}
-                </p-button>
-            </div>
+            <verify-button
+                :email="formState.notificationEmail"
+                :user-id="state.userId"
+                :domain-id="state.domainId"
+            />
         </form>
-        <notification-email-modal
-            :domain-id="state.domainId"
-            :user-id="state.userId"
-        />
     </user-account-module-container>
 </template>
 
@@ -83,29 +62,23 @@
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import {
-    PButton, PI, PTextInput, PFieldGroup,
-} from '@spaceone/design-system';
+import { PI, PTextInput, PFieldGroup } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
-import NotificationEmailModal from '@/common/components/modals/NotificationEmailModal.vue';
+import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
 
 import UserAccountModuleContainer
     from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
-import { useMyAccountPageStore } from '@/services/my-page/store/my-account-page-store';
-
-const myAccountPageStore = useMyAccountPageStore();
-const myAccountPageState = myAccountPageStore.$state;
 
 const state = reactive({
     userType: computed(() => store.state.user.backend),
     verified: computed(() => store.state.user.emeilVerified),
     userId: computed(() => store.state.user.userId),
-    email: computed(() => store.state.user.email),
     domainId: computed(() => store.state.domain.domainId),
+    email: computed(() => store.state.user.email),
 });
 const formState = reactive({
     notificationEmail: '',
@@ -117,7 +90,6 @@ const validationState = reactive({
 
 /* Components */
 const handleChangeInput = async () => {
-    console.log(formState.notificationEmail);
     if (formState.notificationEmail === '') {
         validationState.isNotificationEmailValid = false;
     } else if (emailValidator(formState.notificationEmail)) {
@@ -126,19 +98,6 @@ const handleChangeInput = async () => {
         validationState.isNotificationEmailValid = true;
         // TODO: babel edit
         validationState.notificationEmailInvalidText = 'check format';
-    }
-};
-
-/* API */
-const handleClickVerifiedEmail = async () => {
-    if (state.verified) {
-        await myAccountPageStore.handleChangeValidationEmail(formState.notificationEmail);
-    } else {
-        await myAccountPageStore.postValidationEmail(
-            state.userId,
-            state.domainId,
-            formState.notificationEmail,
-        );
     }
 };
 
@@ -180,7 +139,7 @@ const handleClickVerifiedEmail = async () => {
         @apply text-paragraph-md;
     }
     .form {
-        @apply relative flex items-center;
+        @apply relative flex;
         margin-top: 1rem;
 
         .icon-edit {
@@ -189,25 +148,20 @@ const handleClickVerifiedEmail = async () => {
 
         /* custom design-system component - p-field-group */
         :deep(.p-field-group) {
-            width: 26.625rem;
-            margin-bottom: 0;
+            &.field-group {
+                width: 26.625rem;
+                margin-bottom: 0;
 
-            /* custom design-system component - p-text-input */
-            :deep(.p-text-input) {
-                &::placeholder {
-                    @apply text-gray-300;
+                /* custom design-system component - p-text-input */
+                :deep(.p-text-input) {
+                    &::placeholder {
+                        @apply text-gray-300;
+                    }
+                }
+                .invalid-feedback {
+                    position: absolute;
                 }
             }
-            .invalid-feedback {
-                position: absolute;
-            }
-        }
-
-        /* custom design-system component - p-button */
-        :deep(.p-button) {
-            margin-left: 1rem;
-            padding-right: 0.75rem;
-            padding-left: 0.75rem;
         }
     }
 }
