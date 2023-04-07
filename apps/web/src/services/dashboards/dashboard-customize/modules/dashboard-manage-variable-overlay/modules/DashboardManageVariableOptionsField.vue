@@ -76,8 +76,6 @@ import {
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
-import DashboardManageVariableDataSourceOptionsSelector
-    from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/modules/DashboardManageVariableDataSourceOptionsSelector.vue';
 import type { OptionItem } from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
 
 
@@ -179,10 +177,10 @@ watch(() => state.manualOptionValidations, (updated) => {
         }
     }
 }
+
 @screen tablet {
     .dashboard-manage-variable-options-field {
-        @apply w-full
-    }
+        @apply w-full; }
 }
 
 </style>
