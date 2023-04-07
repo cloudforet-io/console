@@ -42,6 +42,15 @@
                         />
                     </div>
                 </template>
+                <template #input-extra="{ propertyName }">
+                    <p-icon-button v-if="!fixedProperties.includes(propertyName)"
+                                   class="delete-button"
+                                   shape="square"
+                                   style-type="negative-secondary"
+                                   name="ic_delete"
+                                   @click="handleDeleteProperty(propertyName)"
+                    />
+                </template>
                 <template #dropdown-extra="{ propertyName, selectedItem }">
                     <div v-if="isSelected(selectedItem) && inheritableProperties.includes(propertyName)">
                         <span>{{ selectedItem.label }}</span>
@@ -63,7 +72,7 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader,
+    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader, PIconButton,
 } from '@spaceone/design-system';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
@@ -116,6 +125,7 @@ export default defineComponent<Props>({
         PJsonSchemaForm,
         PToggleButton,
         PDataLoader,
+        PIconButton,
     },
     props: {
         widgetConfigId: {
@@ -190,6 +200,10 @@ export default defineComponent<Props>({
                 properties,
                 dashboardDetailState.projectId,
             );
+        };
+        const handleDeleteProperty = (property: string) => {
+            const _properties = widgetFormState.schemaProperties?.filter((d) => d !== property) ?? [];
+            handleUpdateSchemaProperties(_properties);
         };
 
         /* utils */
@@ -399,6 +413,7 @@ export default defineComponent<Props>({
             referenceStoreState,
             /* more options */
             handleUpdateSchemaProperties,
+            handleDeleteProperty,
             /* inherit */
             handleChangeInheritToggle,
             //
@@ -431,6 +446,9 @@ export default defineComponent<Props>({
     .widget-options-form-wrapper {
         height: 100%;
         min-height: 15rem;
+        .delete-button {
+            margin-left: 0.25rem;
+        }
     }
 
     /* custom design-system component - p-field-group */
