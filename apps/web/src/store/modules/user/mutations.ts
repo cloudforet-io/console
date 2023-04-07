@@ -9,6 +9,7 @@ export const setUser = (state: UserState, userInfo: UserState): void => {
     state.language = userInfo.language;
     state.timezone = userInfo.timezone;
     state.requiredActions = userInfo.requiredActions;
+    state.emailVerified = userInfo.emailVerified;
 };
 
 export const setIsSessionExpired = (state: UserState, isSessionExpired?: boolean): void => {

@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 
-// import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -9,21 +11,19 @@ export const useMyAccountPageStore = defineStore('my-account-page', {
     state: () => ({
         loading: false,
         isModalVisible: false,
-        userId: '',
+        isEditMode: false,
         email: '',
     }),
     actions: {
-        async postValidationEmail(userId: string, email: string): Promise<void|Error> {
-            console.log(userId, email);
+        async postValidationEmail(userId: string, domainId: string, email: string): Promise<void|Error> {
             this.loading = true;
             try {
-                // TODO: API 완성 후 연결
-                // await SpaceConnector.clientV2.identity.user.verifyEmail({ userId, email });
-                this.userId = userId;
-                this.email = email;
                 if (!this.isModalVisible) {
                     this.isModalVisible = true;
                 }
+                this.email = email;
+                this.isEditMode = false;
+                await SpaceConnector.clientV2.identity.user.verifyEmail({ user_id: userId, email, domain_id: domainId });
             } catch (e: any) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -31,13 +31,13 @@ export const useMyAccountPageStore = defineStore('my-account-page', {
                 this.loading = false;
             }
         },
-        async postValidationCode(code: string): Promise<void|Error> {
-            console.log(code);
+        async postValidationCode(userId: string, domainId: string, code: string): Promise<void|Error> {
             this.loading = true;
             try {
-                // TODO: API 완성 후 연결
-                // await SpaceConnector.clientV2.identity.user.confirmEmail({ userId: this.userId, code });
-                this.closeModal();
+                await SpaceConnector.clientV2.identity.user.confirmEmail({ user_id: userId, verify_code: code, domain_id: domainId });
+                this.handleCloseModal();
+                // TODO: babel edit
+                showSuccessMessage('success!!!!!', '');
             } catch (e: any) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -45,8 +45,18 @@ export const useMyAccountPageStore = defineStore('my-account-page', {
                 this.loading = false;
             }
         },
-        closeModal() {
+        handleChangeValidationEmail(email: string) {
+            if (!this.isModalVisible) {
+                this.isModalVisible = true;
+                this.email = email;
+                this.handleSetEdit();
+            }
+        },
+        handleCloseModal() {
             this.isModalVisible = false;
+        },
+        handleSetEdit() {
+            this.isEditMode = true;
         },
     },
 });

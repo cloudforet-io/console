@@ -32,31 +32,50 @@
         <span class="help-text">
             {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.HELP_TEXT') }}
         </span>
-        <form class="form">
-            <p-field-group required
-                           :invalid="validationState.isNotificationEmailValid === false"
-                           :invalid-text="validationState.notificationEmailInvalidText"
+        <form class="form"
+              onsubmit="return false"
+        >
+            <p-field-group
+                :invalid="validationState.isNotificationEmailValid"
+                :invalid-text="validationState.notificationEmailInvalidText"
+                required
             >
                 <p-text-input v-model="formState.notificationEmail"
-                              :invalid="validationState.isNotificationEmailValid === false"
                               :placeholder="state.userId"
+                              :disabled="myAccountPageState.loading || state.verified"
+                              :invalid="validationState.isNotificationEmailValid"
                               block
+                              @update:value="handleChangeInput"
                 />
             </p-field-group>
             <div>
-                <p-button :disabled="formState.notificationEmail === ''"
-                          :style-type="state.verified ? 'tertiary' : 'primary'"
+                <p-button v-if="state.verified"
+                          style-type="tertiary"
+                          :loading="myAccountPageState.loading"
                           @click.prevent="handleClickVerifiedEmail"
                 >
-                    {{
-                        state.verified
-                            ? $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE')
-                            : $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY')
-                    }}
+                    <p-i name="ic_edit"
+                         height="1rem"
+                         width="1rem"
+                         color="inherit"
+                         class="icon-edit"
+                    />
+                    {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}
+                </p-button>
+                <p-button v-else
+                          :disabled="formState.notificationEmail === '' || !emailValidator(formState.notificationEmail)"
+                          style-type="primary"
+                          :loading="myAccountPageState.loading"
+                          @click.prevent="handleClickVerifiedEmail"
+                >
+                    {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}
                 </p-button>
             </div>
         </form>
-        <notification-email-modal />
+        <notification-email-modal
+            :domain-id="state.domainId"
+            :user-id="state.userId"
+        />
     </user-account-module-container>
 </template>
 
@@ -70,6 +89,8 @@ import {
 
 import { store } from '@/store';
 
+import { emailValidator } from '@/lib/helper/user-validation-helper';
+
 import NotificationEmailModal from '@/common/components/modals/NotificationEmailModal.vue';
 
 import UserAccountModuleContainer
@@ -77,36 +98,60 @@ import UserAccountModuleContainer
 import { useMyAccountPageStore } from '@/services/my-page/store/my-account-page-store';
 
 const myAccountPageStore = useMyAccountPageStore();
+const myAccountPageState = myAccountPageStore.$state;
 
 const state = reactive({
+    userType: computed(() => store.state.user.backend),
+    verified: computed(() => store.state.user.emeilVerified),
     userId: computed(() => store.state.user.userId),
-    verified: false,
+    email: computed(() => store.state.user.email),
+    domainId: computed(() => store.state.domain.domainId),
 });
 const formState = reactive({
     notificationEmail: '',
 });
 const validationState = reactive({
-    showValidation: false,
     isNotificationEmailValid: undefined as undefined | boolean,
     notificationEmailInvalidText: '' as TranslateResult | string,
 });
 
-const checkNotificationEmail = async () => {
-    const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-    if (regex.test(formState.notificationEmail)) {
-        validationState.isNotificationEmailValid = true;
-    } else {
-        console.log('true');
+/* Components */
+const handleChangeInput = async () => {
+    console.log(formState.notificationEmail);
+    if (formState.notificationEmail === '') {
         validationState.isNotificationEmailValid = false;
+    } else if (emailValidator(formState.notificationEmail)) {
+        validationState.isNotificationEmailValid = false;
+    } else {
+        validationState.isNotificationEmailValid = true;
+        // TODO: babel edit
         validationState.notificationEmailInvalidText = 'check format';
     }
 };
+
+/* API */
 const handleClickVerifiedEmail = async () => {
-    await checkNotificationEmail();
-    if (!validationState.isNotificationEmailValid) return;
-    await myAccountPageStore.postValidationEmail(state.userId, formState.notificationEmail);
-    formState.notificationEmail = '';
+    if (state.verified) {
+        await myAccountPageStore.handleChangeValidationEmail(formState.notificationEmail);
+    } else {
+        await myAccountPageStore.postValidationEmail(
+            state.userId,
+            state.domainId,
+            formState.notificationEmail,
+        );
+    }
 };
+
+/* Init */
+(async () => {
+    if (!state.verified) {
+        if (state.userType === 'LOCAL') {
+            formState.notificationEmail = state.userId;
+        }
+    } else {
+        formState.notificationEmail = state.email;
+    }
+})();
 </script>
 
 <style lang="postcss" scoped>
@@ -135,8 +180,12 @@ const handleClickVerifiedEmail = async () => {
         @apply text-paragraph-md;
     }
     .form {
-        @apply flex items-center;
+        @apply relative flex items-center;
         margin-top: 1rem;
+
+        .icon-edit {
+            margin-right: 0.375rem;
+        }
 
         /* custom design-system component - p-field-group */
         :deep(.p-field-group) {
@@ -157,6 +206,8 @@ const handleClickVerifiedEmail = async () => {
         /* custom design-system component - p-button */
         :deep(.p-button) {
             margin-left: 1rem;
+            padding-right: 0.75rem;
+            padding-left: 0.75rem;
         }
     }
 }

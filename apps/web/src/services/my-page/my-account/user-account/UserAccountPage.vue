@@ -2,12 +2,8 @@
     <section class="user-account-page">
         <p-heading :title="$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE')" />
         <base-information />
-        <div v-if="state.userType === 'LOCAL' || state.userType === 'EXTERNAL'">
-            <notification-email />
-        </div>
-        <div v-if="state.userType === 'LOCAL'">
-            <change-password />
-        </div>
+        <notification-email v-if="state.userType === 'LOCAL' || state.userType === 'EXTERNAL'" />
+        <change-password v-if="state.userType === 'LOCAL'" />
     </section>
 </template>
 
@@ -23,6 +19,6 @@ import ChangePassword from '@/services/my-page/my-account/user-account/modules/C
 import NotificationEmail from '@/services/my-page/my-account/user-account/modules/NotificationEmail.vue';
 
 const state = reactive({
-    userType: computed(() => store.state.user.backend) as unknown as string,
+    userType: computed(() => store.state.user.backend),
 });
 </script>

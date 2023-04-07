@@ -19,6 +19,8 @@ const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> 
         email: response.email,
         language: response.language,
         timezone: response.timezone,
+        // email_verified : There is data only when the value is true.
+        emailVerified: response.email_verified || false,
     };
 };
 
@@ -33,6 +35,8 @@ const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
         language: response.language,
         timezone: response.timezone,
         requiredActions: response.required_actions,
+        // email_verified : There is data only when the value is true.
+        emailVerified: response.email_verified || false,
     };
 };
 
@@ -130,6 +134,7 @@ export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {
 };
 
 export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {
+    console.log({ commit, state, userRequest });
     await updateUser(state.userId, state.userType, userRequest);
     commit('setUser', { ...state, ...userRequest });
     commit('setTimezone', userRequest.timezone);

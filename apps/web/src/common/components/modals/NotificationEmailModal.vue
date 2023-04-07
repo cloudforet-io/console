@@ -9,18 +9,19 @@
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <div v-if="state.isEditMode">
+                <div v-if="myAccountPageState.isEditMode">
                     <p-field-group :label="$t('COMMON.NOTIFICATION_MODAL.NOTIFICATION_EMAIL')"
                                    required
                     >
                         <div class="notification-field-wrapper">
                             <p-text-input
                                 v-model="formState.newNotificationEmail"
-                                :invalid="validationState.isNewNotificationEmailValid"
+                                @keyup.enter="handleClickSendEmailButton"
                             />
                             <p-button style-type="secondary"
-                                      :disabled="formState.newNotificationEmail === ''"
-                                      @click.prevent="handleClickSendButton"
+                                      :disabled="formState.newNotificationEmail === '' || !emailValidator(formState.newNotificationEmail)"
+                                      :loading="myAccountPageState.loading"
+                                      @click.prevent="handleClickSendEmailButton"
                             >
                                 {{ $t('COMMON.NOTIFICATION_MODAL.SEND_CODE') }}
                             </p-button>
@@ -56,6 +57,7 @@
                 >
                     <p-text-input v-model="formState.verificationCode"
                                   :invalid="validationState.isValidationCodeValid"
+                                  @keyup.enter="onClickConfirm"
                     />
                 </p-field-group>
                 <div class="collapsible-wrapper">
@@ -69,7 +71,7 @@
                     >
                         {{ $t('COMMON.NOTIFICATION_MODAL.COLLAPSE_DESC') }}
                         <p-button class="send-code-button"
-                                  @click.prevent="handleClickNewCode"
+                                  @click.prevent="handleClickResendEmailButton"
                         >
                             <span class="emphasis">{{ $t('COMMON.NOTIFICATION_MODAL.SEND_NEW_CODE') }}</span>
                         </p-button>
@@ -98,66 +100,90 @@ import {
     PTextInput,
 } from '@spaceone/design-system';
 
+import { store } from '@/store';
+
+import type { UpdateUserRequest } from '@/store/modules/user/type';
+
+import { emailValidator } from '@/lib/helper/user-validation-helper';
+
 import { useMyAccountPageStore } from '@/services/my-page/store/my-account-page-store';
+
+interface Props {
+    domainId: string
+    userId: string
+}
+
+const vm = getCurrentInstance()?.proxy as Vue;
 
 const myAccountPageStore = useMyAccountPageStore();
 const myAccountPageState = myAccountPageStore.$state;
-const vm = getCurrentInstance()?.proxy as Vue;
+
+const props = withDefaults(defineProps<Props>(), {
+    domainId: '',
+    userId: '',
+});
 
 const state = reactive({
     isCollapsed: true,
-    isEditMode: false,
 });
 const formState = reactive({
     newNotificationEmail: '',
     verificationCode: '',
 });
 const validationState = reactive({
-    showValidation: false,
-    isNewNotificationEmailValid: undefined as undefined | boolean,
     isValidationCodeValid: undefined as undefined | boolean,
     validationCodeInvalidText: '' as TranslateResult | string,
 });
 
-const checkNotificationEmail = async () => {
-    const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-    if (formState.newNotificationEmail) {
-        validationState.isNewNotificationEmailValid = regex.test(formState.newNotificationEmail);
-    } else validationState.isNewNotificationEmailValid = true;
-};
+/* Components */
 const handleEditButton = () => {
-    state.isEditMode = true;
-};
-const handleClickSendButton = async () => {
-    await checkNotificationEmail();
-    if (!validationState.isNewNotificationEmailValid) return;
-    await myAccountPageStore.postValidationEmail(myAccountPageState.userId, formState.newNotificationEmail);
-};
-const handleClickNewCode = () => {
-    myAccountPageStore.postValidationEmail(myAccountPageState.userId, myAccountPageState.email);
+    myAccountPageStore.handleSetEdit();
 };
 const handleClickCancel = () => {
-    myAccountPageStore.closeModal();
+    myAccountPageStore.handleCloseModal();
     handleReset();
-};
-const onClickConfirm = async () => {
-    try {
-        await myAccountPageStore.postValidationCode(formState.verificationCode);
-        handleReset();
-        // showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_ASSIGN_MEMBER'), '');
-    } catch (e) {
-        validationState.isValidationCodeValid = true;
-        validationState.validationCodeInvalidText = vm.$t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');
-        console.log(e);
-    }
 };
 const handleReset = () => {
     formState.newNotificationEmail = '';
     formState.verificationCode = '';
-    validationState.isNewNotificationEmailValid = false;
     validationState.isValidationCodeValid = false;
     validationState.validationCodeInvalidText = '';
 };
+
+/* API */
+const handleClickSendEmailButton = async () => {
+    await myAccountPageStore.postValidationEmail(
+        props.userId,
+        props.domainId,
+        formState.newNotificationEmail,
+    );
+    formState.newNotificationEmail = '';
+};
+const handleClickResendEmailButton = async () => {
+    await myAccountPageStore.postValidationEmail(
+        props.userId,
+        props.domainId,
+        myAccountPageState.email,
+    );
+};
+const onClickConfirm = async () => {
+    try {
+        await myAccountPageStore.postValidationCode(
+            props.userId,
+            props.domainId,
+            formState.verificationCode,
+        );
+        const userParam: UpdateUserRequest = {
+            email: myAccountPageState.email,
+        };
+        await store.dispatch('user/setUser', userParam);
+        handleReset();
+    } catch (e) {
+        validationState.isValidationCodeValid = true;
+        validationState.validationCodeInvalidText = vm.$t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');
+    }
+};
+
 </script>
 
 <style lang="postcss" scoped>
@@ -210,17 +236,6 @@ const handleReset = () => {
         }
     }
 }
-
-/* :deep(.p-button-modal) {
-//    .modal-wrapper {
-//        max-width: 30rem;
-//        margin: auto;
-//    }
-//    .modal-footer {
-//        @apply justify-end;
-//        padding-top: 2.625rem;
-//    }
-} */
 
 /* custom design-system component - p-button-modal */
 .p-button-modal::v-deep {

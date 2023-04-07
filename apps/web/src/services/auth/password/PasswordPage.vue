@@ -90,10 +90,10 @@ import { AUTH_ROUTE } from '@/services/auth/route-config';
 import { usePasswordPageStore } from '@/services/auth/store/password-page-store';
 import type { PasswordFormExpose } from '@/services/auth/type';
 
+const vm = getCurrentInstance()?.proxy as Vue;
+
 const passwordPageStore = usePasswordPageStore();
 const passwordPageState = passwordPageStore.$state;
-
-const vm = getCurrentInstance()?.proxy as Vue;
 
 const passwordFormEl = ref<ComponentPublicInstance<PasswordFormExpose>>();
 const state = reactive({
