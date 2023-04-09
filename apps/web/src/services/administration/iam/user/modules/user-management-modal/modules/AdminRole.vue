@@ -40,6 +40,8 @@ const props = withDefaults(defineProps<Props>(), {
     activeTab: '',
 });
 
+const emit = defineEmits<{(e: 'change-input', formState): void}>();
+
 const state = reactive({
     isSameId: false,
     isToggled: false,
@@ -54,17 +56,17 @@ const formState = reactive({
     domainRoleList: [] as any[],
 });
 
+/* Components */
 const handleUpdateToggle = () => {
     state.isToggled = !state.isToggled;
 };
 const handleSelectedMenuIndex = (selectedIndex: number) => {
     state.selectedMenuIndex = selectedIndex;
     formState.domainRole = formState.domainRoleItem[selectedIndex].label;
+    emit('change-input', { domainRole: formState.domainRole });
 };
 
 /* API */
-
-
 const getRoleList = async () => {
     try {
         const { results } = await SpaceConnector.client.identity.role.list({

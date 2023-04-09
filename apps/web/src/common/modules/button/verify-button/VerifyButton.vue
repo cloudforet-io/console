@@ -19,7 +19,7 @@
                 {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}
             </p-button>
             <p-button v-else
-                      :disabled="!props.isTableColumn && (props.email === '' || !emailValidator(props.email))"
+                      :disabled="!props.isTableColumn && (props.email === '' || emailValidator(props.email))"
                       style-type="primary"
                       :loading="state.loading"
                       :size="props.isTableColumn ? 'sm' : 'md'"

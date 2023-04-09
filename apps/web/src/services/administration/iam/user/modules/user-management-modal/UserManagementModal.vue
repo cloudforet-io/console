@@ -5,6 +5,7 @@
                     :fade="true"
                     :backdrop="true"
                     :visible="isUpdate ? userPageState.visibleUpdateModal : userPageState.visibleCreateModal"
+                    :disabled="formState.userId === '' || formState.name === ''"
                     @confirm="confirm"
                     @cancel="handleClose"
                     @close="handleClose"
@@ -17,24 +18,39 @@
                        class="auth-type-tab"
             >
                 <div class="input-form-wrapper">
-                    <user-info-form :active-tab="formState.activeTab" />
-                    <notification-email-form v-if="formState.activeTab !== 'apiOnly'" />
-                    <password-form v-if="formState.activeTab === 'local'" />
-                    <admin-role :active-tab="formState.activeTab" />
+                    <user-info-form
+                        :active-tab="formState.activeTab"
+                        @change-input="handleChangeInputs"
+                    />
+                    <notification-email-form
+                        v-if="formState.activeTab !== 'apiOnly'"
+                        @change-input="handleChangeInputs"
+                    />
+                    <password-form
+                        v-if="formState.activeTab === 'local'"
+                        @change-input="handleChangeInputs"
+                    />
+                    <admin-role
+                        :active-tab="formState.activeTab"
+                        @change-input="handleChangeInputs"
+                    />
                 </div>
                 <div class="input-form-wrapper tags">
-                    <tags />
+                    <tags @change-input="handleChangeInputs" />
                 </div>
             </p-box-tab>
             <div v-else>
                 <div class="input-form-wrapper">
-                    <user-info-form :active-tab="formState.activeTab" />
-                    <notification-email-form />
-                    <password-form />
-                    <admin-role />
+                    <user-info-form
+                        :active-tab="formState.activeTab"
+                        @change-input="handleChangeInputs"
+                    />
+                    <notification-email-form @change-input="handleChangeInputs" />
+                    <password-form @change-input="handleChangeInputs" />
+                    <admin-role @change-input="handleChangeInputs" />
                 </div>
                 <div class="input-form-wrapper tags">
-                    <tags />
+                    <tags @change-input="handleChangeInputs" />
                 </div>
             </div>
         </template>
@@ -42,9 +58,7 @@
 </template>
 
 <script lang="ts">
-import {
-    reactive, computed, watch,
-} from 'vue';
+import { reactive, computed } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
@@ -55,12 +69,6 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { Validation } from '@/services/administration/iam/user/lib/user-form-validations';
-import {
-    checkEmptyValue, checkMinLength,
-    checkOneLowerCase, checkOneNumber, checkOneUpperCase,
-    checkRequiredField, checkSamePassword,
-} from '@/services/administration/iam/user/lib/user-form-validations';
 import AdminRole from '@/services/administration/iam/user/modules/user-management-modal/modules/AdminRole.vue';
 import NotificationEmailForm
     from '@/services/administration/iam/user/modules/user-management-modal/modules/NotificationEmailForm.vue';
@@ -68,26 +76,6 @@ import PasswordForm from '@/services/administration/iam/user/modules/user-manage
 import Tags from '@/services/administration/iam/user/modules/user-management-modal/modules/Tags.vue';
 import UserInfoForm from '@/services/administration/iam/user/modules/user-management-modal/modules/UserInfoForm.vue';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-
-interface AuthType {
-    user_type: string;
-    backend: string;
-}
-
-const authTypeMap: Record<string, AuthType> = {
-    external: {
-        user_type: 'USER',
-        backend: 'EXTERNAL',
-    },
-    local: {
-        user_type: 'USER',
-        backend: 'LOCAL',
-    },
-    apiOnly: {
-        user_type: 'API_USER',
-        backend: 'LOCAL',
-    },
-};
 
 export default {
     name: 'UserCreateModal',
@@ -121,7 +109,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup() {
         const userPageStore = useUserPageStore();
         const userPageState = userPageStore.$state;
 
@@ -135,11 +123,9 @@ export default {
             name: '',
             email: '',
             domainRole: '',
-            domainRoleItem: computed(() => [
-                { type: 'item', label: i18n.t('IDENTITY.USER.FORM.NOT_SELECT_ROLE'), name: '' },
-                ...formState.domainRoleList,
-            ]),
-            domainRoleList: [] as any[],
+            password: '',
+            passwordCheck: '',
+            passwordManual: false,
             tags: {},
         });
         const validationState = reactive({
@@ -155,38 +141,47 @@ export default {
             isTagsValid: undefined as undefined | boolean,
         });
 
-        const checkPasswordCheck = async (password) => {
-            const passwordCheckValidation: Validation[] = await Promise.all([
-                checkRequiredField(formState.passwordCheck),
-                checkSamePassword(formState.passwordCheck, password),
-            ]);
-            const passwordCheckInvalidObj = passwordCheckValidation.find((item) => item.invalidText.length > 0);
-            if (!passwordCheckInvalidObj) {
-                validationState.isPasswordCheckValid = true;
-                validationState.passwordCheckInvalidText = '';
-            } else {
-                validationState.isPasswordCheckValid = passwordCheckInvalidObj.isValid;
-                validationState.passwordCheckInvalidText = passwordCheckInvalidObj.invalidText;
-            }
+        /* Components */
+        const handleChangeInputs = (value) => {
+            formState.userId = value.userId;
+            formState.name = value.name;
+            formState.email = value.email;
+            formState.password = value.password;
+            formState.passwordCheck = value.passwordCheck;
+            formState.domainRole = value.domainRole;
+            formState.passwordManual = value.passwordManual;
+            formState.tags = value.tags;
         };
-        const checkPassword = async (password) => {
-            const passwordValidation: Validation[] = await Promise.all([
-                checkEmptyValue(password),
-                checkMinLength(password, 8),
-                checkOneLowerCase(password),
-                checkOneUpperCase(password),
-                checkOneNumber(password),
-            ]);
-            const passwordInvalidObj = passwordValidation.find((item) => item.invalidText.length > 0);
-            if (!passwordInvalidObj) {
-                validationState.isPasswordValid = true;
-                validationState.passwordInvalidText = '';
-            } else {
-                validationState.isPasswordValid = passwordInvalidObj.isValid;
-                validationState.passwordInvalidText = passwordInvalidObj.invalidText;
-            }
+        const handleClose = () => {
+            userPageStore.$patch({ visibleCreateModal: false });
         };
 
+        /* API */
+        const confirm = async () => {
+            console.log({ ...formState });
+            // if (!validationState.isUserIdValid || !validationState.isTagsValid) return;
+            // if (formState.activeTab === 'local') {
+            //     await checkPasswordValidation(formState.password);
+            //     if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
+            // }
+            // const data = {
+            //     user_id: formState.userId,
+            //     name: formState.name,
+            //     email: formState.email,
+            //     backend: authTypeMap[formState.activeTab]?.backend,
+            //     user_type: authTypeMap[formState.activeTab]?.user_type,
+            //     password: formState.password || '',
+            //     tags: formState.tags || {},
+            // };
+            // if (formState.domainRoleList.length > 0) {
+            //     emit('confirm', data, formState.domainRole);
+            // } else {
+            //     emit('confirm', data, null);
+            // }
+            // userPageStore.$patch({ visibleCreateModal: false });
+        };
+
+        /* init */
         const initAuthTypeList = async () => {
             if (store.state.domain.extendedAuthType !== undefined) {
                 formState.tabs = [
@@ -198,43 +193,6 @@ export default {
                 formState.activeTab = 'local';
             }
         };
-        const checkPasswordValidation = async (password) => {
-            // password
-            await checkPassword(password);
-
-            // password check
-            await checkPasswordCheck(password);
-        };
-
-        const confirm = async () => {
-            if (!validationState.isUserIdValid || !validationState.isTagsValid) return;
-            if (formState.activeTab === 'local') {
-                await checkPasswordValidation(formState.password);
-                if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
-            }
-            const data = {
-                user_id: formState.userId,
-                name: formState.name,
-                email: formState.email,
-                backend: authTypeMap[formState.activeTab]?.backend,
-                user_type: authTypeMap[formState.activeTab]?.user_type,
-                password: formState.password || '',
-                tags: formState.tags || {},
-            };
-            if (formState.domainRoleList.length > 0) {
-                emit('confirm', data, formState.domainRole);
-            } else {
-                emit('confirm', data, null);
-            }
-            userPageStore.$patch({ visibleCreateModal: false });
-        };
-
-        const handleClose = () => {
-            userPageStore.$patch({ visibleCreateModal: false });
-        };
-
-
-        /* init */
         (async () => {
             await Promise.allSettled([
                 initAuthTypeList(),
@@ -243,20 +201,13 @@ export default {
             ]);
         })();
 
-
-        watch(() => formState.password, (after) => {
-            checkPassword(after);
-        });
-        watch(() => formState.passwordCheck, () => {
-            checkPasswordCheck(formState.password);
-        });
-
         return {
             userPageState,
             formState,
             validationState,
             confirm,
             handleClose,
+            handleChangeInputs,
         };
     },
     computed: {

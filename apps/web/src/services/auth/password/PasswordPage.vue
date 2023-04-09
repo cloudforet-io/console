@@ -124,7 +124,7 @@ const resetInputs = () => {
 /* API */
 const handleClickButton = () => {
     if (formState.userId !== '') {
-        if (!emailValidator(formState.userId)) {
+        if (emailValidator(formState.userId)) {
             if (passwordFormEl.value) {
                 passwordFormEl.value.validationState.isIdValid = false;
                 // TODO: babel edit;

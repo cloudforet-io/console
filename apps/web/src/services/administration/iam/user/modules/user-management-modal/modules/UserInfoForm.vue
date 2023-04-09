@@ -17,7 +17,6 @@
                 </div>
             </template>
             <template #default="{invalid}">
-                <!--                v-if="props.activeTab === 'external' && state.supportFind"-->
                 <div v-if="props.activeTab === 'external' && state.supportFind">
                     <p-filterable-dropdown
                         :search-text.sync="state.searchText"
@@ -42,11 +41,12 @@
                                   :invalid="invalid"
                                   :disabled="userPageState.visibleUpdateModal"
                                   class="text-input"
+                                  @update:value="handleChangeInput"
                     />
                     <p-button v-if="!userPageState.visibleUpdateModal"
                               style-type="secondary"
                               class="user-id-check-button"
-                              @click="checkUserId"
+                              @click="handleClickCheckId"
                     >
                         {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
                     </p-button>
@@ -59,6 +59,7 @@
             <p-text-input v-model="formState.name"
                           class="text-input"
                           autocomplete="username"
+                          @update:value="handleChangeInput"
             />
         </p-field-group>
     </div>
@@ -82,15 +83,15 @@ import { i18n } from '@/translations';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
+import {
+    blankValidator,
+    emailValidator,
+    postCheckDuplicateID,
+    postCheckOauth,
+} from '@/lib/helper/user-validation-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type {
-    Validation,
-} from '@/services/administration/iam/user/lib/user-form-validations';
-import {
-    checkDuplicateID, checkEmailFormat, checkEmptyValue, checkOauth,
-    checkRequiredField,
-} from '@/services/administration/iam/user/lib/user-form-validations';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface Props {
@@ -102,6 +103,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
+
+const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const state = reactive({
     loading: false,
@@ -123,36 +126,8 @@ const validationState = reactive({
 });
 
 /* Components */
-const executeSpecificIDValidation = async () => {
-    let res: Validation = { isValid: true, invalidText: '' };
-    if (props.activeTab === 'local') res = checkEmailFormat(formState.userId);
-    else if (props.activeTab === 'external') res = await checkOauth(formState.userId);
-    return res;
-};
-const checkUserId = async () => {
-    const validation: Validation[] = await Promise.all([
-        checkRequiredField(formState.userId),
-        checkDuplicateID(formState.userId),
-        checkEmptyValue(formState.userId),
-        executeSpecificIDValidation()]);
-    const invalidObj = validation.find((item) => item.invalidText.length > 0);
-    if (!invalidObj) {
-        validationState.isUserIdValid = true;
-        validationState.userIdInvalidText = '';
-    } else {
-        validationState.isUserIdValid = invalidObj.isValid;
-        validationState.userIdInvalidText = invalidObj.invalidText;
-    }
-};
-const onSelectExternalUser = async (userItem) => {
-    await getExternalUser(userItem.name);
-    await checkUserId();
-};
-const onDeleteSelectedExternalUser = () => {
-    formState.userId = '';
-    formState.name = '';
-    validationState.isUserIdValid = undefined;
-    validationState.userIdInvalidText = '';
+const handleChangeInput = () => {
+    emit('change-input', formState);
 };
 const setExternalMenuItems = (users) => {
     state.externalItems = [];
@@ -168,6 +143,16 @@ const setExternalMenuItems = (users) => {
         }
         state.externalItems.push(singleItem);
     });
+};
+const onDeleteSelectedExternalUser = () => {
+    formState.userId = '';
+    formState.name = '';
+    validationState.isUserIdValid = undefined;
+    validationState.userIdInvalidText = '';
+};
+const onSelectExternalUser = async (userItem) => {
+    await getExternalUser(userItem.name);
+    await handleClickCheckId();
 };
 
 /* API */
@@ -187,7 +172,6 @@ const listExternalUser = debounce(async () => {
         state.loading = false;
     }
 }, 300);
-
 const getExternalUser = async (userId: string) => {
     try {
         const { results } = await SpaceConnector.client.identity.user.find({
@@ -210,6 +194,32 @@ const getExternalUser = async (userId: string) => {
         formState.userId = userId;
         formState.name = '';
     }
+};
+const checkValidate = async () => {
+    if (emailValidator(formState.userId)) {
+        validationState.isUserIdValid = false;
+        validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID');
+    }
+    if (blankValidator(formState.userId)) {
+        validationState.isUserIdValid = false;
+        validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
+    }
+    if (await postCheckDuplicateID(formState.userId)) {
+        validationState.isUserIdValid = false;
+        validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
+    }
+    if (props.activeTab === 'external') {
+        if (await postCheckOauth(formState.userId)) {
+            validationState.isUserIdValid = false;
+            validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_NOT_EXIST');
+        }
+    }
+};
+const handleClickCheckId = async () => {
+    await checkValidate();
+    if (validationState.isUserIdValid === false) return;
+    validationState.isUserIdValid = true;
+    validationState.userIdInvalidText = '';
 };
 
 watch(() => props.activeTab, (after) => {

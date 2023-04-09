@@ -19,7 +19,7 @@
                                 @keyup.enter="handleClickSendEmailButton"
                             />
                             <p-button style-type="secondary"
-                                      :disabled="formState.newNotificationEmail === '' || !emailValidator(formState.newNotificationEmail)"
+                                      :disabled="formState.newNotificationEmail === '' || emailValidator(formState.newNotificationEmail)"
                                       :loading="state.loading"
                                       @click.prevent="handleClickSendEmailButton"
                             >

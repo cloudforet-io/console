@@ -12,6 +12,7 @@
                                   :placeholder="store.state.user.userId"
                                   :disabled="userPageState.visibleUpdateModal"
                                   class="text-input"
+                                  @update:value="handleChangeInput"
                     />
                     <p-button v-if="userPageState.visibleUpdateModal"
                               style-type="tertiary"
@@ -59,6 +60,8 @@ import { useUserPageStore } from '@/services/administration/store/user-page-stor
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
+const emit = defineEmits<{(e: 'change-input', formState): void}>();
+
 const formState = reactive({
     email: '',
 });
@@ -66,6 +69,11 @@ const validationState = reactive({
     isEmailValid: undefined as undefined | boolean,
     emailInvalidText: '' as TranslateResult | string,
 });
+
+/* Components */
+const handleChangeInput = () => {
+    emit('change-input', formState);
+};
 </script>
 
 <style lang="postcss" scoped>

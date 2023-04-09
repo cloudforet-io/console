@@ -29,6 +29,7 @@
                                       class="text-input"
                                       :disabled="!state.isManually"
                                       :invalid="invalid"
+                                      @update:value="handleChangeInput"
                         />
                     </template>
                 </p-field-group>
@@ -47,6 +48,7 @@
                                       appearance-type="masking"
                                       :disabled="!state.isManually"
                                       :invalid="invalid"
+                                      @update:value="handleChangeInput"
                         />
                     </template>
                 </p-field-group>
@@ -70,6 +72,8 @@ import { useUserPageStore } from '@/services/administration/store/user-page-stor
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
+
+const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const state = reactive({
     passwordStatus: 0,
@@ -116,6 +120,10 @@ const validationState = reactive({
     passwordCheckInvalidText: '' as TranslateResult | string,
 });
 
+/* Components */
+const handleChangeInput = () => {
+    emit('change-input', { ...formState, passwordManual: state.isManually });
+};
 const handleClickRadio = (idx: number) => {
     state.isManually = state.passwordType[idx].name === PasswordType.MANUALLY;
 };

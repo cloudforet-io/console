@@ -27,6 +27,8 @@ import { PFieldGroup } from '@spaceone/design-system';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
+const emit = defineEmits<{(e: 'change-input', formState): void}>();
+
 const formState = reactive({
     tags: {},
 });
@@ -36,6 +38,7 @@ const validationState = reactive({
 
 const handleUpdateTags = (tags: Tag) => {
     formState.tags = tags;
+    emit('change-input', formState);
 };
 </script>
 

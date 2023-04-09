@@ -92,7 +92,7 @@ const validationState = reactive({
 const handleChangeInput = async () => {
     if (formState.notificationEmail === '') {
         validationState.isNotificationEmailValid = false;
-    } else if (emailValidator(formState.notificationEmail)) {
+    } else if (!emailValidator(formState.notificationEmail)) {
         validationState.isNotificationEmailValid = false;
     } else {
         validationState.isNotificationEmailValid = true;
