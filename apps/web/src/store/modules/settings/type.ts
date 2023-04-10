@@ -7,5 +7,5 @@ export interface SetItemRequest {
 export type SettingItem = Record<string, any>;
 
 export interface SettingsState {
-    items: SettingItem;
+    user: SettingItem;
 }

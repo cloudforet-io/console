@@ -1,6 +1,6 @@
 import type { SettingsState } from './type';
 
-export const getItem = (state: SettingsState): any => {
-    const items = state.items;
-    return (key: string, path = '/') => items[`${path}:${key}`];
+export const getItem = (state: SettingsState): any => (key: string, path = '') => {
+    if (!path.length) return state.user[key];
+    return state.user[`${path}:${key}`];
 };

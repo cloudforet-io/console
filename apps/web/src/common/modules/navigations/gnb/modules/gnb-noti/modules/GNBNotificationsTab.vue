@@ -274,7 +274,7 @@ export default {
                 await store.dispatch('settings/setItem', {
                     key: 'lastNotificationReadTime',
                     value: dayjs.utc().toISOString(),
-                    path: '/gnb',
+                    path: 'gnb',
                 }, { root: true });
             } catch (e: any) {
                 if (!axios.isCancel(e.axiosError)) {
