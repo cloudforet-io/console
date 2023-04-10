@@ -93,17 +93,17 @@ export interface ManualOptions {
     type: 'MANUAL';
     values: { key: string; label: string; }[];
 }
-export interface SearchDataSourceOptions {
-    type: 'DATA_SOURCE';
-    data_source: any;
-    // data_source: {
-    //     resource_type: string;
-    //     provider: string;
-    //     cloud_service_group?: string;
-    // }
+export interface SearchResourceOptions {
+    type: 'SEARCH_RESOURCE';
+    resource_key: string;
 }
+export interface ResourceOptions {
+    type: 'RESOURCE',
+    reference_key: string;
+}
+
 type LegacyOptions = string[];
-type VariableOptions = ManualOptions | SearchDataSourceOptions | LegacyOptions;
+type VariableOptions = ManualOptions|SearchResourceOptions|ResourceOptions|LegacyOptions;
 
 // variables schema
 export interface DashboardVariableSchemaProperty {
