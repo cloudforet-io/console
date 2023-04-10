@@ -153,7 +153,6 @@ const convertAndUpdateVariablesForTable = (order: string[]) => {
             return {
                 ...properties[d],
                 propertyName: d,
-                options: Object.keys(state.allReferenceTypeInfo[d].referenceMap),
             };
         }
         return {

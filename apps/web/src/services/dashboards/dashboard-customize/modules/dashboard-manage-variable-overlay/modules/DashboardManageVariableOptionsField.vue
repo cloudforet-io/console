@@ -81,7 +81,7 @@ import type { OptionItem } from '@/services/dashboards/dashboard-customize/modul
 
 interface Props {
     options: OptionItem[];
-    optionsType: 'MANUAL' | 'DATA_SOURCE';
+    optionsType: 'MANUAL' | 'SEARCH_RESOURCE';
 }
 interface EmitFn {
     (e: string, value: string): void;

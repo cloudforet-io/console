@@ -69,7 +69,7 @@ import { getUUID } from '@/lib/component-util/getUUID';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type {
-    DashboardVariableSchemaProperty, ManualOptions, SearchDataSourceOptions,
+    DashboardVariableSchemaProperty, ManualOptions, SearchResourceOptions,
 } from '@/services/dashboards/config';
 import DashboardManageVariableOptionsField
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/modules/DashboardManageVariableOptionsField.vue';
@@ -137,7 +137,7 @@ const state = reactive({
     options: [
         { draggableItemId: getUUID(), key: '', label: '' },
     ] as OptionItem[],
-    dataSource: '', // TODO: need to refactor
+    resourceKey: '', // TODO: setting resource key in 'RESOURCE' option type
     selectionMenu: computed(() => [
         { name: 'MULTI', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT') },
         { name: 'SINGLE', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT') },
@@ -185,9 +185,9 @@ const handleSave = () => {
         } as ManualOptions;
     } else {
         options = {
-            type: 'DATA_SOURCE',
-            data_source: '',
-        } as SearchDataSourceOptions;
+            type: 'SEARCH_RESOURCE',
+            resource_key: '',
+        } as SearchResourceOptions;
     }
     const variableToSave = {
         variable_type: 'CUSTOM',
@@ -206,7 +206,7 @@ onMounted(() => {
         setForm('name', `${namePrefix}${props.selectedVariable?.name}` ?? '');
         setForm('description', props.selectedVariable?.description ?? '');
         state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
-        // TODO: refactor & add DATA SOURCE case
+        // TODO: add RESOURCE & SEARCH_RESOURCE case
         if (Array.isArray(props.selectedVariable?.options)) {
             state.options = (props.selectedVariable?.options ?? []).map((d) => ({ draggableItemId: getUUID(), key: d, label: d })) ?? [{ draggableItemId: getUUID(), key: '', label: '' }];
         } else if (props.selectedVariable?.options?.type === 'MANUAL') {
