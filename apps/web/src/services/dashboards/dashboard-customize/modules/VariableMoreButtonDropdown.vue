@@ -47,9 +47,13 @@
                 <b>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_1') }} </b>
                 <span>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_2') }}</span>
             </p>
-            <div>
+            <div class="affected-widget-wrapper">
                 <ul>
-                    <!--                    <li v-for=""></li>-->
+                    <li v-for="(title, idx) in state.affectedWidgetTitlesByCustomVariable"
+                        :key="`affected-widget-${idx}`"
+                    >
+                        • {{ title }}
+                    </li>
                 </ul>
             </div>
         </delete-modal>
@@ -109,7 +113,7 @@ const state = reactive({
     // uncheck custom variable
     uncheckConfirmModalVisible: false,
     selectedCustomVariable: undefined,
-    widgetsAffectedByCustomVariable: [],
+    affectedWidgetTitlesByCustomVariable: [] as string[],
 });
 
 const {
@@ -136,14 +140,24 @@ const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideContextMenu);
 
 // helper
-const updateVariablesUse = (property: string, isChecked: boolean) => {
+const _getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): string[] => {
+    const widgetTitles: string[] = [];
+    dashboardDetailState.dashboardWidgetInfoList.forEach((widgetInfo) => {
+        const widgetInheritVariableKeys = Object.values(widgetInfo.inherit_options).filter((d) => d.enabled).map((d) => d.variable_info?.key);
+        if (widgetInheritVariableKeys.includes(targetProperty)) {
+            widgetTitles.push(widgetInfo.title);
+        }
+    });
+    return widgetTitles;
+};
+const _updateVariablesUse = (property: string, isChecked: boolean) => {
     const _variablesSchema = cloneDeep(state.variableSchema);
     _variablesSchema.properties[property].use = isChecked;
     dashboardDetailStore.$patch((_state) => {
         _state.variablesSchema = _variablesSchema;
     });
 };
-const toggleDashboardVariableUse = () => {
+const _toggleDashboardVariableUse = () => {
     /*
      * when variable is unchecked,
      * managed variable: delete variable from each widget & set default value if it's required option
@@ -153,15 +167,19 @@ const toggleDashboardVariableUse = () => {
     const _afterPropertyNames: string[] = state.selected.map((d) => d.name);
     Object.entries(_beforeProperties).forEach(([k, v]) => {
         if (v?.use && !_afterPropertyNames.includes(k)) { /* uncheck case */
-            if (dashboardDetailState.variablesSchema.properties[k]?.variable_type === 'CUSTOM') {
-                // TODO: check widgets which use custom variables
-                state.selectedCustomVariable = k;
-                state.uncheckConfirmModalVisible = true;
-            } else {
-                updateVariablesUse(k, false);
+            if (dashboardDetailState.variablesSchema.properties[k]?.variable_type === 'CUSTOM') { /* custom variable case */
+                state.affectedWidgetTitlesByCustomVariable = _getAffectedWidgetTitlesByCustomVariable(k);
+                if (state.affectedWidgetTitlesByCustomVariable) {
+                    state.selectedCustomVariable = k;
+                    state.uncheckConfirmModalVisible = true;
+                } else {
+                    _updateVariablesUse(k, false);
+                }
+            } else { /* manged variable case */
+                _updateVariablesUse(k, false);
             }
         } else if (!v?.use && _afterPropertyNames.includes(k)) { /* check case */
-            updateVariablesUse(k, true);
+            _updateVariablesUse(k, true);
         }
     });
 };
@@ -184,7 +202,7 @@ const handleClickButton = () => {
 };
 
 const handleSelectVariable = () => {
-    toggleDashboardVariableUse();
+    _toggleDashboardVariableUse();
     hideContextMenu();
     state.searchText = '';
 };
@@ -194,7 +212,7 @@ const handleUpdateSearchText = debounce((text: string) => {
     reloadMenu();
 }, 200);
 const handleConfirmUncheckModal = () => {
-    updateVariablesUse(state.selectedCustomVariable, false);
+    _updateVariablesUse(state.selectedCustomVariable, false);
     state.uncheckConfirmModalVisible = false;
 };
 const handleCancelUncheckModal = () => {
@@ -238,6 +256,12 @@ const {
             width: max-content;
             max-width: 22.5rem;
         }
+    }
+
+    .affected-widget-wrapper {
+        @apply bg-gray-100 text-paragraph-md rounded;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
     }
 }
 </style>
