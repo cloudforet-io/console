@@ -9,7 +9,7 @@ import type { Currency } from '@/store/modules/display/config';
 
 import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import type { InheritOptions, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { InheritOptions, WidgetProps, WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
 
@@ -23,6 +23,7 @@ interface UseWidgetLifecycleOptions {
 
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const checkRefreshableByDashboardVariables = (
     inheritOptions: InheritOptions,
@@ -42,30 +43,42 @@ const checkRefreshableByDashboardVariables = (
 };
 const checkRefreshableByDashboardVariableSchema = (
     inheritOptions: InheritOptions,
-    optionsSchemaProperty: string[],
+    widgetConfig: WidgetConfig,
     widgetKey: string,
     after?: DashboardVariables|DashboardVariablesSchema,
     before?: DashboardVariables|DashboardVariablesSchema,
 ): boolean => {
     let _refresh = false;
-    Object.entries(inheritOptions).forEach(([optionName]) => {
-        if (_refresh) return;
-        const _variableKey = optionName.replace('filters.', '');
+    const targetWidgetInfo = dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === widgetKey);
+    if (!targetWidgetInfo) return false;
+    Object.entries(inheritOptions).forEach(([property, { enabled, variable_info }]) => {
+        if (!enabled) return;
+
+        const _variableKey = variable_info?.key;
+        if (!_variableKey) return;
+
         const _after = after?.properties?.[_variableKey];
         const _before = before?.properties?.[_variableKey];
-
-        if (!_variableKey || (!_after && !_before)) return;
         if (!isEqual(_after, _before)) _refresh = true;
 
-        // set inherit options to widget when new dashboard variable added (only when options in widget config)
-        const isInOptionsSchema = optionsSchemaProperty.some((d) => d.includes(_variableKey));
-        if (isInOptionsSchema && _before?.use === false && _after?.use === true) {
-            const targetWidgetInfo = dashboardDetailStore.$state.dashboardWidgetInfoList.find((d) => d.widget_key === widgetKey);
-            if (targetWidgetInfo) {
-                // TODO: check required option
-                targetWidgetInfo.inherit_options[optionName] = { enabled: true, variable_info: { key: _variableKey } };
-                dashboardDetailStore.updateWidgetInfo(widgetKey, targetWidgetInfo);
+        /* update widget info (only when options in widget config) */
+        const optionsSchemaProperties: string[] = Object.keys(widgetConfig.options_schema?.schema.properties ?? {});
+        const isInWidgetOptionsSchema = optionsSchemaProperties.some((d) => d.includes(property));
+        if (!isInWidgetOptionsSchema) return;
+
+        if (_before?.use === false && _after?.use === true) { /* checked case */
+            targetWidgetInfo.inherit_options[property] = { enabled: true, variable_info: { key: _variableKey } };
+            dashboardDetailStore.updateWidgetInfo(widgetKey, targetWidgetInfo);
+        } else if (_before?.use === true && _after?.use === false) { /* unchecked case */
+            const isFixedProperty: boolean = widgetConfig.options_schema?.fixed_properties?.includes(property) ?? false;
+            if (isFixedProperty) { /* fixed property case */
+                console.log(property, widgetConfig.options?.[property]);
+                targetWidgetInfo.widget_options[property] = widgetConfig.options?.[property] ?? undefined; // set default value to option
+            } else { /* not-fixed property case */
+                targetWidgetInfo.schema_properties.splice(targetWidgetInfo.schema_properties.indexOf(property), 1);
             }
+            targetWidgetInfo.inherit_options[property] = { enabled: false };
+            dashboardDetailStore.updateWidgetInfo(widgetKey, targetWidgetInfo);
         }
     });
     return _refresh;
@@ -87,9 +100,9 @@ export const useWidgetLifecycle = ({
         if (_isRefreshable) refreshWidget();
     }, { deep: true });
     watch(() => props.dashboardVariablesSchema, (after, before) => {
-        if (!props.initiated || props.errorMode || !props.editMode || !props.inheritOptions) return;
-        const optionsSchemaProperty = Object.keys(state.widgetConfig.options_schema?.schema.properties ?? {});
-        const _isRefreshable = checkRefreshableByDashboardVariableSchema(props.inheritOptions, optionsSchemaProperty, props.widgetKey, after, before);
+        if (!props.initiated || !props.editMode || !props.inheritOptions) return;
+        const _isRefreshable = checkRefreshableByDashboardVariableSchema(props.inheritOptions, state.widgetConfig, props.widgetKey, after, before);
+        if (props.errorMode) return;
         if (_isRefreshable) refreshWidget();
     }, { deep: true });
     if (state.settings) {
