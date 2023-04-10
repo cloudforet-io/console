@@ -52,6 +52,9 @@ pinia.use(resetStore);
         components: {
             App,
         },
+        created() {
+            store.dispatch('settings/initSettings');
+        },
         template: '<App/>',
         pinia,
     });

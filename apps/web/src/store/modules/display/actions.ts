@@ -120,7 +120,7 @@ export const checkNotification: Action<DisplayState, any> = async ({
         notificationListApiToken = axios.CancelToken.source();
 
         const currentTime = dayjs.tz(dayjs.utc(), rootState.user.timezone);
-        const lastNotificationReadTimeStr = rootGetters['settings/getItem']('lastNotificationReadTime', '/gnb');
+        const lastNotificationReadTimeStr = rootGetters['settings/getItem']('lastNotificationReadTime', 'gnb');
         const lastNotificationReadTime = lastNotificationReadTimeStr ? dayjs(lastNotificationReadTimeStr).tz(rootState.user.timezone) : undefined;
         const param = getNotificationListParam(
             rootState.user.userId,
@@ -213,14 +213,14 @@ const storeCurrencyRates = (rates, dispatch: Dispatch) => {
     dispatch('settings/setItem', {
         key: 'currencyRates',
         value: currencyRatesStoreData,
-        path: '/common',
+        path: 'common',
     }, { root: true });
 };
 
 export const loadCurrencyRates: Action<DisplayState, any> = async ({
     commit, dispatch, rootGetters,
 }) => {
-    const storedData: CurrencyRatesStoredData|undefined = rootGetters['settings/getItem']('currencyRates', '/common');
+    const storedData: CurrencyRatesStoredData|undefined = rootGetters['settings/getItem']('currencyRates', 'common');
     const now = dayjs();
     const storedDate = storedData?.timestamp ? dayjs.unix(storedData?.timestamp) : undefined;
     const storedRates = storedData?.rates ?? {};

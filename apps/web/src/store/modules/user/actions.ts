@@ -95,7 +95,7 @@ const getUserRoleBindings = async (userId: string): Promise<Array<UserRole>> => 
     }
 };
 
-export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
+export const signIn = async ({ commit, dispatch }, signInRequest: SignInRequest): Promise<void> => {
     const response = await SpaceConnector.client.identity.token.issue({
         domain_id: signInRequest.domainId,
         user_id: signInRequest.userId || null, // user_id is nullable
@@ -117,6 +117,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
         const userRoles = await getUserRoleBindings(userId);
         commit('setRoles', userRoles);
     }
+    await dispatch('settings/initSettings', null, { root: true });
 
     commit('setIsSessionExpired', false);
 };
