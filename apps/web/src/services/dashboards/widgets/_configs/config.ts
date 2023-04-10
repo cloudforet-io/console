@@ -127,7 +127,7 @@ export type WidgetFiltersSchema = {
     [K in WidgetFilterKey as `filters.${K}`]: JsonSchema['properties']
 };
 export type WidgetFiltersSchemaProperty = keyof WidgetFiltersSchema;
-export type WidgetOptionsSchemaProperty = 'group_by'|WidgetFiltersSchemaProperty;
+export type WidgetOptionsSchemaProperty = 'group_by'|WidgetFiltersSchemaProperty|string;
 export type WidgetOptionsSchemaProperties = Partial<Record<WidgetOptionsSchemaProperty, JsonSchema['properties']>>;
 export interface WidgetOptionsSchema {
     default_properties?: WidgetOptionsSchemaProperty[];
