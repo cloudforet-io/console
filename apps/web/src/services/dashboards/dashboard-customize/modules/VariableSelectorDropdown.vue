@@ -107,10 +107,15 @@ const state = reactive({
     selected: computed<MenuItem[]>(() => {
         const arrayOfSelectedOptions = state.variableSelectedOptions;
 
-        if (state.variableProperty.options.type === 'RESOURCE') {
+        // Handle Legacy Variable Options
+        if (state.variableProperty.variable_type === 'MANAGED' && !state.variableProperty.options) {
             return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
         }
-        if (state.variableProperty.options.type === 'SEARCH_RESOURCE') {
+
+        if (state.variableProperty.options?.type === 'RESOURCE') {
+            return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
+        }
+        if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
             return arrayOfSelectedOptions.map((d) => ({ name: d, label: d }));
         } return arrayOfSelectedOptions.map((d) => ({ name: d, label: state.options.find((optionItem) => optionItem.name === d).label }));
     }),
@@ -118,10 +123,18 @@ const state = reactive({
     searchResourceOptions: [],
     options: computed<MenuItem[]>(() => {
         let result;
+
+        // Handle Legacy Variable Options
         if (Array.isArray(state.variableProperty.options)) {
-            // Handle Legacy Options
             result = state.variableProperty.options?.map((d) => ({ name: d, label: d }));
-        } else if (state.variableProperty.options.type === 'RESOURCE') {
+        } else if (state.variableProperty.variable_type === 'MANAGED' && !state.variableProperty.options) {
+            result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
+                name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
+            }));
+        }
+
+        // Handle Current Variable Options
+        if (state.variableProperty.options?.type === 'RESOURCE') {
             result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
                 name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
             }));
