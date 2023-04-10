@@ -962,6 +962,7 @@
 			"PASSWORD": "비밀번호",
 			"PASSWORD_CHECK": "비밀번호 확인",
 			"PASSWORD_CHECK_INVALID": "동일한 비밀번호를 입력해 주세요.",
+			"PASSWORD_HELP_TEXT": "",
 			"ROLE": "권한",
 			"SEND_LINK": "",
 			"SET_MANUALLY": "",
@@ -1644,6 +1645,7 @@
 					"CHANGE": "",
 					"HELP_TEXT": "",
 					"NOT_VERIFIED": "",
+					"SEND_MAIL": "",
 					"TITLE": "",
 					"VERIFIED": "",
 					"VERIFY": ""

@@ -10,8 +10,8 @@
         <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
         <p-select-dropdown v-if="state.isToggled"
                            :key="props.activeTab"
-                           :items="formState.domainRoleItem"
-                           :disabled="formState.domainRoleItem.length < 2 || state.isSameId"
+                           :items="formState.domainRoleList"
+                           :disabled="formState.domainRoleList.length < 2 || state.isSameId"
                            use-fixed-menu-style
                            :selected="state.selectedMenuIndex"
                            index-mode
@@ -22,23 +22,30 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { PToggleButton, PSelectDropdown } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { User } from '@/services/administration/iam/user/type';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
+
 interface Props {
     activeTab?: string
+    item?: User;
 }
 const props = withDefaults(defineProps<Props>(), {
     activeTab: '',
+    item: undefined,
 });
+
+const userPageStore = useUserPageStore();
+const userPageState = userPageStore.$state;
 
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
@@ -49,10 +56,6 @@ const state = reactive({
 });
 const formState = reactive({
     domainRole: '',
-    domainRoleItem: computed(() => [
-        { type: 'item', label: i18n.t('IDENTITY.USER.FORM.NOT_SELECT_ROLE'), name: '' },
-        ...formState.domainRoleList,
-    ]),
     domainRoleList: [] as any[],
 });
 
@@ -62,8 +65,15 @@ const handleUpdateToggle = () => {
 };
 const handleSelectedMenuIndex = (selectedIndex: number) => {
     state.selectedMenuIndex = selectedIndex;
-    formState.domainRole = formState.domainRoleItem[selectedIndex].label;
-    emit('change-input', { domainRole: formState.domainRole });
+    formState.domainRole = formState.domainRoleList[selectedIndex].label;
+    emit('change-input', { ...formState, domainRole: formState.domainRole });
+};
+const setForm = async () => {
+    if (formState.domainRoleList[0] && userPageStore.selectedUsers[0].role_bindings) {
+        state.isToggled = true;
+        state.selectedMenuIndex = formState.domainRoleList.findIndex((data) => data.name === props.item.role_bindings?.find((role) => role.role_info.role_type === 'DOMAIN')?.role_info.role_id);
+        formState.domainRole = formState.domainRoleList[state.selectedMenuIndex].label;
+    } else formState.domainRole = '';
 };
 
 /* API */
@@ -90,6 +100,9 @@ const getRoleList = async () => {
         // LOAD REFERENCE STORE
         store.dispatch('reference/user/load'),
     ]);
+    if (userPageState.visibleUpdateModal) {
+        await setForm();
+    }
 })();
 </script>
 

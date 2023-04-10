@@ -4,14 +4,14 @@
                     size="md"
                     :fade="true"
                     :backdrop="true"
-                    :visible="isUpdate ? userPageState.visibleUpdateModal : userPageState.visibleCreateModal"
-                    :disabled="formState.userId === '' || formState.name === ''"
+                    :visible="userPageState.visibleUpdateModal || userPageState.visibleCreateModal"
+                    :disabled="formState.userId === '' || (formState.passwordManual && formState.password === '')"
                     @confirm="confirm"
                     @cancel="handleClose"
                     @close="handleClose"
     >
         <template #body>
-            <p-box-tab v-if="!isUpdate"
+            <p-box-tab v-if="userPageState.visibleCreateModal"
                        v-model="formState.activeTab"
                        :tabs="formState.tabs"
                        style-type="gray"
@@ -24,6 +24,7 @@
                     />
                     <notification-email-form
                         v-if="formState.activeTab !== 'apiOnly'"
+                        v-model="formState.email"
                         @change-input="handleChangeInputs"
                     />
                     <password-form
@@ -43,14 +44,26 @@
                 <div class="input-form-wrapper">
                     <user-info-form
                         :active-tab="formState.activeTab"
+                        :item="item"
                         @change-input="handleChangeInputs"
                     />
-                    <notification-email-form @change-input="handleChangeInputs" />
-                    <password-form @change-input="handleChangeInputs" />
-                    <admin-role @change-input="handleChangeInputs" />
+                    <notification-email-form
+                        :item="item"
+                        @change-input="handleChangeInputs"
+                    />
+                    <password-form
+                        :item="item"
+                        @change-input="handleChangeInputs"
+                    />
+                    <admin-role
+                        :item="item"
+                        @change-input="handleChangeInputs"
+                    />
                 </div>
                 <div class="input-form-wrapper tags">
-                    <tags @change-input="handleChangeInputs" />
+                    <tags :item="item"
+                          @change-input="handleChangeInputs"
+                    />
                 </div>
             </div>
         </template>
@@ -58,16 +71,11 @@
 </template>
 
 <script lang="ts">
-import { reactive, computed } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
+import { reactive } from 'vue';
 
-import {
-    PButtonModal,
-    PBoxTab,
-} from '@spaceone/design-system';
+import { PButtonModal, PBoxTab } from '@spaceone/design-system';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import AdminRole from '@/services/administration/iam/user/modules/user-management-modal/modules/AdminRole.vue';
 import NotificationEmailForm
@@ -75,7 +83,28 @@ import NotificationEmailForm
 import PasswordForm from '@/services/administration/iam/user/modules/user-management-modal/modules/PasswordForm.vue';
 import Tags from '@/services/administration/iam/user/modules/user-management-modal/modules/Tags.vue';
 import UserInfoForm from '@/services/administration/iam/user/modules/user-management-modal/modules/UserInfoForm.vue';
+import type { User } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
+
+interface AuthType {
+    user_type: string;
+    backend: string;
+}
+
+const authTypeMap: Record<string, AuthType> = {
+    external: {
+        user_type: 'USER',
+        backend: 'EXTERNAL',
+    },
+    local: {
+        user_type: 'USER',
+        backend: 'LOCAL',
+    },
+    apiOnly: {
+        user_type: 'API_USER',
+        backend: 'LOCAL',
+    },
+};
 
 export default {
     name: 'UserCreateModal',
@@ -101,15 +130,11 @@ export default {
             required: true,
         },
         item: {
-            type: Object,
+            type: undefined as undefined | User,
             default: undefined,
         },
-        isUpdate: {
-            type: Boolean || undefined,
-            default: false,
-        },
     },
-    setup() {
+    setup(props, { emit }) {
         const userPageStore = useUserPageStore();
         const userPageState = userPageStore.$state;
 
@@ -128,57 +153,62 @@ export default {
             passwordManual: false,
             tags: {},
         });
-        const validationState = reactive({
-            isUserIdValid: undefined as undefined | boolean,
-            userIdInvalidText: '' as TranslateResult | string,
-            userIdValidText: computed(() => i18n.t('IDENTITY.USER.FORM.NAME_VALID')),
-            isEmailValid: undefined as undefined | boolean,
-            emailInvalidText: '' as TranslateResult | string,
-            isPasswordValid: undefined as undefined | boolean,
-            passwordInvalidText: '' as TranslateResult | string,
-            isPasswordCheckValid: undefined as undefined | boolean,
-            passwordCheckInvalidText: '' as TranslateResult | string,
-            isTagsValid: undefined as undefined | boolean,
-        });
 
         /* Components */
         const handleChangeInputs = (value) => {
-            formState.userId = value.userId;
-            formState.name = value.name;
-            formState.email = value.email;
-            formState.password = value.password;
-            formState.passwordCheck = value.passwordCheck;
-            formState.domainRole = value.domainRole;
-            formState.passwordManual = value.passwordManual;
-            formState.tags = value.tags;
+            if (value.userId || value.userId) {
+                formState.userId = value.userId;
+                formState.email = value.userId;
+            }
+            if (value.email) {
+                formState.email = value.email;
+            }
+            if (value.password || value.passwordManual !== undefined) {
+                formState.password = value.password;
+                formState.passwordCheck = value.passwordCheck;
+                formState.passwordManual = value.passwordManual;
+            }
+            if (value.domainRole) {
+                formState.domainRole = value.domainRole;
+            }
+            if (value.tags) {
+                formState.tags = value.tags;
+            }
         };
         const handleClose = () => {
-            userPageStore.$patch({ visibleCreateModal: false });
+            userPageStore.$patch({ visibleCreateModal: false, visibleUpdateModal: false });
+        };
+        const setForm = () => {
+            if (props.item) {
+                formState.userId = props.item.user_id;
+                formState.name = props.item.name;
+                formState.email = props.item.email;
+                formState.domainRole = props.item.domain_role;
+                formState.password = props.item.password;
+                formState.passwordCheck = props.item.password;
+                formState.passwordManual = false;
+                formState.tags = props.item.tags;
+            }
         };
 
         /* API */
         const confirm = async () => {
-            console.log({ ...formState });
-            // if (!validationState.isUserIdValid || !validationState.isTagsValid) return;
-            // if (formState.activeTab === 'local') {
-            //     await checkPasswordValidation(formState.password);
-            //     if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
-            // }
-            // const data = {
-            //     user_id: formState.userId,
-            //     name: formState.name,
-            //     email: formState.email,
-            //     backend: authTypeMap[formState.activeTab]?.backend,
-            //     user_type: authTypeMap[formState.activeTab]?.user_type,
-            //     password: formState.password || '',
-            //     tags: formState.tags || {},
-            // };
-            // if (formState.domainRoleList.length > 0) {
-            //     emit('confirm', data, formState.domainRole);
-            // } else {
-            //     emit('confirm', data, null);
-            // }
-            // userPageStore.$patch({ visibleCreateModal: false });
+            const data = {
+                user_id: formState.userId,
+                name: formState.name,
+                email: formState.email,
+                backend: authTypeMap[formState.activeTab]?.backend,
+                user_type: authTypeMap[formState.activeTab]?.user_type,
+                password: formState.password || '',
+                tags: formState.tags || {},
+                reset_password: !formState.passwordManual,
+            };
+            if (formState.domainRole !== '') {
+                emit('confirm', data, formState.domainRole);
+            } else {
+                emit('confirm', data, null);
+            }
+            userPageStore.$patch({ visibleCreateModal: false });
         };
 
         /* init */
@@ -199,12 +229,14 @@ export default {
                 // LOAD REFERENCE STORE
                 store.dispatch('reference/user/load'),
             ]);
+            if (userPageState.visibleUpdateModal) {
+                await setForm();
+            }
         })();
 
         return {
             userPageState,
             formState,
-            validationState,
             confirm,
             handleClose,
             handleChangeInputs,

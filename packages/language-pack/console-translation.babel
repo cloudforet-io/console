@@ -16837,6 +16837,27 @@
                                 </translations>
                             </concept_node>
                             <concept_node>
+                                <name>PASSWORD_HELP_TEXT</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description/>
+                                <comment/>
+                                <default_text/>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
                                 <name>ROLE</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description/>
@@ -28772,6 +28793,27 @@
                                             </concept_node>
                                             <concept_node>
                                                 <name>NOT_VERIFIED</name>
+                                                <definition_loaded>false</definition_loaded>
+                                                <description/>
+                                                <comment/>
+                                                <default_text/>
+                                                <translations>
+                                                    <translation>
+                                                        <language>en-US</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ja-JP</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                    <translation>
+                                                        <language>ko-KR</language>
+                                                        <approved>false</approved>
+                                                    </translation>
+                                                </translations>
+                                            </concept_node>
+                                            <concept_node>
+                                                <name>SEND_MAIL</name>
                                                 <definition_loaded>false</definition_loaded>
                                                 <description/>
                                                 <comment/>

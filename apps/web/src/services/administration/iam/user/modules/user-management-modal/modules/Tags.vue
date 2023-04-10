@@ -27,6 +27,20 @@ import { PFieldGroup } from '@spaceone/design-system';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
+import type { User } from '@/services/administration/iam/user/type';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
+
+interface Props {
+    item?: User;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    item: undefined,
+});
+
+const userPageStore = useUserPageStore();
+const userPageState = userPageStore.$state;
+
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const formState = reactive({
@@ -36,10 +50,21 @@ const validationState = reactive({
     isTagsValid: undefined as undefined | boolean,
 });
 
+/* Components */
+const setForm = () => {
+    formState.tags = props.item.tags || {};
+};
 const handleUpdateTags = (tags: Tag) => {
     formState.tags = tags;
-    emit('change-input', formState);
+    emit('change-input', { ...formState, tags: formState.tags });
 };
+
+/* Init */
+(async () => {
+    if (userPageState.visibleUpdateModal) {
+        await setForm();
+    }
+})();
 </script>
 
 <style lang="postcss" scoped>

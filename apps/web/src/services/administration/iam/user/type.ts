@@ -17,6 +17,7 @@ interface UserData {
 	created_at: TimeStamp;
 	domain_id?: string;
 	email?: string;
+	email_verified?: boolean;
 	language: string;
 	last_accessed_at: TimeStamp;
 	name: string;

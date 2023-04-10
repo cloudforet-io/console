@@ -962,6 +962,7 @@
 			"PASSWORD": "パスワード",
 			"PASSWORD_CHECK": "パスワードの確認",
 			"PASSWORD_CHECK_INVALID": "同じパスワードを入力してください",
+			"PASSWORD_HELP_TEXT": "",
 			"ROLE": "権限",
 			"SEND_LINK": "",
 			"SET_MANUALLY": "",
@@ -1644,6 +1645,7 @@
 					"CHANGE": "",
 					"HELP_TEXT": "",
 					"NOT_VERIFIED": "",
+					"SEND_MAIL": "",
 					"TITLE": "",
 					"VERIFIED": "",
 					"VERIFY": ""

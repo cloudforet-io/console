@@ -962,6 +962,7 @@
 			"PASSWORD": "Password",
 			"PASSWORD_CHECK": "Password Check",
 			"PASSWORD_CHECK_INVALID": "Please enter same value again",
+			"PASSWORD_HELP_TEXT": "Notification email verification is required to send a password reset link.",
 			"ROLE": "Role",
 			"SEND_LINK": "Send user a password reset link",
 			"SET_MANUALLY": "Set password manually",
@@ -1644,6 +1645,7 @@
 					"CHANGE": "Change",
 					"HELP_TEXT": "Enter email address to receive important account and system-related information.",
 					"NOT_VERIFIED": "Not Verified",
+					"SEND_MAIL": "Send Verification Code",
 					"TITLE": "Notification Email",
 					"VERIFIED": "Verified",
 					"VERIFY": "Verify"

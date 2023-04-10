@@ -37,11 +37,10 @@
                 >
                     <p-text-input v-model="formState.userId"
                                   v-focus
-                                  :placeholder="store.state.user.userId"
+                                  :placeholder="!userPageState.visibleUpdateModal ? store.state.user.userId : ''"
                                   :invalid="invalid"
                                   :disabled="userPageState.visibleUpdateModal"
                                   class="text-input"
-                                  @update:value="handleChangeInput"
                     />
                     <p-button v-if="!userPageState.visibleUpdateModal"
                               style-type="secondary"
@@ -83,22 +82,27 @@ import { i18n } from '@/translations';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
-import {
-    blankValidator,
-    emailValidator,
-    postCheckDuplicateID,
-    postCheckOauth,
-} from '@/lib/helper/user-validation-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type {
+    Validation,
+} from '@/services/administration/iam/user/lib/user-form-validations';
+import {
+    checkDuplicateID,
+    checkEmailFormat, checkEmptyValue,
+    checkOauth,
+    checkRequiredField,
+} from '@/services/administration/iam/user/lib/user-form-validations';
+import type { User } from '@/services/administration/iam/user/type';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface Props {
     activeTab?: string;
+    item?: User;
 }
 const props = withDefaults(defineProps<Props>(), {
     activeTab: '',
+    item: undefined,
 });
 
 const userPageStore = useUserPageStore();
@@ -126,9 +130,6 @@ const validationState = reactive({
 });
 
 /* Components */
-const handleChangeInput = () => {
-    emit('change-input', formState);
-};
 const setExternalMenuItems = (users) => {
     state.externalItems = [];
     users.forEach((user) => {
@@ -153,6 +154,13 @@ const onDeleteSelectedExternalUser = () => {
 const onSelectExternalUser = async (userItem) => {
     await getExternalUser(userItem.name);
     await handleClickCheckId();
+};
+const handleChangeInput = () => {
+    emit('change-input', { ...formState, name: formState.name });
+};
+const setForm = () => {
+    formState.userId = props.item.user_id;
+    formState.name = props.item.name || '';
 };
 
 /* API */
@@ -195,32 +203,35 @@ const getExternalUser = async (userId: string) => {
         formState.name = '';
     }
 };
-const checkValidate = async () => {
-    if (emailValidator(formState.userId)) {
-        validationState.isUserIdValid = false;
-        validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID');
-    }
-    if (blankValidator(formState.userId)) {
-        validationState.isUserIdValid = false;
-        validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
-    }
-    if (await postCheckDuplicateID(formState.userId)) {
-        validationState.isUserIdValid = false;
-        validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
-    }
-    if (props.activeTab === 'external') {
-        if (await postCheckOauth(formState.userId)) {
-            validationState.isUserIdValid = false;
-            validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_NOT_EXIST');
-        }
-    }
+
+const executeSpecificIDValidation = async () => {
+    let res: Validation = { isValid: true, invalidText: '' };
+    if (props.activeTab === 'local') res = checkEmailFormat(formState.userId);
+    else if (props.activeTab === 'external') res = await checkOauth(formState.userId);
+    return res;
 };
 const handleClickCheckId = async () => {
-    await checkValidate();
-    if (validationState.isUserIdValid === false) return;
-    validationState.isUserIdValid = true;
-    validationState.userIdInvalidText = '';
+    const validation: Validation[] = await Promise.all([
+        checkRequiredField(formState.userId),
+        checkDuplicateID(formState.userId),
+        checkEmptyValue(formState.userId),
+        executeSpecificIDValidation()]);
+    const invalidObj = validation.find((item) => item.invalidText.length > 0);
+    if (!invalidObj) {
+        validationState.isUserIdValid = true;
+        emit('change-input', { ...formState, userId: formState.userId });
+    } else {
+        validationState.isUserIdValid = invalidObj.isValid;
+        validationState.userIdInvalidText = invalidObj.invalidText;
+    }
 };
+
+/* Init */
+(async () => {
+    if (userPageState.visibleUpdateModal) {
+        await setForm();
+    }
+})();
 
 watch(() => props.activeTab, (after) => {
     if (after) {

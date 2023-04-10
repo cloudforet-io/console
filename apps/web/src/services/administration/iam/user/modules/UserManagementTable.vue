@@ -88,7 +88,6 @@
         <user-management-modal v-if="userPageState.visibleUpdateModal"
                                :header-title="userFormState.headerTitle"
                                :item="userFormState.item"
-                               is-update
                                @confirm="handleUserFormConfirm"
         />
     </section>
