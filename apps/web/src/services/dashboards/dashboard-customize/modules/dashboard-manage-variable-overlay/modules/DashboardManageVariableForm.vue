@@ -26,7 +26,7 @@
             />
         </p-field-group>
         <p-field-group class="description-field"
-                       :label="$t('Description')"
+                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_DESCRIPTION')"
         >
             <p-text-input class="description-input"
                           :value="description"

@@ -1,3 +1,5 @@
+import { i18n } from '@/translations';
+
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
@@ -25,7 +27,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
-            description: 'Project Description',
+            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROJECT'),
             options: {
                 type: 'REFERENCE_RESOURCE',
                 reference_key: REFERENCE_TYPE_INFO.project.type,
@@ -36,7 +38,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
-            description: 'Provider Description',
+            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROVIDER'),
             options: {
                 type: 'REFERENCE_RESOURCE',
                 reference_key: REFERENCE_TYPE_INFO.provider.type,
@@ -47,7 +49,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
-            description: 'Service Account Description',
+            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_SERVICE_ACCOUNT'),
             options: {
                 type: 'REFERENCE_RESOURCE',
                 reference_key: REFERENCE_TYPE_INFO.service_account.type,
@@ -58,7 +60,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
-            description: 'Region Description',
+            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_REGION'),
             options: {
                 type: 'REFERENCE_RESOURCE',
                 reference_key: REFERENCE_TYPE_INFO.region.type,
@@ -70,7 +72,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
-            description: 'Product Description',
+            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PRODUCT'),
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_key: COST_VARIABLES_INFO.product.key,
@@ -81,7 +83,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
-            description: 'Account Description',
+            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ACCOUNT'),
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_key: COST_VARIABLES_INFO.account.key,
@@ -92,7 +94,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
-            description: 'Group By Description',
+            description: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_GROUP_BY'),
             options: {
                 type: 'ENUM',
                 values: Object.values(GROUP_BY_ITEM_MAP).map((d) => ({ key: d.name, label: d.label })),
