@@ -100,12 +100,6 @@ const state = reactive({
         // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
         const arrayOfSelectedOptions = flattenDeep([dashboardDetailState.variables[props.propertyName] ?? []]);
 
-        // Handle Legacy Variable Options
-        if (state.variableProperty.variable_type === 'MANAGED' && !state.variableProperty.options) {
-            return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
-        }
-
-        // Handle Current Variable Options
         if (state.variableProperty.options?.type === 'REFERENCE_RESOURCE') {
             return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
         }
@@ -119,16 +113,6 @@ const state = reactive({
     options: computed<MenuItem[]>(() => {
         let result;
 
-        // Handle Legacy Variable Options
-        if (Array.isArray(state.variableProperty.options)) {
-            result = state.variableProperty.options?.map((d) => ({ name: d, label: d }));
-        } else if (state.variableProperty.variable_type === 'MANAGED' && !state.variableProperty.options) {
-            result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
-                name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
-            }));
-        }
-
-        // Handle Current Variable Options
         if (state.variableProperty.options?.type === 'REFERENCE_RESOURCE') {
             result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
                 name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
