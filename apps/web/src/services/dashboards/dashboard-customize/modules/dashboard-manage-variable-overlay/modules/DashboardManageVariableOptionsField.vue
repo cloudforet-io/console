@@ -1,20 +1,20 @@
 <template>
     <p-field-group class="dashboard-manage-variable-options-field"
-                   :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_OPTIONS')"
+                   :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_DATA_SOURCE')"
                    required
     >
-        <p-radio-group>
-            <p-radio :selected="state.proxyOptionsType === 'ENUM'"
-                     @change="handleSelectOptionsType('ENUM')"
-            >
-                {{ $t('Manual Entry') }}
-            </p-radio>
-            <p-radio :selected="state.proxyOptionsType === 'SEARCH_RESOURCE'"
-                     @change="handleSelectOptionsType('SEARCH_RESOURCE')"
-            >
-                {{ $t('Search Data Source') }}
-            </p-radio>
-        </p-radio-group>
+        <!--        <p-radio-group>-->
+        <!--            <p-radio :selected="state.proxyOptionsType === 'ENUM'"-->
+        <!--                     @change="handleSelectOptionsType('ENUM')"-->
+        <!--            >-->
+        <!--                {{ $t('Manual Entry') }}-->
+        <!--            </p-radio>-->
+        <!--            <p-radio :selected="state.proxyOptionsType === 'SEARCH_RESOURCE'"-->
+        <!--                     @change="handleSelectOptionsType('SEARCH_RESOURCE')"-->
+        <!--            >-->
+        <!--                {{ $t('Search Data Source') }}-->
+        <!--            </p-radio>-->
+        <!--        </p-radio-group>-->
         <div v-if="state.proxyOptionsType === 'ENUM'"
              class="maunal-entry-options-wrapper"
         >
@@ -71,7 +71,7 @@ import { computed, reactive, watch } from 'vue';
 import draggable from 'vuedraggable';
 
 import {
-    PButton, PFieldGroup, PIconButton, PRadio, PRadioGroup, PTextInput, PI, useProxyValue,
+    PButton, PFieldGroup, PIconButton, PTextInput, PI, useProxyValue,
 } from '@spaceone/design-system';
 
 import { getUUID } from '@/lib/component-util/getUUID';
@@ -116,9 +116,9 @@ const handleChangeOptionValue = (index: number, value: string) => {
 const handleChangeOptionLabel = (index: number, value: string) => {
     state.proxyOptions[index].label = value;
 };
-const handleSelectOptionsType = (type: string) => {
-    state.proxyOptionsType = type;
-};
+// const handleSelectOptionsType = (type: string) => {
+//     state.proxyOptionsType = type;
+// };
 const handleAddOption = () => {
     state.proxyOptions = [...state.proxyOptions, {
         draggableItemId: getUUID(), key: '', label: '', error: true,
