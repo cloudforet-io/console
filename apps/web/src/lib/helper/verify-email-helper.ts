@@ -28,11 +28,12 @@ export const postValidationEmail = async (body): Promise<void|Error> => {
 export const postValidationCode = async (body): Promise<void|Error> => {
     const { userId, code, domainId } = body;
     try {
-        await SpaceConnector.clientV2.identity.user.confirmEmail({
+        const response = await SpaceConnector.clientV2.identity.user.confirmEmail({
             user_id: userId,
             verify_code: code,
             domain_id: domainId,
         });
+        await store.dispatch('user/setUser', { emailVerified: response.email_verified, email: response.email });
         // TODO: babel edit
         showSuccessMessage('success!!!!!', '');
     } catch (e: any) {

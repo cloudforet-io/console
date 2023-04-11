@@ -43,6 +43,8 @@ import { PButton, PI } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
+import type { UpdateUserRequest } from '@/store/modules/user/type';
+
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { postValidationEmail } from '@/lib/helper/verify-email-helper';
 
@@ -66,32 +68,32 @@ const props = withDefaults(defineProps<IProps>(), {
 const state = reactive({
     loading: false,
     isModalVisible: false,
-    verified: computed(() => store.state.user.emeilVerified),
+    verified: computed(() => store.state.user.emailVerified),
 });
 
-/* API */
+/* Components */
 const handleClickVerifiedEmail = async () => {
-    if (state.verified) {
-        if (!state.isModalVisible) {
-            state.isModalVisible = true;
-        }
-    } else {
+    state.isModalVisible = true;
+
+    if (state.verified) return;
+    const userParam: UpdateUserRequest = {
+        user_id: props.userId,
+        email: props.email,
+        domain_id: props.domainId,
+    };
+    await sendVerifiedEmail(userParam);
+};
+
+/* API */
+const sendVerifiedEmail = async (userParam) => {
+    try {
         state.loading = true;
-        try {
-            if (!state.isModalVisible) {
-                state.isModalVisible = true;
-            }
-            await postValidationEmail({
-                userId: props.userId,
-                email: props.email,
-                domainId: props.domainId,
-            });
-        } catch (e: any) {
-            ErrorHandler.handleError(e);
-            throw e;
-        } finally {
-            state.loading = false;
-        }
+        await postValidationEmail(userParam);
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+        throw e;
+    } finally {
+        state.loading = false;
     }
 };
 </script>

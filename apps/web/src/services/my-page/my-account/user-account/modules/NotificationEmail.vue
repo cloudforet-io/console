@@ -75,13 +75,26 @@ import UserAccountModuleContainer
 
 const state = reactive({
     userType: computed(() => store.state.user.backend),
-    verified: computed(() => store.state.user.emeilVerified),
+    verified: computed(() => store.state.user.emailVerified),
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
     email: computed(() => store.state.user.email),
 });
 const formState = reactive({
-    notificationEmail: '',
+    notificationEmail: computed({
+        get() {
+            if (!state.verified) {
+                if (state.userType === 'LOCAL') {
+                    return state.userId;
+                }
+                return '';
+            }
+            return state.email;
+        },
+        set(newVal) {
+            return newVal;
+        },
+    }),
 });
 const validationState = reactive({
     isNotificationEmailValid: undefined as undefined | boolean,
@@ -100,17 +113,6 @@ const handleChangeInput = async () => {
         validationState.notificationEmailInvalidText = 'check format';
     }
 };
-
-/* Init */
-(async () => {
-    if (!state.verified) {
-        if (state.userType === 'LOCAL') {
-            formState.notificationEmail = state.userId;
-        }
-    } else {
-        formState.notificationEmail = state.email;
-    }
-})();
 </script>
 
 <style lang="postcss" scoped>

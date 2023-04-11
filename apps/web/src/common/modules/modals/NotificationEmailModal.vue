@@ -3,7 +3,7 @@
         :visible="state.proxyVisible"
         :header-title="$t('COMMON.NOTIFICATION_MODAL.TITLE')"
         class="notification-email-modal-wrapper"
-        @confirm="onClickConfirm"
+        @confirm="handleClickConfirmButton"
         @cancel="handleClickCancel"
         @close="handleClickCancel"
     >
@@ -57,7 +57,7 @@
                 >
                     <p-text-input v-model="formState.verificationCode"
                                   :invalid="validationState.isValidationCodeValid"
-                                  @keyup.enter="onClickConfirm"
+                                  @keyup.enter="handleClickConfirmButton"
                     />
                 </p-field-group>
                 <div class="collapsible-wrapper">
@@ -114,15 +114,15 @@ interface Props {
     visible: boolean
 }
 
-const vm = getCurrentInstance()?.proxy as Vue;
-
-const emit = defineEmits<{(e: 'visible'): void}>();
-
 const props = withDefaults(defineProps<Props>(), {
     domainId: '',
     userId: '',
     visible: false,
 });
+
+const vm = getCurrentInstance()?.proxy as Vue;
+
+const emit = defineEmits<{(e: 'visible'): void}>();
 
 const state = reactive({
     loading: false,
@@ -175,7 +175,7 @@ const handleClickSendEmailButton = async (resend?: boolean) => {
         state.loading = false;
     }
 };
-const onClickConfirm = async () => {
+const handleClickConfirmButton = async () => {
     state.loading = true;
     try {
         await postValidationCode({

@@ -63,10 +63,13 @@
 
 <script setup lang="ts">
 
-import { reactive } from 'vue';
+import { computed, getCurrentInstance, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import type { Vue } from 'vue/types/vue';
 
 import { PButton, PFieldGroup, PTextInput } from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -74,21 +77,24 @@ import { i18n } from '@/translations';
 import type { UpdateUserRequest } from '@/store/modules/user/type';
 
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import { getPasswordValidationInfo } from '@/services/auth/lib/helper';
 import UserAccountModuleContainer
     from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
 
+const vm = getCurrentInstance()?.proxy as Vue;
+
+const state = reactive({
+    userId: computed(() => store.state.user.userId),
+    domainId: computed(() => store.state.domain.domainId),
+    isCheckedToken: false,
+});
 const formState = reactive({
     currentPassword: '',
     password: '',
     passwordCheck: '',
 });
-
 const validationState = reactive({
     isCurrentPasswordValid: undefined as undefined | boolean,
     currentPasswordInvalidText: '' as TranslateResult | string,
@@ -96,19 +102,13 @@ const validationState = reactive({
     passwordInvalidText: '' as TranslateResult | string,
     isPasswordCheckValid: undefined as undefined | boolean,
     passwordCheckInvalidText: '' as TranslateResult | string,
-    showValidation: false,
 });
+
+/*  Components */
 const resetPasswordForm = () => {
+    formState.currentPassword = '';
     formState.password = '';
     formState.passwordCheck = '';
-};
-const updateUser = async (userParam) => {
-    try {
-        await store.dispatch('user/setUser', userParam);
-        showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
-    }
 };
 const checkPassword = async (password) => {
     const { isValid, invalidText } = getPasswordValidationInfo(password);
@@ -134,6 +134,37 @@ const handleClickPasswordConfirm = async () => {
     };
     await updateUser(userParam);
     resetPasswordForm();
+};
+
+/* API */
+const checkCurrentPassword = async () => {
+    try {
+        const response = await SpaceConnector.client.identity.token.issue({
+            domain_id: state.domainId,
+            user_id: state.userId,
+            credentials: {
+                password: formState.currentPassword,
+            },
+        }, { skipAuthRefresh: true });
+        if (response.access_token !== '' && response.refresh_token !== '') {
+            state.isCheckedToken = true;
+        }
+        validationState.isCurrentPasswordValid = true;
+        validationState.currentPasswordInvalidText = '';
+    } catch (e) {
+        validationState.isCurrentPasswordValid = false;
+        validationState.currentPasswordInvalidText = vm.$t('AUTH.PASSWORD.RESET.NOT_MATCHING');
+    }
+};
+const updateUser = async (userParam) => {
+    try {
+        await checkCurrentPassword();
+        if (state.isCheckedToken === false) return;
+        await store.dispatch('user/setUser', userParam);
+        showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
+    } catch (e) {
+        showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e);
+    }
 };
 </script>
 

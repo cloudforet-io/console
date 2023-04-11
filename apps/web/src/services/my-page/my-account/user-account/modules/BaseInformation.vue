@@ -64,7 +64,6 @@
 
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButton, PFieldGroup, PSelectDropdown, PTextInput, PFilterableDropdown,
@@ -100,33 +99,41 @@ const state = reactive({
         type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
     })) as FilterableDropdownMenuItem[],
 });
-
 const formState = reactive({
     userName: '' as string | undefined,
-    email: '',
     timezone: [] as FilterableDropdownMenuItem[],
     language: '' as LanguageCode | undefined,
 });
-
 const validationState = reactive({
-    isEmailValid: undefined as undefined | boolean,
-    emailInvalidText: '' as TranslateResult | string,
     timezoneInvalidText: computed(() => {
         if (!formState.timezone.length) return i18n.t('IDENTITY.USER.FORM.TIMEZONE_INVALID');
         return '';
     }),
     showValidation: false,
 });
+
+/* Components */
 const getProfile = async () => {
     try {
         formState.userName = store.state.user.name;
-        formState.email = store.state.user.email;
         formState.language = store.state.user.language;
         formState.timezone = state.timezones.filter((d) => d.name === store.state.user.timezone);
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
+const handleClickProfileConfirm = async () => {
+    if (!validationState.showValidation) validationState.showValidation = true;
+
+    const userParam: UpdateUserRequest = {
+        name: formState.userName,
+        language: formState.language,
+        timezone: formState.timezone[0].name,
+    };
+    await updateUser(userParam);
+};
+
+/* API */
 const updateUser = async (userParam) => {
     try {
         await store.dispatch('user/setUser', userParam);
@@ -135,42 +142,17 @@ const updateUser = async (userParam) => {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
     }
 };
-const checkEmail = async () => {
-    const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-    if (formState.email) {
-        if (!regex.test(formState.email)) {
-            validationState.isEmailValid = false;
-            validationState.emailInvalidText = i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID');
-        } else {
-            validationState.isEmailValid = true;
-            validationState.emailInvalidText = '';
-        }
-    } else validationState.isEmailValid = true;
-};
-
-const handleClickProfileConfirm = async () => {
-    if (!validationState.showValidation) validationState.showValidation = true;
-    await checkEmail();
-    if (!validationState.isEmailValid || validationState.timezoneInvalidText) return;
-
-    const userParam: UpdateUserRequest = {
-        name: formState.userName,
-        email: formState.email,
-        language: formState.language,
-        timezone: formState.timezone[0].name,
-    };
-    await updateUser(userParam);
-};
 
 watch(() => store.state.user.language, (language) => {
     if (language !== formState.language) {
         formState.language = language;
     }
 });
-const init = async () => {
+
+/* Init */
+(async () => {
     await getProfile();
-};
-init();
+})();
 </script>
 
 <style lang="postcss" scoped>

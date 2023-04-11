@@ -11,6 +11,7 @@ import type {
 
 const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.client.identity.domainOwner.get({ owner_id: ownerId });
+    console.log({ domain: response });
     return {
         userId: response.owner_id,
         userType: 'DOMAIN_OWNER',
@@ -20,12 +21,13 @@ const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> 
         language: response.language,
         timezone: response.timezone,
         // email_verified : There is data only when the value is true.
-        emailVerified: response.email_verified || false,
+        emailVerified: response.email_verified,
     };
 };
 
 const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.client.identity.user.get({ user_id: userId });
+    console.log({ user: response });
     return {
         userId: response.user_id,
         userType: 'USER',
@@ -36,7 +38,7 @@ const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
         timezone: response.timezone,
         requiredActions: response.required_actions,
         // email_verified : There is data only when the value is true.
-        emailVerified: response.email_verified || false,
+        emailVerified: response.email_verified,
     };
 };
 
@@ -112,10 +114,12 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 
     if (userType === 'DOMAIN_OWNER') {
         const userInfo = await getDomainOwnerInfo(userId);
+        console.log(userInfo);
         commit('setUser', userInfo);
         commit('setRoles', [{ name: 'Root Account', roleType: 'DOMAIN' }]);
     } else {
         const userInfo = await getUserInfo(userId);
+        console.log(userInfo);
         commit('setUser', userInfo);
 
         const userRoles = await getUserRoleBindings(userId);

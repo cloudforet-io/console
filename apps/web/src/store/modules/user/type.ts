@@ -44,4 +44,5 @@ export interface UpdateUserRequest {
     tags?: Record<string, any>;
     domain_id?: string
     verify_code?: string
+    email_verified?: boolean
 }
