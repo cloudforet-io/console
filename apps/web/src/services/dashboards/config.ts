@@ -111,7 +111,7 @@ export interface DashboardVariableSchemaProperty {
     variable_type: VariableType;
     use: boolean;
     selection_type: VariableSelectionType;
-    description?: string;
+    description?: string | TranslateResult;
     disabled?: boolean;
     options?: VariableOptions;
 }
