@@ -62,7 +62,9 @@
                     :email="state.data.email"
                     :user-id="state.data.user_id"
                     :domain-id="state.data.domain_id"
-                    is-table-column
+                    :verified="state.data.email_verified"
+                    is-administration
+                    @handle-user-detail="getUserDetailPartialData"
                 />
             </template>
         </p-definition-table>
@@ -98,6 +100,7 @@ const props = withDefaults(defineProps<Props>(), {
     userId: '',
     timezone: '',
 });
+
 const state = reactive({
     loading: true,
     fields: computed(() => [
@@ -117,11 +120,12 @@ const state = reactive({
     data: {} as UserDetailData,
 });
 
+/* API */
 const getUserDetailData = async (userId) => {
     state.loading = true;
     try {
         state.data = await SpaceConnector.client.identity.user.get({
-            user_id: userId,
+            user_id: userId || props.userId,
         });
         // eslint-disable-next-line camelcase
         state.data.last_accessed_at = calculateTime(state.data.last_accessed_at, props.timezone as string) || 0;
@@ -130,7 +134,21 @@ const getUserDetailData = async (userId) => {
         ErrorHandler.handleError(e);
     }
 };
+const getUserDetailPartialData = async () => {
+    state.loading = true;
+    try {
+        const response = await SpaceConnector.client.identity.user.get({
+            user_id: props.userId,
+        });
+        state.data.email = response.email;
+        state.data.email_verified = response.email_verified;
+        state.loading = false;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
 
+/* Watcher */
 watch(() => props.userId, () => {
     const userId = props.userId;
     getUserDetailData(userId);
@@ -155,7 +173,7 @@ watch(() => props.userId, () => {
             }
             .verified-icon {
                 @apply absolute;
-                top: 0.15rem;
+                bottom: -0.1rem;
                 left: 0;
             }
         }

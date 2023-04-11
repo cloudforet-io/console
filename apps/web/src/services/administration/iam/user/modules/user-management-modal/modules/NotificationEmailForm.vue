@@ -200,7 +200,7 @@ const handleClickSend = async () => {
             user_id: props.item.user_id,
             email: formState.email,
             domain_id: props.item.domain_id,
-        }, false);
+        });
         state.isSent = true;
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -215,7 +215,7 @@ const handleChangeVerify = async () => {
             user_id: props.item.user_id,
             domain_id: props.item.domain_id,
             code: formState.verificationCode,
-        });
+        }, false);
     } catch (e) {
         validationState.isValidationCodeValid = true;
         validationState.validationCodeInvalidText = vm.$t('COMMON.NOTIFICATION_MODAL.INVALID_CODE');

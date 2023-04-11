@@ -1,15 +1,15 @@
 <template>
     <div>
         <div class="verify-button"
-             :class="!props.isTableColumn ? 'block' : 'table-column'"
+             :class="!props.isAdministration ? 'block' : 'table-column'"
         >
-            <p-button v-if="state.verified"
+            <p-button v-if="props.verified"
                       style-type="tertiary"
                       :loading="state.loading"
-                      :size="props.isTableColumn ? 'sm' : 'md'"
+                      :size="props.isAdministration ? 'sm' : 'md'"
                       @click.prevent="handleClickVerifiedEmail"
             >
-                <p-i v-if="!props.isTableColumn"
+                <p-i v-if="!props.isAdministration"
                      name="ic_edit"
                      height="1rem"
                      width="1rem"
@@ -19,10 +19,10 @@
                 {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}
             </p-button>
             <p-button v-else
-                      :disabled="!props.isTableColumn && (props.email === '' || emailValidator(props.email))"
+                      :disabled="!props.isAdministration && (props.email === '' || emailValidator(props.email))"
                       style-type="primary"
                       :loading="state.loading"
-                      :size="props.isTableColumn ? 'sm' : 'md'"
+                      :size="props.isAdministration ? 'sm' : 'md'"
                       @click.prevent="handleClickVerifiedEmail"
             >
                 {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}
@@ -31,14 +31,17 @@
         <notification-email-modal
             :domain-id="props.domainId"
             :user-id="props.userId"
+            :verified="props.verified"
+            :email="props.email"
+            :is-administration="props.isAdministration"
             :visible.sync="state.isModalVisible"
-            :verified="state.verified"
+            @handle-user-detail="handleGetUserDetailEmit"
         />
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { PButton, PI } from '@spaceone/design-system';
 
@@ -56,21 +59,27 @@ interface IProps {
     email: string
     userId: string
     domainId: string
-    isTableColumn?: boolean
+    verified: boolean
+    isAdministration?: boolean
 }
 
 const props = withDefaults(defineProps<IProps>(), {
     email: '',
     userId: '',
     domainId: '',
-    isTableColumn: false,
+    verified: false,
+    isAdministration: false,
 });
+
+const emit = defineEmits<{(e: 'handle-user-detail'): void}>();
 
 const state = reactive({
     loading: false,
     isModalVisible: false,
-    verified: computed(() => store.state.user.emailVerified),
 });
+const handleGetUserDetailEmit = () => {
+    emit('handle-user-detail');
+};
 
 /* API */
 const handleClickVerifiedEmail = async () => {
@@ -80,9 +89,12 @@ const handleClickVerifiedEmail = async () => {
         domain_id: props.domainId,
     };
     try {
-        if (state.verified) return;
+        if (props.verified) return;
         state.loading = true;
-        await postValidationEmail(userParam, false);
+        await postValidationEmail(userParam);
+        if (!props.isAdministration) {
+            await store.dispatch('user/setUser', { email: props.email });
+        }
     } catch (e: any) {
         ErrorHandler.handleError(e);
         throw e;

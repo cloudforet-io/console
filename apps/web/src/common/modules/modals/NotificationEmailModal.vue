@@ -21,7 +21,7 @@
                             <p-button style-type="secondary"
                                       :disabled="formState.newNotificationEmail === '' || emailValidator(formState.newNotificationEmail)"
                                       :loading="state.loading"
-                                      @click.prevent="handleClickSendEmailButton"
+                                      @click.prevent="handleClickSendEmailButton(false)"
                             >
                                 {{ $t('COMMON.NOTIFICATION_MODAL.SEND_CODE') }}
                             </p-button>
@@ -113,26 +113,31 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 interface Props {
     domainId: string
     userId: string
-    visible: boolean
     verified: boolean
+    email: string
+    isAdministration: boolean
+    visible: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     domainId: '',
     userId: '',
-    visible: false,
     verified: false,
+    email: '',
+    isAdministration: false,
+    visible: false,
 });
 
 const vm = getCurrentInstance()?.proxy as Vue;
 
-const emit = defineEmits<{(e: 'visible'): void}>();
+const emit = defineEmits(['visible', 'handle-user-detail']);
 
 const state = reactive({
     loading: false,
     isCollapsed: true,
     isEditMode: props.verified,
-    email: computed(() => store.state.user.email),
+    myId: computed(() => store.state.user.userId),
+    email: computed(() => (props.isAdministration ? props.email : store.state.user.email)),
     proxyVisible: useProxyValue('visible', props, emit),
 });
 const formState = reactive({
@@ -166,11 +171,14 @@ const handleClickSendEmailButton = async (resend?: boolean) => {
         await postValidationEmail({
             user_id: props.userId,
             domain_id: props.domainId,
-            email: formState.newNotificationEmail,
-        }, resend);
-        if (!resend) {
-            formState.newNotificationEmail = '';
+            email: resend === true ? state.email : formState.newNotificationEmail,
+        });
+        if (state.myId === props.userId) {
+            if (resend !== true) {
+                await store.dispatch('user/setUser', { emailVerified: false, email: formState.newNotificationEmail });
+            }
         }
+        emit('handle-user-detail');
         state.isEditMode = false;
     } catch (e: any) {
         ErrorHandler.handleError(e);
@@ -186,7 +194,8 @@ const handleClickConfirmButton = async () => {
             user_id: props.userId,
             domain_id: props.domainId,
             code: formState.verificationCode,
-        });
+        }, state.myId === props.userId);
+        emit('handle-user-detail');
         state.proxyVisible = false;
         handleReset();
     } catch (e) {

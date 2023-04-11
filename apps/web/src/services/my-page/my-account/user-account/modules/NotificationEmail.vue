@@ -53,6 +53,7 @@
                 :email="formState.notificationEmail"
                 :user-id="state.userId"
                 :domain-id="state.domainId"
+                :verified="state.verified"
             />
         </form>
     </user-account-module-container>
