@@ -71,7 +71,7 @@ import {
     PBadge, PContextMenu, PI, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep, debounce } from 'lodash';
+import { cloneDeep, debounce, flattenDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -95,17 +95,10 @@ const state = reactive({
     contextMenuRef: null as any|null,
     searchText: '',
     variableProperty: computed<DashboardVariableSchemaProperty>(() => dashboardDetailState.variablesSchema.properties[props.propertyName]),
-    variableSelectedOptions: computed<undefined|string|string[]>(() => {
-        const selectedOtpions = dashboardDetailState.variables[props.propertyName];
-        if (!selectedOtpions) return [];
-        if (Array.isArray(selectedOtpions)) {
-            return selectedOtpions;
-        }
-        return [selectedOtpions];
-    }),
     variableName: computed(() => state.variableProperty?.name),
     selected: computed<MenuItem[]>(() => {
-        const arrayOfSelectedOptions = state.variableSelectedOptions;
+        // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
+        const arrayOfSelectedOptions = flattenDeep([dashboardDetailState.variables[props.propertyName] ?? []]);
 
         // Handle Legacy Variable Options
         if (state.variableProperty.variable_type === 'MANAGED' && !state.variableProperty.options) {
