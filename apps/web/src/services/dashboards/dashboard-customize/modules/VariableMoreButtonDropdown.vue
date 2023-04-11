@@ -140,7 +140,7 @@ const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideContextMenu);
 
 // helper
-const _getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): string[] => {
+const getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): string[] => {
     const widgetTitles: string[] = [];
     dashboardDetailState.dashboardWidgetInfoList.forEach((widgetInfo) => {
         const widgetInheritVariableKeys = Object.values(widgetInfo.inherit_options).filter((d) => d.enabled).map((d) => d.variable_info?.key);
@@ -150,7 +150,7 @@ const _getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): strin
     });
     return widgetTitles;
 };
-const _updateVariablesUse = (property: string, isChecked: boolean) => {
+const updateVariablesUse = (property: string, isChecked: boolean) => {
     const _variablesSchema = cloneDeep(state.variableSchema);
     _variablesSchema.properties[property].use = isChecked;
     dashboardDetailStore.$patch((_state) => {
@@ -168,18 +168,18 @@ const _toggleDashboardVariableUse = () => {
     Object.entries(_beforeProperties).forEach(([k, v]) => {
         if (v?.use && !_afterPropertyNames.includes(k)) { /* uncheck case */
             if (dashboardDetailState.variablesSchema.properties[k]?.variable_type === 'CUSTOM') { /* custom variable case */
-                state.affectedWidgetTitlesByCustomVariable = _getAffectedWidgetTitlesByCustomVariable(k);
-                if (state.affectedWidgetTitlesByCustomVariable) {
+                state.affectedWidgetTitlesByCustomVariable = getAffectedWidgetTitlesByCustomVariable(k);
+                if (state.affectedWidgetTitlesByCustomVariable.length) {
                     state.selectedCustomVariable = k;
                     state.uncheckConfirmModalVisible = true;
                 } else {
-                    _updateVariablesUse(k, false);
+                    updateVariablesUse(k, false);
                 }
             } else { /* manged variable case */
-                _updateVariablesUse(k, false);
+                updateVariablesUse(k, false);
             }
         } else if (!v?.use && _afterPropertyNames.includes(k)) { /* check case */
-            _updateVariablesUse(k, true);
+            updateVariablesUse(k, true);
         }
     });
 };
@@ -212,7 +212,7 @@ const handleUpdateSearchText = debounce((text: string) => {
     reloadMenu();
 }, 200);
 const handleConfirmUncheckModal = () => {
-    _updateVariablesUse(state.selectedCustomVariable, false);
+    updateVariablesUse(state.selectedCustomVariable, false);
     state.uncheckConfirmModalVisible = false;
 };
 const handleCancelUncheckModal = () => {
