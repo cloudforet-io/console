@@ -47,7 +47,7 @@ const checkRefreshableByDashboardVariables = (
 };
 
 /* Dashboard Variable Schema */
-const getUpdatedDashboardVariables = (
+const getUpdatedDashboardVariableSchemaProperties = (
     after?: DashboardVariablesSchema,
     before?: DashboardVariablesSchema,
 ): [WidgetFilterKey[], WidgetFilterKey[], WidgetFilterKey[]] => {
@@ -69,7 +69,7 @@ const getUpdatedDashboardVariables = (
     });
     return [added, deleted, changed];
 };
-const isAffectedByChangedVariables = (
+const isAffectedByChangedVariableSchemaProperties = (
     dashboardVariables: string[],
     inheritOptions: InheritOptions,
 ): boolean => {
@@ -79,7 +79,7 @@ const isAffectedByChangedVariables = (
     if (!enabledInheritOptions.length || !enabledInheritOptions.some((d) => dashboardVariables.includes(d))) return false;
     return true;
 };
-const updateWidgetByAddedVariables = (
+const updateWidgetByAddedVariableSchemaProperties = (
     dashboardVariables: WidgetFilterKey[],
     widgetInfo: DashboardLayoutWidgetInfo,
     widgetKey: string,
@@ -103,7 +103,7 @@ const updateWidgetByAddedVariables = (
     }
     return isAffected;
 };
-const updateWidgetByDeletedVariables = (
+const updateWidgetByDeletedVariableSchemaProperties = (
     dashboardVariables: WidgetFilterKey[],
     widgetInfo: DashboardLayoutWidgetInfo,
     widgetKey: string,
@@ -166,18 +166,22 @@ export const useWidgetLifecycle = ({
         if (!props.initiated || !props.editMode || !props.inheritOptions || isEqual(after, before)) return;
         if (!state.widgetInfo) return;
 
-        const [added, deleted, changed] = getUpdatedDashboardVariables(after, before);
-        let isChanged; let isAdded; let isDeleted;
-        if (changed.length) {
-            isChanged = isAffectedByChangedVariables(changed, props.inheritOptions);
+        const [
+            addedVariableSchemaProperties,
+            deletedVariableSchemaProperties,
+            changedVariableSchemaProperties,
+        ] = getUpdatedDashboardVariableSchemaProperties(after, before);
+        let isWidgetOptionChanged; let isWidgetOptionAdded; let isWidgetOptionDeleted;
+        if (addedVariableSchemaProperties.length) {
+            isWidgetOptionAdded = updateWidgetByAddedVariableSchemaProperties(addedVariableSchemaProperties, state.widgetInfo, props.widgetKey, state.widgetConfig);
         }
-        if (added.length) {
-            isAdded = updateWidgetByAddedVariables(added, state.widgetInfo, props.widgetKey, state.widgetConfig);
+        if (deletedVariableSchemaProperties.length) {
+            isWidgetOptionDeleted = updateWidgetByDeletedVariableSchemaProperties(deletedVariableSchemaProperties, state.widgetInfo, props.widgetKey, state.widgetConfig, props.inheritOptions, after);
         }
-        if (deleted.length) {
-            isDeleted = updateWidgetByDeletedVariables(deleted, state.widgetInfo, props.widgetKey, state.widgetConfig, props.inheritOptions, after);
+        if (changedVariableSchemaProperties.length) {
+            isWidgetOptionChanged = isAffectedByChangedVariableSchemaProperties(changedVariableSchemaProperties, props.inheritOptions);
         }
-        if (isChanged || isAdded || isDeleted) refreshWidget();
+        if (isWidgetOptionAdded || isWidgetOptionDeleted || isWidgetOptionChanged) refreshWidget();
     }, { deep: true });
     if (state.settings) {
         watch(() => state.settings, (current, previous) => {
