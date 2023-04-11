@@ -62,6 +62,7 @@ const formState = reactive({
 /* Components */
 const handleUpdateToggle = () => {
     state.isToggled = !state.isToggled;
+    emit('change-input', { ...formState, domainRole: formState.domainRole });
 };
 const handleSelectedMenuIndex = (selectedIndex: number) => {
     state.selectedMenuIndex = selectedIndex;
@@ -87,6 +88,7 @@ const getRoleList = async () => {
             label: d.name,
             name: d.role_id,
         }));
+        formState.domainRole = formState.domainRoleList[0].label;
     } catch (e) {
         ErrorHandler.handleError(e);
         formState.domainRoleList = [];

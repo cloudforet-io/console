@@ -52,7 +52,7 @@
                                           appearance-type="masking"
                                           :disabled="!state.isManually"
                                           :invalid="invalid"
-                                          @update:value="handleChangeChkInput"
+                                          @update:value="handleChangeInput"
                             />
                         </template>
                     </p-field-group>
@@ -140,8 +140,6 @@ const state = reactive({
     }),
     isManually: false,
 });
-
-
 const formState = reactive({
     password: '',
     passwordCheck: '',
@@ -152,6 +150,7 @@ const validationState = reactive({
     isPasswordCheckValid: undefined as undefined | boolean,
     passwordCheckInvalidText: '' as TranslateResult | string,
 });
+
 /* Components */
 const checkPassword = async (password) => {
     const passwordValidation: Validation[] = await Promise.all([
@@ -184,22 +183,29 @@ const checkPasswordCheck = async (password) => {
         validationState.passwordCheckInvalidText = passwordCheckInvalidObj.invalidText;
     }
 };
-const checkPasswordValidation = async () => {
-    await checkPassword(formState.password);
-};
 const handleChangeInput = async () => {
-    await checkPasswordValidation();
-    if (validationState.isPasswordValid === false) return;
-    emit('change-input', { ...formState, password: formState.password });
-};
-const handleChangeChkInput = async () => {
+    if (!state.isManually) return;
+    await checkPassword(formState.password);
     await checkPasswordCheck(formState.password);
-    if (validationState.isPasswordCheckValid === false) return;
-    emit('change-input', { ...formState, passwordCheck: formState.passwordCheck });
+    if (validationState.isPasswordValid === false || validationState.isPasswordCheckValid === false) return;
+    emit('change-input', {
+        ...formState,
+        password: formState.password,
+        passwordManual: state.isManually,
+    });
 };
 const handleClickRadio = (idx: number) => {
     state.isManually = state.passwordType[idx].name === PasswordType.MANUALLY;
-    emit('change-input', { ...formState, passwordManual: state.isManually });
+    emit('change-input', { ...formState, password: '', passwordManual: state.isManually });
+    resetForm();
+};
+const resetForm = () => {
+    formState.password = '';
+    formState.passwordCheck = '';
+    validationState.isPasswordValid = true;
+    validationState.passwordInvalidText = '';
+    validationState.isPasswordCheckValid = true;
+    validationState.passwordCheckInvalidText = '';
 };
 
 </script>

@@ -122,7 +122,6 @@ const formState = reactive({
     userId: '',
     name: '',
 });
-
 const validationState = reactive({
     isUserIdValid: undefined as undefined | boolean,
     userIdInvalidText: '' as TranslateResult | string,

@@ -149,31 +149,25 @@ export default {
             email: '',
             domainRole: '',
             password: '',
-            passwordCheck: '',
             passwordManual: false,
             tags: {},
         });
 
         /* Components */
         const handleChangeInputs = (value) => {
-            if (value.userId || value.userId) {
+            if (value.userId) {
                 formState.userId = value.userId;
                 formState.email = value.userId;
             }
-            if (value.email) {
-                formState.email = value.email;
-            }
-            if (value.password || value.passwordManual !== undefined) {
-                formState.password = value.password;
-                formState.passwordCheck = value.passwordCheck;
+            if (value.email) formState.email = value.email;
+            if (value.domainRole) formState.domainRole = value.domainRole;
+            if (value.tags) formState.tags = value.tags;
+            if (value.name) formState.name = value.name;
+            if (value.password !== undefined || formState.passwordManual !== undefined) {
+                formState.password = value.password || '';
                 formState.passwordManual = value.passwordManual;
             }
-            if (value.domainRole) {
-                formState.domainRole = value.domainRole;
-            }
-            if (value.tags) {
-                formState.tags = value.tags;
-            }
+            console.log(value);
         };
         const handleClose = () => {
             userPageStore.$patch({ visibleCreateModal: false, visibleUpdateModal: false });
@@ -185,7 +179,6 @@ export default {
                 formState.email = props.item.email;
                 formState.domainRole = props.item.domain_role;
                 formState.password = props.item.password;
-                formState.passwordCheck = props.item.password;
                 formState.passwordManual = false;
                 formState.tags = props.item.tags;
             }
@@ -203,6 +196,7 @@ export default {
                 tags: formState.tags || {},
                 reset_password: !formState.passwordManual,
             };
+            console.log(data);
             if (formState.domainRole !== '') {
                 emit('confirm', data, formState.domainRole);
             } else {
