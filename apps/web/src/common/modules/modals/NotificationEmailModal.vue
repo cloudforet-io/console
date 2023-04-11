@@ -86,7 +86,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, getCurrentInstance, reactive } from 'vue';
+import {
+    computed, getCurrentInstance, reactive, watch,
+} from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 import type { Vue } from 'vue/types/vue';
 
@@ -112,12 +114,14 @@ interface Props {
     domainId: string
     userId: string
     visible: boolean
+    verified: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     domainId: '',
     userId: '',
     visible: false,
+    verified: false,
 });
 
 const vm = getCurrentInstance()?.proxy as Vue;
@@ -127,7 +131,7 @@ const emit = defineEmits<{(e: 'visible'): void}>();
 const state = reactive({
     loading: false,
     isCollapsed: true,
-    isEditMode: false,
+    isEditMode: props.verified,
     email: computed(() => store.state.user.email),
     proxyVisible: useProxyValue('visible', props, emit),
 });
@@ -160,10 +164,10 @@ const handleClickSendEmailButton = async (resend?: boolean) => {
     state.loading = true;
     try {
         await postValidationEmail({
-            userId: props.userId,
-            domainId: props.domainId,
+            user_id: props.userId,
+            domain_id: props.domainId,
             email: formState.newNotificationEmail,
-        });
+        }, resend);
         if (!resend) {
             formState.newNotificationEmail = '';
         }
@@ -179,8 +183,8 @@ const handleClickConfirmButton = async () => {
     state.loading = true;
     try {
         await postValidationCode({
-            userId: props.userId,
-            domainId: props.domainId,
+            user_id: props.userId,
+            domain_id: props.domainId,
             code: formState.verificationCode,
         });
         state.proxyVisible = false;
@@ -192,6 +196,11 @@ const handleClickConfirmButton = async () => {
         state.loading = false;
     }
 };
+
+/* Watcher */
+watch(() => props.verified, (value) => {
+    state.isEditMode = value;
+});
 </script>
 
 <style lang="postcss" scoped>

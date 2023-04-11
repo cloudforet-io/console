@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { PI, PTextInput, PFieldGroup } from '@spaceone/design-system';
@@ -78,23 +78,18 @@ const state = reactive({
     verified: computed(() => store.state.user.emailVerified),
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
-    email: computed(() => store.state.user.email),
+    email: computed(() => {
+        if (store.state.user.email === '') {
+            if (state.userType === 'LOCAL') {
+                return state.userId;
+            }
+            return '';
+        }
+        return store.state.user.email;
+    }),
 });
 const formState = reactive({
-    notificationEmail: computed({
-        get() {
-            if (!state.verified) {
-                if (state.userType === 'LOCAL') {
-                    return state.userId;
-                }
-                return '';
-            }
-            return state.email;
-        },
-        set(newVal) {
-            return newVal;
-        },
-    }),
+    notificationEmail: state.email,
 });
 const validationState = reactive({
     isNotificationEmailValid: undefined as undefined | boolean,
@@ -113,6 +108,12 @@ const handleChangeInput = async () => {
         validationState.notificationEmailInvalidText = 'check format';
     }
 };
+
+/* Watcher */
+watch(() => store.state.user.email, (value) => {
+    console.log(value, state.email);
+    formState.notificationEmail = value;
+});
 </script>
 
 <style lang="postcss" scoped>

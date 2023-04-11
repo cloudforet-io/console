@@ -197,10 +197,10 @@ const handleClickSend = async () => {
     state.loading = true;
     try {
         await postValidationEmail({
-            userId: props.item.user_id,
+            user_id: props.item.user_id,
             email: formState.email,
-            domainId: props.item.domain_id,
-        });
+            domain_id: props.item.domain_id,
+        }, false);
         state.isSent = true;
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -212,8 +212,8 @@ const handleChangeVerify = async () => {
     state.loading = true;
     try {
         await postValidationCode({
-            userId: props.item.user_id,
-            domainId: props.item.domain_id,
+            user_id: props.item.user_id,
+            domain_id: props.item.domain_id,
             code: formState.verificationCode,
         });
     } catch (e) {

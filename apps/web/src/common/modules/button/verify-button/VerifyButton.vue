@@ -31,7 +31,8 @@
         <notification-email-modal
             :domain-id="props.domainId"
             :user-id="props.userId"
-            :visible="state.isModalVisible"
+            :visible.sync="state.isModalVisible"
+            :verified="state.verified"
         />
     </div>
 </template>
@@ -71,28 +72,22 @@ const state = reactive({
     verified: computed(() => store.state.user.emailVerified),
 });
 
-/* Components */
+/* API */
 const handleClickVerifiedEmail = async () => {
-    state.isModalVisible = true;
-
-    if (state.verified) return;
     const userParam: UpdateUserRequest = {
         user_id: props.userId,
         email: props.email,
         domain_id: props.domainId,
     };
-    await sendVerifiedEmail(userParam);
-};
-
-/* API */
-const sendVerifiedEmail = async (userParam) => {
     try {
+        if (state.verified) return;
         state.loading = true;
-        await postValidationEmail(userParam);
+        await postValidationEmail(userParam, false);
     } catch (e: any) {
         ErrorHandler.handleError(e);
         throw e;
     } finally {
+        state.isModalVisible = true;
         state.loading = false;
     }
 };
