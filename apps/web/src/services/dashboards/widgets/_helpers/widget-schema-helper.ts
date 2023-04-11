@@ -44,6 +44,7 @@ export const getWidgetFilterOptionsSchema = (...filterKeys: WidgetFilterKey[]): 
 
 
 export const getWidgetFilterSchemaPropertyNames = (...keys: WidgetFilterKey[]): WidgetFiltersSchemaProperty[] => keys.map((key) => `filters.${key}` as WidgetFiltersSchemaProperty);
+export const getWidgetFilterSchemaPropertyName = (key: WidgetFilterKey): WidgetFiltersSchemaProperty => `filters.${key}`;
 
 export const getWidgetDefaultInheritOptions = (widgetConfig: WidgetConfig): InheritOptions => {
     const inheritOptions: InheritOptions = {};
