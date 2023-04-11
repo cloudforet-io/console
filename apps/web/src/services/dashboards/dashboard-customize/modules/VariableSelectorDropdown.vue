@@ -138,9 +138,9 @@ const state = reactive({
             result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
                 name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
             }));
-        } else if (state.variableProperty.options.type === 'SEARCH_RESOURCE') {
+        } else if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
             result = state.searchResourceOptions;
-        } else if (state.variableProperty.options.type === 'MANUAL') {
+        } else if (state.variableProperty.options?.type === 'MANUAL') {
             result = state.variableProperty.options.values.map((d) => ({ name: d.key, label: d.label }));
         }
         return result ?? [];
@@ -206,7 +206,7 @@ const handleUpdateSearchText = debounce((text: string) => {
 }, 200);
 
 const loadSearchResourceOptionsByCostAnalysis = async () => {
-    if (state.variableProperty.options.type === 'SEARCH_RESOURCE') {
+    if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
         const { results } = await SpaceConnector.client.addOns.autocomplete.distinct({
             resource_type: 'cost_analysis.Cost',
             distinct_key: state.variableProperty.options.resource_key,
