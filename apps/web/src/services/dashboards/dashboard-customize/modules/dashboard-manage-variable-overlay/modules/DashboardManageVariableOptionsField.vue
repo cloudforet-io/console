@@ -4,18 +4,18 @@
                    required
     >
         <p-radio-group>
-            <p-radio :selected="state.proxyOptionsType === 'MANUAL'"
-                     @change="handleSelectOptionsType('MANUAL')"
+            <p-radio :selected="state.proxyOptionsType === 'ENUM'"
+                     @change="handleSelectOptionsType('ENUM')"
             >
                 {{ $t('Manual Entry') }}
             </p-radio>
-            <p-radio :selected="state.proxyOptionsType === 'DATA_SOURCE'"
-                     @change="handleSelectOptionsType('DATA_SOURCE')"
+            <p-radio :selected="state.proxyOptionsType === 'SEARCH_RESOURCE'"
+                     @change="handleSelectOptionsType('SEARCH_RESOURCE')"
             >
                 {{ $t('Search Data Source') }}
             </p-radio>
         </p-radio-group>
-        <div v-if="state.proxyOptionsType === 'MANUAL'"
+        <div v-if="state.proxyOptionsType === 'ENUM'"
              class="maunal-entry-options-wrapper"
         >
             <p-button class="option-add-button"
@@ -81,7 +81,7 @@ import type { OptionItem } from '@/services/dashboards/dashboard-customize/modul
 
 interface Props {
     options: OptionItem[];
-    optionsType: 'MANUAL' | 'SEARCH_RESOURCE';
+    optionsType: 'ENUM' | 'SEARCH_RESOURCE';
 }
 interface EmitFn {
     (e: string, value: string): void;

@@ -112,12 +112,14 @@ const state = reactive({
             return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
         }
 
-        if (state.variableProperty.options?.type === 'RESOURCE') {
+        // Handle Current Variable Options
+        if (state.variableProperty.options?.type === 'REFERENCE_RESOURCE') {
             return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
         }
         if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
             return arrayOfSelectedOptions.map((d) => ({ name: d, label: d }));
-        } return arrayOfSelectedOptions.map((d) => ({ name: d, label: state.options.find((optionItem) => optionItem.name === d).label }));
+        }
+        return arrayOfSelectedOptions.map((d) => ({ name: d, label: state.options.find((optionItem) => optionItem.name === d).label }));
     }),
     // Options State
     searchResourceOptions: [],
@@ -134,13 +136,13 @@ const state = reactive({
         }
 
         // Handle Current Variable Options
-        if (state.variableProperty.options?.type === 'RESOURCE') {
+        if (state.variableProperty.options?.type === 'REFERENCE_RESOURCE') {
             result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
                 name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
             }));
         } else if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
             result = state.searchResourceOptions;
-        } else if (state.variableProperty.options?.type === 'MANUAL') {
+        } else if (state.variableProperty.options?.type === 'ENUM') {
             result = state.variableProperty.options.values.map((d) => ({ name: d.key, label: d.label }));
         }
         return result ?? [];

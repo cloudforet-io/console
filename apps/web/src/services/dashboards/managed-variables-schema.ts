@@ -27,7 +27,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             selection_type: 'MULTI',
             description: 'Project Description',
             options: {
-                type: 'RESOURCE',
+                type: 'REFERENCE_RESOURCE',
                 reference_key: REFERENCE_TYPE_INFO.project.type,
             },
         },
@@ -38,7 +38,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             selection_type: 'MULTI',
             description: 'Provider Description',
             options: {
-                type: 'RESOURCE',
+                type: 'REFERENCE_RESOURCE',
                 reference_key: REFERENCE_TYPE_INFO.provider.type,
             },
         },
@@ -49,7 +49,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             selection_type: 'MULTI',
             description: 'Service Account Description',
             options: {
-                type: 'RESOURCE',
+                type: 'REFERENCE_RESOURCE',
                 reference_key: REFERENCE_TYPE_INFO.service_account.type,
             },
         },
@@ -60,7 +60,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             selection_type: 'MULTI',
             description: 'Region Description',
             options: {
-                type: 'RESOURCE',
+                type: 'REFERENCE_RESOURCE',
                 reference_key: REFERENCE_TYPE_INFO.region.type,
             },
         },
@@ -94,7 +94,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             selection_type: 'MULTI',
             description: 'Group By Description',
             options: {
-                type: 'MANUAL',
+                type: 'ENUM',
                 values: Object.values(GROUP_BY_ITEM_MAP).map((d) => ({ key: d.name, label: d.label })),
             },
         },

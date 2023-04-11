@@ -69,7 +69,7 @@ import { getUUID } from '@/lib/component-util/getUUID';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type {
-    DashboardVariableSchemaProperty, ManualOptions, SearchResourceOptions,
+    DashboardVariableSchemaProperty, EnumOptions, SearchResourceOptions,
 } from '@/services/dashboards/config';
 import DashboardManageVariableOptionsField
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/modules/DashboardManageVariableOptionsField.vue';
@@ -120,7 +120,7 @@ const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options']
     let _subject;
     if (Array.isArray(subject)) {
         _subject = subject.map((d) => ({ key: d, label: d }));
-    } else if (subject?.type === 'MANUAL') {
+    } else if (subject?.type === 'ENUM') {
         _subject = subject?.values;
     } else _subject = [];
     // TODO: refactor Search Data Source CASE
@@ -133,11 +133,11 @@ const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options']
 const state = reactive({
     proxyContentType: useProxyValue('contentType', props, emit),
     selectionType: 'MULTI',
-    optionsType: 'MANUAL',
+    optionsType: 'ENUM',
     options: [
         { draggableItemId: getUUID(), key: '', label: '' },
     ] as OptionItem[],
-    resourceKey: '', // TODO: setting resource key in 'RESOURCE' option type
+    resourceKey: '', // TODO: setting resource key in 'SEARCH_RESOURCE' option type
     selectionMenu: computed(() => [
         { name: 'MULTI', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.MULTI_SELECT') },
         { name: 'SINGLE', label: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT') },
@@ -178,11 +178,11 @@ const handleCancel = () => {
 
 const handleSave = () => {
     let options;
-    if (state.optionsType === 'MANUAL') {
+    if (state.optionsType === 'ENUM') {
         options = {
-            type: 'MANUAL',
+            type: 'ENUM',
             values: state.options.map((d) => ({ key: d.key, label: d.label })).filter(({ key, label }) => key !== '' && label !== ''),
-        } as ManualOptions;
+        } as EnumOptions;
     } else {
         options = {
             type: 'SEARCH_RESOURCE',
@@ -206,10 +206,10 @@ onMounted(() => {
         setForm('name', `${namePrefix}${props.selectedVariable?.name}` ?? '');
         setForm('description', props.selectedVariable?.description ?? '');
         state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
-        // TODO: add RESOURCE & SEARCH_RESOURCE case
+        // TODO: add SEARCH_RESOURCE case
         if (Array.isArray(props.selectedVariable?.options)) {
             state.options = (props.selectedVariable?.options ?? []).map((d) => ({ draggableItemId: getUUID(), key: d, label: d })) ?? [{ draggableItemId: getUUID(), key: '', label: '' }];
-        } else if (props.selectedVariable?.options?.type === 'MANUAL') {
+        } else if (props.selectedVariable?.options?.type === 'ENUM') {
             state.options = props.selectedVariable?.options.values.map((d) => ({ draggableItemId: getUUID(), key: d.key, label: d.label })) ?? [{ draggableItemId: getUUID(), key: '', label: '' }];
         }
     }

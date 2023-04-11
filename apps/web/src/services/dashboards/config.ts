@@ -89,21 +89,21 @@ export const VARIABLE_TYPES = ['MANAGED', 'CUSTOM'] as const;
 export type VariableType = typeof VARIABLE_TYPES[number];
 
 
-export interface ManualOptions {
-    type: 'MANUAL';
+export interface EnumOptions {
+    type: 'ENUM';
     values: { key: string; label: string; }[];
 }
 export interface SearchResourceOptions {
     type: 'SEARCH_RESOURCE';
     resource_key: string;
 }
-export interface ResourceOptions {
-    type: 'RESOURCE',
+export interface ReferenceResourceOptions {
+    type: 'REFERENCE_RESOURCE',
     reference_key: string;
 }
 
 type LegacyOptions = string[];
-type VariableOptions = ManualOptions|SearchResourceOptions|ResourceOptions|LegacyOptions;
+type VariableOptions = EnumOptions|SearchResourceOptions|ReferenceResourceOptions|LegacyOptions;
 
 // variables schema
 export interface DashboardVariableSchemaProperty {
